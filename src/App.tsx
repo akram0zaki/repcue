@@ -9,7 +9,7 @@ import ConsentBanner from './components/ConsentBanner';
 import Navigation from './components/Navigation';
 import type { Exercise, AppSettings, TimerState, ActivityLog } from './types';
 import { Routes as AppRoutes } from './types';
-import { DEFAULT_APP_SETTINGS, TIMER_PRESETS, type TimerPreset } from './constants';
+import { DEFAULT_APP_SETTINGS, type TimerPreset } from './constants';
 
 // Lazy load components for better performance
 import { lazy, Suspense } from 'react';

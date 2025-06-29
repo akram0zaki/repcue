@@ -116,6 +116,12 @@ npm run preview
 | `npm run dev` | Development server | Daily development |
 | `npm run build` | Production build | Before deployment |
 | `npm run preview` | Preview built app | Test production build |
+| `npm start` | Start Express server | Production server |
+| `npm run build:serve` | Build and serve | Quick production test |
+| `npm run pm2:start` | Deploy with PM2 | Production deployment |
+| `npm run pm2:stop` | Stop PM2 app | Stop production app |
+| `npm run pm2:restart` | Restart PM2 app | Update production app |
+| `npm run pm2:logs` | View PM2 logs | Monitor production app |
 | `npm run lint` | Check code quality | Before committing |
 | `npm test` | Run all tests | Development/CI |
 | `npm run test:ui` | Visual test runner | Debugging tests |
@@ -231,6 +237,22 @@ npm test -- --clearCache
 npm run build
 ```
 
+#### **Issue**: PM2 application not responding
+**Solution**:
+```bash
+# Check health endpoint
+curl http://localhost:3001/health
+
+# Check PM2 status
+pm2 status
+
+# View detailed logs
+npm run pm2:logs
+
+# Restart if needed
+npm run pm2:restart
+```
+
 ### Getting Help
 
 1. **Check Browser Console**: F12 → Console for JavaScript errors
@@ -243,6 +265,145 @@ npm run build
    npm install
    npm run dev
    ```
+
+---
+
+## 🚀 PM2 Deployment
+
+RepCue includes full PM2 support for production deployment with an Express server. This is the recommended approach for Raspberry Pi and server deployments.
+
+### Quick PM2 Setup
+
+```bash
+# 1. Install dependencies (Express & compression are included)
+npm install
+
+# 2. Build and start with PM2 in one command
+npm run pm2:start
+
+# 3. Check status
+pm2 status
+
+# 4. View logs
+npm run pm2:logs
+```
+
+### Manual PM2 Setup
+
+```bash
+# 1. Build the application
+npm run build
+
+# 2. Start with PM2
+pm2 start ecosystem.config.cjs
+
+# 3. Save PM2 configuration
+pm2 save
+
+# 4. Setup auto-start on boot
+pm2 startup
+```
+
+### PM2 Management Commands
+
+| Command | Purpose |
+|---------|---------|
+| `npm run pm2:start` | Build and start application |
+| `npm run pm2:stop` | Stop the application |
+| `npm run pm2:restart` | Restart the application |
+| `npm run pm2:logs` | View application logs |
+| `pm2 status` | Check all PM2 processes |
+| `pm2 monit` | Real-time monitoring |
+| `pm2 save` | Save current configuration |
+
+### PM2 Configuration
+
+The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
+
+- **Single instance** for Pi resource efficiency
+- **512MB memory limit** with automatic restart
+- **Health monitoring** at `/health` endpoint
+- **Automatic daily restart** at 4 AM
+- **Comprehensive logging** with timestamps
+
+### Nginx + Cloudflare Tunnel Setup
+
+For production deployment with custom domain:
+
+#### 1. Nginx Configuration
+Create `/etc/nginx/sites-available/repcue`:
+
+```nginx
+server {
+    listen 80;
+    server_name repcue.azprojects.net;
+    
+    # Security headers
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
+    
+    # Proxy to PM2 Express server
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+    
+    # Health check endpoint
+    location /health {
+        proxy_pass http://localhost:3001/health;
+        access_log off;
+    }
+    
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2)$ {
+        proxy_pass http://localhost:3001;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+#### 2. Enable the Site
+```bash
+# Enable site
+sudo ln -s /etc/nginx/sites-available/repcue /etc/nginx/sites-enabled/
+
+# Test configuration
+sudo nginx -t
+
+# Reload nginx
+sudo systemctl reload nginx
+```
+
+#### 3. Cloudflare Tunnel Configuration
+Add to your `config.yml`:
+
+```yaml
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /path/to/credentials.json
+
+ingress:
+  - hostname: repcue.azprojects.net
+    service: http://localhost:80
+  # Your other services...
+  - service: http_status:404
+```
+
+#### 4. Update Cloudflare DNS
+Add DNS record in Cloudflare dashboard:
+- **Type**: CNAME
+- **Name**: repcue
+- **Content**: YOUR_TUNNEL_ID.cfargotunnel.com
+- **Proxy**: Enabled (Orange cloud)
 
 ---
 
@@ -589,6 +750,9 @@ We welcome contributions! Here's how to get started:
 - ✅ GDPR-compliant privacy controls
 - ✅ Mobile-responsive design
 - ✅ Dark mode support
+- ✅ PM2 production deployment support
+- ✅ Express server with health monitoring
+- ✅ Nginx + Cloudflare tunnel integration
 
 ### Planned Features (v0.2.0)
 - 🔄 Custom workout routines
