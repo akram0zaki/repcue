@@ -12,7 +12,7 @@ RepCue is a modern, privacy-first fitness tracking web application designed for 
 
 ```bash
 # 1. Clone and navigate to the project
-git clone <your-repository-url>
+git clone https://github.com/akram0zaki/repcue.git
 cd repcue
 
 # 2. Install dependencies
@@ -64,7 +64,7 @@ If Node.js is not installed:
 
 #### 2. **Clone the Repository**
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/akram0zaki/repcue.git
 cd repcue
 ```
 
@@ -282,7 +282,7 @@ sudo chown pi:pi /var/www/repcue
 
 # Clone repository
 cd /var/www/repcue
-git clone <your-repository-url> .
+git clone https://github.com/akram0zaki/repcue.git .
 
 # Install dependencies (this may take 10-15 minutes on Pi)
 npm install
