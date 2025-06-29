@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply h-full;
+  }
+  
+  body {
+    @apply h-full m-0 font-sans antialiased;
+    @apply bg-gray-50 text-gray-900;
+    @apply dark:bg-gray-900 dark:text-gray-100;
+  }
+
+  #root {
+    @apply h-full;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    * {
+      border-color: currentColor !important;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Big touch-friendly buttons for exercise */
+  .btn-exercise {
+    @apply w-full min-h-[4rem] p-4 rounded-lg text-xl font-semibold;
+    @apply bg-blue-500 text-white shadow-lg;
+    @apply hover:bg-blue-600 active:bg-blue-700;
+    @apply focus:outline-none focus:ring-4 focus:ring-blue-500/50;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply transition-colors duration-200;
+  }
+
+  /* Timer display */
+  .timer-display {
+    @apply text-6xl md:text-8xl font-bold text-center;
+    @apply text-gray-900 dark:text-gray-100;
+    @apply font-mono tracking-wider;
+  }
+
+  /* Start/Stop button */
+  .btn-primary {
+    @apply min-h-[5rem] px-8 py-4 rounded-xl text-2xl font-bold;
+    @apply bg-green-500 text-white shadow-xl;
+    @apply hover:bg-green-600 active:bg-green-700;
+    @apply focus:outline-none focus:ring-4 focus:ring-green-500/50;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply transition-all duration-200 transform active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply min-h-[3rem] px-6 py-3 rounded-lg text-lg font-semibold;
+    @apply bg-gray-200 text-gray-900 shadow-md;
+    @apply dark:bg-gray-700 dark:text-gray-100;
+    @apply hover:bg-gray-300 dark:hover:bg-gray-600;
+    @apply focus:outline-none focus:ring-4 focus:ring-gray-500/50;
+    @apply transition-colors duration-200;
+  }
+
+  /* Exercise card */
+  .exercise-card {
+    @apply p-4 rounded-lg border-2 border-transparent;
+    @apply bg-white dark:bg-gray-800 shadow-md;
+    @apply hover:border-blue-200 hover:shadow-lg;
+    @apply focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/50;
+    @apply transition-all duration-200;
+  }
+
+  .exercise-card.favorite {
+    @apply border-amber-300 bg-amber-50 dark:bg-amber-900/20;
+  }
+
+  .exercise-card.selected {
+    @apply border-blue-500 bg-blue-50 dark:bg-blue-900/20;
+  }
+
+  /* Skip links for accessibility */
+  .skip-link {
+    @apply absolute left-[-9999px] top-4 z-50;
+    @apply bg-blue-600 text-white px-4 py-2 rounded;
+    @apply focus:left-4 focus:outline-none focus:ring-4 focus:ring-blue-500/50;
+  }
+}
+
+@layer utilities {
+  /* Safe area utilities for mobile */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  /* Touch target size (minimum 44px) */
+  .touch-target {
+    @apply min-h-[2.75rem] min-w-[2.75rem];
+  }
+}

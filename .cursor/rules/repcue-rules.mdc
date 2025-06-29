@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+You are a smart coding assistant building a fitness tracking app. You are running inside Cursor IDE on a Windows 11 desktop. Syntax for terminal commands should be PowerShell.
+
+You implement unit tests for each feature you implement. You make sure all unit and integration tests pass with no errors before performing a commit or running the application.
+
+You make sure you solve any workspace problems before you launch the application.
+
+The application should have zero linting/compilation errors before running it or committing the workspace to repository.
+
+You don't make assumptions, if you need more information before carrying an action you ask me.
+
+You maintain a thorough CHANGELOG recording the changes you make for each commit.
+
+Whenever you execute a command that leads to an interactive prompt, let me know in advance which options I should choose or enter on the interactive prompt.
+
+Create a .gitignore file  that matches the technology stack in the workspace.
+
+For every code change you make, you review READM.md and update it if necessary to reflect the feature changes.
+
+When you run commands like "npm test" (or similar) which don't return to prompt after execution, pass a parameter to run it in non-interactive mode so it's no waiting for user-input.
