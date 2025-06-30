@@ -114,10 +114,11 @@ npm run preview
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
 | `npm run dev` | Development server | Daily development |
-| `npm run build` | Production build | Before deployment |
+| `npm run build` | Full build with TypeScript | Development/testing |
+| `npm run build:prod` | Production build (optimized) | Pi deployment |
 | `npm run preview` | Preview built app | Test production build |
 | `npm start` | Start Express server | Production server |
-| `npm run build:serve` | Build and serve | Quick production test |
+| `npm run build:serve` | Build (prod) and serve | Quick production test |
 | `npm run pm2:start` | Deploy with PM2 | Production deployment |
 | `npm run pm2:stop` | Stop PM2 app | Stop production app |
 | `npm run pm2:restart` | Restart PM2 app | Update production app |
@@ -291,8 +292,8 @@ npm run pm2:logs
 ### Manual PM2 Setup
 
 ```bash
-# 1. Build the application
-npm run build
+# 1. Build the application for production
+npm run build:prod
 
 # 2. Start with PM2
 pm2 start ecosystem.config.cjs
@@ -325,6 +326,15 @@ The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
 - **Health monitoring** at `/health` endpoint
 - **Automatic daily restart** at 4 AM
 - **Comprehensive logging** with timestamps
+
+### Build Commands for Production
+
+| Command | Use Case | TypeScript Compilation |
+|---------|----------|----------------------|
+| `npm run build` | Development/Testing | ✅ Full (includes test files) |
+| `npm run build:prod` | Production/Pi Deployment | ⚡ Optimized (excludes tests) |
+
+**Note**: Use `build:prod` for Raspberry Pi deployment to avoid TypeScript test compilation errors and faster builds.
 
 ### Nginx + Cloudflare Tunnel Setup
 
@@ -448,8 +458,8 @@ git clone https://github.com/akram0zaki/repcue.git .
 # Install dependencies (this may take 10-15 minutes on Pi)
 npm install
 
-# Build for production
-npm run build
+# Build for production (optimized, skips test compilation)
+npm run build:prod
 ```
 
 ### Step 3: Configure Nginx
@@ -517,7 +527,7 @@ After=network.target
 Type=oneshot
 User=pi
 WorkingDirectory=/var/www/repcue
-ExecStart=/bin/bash -c 'git pull && npm run build'
+ExecStart=/bin/bash -c 'git pull && npm run build:prod'
 
 [Install]
 WantedBy=multi-user.target
@@ -661,7 +671,7 @@ repcue/
 
 4. **Build & Test**:
    ```bash
-   npm run build
+   npm run build:prod  # For production
    npm run preview
    ```
 
