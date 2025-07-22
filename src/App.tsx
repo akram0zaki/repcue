@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { consentService } from './services/consentService';
 import { storageService } from './services/storageService';
 import { audioService } from './services/audioService';
@@ -19,6 +19,54 @@ const ExercisePage = lazy(() => import('./pages/ExercisePage'));
 const TimerPage = lazy(() => import('./pages/TimerPage'));
 const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+
+// Wrapper component to handle navigation state for TimerPage
+const TimerPageWrapper: React.FC<{
+  exercises: Exercise[];
+  appSettings: AppSettings;
+  timerState: TimerState;
+  selectedExercise: Exercise | null;
+  selectedDuration: TimerPreset;
+  showExerciseSelector: boolean;
+  wakeLockSupported: boolean;
+  wakeLockActive: boolean;
+  onSetSelectedExercise: (exercise: Exercise | null) => void;
+  onSetSelectedDuration: (duration: TimerPreset) => void;
+  onSetShowExerciseSelector: (show: boolean) => void;
+  onStartTimer: () => Promise<void>;
+  onStopTimer: () => Promise<void>;
+  onResetTimer: () => Promise<void>;
+}> = (props) => {
+  const location = useLocation();
+  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, timerState } = props;
+  const processedStateRef = React.useRef<string | null>(null);
+
+  // Handle navigation state from ExercisePage
+  useEffect(() => {
+    const state = location.state as { selectedExercise?: Exercise; selectedDuration?: number } | null;
+    const stateKey = state?.selectedExercise?.id || null;
+    
+    // Only process if we have a new exercise and haven't already processed this state
+    if (state?.selectedExercise && !timerState.isRunning && processedStateRef.current !== stateKey) {
+      processedStateRef.current = stateKey;
+      
+      // Set the exercise and duration from navigation state
+      onSetSelectedExercise(state.selectedExercise);
+      if (state.selectedDuration) {
+        onSetSelectedDuration(state.selectedDuration as TimerPreset);
+      }
+      
+      // Auto-start timer after a brief delay to ensure state is updated
+      const timer = setTimeout(() => {
+        onStartTimer();
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [location.state, onSetSelectedExercise, onSetSelectedDuration, onStartTimer, timerState.isRunning]);
+
+  return <TimerPage {...props} />;
+};
 
 function App() {
   const [hasConsent, setHasConsent] = useState(consentService.hasConsent());
@@ -194,14 +242,28 @@ function App() {
         try {
           // Load exercises from storage or use initial data
           const storedExercises = await storageService.getExercises();
-          const exercisesToSet = storedExercises.length > 0 ? storedExercises : INITIAL_EXERCISES;
-
+          let allExercises: Exercise[];
+          
           if (storedExercises.length === 0) {
+            // No stored exercises, use all initial exercises
             for (const exercise of INITIAL_EXERCISES) {
               await storageService.saveExercise(exercise);
             }
+            allExercises = INITIAL_EXERCISES;
+          } else {
+            // Merge stored exercises with new ones from initial data
+            const storedIds = new Set(storedExercises.map(ex => ex.id));
+            const newExercises = INITIAL_EXERCISES.filter(ex => !storedIds.has(ex.id));
+            
+            // Save any new exercises to storage
+            for (const exercise of newExercises) {
+              await storageService.saveExercise(exercise);
+            }
+            
+            // Combine stored and new exercises
+            allExercises = [...storedExercises, ...newExercises];
           }
-          setExercises(exercisesToSet);
+          setExercises(allExercises);
 
           // Load app settings
           const storedSettings = await storageService.getAppSettings();
@@ -214,8 +276,8 @@ function App() {
 
           // Set last selected exercise
           if (settingsToSet.lastSelectedExerciseId) {
-            const lastExercise = exercisesToSet.find(
-              (ex) => ex.id === settingsToSet.lastSelectedExerciseId
+            const lastExercise = allExercises.find(
+              (ex: Exercise) => ex.id === settingsToSet.lastSelectedExerciseId
             );
             if (lastExercise) {
               setSelectedExercise(lastExercise);
@@ -361,7 +423,7 @@ function App() {
             <Route 
               path={AppRoutes.TIMER} 
               element={
-                <TimerPage 
+                <TimerPageWrapper 
                   exercises={exercises}
                   appSettings={appSettings}
                   timerState={timerState}

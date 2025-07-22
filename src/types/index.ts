@@ -14,7 +14,8 @@ export const ExerciseCategory = {
   STRENGTH: 'strength',
   CARDIO: 'cardio',
   FLEXIBILITY: 'flexibility',
-  BALANCE: 'balance'
+  BALANCE: 'balance',
+  HAND_WARMUP: 'hand-warmup'
 } as const;
 
 export type ExerciseCategory = typeof ExerciseCategory[keyof typeof ExerciseCategory];

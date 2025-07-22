@@ -192,6 +192,17 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultDuration: 45,
     isFavorite: false,
     tags: ['glutes', 'lower-body', 'posterior-chain']
+  },
+
+  // Hand warmup exercises
+  {
+    id: 'finger-roll',
+    name: 'Finger Roll',
+    description: 'Roll fingers from fist to full extension, working each finger individually',
+    category: ExerciseCategory.HAND_WARMUP,
+    defaultDuration: 30,
+    isFavorite: false,
+    tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity']
   }
 ];
 

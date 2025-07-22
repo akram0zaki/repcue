@@ -341,7 +341,8 @@ The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
 For production deployment with custom domain:
 
 #### 1. Nginx Configuration
-Create `/etc/nginx/sites-available/repcue`:
+Create `/etc/nginx/sites-available/repcue.conf`:
+sudo nano /etc/nginx/sites-available/repcue.conf
 
 ```nginx
 server {
@@ -385,7 +386,7 @@ server {
 #### 2. Enable the Site
 ```bash
 # Enable site
-sudo ln -s /etc/nginx/sites-available/repcue /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/repcue.conf /etc/nginx/sites-enabled/
 
 # Test configuration
 sudo nginx -t
@@ -395,7 +396,7 @@ sudo systemctl reload nginx
 ```
 
 #### 3. Cloudflare Tunnel Configuration
-Add to your `config.yml`:
+Add to your `/etc/cloudflared/config.yml`:
 
 ```yaml
 tunnel: YOUR_TUNNEL_ID
@@ -407,6 +408,9 @@ ingress:
   # Your other services...
   - service: http_status:404
 ```
+
+Then:
+sudo systemctl restart cloudflared
 
 #### 4. Update Cloudflare DNS
 Add DNS record in Cloudflare dashboard:
