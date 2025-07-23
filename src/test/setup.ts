@@ -3,6 +3,9 @@ import { vi } from 'vitest'
 
 // Mock Web Audio API
 global.AudioContext = class MockAudioContext {
+  currentTime = 0;
+  destination = {};
+  
   createOscillator() {
     return {
       connect: vi.fn(),
@@ -15,10 +18,13 @@ global.AudioContext = class MockAudioContext {
   createGain() {
     return {
       connect: vi.fn(),
-      gain: { value: 0 }
+      gain: { 
+        value: 0,
+        linearRampToValueAtTime: vi.fn(),
+        exponentialRampToValueAtTime: vi.fn()
+      }
     }
   }
-  destination = {}
 } as any
 
 // Mock Vibration API

@@ -1,6 +1,8 @@
 import React from 'react';
 import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
+import { storageService } from '../services/storageService';
+import { consentService } from '../services/consentService';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -22,6 +24,37 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     const duration = parseInt(event.target.value);
     onUpdateSettings({ intervalDuration: duration });
   };
+
+  const handleExportData = async () => {
+    try {
+      const data = await storageService.exportAllData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `repcue-data-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export data:', error);
+    }
+  };
+
+  const handleClearData = async () => {
+    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+      try {
+        await storageService.clearAllData();
+        // Optionally reload the page or update UI state
+        window.location.reload();
+      } catch (error) {
+        console.error('Failed to clear data:', error);
+      }
+    }
+  };
+
+  const hasConsent = consentService.hasConsent();
 
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
@@ -169,7 +202,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </h2>
           
           {/* Auto Save */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <label htmlFor="auto-save" className="text-gray-700 dark:text-gray-300 font-medium">
               Auto Save
             </label>
@@ -188,6 +221,46 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 }`}
               />
             </button>
+          </div>
+
+          {/* Data Storage Status */}
+          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Data Storage: <span className="font-medium">{hasConsent ? 'Enabled' : 'Disabled'}</span>
+            </p>
+            {hasConsent && (
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                Your workout data is stored locally on this device.
+              </p>
+            )}
+          </div>
+
+          {/* Export Data Button */}
+          <div className="mb-3">
+            <button
+              onClick={handleExportData}
+              disabled={!hasConsent}
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            >
+              Export Data
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Download your workout data as a JSON file
+            </p>
+          </div>
+
+          {/* Clear Data Button */}
+          <div>
+            <button
+              onClick={handleClearData}
+              disabled={!hasConsent}
+              className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            >
+              Clear All Data
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Permanently delete all workout data and settings
+            </p>
           </div>
         </div>
       </div>

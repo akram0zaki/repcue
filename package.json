@@ -17,7 +17,13 @@
     "pm2:logs": "pm2 logs repcue",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:unit": "vitest run",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "start-server-and-test dev http://localhost:5173 cypress:run",
+    "test:a11y": "start-server-and-test dev http://localhost:5173 'cypress run --spec cypress/e2e/axe.cy.ts'",
+    "test:all": "npm run test:unit && npm run test:e2e"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",
@@ -33,6 +39,8 @@
   },
   "devDependencies": {
     "@axe-core/cli": "^4.10.2",
+    "@cypress/react": "^9.0.1",
+    "@cypress/webpack-dev-server": "^4.1.0",
     "@eslint/js": "^9.29.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -41,6 +49,9 @@
     "@types/react-dom": "^19.1.6",
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.5.2",
+    "axe-core": "^4.10.3",
+    "cypress": "^14.5.2",
+    "cypress-axe": "^1.6.0",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
