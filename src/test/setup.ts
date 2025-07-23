@@ -25,6 +25,7 @@ global.AudioContext = class MockAudioContext {
       }
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any
 
 // Mock Vibration API
@@ -33,14 +34,33 @@ Object.defineProperty(navigator, 'vibrate', {
   writable: true,
 })
 
-// Mock localStorage
+// Mock localStorage with actual storage behavior
+const localStorageMock = (() => {
+  let store: Record<string, string> = {}
+  
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString()
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      store = {}
+    },
+    get length() {
+      return Object.keys(store).length
+    },
+    key: (index: number) => {
+      const keys = Object.keys(store)
+      return keys[index] || null
+    }
+  }
+})()
+
 Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: vi.fn(),
-    setItem: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-  },
+  value: localStorageMock,
   writable: true,
 })
 
@@ -48,10 +68,5 @@ Object.defineProperty(window, 'localStorage', {
 global.indexedDB = {
   open: vi.fn(),
   deleteDatabase: vi.fn(),
-} as any
-
-// Mock IndexedDB
-global.indexedDB = {
-  open: vi.fn(),
-  deleteDatabase: vi.fn(),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any 

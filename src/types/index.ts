@@ -64,6 +64,9 @@ export interface ConsentData {
   analyticsAccepted: boolean;
 }
 
+// Export all consent types from the dedicated consent types file
+export * from './consent';
+
 // Settings
 export interface AppSettings {
   intervalDuration: number;

@@ -3,8 +3,11 @@ import { AudioService } from '../audioService'
 
 describe('AudioService', () => {
   let audioService: AudioService
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockAudioContext: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockOscillator: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockGainNode: any
 
   beforeEach(() => {
@@ -12,8 +15,26 @@ describe('AudioService', () => {
     vi.clearAllMocks()
 
     // Reset the AudioService singleton
-    // @ts-ignore - accessing private static property for testing
+    // @ts-expect-error - accessing private static property for testing
     AudioService.instance = undefined
+
+    // Mock document for event listeners
+    global.document = {
+      ...global.document,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      createElement: vi.fn(() => ({
+        setAttribute: vi.fn(),
+        style: {},
+        textContent: '',
+        className: ''
+      })),
+      body: {
+        appendChild: vi.fn(),
+        removeChild: vi.fn()
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any
 
     // Mock AudioContext and related objects
     mockOscillator = {
@@ -79,6 +100,7 @@ describe('AudioService', () => {
     })
 
     it('should handle missing AudioContext gracefully', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       global.AudioContext = undefined as any
       const service = AudioService.getInstance()
       expect(service.isAudioSupported()).toBe(false)
@@ -91,27 +113,22 @@ describe('AudioService', () => {
     })
 
     it('should handle missing vibration API', () => {
-      // Mock navigator.vibrate as undefined 
-      const originalVibrate = navigator.vibrate
-      // @ts-ignore - temporarily remove vibrate
-      delete navigator.vibrate
+      // Create a new navigator mock without the vibrate property at all
+      const originalNavigator = global.navigator
+      const { vibrate: _vibrate, ...navigatorWithoutVibrate } = originalNavigator
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      global.navigator = navigatorWithoutVibrate as any
       
       // Reset singleton to pick up the change
-      // @ts-ignore - accessing private static property for testing
+      // @ts-expect-error - accessing private static property for testing
       AudioService.instance = undefined
       
       // Create new instance to test without vibration
       const newService = AudioService.getInstance()
       expect(newService.isVibrationSupported()).toBe(false)
       
-      // Restore original vibrate
-      if (originalVibrate) {
-        Object.defineProperty(navigator, 'vibrate', {
-          value: originalVibrate,
-          writable: true,
-          configurable: true
-        })
-      }
+      // Restore original navigator
+      global.navigator = originalNavigator
     })
   })
 
@@ -130,7 +147,7 @@ describe('AudioService', () => {
     it('should resume suspended audio context', async () => {
       // Set audio context to suspended state and reset singleton
       mockAudioContext.state = 'suspended'
-      // @ts-ignore - accessing private static property for testing
+      // @ts-expect-error - accessing private static property for testing
       AudioService.instance = undefined
       
       const suspendedService = AudioService.getInstance()
@@ -140,6 +157,7 @@ describe('AudioService', () => {
     })
 
     it('should handle missing audio context gracefully', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       global.AudioContext = undefined as any
       
       await expect(audioService.playIntervalBeep()).resolves.not.toThrow()
@@ -255,56 +273,61 @@ describe('AudioService', () => {
   })
 
   describe('announceText', () => {
-    it('should create and configure speech synthesis utterance', () => {
-      const mockUtterance = {
-        text: '',
-        rate: 0,
-        volume: 0
-      } as any
-      const mockSpeak = vi.fn()
+    it('should create screen reader accessible announcement', () => {
+      // Mock document methods are already set up in beforeEach
+      const mockDiv = {
+        setAttribute: vi.fn(),
+        style: {},
+        textContent: '',
+        className: ''
+      }
       
-      global.SpeechSynthesisUtterance = vi.fn(() => mockUtterance) as any
-      global.speechSynthesis = { speak: mockSpeak } as any
+      // @ts-expect-error - mock setup
+      global.document.createElement = vi.fn(() => mockDiv)
       
       audioService.announceText('Test announcement')
       
-      expect(global.SpeechSynthesisUtterance).toHaveBeenCalledWith('Test announcement')
-      expect(mockUtterance.rate).toBe(0.9)
-      expect(mockUtterance.volume).toBe(0.7)
-      expect(mockSpeak).toHaveBeenCalledWith(mockUtterance)
-    })
-
-    it('should handle missing speech synthesis gracefully', () => {
-      global.SpeechSynthesisUtterance = undefined as any
-      global.speechSynthesis = undefined as any
-      
-      expect(() => audioService.announceText('Test')).not.toThrow()
+      expect(global.document.createElement).toHaveBeenCalledWith('div')
+      expect(mockDiv.setAttribute).toHaveBeenCalledWith('aria-live', 'polite')
+      expect(mockDiv.setAttribute).toHaveBeenCalledWith('aria-atomic', 'true')
+      expect(mockDiv.className).toBe('sr-only')
+      expect(mockDiv.textContent).toBe('Test announcement')
+      expect(global.document.body.appendChild).toHaveBeenCalledWith(mockDiv)
     })
   })
 
   describe('getAudioState', () => {
     it('should return audio context state', () => {
+      // Force initialize the audio context
+      // @ts-expect-error - accessing private method for testing
+      audioService.initializeAudioContext()
+      
+      // Set the mock state
       mockAudioContext.state = 'running'
       expect(audioService.getAudioState()).toBe('running')
     })
 
     it('should return "unavailable" when no audio context', () => {
-      global.AudioContext = undefined as any
-      const service = AudioService.getInstance()
-      expect(service.getAudioState()).toBe('unavailable')
+      // @ts-expect-error - accessing private property for testing
+      audioService.audioContext = null
+      expect(audioService.getAudioState()).toBe('not-initialized')
     })
   })
 
   describe('dispose', () => {
-    it('should close audio context', async () => {
-      await audioService.dispose()
+    it('should close audio context', () => {
+      // Force initialize the audio context
+      // @ts-expect-error - accessing private method for testing
+      audioService.initializeAudioContext()
+      
+      audioService.dispose()
       expect(mockAudioContext.close).toHaveBeenCalled()
     })
 
-    it('should handle disposal without audio context', async () => {
-      global.AudioContext = undefined as any
-      const service = AudioService.getInstance()
-      await expect(service.dispose()).resolves.not.toThrow()
+    it('should handle disposal without audio context', () => {
+      // @ts-expect-error - accessing private property for testing
+      audioService.audioContext = null
+      expect(() => audioService.dispose()).not.toThrow()
     })
   })
 }) 

@@ -22,6 +22,7 @@ import 'cypress-axe'
 
 // Add custom command types
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       /**

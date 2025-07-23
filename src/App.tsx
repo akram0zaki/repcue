@@ -34,7 +34,7 @@ const TimerPageWrapper: React.FC<{
   onSetSelectedDuration: (duration: TimerPreset) => void;
   onSetShowExerciseSelector: (show: boolean) => void;
   onStartTimer: () => Promise<void>;
-  onStopTimer: () => Promise<void>;
+  onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
 }> = (props) => {
   const location = useLocation();
@@ -157,10 +157,27 @@ function App() {
     }, 100);
   }, [selectedExercise, selectedDuration, appSettings, wakeLockSupported, requestWakeLock]);
 
-  const stopTimer = useCallback(async () => {
+  const stopTimer = useCallback(async (isCompletion: boolean = false) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+    }
+
+    // Log the activity for manual stops (not for completions, which are handled separately)
+    const { currentTime, currentExercise, isRunning } = timerState;
+    if (!isCompletion && isRunning && currentExercise && currentTime > 0) {
+      const activityLog: ActivityLog = {
+        id: `log-${Date.now()}`,
+        exerciseId: currentExercise.id,
+        exerciseName: currentExercise.name,
+        duration: currentTime, // Use actual time completed, not target time
+        timestamp: new Date(),
+        notes: `Stopped after ${currentTime}s`
+      };
+
+      if (consentService.hasConsent()) {
+        storageService.saveActivityLog(activityLog);
+      }
     }
 
     // Play stop sound and vibration
@@ -174,7 +191,7 @@ function App() {
     }
 
     setTimerState(prev => ({ ...prev, isRunning: false }));
-  }, [appSettings, wakeLockActive, releaseWakeLock]);
+  }, [appSettings, wakeLockActive, releaseWakeLock, timerState]);
 
   const resetTimer = useCallback(async () => {
     if (intervalRef.current) {
@@ -202,22 +219,24 @@ function App() {
     const { isRunning, currentTime, targetTime, currentExercise } = timerState;
     
     if (isRunning && targetTime && currentTime >= targetTime) {
-      // Timer completed
-      stopTimer();
-      
-      // Log the activity
+      // Timer completed - log with target time and completion note
       if (currentExercise) {
         const activityLog: ActivityLog = {
           id: `log-${Date.now()}`,
           exerciseId: currentExercise.id,
           exerciseName: currentExercise.name,
-          duration: targetTime,
+          duration: targetTime, // Use target time for completed sessions
           timestamp: new Date(),
-          notes: `${targetTime}s interval timer`
+          notes: `Completed ${targetTime}s interval timer`
         };
 
-        storageService.saveActivityLog(activityLog);
+        if (consentService.hasConsent()) {
+          storageService.saveActivityLog(activityLog);
+        }
       }
+
+      // Stop timer (pass true to indicate this is a completion, not manual stop)
+      stopTimer(true);
 
       // Announce completion
       if (appSettings.soundEnabled) {

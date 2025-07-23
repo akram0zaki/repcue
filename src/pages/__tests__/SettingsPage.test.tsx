@@ -11,7 +11,9 @@ vi.mock('../../services/consentService', () => ({
   consentService: {
     hasConsent: vi.fn(),
     setConsent: vi.fn(),
-    getConsentData: vi.fn()
+    getConsentData: vi.fn(),
+    getConsentStatus: vi.fn(),
+    resetConsent: vi.fn()
   }
 }));
 
@@ -48,6 +50,21 @@ describe('SettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(consentService.hasConsent).mockReturnValue(true);
+    vi.mocked(consentService.getConsentStatus).mockReturnValue({
+      hasConsent: true,
+      version: 2,
+      isLatestVersion: true,
+      data: {
+        version: 2,
+        timestamp: new Date().toISOString(),
+        hasConsented: true,
+        cookiesAccepted: true,
+        analyticsAccepted: false,
+        marketingAccepted: false,
+        dataRetentionDays: 365
+      },
+      requiresUpdate: false
+    });
   });
 
   afterEach(() => {
@@ -203,8 +220,10 @@ describe('SettingsPage', () => {
           download: '',
           click: mockClick,
           style: {}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return originalCreateElement.call(document, tagName as any);
     });
 
@@ -222,22 +241,26 @@ describe('SettingsPage', () => {
   });
 
   it('clears data when clear data button is clicked and confirmed', async () => {
-    // Mock window.confirm
-    const mockConfirm = vi.fn(() => true);
-    global.confirm = mockConfirm;
-
     vi.mocked(storageService.clearAllData).mockResolvedValue();
 
     renderSettingsPage();
     
-    const clearDataButton = screen.getByRole('button', { name: /clear all data/i });
+    const clearDataButton = screen.getByRole('button', { name: /clear all data & reset app/i });
     fireEvent.click(clearDataButton);
 
+    // Toast should appear
     await waitFor(() => {
-      expect(mockConfirm).toHaveBeenCalledWith(
-        expect.stringContaining('Are you sure you want to clear all data?')
-      );
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getAllByText('Clear All Data & Reset App')).toHaveLength(2); // Button + dialog title
+    });
+
+    // Click confirm in the toast
+    const confirmButton = screen.getByText('Clear All Data');
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => {
       expect(storageService.clearAllData).toHaveBeenCalled();
+      expect(consentService.resetConsent).toHaveBeenCalled();
     });
   });
 
@@ -284,7 +307,7 @@ describe('SettingsPage', () => {
     vi.mocked(consentService.hasConsent).mockReturnValue(true);
     renderSettingsPage();
     
-    const clearButton = screen.getByRole('button', { name: /clear all data/i });
+    const clearButton = screen.getByRole('button', { name: /clear all data & reset app/i });
     expect(clearButton).not.toBeDisabled();
   });
 
@@ -292,7 +315,7 @@ describe('SettingsPage', () => {
     vi.mocked(consentService.hasConsent).mockReturnValue(false);
     renderSettingsPage();
     
-    const clearButton = screen.getByRole('button', { name: /clear all data/i });
+    const clearButton = screen.getByRole('button', { name: /clear all data & reset app/i });
     expect(clearButton).toBeDisabled();
   });
 
@@ -335,41 +358,24 @@ describe('SettingsPage', () => {
     consoleSpy.mockRestore();
   });
 
-  it('handles clear data with confirmation', async () => {
-    vi.mocked(consentService.hasConsent).mockReturnValue(true);
-    const mockConfirm = vi.fn(() => true);
-    const mockReload = vi.fn();
-    global.confirm = mockConfirm;
-    Object.defineProperty(window, 'location', {
-      value: { reload: mockReload },
-      writable: true
-    });
-
-    renderSettingsPage();
-    
-    const clearButton = screen.getByRole('button', { name: /clear all data/i });
-    fireEvent.click(clearButton);
-
-    await waitFor(() => {
-      expect(mockConfirm).toHaveBeenCalledWith(
-        expect.stringContaining('Are you sure you want to clear all data?')
-      );
-      expect(storageService.clearAllData).toHaveBeenCalled();
-    });
-  });
-
   it('does not clear data when clear data is cancelled', async () => {
     vi.mocked(consentService.hasConsent).mockReturnValue(true);
-    const mockConfirm = vi.fn(() => false);
-    global.confirm = mockConfirm;
 
     renderSettingsPage();
     
-    const clearButton = screen.getByRole('button', { name: /clear all data/i });
+    const clearButton = screen.getByRole('button', { name: /clear all data & reset app/i });
     fireEvent.click(clearButton);
 
+    // Toast should appear
     await waitFor(() => {
-      expect(mockConfirm).toHaveBeenCalled();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    // Click cancel in the toast
+    const cancelButton = screen.getByText('Cancel');
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => {
       expect(storageService.clearAllData).not.toHaveBeenCalled();
     });
   });
@@ -377,15 +383,22 @@ describe('SettingsPage', () => {
   it('handles clear data error gracefully', async () => {
     vi.mocked(consentService.hasConsent).mockReturnValue(true);
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const mockConfirm = vi.fn(() => true);
-    global.confirm = mockConfirm;
 
     vi.mocked(storageService.clearAllData).mockRejectedValue(new Error('Clear failed'));
 
     renderSettingsPage();
     
-    const clearButton = screen.getByRole('button', { name: /clear all data/i });
+    const clearButton = screen.getByRole('button', { name: /clear all data & reset app/i });
     fireEvent.click(clearButton);
+
+    // Toast should appear
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    // Click confirm in the toast
+    const confirmButton = screen.getByText('Clear All Data');
+    fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(consoleSpy).toHaveBeenCalledWith('Failed to clear data:', expect.any(Error));

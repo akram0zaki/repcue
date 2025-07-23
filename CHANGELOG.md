@@ -1,5 +1,53 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-24] - Code Quality & ESLint Fixes
+
+### Fixed
+- **ESLint Compliance**: Fixed all 35 ESLint errors across the codebase
+- **TypeScript Types**: Replaced all inappropriate `any` types with proper TypeScript types
+- **Test File Types**: Improved type safety in test files with proper mock typing
+- **Code Comments**: Converted `@ts-ignore` to `@ts-expect-error` where appropriate
+- **Unused Variables**: Fixed unused variable issues in test files
+- **Namespace Issues**: Added proper ESLint disable for Cypress namespace declaration
+- **Import Optimization**: Removed unused imports across multiple files
+
+### Improved
+- **Type Safety**: Enhanced type safety throughout the application
+- **Code Quality**: Achieved clean ESLint output with strict TypeScript rules
+- **Test Reliability**: Improved test file typing for better maintainability
+- **Developer Experience**: Cleaner codebase with proper type annotations
+
+### Technical Details
+- Fixed consent service migration types from `any` to proper `ConsentData` interface
+- Enhanced test mocks with appropriate ESLint disable comments for legitimate `any` usage
+- Improved type guards in consent validation with proper unknown type handling
+- Added proper type imports for test utilities and mock objects
+
+## [2025-07-23] - Robust Consent Management & Data Reset Enhancement
+
+### Added
+- **Versioned Consent System**: Implemented comprehensive consent versioning (v1→v2) with automatic migration
+- **Consent Migration**: Automatic migration from legacy consent data to current version
+- **Enhanced Data Reset**: Clear data now resets consent and redirects to home with consent banner
+- **Consent Status API**: New `getConsentStatus()` method provides version info and migration status
+- **Future-Proof Architecture**: Extensible migration system for future consent structure changes
+- **Comprehensive Documentation**: Created `consent.md` with detailed consent system documentation including lifecycle diagrams
+
+### Removed
+- **Debug Reset Consent Button**: Removed temporary debug button from Settings page as robust consent system makes it unnecessary
+- **Debug Information**: Enhanced consent debugging in Settings page with version display
+
+### Changed
+- **ConsentService**: Complete rewrite with versioning, migration, and backward compatibility
+- **SettingsPage**: Updated "Clear All Data" to "Clear All Data & Reset App" with enhanced behavior
+- **Test Suite**: Updated all consent-related tests to work with new versioned system
+- **Data Clear Workflow**: Now includes consent reset and home screen redirect for fresh app experience
+
+### Fixed
+- **Production Export Issue**: Resolved export/clear buttons not appearing in production due to legacy consent data
+- **Consent Compatibility**: Fixed incompatibility between old and new consent data structures
+- **Migration Reliability**: Robust error handling for consent migration with fallback to reset
+
 ## [2025-07-23] - Comprehensive Testing Infrastructure & Data Management
 
 ### Added

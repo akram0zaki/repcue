@@ -15,7 +15,7 @@ vi.mock('../../services/consentService', () => ({
 }))
 
 describe('ConsentBanner', () => {
-  let mockOnConsentGranted: any
+  let mockOnConsentGranted: () => void
 
   beforeEach(() => {
     mockOnConsentGranted = vi.fn()

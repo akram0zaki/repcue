@@ -7,7 +7,9 @@ const mockWakeLock = {
   request: vi.fn(),
   release: vi.fn(),
   released: false,
-  type: 'screen'
+  type: 'screen',
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn()
 };
 
 const mockNavigator = {
@@ -19,11 +21,29 @@ const mockNavigator = {
 describe('useWakeLock', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Reset mock wake lock object
+    mockWakeLock.released = false;
+    mockWakeLock.release.mockResolvedValue(undefined);
+    mockWakeLock.addEventListener.mockImplementation(() => {});
+    mockWakeLock.removeEventListener.mockImplementation(() => {});
+    
     // Reset navigator mock
     Object.defineProperty(global, 'navigator', {
       value: mockNavigator,
       writable: true
     });
+    
+    // Mock document properties needed by the hook (don't override entire document)
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      writable: true,
+      configurable: true
+    });
+    
+    // Spy on document event listeners rather than mocking them
+    vi.spyOn(document, 'addEventListener').mockImplementation(() => {});
+    vi.spyOn(document, 'removeEventListener').mockImplementation(() => {});
   });
 
   afterEach(() => {

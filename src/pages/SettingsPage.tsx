@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import Toast from '../components/Toast';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -10,6 +11,8 @@ interface SettingsPageProps {
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettings }) => {
+  const [showClearDataToast, setShowClearDataToast] = useState(false);
+
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
     onUpdateSettings({ beepVolume: volume });
@@ -43,18 +46,30 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   };
 
   const handleClearData = async () => {
-    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
-      try {
-        await storageService.clearAllData();
-        // Optionally reload the page or update UI state
-        window.location.reload();
-      } catch (error) {
-        console.error('Failed to clear data:', error);
-      }
+    setShowClearDataToast(true);
+  };
+
+  const confirmClearData = async () => {
+    try {
+      // Clear all application data
+      await storageService.clearAllData();
+      
+      // Reset consent to trigger banner on next load
+      consentService.resetConsent();
+      
+      // Navigate to home screen and reload to show consent banner
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Failed to clear data:', error);
     }
   };
 
   const hasConsent = consentService.hasConsent();
+  const consentStatus = consentService.getConsentStatus();
+
+  // Debug logging for production troubleshooting
+  console.log('SettingsPage - Consent Status:', consentStatus);
+  console.log('SettingsPage - hasConsent:', hasConsent);
 
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
@@ -225,12 +240,27 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
           {/* Data Storage Status */}
           <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Data Storage: <span className="font-medium">{hasConsent ? 'Enabled' : 'Disabled'}</span>
-            </p>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Data Storage: <span className="font-medium">{hasConsent ? 'Enabled' : 'Disabled'}</span>
+              </p>
+              <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                v{consentStatus.version}
+              </span>
+            </div>
             {hasConsent && (
               <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                 Your workout data is stored locally on this device.
+              </p>
+            )}
+            {!hasConsent && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+                Please accept data storage consent to enable export/clear features.
+              </p>
+            )}
+            {!consentStatus.isLatestVersion && (
+              <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                ⚠️ Consent data will be migrated to latest version on next app load.
               </p>
             )}
           </div>
@@ -256,14 +286,26 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               disabled={!hasConsent}
               className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
-              Clear All Data
+              Clear All Data & Reset App
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Permanently delete all workout data and settings
+              Permanently delete all data, reset consent, and return to home screen
             </p>
           </div>
         </div>
       </div>
+
+      {/* Clear Data Confirmation Toast */}
+      <Toast
+        isOpen={showClearDataToast}
+        onClose={() => setShowClearDataToast(false)}
+        onConfirm={confirmClearData}
+        type="danger"
+        title="Clear All Data & Reset App"
+        message="Are you sure you want to clear all data? This action cannot be undone. You will be redirected to the home screen and asked for consent again."
+        confirmText="Clear All Data"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

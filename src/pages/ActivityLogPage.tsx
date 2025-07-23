@@ -89,7 +89,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       })
     );
 
-    let checkDate = new Date(today);
+    const checkDate = new Date(today);
     while (workoutDates.has(checkDate.getTime())) {
       currentStreak++;
       checkDate.setDate(checkDate.getDate() - 1);

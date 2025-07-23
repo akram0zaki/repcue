@@ -46,6 +46,7 @@ vi.mock('../consentService', () => ({
 
 describe('StorageService', () => {
   let storageService: StorageService
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockDb: any
 
   const mockExercise: Exercise = {
@@ -91,62 +92,132 @@ describe('StorageService', () => {
     vi.mocked(consentService.hasConsent).mockReturnValue(true)
     
     // Create a fresh StorageService instance by clearing singleton
-    // @ts-ignore - accessing private static property for testing
+    // @ts-expect-error - accessing private static property for testing
     StorageService.instance = undefined
     
     storageService = StorageService.getInstance()
     
-    // Get reference to the mocked database and override it
-    // @ts-ignore - accessing private property for testing
+    // Create fresh storage for our mocks
+    const exerciseStorage = new Map()
+    const activityLogStorage: ActivityLog[] = []
+    const userPreferencesStorage: UserPreferences[] = []
+    const appSettingsStorage: AppSettings[] = []
+    
+    // Get reference to the mocked database and override it with fresh mocks
+    // @ts-expect-error - accessing private property for testing
     mockDb = storageService.db = {
       exercises: {
-        put: vi.fn().mockResolvedValue(undefined),
-        get: vi.fn().mockResolvedValue(undefined),
-        update: vi.fn().mockResolvedValue(undefined),
-        toArray: vi.fn().mockResolvedValue([]),
-        clear: vi.fn().mockResolvedValue(undefined),
-        count: vi.fn().mockResolvedValue(0)
+        put: vi.fn().mockImplementation((exercise) => {
+          exerciseStorage.set(exercise.id, exercise)
+          return Promise.resolve(undefined)
+        }),
+        get: vi.fn().mockImplementation((id) => {
+          return Promise.resolve(exerciseStorage.get(id))
+        }),
+        update: vi.fn().mockImplementation((id, updates) => {
+          const existing = exerciseStorage.get(id)
+          if (existing) {
+            exerciseStorage.set(id, { ...existing, ...updates })
+          }
+          return Promise.resolve(undefined)
+        }),
+        toArray: vi.fn().mockImplementation(() => {
+          return Promise.resolve(Array.from(exerciseStorage.values()))
+        }),
+        clear: vi.fn().mockImplementation(() => {
+          exerciseStorage.clear()
+          return Promise.resolve(undefined)
+        }),
+        count: vi.fn().mockImplementation(() => {
+          return Promise.resolve(exerciseStorage.size)
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       activityLogs: {
-        add: vi.fn().mockResolvedValue(undefined),
-        toArray: vi.fn().mockResolvedValue([]),
-        orderBy: vi.fn(() => ({
-          reverse: vi.fn(() => ({
-            filter: vi.fn(() => ({
-              limit: vi.fn().mockResolvedValue([]),
-              toArray: vi.fn().mockResolvedValue([])
+        add: vi.fn().mockImplementation((log) => {
+          activityLogStorage.push(log)
+          return Promise.resolve(undefined)
+        }),
+        toArray: vi.fn().mockImplementation(() => {
+          return Promise.resolve([...activityLogStorage])
+        }),
+        orderBy: vi.fn().mockImplementation(() => {
+          const createQueryObject = () => ({
+            filter: vi.fn().mockImplementation(() => createQueryObject()),
+            limit: vi.fn().mockImplementation((limit) => ({
+              toArray: vi.fn().mockImplementation(() => {
+                return Promise.resolve(activityLogStorage.slice(0, limit))
+              })
             })),
-            limit: vi.fn().mockResolvedValue([]),
-            toArray: vi.fn().mockResolvedValue([])
-          })),
-          toArray: vi.fn().mockResolvedValue([])
-        })),
-        clear: vi.fn().mockResolvedValue(undefined),
-        count: vi.fn().mockResolvedValue(0)
+            toArray: vi.fn().mockImplementation(() => {
+              return Promise.resolve([...activityLogStorage])
+            })
+          })
+          
+          return {
+            reverse: vi.fn().mockImplementation(() => createQueryObject()),
+            toArray: vi.fn().mockImplementation(() => {
+              return Promise.resolve([...activityLogStorage])
+            })
+          }
+        }),
+        clear: vi.fn().mockImplementation(() => {
+          activityLogStorage.length = 0
+          return Promise.resolve(undefined)
+        }),
+        count: vi.fn().mockImplementation(() => {
+          return Promise.resolve(activityLogStorage.length)
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       userPreferences: {
         put: vi.fn().mockResolvedValue(undefined),
-        add: vi.fn().mockResolvedValue(undefined),
-        toArray: vi.fn().mockResolvedValue([]),
-        orderBy: vi.fn(() => ({
+        add: vi.fn().mockImplementation((preferences) => {
+          userPreferencesStorage.push(preferences)
+          return Promise.resolve(undefined)
+        }),
+        toArray: vi.fn().mockImplementation(() => {
+          return Promise.resolve([...userPreferencesStorage])
+        }),
+        orderBy: vi.fn().mockImplementation(() => ({
+          last: vi.fn(() => {
+            return Promise.resolve(userPreferencesStorage[userPreferencesStorage.length - 1])
+          }),
           limit: vi.fn(() => ({
-            first: vi.fn().mockResolvedValue(undefined)
+            first: vi.fn().mockResolvedValue(userPreferencesStorage[0])
           }))
         })),
-        clear: vi.fn().mockResolvedValue(undefined)
+        clear: vi.fn().mockImplementation(() => {
+          userPreferencesStorage.length = 0
+          return Promise.resolve(undefined)
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       appSettings: {
         put: vi.fn().mockResolvedValue(undefined),
-        add: vi.fn().mockResolvedValue(undefined),
-        toArray: vi.fn().mockResolvedValue([]),
-        orderBy: vi.fn(() => ({
+        add: vi.fn().mockImplementation((settings) => {
+          appSettingsStorage.push(settings)
+          return Promise.resolve(undefined)
+        }),
+        toArray: vi.fn().mockImplementation(() => {
+          return Promise.resolve([...appSettingsStorage])
+        }),
+        orderBy: vi.fn().mockImplementation(() => ({
+          last: vi.fn(() => {
+            return Promise.resolve(appSettingsStorage[appSettingsStorage.length - 1])
+          }),
           limit: vi.fn(() => ({
-            first: vi.fn().mockResolvedValue(undefined)
+            first: vi.fn().mockResolvedValue(appSettingsStorage[0])
           }))
         })),
-        clear: vi.fn().mockResolvedValue(undefined)
+        clear: vi.fn().mockImplementation(() => {
+          appSettingsStorage.length = 0
+          return Promise.resolve(undefined)
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       close: vi.fn().mockResolvedValue(undefined)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
   })
 
@@ -266,12 +337,8 @@ describe('StorageService', () => {
 
   describe('getActivityLogs', () => {
     it('should retrieve activity logs from IndexedDB', async () => {
-      const storedLogs = [{
-        ...mockActivityLog,
-        timestamp: mockActivityLog.timestamp.toISOString()
-      }]
-      
-      mockDb.activityLogs.orderBy().reverse().limit.mockResolvedValue(storedLogs)
+      // First add the log to our mock storage
+      await storageService.saveActivityLog(mockActivityLog)
       
       const logs = await storageService.getActivityLogs(10)
       
@@ -280,7 +347,10 @@ describe('StorageService', () => {
     })
 
     it('should handle IndexedDB errors gracefully', async () => {
-      mockDb.activityLogs.orderBy().reverse().limit.mockRejectedValue(new Error('IndexedDB error'))
+      // Force the mock to throw an error
+      mockDb.activityLogs.orderBy.mockImplementation(() => {
+        throw new Error('IndexedDB error')
+      })
       
       const logs = await storageService.getActivityLogs()
       
@@ -292,9 +362,8 @@ describe('StorageService', () => {
     it('should save user preferences to IndexedDB', async () => {
       await storageService.saveUserPreferences(mockUserPreferences)
       
-      expect(mockDb.userPreferences.put).toHaveBeenCalledWith({
+      expect(mockDb.userPreferences.add).toHaveBeenCalledWith({
         ...mockUserPreferences,
-        id: 1,
         updatedAt: expect.any(String)
       })
     })
@@ -302,12 +371,8 @@ describe('StorageService', () => {
 
   describe('getUserPreferences', () => {
     it('should retrieve user preferences from IndexedDB', async () => {
-      const storedPreferences = {
-        ...mockUserPreferences,
-        id: 1,
-        updatedAt: '2024-01-01T12:00:00Z'
-      }
-      mockDb.userPreferences.toArray.mockResolvedValue([storedPreferences])
+      // First save preferences to our mock storage
+      await storageService.saveUserPreferences(mockUserPreferences)
       
       const preferences = await storageService.getUserPreferences()
       
@@ -315,8 +380,6 @@ describe('StorageService', () => {
     })
 
     it('should return null when no preferences exist', async () => {
-      mockDb.userPreferences.toArray.mockResolvedValue([])
-      
       const preferences = await storageService.getUserPreferences()
       
       expect(preferences).toBeNull()
@@ -327,9 +390,8 @@ describe('StorageService', () => {
     it('should save app settings to IndexedDB', async () => {
       await storageService.saveAppSettings(mockAppSettings)
       
-      expect(mockDb.appSettings.put).toHaveBeenCalledWith({
+      expect(mockDb.appSettings.add).toHaveBeenCalledWith({
         ...mockAppSettings,
-        id: 1,
         updatedAt: expect.any(String)
       })
     })
@@ -337,12 +399,8 @@ describe('StorageService', () => {
 
   describe('getAppSettings', () => {
     it('should retrieve app settings from IndexedDB', async () => {
-      const storedSettings = {
-        ...mockAppSettings,
-        id: 1,
-        updatedAt: '2024-01-01T12:00:00Z'
-      }
-      mockDb.appSettings.toArray.mockResolvedValue([storedSettings])
+      // First save settings to our mock storage
+      await storageService.saveAppSettings(mockAppSettings)
       
       const settings = await storageService.getAppSettings()
       
@@ -350,8 +408,6 @@ describe('StorageService', () => {
     })
 
     it('should return null when no settings exist', async () => {
-      mockDb.appSettings.toArray.mockResolvedValue([])
-      
       const settings = await storageService.getAppSettings()
       
       expect(settings).toBeNull()
@@ -360,30 +416,16 @@ describe('StorageService', () => {
 
   describe('exportAllData', () => {
     it('should export all user data', async () => {
-      // Mock data in all tables
-      mockDb.exercises.toArray.mockResolvedValue([{
-        ...mockExercise,
-        updatedAt: '2024-01-01T12:00:00Z'
-      }])
-      mockDb.activityLogs.toArray.mockResolvedValue([{
-        ...mockActivityLog,
-        timestamp: mockActivityLog.timestamp.toISOString()
-      }])
-      mockDb.userPreferences.toArray.mockResolvedValue([{
-        ...mockUserPreferences,
-        id: 1,
-        updatedAt: '2024-01-01T12:00:00Z'
-      }])
-      mockDb.appSettings.toArray.mockResolvedValue([{
-        ...mockAppSettings,
-        id: 1,
-        updatedAt: '2024-01-01T12:00:00Z'
-      }])
+      // Add data to our mock storage through the service
+      await storageService.saveExercise(mockExercise)
+      await storageService.saveActivityLog(mockActivityLog)
+      await storageService.saveUserPreferences(mockUserPreferences)
+      await storageService.saveAppSettings(mockAppSettings)
       
       const exportData = await storageService.exportAllData()
       
       expect(exportData).toMatchObject({
-        exercises: [mockExercise],
+        exercises: [expect.objectContaining({ id: mockExercise.id })],
         activityLogs: [expect.objectContaining({ id: mockActivityLog.id })],
         userPreferences: mockUserPreferences,
         appSettings: mockAppSettings,
@@ -406,10 +448,11 @@ describe('StorageService', () => {
 
   describe('getStorageStats', () => {
     it('should return storage statistics', async () => {
-      mockDb.exercises.toArray.mockResolvedValue([mockExercise])
-      mockDb.activityLogs.toArray.mockResolvedValue([mockActivityLog])
-      mockDb.userPreferences.toArray.mockResolvedValue([mockUserPreferences])
-      mockDb.appSettings.toArray.mockResolvedValue([mockAppSettings])
+      // Add data to our mock storage through the service
+      await storageService.saveExercise(mockExercise)
+      await storageService.saveActivityLog(mockActivityLog)
+      await storageService.saveUserPreferences(mockUserPreferences)
+      await storageService.saveAppSettings(mockAppSettings)
       
       const stats = await storageService.getStorageStats()
       

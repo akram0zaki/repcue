@@ -645,7 +645,9 @@ repcue/
 │   └── test/               # Test utilities
 ├── public/                 # Static assets
 ├── dist/                   # Built application (generated)
-└── docs/                   # Documentation
+├── docs/                   # Documentation
+├── consent.md              # Consent system documentation
+└── CHANGELOG.md            # Version history
 ```
 
 ### Key Technologies
@@ -708,9 +710,18 @@ RepCue is designed with privacy as the top priority:
 
 - **Local-Only Storage**: All data stays on your device/Pi
 - **No Tracking**: Zero analytics, cookies, or external requests
-- **GDPR Compliant**: Full consent management system
+- **GDPR Compliant**: Full consent management system with versioning
 - **Open Source**: Complete transparency in code
 - **Self-Hosted**: You control your data completely
+
+### Robust Consent System
+RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[consent.md](./consent.md)** which covers:
+
+- GDPR/CCPA compliance features
+- Consent versioning and migration
+- User control and transparency
+- Technical implementation details
+- Privacy-first design principles
 
 ### Data Stored Locally
 - Exercise preferences and favorites

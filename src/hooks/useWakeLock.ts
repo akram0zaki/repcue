@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Wake Lock API types (not in all TypeScript versions)
 interface WakeLockSentinel {
@@ -21,14 +21,15 @@ export const useWakeLock = () => {
     setIsSupported('wakeLock' in navigator);
   }, []);
 
-  const requestWakeLock = async (): Promise<boolean> => {
-    if (!isSupported || !(navigator as any).wakeLock) {
+  const requestWakeLock = useCallback(async (): Promise<boolean> => {
+    if (!isSupported || !('wakeLock' in navigator)) {
       console.warn('Wake Lock API not supported');
       return false;
     }
 
     try {
-      wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+      const wakeLock = await (navigator as { wakeLock: { request: (type: string) => Promise<WakeLockSentinel> } }).wakeLock.request('screen');
+      wakeLockRef.current = wakeLock;
       
       // Listen for wake lock release
       const handleRelease = () => {
@@ -48,7 +49,7 @@ export const useWakeLock = () => {
       console.error('Failed to request wake lock:', error);
       return false;
     }
-  };
+  }, [isSupported]);
 
   const releaseWakeLock = async (): Promise<void> => {
     if (wakeLockRef.current && !wakeLockRef.current.released) {
@@ -77,7 +78,7 @@ export const useWakeLock = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isActive, isSupported]);
+  }, [isActive, isSupported, requestWakeLock]);
 
   // Cleanup on unmount
   useEffect(() => {

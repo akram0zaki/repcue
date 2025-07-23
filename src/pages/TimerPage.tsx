@@ -15,7 +15,7 @@ interface TimerPageProps {
   onSetSelectedDuration: (duration: TimerPreset) => void;
   onSetShowExerciseSelector: (show: boolean) => void;
   onStartTimer: () => Promise<void>;
-  onStopTimer: () => Promise<void>;
+  onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
 }
 
@@ -178,7 +178,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               </button>
             ) : (
               <button
-                onClick={onStopTimer}
+                onClick={() => onStopTimer()}
                 className="btn-secondary px-8"
               >
                 Stop
