@@ -9,8 +9,21 @@ interface HomePageProps {
   onToggleFavorite: (exerciseId: string) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ exercises }) => {
+const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
+
+  const handleStartTimer = (exercise?: Exercise) => {
+    if (exercise) {
+      navigate(Routes.TIMER, { 
+        state: { 
+          selectedExercise: exercise,
+          selectedDuration: exercise.defaultDuration || 30
+        }
+      });
+    } else {
+      navigate(Routes.TIMER);
+    }
+  };
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4 max-w-md">
@@ -29,7 +42,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises }) => {
             <div className="space-y-3">
               <button 
                 className="btn-primary w-full"
-                onClick={() => navigate(Routes.TIMER)}
+                onClick={() => handleStartTimer()}
               >
                 Start Timer
               </button>
@@ -53,18 +66,33 @@ const HomePage: React.FC<HomePageProps> = ({ exercises }) => {
                   .filter(exercise => exercise.isFavorite)
                   .slice(0, 3)
                   .map(exercise => (
-                    <button 
-                      key={exercise.id} 
-                      className="exercise-card w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      onClick={() => navigate(Routes.TIMER)}
-                    >
-                      <h3 className="font-medium text-gray-900 dark:text-gray-100">
-                        {exercise.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {exercise.description}
-                      </p>
-                    </button>
+                    <div key={exercise.id} className="exercise-card w-full p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                            {exercise.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                            {exercise.description}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 ml-3">
+                          <button
+                            onClick={() => onToggleFavorite(exercise.id)}
+                            className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
+                            aria-label={`Remove ${exercise.name} from favorites`}
+                          >
+                            ⭐
+                          </button>
+                          <button 
+                            className="btn-primary px-3 py-1 text-sm"
+                            onClick={() => handleStartTimer(exercise)}
+                          >
+                            Start
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   ))}
               </div>
             ) : (

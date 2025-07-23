@@ -1,8 +1,10 @@
 # RepCue - Fitness Tracking App Changelog
 
-## [2025-07-24] - Code Quality & ESLint Fixes
+## [2025-07-24] - Code Quality & Exercise Selection Fix
 
 ### Fixed
+- **Exercise Selection Bug**: Fixed issue where clicking a favorite exercise on HomePage didn't select that exercise in TimerPage
+- **HomePage Navigation**: Favorite exercises now properly pass exercise data to TimerPage with navigation state
 - **ESLint Compliance**: Fixed all 35 ESLint errors across the codebase
 - **TypeScript Types**: Replaced all inappropriate `any` types with proper TypeScript types
 - **Test File Types**: Improved type safety in test files with proper mock typing
@@ -11,13 +13,22 @@
 - **Namespace Issues**: Added proper ESLint disable for Cypress namespace declaration
 - **Import Optimization**: Removed unused imports across multiple files
 
+### Added
+- **Enhanced HomePage UI**: Favorite exercises now display with individual start buttons and favorite toggle stars
+- **Exercise Quick Start**: Users can now start a timer directly from favorite exercises on the home page
+- **Responsive Exercise Cards**: Improved layout for favorite exercise display with better mobile optimization
+
 ### Improved
 - **Type Safety**: Enhanced type safety throughout the application
 - **Code Quality**: Achieved clean ESLint output with strict TypeScript rules
 - **Test Reliability**: Improved test file typing for better maintainability
 - **Developer Experience**: Cleaner codebase with proper type annotations
+- **User Experience**: More intuitive exercise selection and timer workflow
 
 ### Technical Details
+- Updated HomePage to use navigation state when starting timer with specific exercise
+- Added handleStartTimer function that properly passes selectedExercise and selectedDuration to TimerPage
+- Enhanced favorite exercise display with individual action buttons
 - Fixed consent service migration types from `any` to proper `ConsentData` interface
 - Enhanced test mocks with appropriate ESLint disable comments for legitimate `any` usage
 - Improved type guards in consent validation with proper unknown type handling

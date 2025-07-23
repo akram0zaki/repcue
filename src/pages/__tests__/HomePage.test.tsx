@@ -128,14 +128,40 @@ describe('HomePage', () => {
     });
   });
 
-  it('navigates to timer when favorite exercise is clicked', async () => {
+  it('navigates to timer when favorite exercise start button is clicked', async () => {
     renderHomePage();
     
-    const plankButton = screen.getByText('Plank');
-    fireEvent.click(plankButton);
+    // Find all buttons with "Start" text and get the small one (the exercise start button)
+    const allStartButtons = screen.getAllByText('Start');
+    const exerciseStartButton = allStartButtons.find(button => 
+      button.className.includes('text-sm')
+    );
+    
+    expect(exerciseStartButton).toBeInTheDocument();
+    fireEvent.click(exerciseStartButton!);
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/timer');
+      expect(mockNavigate).toHaveBeenCalledWith('/timer', {
+        state: {
+          selectedExercise: expect.objectContaining({
+            id: 'plank',
+            name: 'Plank',
+            defaultDuration: 60
+          }),
+          selectedDuration: 60
+        }
+      });
+    });
+  });
+
+  it('calls onToggleFavorite when favorite star is clicked', async () => {
+    renderHomePage();
+    
+    const favoriteButton = screen.getByLabelText(/remove plank from favorites/i);
+    fireEvent.click(favoriteButton);
+
+    await waitFor(() => {
+      expect(mockOnToggleFavorite).toHaveBeenCalledWith('plank');
     });
   });
 
