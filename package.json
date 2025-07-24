@@ -23,7 +23,9 @@
     "cypress:run": "cypress run",
     "test:e2e": "start-server-and-test dev http://localhost:5173 cypress:run",
     "test:a11y": "start-server-and-test dev http://localhost:5173 'cypress run --spec cypress/e2e/axe.cy.ts'",
-    "test:all": "npm run test:unit && npm run test:e2e"
+    "test:all": "npm run test:unit && npm run test:e2e",
+    "generate-favicons": "node scripts/generate-favicons.js",
+    "generate-favicons:full": "node scripts/generate-favicons.js --full"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",
@@ -57,6 +59,7 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
     "jsdom": "^26.1.0",
+    "sharp": "^0.34.3",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.0.0",

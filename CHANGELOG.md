@@ -1,5 +1,36 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-25] - TypeScript Configuration & Testing Improvements
+
+### Fixed
+- **TypeScript Test Errors**: Resolved "toBeInTheDocument does not exist" errors in test files
+- **Jest-DOM Types**: Added proper @testing-library/jest-dom type references to vite-env.d.ts
+- **Test TypeScript Config**: Created dedicated tsconfig.test.json for proper test file type checking
+- **Project References**: Updated main tsconfig.json to include test configuration references
+- **Vitest Type Checking**: Enhanced vitest.config.ts with typecheck configuration for comprehensive test validation
+
+### Technical Infrastructure
+- **Comprehensive Test Setup**: All 157 tests now pass without TypeScript errors
+- **Type Safety**: Improved type checking for test files with proper jest-dom matcher support
+- **Development Workflow**: Enhanced development experience with better TypeScript support in tests
+- **Build Pipeline**: Maintained separation between app and test TypeScript configurations
+
+## [2025-07-24] - Custom Branding & PWA Enhancements
+
+### Added
+- **Custom Favicon System**: Created RepCue-branded favicon with timer design in blue (#2563eb) and green (#10b981) theme
+- **Multi-Format Icons**: Generated favicon in SVG, PNG (16x16, 32x32, 48x48, 192x192, 512x512), ICO, and Apple Touch Icon formats
+- **PWA Manifest**: Added comprehensive manifest.json for Progressive Web App installation on mobile devices
+- **Favicon Generator Script**: Automated favicon generation pipeline using Sharp library (`npm run generate-favicons`)
+- **Enhanced HTML Meta**: Added theme-color, description, and proper favicon references for all browser types
+- **Professional Branding**: Replaced default Vite favicon with custom RepCue timer icon design
+
+### Technical Infrastructure
+- **Sharp Integration**: Added Sharp library for high-quality image processing and favicon generation
+- **ES Module Scripts**: Updated favicon generation script to use ES modules for consistency with project setup
+- **PWA Ready**: Application now supports "Add to Home Screen" functionality on mobile devices
+- **Multi-Device Support**: Favicon optimized for desktop browsers, mobile web, and native app installations
+
 ## [2025-07-24] - Code Quality & Exercise Selection Fix
 
 ### Fixed

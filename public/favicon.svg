@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <style>
+      .timer-bg { fill: #2563eb; }
+      .timer-fg { fill: #ffffff; }
+      .timer-accent { fill: #10b981; }
+    </style>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" class="timer-bg" stroke="#1d4ed8" stroke-width="1"/>
+  
+  <!-- Timer face -->
+  <circle cx="16" cy="16" r="11" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+  
+  <!-- Timer hands pointing to 12 and 3 (representing intervals) -->
+  <line x1="16" y1="16" x2="16" y2="8" class="timer-fg" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="16" x2="22" y2="16" class="timer-accent" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Center dot -->
+  <circle cx="16" cy="16" r="1.5" class="timer-fg"/>
+  
+  <!-- Small tick marks for timer -->
+  <g class="timer-fg" stroke-width="1">
+    <line x1="16" y1="5" x2="16" y2="7"/>
+    <line x1="27" y1="16" x2="25" y2="16"/>
+    <line x1="16" y1="27" x2="16" y2="25"/>
+    <line x1="5" y1="16" x2="7" y2="16"/>
+  </g>
+</svg>
