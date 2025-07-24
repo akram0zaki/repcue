@@ -6,7 +6,9 @@ import { audioService } from './services/audioService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import ConsentBanner from './components/ConsentBanner';
+import OfflineBanner from './components/OfflineBanner';
 import Navigation from './components/Navigation';
+import { registerServiceWorker } from './utils/serviceWorker';
 import type { Exercise, AppSettings, TimerState, ActivityLog } from './types';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, type TimerPreset } from './constants';
@@ -259,6 +261,17 @@ function App() {
     const initializeApp = async () => {
       if (hasConsent) {
         try {
+          // Register service worker for offline functionality
+          console.log('🚀 Initializing PWA capabilities...');
+          registerServiceWorker().then((swInfo) => {
+            if (swInfo.updateAvailable) {
+              console.log('📦 App update available - refresh to update');
+              // Could show a toast notification here for updates
+            }
+          }).catch((error) => {
+            console.error('❌ Service worker registration failed:', error);
+          });
+
           // Load exercises from storage or use initial data
           const storedExercises = await storageService.getExercises();
           let allExercises: Exercise[];
@@ -413,6 +426,9 @@ function App() {
         >
           Skip to main content
         </a>
+
+        {/* Offline/Online status banner */}
+        <OfflineBanner />
 
         <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center">
