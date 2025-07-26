@@ -31,7 +31,8 @@ const mockAppSettings: AppSettings = {
   beepVolume: 0.5,
   darkMode: false,
   autoSave: true,
-  lastSelectedExerciseId: null
+  lastSelectedExerciseId: null,
+  preTimerCountdown: 3
 };
 
 const mockOnUpdateSettings = vi.fn();

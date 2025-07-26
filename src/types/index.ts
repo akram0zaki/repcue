@@ -38,6 +38,8 @@ export interface TimerState {
   startTime?: Date;
   intervalDuration: number; // beep interval in seconds
   currentExercise?: Exercise;
+  isCountdown: boolean; // true when in pre-timer countdown mode
+  countdownTime: number; // countdown remaining time in seconds
 }
 
 // User preferences and profile
@@ -76,6 +78,7 @@ export interface AppSettings {
   darkMode: boolean;
   autoSave: boolean;
   lastSelectedExerciseId?: string | null;
+  preTimerCountdown: number; // 0-10 seconds countdown before timer starts
 }
 
 // Navigation routes

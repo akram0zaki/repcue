@@ -1,5 +1,30 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-26] - Pre-Timer Countdown Feature & UI Improvement
+
+### Changed
+- **Start Button Label**: Timer start button now always shows "Start" regardless of countdown setting for consistency
+
+### Added
+- **Pre-Timer Countdown**: Configurable countdown before timer starts (0-10 seconds)
+- **Settings Integration**: Countdown duration slider in Timer Settings section
+- **Visual Countdown Display**: Large orange countdown numbers with "Get Ready!" message
+- **Audio Announcements**: Voice countdown for last 3 seconds (when sound enabled)
+- **Countdown Progress**: Orange circular progress indicator during countdown phase
+- **Dynamic UI**: "Cancel" button available during countdown phase
+- **Countdown Banner**: Clear visual indicator showing remaining preparation time
+
+### Enhanced
+- **Timer State Management**: Extended TimerState interface with countdown properties
+- **User Experience**: Helps users get into position before exercise timer begins
+- **Accessibility**: Screen reader announcements and clear visual indicators
+- **Settings UI**: Intuitive slider with "Off" option and second labels
+
+### Technical
+- **Type Safety**: Updated AppSettings and TimerState interfaces
+- **Test Coverage**: Comprehensive tests for countdown functionality
+- **Documentation**: Updated README with usage instructions
+
 ## [2025-07-25] - Complete Offline-First PWA Implementation
 
 ### Added

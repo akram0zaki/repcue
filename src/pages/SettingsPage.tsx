@@ -159,6 +159,36 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             ⏱️ Timer Settings
           </h2>
           
+          {/* Pre-Timer Countdown */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="pre-timer-countdown" className="text-gray-700 dark:text-gray-300 font-medium">
+                Pre-Timer Countdown
+              </label>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {appSettings.preTimerCountdown === 0 ? 'Off' : `${appSettings.preTimerCountdown}s`}
+              </span>
+            </div>
+            <input
+              id="pre-timer-countdown"
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value={appSettings.preTimerCountdown}
+              onChange={(e) => onUpdateSettings({ preTimerCountdown: parseInt(e.target.value) })}
+              className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+              <span>Off</span>
+              <span>5s</span>
+              <span>10s</span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Countdown before the timer starts to help you get into position
+            </p>
+          </div>
+          
           {/* Interval Duration */}
           <div>
             <label htmlFor="interval-duration" className="block text-gray-700 dark:text-gray-300 font-medium mb-2">

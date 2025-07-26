@@ -81,7 +81,9 @@ function App() {
     isRunning: false,
     currentTime: 0,
     intervalDuration: 30,
-    currentExercise: undefined
+    currentExercise: undefined,
+    isCountdown: false,
+    countdownTime: 0
   });
 
   // Timer UI State
@@ -96,41 +98,34 @@ function App() {
   // Wake lock for keeping screen active
   const { isSupported: wakeLockSupported, isActive: wakeLockActive, requestWakeLock, releaseWakeLock } = useWakeLock();
 
-  // Timer Functions
-  const startTimer = useCallback(async () => {
-    if (!selectedExercise) {
-      alert('Please select an exercise first');
-      return;
-    }
-
+  // Separate function for the actual timer logic
+  const startActualTimer = useCallback(() => {
     // Play start sound and vibration
     if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-      await audioService.playStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+      audioService.playStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
     }
 
-    // Announce start if sound enabled
+    // Announce timer start
     if (appSettings.soundEnabled) {
-      audioService.announceText(`Starting ${selectedExercise.name} timer for ${selectedDuration} seconds`);
+      audioService.announceText(`Timer started! ${selectedDuration} seconds`);
     }
 
     const startTime = Date.now();
     lastBeepIntervalRef.current = 0; // Reset interval counter
 
-    // Request wake lock to keep screen active
-    if (wakeLockSupported) {
-      await requestWakeLock();
-    }
-
+    // Update timer state to actual timer mode
     setTimerState(prev => ({
       ...prev,
       isRunning: true,
+      isCountdown: false,
+      countdownTime: 0,
       currentTime: 0,
       targetTime: selectedDuration,
       startTime: new Date(),
-      currentExercise: selectedExercise
+      currentExercise: selectedExercise || undefined
     }));
 
-    // Start the timer interval
+    // Start the main timer interval
     intervalRef.current = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       
@@ -157,7 +152,72 @@ function App() {
         }
       }
     }, 100);
-  }, [selectedExercise, selectedDuration, appSettings, wakeLockSupported, requestWakeLock]);
+  }, [selectedExercise, selectedDuration, appSettings]);
+
+  // Timer Functions
+  const startTimer = useCallback(async () => {
+    if (!selectedExercise) {
+      alert('Please select an exercise first');
+      return;
+    }
+
+    // Request wake lock to keep screen active at the start
+    if (wakeLockSupported) {
+      await requestWakeLock();
+    }
+
+    // If pre-timer countdown is enabled, start countdown phase
+    if (appSettings.preTimerCountdown > 0) {
+      // Start countdown phase
+      setTimerState(prev => ({
+        ...prev,
+        isRunning: true,
+        isCountdown: true,
+        countdownTime: appSettings.preTimerCountdown,
+        currentTime: 0,
+        targetTime: selectedDuration,
+        currentExercise: selectedExercise || undefined
+      }));
+
+      // Announce countdown start
+      if (appSettings.soundEnabled) {
+        audioService.announceText(`Get ready for ${selectedExercise.name}. Starting in ${appSettings.preTimerCountdown} seconds`);
+      }
+
+      const countdownStartTime = Date.now();
+
+      // Countdown interval
+      intervalRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - countdownStartTime) / 1000);
+        const remaining = appSettings.preTimerCountdown - elapsed;
+
+        if (remaining <= 0) {
+          // Countdown finished, start actual timer
+          clearInterval(intervalRef.current!);
+          startActualTimer();
+        } else {
+          // Update countdown display
+          setTimerState(prev => ({
+            ...prev,
+            countdownTime: remaining
+          }));
+
+          // Beep on each countdown second
+          if (remaining <= 3 && elapsed > appSettings.preTimerCountdown - remaining - 1) {
+            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+              audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+            }
+            if (appSettings.soundEnabled) {
+              audioService.announceText(remaining.toString());
+            }
+          }
+        }
+      }, 100);
+    } else {
+      // No countdown, start timer immediately
+      startActualTimer();
+    }
+  }, [selectedExercise, selectedDuration, appSettings, wakeLockSupported, requestWakeLock, startActualTimer]);
 
   const stopTimer = useCallback(async (isCompletion: boolean = false) => {
     if (intervalRef.current) {
@@ -192,7 +252,7 @@ function App() {
       await releaseWakeLock();
     }
 
-    setTimerState(prev => ({ ...prev, isRunning: false }));
+    setTimerState(prev => ({ ...prev, isRunning: false, isCountdown: false, countdownTime: 0 }));
   }, [appSettings, wakeLockActive, releaseWakeLock, timerState]);
 
   const resetTimer = useCallback(async () => {
@@ -212,7 +272,9 @@ function App() {
       currentTime: 0,
       targetTime: undefined,
       startTime: undefined,
-      currentExercise: undefined
+      currentExercise: undefined,
+      isCountdown: false,
+      countdownTime: 0
     }));
   }, [wakeLockActive, releaseWakeLock]);
 

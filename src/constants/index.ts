@@ -16,4 +16,5 @@ export const DEFAULT_APP_SETTINGS = {
   darkMode: false,
   autoSave: true,
   lastSelectedExerciseId: null,
+  preTimerCountdown: 3, // Default 3 seconds countdown
 }; 

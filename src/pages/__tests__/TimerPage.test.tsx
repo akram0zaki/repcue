@@ -22,7 +22,9 @@ const defaultTimerState: TimerState = {
   targetTime: undefined,
   startTime: undefined,
   intervalDuration: 30,
-  currentExercise: undefined
+  currentExercise: undefined,
+  isCountdown: false,
+  countdownTime: 0
 };
 
 const defaultProps = {
@@ -51,7 +53,7 @@ describe('TimerPage', () => {
     render(<TimerPage {...defaultProps} />);
     
     expect(screen.getByText('Test Exercise')).toBeInTheDocument();
-    expect(screen.getByText('Start')).toBeInTheDocument();
+    expect(screen.getByText('Start')).toBeInTheDocument(); // Button always shows "Start"
     expect(screen.getByText('Reset')).toBeInTheDocument();
   });
 

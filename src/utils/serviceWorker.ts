@@ -8,6 +8,15 @@ export interface SWUpdateInfo {
   registration?: ServiceWorkerRegistration;
 }
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
+
 /**
  * Register service worker and handle updates
  * Only registers in production to avoid development conflicts
@@ -109,7 +118,7 @@ export const updateServiceWorker = (registration: ServiceWorkerRegistration): Pr
  */
 export const isStandalone = (): boolean => {
   return window.matchMedia('(display-mode: standalone)').matches ||
-         (window.navigator as any).standalone === true;
+         (window.navigator as { standalone?: boolean }).standalone === true;
 };
 
 /**
@@ -117,12 +126,12 @@ export const isStandalone = (): boolean => {
  */
 export const setupInstallPrompt = (): Promise<boolean> => {
   return new Promise((resolve) => {
-    let deferredPrompt: any;
+    let deferredPrompt: BeforeInstallPromptEvent | null = null;
 
     window.addEventListener('beforeinstallprompt', (e) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      deferredPrompt = e;
+      deferredPrompt = e as BeforeInstallPromptEvent;
       
       console.log('💡 PWA install prompt available');
       resolve(true);

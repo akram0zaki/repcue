@@ -34,3 +34,14 @@ Make sure the plan covers the compliance with applicable EU regulations like coo
 5. Out of Vite, Create React App, or Next.js for the React setup, you choose the best technology that is most fit for purpose, provides beter extension in the future into mobile apps, and would run nicely on raspberry pi 5.
 6. Create a clean minimal design that upholds the mobile-first principle, with big buttons for ease of use while exercising.
 
+---
+
+Implement a feature for a countdown before the timer starts. The countdown duration is configurable on the settings page in a slider that allow the user to select a value between 0 and 10.
+
+---
+
+implement PWA changes to provide a truly native-like experience across all platforms
+
+---
+
+

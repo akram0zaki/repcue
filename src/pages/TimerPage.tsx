@@ -36,9 +36,14 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onResetTimer
 }) => {
   // Calculate display values
-  const { currentTime, targetTime, isRunning } = timerState;
+  const { currentTime, targetTime, isRunning, isCountdown, countdownTime } = timerState;
   const remainingTime = targetTime ? Math.max(0, targetTime - currentTime) : 0;
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
+  
+  // Countdown progress (reverse of normal progress)
+  const countdownProgress = isCountdown && appSettings.preTimerCountdown > 0 
+    ? ((appSettings.preTimerCountdown - countdownTime) / appSettings.preTimerCountdown) * 100 
+    : 0;
 
   // Format time display
   const formatTime = (seconds: number): string => {
@@ -119,6 +124,15 @@ const TimerPage: React.FC<TimerPageProps> = ({
           </div>
         </div>
 
+        {/* Countdown Banner */}
+        {isCountdown && (
+          <div className="bg-orange-100 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-3 mb-4 text-center">
+            <div className="text-orange-800 dark:text-orange-300 font-medium text-sm">
+              🏃‍♂️ Get Ready! Timer starts in {countdownTime} second{countdownTime !== 1 ? 's' : ''}
+            </div>
+          </div>
+        )}
+
         {/* Timer Display */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-4">
           {/* Circular Progress */}
@@ -141,9 +155,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 strokeWidth="8"
                 fill="none"
                 strokeDasharray={`${2 * Math.PI * 70}`}
-                strokeDashoffset={`${2 * Math.PI * 70 * (1 - progress / 100)}`}
-                className={`text-blue-600 transition-all duration-300 ${
-                  remainingTime <= 10 && remainingTime > 0 ? 'text-red-500' : ''
+                strokeDashoffset={`${2 * Math.PI * 70 * (1 - (isCountdown ? countdownProgress : progress) / 100)}`}
+                className={`transition-all duration-300 ${
+                  isCountdown 
+                    ? 'text-orange-500' 
+                    : remainingTime <= 10 && remainingTime > 0 
+                      ? 'text-red-500' 
+                      : 'text-blue-600'
                 }`}
                 strokeLinecap="round"
               />
@@ -152,16 +170,29 @@ const TimerPage: React.FC<TimerPageProps> = ({
             {/* Time Display */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <div className={`text-3xl font-bold ${
-                  remainingTime <= 10 && remainingTime > 0 
-                    ? 'text-red-500 dark:text-red-400' 
-                    : 'text-gray-900 dark:text-gray-100'
-                }`}>
-                  {formatTime(remainingTime)}
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {targetTime ? `of ${formatTime(targetTime)}` : 'Set duration'}
-                </div>
+                {isCountdown ? (
+                  <>
+                    <div className="text-4xl font-bold text-orange-500 dark:text-orange-400">
+                      {countdownTime}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Get ready...
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={`text-3xl font-bold ${
+                      remainingTime <= 10 && remainingTime > 0 
+                        ? 'text-red-500 dark:text-red-400' 
+                        : 'text-gray-900 dark:text-gray-100'
+                    }`}>
+                      {formatTime(remainingTime)}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {targetTime ? `of ${formatTime(targetTime)}` : 'Set duration'}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -181,7 +212,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 onClick={() => onStopTimer()}
                 className="btn-secondary px-8"
               >
-                Stop
+                {isCountdown ? 'Cancel' : 'Stop'}
               </button>
             )}
             

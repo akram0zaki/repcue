@@ -82,7 +82,8 @@ describe('StorageService', () => {
     vibrationEnabled: true,
     beepVolume: 0.5,
     darkMode: false,
-    autoSave: true
+    autoSave: true,
+    preTimerCountdown: 3
   }
 
   beforeEach(() => {
