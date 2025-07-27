@@ -27,5 +27,6 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - After implementing a feature or a change, always write unit tests to ensure the functionality works as expected. Also revisit README.md to update any relevant documentation. Make sure to track the changes in CHANGELOG.md under a headline with the date of the change.
 
-- This goes without saying but obviously you need it because you tend to ignore build errors, when you build the application, make sure to read the result on terminal before proceeding to the next step.
+- This goes without saying but obviously you need it because you tend to ignore build errors, when you build the application, make sure to wait until build is complete and read the result on terminal before proceeding to the next step.
 
+- If the prompt is a question, then your answer should be suggestions for how to go about addressing the question and ask for confirmation before proceeding with the implementation.

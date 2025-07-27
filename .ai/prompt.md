@@ -37,6 +37,13 @@ Make sure the plan covers the compliance with applicable EU regulations like coo
 ---
 
 Implement a feature for a countdown before the timer starts. The countdown duration is configurable on the settings page in a slider that allow the user to select a value between 0 and 10.
+The pre-timer countdown allows the user to get into position for the exercise before the timer starts.
+
+---
+
+on every exercise listing there is a number of tags displayed, if they're more than two tags then there is a +n tag displayed next to them. Currently there is no way on the UI to expand or see what additional tags are there. What is the best way, from usability and user experience perspective, to be able to show the additional tags?
+
+Don't make any changes yet, just give me your proposal to tackle this and ask for my confirmation before implementation.
 
 ---
 
