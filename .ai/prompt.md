@@ -47,7 +47,20 @@ Don't make any changes yet, just give me your proposal to tackle this and ask fo
 
 ---
 
-implement PWA changes to provide a truly native-like experience across all platforms
+Create a PWA implementation plan to provide a truly native-like experience across all platforms. Walk me through the plan before implementing it.
+
+---
+
+Further detail the implementation plan into trackable modules and tasks and write it to the .plans/ directory as pwa-implementation-plan.md . This file will be used to track progress on the implementation.
+
+---
+
+Implement the changes in Module 1
+Ask questions if you need more information.
+
+---
+
+I have switched to branch dev-pwa to implement these changes. update the pwa implementation plan with the current progress, update changelog and readme, then commit and push changes to the dev-pwa branch before we proceed to implementing the next module.
 
 ---
 

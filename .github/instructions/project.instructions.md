@@ -33,3 +33,6 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - When requested to create an implementation plan, save it to the .plan/ directory in markdown (.md) format.
 
+- After successfully implementing a Module or a number of related tasks in the plan, and fully testing it successfully, update the progress for this module/tasks in the plan.
+
+
