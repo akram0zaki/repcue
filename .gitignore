@@ -37,5 +37,8 @@ coverage
 # nyc test coverage
 .nyc_output
 
+# TypeScript build info
+*.tsbuildinfo
+
 # Other
 .local/*
