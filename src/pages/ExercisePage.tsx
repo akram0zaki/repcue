@@ -252,6 +252,16 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   getCategoryColor,
   formatDuration
 }) => {
+  const [isTagsExpanded, setIsTagsExpanded] = useState(false);
+  
+  const visibleTags = isTagsExpanded ? exercise.tags : exercise.tags.slice(0, 2);
+  const additionalTagsCount = exercise.tags.length - 2;
+  const hasMoreTags = exercise.tags.length > 2;
+
+  const handleTagExpansionToggle = () => {
+    setIsTagsExpanded(!isTagsExpanded);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation">
       {/* Category Header */}
@@ -278,20 +288,35 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         </p>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
-          {exercise.tags.slice(0, 2).map((tag) => (
-            <span
-              key={tag}
-              className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
-            >
-              {tag}
-            </span>
-          ))}
-          {exercise.tags.length > 2 && (
-            <span className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full">
-              +{exercise.tags.length - 2}
-            </span>
-          )}
+        <div className="mb-3 sm:mb-4">
+          <div 
+            className={`flex flex-wrap gap-1 transition-all duration-200 ease-out ${
+              isTagsExpanded ? 'max-h-none' : 'max-h-6 overflow-hidden'
+            }`}
+          >
+            {visibleTags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+            {hasMoreTags && (
+              <button
+                onClick={handleTagExpansionToggle}
+                className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                aria-label={
+                  isTagsExpanded 
+                    ? 'Show fewer tags' 
+                    : `Show ${additionalTagsCount} more tag${additionalTagsCount === 1 ? '' : 's'}`
+                }
+                aria-expanded={isTagsExpanded}
+              >
+                {isTagsExpanded ? 'Show less' : `+${additionalTagsCount}`}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Duration and Action */}

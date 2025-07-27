@@ -795,6 +795,7 @@ We welcome contributions! Here's how to get started:
 ### Current Version (v0.1.0)
 - ✅ Core interval timer functionality
 - ✅ 20 exercise library with categories
+- ✅ Expandable exercise tags with smooth animations
 - ✅ Audio feedback and voice announcements
 - ✅ Activity logging and tracking
 - ✅ GDPR-compliant privacy controls

@@ -1,5 +1,20 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-27] - Expandable Exercise Tags
+
+### Added
+- **Expandable Tags**: Exercise cards now show expandable tag functionality
+- **Tag Management**: Click "+n" to reveal all additional tags beyond the first 2
+- **Smooth Transitions**: 200ms ease-out animations for tag expansion/collapse
+- **Show Less Option**: Clear "Show less" button when tags are expanded
+- **Accessibility Support**: Proper ARIA attributes for screen readers
+- **Responsive Design**: Consistent behavior across mobile and desktop
+
+### Enhanced
+- **User Experience**: Users can now see all exercise tags without cluttering the interface
+- **Progressive Disclosure**: Tags are revealed only when needed, maintaining clean UI
+- **Comprehensive Testing**: 7 new test cases covering all expandable tag scenarios
+
 ## [2025-07-26] - Pre-Timer Countdown Feature & UI Improvement
 
 ### Changed
