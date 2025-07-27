@@ -418,6 +418,43 @@ export class StorageService {
   }
 
   /**
+   * Delete exercise data
+   */
+  public async deleteExercise(exerciseId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot delete data without user consent');
+    }
+
+    try {
+      await this.db.exercises.delete(exerciseId);
+      console.log(`Exercise ${exerciseId} deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete exercise from IndexedDB:', error);
+      // Remove from fallback storage
+      this.fallbackStorage.delete(`exercise_${exerciseId}`);
+    }
+  }
+
+  /**
+   * Delete activity log data
+   */
+  public async deleteActivityLog(activityLogId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot delete data without user consent');
+    }
+
+    try {
+      const id = parseInt(activityLogId, 10);
+      await this.db.activityLogs.delete(id);
+      console.log(`Activity log ${activityLogId} deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete activity log from IndexedDB:', error);
+      // Remove from fallback storage
+      this.fallbackStorage.delete(`activityLog_${activityLogId}`);
+    }
+  }
+
+  /**
    * Convert stored exercise to runtime format
    */
   private convertStoredExercise(stored: StoredExercise): Exercise {
