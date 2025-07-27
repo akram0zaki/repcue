@@ -12,14 +12,19 @@ import type { Exercise, AppSettings, TimerState, ActivityLog } from './types';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, type TimerPreset } from './constants';
 
-// Lazy load components for better performance
-import { lazy, Suspense } from 'react';
-
-const HomePage = lazy(() => import('./pages/HomePage'));
-const ExercisePage = lazy(() => import('./pages/ExercisePage'));
-const TimerPage = lazy(() => import('./pages/TimerPage'));
-const ActivityLogPage = lazy(() => import('./pages/ActivityLogPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+// Enhanced lazy loading with error boundaries and preloading
+import { Suspense } from 'react';
+import { 
+  HomePage, 
+  ExercisePage, 
+  TimerPage, 
+  ActivityLogPage, 
+  SettingsPage,
+  PageLoader,
+  ChunkErrorBoundary,
+  preloadCriticalRoutes,
+  createRouteLoader
+} from './router/LazyRoutes';
 
 // Wrapper component to handle navigation state for TimerPage
 const TimerPageWrapper: React.FC<{
@@ -403,6 +408,9 @@ function App() {
     window.addEventListener('consent-granted', handleConsentGranted);
     window.addEventListener('consent-revoked', handleConsentRevoked);
 
+    // Preload critical routes after initial setup
+    preloadCriticalRoutes();
+
     return () => {
       window.removeEventListener('consent-granted', handleConsentGranted);
       window.removeEventListener('consent-revoked', handleConsentRevoked);
@@ -479,36 +487,38 @@ function App() {
 
   return (
     <Router>
-      <AppShell>
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        }>
-          <Routes>
-            <Route 
-              path={AppRoutes.HOME} 
-              element={
-                <HomePage 
-                  exercises={exercises}
-                  appSettings={appSettings}
-                  onToggleFavorite={toggleExerciseFavorite}
-                />
-              } 
-            />
-            <Route 
-              path={AppRoutes.EXERCISES} 
-              element={
-                <ExercisePage 
-                  exercises={exercises}
-                  onToggleFavorite={toggleExerciseFavorite}
-                />
-              } 
-            />
-            <Route 
-              path={AppRoutes.TIMER} 
-              element={
-                <TimerPageWrapper 
+      <ChunkErrorBoundary>
+        <AppShell>
+          <Suspense fallback={createRouteLoader('page')}>
+            <Routes>
+              <Route 
+                path={AppRoutes.HOME} 
+                element={
+                  <Suspense fallback={createRouteLoader('Home')}>
+                    <HomePage 
+                      exercises={exercises}
+                      appSettings={appSettings}
+                      onToggleFavorite={toggleExerciseFavorite}
+                    />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.EXERCISES} 
+                element={
+                  <Suspense fallback={createRouteLoader('Exercises')}>
+                    <ExercisePage 
+                      exercises={exercises}
+                      onToggleFavorite={toggleExerciseFavorite}
+                    />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.TIMER} 
+                element={
+                  <Suspense fallback={createRouteLoader('Timer')}>
+                    <TimerPageWrapper 
                   exercises={exercises}
                   appSettings={appSettings}
                   timerState={timerState}
@@ -517,33 +527,41 @@ function App() {
                   showExerciseSelector={showExerciseSelector}
                   wakeLockSupported={wakeLockSupported}
                   wakeLockActive={wakeLockActive}
-                  onSetSelectedExercise={handleSetSelectedExercise}
-                  onSetSelectedDuration={setSelectedDuration}
-                  onSetShowExerciseSelector={setShowExerciseSelector}
-                  onStartTimer={startTimer}
-                  onStopTimer={stopTimer}
-                  onResetTimer={resetTimer}
-                />
-              } 
-            />
-            <Route 
-              path={AppRoutes.ACTIVITY_LOG} 
-              element={<ActivityLogPage exercises={exercises} />} 
-            />
-            <Route 
-              path={AppRoutes.SETTINGS} 
-              element={
-                <SettingsPage 
-                  appSettings={appSettings}
-                  onUpdateSettings={updateAppSettings}
-                />
-              } 
-            />
-            {/* Redirect any unknown routes to home */}
-            <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />
-          </Routes>
-        </Suspense>
-      </AppShell>
+                      onSetSelectedExercise={handleSetSelectedExercise}
+                      onSetSelectedDuration={setSelectedDuration}
+                      onSetShowExerciseSelector={setShowExerciseSelector}
+                      onStartTimer={startTimer}
+                      onStopTimer={stopTimer}
+                      onResetTimer={resetTimer}
+                    />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.ACTIVITY_LOG} 
+                element={
+                  <Suspense fallback={createRouteLoader('Activity Log')}>
+                    <ActivityLogPage exercises={exercises} />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.SETTINGS} 
+                element={
+                  <Suspense fallback={createRouteLoader('Settings')}>
+                    <SettingsPage 
+                      appSettings={appSettings}
+                      onUpdateSettings={updateAppSettings}
+                    />
+                  </Suspense>
+                } 
+              />
+              {/* Redirect any unknown routes to home */}
+              <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />
+            </Routes>
+          </Suspense>
+        </AppShell>
+      </ChunkErrorBoundary>
     </Router>
   );
 }

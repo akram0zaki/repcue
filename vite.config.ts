@@ -4,13 +4,14 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg'],
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'favicon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'favicon.svg', 'splash/**/*', 'manifest.json'],
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'splash/*.{png,svg}', 'manifest.json'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
@@ -35,15 +36,27 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 365 days
               }
             }
+          },
+          {
+            urlPattern: /^\/splash\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'splash-screens-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
           }
         ]
       },
+      // Use our custom manifest instead of generating one
       manifest: {
-        name: 'RepCue - Exercise Timer',
+        name: 'RepCue - Fitness Timer',
         short_name: 'RepCue',
         description: 'Privacy-first fitness tracking app for interval training, optimized for mobile devices',
         theme_color: '#2563eb',
-        background_color: '#ffffff',
+        background_color: '#f8fafc',
         display: 'standalone',
         orientation: 'portrait-primary',
         scope: '/',
@@ -87,9 +100,36 @@ export default defineConfig({
                 sizes: '192x192'
               }
             ]
+          },
+          {
+            name: 'Browse Exercises',
+            short_name: 'Exercises',
+            description: 'Browse available exercises',
+            url: '/exercises',
+            icons: [
+              {
+                src: '/android-chrome-192x192.png',
+                sizes: '192x192'
+              }
+            ]
           }
         ]
-      }
+      },
+      useCredentials: true
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Optimize chunk splitting for better loading
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          utils: ['./src/utils/platformDetection', './src/services/storageService'],
+          components: ['./src/components/Navigation', './src/components/AppShell']
+        }
+      }
+    },
+    assetsInlineLimit: 0 // Ensure all assets are copied as files
+  },
+  publicDir: 'public' // Ensure public directory is properly copied
 })
