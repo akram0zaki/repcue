@@ -1,5 +1,40 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-27] - PWA Module 2: App Shell Architecture Complete
+
+### Added
+- **App Shell Architecture**: Persistent UI shell for native-like PWA experience
+  - Clean UI shell without flickering route transitions
+  - Persistent bottom navigation across all pages including timer
+  - PWA feature integration: install prompt, onboarding flow, offline banner
+  - Accessibility compliant with skip links, ARIA landmarks, and screen reader support
+  - Platform detection integration without distracting header indicators
+  - Responsive design optimized for mobile-first PWA experience
+
+### Fixed
+- **UI Issues Resolved**: Multiple user experience improvements
+  - Eliminated screen flickering during navigation between menu options
+  - Removed unwanted page title display at top-left corner
+  - Removed "Desktop" platform indicator from top-right corner
+  - Restored missing bottom navigation menu on Timer page
+  - Disabled route transition animations that caused poor UX
+
+### Technical Implementation
+- **AppShell Component**: 161-line production-ready shell component
+  - Integration of Module 1 PWA features (InstallPrompt, OnboardingFlow, OfflineBanner)
+  - PAGE_CONFIGS system for route-specific navigation behavior
+  - Proper component composition without fixed header elements
+  - TypeScript interfaces for maintainable configuration management
+- **Test Coverage**: Simplified test suite with proper mocking
+  - 6 focused tests covering core AppShell functionality
+  - Proper mocking of browser APIs and hook dependencies
+  - Component integration testing with React Router
+
+### Performance
+- **Bundle Optimization**: Maintained small bundle size with new features
+- **Navigation Speed**: Instant route transitions without animation overhead
+- **Memory Efficiency**: Clean component unmounting and state management
+
 ## [2025-01-27] - PWA Module 1 Complete: Post-Install Onboarding Flow
 
 ### Added

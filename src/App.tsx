@@ -6,8 +6,7 @@ import { audioService } from './services/audioService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import ConsentBanner from './components/ConsentBanner';
-import OfflineBanner from './components/OfflineBanner';
-import Navigation from './components/Navigation';
+import AppShell from './components/AppShell';
 import { registerServiceWorker } from './utils/serviceWorker';
 import type { Exercise, AppSettings, TimerState, ActivityLog } from './types';
 import { Routes as AppRoutes } from './types';
@@ -480,18 +479,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Skip link for accessibility */}
-        <a 
-          href="#main-content" 
-          className="skip-link"
-        >
-          Skip to main content
-        </a>
-
-        {/* Offline/Online status banner */}
-        <OfflineBanner />
-
+      <AppShell>
         <Suspense fallback={
           <div className="min-h-screen flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -555,10 +543,7 @@ function App() {
             <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />
           </Routes>
         </Suspense>
-        
-        {/* Bottom Navigation */}
-        <Navigation />
-      </div>
+      </AppShell>
     </Router>
   );
 }
