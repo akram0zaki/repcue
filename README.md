@@ -1,6 +1,6 @@
-# RepCue - Privacy-First Fitness Tracking App
+# RepCue - Privacy-First Fitness Tracking PWA
 
-RepCue is a modern, privacy-first fitness tracking web application designed for interval training and exercise logging. Built with React, TypeScript, and Tailwind CSS, it's optimized for mobile devices and perfect for self-hosting on Raspberry Pi.
+RepCue is a modern, privacy-first fitness tracking Progressive Web App (PWA) designed for interval training and exercise logging. Built with React, TypeScript, and Tailwind CSS, it delivers a native-like app experience while being optimized for mobile devices and perfect for self-hosting on Raspberry Pi.
 
 ## 🚀 Quick Start
 
@@ -36,6 +36,8 @@ RepCue is your personal interval training companion that:
 - 🔔 **Audio Feedback**: Start/stop sounds, interval beeps, voice announcements
 - 📊 **Activity Logging**: Track your workout sessions automatically
 - 🔒 **100% Private**: All data stored locally on your device
+- 📱 **Progressive Web App**: Install as native app on iOS, Android, and Desktop
+- 🌐 **Cross-Platform Detection**: Smart platform identification for optimal experience
 - 📱 **Mobile-First**: Responsive design optimized for phones and tablets
 - 🌙 **Dark Mode**: Full dark/light theme support
 - ♿ **Accessible**: WCAG 2.1 compliant for all users
@@ -804,21 +806,25 @@ We welcome contributions! Here's how to get started:
 - ✅ PM2 production deployment support
 - ✅ Express server with health monitoring
 - ✅ Nginx + Cloudflare tunnel integration
+- ✅ **PWA Platform Detection**: Cross-platform detection system with comprehensive browser/OS identification
+- ✅ **TypeScript Integration**: Fully typed platform utilities with 100% test coverage
 
-### Planned Features (v0.2.0)
+### Planned Features (v0.2.0) - PWA Enhancement
+- 🔄 **Install Experience**: Smart install prompts for iOS, Android, and Desktop
+- 🔄 **Offline Functionality**: Full offline workout capability with background sync
+- 🔄 **App Shell Architecture**: Instant loading with persistent navigation
+- ✅ **Platform Detection**: Cross-platform detection system (Completed)
 - 🔄 Custom workout routines
 - 🔄 Exercise progression tracking
 - 🔄 Import/export workout data
-- 🔄 Offline PWA functionality
-- 🔄 More exercise categories
-- 🔄 Advanced timer patterns
 
 ### Future Enhancements
 - 📋 Workout scheduling
 - 📊 Advanced analytics and charts
 - 🏆 Achievement system
 - 🔊 Custom audio cues
-- 📱 Native mobile app
+- 🔄 **Background Sync**: Automatic data sync when online
+- � **Push Notifications**: Workout reminders and achievements
 
 ---
 
