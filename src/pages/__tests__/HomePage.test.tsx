@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import HomePage from '../HomePage';
 import type { Exercise, AppSettings } from '../../types';
-import { ExerciseCategory } from '../../types';
+import { ExerciseCategory, ExerciseType } from '../../types';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -22,6 +22,7 @@ const mockExercises: Exercise[] = [
     name: 'Plank',
     description: 'Hold your body in a straight line',
     category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 60,
     isFavorite: true,
     tags: ['core', 'stability']
@@ -31,6 +32,7 @@ const mockExercises: Exercise[] = [
     name: 'Push-ups',
     description: 'Lower and raise body using arms',
     category: ExerciseCategory.STRENGTH,
+    exerciseType: ExerciseType.REPETITION_BASED,
     defaultDuration: 45,
     isFavorite: false,
     tags: ['strength', 'arms']
@@ -40,6 +42,7 @@ const mockExercises: Exercise[] = [
     name: 'Jumping Jacks',
     description: 'Jump with legs apart and arms overhead',
     category: ExerciseCategory.CARDIO,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['cardio', 'full-body']
@@ -54,7 +57,8 @@ const mockAppSettings: AppSettings = {
   darkMode: false,
   autoSave: true,
   lastSelectedExerciseId: 'plank',
-  preTimerCountdown: 3
+  preTimerCountdown: 3,
+  defaultRestTime: 60
 };
 
 const mockOnToggleFavorite = vi.fn();

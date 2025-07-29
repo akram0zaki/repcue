@@ -1,6 +1,14 @@
 import Dexie from 'dexie';
 import type { Table } from 'dexie';
-import type { Exercise, ActivityLog, UserPreferences, AppSettings } from '../types';
+import type { 
+  Exercise, 
+  ActivityLog, 
+  UserPreferences, 
+  AppSettings,
+  Workout,
+  Schedule,
+  WorkoutSession
+} from '../types';
 import { consentService } from './consentService';
 
 // Database schema interfaces
@@ -22,6 +30,22 @@ interface StoredExercise extends Exercise {
   updatedAt: string;
 }
 
+// New interfaces for workout-related data
+interface StoredWorkout extends Omit<Workout, 'createdAt' | 'updatedAt'> {
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface StoredSchedule extends Omit<Schedule, 'createdAt' | 'updatedAt'> {
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface StoredWorkoutSession extends Omit<WorkoutSession, 'startTime' | 'endTime'> {
+  startTime: string;
+  endTime?: string;
+}
+
 
 
 /**
@@ -33,15 +57,21 @@ class RepCueDatabase extends Dexie {
   activityLogs!: Table<StoredActivityLog>;
   userPreferences!: Table<StoredUserPreferences>;
   appSettings!: Table<StoredAppSettings>;
+  workouts!: Table<StoredWorkout>;
+  schedules!: Table<StoredSchedule>;
+  workoutSessions!: Table<StoredWorkoutSession>;
 
   constructor() {
     super('RepCueDB');
     
-    this.version(1).stores({
-      exercises: 'id, name, category, isFavorite, updatedAt',
+    this.version(2).stores({
+      exercises: 'id, name, category, exerciseType, isFavorite, updatedAt',
       activityLogs: '++id, exerciseId, timestamp, duration',
       userPreferences: '++id, updatedAt',
-      appSettings: '++id, updatedAt'
+      appSettings: '++id, updatedAt',
+      workouts: 'id, name, createdAt, updatedAt',
+      schedules: 'id, name, isActive, createdAt, updatedAt',
+      workoutSessions: 'id, workoutId, startTime, endTime, isCompleted'
     });
   }
 }
@@ -417,6 +447,268 @@ export class StorageService {
     }
   }
 
+  // ===============================
+  // Workout Management Methods
+  // ===============================
+
+  /**
+   * Save workout data
+   */
+  public async saveWorkout(workout: Workout): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    const storedWorkout: StoredWorkout = {
+      ...workout,
+      createdAt: workout.createdAt.toISOString(),
+      updatedAt: workout.updatedAt.toISOString()
+    };
+
+    try {
+      await this.db.workouts.put(storedWorkout);
+    } catch (error) {
+      console.warn('Failed to save workout to IndexedDB:', error);
+      this.fallbackStorage.set(`workout_${workout.id}`, storedWorkout);
+    }
+  }
+
+  /**
+   * Get all workouts
+   */
+  public async getWorkouts(): Promise<Workout[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const storedWorkouts = await this.db.workouts.orderBy('updatedAt').reverse().toArray();
+      return storedWorkouts.map(this.convertStoredWorkout);
+    } catch (error) {
+      console.warn('Failed to load workouts from IndexedDB:', error);
+      const workouts: Workout[] = [];
+      this.fallbackStorage.forEach((value, key) => {
+        if (key.startsWith('workout_')) {
+          workouts.push(this.convertStoredWorkout(value));
+        }
+      });
+      return workouts;
+    }
+  }
+
+  /**
+   * Get workout by ID
+   */
+  public async getWorkout(workoutId: string): Promise<Workout | null> {
+    if (!this.canStoreData()) {
+      return null;
+    }
+
+    try {
+      const storedWorkout = await this.db.workouts.get(workoutId);
+      return storedWorkout ? this.convertStoredWorkout(storedWorkout) : null;
+    } catch (error) {
+      console.warn('Failed to get workout from IndexedDB:', error);
+      const fallback = this.fallbackStorage.get(`workout_${workoutId}`);
+      return fallback ? this.convertStoredWorkout(fallback) : null;
+    }
+  }
+
+  /**
+   * Delete workout data
+   */
+  public async deleteWorkout(workoutId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot delete data without user consent');
+    }
+
+    try {
+      await this.db.workouts.delete(workoutId);
+      console.log(`Workout ${workoutId} deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete workout from IndexedDB:', error);
+      this.fallbackStorage.delete(`workout_${workoutId}`);
+    }
+  }
+
+  // ===============================
+  // Schedule Management Methods
+  // ===============================
+
+  /**
+   * Save schedule data
+   */
+  public async saveSchedule(schedule: Schedule): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    const storedSchedule: StoredSchedule = {
+      ...schedule,
+      createdAt: schedule.createdAt.toISOString(),
+      updatedAt: schedule.updatedAt.toISOString()
+    };
+
+    try {
+      await this.db.schedules.put(storedSchedule);
+    } catch (error) {
+      console.warn('Failed to save schedule to IndexedDB:', error);
+      this.fallbackStorage.set(`schedule_${schedule.id}`, storedSchedule);
+    }
+  }
+
+  /**
+   * Get all schedules
+   */
+  public async getSchedules(): Promise<Schedule[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const storedSchedules = await this.db.schedules.orderBy('updatedAt').reverse().toArray();
+      return storedSchedules.map(this.convertStoredSchedule);
+    } catch (error) {
+      console.warn('Failed to load schedules from IndexedDB:', error);
+      const schedules: Schedule[] = [];
+      this.fallbackStorage.forEach((value, key) => {
+        if (key.startsWith('schedule_')) {
+          schedules.push(this.convertStoredSchedule(value));
+        }
+      });
+      return schedules;
+    }
+  }
+
+  /**
+   * Get active schedule
+   */
+  public async getActiveSchedule(): Promise<Schedule | null> {
+    if (!this.canStoreData()) {
+      return null;
+    }
+
+    try {
+      const storedSchedule = await this.db.schedules
+        .filter(schedule => schedule.isActive)
+        .first();
+      return storedSchedule ? this.convertStoredSchedule(storedSchedule) : null;
+    } catch (error) {
+      console.warn('Failed to get active schedule from IndexedDB:', error);
+      // Try fallback storage
+      const schedules: Schedule[] = [];
+      this.fallbackStorage.forEach((value, key) => {
+        if (key.startsWith('schedule_')) {
+          schedules.push(this.convertStoredSchedule(value));
+        }
+      });
+      return schedules.find(schedule => schedule.isActive) || null;
+    }
+  }
+
+  /**
+   * Delete schedule data
+   */
+  public async deleteSchedule(scheduleId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot delete data without user consent');
+    }
+
+    try {
+      await this.db.schedules.delete(scheduleId);
+      console.log(`Schedule ${scheduleId} deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete schedule from IndexedDB:', error);
+      this.fallbackStorage.delete(`schedule_${scheduleId}`);
+    }
+  }
+
+  // ===============================
+  // Workout Session Management Methods
+  // ===============================
+
+  /**
+   * Save workout session data
+   */
+  public async saveWorkoutSession(session: WorkoutSession): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    const storedSession: StoredWorkoutSession = {
+      ...session,
+      startTime: session.startTime.toISOString(),
+      endTime: session.endTime?.toISOString()
+    };
+
+    try {
+      await this.db.workoutSessions.put(storedSession);
+    } catch (error) {
+      console.warn('Failed to save workout session to IndexedDB:', error);
+      this.fallbackStorage.set(`session_${session.id}`, storedSession);
+    }
+  }
+
+  /**
+   * Get workout sessions
+   */
+  public async getWorkoutSessions(
+    limit?: number,
+    workoutId?: string,
+    fromDate?: Date
+  ): Promise<WorkoutSession[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      let query = this.db.workoutSessions.orderBy('startTime').reverse();
+
+      if (fromDate) {
+        query = query.filter(session => session.startTime >= fromDate.toISOString());
+      }
+
+      if (workoutId) {
+        query = query.filter(session => session.workoutId === workoutId);
+      }
+
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      const storedSessions = await query.toArray();
+      return storedSessions.map(this.convertStoredWorkoutSession);
+    } catch (error) {
+      console.warn('Failed to load workout sessions from IndexedDB:', error);
+      const sessions: WorkoutSession[] = [];
+      this.fallbackStorage.forEach((value, key) => {
+        if (key.startsWith('session_')) {
+          sessions.push(this.convertStoredWorkoutSession(value));
+        }
+      });
+      return sessions
+        .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+        .slice(0, limit);
+    }
+  }
+
+  /**
+   * Delete workout session data
+   */
+  public async deleteWorkoutSession(sessionId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot delete data without user consent');
+    }
+
+    try {
+      await this.db.workoutSessions.delete(sessionId);
+      console.log(`Workout session ${sessionId} deleted successfully`);
+    } catch (error) {
+      console.error('Failed to delete workout session from IndexedDB:', error);
+      this.fallbackStorage.delete(`session_${sessionId}`);
+    }
+  }
+
   /**
    * Delete exercise data
    */
@@ -469,6 +761,39 @@ export class StorageService {
     return {
       ...stored,
       timestamp: new Date(stored.timestamp)
+    };
+  }
+
+  /**
+   * Convert stored workout to runtime format
+   */
+  private convertStoredWorkout(stored: StoredWorkout): Workout {
+    return {
+      ...stored,
+      createdAt: new Date(stored.createdAt),
+      updatedAt: new Date(stored.updatedAt)
+    };
+  }
+
+  /**
+   * Convert stored schedule to runtime format
+   */
+  private convertStoredSchedule(stored: StoredSchedule): Schedule {
+    return {
+      ...stored,
+      createdAt: new Date(stored.createdAt),
+      updatedAt: new Date(stored.updatedAt)
+    };
+  }
+
+  /**
+   * Convert stored workout session to runtime format
+   */
+  private convertStoredWorkoutSession(stored: StoredWorkoutSession): WorkoutSession {
+    return {
+      ...stored,
+      startTime: new Date(stored.startTime),
+      endTime: stored.endTime ? new Date(stored.endTime) : undefined
     };
   }
 

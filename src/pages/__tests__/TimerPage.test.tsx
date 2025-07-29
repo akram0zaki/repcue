@@ -4,6 +4,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { ExerciseType } from '../../types';
 
 // Mock data
 const mockExercise: Exercise = {
@@ -11,6 +12,7 @@ const mockExercise: Exercise = {
   name: 'Test Exercise',
   description: 'Test description',
   category: 'core',
+  exerciseType: ExerciseType.TIME_BASED,
   defaultDuration: 30,
   isFavorite: false,
   tags: ['test']

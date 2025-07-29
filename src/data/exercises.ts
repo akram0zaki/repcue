@@ -1,5 +1,5 @@
 import type { Exercise } from '../types';
-import { ExerciseCategory } from '../types';
+import { ExerciseCategory, ExerciseType } from '../types';
 
 export const INITIAL_EXERCISES: Exercise[] = [
   // Core exercises
@@ -8,6 +8,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Plank',
     description: 'Hold your body in a straight line, supported by forearms and toes',
     category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 60,
     isFavorite: false,
     tags: ['isometric', 'core', 'stability']
@@ -17,6 +18,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Side Plank',
     description: 'Hold your body sideways, supported by one forearm',
     category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['isometric', 'core', 'obliques']
@@ -26,6 +28,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Mountain Climbers',
     description: 'Alternate bringing knees to chest in plank position',
     category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 45,
     isFavorite: false,
     tags: ['dynamic', 'core', 'cardio']
@@ -35,7 +38,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Bicycle Crunches',
     description: 'Alternate elbow to opposite knee in cycling motion',
     category: ExerciseCategory.CORE,
-    defaultDuration: 45,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 20,
     isFavorite: false,
     tags: ['dynamic', 'core', 'obliques']
   },
@@ -46,7 +51,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Push-ups',
     description: 'Lower and raise body using arms in prone position',
     category: ExerciseCategory.STRENGTH,
-    defaultDuration: 60,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 12,
     isFavorite: false,
     tags: ['upper-body', 'chest', 'arms']
   },
@@ -55,7 +62,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Squats',
     description: 'Lower body by bending knees, then return to standing',
     category: ExerciseCategory.STRENGTH,
-    defaultDuration: 60,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 15,
     isFavorite: false,
     tags: ['lower-body', 'glutes', 'legs']
   },
@@ -64,7 +73,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Lunges',
     description: 'Step forward and lower body, alternating legs',
     category: ExerciseCategory.STRENGTH,
-    defaultDuration: 60,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 12,
     isFavorite: false,
     tags: ['lower-body', 'glutes', 'legs', 'balance']
   },
@@ -73,6 +84,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Wall Sit',
     description: 'Slide down wall until thighs parallel, hold position',
     category: ExerciseCategory.STRENGTH,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 45,
     isFavorite: false,
     tags: ['isometric', 'lower-body', 'quads']
@@ -82,7 +94,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Burpees',
     description: 'Squat, jump back to plank, push-up, jump feet back, jump up',
     category: ExerciseCategory.STRENGTH,
-    defaultDuration: 45,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 10,
     isFavorite: false,
     tags: ['full-body', 'cardio', 'explosive']
   },
@@ -93,6 +107,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Jumping Jacks',
     description: 'Jump feet apart while raising arms, then jump back together',
     category: ExerciseCategory.CARDIO,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 60,
     isFavorite: false,
     tags: ['cardio', 'full-body', 'coordination']
@@ -102,6 +117,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'High Knees',
     description: 'Run in place bringing knees up to chest level',
     category: ExerciseCategory.CARDIO,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 45,
     isFavorite: false,
     tags: ['cardio', 'lower-body', 'explosive']
@@ -111,6 +127,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Butt Kicks',
     description: 'Run in place kicking heels up toward glutes',
     category: ExerciseCategory.CARDIO,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 45,
     isFavorite: false,
     tags: ['cardio', 'lower-body', 'hamstrings']
@@ -122,6 +139,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Downward Dog',
     description: 'Form inverted V-shape with hands and feet on ground',
     category: ExerciseCategory.FLEXIBILITY,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['yoga', 'stretch', 'shoulders', 'hamstrings']
@@ -131,6 +149,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: "Child's Pose",
     description: 'Kneel and sit back on heels, extend arms forward on ground',
     category: ExerciseCategory.FLEXIBILITY,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['yoga', 'stretch', 'relaxation', 'back']
@@ -140,7 +159,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Cat-Cow Stretch',
     description: 'Alternate arching and rounding spine on hands and knees',
     category: ExerciseCategory.FLEXIBILITY,
-    defaultDuration: 45,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 2,
+    defaultReps: 10,
     isFavorite: false,
     tags: ['yoga', 'stretch', 'spine', 'mobility']
   },
@@ -151,6 +172,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Single Leg Stand',
     description: 'Stand on one leg, hold for time, then switch',
     category: ExerciseCategory.BALANCE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['balance', 'stability', 'proprioception']
@@ -160,6 +182,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Tree Pose',
     description: 'Stand on one leg with other foot on inner thigh',
     category: ExerciseCategory.BALANCE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['yoga', 'balance', 'stability', 'focus']
@@ -169,6 +192,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Warrior III',
     description: 'Balance on one leg with other leg extended behind',
     category: ExerciseCategory.BALANCE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 20,
     isFavorite: false,
     tags: ['yoga', 'balance', 'strength', 'core']
@@ -180,7 +204,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Dead Bug',
     description: 'Lie on back, alternate extending opposite arm and leg',
     category: ExerciseCategory.CORE,
-    defaultDuration: 45,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 8,
     isFavorite: false,
     tags: ['core', 'stability', 'coordination']
   },
@@ -189,7 +215,9 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Glute Bridges',
     description: 'Lie on back, lift hips by squeezing glutes',
     category: ExerciseCategory.STRENGTH,
-    defaultDuration: 45,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 15,
     isFavorite: false,
     tags: ['glutes', 'lower-body', 'posterior-chain']
   },
@@ -200,6 +228,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     name: 'Finger Roll',
     description: 'Roll fingers from fist to full extension, working each finger individually',
     category: ExerciseCategory.HAND_WARMUP,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30,
     isFavorite: false,
     tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity']

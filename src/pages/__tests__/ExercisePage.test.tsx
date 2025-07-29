@@ -5,7 +5,7 @@ import { describe, it, vi, expect } from 'vitest';
 import ExercisePage from '../ExercisePage';
 import { INITIAL_EXERCISES } from '../../data/exercises';
 import type { Exercise } from '../../types';
-import { ExerciseCategory } from '../../types';
+import { ExerciseCategory, ExerciseType } from '../../types';
 
 // Mock exercise with many tags for testing expandable functionality
 const mockExerciseWithManyTags: Exercise = {
@@ -13,6 +13,7 @@ const mockExerciseWithManyTags: Exercise = {
   name: 'Test Exercise',
   description: 'A test exercise with many tags',
   category: ExerciseCategory.CORE,
+  exerciseType: ExerciseType.TIME_BASED,
   defaultDuration: 30,
   isFavorite: false,
   tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5']
@@ -24,6 +25,7 @@ const mockExerciseWithFewTags: Exercise = {
   name: 'Test Exercise Few',
   description: 'A test exercise with few tags',
   category: ExerciseCategory.CARDIO,
+  exerciseType: ExerciseType.TIME_BASED,
   defaultDuration: 60,
   isFavorite: true,
   tags: ['tag1', 'tag2']

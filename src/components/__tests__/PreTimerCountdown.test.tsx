@@ -4,6 +4,7 @@ import SettingsPage from '../../pages/SettingsPage';
 import TimerPage from '../../pages/TimerPage';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
 import type { Exercise, AppSettings, TimerState } from '../../types';
+import { ExerciseType } from '../../types';
 
 // Mock services
 vi.mock('../../services/audioService', () => ({
@@ -31,6 +32,7 @@ const mockExercise: Exercise = {
   name: 'Test Exercise',
   description: 'Test description for countdown',
   category: 'core',
+  exerciseType: ExerciseType.TIME_BASED,
   defaultDuration: 30,
   isFavorite: false,
   tags: ['test']

@@ -1,10 +1,21 @@
+// Exercise types
+export const ExerciseType = {
+  TIME_BASED: 'time-based',
+  REPETITION_BASED: 'repetition-based'
+} as const;
+
+export type ExerciseType = typeof ExerciseType[keyof typeof ExerciseType];
+
 // Core exercise types
 export interface Exercise {
   id: string;
   name: string;
   description: string;
   category: ExerciseCategory;
-  defaultDuration?: number; // in seconds
+  exerciseType: ExerciseType;
+  defaultDuration?: number; // in seconds - for time-based exercises
+  defaultSets?: number; // for repetition-based exercises
+  defaultReps?: number; // for repetition-based exercises
   isFavorite: boolean;
   tags: string[];
 }
@@ -19,6 +30,85 @@ export const ExerciseCategory = {
 } as const;
 
 export type ExerciseCategory = typeof ExerciseCategory[keyof typeof ExerciseCategory];
+
+// Workout structure
+export interface WorkoutExercise {
+  id: string;
+  exerciseId: string;
+  order: number; // Position in workout sequence
+  // Custom values that override exercise defaults
+  customDuration?: number; // for time-based exercises
+  customSets?: number; // for repetition-based exercises
+  customReps?: number; // for repetition-based exercises
+  customRestTime?: number; // rest time after this exercise (in seconds)
+}
+
+export interface Workout {
+  id: string;
+  name: string;
+  description?: string;
+  exercises: WorkoutExercise[];
+  estimatedDuration?: number; // calculated total time in seconds
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Schedule structure
+export const Weekday = {
+  MONDAY: 'monday',
+  TUESDAY: 'tuesday',
+  WEDNESDAY: 'wednesday',
+  THURSDAY: 'thursday',
+  FRIDAY: 'friday',
+  SATURDAY: 'saturday',
+  SUNDAY: 'sunday'
+} as const;
+
+export type Weekday = typeof Weekday[keyof typeof Weekday];
+
+export interface ScheduleEntry {
+  id: string;
+  weekday: Weekday;
+  workoutId: string;
+  isActive: boolean;
+}
+
+export interface Schedule {
+  id: string;
+  name: string;
+  entries: ScheduleEntry[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Workout session logging
+export interface WorkoutSessionExercise {
+  id: string;
+  exerciseId: string;
+  exerciseName: string;
+  order: number;
+  // Actual values performed
+  actualDuration?: number; // for time-based exercises
+  actualSets?: number; // for repetition-based exercises
+  actualReps?: number; // for repetition-based exercises
+  restTime?: number; // actual rest time taken
+  isCompleted: boolean;
+  startTime?: Date;
+  endTime?: Date;
+}
+
+export interface WorkoutSession {
+  id: string;
+  workoutId: string;
+  workoutName: string;
+  startTime: Date;
+  endTime?: Date;
+  exercises: WorkoutSessionExercise[];
+  isCompleted: boolean;
+  completionPercentage: number; // 0-100
+  totalDuration?: number; // actual time spent in seconds
+}
 
 // Activity logging
 export interface ActivityLog {
@@ -79,6 +169,7 @@ export interface AppSettings {
   autoSave: boolean;
   lastSelectedExerciseId?: string | null;
   preTimerCountdown: number; // 0-10 seconds countdown before timer starts
+  defaultRestTime: number; // default rest time between exercises in seconds
 }
 
 // Navigation routes
@@ -88,7 +179,8 @@ export const Routes = {
   TIMER: '/timer',
   ACTIVITY_LOG: '/activity',
   SETTINGS: '/settings',
-  PRIVACY: '/privacy'
+  PRIVACY: '/privacy',
+  SCHEDULE: '/schedule'
 } as const;
 
 export type Routes = typeof Routes[keyof typeof Routes];
@@ -104,4 +196,4 @@ export interface SyncStatus {
   lastSyncDate?: Date;
   pendingChanges: number;
   isOnline: boolean;
-} 
+}

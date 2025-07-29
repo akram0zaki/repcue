@@ -32,7 +32,8 @@ const mockAppSettings: AppSettings = {
   darkMode: false,
   autoSave: true,
   lastSelectedExerciseId: null,
-  preTimerCountdown: 3
+  preTimerCountdown: 3,
+  defaultRestTime: 60
 };
 
 const mockOnUpdateSettings = vi.fn();

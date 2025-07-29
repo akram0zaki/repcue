@@ -3,12 +3,14 @@ import { render, screen } from '@testing-library/react';
 import TimerPage from '../TimerPage';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
 import type { Exercise, TimerState } from '../../types';
+import { ExerciseType } from '../../types';
 
 const mockExercise: Exercise = {
   id: 'test-exercise',
   name: 'Test Exercise',
   description: 'Test description for countdown',
   category: 'core',
+  exerciseType: ExerciseType.TIME_BASED,
   defaultDuration: 30,
   isFavorite: false,
   tags: ['test']

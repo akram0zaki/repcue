@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import ActivityLogPage from '../ActivityLogPage';
 import { storageService } from '../../services/storageService';
 import type { Exercise, ActivityLog } from '../../types';
-import { ExerciseCategory } from '../../types';
+import { ExerciseCategory, ExerciseType } from '../../types';
 
 // Mock the storage service
 vi.mock('../../services/storageService', () => ({
@@ -19,6 +19,7 @@ const mockExercises: Exercise[] = [
     name: 'Plank',
     description: 'Hold your body in a straight line',
     category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 60,
     isFavorite: false,
     tags: ['core', 'stability']
@@ -28,6 +29,7 @@ const mockExercises: Exercise[] = [
     name: 'Push-ups',
     description: 'Lower and raise body using arms',
     category: ExerciseCategory.STRENGTH,
+    exerciseType: ExerciseType.REPETITION_BASED,
     defaultDuration: 60,
     isFavorite: false,
     tags: ['strength', 'arms']
@@ -37,6 +39,7 @@ const mockExercises: Exercise[] = [
     name: 'Running',
     description: 'Cardiovascular exercise',
     category: ExerciseCategory.CARDIO,
+    exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 300,
     isFavorite: false,
     tags: ['cardio', 'endurance']

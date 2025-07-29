@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { StorageService } from '../storageService'
 import { consentService } from '../consentService'
 import type { Exercise, ActivityLog, UserPreferences, AppSettings } from '../../types'
+import { ExerciseType } from '../../types'
 
 // Mock Dexie
 vi.mock('dexie', () => {
@@ -53,6 +54,7 @@ describe('StorageService', () => {
     id: 'test-exercise-1',
     name: 'Push-ups',
     category: 'strength',
+    exerciseType: ExerciseType.REPETITION_BASED,
     description: 'Basic push-up exercise',
     defaultDuration: 30,
     isFavorite: false,
@@ -83,7 +85,8 @@ describe('StorageService', () => {
     beepVolume: 0.5,
     darkMode: false,
     autoSave: true,
-    preTimerCountdown: 3
+    preTimerCountdown: 3,
+    defaultRestTime: 60
   }
 
   beforeEach(() => {

@@ -17,4 +17,5 @@ export const DEFAULT_APP_SETTINGS = {
   autoSave: true,
   lastSelectedExerciseId: null,
   preTimerCountdown: 3, // Default 3 seconds countdown
+  defaultRestTime: 60, // Default 60 seconds rest between exercises
 }; 
