@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import type { Exercise, AppSettings } from '../types';
-import { Routes } from '../types';
+import React, { useState, useEffect } from 'react';
+import type { Exercise, AppSettings, Schedule, Workout } from '../types';
+import { Routes, Weekday } from '../types';
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
+import { storageService } from '../services/storageService';
+import { consentService } from '../services/consentService';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -11,6 +14,79 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
+  const [upcomingWorkout, setUpcomingWorkout] = useState<{
+    workout: Workout;
+    weekday: string;
+    date: string;
+  } | null>(null);
+  const [hasConsent, setHasConsent] = useState(false);
+
+  useEffect(() => {
+    const checkConsentAndLoadUpcoming = async () => {
+      const consentStatus = consentService.hasConsent();
+      setHasConsent(consentStatus);
+      
+      if (consentStatus) {
+        try {
+          const activeSchedule = await storageService.getActiveSchedule();
+          if (activeSchedule) {
+            const today = new Date();
+            const currentWeekday = Object.values(Weekday)[today.getDay()];
+            
+            // Find today's workout or next workout
+            let targetEntry = activeSchedule.entries.find(entry => 
+              entry.weekday === currentWeekday && entry.isActive
+            );
+            
+            // If no workout today, find next upcoming workout
+            if (!targetEntry) {
+              const weekdayOrder = Object.values(Weekday);
+              const currentIndex = weekdayOrder.indexOf(currentWeekday);
+              
+              for (let i = 1; i <= 7; i++) {
+                const nextIndex = (currentIndex + i) % 7;
+                const nextWeekday = weekdayOrder[nextIndex];
+                targetEntry = activeSchedule.entries.find(entry => 
+                  entry.weekday === nextWeekday && entry.isActive
+                );
+                if (targetEntry) break;
+              }
+            }
+            
+            if (targetEntry) {
+              const workout = await storageService.getWorkout(targetEntry.workoutId);
+              if (workout) {
+                const weekdayNames = {
+                  [Weekday.MONDAY]: 'Monday',
+                  [Weekday.TUESDAY]: 'Tuesday',
+                  [Weekday.WEDNESDAY]: 'Wednesday',
+                  [Weekday.THURSDAY]: 'Thursday',
+                  [Weekday.FRIDAY]: 'Friday',
+                  [Weekday.SATURDAY]: 'Saturday',
+                  [Weekday.SUNDAY]: 'Sunday'
+                };
+                
+                // Calculate the date for the workout
+                const workoutDate = new Date();
+                const daysUntilWorkout = (Object.values(Weekday).indexOf(targetEntry.weekday) - today.getDay() + 7) % 7;
+                workoutDate.setDate(today.getDate() + daysUntilWorkout);
+                
+                setUpcomingWorkout({
+                  workout,
+                  weekday: weekdayNames[targetEntry.weekday],
+                  date: workoutDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                });
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Failed to load upcoming workout:', error);
+        }
+      }
+    };
+
+    checkConsentAndLoadUpcoming();
+  }, []);
 
   const handleStartTimer = (exercise?: Exercise) => {
     if (exercise) {
@@ -35,6 +111,65 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {APP_DESCRIPTION}
           </p>
         </header>
+
+        {/* Upcoming Workout Section */}
+        {hasConsent && (
+          <section className="mb-6">
+            {upcomingWorkout ? (
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Upcoming Workout
+                    </h2>
+                    <div className="flex items-center space-x-4">
+                      <div>
+                        <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                          {upcomingWorkout.weekday}
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          {upcomingWorkout.date}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                          {upcomingWorkout.workout.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {upcomingWorkout.workout.exercises.length} exercise{upcomingWorkout.workout.exercises.length !== 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      // TODO: Start workout mode in timer - will be implemented in Phase 4
+                      console.log('Start workout clicked - will be implemented in Phase 4');
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  >
+                    Start Now
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 text-center">
+                <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  No Schedule Set
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                  Create a workout schedule to see your upcoming workouts here
+                </p>
+                <button
+                  onClick={() => navigate(Routes.SCHEDULE)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Add Workout
+                </button>
+              </div>
+            )}
+          </section>
+        )}
 
         <div className="space-y-4">
           {/* Quick Start Section */}

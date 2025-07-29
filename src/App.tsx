@@ -20,6 +20,7 @@ import {
   TimerPage, 
   ActivityLogPage, 
   SettingsPage,
+  SchedulePage,
   ChunkErrorBoundary,
   preloadCriticalRoutes,
   createRouteLoader
@@ -510,6 +511,14 @@ function App() {
                       exercises={exercises}
                       onToggleFavorite={toggleExerciseFavorite}
                     />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.SCHEDULE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Schedule')}>
+                    <SchedulePage />
                   </Suspense>
                 } 
               />

@@ -1,5 +1,33 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-30] - Phase 2: Navigation and UI Integration
+
+### Added
+- **Schedule Navigation Tab**: Added dedicated Schedule tab to main navigation
+  - **Compact More Menu**: Moved Settings to vertical three-dot (⋮) overflow menu to maximize space for main tabs
+  - **SchedulePage Implementation**: Complete schedule management UI with empty states and data display
+  - **HomePage Integration**: Added upcoming workout section with "Start Now" functionality
+  - **First-time Guidance**: Smart tooltip system with progressive disclosure for new users
+
+### Enhanced
+- **Navigation UX**: Optimized bottom navigation for better space utilization
+  - **Vertical More Icon**: Changed from horizontal dots to vertical (⋮) for cleaner design
+  - **Label-free Overflow**: Removed "More" text label to maximize main navigation space
+  - **Accessibility Maintained**: Preserved all ARIA attributes and screen reader support
+
+- **SchedulePage Features**:
+  - **Consent-aware**: Graceful handling of users without storage consent
+  - **Loading States**: Smooth skeleton UI during data loading
+  - **Tooltip Guidance**: Contextual help for first-time users with auto-dismiss
+  - **Dark Mode Support**: Complete dark mode styling with proper contrast ratios
+  - **Responsive Design**: Mobile-first layout optimized for PWA usage
+
+### Technical Improvements
+- **Component Architecture**: Added ScheduleIcon and enhanced NavigationIcons
+- **Test Coverage**: Added comprehensive tests for navigation changes (3 new test cases)
+- **TypeScript Integration**: Full type safety with existing Phase 1 models
+- **Lazy Loading**: Schedule page integrated with React.lazy() for optimal performance
+
 ## [2025-07-30] - Phase 1: Workout Schedule Foundation Implementation
 
 ### Added

@@ -81,6 +81,12 @@ export const SettingsPage = lazy(() =>
   }))
 );
 
+export const SchedulePage = lazy(() => 
+  import('../pages/SchedulePage').catch(() => ({
+    default: () => <div>Error loading Schedule page</div>
+  }))
+);
+
 // Preload critical routes
 export const preloadCriticalRoutes = () => {
   // Preload Timer and Home pages as they are most commonly used
