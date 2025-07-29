@@ -8,6 +8,8 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 - `StorageService` - Dexie.js (IndexedDB) wrapper with consent-aware persistence
 - `AudioService` - Web Audio API for beeps, vibrations, and accessibility announcements  
 - `ConsentService` - GDPR-compliant consent management with granular permissions
+- `SyncService` - Background sync and offline-first queue management
+- `QueueService` - Persistent operation queue with retry logic
 
 **State Management**: App-level React state in `App.tsx` with services for persistence. No external state management - intentionally simple for Pi deployment.
 
@@ -71,24 +73,28 @@ Object.defineProperty(navigator, 'vibrate', { value: vi.fn() });
 ### Essential Commands
 ```bash
 npm run dev          # Development server (port 5173)
-npm test             # Vitest unit tests with --coverage
+npm test             # Vitest unit tests with coverage
+npm run build        # Full build with splash generation
+npm run build:prod   # Production-optimized build (Pi deployment)
 npm run build:serve  # Production build + Express server (port 3001)
+npm run pm2:start    # Deploy with PM2 process manager
 npm run lint         # ESLint validation
-npm run test:ui      # Interactive test interface
+npm run test:ui      # Interactive test interface with coverage
 ```
 
 ### Testing Strategy
-- **Comprehensive Coverage**: 182/182 tests passing with >90% coverage requirement
+- **Comprehensive Coverage**: >350 tests passing with >90% coverage requirement
 - **Service Testing**: Every service has dedicated `__tests__/` subdirectory
 - **Mock Architecture**: Browser APIs comprehensively mocked in `src/test/setup.ts`
 - **Test Organization**: Separate test files for complex features (e.g., `TimerPage.countdown.test.tsx`)
-- **Accessibility Testing**: Cypress e2e tests with axe-core for WCAG compliance
+- **Accessibility Testing**: E2e tests with axe-core for WCAG compliance
 
 ### Pi-Specific Optimizations
 - **Memory Management**: PM2 config with 512MB memory limits (`ecosystem.config.cjs`)
 - **Performance**: Compression middleware, lazy-loaded components, 1-day static asset caching
 - **Production Server**: Express with security headers optimized for Cloudflare tunnel
 - **Process Management**: PM2 with health checks and daily restart scheduling
+- **Build Optimization**: `build:prod` excludes test compilation for faster Pi builds
 
 ## Component Architecture
 
@@ -119,6 +125,32 @@ interface TimerState {
 - **Web Audio API**: Custom beep generation with volume control and accessibility
 - **Vibration API**: Haptic feedback patterns for different timer events
 - **IndexedDB**: Primary storage via Dexie.js with consent management
+- **Service Worker**: PWA capabilities with Vite PWA plugin
+
+## PWA & Deployment Architecture
+
+### Vite PWA Configuration
+```typescript
+// vite.config.ts - PWA manifest and service worker
+VitePWA({
+  registerType: 'autoUpdate',
+  workbox: {
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+    navigateFallback: '/index.html'
+  }
+})
+```
+
+### Raspberry Pi Deployment
+- **Production Server**: Express.js with compression and security headers
+- **PM2 Process Management**: Single instance with 512MB memory limit
+- **Nginx Configuration**: Reverse proxy with asset caching
+- **Cloudflare Tunnel**: Secure external access without port forwarding
+
+### Build System
+- **Development**: Hot reload with Vite dev server
+- **Production**: TypeScript compilation + Vite build + splash screen generation
+- **Testing**: Vitest with jsdom environment and comprehensive mocking
 
 ## Data Architecture
 
@@ -219,10 +251,11 @@ Referrer-Policy: strict-origin-when-cross-origin
 - `server.js` - Production Express server with Pi optimizations
 - `ecosystem.config.cjs` - PM2 process management for Raspberry Pi deployment
 - `vitest.config.ts` - Test configuration with coverage reporting
+- `vite.config.ts` - Build configuration with PWA optimizations
 
 ### TypeScript & Configuration
 - `src/types/index.ts` - Complete type definitions for the application
 - `src/constants/index.ts` - App-wide constants and default configurations
-- `vite.config.ts` - Build configuration with PWA optimizations
+- `package.json` - Build scripts optimized for Pi deployment
 
 This architecture enables a highly maintainable, accessible, and privacy-respecting fitness tracking application optimized for self-hosted deployment on resource-constrained devices.
