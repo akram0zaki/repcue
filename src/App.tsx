@@ -20,7 +20,6 @@ import {
   TimerPage, 
   ActivityLogPage, 
   SettingsPage,
-  PageLoader,
   ChunkErrorBoundary,
   preloadCriticalRoutes,
   createRouteLoader
