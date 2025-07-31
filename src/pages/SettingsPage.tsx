@@ -64,6 +64,30 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     }
   };
 
+  const handleRefreshExercises = async () => {
+    try {
+      // Import fresh exercise data from server/source
+      const { INITIAL_EXERCISES } = await import('../data/exercises');
+      
+      // Force refresh: Use fresh exercise data WITHOUT preserving favorites
+      // This gives users a clean slate with the latest exercise definitions
+      const refreshedExercises = INITIAL_EXERCISES.map(exercise => ({
+        ...exercise,
+        isFavorite: false // Reset all favorites for a complete refresh
+      }));
+      
+      // Save all refreshed exercises (this will overwrite existing ones)
+      for (const exercise of refreshedExercises) {
+        await storageService.saveExercise(exercise);
+      }
+      
+      // Trigger a page reload to show updated exercises
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to refresh exercises:', error);
+    }
+  };
+
   const hasConsent = consentService.hasConsent();
   const consentStatus = consentService.getConsentStatus();
 
@@ -306,6 +330,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Download your workout data as a JSON file
+            </p>
+          </div>
+
+          {/* Refresh Exercises Button */}
+          <div className="mb-3">
+            <button
+              onClick={handleRefreshExercises}
+              disabled={!hasConsent}
+              className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            >
+              Refresh Exercises
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Force refresh exercises from server and reset all favorites
             </p>
           </div>
 

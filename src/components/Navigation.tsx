@@ -37,9 +37,9 @@ const Navigation: React.FC = () => {
       icon: HomeIcon,
     },
     {
-      path: Routes.SCHEDULE,
-      label: 'Schedule',
-      icon: ScheduleIcon,
+      path: Routes.WORKOUTS, // Changed from SCHEDULE
+      label: 'Workouts', // Changed from 'Schedule'
+      icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
     },
     {
       path: Routes.EXERCISES,

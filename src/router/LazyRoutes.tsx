@@ -81,9 +81,21 @@ export const SettingsPage = lazy(() =>
   }))
 );
 
-export const SchedulePage = lazy(() => 
-  import('../pages/SchedulePage').catch(() => ({
-    default: () => <div>Error loading Schedule page</div>
+export const WorkoutsPage = lazy(() => 
+  import('../pages/WorkoutsPage').catch(() => ({
+    default: () => <div>Error loading Workouts page</div>
+  }))
+);
+
+export const CreateWorkoutPage = lazy(() => 
+  import('../pages/CreateWorkoutPage').catch(() => ({
+    default: () => <div>Error loading Create Workout page</div>
+  }))
+);
+
+export const EditWorkoutPage = lazy(() => 
+  import('../pages/EditWorkoutPage').catch(() => ({
+    default: () => <div>Error loading Edit Workout page</div>
   }))
 );
 

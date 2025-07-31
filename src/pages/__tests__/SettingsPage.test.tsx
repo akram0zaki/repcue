@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import SettingsPage from '../SettingsPage';
 import { consentService } from '../../services/consentService';
 import { storageService } from '../../services/storageService';
-import type { AppSettings } from '../../types';
+import type { AppSettings, Exercise } from '../../types';
 
 // Mock the services
 vi.mock('../../services/consentService', () => ({
@@ -20,8 +20,38 @@ vi.mock('../../services/consentService', () => ({
 vi.mock('../../services/storageService', () => ({
   storageService: {
     exportAllData: vi.fn(),
-    clearAllData: vi.fn()
+    clearAllData: vi.fn(),
+    getExercises: vi.fn(),
+    saveExercise: vi.fn()
   }
+}));
+
+// Mock the dynamic import for exercises data
+vi.mock('../../data/exercises', () => ({
+  INITIAL_EXERCISES: [
+    {
+      id: '1',
+      name: 'Test Exercise 1',
+      description: 'Test description 1',
+      exerciseType: 'repetition-based',
+      defaultSets: 3,
+      defaultReps: 12,
+      category: 'strength',
+      tags: [],
+      isFavorite: false
+    },
+    {
+      id: '2', 
+      name: 'Test Exercise 2',
+      description: 'Test description 2',
+      exerciseType: 'time-based',
+      defaultSets: 1,
+      defaultDuration: 60,
+      category: 'cardio',
+      tags: [],
+      isFavorite: false
+    }
+  ]
 }));
 
 const mockAppSettings: AppSettings = {
@@ -264,6 +294,70 @@ describe('SettingsPage', () => {
       expect(storageService.clearAllData).toHaveBeenCalled();
       expect(consentService.resetConsent).toHaveBeenCalled();
     });
+  });
+
+  it('refreshes exercises when refresh button is clicked', async () => {
+    // Mock current exercises with some having favorites
+    const currentExercises: Exercise[] = [
+      {
+        id: '1',
+        name: 'Old Exercise 1',
+        description: 'Old description',
+        category: 'strength' as const,
+        exerciseType: 'repetition-based' as const,
+        isFavorite: true,
+        defaultSets: 2,
+        defaultReps: 10,
+        tags: []
+      },
+      {
+        id: '2',
+        name: 'Old Exercise 2',
+        description: 'Old description 2', 
+        category: 'cardio' as const,
+        exerciseType: 'time-based' as const,
+        isFavorite: false,
+        defaultSets: 1,
+        defaultDuration: 30,
+        tags: []
+      }
+    ];
+
+    vi.mocked(storageService.getExercises).mockResolvedValue(currentExercises);
+    vi.mocked(storageService.saveExercise).mockResolvedValue();
+
+    // Mock window.location.reload
+    const mockReload = vi.fn();
+    Object.defineProperty(window, 'location', {
+      value: { reload: mockReload },
+      writable: true
+    });
+
+    renderSettingsPage();
+    
+    const refreshButton = screen.getByRole('button', { name: /refresh exercises/i });
+    fireEvent.click(refreshButton);
+
+    await waitFor(() => {
+      expect(storageService.saveExercise).toHaveBeenCalledTimes(2); // For each INITIAL_EXERCISES
+      expect(mockReload).toHaveBeenCalled();
+    });
+
+    // Verify exercises were saved with favorites RESET (force refresh behavior)
+    expect(storageService.saveExercise).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: '1',
+        name: 'Test Exercise 1',
+        isFavorite: false // Should reset favorite status for force refresh
+      })
+    );
+    expect(storageService.saveExercise).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: '2',
+        name: 'Test Exercise 2', 
+        isFavorite: false // Should reset favorite status for force refresh
+      })
+    );
   });
 
   it('shows data section with auto save setting', () => {

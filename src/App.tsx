@@ -20,7 +20,9 @@ import {
   TimerPage, 
   ActivityLogPage, 
   SettingsPage,
-  SchedulePage,
+  WorkoutsPage,
+  CreateWorkoutPage,
+  EditWorkoutPage,
   ChunkErrorBoundary,
   preloadCriticalRoutes,
   createRouteLoader
@@ -349,17 +351,38 @@ function App() {
             }
             allExercises = INITIAL_EXERCISES;
           } else {
-            // Merge stored exercises with new ones from initial data
+            // Always use the latest exercise definitions from INITIAL_EXERCISES to ensure
+            // users get updated exercise types, defaults, and any new exercises
+            // This is an AUTOMATIC refresh that preserves user favorites
             const storedIds = new Set(storedExercises.map(ex => ex.id));
             const newExercises = INITIAL_EXERCISES.filter(ex => !storedIds.has(ex.id));
+            
+            // Update existing exercises with latest data from INITIAL_EXERCISES while preserving favorites
+            // Note: This differs from manual refresh which resets ALL data including favorites
+            const updatedStoredExercises = storedExercises.map(storedExercise => {
+              const latestExercise = INITIAL_EXERCISES.find(ex => ex.id === storedExercise.id);
+              if (latestExercise) {
+                // Use latest exercise data but preserve user's favorite status (automatic refresh)
+                return {
+                  ...latestExercise,
+                  isFavorite: storedExercise.isFavorite
+                };
+              }
+              return storedExercise; // Keep old exercise if not found in latest data
+            });
+            
+            // Save updated exercises back to storage
+            for (const exercise of updatedStoredExercises) {
+              await storageService.saveExercise(exercise);
+            }
             
             // Save any new exercises to storage
             for (const exercise of newExercises) {
               await storageService.saveExercise(exercise);
             }
             
-            // Combine stored and new exercises
-            allExercises = [...storedExercises, ...newExercises];
+            // Combine updated and new exercises
+            allExercises = [...updatedStoredExercises, ...newExercises];
           }
           setExercises(allExercises);
 
@@ -515,10 +538,26 @@ function App() {
                 } 
               />
               <Route 
-                path={AppRoutes.SCHEDULE} 
+                path={AppRoutes.WORKOUTS} 
                 element={
-                  <Suspense fallback={createRouteLoader('Schedule')}>
-                    <SchedulePage />
+                  <Suspense fallback={createRouteLoader('Workouts')}>
+                    <WorkoutsPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.CREATE_WORKOUT} 
+                element={
+                  <Suspense fallback={createRouteLoader('Create Workout')}>
+                    <CreateWorkoutPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.EDIT_WORKOUT} 
+                element={
+                  <Suspense fallback={createRouteLoader('Edit Workout')}>
+                    <EditWorkoutPage />
                   </Suspense>
                 } 
               />

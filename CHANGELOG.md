@@ -1,5 +1,20 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-07-31] - Build Fixes and Codebase Cleanup
+
+### Fixed
+- **Build Errors Resolved**: Fixed all 45 TypeScript compilation errors related to deprecated Schedule system
+  - **Removed Obsolete Files**: Deleted `SchedulePage.tsx` and `AddSchedulePage.tsx` that used deprecated Schedule types
+  - **Updated HomePage Logic**: Refactored upcoming workout display to use new Workout system with `scheduledDays`
+  - **Type Safety Restored**: Removed all references to non-existent Schedule types and API methods
+  - **Navigation Fixed**: Updated route references from deprecated `Routes.SCHEDULE` to `Routes.WORKOUTS`
+
+### Technical Improvements
+- **Codebase Modernization**: Completed migration from Schedule-based system to integrated Workout scheduling
+- **Test Coverage Maintained**: All 481 tests continue to pass after refactoring
+- **Settings Page Restored**: Resolved "Error loading Settings page" issue through codebase cleanup
+- **Build Pipeline**: Restored successful TypeScript compilation and Vite build process
+
 ## [2025-07-30] - Phase 2: Navigation and UI Integration
 
 ### Added

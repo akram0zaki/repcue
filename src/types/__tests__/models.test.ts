@@ -6,8 +6,6 @@ import {
   type Exercise,
   type Workout,
   type WorkoutExercise,
-  type Schedule,
-  type ScheduleEntry,
   type WorkoutSession,
   type WorkoutSessionExercise
 } from '../../types'
@@ -139,6 +137,8 @@ describe('Types and Models', () => {
           }
         ],
         estimatedDuration: 600,
+        scheduledDays: ['monday', 'wednesday', 'friday'],
+        isActive: true,
         createdAt: now,
         updatedAt: now
       }
@@ -147,53 +147,8 @@ describe('Types and Models', () => {
       expect(workout.exercises[0].order).toBe(1)
       expect(workout.exercises[1].order).toBe(2)
       expect(workout.estimatedDuration).toBe(600)
-    })
-  })
-
-  describe('ScheduleEntry Model', () => {
-    it('should create a valid schedule entry', () => {
-      const entry: ScheduleEntry = {
-        id: 'entry-1',
-        weekday: Weekday.MONDAY,
-        workoutId: 'workout-1',
-        isActive: true
-      }
-
-      expect(entry.weekday).toBe('monday')
-      expect(entry.workoutId).toBe('workout-1')
-      expect(entry.isActive).toBe(true)
-    })
-  })
-
-  describe('Schedule Model', () => {
-    it('should create a valid schedule', () => {
-      const now = new Date()
-      const schedule: Schedule = {
-        id: 'schedule-1',
-        name: 'Weekly Routine',
-        entries: [
-          {
-            id: 'entry-1',
-            weekday: Weekday.MONDAY,
-            workoutId: 'workout-1',
-            isActive: true
-          },
-          {
-            id: 'entry-2',
-            weekday: Weekday.WEDNESDAY,
-            workoutId: 'workout-2',
-            isActive: true
-          }
-        ],
-        isActive: true,
-        createdAt: now,
-        updatedAt: now
-      }
-
-      expect(schedule.entries).toHaveLength(2)
-      expect(schedule.entries[0].weekday).toBe('monday')
-      expect(schedule.entries[1].weekday).toBe('wednesday')
-      expect(schedule.isActive).toBe(true)
+      expect(workout.scheduledDays).toEqual(['monday', 'wednesday', 'friday'])
+      expect(workout.isActive).toBe(true)
     })
   })
 

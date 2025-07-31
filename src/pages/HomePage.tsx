@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import type { Exercise, AppSettings, Schedule, Workout } from '../types';
+import type { Exercise, AppSettings, Workout } from '../types';
 import { Routes, Weekday } from '../types';
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
 import { storageService } from '../services/storageService';
@@ -28,55 +28,58 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       
       if (consentStatus) {
         try {
-          const activeSchedule = await storageService.getActiveSchedule();
-          if (activeSchedule) {
+          const workouts = await storageService.getWorkouts();
+          const activeWorkouts = workouts.filter(workout => workout.isActive);
+          
+          if (activeWorkouts.length > 0) {
             const today = new Date();
-            const currentWeekday = Object.values(Weekday)[today.getDay()];
+            const currentWeekday = Object.values(Weekday)[today.getDay()] as Weekday;
             
-            // Find today's workout or next workout
-            let targetEntry = activeSchedule.entries.find(entry => 
-              entry.weekday === currentWeekday && entry.isActive
+            // Find today's workout or next upcoming workout
+            let targetWorkout = activeWorkouts.find(workout => 
+              workout.scheduledDays.includes(currentWeekday)
             );
+            let targetWeekday = currentWeekday;
             
             // If no workout today, find next upcoming workout
-            if (!targetEntry) {
+            if (!targetWorkout) {
               const weekdayOrder = Object.values(Weekday);
               const currentIndex = weekdayOrder.indexOf(currentWeekday);
               
               for (let i = 1; i <= 7; i++) {
                 const nextIndex = (currentIndex + i) % 7;
-                const nextWeekday = weekdayOrder[nextIndex];
-                targetEntry = activeSchedule.entries.find(entry => 
-                  entry.weekday === nextWeekday && entry.isActive
+                const nextWeekday = weekdayOrder[nextIndex] as Weekday;
+                targetWorkout = activeWorkouts.find(workout => 
+                  workout.scheduledDays.includes(nextWeekday)
                 );
-                if (targetEntry) break;
+                if (targetWorkout) {
+                  targetWeekday = nextWeekday;
+                  break;
+                }
               }
             }
             
-            if (targetEntry) {
-              const workout = await storageService.getWorkout(targetEntry.workoutId);
-              if (workout) {
-                const weekdayNames = {
-                  [Weekday.MONDAY]: 'Monday',
-                  [Weekday.TUESDAY]: 'Tuesday',
-                  [Weekday.WEDNESDAY]: 'Wednesday',
-                  [Weekday.THURSDAY]: 'Thursday',
-                  [Weekday.FRIDAY]: 'Friday',
-                  [Weekday.SATURDAY]: 'Saturday',
-                  [Weekday.SUNDAY]: 'Sunday'
-                };
-                
-                // Calculate the date for the workout
-                const workoutDate = new Date();
-                const daysUntilWorkout = (Object.values(Weekday).indexOf(targetEntry.weekday) - today.getDay() + 7) % 7;
-                workoutDate.setDate(today.getDate() + daysUntilWorkout);
-                
-                setUpcomingWorkout({
-                  workout,
-                  weekday: weekdayNames[targetEntry.weekday],
-                  date: workoutDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                });
-              }
+            if (targetWorkout) {
+              const weekdayNames = {
+                [Weekday.MONDAY]: 'Monday',
+                [Weekday.TUESDAY]: 'Tuesday',
+                [Weekday.WEDNESDAY]: 'Wednesday',
+                [Weekday.THURSDAY]: 'Thursday',
+                [Weekday.FRIDAY]: 'Friday',
+                [Weekday.SATURDAY]: 'Saturday',
+                [Weekday.SUNDAY]: 'Sunday'
+              };
+              
+              // Calculate the date for the workout
+              const workoutDate = new Date();
+              const daysUntilWorkout = (Object.values(Weekday).indexOf(targetWeekday) - today.getDay() + 7) % 7;
+              workoutDate.setDate(today.getDate() + daysUntilWorkout);
+              
+              setUpcomingWorkout({
+                workout: targetWorkout,
+                weekday: weekdayNames[targetWeekday],
+                date: workoutDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              });
             }
           }
         } catch (error) {
@@ -161,7 +164,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                   Create a workout schedule to see your upcoming workouts here
                 </p>
                 <button
-                  onClick={() => navigate(Routes.SCHEDULE)}
+                  onClick={() => navigate(Routes.WORKOUTS)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Add Workout

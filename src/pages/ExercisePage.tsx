@@ -94,10 +94,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-4xl">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1 sm:mb-2">
-            💪 Exercises
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+              💪 Exercises
+            </h1>
+          </div>
+          
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
             Browse and select exercises for your workout
           </p>
         </div>
@@ -287,6 +290,45 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           {exercise.description}
         </p>
 
+        {/* Exercise Type and Default Values */}
+        <div className="mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            {/* Exercise Type Badge */}
+            <span
+              className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                exercise.exerciseType === 'time-based'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                  : 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
+              }`}
+            >
+              {exercise.exerciseType === 'time-based' ? (
+                <>
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Time-based
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Rep-based
+                </>
+              )}
+            </span>
+            
+            {/* Default Values */}
+            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+              {exercise.exerciseType === 'time-based' ? (
+                `Default: ${formatDuration(exercise.defaultDuration)}`
+              ) : (
+                `Default: ${exercise.defaultSets || 1}×${exercise.defaultReps || 1}`
+              )}
+            </span>
+          </div>
+        </div>
+
         {/* Tags */}
         <div className="mb-3 sm:mb-4">
           <div 
@@ -319,14 +361,11 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         </div>
 
-        {/* Duration and Action */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 order-2 sm:order-1">
-            Default: {formatDuration(exercise.defaultDuration)}
-          </div>
+        {/* Action Button */}
+        <div className="flex justify-end">
           <button
             onClick={() => onStartTimer(exercise)}
-            className="w-full sm:w-auto px-3 py-2.5 sm:py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px] sm:min-h-0 order-1 sm:order-2"
+            className="w-full sm:w-auto px-3 py-2.5 sm:py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px] sm:min-h-0"
           >
             Start Timer
           </button>

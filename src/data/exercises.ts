@@ -2,14 +2,14 @@ import type { Exercise } from '../types';
 import { ExerciseCategory, ExerciseType } from '../types';
 
 export const INITIAL_EXERCISES: Exercise[] = [
-  // Core exercises
+  // Core exercises - Research-based defaults for beginners to intermediate
   {
     id: 'plank',
     name: 'Plank',
     description: 'Hold your body in a straight line, supported by forearms and toes',
     category: ExerciseCategory.CORE,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 60,
+    defaultDuration: 30, // Beginner-friendly: 30 seconds (research shows 20-60s range)
     isFavorite: false,
     tags: ['isometric', 'core', 'stability']
   },
@@ -19,7 +19,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Hold your body sideways, supported by one forearm',
     category: ExerciseCategory.CORE,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
+    defaultDuration: 20, // Harder than regular plank, shorter duration
     isFavorite: false,
     tags: ['isometric', 'core', 'obliques']
   },
@@ -29,7 +29,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Alternate bringing knees to chest in plank position',
     category: ExerciseCategory.CORE,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 45,
+    defaultDuration: 30, // High intensity cardio movement
     isFavorite: false,
     tags: ['dynamic', 'core', 'cardio']
   },
@@ -40,12 +40,12 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.CORE,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 20,
+    defaultReps: 15, // Standard rep range for ab exercises
     isFavorite: false,
     tags: ['dynamic', 'core', 'obliques']
   },
 
-  // Strength exercises
+  // Strength exercises - Based on fitness industry standards
   {
     id: 'push-ups',
     name: 'Push-ups',
@@ -53,7 +53,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.STRENGTH,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 12,
+    defaultReps: 8, // Beginner to intermediate range (research shows 8-15 for strength)
     isFavorite: false,
     tags: ['upper-body', 'chest', 'arms']
   },
@@ -64,7 +64,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.STRENGTH,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 15,
+    defaultReps: 12, // Classic strength training rep range
     isFavorite: false,
     tags: ['lower-body', 'glutes', 'legs']
   },
@@ -75,7 +75,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.STRENGTH,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 12,
+    defaultReps: 10, // Per leg, so 20 total alternating
     isFavorite: false,
     tags: ['lower-body', 'glutes', 'legs', 'balance']
   },
@@ -85,7 +85,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Slide down wall until thighs parallel, hold position',
     category: ExerciseCategory.STRENGTH,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 45,
+    defaultDuration: 30, // Beginner-friendly isometric hold
     isFavorite: false,
     tags: ['isometric', 'lower-body', 'quads']
   },
@@ -96,19 +96,19 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.STRENGTH,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 10,
+    defaultReps: 5, // Very demanding exercise, lower rep count
     isFavorite: false,
     tags: ['full-body', 'cardio', 'explosive']
   },
 
-  // Cardio exercises
+  // Cardio exercises - Time-based with research-backed durations
   {
     id: 'jumping-jacks',
     name: 'Jumping Jacks',
     description: 'Jump feet apart while raising arms, then jump back together',
     category: ExerciseCategory.CARDIO,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 60,
+    defaultDuration: 30, // Standard cardio interval
     isFavorite: false,
     tags: ['cardio', 'full-body', 'coordination']
   },
@@ -118,7 +118,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Run in place bringing knees up to chest level',
     category: ExerciseCategory.CARDIO,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 45,
+    defaultDuration: 30, // High intensity, shorter duration
     isFavorite: false,
     tags: ['cardio', 'lower-body', 'explosive']
   },
@@ -128,19 +128,19 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Run in place kicking heels up toward glutes',
     category: ExerciseCategory.CARDIO,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 45,
+    defaultDuration: 30, // Consistent with other high-intensity cardio
     isFavorite: false,
     tags: ['cardio', 'lower-body', 'hamstrings']
   },
 
-  // Flexibility exercises
+  // Flexibility exercises - Time-based holds as per yoga/stretching standards
   {
     id: 'downward-dog',
     name: 'Downward Dog',
     description: 'Form inverted V-shape with hands and feet on ground',
     category: ExerciseCategory.FLEXIBILITY,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
+    defaultDuration: 30, // Standard yoga pose hold
     isFavorite: false,
     tags: ['yoga', 'stretch', 'shoulders', 'hamstrings']
   },
@@ -150,7 +150,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Kneel and sit back on heels, extend arms forward on ground',
     category: ExerciseCategory.FLEXIBILITY,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
+    defaultDuration: 45, // Relaxation pose, longer hold
     isFavorite: false,
     tags: ['yoga', 'stretch', 'relaxation', 'back']
   },
@@ -161,19 +161,19 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.FLEXIBILITY,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 2,
-    defaultReps: 10,
+    defaultReps: 8, // Gentle mobility movement
     isFavorite: false,
     tags: ['yoga', 'stretch', 'spine', 'mobility']
   },
 
-  // Balance exercises
+  // Balance exercises - Time-based holds for stability training
   {
     id: 'single-leg-stand',
     name: 'Single Leg Stand',
     description: 'Stand on one leg, hold for time, then switch',
     category: ExerciseCategory.BALANCE,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
+    defaultDuration: 30, // Per leg
     isFavorite: false,
     tags: ['balance', 'stability', 'proprioception']
   },
@@ -183,7 +183,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Stand on one leg with other foot on inner thigh',
     category: ExerciseCategory.BALANCE,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
+    defaultDuration: 30, // Standard yoga balance pose
     isFavorite: false,
     tags: ['yoga', 'balance', 'stability', 'focus']
   },
@@ -193,12 +193,12 @@ export const INITIAL_EXERCISES: Exercise[] = [
     description: 'Balance on one leg with other leg extended behind',
     category: ExerciseCategory.BALANCE,
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 20,
+    defaultDuration: 20, // More challenging, shorter hold
     isFavorite: false,
     tags: ['yoga', 'balance', 'strength', 'core']
   },
 
-  // Additional popular exercises
+  // Additional popular exercises with proper classification
   {
     id: 'dead-bug',
     name: 'Dead Bug',
@@ -206,7 +206,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.CORE,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 8,
+    defaultReps: 6, // Per side, 12 total alternating
     isFavorite: false,
     tags: ['core', 'stability', 'coordination']
   },
@@ -217,21 +217,80 @@ export const INITIAL_EXERCISES: Exercise[] = [
     category: ExerciseCategory.STRENGTH,
     exerciseType: ExerciseType.REPETITION_BASED,
     defaultSets: 3,
-    defaultReps: 15,
+    defaultReps: 12, // Standard strength training range
     isFavorite: false,
     tags: ['glutes', 'lower-body', 'posterior-chain']
   },
 
-  // Hand warmup exercises
+  // Hand warmup exercises - Time-based for mobility
   {
     id: 'finger-roll',
     name: 'Finger Roll',
     description: 'Roll fingers from fist to full extension, working each finger individually',
-    category: ExerciseCategory.HAND_WARMUP,
+    category: ExerciseCategory.HAND_WARMUP, // Restored to proper category
     exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
+    defaultDuration: 30, // Standard mobility/warmup duration
     isFavorite: false,
     tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity']
+  },
+
+  // Additional strength exercises
+  {
+    id: 'tricep-dips',
+    name: 'Tricep Dips',
+    description: 'Lower and raise body using arm strength while seated on edge',
+    category: ExerciseCategory.STRENGTH,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 8, // Challenging upper body exercise
+    isFavorite: false,
+    tags: ['upper-body', 'triceps', 'arms', 'bodyweight']
+  },
+  {
+    id: 'calf-raises',
+    name: 'Calf Raises',
+    description: 'Rise up onto toes, hold briefly, then lower back down',
+    category: ExerciseCategory.STRENGTH,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 15, // Higher reps for smaller muscle group
+    isFavorite: false,
+    tags: ['lower-body', 'calves', 'balance']
+  },
+
+  // Additional core exercises
+  {
+    id: 'russian-twists',
+    name: 'Russian Twists',
+    description: 'Sit with feet elevated, rotate torso side to side',
+    category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.REPETITION_BASED,
+    defaultSets: 3,
+    defaultReps: 16, // 8 per side
+    isFavorite: false,
+    tags: ['core', 'obliques', 'rotation']
+  },
+  {
+    id: 'bear-crawl',
+    name: 'Bear Crawl',
+    description: 'Crawl forward on hands and feet, keeping knees off ground',
+    category: ExerciseCategory.CORE,
+    exerciseType: ExerciseType.TIME_BASED,
+    defaultDuration: 30, // Full-body stability exercise
+    isFavorite: false,
+    tags: ['core', 'full-body', 'stability', 'cardio']
+  },
+
+  // Additional flexibility exercises
+  {
+    id: 'forward-fold',
+    name: 'Forward Fold',
+    description: 'Stand and bend forward, reaching toward toes',
+    category: ExerciseCategory.FLEXIBILITY,
+    exerciseType: ExerciseType.TIME_BASED,
+    defaultDuration: 30, // Standard stretch hold
+    isFavorite: false,
+    tags: ['yoga', 'hamstrings', 'back', 'stretch']
   }
 ];
 

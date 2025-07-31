@@ -56,7 +56,7 @@ describe('Navigation - More Icon', () => {
     
     // Main nav items should still have labels
     expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
+    expect(screen.getByText('Workouts')).toBeInTheDocument();
     expect(screen.getByText('Exercises')).toBeInTheDocument();
     expect(screen.getByText('Timer')).toBeInTheDocument();
     expect(screen.getByText('Log')).toBeInTheDocument();

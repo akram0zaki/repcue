@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { StorageService } from '../storageService'
 import { consentService } from '../consentService'
-import type { Workout, Schedule, WorkoutSession, WorkoutExercise, ScheduleEntry } from '../../types'
+import type { Workout, WorkoutSession, WorkoutExercise } from '../../types'
 import { ExerciseType, Weekday } from '../../types'
 
 // Mock Dexie
@@ -42,7 +42,6 @@ vi.mock('dexie', () => {
       userPreferences: new MockTable(),
       appSettings: new MockTable(),
       workouts: new MockTable(),
-      schedules: new MockTable(),
       workoutSessions: new MockTable()
     }))
   }
@@ -76,19 +75,6 @@ describe('StorageService - Workout Management', () => {
         reverse: vi.fn(() => ({
           toArray: vi.fn().mockResolvedValue([])
         }))
-      }))
-    }
-    mockDb.schedules = {
-      put: vi.fn(),
-      get: vi.fn(),
-      delete: vi.fn(),
-      orderBy: vi.fn(() => ({
-        reverse: vi.fn(() => ({
-          toArray: vi.fn().mockResolvedValue([])
-        }))
-      })),
-      filter: vi.fn(() => ({
-        first: vi.fn().mockResolvedValue(null)
       }))
     }
     mockDb.workoutSessions = {
@@ -128,6 +114,8 @@ describe('StorageService - Workout Management', () => {
         } as WorkoutExercise
       ],
       estimatedDuration: 1800,
+      scheduledDays: ['monday', 'wednesday', 'friday'],
+      isActive: true,
       createdAt: new Date('2023-01-01T10:00:00Z'),
       updatedAt: new Date('2023-01-01T10:00:00Z')
     }
@@ -202,87 +190,6 @@ describe('StorageService - Workout Management', () => {
     })
   })
 
-  describe('Schedule Operations', () => {
-    const mockSchedule: Schedule = {
-      id: 'schedule-1',
-      name: 'Weekly Routine',
-      entries: [
-        {
-          id: 'entry-1',
-          weekday: Weekday.MONDAY,
-          workoutId: 'workout-1',
-          isActive: true
-        } as ScheduleEntry
-      ],
-      isActive: true,
-      createdAt: new Date('2023-01-01T10:00:00Z'),
-      updatedAt: new Date('2023-01-01T10:00:00Z')
-    }
-
-    it('should save schedule successfully', async () => {
-      mockDb.schedules.put.mockResolvedValue(undefined)
-
-      await storageService.saveSchedule(mockSchedule)
-
-      expect(mockDb.schedules.put).toHaveBeenCalledWith({
-        ...mockSchedule,
-        createdAt: '2023-01-01T10:00:00.000Z',
-        updatedAt: '2023-01-01T10:00:00.000Z'
-      })
-    })
-
-    it('should get all schedules', async () => {
-      const storedSchedule = {
-        ...mockSchedule,
-        createdAt: '2023-01-01T10:00:00.000Z',
-        updatedAt: '2023-01-01T10:00:00.000Z'
-      }
-      mockDb.schedules.orderBy.mockReturnValue({
-        reverse: vi.fn().mockReturnValue({
-          toArray: vi.fn().mockResolvedValue([storedSchedule])
-        })
-      })
-
-      const schedules = await storageService.getSchedules()
-
-      expect(schedules).toHaveLength(1)
-      expect(schedules[0]).toEqual(mockSchedule)
-    })
-
-    it('should get active schedule', async () => {
-      const storedSchedule = {
-        ...mockSchedule,
-        createdAt: '2023-01-01T10:00:00.000Z',
-        updatedAt: '2023-01-01T10:00:00.000Z'
-      }
-      mockDb.schedules.filter.mockReturnValue({
-        first: vi.fn().mockResolvedValue(storedSchedule)
-      })
-
-      const activeSchedule = await storageService.getActiveSchedule()
-
-      expect(activeSchedule).toEqual(mockSchedule)
-    })
-
-    it('should return null when no active schedule exists', async () => {
-      mockDb.schedules.filter.mockReturnValue({
-        first: vi.fn().mockResolvedValue(null)
-      })
-
-      const activeSchedule = await storageService.getActiveSchedule()
-
-      expect(activeSchedule).toBeNull()
-    })
-
-    it('should delete schedule successfully', async () => {
-      mockDb.schedules.delete.mockResolvedValue(undefined)
-
-      await storageService.deleteSchedule('schedule-1')
-
-      expect(mockDb.schedules.delete).toHaveBeenCalledWith('schedule-1')
-    })
-  })
-
   describe('Workout Session Operations', () => {
     const mockWorkoutSession: WorkoutSession = {
       id: 'session-1',
@@ -351,6 +258,8 @@ describe('StorageService - Workout Management', () => {
         id: 'workout-1',
         name: 'Test Workout',
         exercises: [],
+        scheduledDays: [],
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -364,11 +273,9 @@ describe('StorageService - Workout Management', () => {
       vi.mocked(consentService.hasConsent).mockReturnValue(false)
 
       const workouts = await storageService.getWorkouts()
-      const schedules = await storageService.getSchedules()
       const sessions = await storageService.getWorkoutSessions()
 
       expect(workouts).toEqual([])
-      expect(schedules).toEqual([])
       expect(sessions).toEqual([])
     })
   })

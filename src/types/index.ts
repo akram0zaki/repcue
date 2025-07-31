@@ -48,12 +48,14 @@ export interface Workout {
   name: string;
   description?: string;
   exercises: WorkoutExercise[];
+  scheduledDays: Weekday[]; // Added: Direct scheduling without separate Schedule entity
+  isActive: boolean; // Added: Allow pause/resume without deletion
   estimatedDuration?: number; // calculated total time in seconds
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Schedule structure
+// Weekday structure
 export const Weekday = {
   MONDAY: 'monday',
   TUESDAY: 'tuesday',
@@ -65,22 +67,6 @@ export const Weekday = {
 } as const;
 
 export type Weekday = typeof Weekday[keyof typeof Weekday];
-
-export interface ScheduleEntry {
-  id: string;
-  weekday: Weekday;
-  workoutId: string;
-  isActive: boolean;
-}
-
-export interface Schedule {
-  id: string;
-  name: string;
-  entries: ScheduleEntry[];
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 // Workout session logging
 export interface WorkoutSessionExercise {
@@ -180,7 +166,9 @@ export const Routes = {
   ACTIVITY_LOG: '/activity',
   SETTINGS: '/settings',
   PRIVACY: '/privacy',
-  SCHEDULE: '/schedule'
+  WORKOUTS: '/workouts', // Changed from SCHEDULE
+  CREATE_WORKOUT: '/workout/create',
+  EDIT_WORKOUT: '/workout/edit'
 } as const;
 
 export type Routes = typeof Routes[keyof typeof Routes];
