@@ -5,6 +5,7 @@ import { Routes, Weekday } from '../types';
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { StarFilledIcon } from '../components/icons/NavigationIcons';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -228,7 +229,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                             className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
                             aria-label={`Remove ${exercise.name} from favorites`}
                           >
-                            ⭐
+                            <StarFilledIcon size={16} />
                           </button>
                           <button 
                             className="btn-primary px-3 py-1 text-sm"

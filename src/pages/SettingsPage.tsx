@@ -3,6 +3,7 @@ import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { SpeakerIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 
 interface SettingsPageProps {
@@ -100,8 +101,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Audio Settings */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            🔊 Audio Settings
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+            <SpeakerIcon size={20} className="text-blue-600 dark:text-blue-400" />
+            Audio Settings
           </h2>
           
           {/* Sound Enable/Disable */}

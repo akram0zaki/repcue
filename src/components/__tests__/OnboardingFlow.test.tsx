@@ -22,8 +22,7 @@ describe('OnboardingFlow', () => {
     currentStepData: {
       id: 'welcome',
       title: 'Welcome to RepCue!',
-      description: 'Your privacy-first fitness tracking app.',
-      icon: '🎯'
+      description: 'Your privacy-first fitness tracking app.'
     },
     currentStep: 0,
     totalSteps: 3,
@@ -63,7 +62,8 @@ describe('OnboardingFlow', () => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.getByText('Welcome to RepCue!')).toBeInTheDocument();
       expect(screen.getByText('Your privacy-first fitness tracking app.')).toBeInTheDocument();
-      expect(screen.getByText('🎯')).toBeInTheDocument();
+      // Check that an icon is rendered (SVG element should be present)
+      expect(document.querySelector('svg')).toBeInTheDocument();
     });
 
     it('should not render when onboarding is not active', () => {

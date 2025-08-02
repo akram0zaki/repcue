@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Exercise, AppSettings, TimerState } from '../types';
 import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../constants';
+import { ReadyIcon, StarFilledIcon } from '../components/icons/NavigationIcons';
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -352,8 +353,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Countdown Banner */}
         {isCountdown && (
           <div className="bg-orange-100 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-3 mb-4 text-center">
-            <div className="text-orange-800 dark:text-orange-300 font-medium text-sm">
-              🏃‍♂️ Get Ready! Timer starts in {countdownTime} second{countdownTime !== 1 ? 's' : ''}
+            <div className="text-orange-800 dark:text-orange-300 font-medium text-sm flex items-center justify-center gap-2">
+              <ReadyIcon size={16} />
+              Get Ready! Timer starts in {countdownTime} second{countdownTime !== 1 ? 's' : ''}
             </div>
           </div>
         )}
@@ -656,7 +658,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                         </p>
                       </div>
                       {exercise.isFavorite && (
-                        <span className="text-yellow-500">⭐</span>
+                        <StarFilledIcon size={16} className="text-yellow-500" />
                       )}
                     </div>
                   </button>

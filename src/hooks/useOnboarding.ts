@@ -5,7 +5,7 @@ export interface OnboardingStep {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  icon?: string;
   action?: () => void;
 }
 
@@ -50,22 +50,19 @@ const createOnboardingSteps = (isDesktop: boolean, isStandalone: boolean): Onboa
     title: 'Welcome to RepCue!',
     description: isStandalone 
       ? 'Thanks for installing RepCue! Your privacy-first fitness tracking app is ready to help you stay focused on your workouts.'
-      : 'Welcome to RepCue, your privacy-first fitness tracking app. Track intervals, manage exercises, and stay focused on your workouts.',
-    icon: '🎯'
+      : 'Welcome to RepCue, your privacy-first fitness tracking app. Track intervals, manage exercises, and stay focused on your workouts.'
   },
   {
     id: 'features',
     title: 'Key Features',
     description: isDesktop
       ? 'Set custom interval timers, track 20+ pre-loaded exercises, manage your workout history, and keep your data private with local storage.'
-      : 'Set custom interval timers with audio cues, track your favorite exercises with haptic feedback, and sync across devices while keeping your data private.',
-    icon: '⚡'
+      : 'Set custom interval timers with audio cues, track your favorite exercises with haptic feedback, and sync across devices while keeping your data private.'
   },
   {
     id: 'privacy',
     title: 'Privacy First',
-    description: 'Your workout data stays on your device. No tracking, no data collection, no account required. Your privacy is our priority.',
-    icon: '🔒'
+    description: 'Your workout data stays on your device. No tracking, no data collection, no account required. Your privacy is our priority.'
   }
 ];
 

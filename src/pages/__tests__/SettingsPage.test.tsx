@@ -107,7 +107,7 @@ describe('SettingsPage', () => {
   it('renders audio settings section', () => {
     renderSettingsPage();
     
-    expect(screen.getByText('🔊 Audio Settings')).toBeInTheDocument();
+    expect(screen.getByText('Audio Settings')).toBeInTheDocument();
     expect(screen.getByLabelText(/enable sound/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/beep volume/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/enable vibration/i)).toBeInTheDocument();

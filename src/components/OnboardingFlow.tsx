@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import useOnboarding from '../hooks/useOnboarding';
+import { useOnboarding } from '../hooks/useOnboarding';
+import { TargetIcon, LightningIcon, LockIcon } from './icons/NavigationIcons';
 
 interface OnboardingFlowProps {
   onComplete?: () => void;
@@ -147,6 +148,21 @@ export function OnboardingFlow({ onComplete, onSkip, className = '' }: Onboardin
     return null;
   }
 
+  // Function to render the appropriate icon for each step
+  const renderStepIcon = (stepId: string) => {
+    const iconProps = { size: 96, className: "text-blue-600 dark:text-blue-400" };
+    switch (stepId) {
+      case 'welcome':
+        return <TargetIcon {...iconProps} />;
+      case 'features':
+        return <LightningIcon {...iconProps} />;
+      case 'privacy':
+        return <LockIcon {...iconProps} />;
+      default:
+        return <TargetIcon {...iconProps} />;
+    }
+  };
+
   return (
     <div 
       className={`fixed inset-0 z-50 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900 flex items-center justify-center p-4 ${className}`}
@@ -212,8 +228,8 @@ export function OnboardingFlow({ onComplete, onSkip, className = '' }: Onboardin
         {/* Step content */}
         <div className="px-6 py-8 text-center">
           {/* Step icon */}
-          <div className="text-6xl mb-6" role="img" aria-label={`Step ${currentStep + 1} icon`}>
-            {currentStepData.icon}
+          <div className="mb-6 flex justify-center" role="img" aria-label={`Step ${currentStep + 1} icon`}>
+            {renderStepIcon(currentStepData.id)}
           </div>
 
           {/* Step title */}

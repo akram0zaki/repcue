@@ -3,6 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import type { Exercise, ExerciseCategory } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
+import { 
+  WorkoutIcon, 
+  TargetIcon, 
+  StrengthIcon, 
+  CardioIcon, 
+  FlexibilityIcon, 
+  BalanceIcon, 
+  HandWarmupIcon, 
+  RunnerIcon,
+  StarIcon,
+  StarFilledIcon
+} from '../components/icons/NavigationIcons';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -56,15 +68,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     return `${seconds}s`;
   };
 
-  const getCategoryIcon = (category: ExerciseCategory): string => {
+  const getCategoryIcon = (category: ExerciseCategory) => {
+    const iconProps = { size: 20, className: "text-current" };
     switch (category) {
-      case Categories.CORE: return '🎯';
-      case Categories.STRENGTH: return '💪';
-      case Categories.CARDIO: return '❤️';
-      case Categories.FLEXIBILITY: return '🤸';
-      case Categories.BALANCE: return '⚖️';
-      case Categories.HAND_WARMUP: return '🤲';
-      default: return '🏃';
+      case Categories.CORE: return <TargetIcon {...iconProps} />;
+      case Categories.STRENGTH: return <StrengthIcon {...iconProps} />;
+      case Categories.CARDIO: return <CardioIcon {...iconProps} />;
+      case Categories.FLEXIBILITY: return <FlexibilityIcon {...iconProps} />;
+      case Categories.BALANCE: return <BalanceIcon {...iconProps} />;
+      case Categories.HAND_WARMUP: return <HandWarmupIcon {...iconProps} />;
+      default: return <RunnerIcon {...iconProps} />;
     }
   };
 
@@ -95,8 +108,9 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         {/* Header */}
         <div className="mb-4 sm:mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
-              💪 Exercises
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <WorkoutIcon size={24} className="text-blue-600 dark:text-blue-400" />
+              Exercises
             </h1>
           </div>
           
@@ -136,12 +150,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               className="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Categories</option>
-              <option value={Categories.CORE}>🎯 Core</option>
-              <option value={Categories.STRENGTH}>💪 Strength</option>
-              <option value={Categories.CARDIO}>❤️ Cardio</option>
-              <option value={Categories.FLEXIBILITY}>🤸 Flexibility</option>
-              <option value={Categories.BALANCE}>⚖️ Balance</option>
-              <option value={Categories.HAND_WARMUP}>🤲 Hand Warmup</option>
+              <option value={Categories.CORE}>Core</option>
+              <option value={Categories.STRENGTH}>Strength</option>
+              <option value={Categories.CARDIO}>Cardio</option>
+              <option value={Categories.FLEXIBILITY}>Flexibility</option>
+              <option value={Categories.BALANCE}>Balance</option>
+              <option value={Categories.HAND_WARMUP}>Hand Warmup</option>
             </select>
 
             {/* Favorites Toggle */}
@@ -153,7 +167,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                   : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
               }`}
             >
-              <span>⭐</span>
+              <StarIcon size={16} />
               <span className="text-sm font-medium">Favorites Only</span>
             </button>
           </div>
@@ -278,10 +292,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </h3>
           <button
             onClick={() => onToggleFavorite(exercise.id)}
-            className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
             title={exercise.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
-            {exercise.isFavorite ? '⭐' : '☆'}
+            {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
           </button>
         </div>
 
