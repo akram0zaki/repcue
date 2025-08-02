@@ -26,7 +26,8 @@ const defaultTimerState: TimerState = {
   intervalDuration: 30,
   currentExercise: undefined,
   isCountdown: false,
-  countdownTime: 0
+  countdownTime: 0,
+  isResting: false
 };
 
 const defaultProps = {

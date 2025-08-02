@@ -116,6 +116,28 @@ export interface TimerState {
   currentExercise?: Exercise;
   isCountdown: boolean; // true when in pre-timer countdown mode
   countdownTime: number; // countdown remaining time in seconds
+  // Rest period state (for rep-based exercises between sets)
+  isResting: boolean; // true when in rest period between sets
+  restTimeRemaining?: number; // rest time countdown in seconds
+  // Standalone rep/set tracking (for standalone rep-based exercises)
+  currentSet?: number; // for repetition-based exercises (0-based internally)
+  totalSets?: number; // for repetition-based exercises
+  currentRep?: number; // for repetition-based exercises (0-based internally)
+  totalReps?: number; // for repetition-based exercises
+  // Workout-guided mode properties
+  workoutMode?: {
+    workoutId: string;
+    workoutName: string;
+    exercises: WorkoutExercise[];
+    currentExerciseIndex: number;
+    currentSet?: number; // for repetition-based exercises
+    totalSets?: number; // for repetition-based exercises
+    currentRep?: number; // for repetition-based exercises
+    totalReps?: number; // for repetition-based exercises
+    isResting: boolean; // true when in rest period between exercises/sets
+    restTimeRemaining?: number; // rest time countdown in seconds
+    sessionId?: string; // WorkoutSession ID for logging
+  };
 }
 
 // User preferences and profile
@@ -156,6 +178,7 @@ export interface AppSettings {
   lastSelectedExerciseId?: string | null;
   preTimerCountdown: number; // 0-10 seconds countdown before timer starts
   defaultRestTime: number; // default rest time between exercises in seconds
+  repSpeedFactor: number; // speed multiplier for repetition-based exercises (0.5 = faster, 2.0 = slower)
 }
 
 // Navigation routes

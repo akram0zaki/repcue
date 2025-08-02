@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Exercise, AppSettings, TimerState } from '../types';
-import { TIMER_PRESETS, type TimerPreset } from '../constants';
+import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../constants';
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -36,13 +36,58 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onResetTimer
 }) => {
   // Calculate display values
-  const { currentTime, targetTime, isRunning, isCountdown, countdownTime } = timerState;
+  const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
   const remainingTime = targetTime ? Math.max(0, targetTime - currentTime) : 0;
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
   
   // Countdown progress (reverse of normal progress)
   const countdownProgress = isCountdown && appSettings.preTimerCountdown > 0 
     ? ((appSettings.preTimerCountdown - countdownTime) / appSettings.preTimerCountdown) * 100 
+    : 0;
+  
+  // Rest time calculations
+  const displayTime = isResting && restTimeRemaining !== undefined 
+    ? restTimeRemaining 
+    : (isCountdown ? countdownTime : remainingTime);
+  const displayProgress = isResting && restTimeRemaining !== undefined
+    ? ((REST_TIME_BETWEEN_SETS - restTimeRemaining) / REST_TIME_BETWEEN_SETS) * 100
+    : (isCountdown ? countdownProgress : progress);
+
+  // Workout mode calculations
+  const isWorkoutMode = !!workoutMode;
+  const workoutProgress = workoutMode ? (workoutMode.currentExerciseIndex / workoutMode.exercises.length) * 100 : 0;
+  
+  // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
+  const isRepBased = selectedExercise?.exerciseType === 'repetition-based';
+  
+  // For workout mode, use workout mode rep/set data
+  // For standalone, use timer state rep/set data
+  const totalReps = workoutMode?.totalReps || (isRepBased ? timerState.totalReps : undefined);
+  const currentRep = workoutMode?.currentRep !== undefined ? workoutMode.currentRep : (isRepBased ? timerState.currentRep : undefined);
+  const totalSets = workoutMode?.totalSets || (isRepBased ? timerState.totalSets : undefined);
+  const currentSet = workoutMode?.currentSet !== undefined ? workoutMode.currentSet : (isRepBased ? timerState.currentSet : undefined);
+  
+  // Rep/Set progress calculations
+  // SEMANTIC CLARIFICATION:
+  // - currentRep: Number of COMPLETED reps (0 = no reps completed, 8 = all 8 reps completed)
+  // - currentSet: Number of COMPLETED sets when resting, or current set index when exercising
+  // - Display: Shows completed counts and progress percentages
+  // - Progress bars: Show completion percentage within current set/exercise
+  
+  // Set progress: Show progress through all sets, only 100% when exercise complete
+  const setProgress = totalSets && currentSet !== undefined
+    ? (isResting 
+        ? ((currentSet + 1) / totalSets) * 100  // During rest, current set is completed
+        : (currentRep !== undefined && currentRep >= (totalReps || 0) && currentSet === totalSets - 1)
+          ? 100  // All reps done in final set = exercise complete
+          : ((currentSet + (currentRep !== undefined && currentRep >= (totalReps || 0) ? 1 : 0)) / totalSets) * 100)     // Show progress including completed sets
+    : 0;
+  
+  // Rep progress within current set: Show completed reps as percentage  
+  const repProgressInSet = totalReps && currentRep !== undefined
+    ? (isResting
+        ? 100  // During rest, all reps in current set are completed
+        : (currentRep / totalReps) * 100)  // Show completed reps in current set
     : 0;
 
   // Format time display
@@ -58,26 +103,69 @@ const TimerPage: React.FC<TimerPageProps> = ({
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-2 max-w-md">
-        {/* Exercise Selection */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Exercise</span>
-            <button
-              onClick={() => onSetShowExerciseSelector(true)}
-              className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
-            >
-              Choose
-            </button>
+        
+        {/* Workout Mode Header */}
+        {isWorkoutMode && (
+          <div className="bg-blue-600 text-white rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold">{workoutMode.workoutName}</h2>
+              <span className="text-sm bg-blue-500 px-2 py-1 rounded">
+                {workoutMode.currentExerciseIndex + 1} / {workoutMode.exercises.length}
+              </span>
+            </div>
+            
+            {/* Workout Progress Bar */}
+            <div className="w-full bg-blue-500 rounded-full h-2 mb-2">
+              <div 
+                className="bg-white h-2 rounded-full transition-all duration-300"
+                style={{ width: `${workoutProgress}%` }}
+              />
+            </div>
+            
+            <div className="text-sm opacity-90">
+              Exercise {workoutMode.currentExerciseIndex + 1}: {selectedExercise?.name || 'Loading...'}
+            </div>
           </div>
-          
-          {selectedExercise ? (
-            <div className="text-center">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                {selectedExercise.name}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        )}
+
+        {/* Current Exercise Display - More prominent in workout mode */}
+        {isWorkoutMode && selectedExercise && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 text-center">
+            <div className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+              {selectedExercise.name}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Current Exercise • {selectedExercise.category}
+            </div>
+            {selectedExercise.description && (
+              <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
                 {selectedExercise.description}
-              </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Exercise Selection - Hidden in workout mode */}
+        {!isWorkoutMode && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Exercise</span>
+              <button
+                onClick={() => onSetShowExerciseSelector(true)}
+                className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+              >
+                Choose
+              </button>
+            </div>
+            
+            {selectedExercise ? (
+              <div className="text-center">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                  {selectedExercise.name}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {selectedExercise.description}
+                </p>
             </div>
           ) : (
             <p className="text-gray-500 dark:text-gray-400 text-center text-sm">
@@ -103,8 +191,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </div>
           )}
         </div>
+        )}
 
-        {/* Timer Duration Selection */}
+        {/* Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
+        {!isWorkoutMode && selectedExercise?.exerciseType !== 'repetition-based' && (
         <div className="mb-4">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duration</p>
           <div className="grid grid-cols-3 gap-2">
@@ -123,6 +213,61 @@ const TimerPage: React.FC<TimerPageProps> = ({
             ))}
           </div>
         </div>
+        )}
+
+        {/* Rep Duration Display - Shown for repetition-based exercises in standalone mode */}
+        {!isWorkoutMode && selectedExercise?.exerciseType === 'repetition-based' && (
+        <div className="mb-4">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rep Duration</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-3">
+            <div className="text-center">
+              <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                {selectedDuration}s per rep
+              </span>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {(selectedExercise.defaultSets || 3)} sets × {(selectedExercise.defaultReps || 8)} reps
+              </div>
+            </div>
+          </div>
+        </div>
+        )}
+
+        {/* Rep/Set Progress - Shown for repetition-based exercises (both workout mode and standalone) */}
+        {selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
+            <div className="mb-3">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <span>Set Progress</span>
+                <span>{
+                  isResting 
+                    ? `${(currentSet || 0) + 1} / ${totalSets}`  // During rest: show completed sets
+                    : (currentRep !== undefined && currentRep >= (totalReps || 0))
+                      ? `${(currentSet || 0) + 1} / ${totalSets}`  // Set complete but not resting yet
+                      : `${(currentSet || 0) + 1} / ${totalSets}`  // Working on current set
+                }</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${setProgress}%` }}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <span>Rep Progress</span>
+                <span>{isResting ? totalReps : (currentRep || 0)} / {totalReps}</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div 
+                  className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${repProgressInSet}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Countdown Banner */}
         {isCountdown && (
@@ -138,33 +283,121 @@ const TimerPage: React.FC<TimerPageProps> = ({
           {/* Circular Progress */}
           <div className="relative w-40 h-40 mx-auto mb-4">
             <svg className="transform -rotate-90 w-40 h-40">
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                className="text-gray-200 dark:text-gray-700"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                strokeDasharray={`${2 * Math.PI * 70}`}
-                strokeDashoffset={`${2 * Math.PI * 70 * (1 - (isCountdown ? countdownProgress : progress) / 100)}`}
-                className={`transition-all duration-300 ${
-                  isCountdown 
-                    ? 'text-orange-500' 
-                    : remainingTime <= 10 && remainingTime > 0 
-                      ? 'text-red-500' 
-                      : 'text-blue-600'
-                }`}
-                strokeLinecap="round"
-              />
+              {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
+              {selectedExercise?.exerciseType === 'repetition-based' && totalReps && totalSets ? (
+                <>
+                  {/* Outer circle for set progress (reps within current set) */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="75"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    className="text-gray-200 dark:text-gray-700"
+                  />
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="75"
+                    stroke="currentColor"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 75}`}
+                    strokeDashoffset={`${2 * Math.PI * 75 * (1 - repProgressInSet / 100)}`}
+                    className="text-green-500 transition-all duration-300"
+                    strokeLinecap="round"
+                  />
+                  
+                  {/* Inner circle for individual rep progress */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="60"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="none"
+                    className="text-gray-200 dark:text-gray-700"
+                  />
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="60"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 60}`}
+                    strokeDashoffset={`${2 * Math.PI * 60 * (1 - displayProgress / 100)}`}
+                    className={`transition-all duration-300 ${
+                      isCountdown 
+                        ? 'text-orange-500' 
+                        : isResting
+                          ? 'text-purple-500'  // Purple for rest progress
+                          : 'text-blue-500'    // Blue for rep progress (fixed color)
+                    }`}
+                    strokeLinecap="round"
+                  />
+                </>
+              ) : (
+                <>
+                  {/* Standard timer display for time-based exercises or standalone mode */}
+                  {/* Outer circle for workout progress (only in workout mode) */}
+                  {isWorkoutMode && (
+                    <>
+                      <circle
+                        cx="80"
+                        cy="80"
+                        r="75"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                        className="text-gray-200 dark:text-gray-700"
+                      />
+                      <circle
+                        cx="80"
+                        cy="80"
+                        r="75"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 75}`}
+                        strokeDashoffset={`${2 * Math.PI * 75 * (1 - workoutProgress / 100)}`}
+                        className="text-purple-500 transition-all duration-300"
+                        strokeLinecap="round"
+                      />
+                    </>
+                  )}
+                  
+                  {/* Inner circle for timer progress */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="70"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="none"
+                    className="text-gray-200 dark:text-gray-700"
+                  />
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="70"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 70}`}
+                    strokeDashoffset={`${2 * Math.PI * 70 * (1 - displayProgress / 100)}`}
+                    className={`transition-all duration-300 ${
+                      isCountdown 
+                        ? 'text-orange-500' 
+                        : isResting
+                          ? 'text-purple-500'  // Purple for rest progress
+                          : 'text-blue-500'    // Blue for rep progress (fixed color)
+                    }`}
+                    strokeLinecap="round"
+                  />
+                </>
+              )}
             </svg>
             
             {/* Time Display */}
@@ -182,14 +415,21 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 ) : (
                   <>
                     <div className={`text-3xl font-bold ${
-                      remainingTime <= 10 && remainingTime > 0 
+                      displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
+                        : isResting
+                        ? 'text-blue-500 dark:text-blue-400'
                         : 'text-gray-900 dark:text-gray-100'
                     }`}>
-                      {formatTime(remainingTime)}
+                      {formatTime(displayTime)}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {targetTime ? `of ${formatTime(targetTime)}` : 'Set duration'}
+                      {isResting 
+                        ? 'Rest between sets'
+                        : isWorkoutMode 
+                          ? `Exercise ${workoutMode.currentExerciseIndex + 1}/${workoutMode.exercises.length}`
+                          : targetTime ? `of ${formatTime(targetTime)}` : 'Set duration'
+                      }
                     </div>
                   </>
                 )}
@@ -224,6 +464,66 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Exercise Controls - Shown for workout mode or standalone rep-based exercises */}
+        {(isWorkoutMode || (selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps)) && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
+            <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">
+              {isWorkoutMode ? 'Workout Controls' : 'Exercise Controls'}
+            </h3>
+            
+            {selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps && (
+              <div className="mb-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      // Note: This would need state management through props
+                      // For now, this is a placeholder for rep advancement
+                      console.log('Next rep clicked');
+                    }}
+                    disabled={(currentRep || 0) >= (totalReps || 0)}
+                    className="btn-secondary text-xs py-2 disabled:opacity-50"
+                  >
+                    Next Rep ({(currentRep || 0) + 1}/{totalReps})
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      // Complete current set or exercise
+                      const currentSetNum = (currentSet || 0) + 1;
+                      const totalSetNum = totalSets || 1;
+                      const isLastSet = currentSetNum >= totalSetNum;
+                      if (isLastSet) {
+                        onStopTimer(true);
+                      } else {
+                        console.log('Next set clicked');
+                      }
+                    }}
+                    className="btn-primary text-xs py-2"
+                  >
+                    {((currentSet || 0) + 1) >= (totalSets || 1) ? 'Complete Exercise' : `Next Set (${(currentSet || 0) + 1}/${totalSets})`}
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => onStopTimer(true)}
+                className="btn-secondary text-xs py-2"
+              >
+                Complete Exercise
+              </button>
+              
+              <button
+                onClick={onResetTimer}
+                className="btn-ghost text-xs py-2"
+              >
+                Exit Workout
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Timer Info */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 text-xs">

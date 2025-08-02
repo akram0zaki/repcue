@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { consentService } from './services/consentService';
 import { storageService } from './services/storageService';
 import { audioService } from './services/audioService';
@@ -8,9 +8,9 @@ import { useWakeLock } from './hooks/useWakeLock';
 import ConsentBanner from './components/ConsentBanner';
 import AppShell from './components/AppShell';
 import { registerServiceWorker } from './utils/serviceWorker';
-import type { Exercise, AppSettings, TimerState, ActivityLog } from './types';
+import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
 import { Routes as AppRoutes } from './types';
-import { DEFAULT_APP_SETTINGS, type TimerPreset } from './constants';
+import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -44,17 +44,29 @@ const TimerPageWrapper: React.FC<{
   onStartTimer: () => Promise<void>;
   onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
+  onStartWorkoutMode: (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => Promise<void>;
 }> = (props) => {
   const location = useLocation();
-  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, timerState } = props;
+  const navigate = useNavigate();
+  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, onStartWorkoutMode, timerState } = props;
   const processedStateRef = React.useRef<string | null>(null);
 
-  // Handle navigation state from ExercisePage
+  // Handle navigation state from ExercisePage or HomePage
   useEffect(() => {
-    const state = location.state as { selectedExercise?: Exercise; selectedDuration?: number } | null;
-    const stateKey = state?.selectedExercise?.id || null;
+    const state = location.state as { 
+      selectedExercise?: Exercise; 
+      selectedDuration?: number;
+      workoutMode?: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] };
+    } | null;
     
-    // Only process if we have a new exercise and haven't already processed this state
+    // Handle workout mode navigation
+    if (state?.workoutMode && !timerState.isRunning && !timerState.workoutMode) {
+      onStartWorkoutMode(state.workoutMode);
+      return;
+    }
+    
+    // Handle single exercise navigation
+    const stateKey = state?.selectedExercise?.id || null;
     if (state?.selectedExercise && !timerState.isRunning && processedStateRef.current !== stateKey) {
       processedStateRef.current = stateKey;
       
@@ -71,9 +83,19 @@ const TimerPageWrapper: React.FC<{
       
       return () => clearTimeout(timer);
     }
-  }, [location.state, onSetSelectedExercise, onSetSelectedDuration, onStartTimer, timerState.isRunning]);
+  }, [location.state, onSetSelectedExercise, onSetSelectedDuration, onStartTimer, onStartWorkoutMode, timerState.isRunning, timerState.workoutMode]);
 
-  return <TimerPage {...props} />;
+  const handleResetTimer = useCallback(async () => {
+    // If we're in workout mode, navigate back to workouts page
+    if (timerState.workoutMode) {
+      navigate(AppRoutes.WORKOUTS, { replace: true });
+    }
+    
+    // Call the original reset timer function
+    await props.onResetTimer();
+  }, [timerState.workoutMode, navigate, props]);
+
+  return <TimerPage {...props} onResetTimer={handleResetTimer} />;
 };
 
 function App() {
@@ -89,13 +111,25 @@ function App() {
     intervalDuration: 30,
     currentExercise: undefined,
     isCountdown: false,
-    countdownTime: 0
+    countdownTime: 0,
+    isResting: false,
+    restTimeRemaining: undefined
   });
 
   // Timer UI State
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<TimerPreset>(30);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+
+  // Effect to ensure correct duration for rep-based exercises
+  useEffect(() => {
+    if (selectedExercise?.exerciseType === 'repetition-based' && appSettings.repSpeedFactor) {
+      const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+      if (selectedDuration !== repDuration) {
+        setSelectedDuration(repDuration as TimerPreset);
+      }
+    }
+  }, [selectedExercise, appSettings.repSpeedFactor, selectedDuration]);
 
   // Timer refs for interval management
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -119,6 +153,22 @@ function App() {
     const startTime = Date.now();
     lastBeepIntervalRef.current = 0; // Reset interval counter
 
+    // Check if this is a standalone rep-based exercise (not in workout mode)
+    const isStandaloneRepBased = selectedExercise?.exerciseType === 'repetition-based' && !timerState.workoutMode;
+    
+    // For standalone rep-based exercises, set up rep/set tracking
+    let repSetState = {};
+    if (isStandaloneRepBased) {
+      const defaultSets = selectedExercise.defaultSets || 3;
+      const defaultReps = selectedExercise.defaultReps || 8;
+      repSetState = {
+        currentSet: 0,
+        totalSets: defaultSets,
+        currentRep: 0,
+        totalReps: defaultReps
+      };
+    }
+
     // Update timer state to actual timer mode
     setTimerState(prev => ({
       ...prev,
@@ -128,7 +178,8 @@ function App() {
       currentTime: 0,
       targetTime: selectedDuration,
       startTime: new Date(),
-      currentExercise: selectedExercise || undefined
+      currentExercise: selectedExercise || undefined,
+      ...repSetState
     }));
 
     // Start the main timer interval
@@ -136,16 +187,25 @@ function App() {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       
       setTimerState(prev => {
-        const newTime = elapsed;
-        const remaining = (prev.targetTime || 0) - newTime;
+        // Don't update if timer is not running or target time is not set
+        if (!prev.isRunning || !prev.targetTime) {
+          return prev;
+        }
+
+        const remaining = prev.targetTime - elapsed;
 
         // Check if timer completed
         if (remaining <= 0) {
           // Timer finished - will be handled in useEffect
-          return { ...prev, currentTime: prev.targetTime || 0 };
+          return { ...prev, currentTime: prev.targetTime };
         }
 
-        return { ...prev, currentTime: newTime };
+        // Only update if the elapsed time has actually changed
+        if (elapsed !== prev.currentTime) {
+          return { ...prev, currentTime: elapsed };
+        }
+
+        return prev;
       });
 
       // Interval beeping: beep every intervalDuration seconds
@@ -157,8 +217,8 @@ function App() {
           lastBeepIntervalRef.current = elapsed;
         }
       }
-    }, 100);
-  }, [selectedExercise, selectedDuration, appSettings]);
+    }, 1000);
+  }, [selectedExercise, selectedDuration, appSettings, timerState.workoutMode]);
 
   // Timer Functions
   const startTimer = useCallback(async () => {
@@ -267,6 +327,9 @@ function App() {
       intervalRef.current = null;
     }
 
+    // Reset beep counter
+    lastBeepIntervalRef.current = 0;
+
     // Release wake lock when timer resets
     if (wakeLockActive) {
       await releaseWakeLock();
@@ -280,40 +343,737 @@ function App() {
       startTime: undefined,
       currentExercise: undefined,
       isCountdown: false,
+      countdownTime: 0,
+      isResting: false,
+      restTimeRemaining: undefined,
+      // Reset standalone rep/set tracking
+      currentSet: undefined,
+      totalSets: undefined,
+      currentRep: undefined,
+      totalReps: undefined,
+      workoutMode: undefined
+    }));
+
+    // Reset duration to default for the current exercise
+    if (selectedExercise) {
+      if (selectedExercise.exerciseType === 'time-based') {
+        setSelectedDuration(selectedExercise.defaultDuration as TimerPreset);
+      } else if (selectedExercise.exerciseType === 'repetition-based') {
+        const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+        setSelectedDuration(repDuration as TimerPreset);
+      }
+    }
+  }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.repSpeedFactor]);
+
+  // Start workout-guided timer mode
+  const startWorkoutMode = useCallback(async (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => {
+    if (!workoutData.exercises || workoutData.exercises.length === 0) {
+      alert('This workout has no exercises');
+      return;
+    }
+
+    // Create a new workout session for logging
+    const sessionId = `session-${Date.now()}`;
+    
+    // Initialize workout mode state
+    setTimerState(prev => ({
+      ...prev,
+      workoutMode: {
+        workoutId: workoutData.workoutId,
+        workoutName: workoutData.workoutName,
+        exercises: workoutData.exercises,
+        currentExerciseIndex: 0,
+        isResting: false,
+        sessionId
+      },
+      isRunning: false,
+      currentTime: 0,
+      targetTime: undefined,
+      isCountdown: false,
       countdownTime: 0
     }));
-  }, [wakeLockActive, releaseWakeLock]);
 
-  // Handle timer completion
-  useEffect(() => {
-    const { isRunning, currentTime, targetTime, currentExercise } = timerState;
+    // Find the first exercise and load it
+    const firstWorkoutExercise = workoutData.exercises[0];
+    const firstExercise = exercises.find(ex => ex.id === firstWorkoutExercise.exerciseId);
     
-    if (isRunning && targetTime && currentTime >= targetTime) {
-      // Timer completed - log with target time and completion note
-      if (currentExercise) {
-        const activityLog: ActivityLog = {
-          id: `log-${Date.now()}`,
-          exerciseId: currentExercise.id,
-          exerciseName: currentExercise.name,
-          duration: targetTime, // Use target time for completed sessions
-          timestamp: new Date(),
-          notes: `Completed ${targetTime}s interval timer`
-        };
+    if (firstExercise) {
+      setSelectedExercise(firstExercise);
+      
+      // Set duration/reps based on exercise type and custom values
+      if (firstExercise.exerciseType === 'time-based') {
+        const duration = firstWorkoutExercise.customDuration || firstExercise.defaultDuration || 30;
+        setSelectedDuration(duration as TimerPreset);
+      } else if (firstExercise.exerciseType === 'repetition-based') {
+        // For rep-based exercises, we'll use a timer for each repetition
+        const sets = firstWorkoutExercise.customSets || firstExercise.defaultSets || 1;
+        const reps = firstWorkoutExercise.customReps || firstExercise.defaultReps || 10;
+        
+        // Calculate rep duration based on base time and speed factor
+        const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor); // BASE_REP_TIME * speed factor
+        
+        // Update workout mode with rep/set info
+        setTimerState(prev => ({
+          ...prev,
+          workoutMode: prev.workoutMode ? {
+            ...prev.workoutMode,
+            currentSet: 0, // Start at 0 to show 0/3 initially
+            totalSets: sets,
+            currentRep: 0, // Start at 0 to show 0/8 initially
+            totalReps: reps
+          } : prev.workoutMode
+        }));
+        
+        // Set timer duration for individual reps
+        setSelectedDuration(repDuration as TimerPreset);
+      }
+    }
 
-        if (consentService.hasConsent()) {
-          storageService.saveActivityLog(activityLog);
+    // Announce workout start
+    if (appSettings.soundEnabled) {
+      audioService.announceText(`Starting workout: ${workoutData.workoutName}. ${workoutData.exercises.length} exercises planned.`);
+    }
+  }, [exercises, appSettings.soundEnabled]);
+
+  // Advance workout to next exercise or complete workout
+  const advanceWorkout = useCallback(async () => {
+    const { workoutMode } = timerState;
+    if (!workoutMode) return;
+
+    const currentIndex = workoutMode.currentExerciseIndex;
+    const isLastExercise = currentIndex >= workoutMode.exercises.length - 1;
+
+    if (isLastExercise) {
+      // Workout completed
+      if (appSettings.soundEnabled) {
+        audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
+      }
+
+      // Save workout session completion
+      if (consentService.hasConsent() && workoutMode.sessionId) {
+        const workoutSession: WorkoutSession = {
+          id: workoutMode.sessionId,
+          workoutId: workoutMode.workoutId,
+          workoutName: workoutMode.workoutName,
+          startTime: new Date(Date.now() - (timerState.currentTime * 1000)), // Approximate start time
+          endTime: new Date(),
+          exercises: [], // TODO: Track individual exercise completion in Phase 5
+          isCompleted: true,
+          completionPercentage: 100,
+          totalDuration: timerState.currentTime
+        };
+        
+        try {
+          await storageService.saveWorkoutSession(workoutSession);
+        } catch (error) {
+          console.error('Failed to save workout session:', error);
         }
       }
 
-      // Stop timer (pass true to indicate this is a completion, not manual stop)
-      stopTimer(true);
+      // Reset timer state
+      await resetTimer();
+    } else {
+      // Move to next exercise
+      const nextExerciseIndex = currentIndex + 1;
+      const nextWorkoutExercise = workoutMode.exercises[nextExerciseIndex];
+      const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exerciseId);
 
-      // Announce completion
-      if (appSettings.soundEnabled) {
-        audioService.announceText(`Timer completed! Great job on ${currentExercise?.name}`);
+      if (nextExercise) {
+        // Check if we need a rest period
+        const currentWorkoutExercise = workoutMode.exercises[currentIndex];
+        const restTime = currentWorkoutExercise.customRestTime || 30; // Default 30s rest
+
+        if (restTime > 0) {
+          // Start rest period
+          setTimerState(prev => ({
+            ...prev,
+            workoutMode: prev.workoutMode ? {
+              ...prev.workoutMode,
+              currentExerciseIndex: nextExerciseIndex,
+              isResting: true,
+              restTimeRemaining: restTime
+            } : prev.workoutMode,
+            isRunning: true,
+            currentTime: 0,
+            targetTime: restTime,
+            isCountdown: false,
+            countdownTime: 0
+          }));
+
+          if (appSettings.soundEnabled) {
+            audioService.announceText(`Rest time: ${restTime} seconds. Next exercise: ${nextExercise.name}`);
+          }
+        } else {
+          // No rest, go directly to next exercise
+          setSelectedExercise(nextExercise);
+          setTimerState(prev => ({
+            ...prev,
+            workoutMode: prev.workoutMode ? {
+              ...prev.workoutMode,
+              currentExerciseIndex: nextExerciseIndex,
+              isResting: false
+            } : prev.workoutMode,
+            isRunning: false,
+            currentTime: 0,
+            targetTime: undefined
+          }));
+
+          // Set duration/reps for next exercise
+          if (nextExercise.exerciseType === 'time-based') {
+            const duration = nextWorkoutExercise.customDuration || nextExercise.defaultDuration || 30;
+            setSelectedDuration(duration as TimerPreset);
+          } else if (nextExercise.exerciseType === 'repetition-based') {
+            const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
+            const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
+            const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+            
+            setTimerState(prev => ({
+              ...prev,
+              workoutMode: prev.workoutMode ? {
+                ...prev.workoutMode,
+                currentSet: 1,
+                totalSets: sets,
+                currentRep: 1,
+                totalReps: reps
+              } : prev.workoutMode
+            }));
+            
+            setSelectedDuration(repDuration as TimerPreset);
+          }
+
+          if (appSettings.soundEnabled) {
+            audioService.announceText(`Next exercise: ${nextExercise.name}`);
+          }
+        }
       }
     }
-  }, [timerState, stopTimer, appSettings.soundEnabled]);
+  }, [timerState, exercises, appSettings.soundEnabled, resetTimer]);
+
+  // Handle timer completion
+  useEffect(() => {
+    const { isRunning, currentTime, targetTime, currentExercise, workoutMode } = timerState;
+    
+    if (isRunning && targetTime && currentTime >= targetTime) {
+      if (workoutMode) {
+        if (workoutMode.isResting) {
+          // Rest period completed, start next exercise
+          const nextWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
+          const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exerciseId);
+          
+          if (nextExercise) {
+            setSelectedExercise(nextExercise);
+            setTimerState(prev => ({
+              ...prev,
+              workoutMode: prev.workoutMode ? {
+                ...prev.workoutMode,
+                isResting: false,
+                restTimeRemaining: undefined
+              } : prev.workoutMode,
+              isRunning: false,
+              currentTime: 0,
+              targetTime: undefined
+            }));
+
+            // Set duration/reps for next exercise
+            if (nextExercise.exerciseType === 'time-based') {
+              const duration = nextWorkoutExercise.customDuration || nextExercise.defaultDuration || 30;
+              setSelectedDuration(duration as TimerPreset);
+            } else if (nextExercise.exerciseType === 'repetition-based') {
+              const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
+              const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
+              const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+              
+              setTimerState(prev => ({
+                ...prev,
+                workoutMode: prev.workoutMode ? {
+                  ...prev.workoutMode,
+                  currentSet: 0,
+                  totalSets: sets,
+                  currentRep: 0,
+                  totalReps: reps
+                } : prev.workoutMode
+              }));
+              
+              setSelectedDuration(repDuration as TimerPreset);
+            }
+
+            if (appSettings.soundEnabled) {
+              audioService.announceText(`Rest complete. Starting ${nextExercise.name}`);
+            }
+          }
+        } else {
+          // Check if this is a repetition-based exercise that needs rep/set advancement
+          if (currentExercise?.exerciseType === 'repetition-based' && workoutMode.totalReps && workoutMode.totalSets) {
+            const currentRep = workoutMode.currentRep || 0;
+            const currentSet = workoutMode.currentSet || 0;
+            const totalReps = workoutMode.totalReps;
+            const totalSets = workoutMode.totalSets;
+            
+            if (currentRep < totalReps) {
+              // Advance to next rep in current set (or complete current rep)
+              const nextRep = currentRep + 1;
+              
+              setTimerState(prev => ({
+                ...prev,
+                workoutMode: prev.workoutMode ? {
+                  ...prev.workoutMode,
+                  currentRep: nextRep
+                } : prev.workoutMode,
+                currentTime: 0,
+                isRunning: nextRep < totalReps,  // Stop running if this was the last rep
+                targetTime: selectedDuration
+              }));
+              
+              if (nextRep < totalReps) {
+                // More reps to go, announce next rep
+                if (appSettings.soundEnabled) {
+                  audioService.announceText(`Rep ${nextRep + 1} of ${totalReps}`);
+                }
+                
+                // Restart timer interval for next rep without full reset
+                if (intervalRef.current) {
+                  clearInterval(intervalRef.current);
+                }
+                
+                const newStartTime = Date.now();
+                intervalRef.current = setInterval(() => {
+                  const elapsed = Math.floor((Date.now() - newStartTime) / 1000);
+                  
+                  setTimerState(prev => {
+                    if (!prev.isRunning || !prev.targetTime) {
+                      return prev;
+                    }
+
+                    const remaining = prev.targetTime - elapsed;
+
+                    if (remaining <= 0) {
+                      return { ...prev, currentTime: prev.targetTime };
+                    }
+
+                    if (elapsed !== prev.currentTime) {
+                      return { ...prev, currentTime: elapsed };
+                    }
+
+                    return prev;
+                  });
+
+                  // Interval beeping: beep every intervalDuration seconds
+                  if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
+                    if (elapsed !== lastBeepIntervalRef.current) {
+                      if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+                        audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+                      }
+                      lastBeepIntervalRef.current = elapsed;
+                    }
+                  }
+                }, 1000);
+              } else {
+                // This was the last rep of the set, check if we need to advance to next set
+                if (currentSet < totalSets - 1) {
+                  // Start rest period before next set
+                  if (appSettings.soundEnabled) {
+                    audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
+                  }
+                } else {
+                  // All sets completed, exercise is done
+                  if (appSettings.soundEnabled) {
+                    audioService.announceText('Exercise completed!');
+                  }
+                }
+              }
+            } else if (currentSet < totalSets - 1) {
+              // Advance to next set, reset reps
+              setTimerState(prev => ({
+                ...prev,
+                workoutMode: prev.workoutMode ? {
+                  ...prev.workoutMode,
+                  currentSet: currentSet + 1,
+                  currentRep: 0
+                } : prev.workoutMode,
+                currentTime: 0,
+                isRunning: true,  // Keep running
+                targetTime: selectedDuration
+              }));
+              
+              if (appSettings.soundEnabled) {
+                audioService.announceText(`Set ${currentSet + 2} of ${totalSets}. Rep 1 of ${totalReps}`);
+              }
+              
+              // Restart timer interval for next set without full reset
+              if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+              }
+              
+              const newStartTime = Date.now();
+              intervalRef.current = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - newStartTime) / 1000);
+                
+                setTimerState(prev => {
+                  if (!prev.isRunning || !prev.targetTime) {
+                    return prev;
+                  }
+
+                  const remaining = prev.targetTime - elapsed;
+
+                  if (remaining <= 0) {
+                    return { ...prev, currentTime: prev.targetTime };
+                  }
+
+                  if (elapsed !== prev.currentTime) {
+                    return { ...prev, currentTime: elapsed };
+                  }
+
+                  return prev;
+                });
+
+                // Interval beeping: beep every intervalDuration seconds
+                if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
+                  if (elapsed !== lastBeepIntervalRef.current) {
+                    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+                      audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+                    }
+                    lastBeepIntervalRef.current = elapsed;
+                  }
+                }
+              }, 1000);
+            } else {
+              // All reps and sets completed for this exercise, advance to next exercise
+              advanceWorkout();
+            }
+          } else {
+            // Time-based exercise completed, advance workout
+            advanceWorkout();
+          }
+        }
+      } else {
+        // Standard timer completion (non-workout mode)
+        
+        // Check if this is a standalone repetition-based exercise
+        if (currentExercise?.exerciseType === 'repetition-based' && timerState.totalReps && timerState.totalSets) {
+          const currentRep = timerState.currentRep || 0;
+          const currentSet = timerState.currentSet || 0;
+          const totalReps = timerState.totalReps;
+          const totalSets = timerState.totalSets;
+          
+          if (currentRep < totalReps) {
+            // Advance to next rep in current set (or complete current rep)
+            const nextRep = currentRep + 1;
+            
+            setTimerState(prev => ({
+              ...prev,
+              currentRep: nextRep,
+              currentTime: 0,
+              isRunning: nextRep < totalReps,  // Stop running if this was the last rep
+              targetTime: selectedDuration
+            }));
+            
+            if (nextRep < totalReps) {
+              // More reps to go, announce next rep
+              if (appSettings.soundEnabled) {
+                audioService.announceText(`Rep ${nextRep + 1} of ${totalReps}`);
+              }
+              
+              // Restart timer interval for next rep without full reset
+              if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+              }
+              
+              const newStartTime = Date.now();
+              intervalRef.current = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - newStartTime) / 1000);
+                
+                setTimerState(prev => {
+                  if (!prev.isRunning || !prev.targetTime) {
+                    return prev;
+                  }
+
+                  const remaining = prev.targetTime - elapsed;
+
+                  if (remaining <= 0) {
+                    // Timer completed - clear interval immediately to prevent double triggers
+                    clearInterval(intervalRef.current!);
+                    return { ...prev, currentTime: prev.targetTime };
+                  }
+
+                  if (elapsed !== prev.currentTime) {
+                    return { ...prev, currentTime: elapsed };
+                  }
+
+                  return prev;
+                });
+
+                // Interval beeping: beep every intervalDuration seconds
+                if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
+                  if (elapsed !== lastBeepIntervalRef.current) {
+                    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+                      audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+                    }
+                    lastBeepIntervalRef.current = elapsed;
+                  }
+                }
+              }, 1000);
+            } else {
+              // This was the last rep of the set, check if we need to advance to next set
+              if (currentSet < totalSets - 1) {
+                // More sets to go, start rest period
+                setTimerState(prev => ({
+                  ...prev,
+                  isRunning: true,
+                  isResting: true,
+                  restTimeRemaining: REST_TIME_BETWEEN_SETS,
+                  currentTime: 0,
+                  targetTime: REST_TIME_BETWEEN_SETS
+                }));
+                
+                if (appSettings.soundEnabled) {
+                  audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
+                }
+                
+                // Start rest timer
+                if (intervalRef.current) {
+                  clearInterval(intervalRef.current);
+                }
+                
+                const restStartTime = Date.now();
+                intervalRef.current = setInterval(() => {
+                  const elapsed = Math.floor((Date.now() - restStartTime) / 1000);
+                  const remaining = REST_TIME_BETWEEN_SETS - elapsed;
+                  
+                  setTimerState(prev => {
+                    if (!prev.isRunning || !prev.isResting) {
+                      return prev;
+                    }
+
+                    if (remaining <= 0) {
+                      // Rest completed, transition to next set
+                      if (appSettings.soundEnabled) {
+                        audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
+                      }
+                      
+                      // Clear rest interval to prevent double triggers
+                      clearInterval(intervalRef.current!);
+                      
+                      // Start new timer for next set immediately
+                      const nextSetStartTime = Date.now();
+                      intervalRef.current = setInterval(() => {
+                        const elapsed = Math.floor((Date.now() - nextSetStartTime) / 1000);
+                        
+                        setTimerState(prev => {
+                          if (!prev.isRunning || prev.isResting || !prev.targetTime) {
+                            return prev;
+                          }
+
+                          const remaining = prev.targetTime - elapsed;
+
+                          if (remaining <= 0) {
+                            // Timer completed - clear interval immediately to prevent double triggers
+                            clearInterval(intervalRef.current!);
+                            return { ...prev, currentTime: prev.targetTime };
+                          }
+
+                          if (elapsed !== prev.currentTime) {
+                            return { ...prev, currentTime: elapsed };
+                          }
+
+                          return prev;
+                        });
+
+                        // Interval beeping: beep every intervalDuration seconds
+                        if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
+                          if (elapsed !== lastBeepIntervalRef.current) {
+                            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+                              audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+                            }
+                            lastBeepIntervalRef.current = elapsed;
+                          }
+                        }
+                      }, 1000);
+                      
+                      return {
+                        ...prev,
+                        currentSet: currentSet + 1,
+                        currentRep: 0,
+                        currentTime: 0,
+                        isResting: false,
+                        restTimeRemaining: undefined,
+                        targetTime: selectedDuration
+                      };
+                    } else {
+                      return {
+                        ...prev,
+                        currentTime: elapsed,
+                        restTimeRemaining: remaining
+                      };
+                    }
+                  });
+                }, 1000);
+              } else {
+                // All sets completed, exercise is done
+                if (appSettings.soundEnabled) {
+                  audioService.announceText('Exercise completed!');
+                }
+              }
+            }
+            
+            return;
+          } else if (currentSet < totalSets - 1) {
+            // Start rest period before next set
+            setTimerState(prev => ({
+              ...prev,
+              isRunning: true,
+              isResting: true,
+              restTimeRemaining: REST_TIME_BETWEEN_SETS,
+              currentTime: 0,
+              targetTime: REST_TIME_BETWEEN_SETS
+            }));
+            
+            if (appSettings.soundEnabled) {
+              audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
+            }
+            
+            // Start rest timer
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+            }
+            
+            const restStartTime = Date.now();
+            intervalRef.current = setInterval(() => {
+              const elapsed = Math.floor((Date.now() - restStartTime) / 1000);
+              const remaining = REST_TIME_BETWEEN_SETS - elapsed;
+              
+              setTimerState(prev => {
+                if (!prev.isRunning || !prev.isResting) {
+                  return prev;
+                }
+
+                if (remaining <= 0) {
+                  // Rest completed, transition to next set
+                  if (appSettings.soundEnabled) {
+                    audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
+                  }
+                  
+                  // Clear rest interval to prevent double triggers
+                  clearInterval(intervalRef.current!);
+                  
+                  // Clear rest interval and start rep timer for next set
+                  clearInterval(intervalRef.current!);
+                  
+                  // Start new timer for next set immediately
+                  const nextSetStartTime = Date.now();
+                  intervalRef.current = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - nextSetStartTime) / 1000);
+                    
+                    setTimerState(prev => {
+                      if (!prev.isRunning || prev.isResting || !prev.targetTime) {
+                        return prev;
+                      }
+
+                      const remaining = prev.targetTime - elapsed;
+
+                      if (remaining <= 0) {
+                        // Timer completed - clear interval immediately to prevent double triggers
+                        clearInterval(intervalRef.current!);
+                        return { ...prev, currentTime: prev.targetTime };
+                      }
+
+                      if (elapsed !== prev.currentTime) {
+                        return { ...prev, currentTime: elapsed };
+                      }
+
+                      return prev;
+                    });
+
+                    // Interval beeping: beep every intervalDuration seconds
+                    if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
+                      if (elapsed !== lastBeepIntervalRef.current) {
+                        if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+                          audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+                        }
+                        lastBeepIntervalRef.current = elapsed;
+                      }
+                    }
+                  }, 1000);
+                  
+                  return { 
+                    ...prev, 
+                    currentTime: 0,
+                    restTimeRemaining: 0,
+                    isResting: false,
+                    currentSet: currentSet + 1,
+                    currentRep: 0,
+                    targetTime: selectedDuration
+                  };
+                }
+
+                return { 
+                  ...prev, 
+                  currentTime: elapsed,
+                  restTimeRemaining: remaining 
+                };
+              });
+
+              // Beep at 3, 2, 1 seconds remaining during rest
+              if (remaining <= 3 && remaining > 0) {
+                if (appSettings.soundEnabled) {
+                  audioService.announceText(remaining.toString());
+                }
+              }
+            }, 1000);
+            
+            return;
+          } else {
+            // All reps and sets completed
+            if (appSettings.soundEnabled) {
+              audioService.announceText(`Exercise completed! Great job on ${currentExercise.name}`);
+            }
+            
+            // Log the activity
+            if (currentExercise) {
+              const activityLog: ActivityLog = {
+                id: `log-${Date.now()}`,
+                exerciseId: currentExercise.id,
+                exerciseName: currentExercise.name,
+                duration: totalSets * totalReps * (targetTime || 0), // Total time for all reps/sets
+                timestamp: new Date(),
+                notes: `Completed ${totalSets} sets of ${totalReps} reps`
+              };
+
+              if (consentService.hasConsent()) {
+                storageService.saveActivityLog(activityLog);
+              }
+            }
+            
+            // Stop timer completely - all reps and sets done
+            stopTimer(true);
+          }
+        } else {
+          // Time-based exercise or rep-based without proper tracking
+          if (currentExercise) {
+            const activityLog: ActivityLog = {
+              id: `log-${Date.now()}`,
+              exerciseId: currentExercise.id,
+              exerciseName: currentExercise.name,
+              duration: targetTime,
+              timestamp: new Date(),
+              notes: `Completed ${targetTime}s interval timer`
+            };
+
+            if (consentService.hasConsent()) {
+              storageService.saveActivityLog(activityLog);
+            }
+          }
+
+          // Stop timer (pass true to indicate this is a completion, not manual stop)
+          stopTimer(true);
+
+          // Announce completion
+          if (appSettings.soundEnabled) {
+            audioService.announceText(`Timer completed! Great job on ${currentExercise?.name}`);
+          }
+        }
+      }
+    }
+  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.soundEnabled, appSettings.repSpeedFactor]);
 
   // Cleanup timer interval on unmount
   useEffect(() => {
@@ -388,10 +1148,18 @@ function App() {
 
           // Load app settings
           const storedSettings = await storageService.getAppSettings();
-          const settingsToSet = storedSettings || DEFAULT_APP_SETTINGS;
+          
+          // Merge with defaults to handle new settings properties
+          const settingsToSet = storedSettings ? {
+            ...DEFAULT_APP_SETTINGS,
+            ...storedSettings
+          } : DEFAULT_APP_SETTINGS;
           
           if (!storedSettings) {
             await storageService.saveAppSettings(DEFAULT_APP_SETTINGS);
+          } else if (Object.keys(DEFAULT_APP_SETTINGS).length !== Object.keys(storedSettings).length) {
+            // Update stored settings with any new defaults
+            await storageService.saveAppSettings(settingsToSet);
           }
           setAppSettings(settingsToSet);
 
@@ -401,7 +1169,7 @@ function App() {
               (ex: Exercise) => ex.id === settingsToSet.lastSelectedExerciseId
             );
             if (lastExercise) {
-              setSelectedExercise(lastExercise);
+              handleSetSelectedExercise(lastExercise, settingsToSet);
             }
           }
         } catch (error) {
@@ -445,9 +1213,16 @@ function App() {
     setHasConsent(true);
   };
 
-  const handleSetSelectedExercise = (exercise: Exercise | null) => {
+  const handleSetSelectedExercise = (exercise: Exercise | null, settings?: AppSettings) => {
     setSelectedExercise(exercise);
     updateAppSettings({ lastSelectedExerciseId: exercise ? exercise.id : null });
+    
+    // Set appropriate duration for rep-based exercises
+    if (exercise?.exerciseType === 'repetition-based') {
+      const currentSettings = settings || appSettings;
+      const repDuration = Math.round(BASE_REP_TIME * currentSettings.repSpeedFactor);
+      setSelectedDuration(repDuration as TimerPreset);
+    }
   };
 
   // Update exercise favorite status
@@ -580,6 +1355,7 @@ function App() {
                       onStartTimer={startTimer}
                       onStopTimer={stopTimer}
                       onResetTimer={resetTimer}
+                      onStartWorkoutMode={startWorkoutMode}
                     />
                   </Suspense>
                 } 

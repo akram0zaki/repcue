@@ -1,5 +1,29 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [2025-08-02] - Rep-Based Timer Logic Fixes
+
+### Fixed
+- **Rep Progress Bar Issues**: Fixed progress tracking that was skipping values and showing incorrect completion states
+  - **Set Progress Display**: Fixed set progress bar showing premature completion (2/2 after 7th rep instead of 8th)
+  - **Rep Progress Tracking**: Fixed rep progress bar getting stuck at 7/8 instead of advancing to 8/8 after final rep
+  - **Outer Ring Visualization**: Fixed progress ring not advancing to 100% after completing all reps in a set
+  - **Rest Period Transition**: Fixed timer not automatically advancing to rest period after completing all reps in a set
+
+### Enhanced
+- **Rep Advancement Logic**: Completely refactored rep/set advancement logic for consistency
+  - **Semantic Clarification**: Added clear documentation for 0-indexed state vs 1-indexed display semantics
+  - **Progress Calculations**: Unified progress bar and text display logic to prevent inconsistencies  
+  - **Exercise Completion Detection**: Fixed premature completion detection that caused display issues
+  - **Rest Timer Implementation**: Added complete rest period logic with automatic set transitions
+
+### Technical Improvements
+- **Test Coverage Extended**: Added comprehensive edge case tests in `TimerPage.rep-edge-cases.test.tsx`
+  - **Cat-Cow Stretch Scenario**: Added specific tests for 2 sets × 8 reps exercise (user's reported scenario)
+  - **Progress Validation**: Tests validate correct progress percentages at critical completion moments
+  - **State Transition Testing**: Covers rest periods, set advancement, and exercise completion states
+- **Code Quality**: All 523 tests passing with improved rep logic reliability
+- **Build Stability**: Successful compilation and deployment with enhanced timer functionality
+
 ## [2025-07-31] - Build Fixes and Codebase Cleanup
 
 ### Fixed

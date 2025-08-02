@@ -86,7 +86,8 @@ describe('StorageService', () => {
     darkMode: false,
     autoSave: true,
     preTimerCountdown: 3,
-    defaultRestTime: 60
+    defaultRestTime: 60,
+    repSpeedFactor: 1.0
   }
 
   beforeEach(() => {

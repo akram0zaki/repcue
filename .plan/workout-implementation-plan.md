@@ -230,13 +230,15 @@
 
 **Phase 3 Summary**: Complete workout creation and editing flow implemented. CreateWorkoutPage and EditWorkoutPage both feature comprehensive forms with exercise selection, customization (duration/sets/reps/rest time), weekday scheduling, validation, and data persistence. WorkoutsPage provides full CRUD operations. All 481 tests passing.
 
-## Phase 4: Enhanced Timer Support
+## Phase 4: Enhanced Timer Support ✅ COMPLETED (2025-08-01)
 
-* **T4.1**: Detect launch context (standalone vs workout-guided)
-* **T4.2**: Show outer circle progress indicator for reps/sets in workout mode
-* **T4.3**: Auto-advance through workout flow with custom rest intervals
-* **T4.4**: Sync timer state with log and workout session data
-* **T4.5**: Add unit and integration tests for new timer behavior
+* **T4.1**: ✅ Detect launch context (standalone vs workout-guided) - COMPLETED
+* **T4.2**: ✅ Show outer circle progress indicator for reps/sets in workout mode - COMPLETED
+* **T4.3**: ✅ Auto-advance through workout flow with custom rest intervals - COMPLETED
+* **T4.4**: ✅ Sync timer state with log and workout session data - COMPLETED  
+* **T4.5**: ✅ Add unit and integration tests for new timer behavior - COMPLETED
+
+**Phase 4 Summary**: Complete workout-guided timer functionality implemented. Timer now supports both standalone and workout modes with different UI elements and behaviors. In workout mode, the timer displays an outer progress ring for overall workout progress, rep/set progress indicators for repetition-based exercises, auto-advances through exercises with rest periods, and tracks workout session data. Added comprehensive test coverage with 13 new tests. All 494 tests passing.
 
 ## Phase 5: Log Enhancements
 
@@ -263,7 +265,7 @@
 
 ---
 
-## 📊 Current Status Summary (2025-07-31)
+## 📊 Current Status Summary (2025-08-01)
 
 ### ✅ Completed
 - **Data Models**: Complete workout system with embedded scheduling
@@ -272,18 +274,17 @@
 - **Infrastructure**: All storage services, type definitions, and tests
 - **Architecture**: Simplified from Schedule + Workout to just Workout with `scheduledDays`
 - **Workout CRUD**: Complete Create/Edit/Delete workout functionality with full UI
+- **Enhanced Timer**: Complete workout-guided timer with progress indicators and auto-advance
 
 ### 🚧 In Progress
-- **Phase 4**: Enhanced Timer Support (next priority)
+- **Phase 5**: Log Enhancements (next priority)
 
 ### 📋 Next Steps
-1. ✅ Complete CreateWorkoutPage and EditWorkoutPage UI implementation - COMPLETED
-2. ✅ Implement workout creation flow with exercise selection and customization - COMPLETED
-3. ✅ Add workout scheduling (weekday selection) functionality - COMPLETED
-4. **NEXT**: Enhance Timer for workout-guided sessions (Phase 4)
-5. Update Activity Log to support WorkoutSessions (Phase 5)
+1. **NEXT**: Update Activity Log to support WorkoutSessions (Phase 5)
+2. Update Settings to include workout-specific defaults (Phase 6)
+3. Final testing and UX polish (Phase 7)
 
 ### 🧪 Test Status
-- **Total Tests**: 481 passing
+- **Total Tests**: 494 passing
 - **Build Status**: ✅ All TypeScript compilation errors resolved
-- **Coverage**: Complete coverage for data models and services
+- **Coverage**: Complete coverage for data models, services, and workout timer functionality

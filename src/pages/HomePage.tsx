@@ -146,8 +146,16 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                   </div>
                   <button
                     onClick={() => {
-                      // TODO: Start workout mode in timer - will be implemented in Phase 4
-                      console.log('Start workout clicked - will be implemented in Phase 4');
+                      // Navigate to timer in workout-guided mode
+                      navigate(Routes.TIMER, {
+                        state: {
+                          workoutMode: {
+                            workoutId: upcomingWorkout.workout.id,
+                            workoutName: upcomingWorkout.workout.name,
+                            exercises: upcomingWorkout.workout.exercises
+                          }
+                        }
+                      });
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                   >

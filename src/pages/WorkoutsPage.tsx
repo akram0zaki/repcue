@@ -39,6 +39,18 @@ const WorkoutsPage: React.FC = () => {
     navigate(`${Routes.EDIT_WORKOUT}?id=${workoutId}`);
   };
 
+  const handleStartWorkout = (workout: Workout) => {
+    navigate(Routes.TIMER, { 
+      state: { 
+        workoutMode: {
+          workoutId: workout.id,
+          workoutName: workout.name,
+          exercises: workout.exercises
+        }
+      } 
+    });
+  };
+
   const handleDeleteWorkout = async (workoutId: string) => {
     if (!hasConsent) return;
     
@@ -213,6 +225,17 @@ const WorkoutsPage: React.FC = () => {
                   </div>
                   
                   <div className="flex items-center space-x-2 ml-4">
+                    <button
+                      onClick={() => handleStartWorkout(workout)}
+                      disabled={!workout.isActive}
+                      className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
+                      title={workout.isActive ? "Start workout" : "Workout is paused"}
+                    >
+                      <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" />
+                      </svg>
+                      Start
+                    </button>
                     <button
                       onClick={() => handleEditWorkout(workout.id)}
                       className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"

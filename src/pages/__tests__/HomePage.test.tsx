@@ -58,7 +58,8 @@ const mockAppSettings: AppSettings = {
   autoSave: true,
   lastSelectedExerciseId: 'plank',
   preTimerCountdown: 3,
-  defaultRestTime: 60
+  defaultRestTime: 60,
+  repSpeedFactor: 1.0
 };
 
 const mockOnToggleFavorite = vi.fn();
