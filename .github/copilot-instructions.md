@@ -2,6 +2,9 @@
 
 RepCue is a privacy-first fitness tracking PWA for interval training, optimized for mobile devices and self-hosting on Raspberry Pi. Built with React 19, TypeScript, Vite, and Tailwind CSS.
 
+**CORE OBJECTIVE: USER EXPERIENCE IS PARAMOUNT**
+Every decision, feature, and code change must prioritize user experience and usability above all else. The application must be intuitive, responsive, and provide seamless interaction patterns that feel natural to users during their workouts.
+
 ## Architecture Overview
 
 **Service-Oriented Design**: All business logic lives in singleton services (`src/services/`):
@@ -48,12 +51,59 @@ if (!consentService.hasConsent()) {
 }
 ```
 
+### Rep-Based Timer Logic (Critical Pattern)
+Rep-based exercises use 0-indexed internal state with specific semantic rules. **CRITICAL**: Rep-based exercises must behave identically in standalone mode and within workout composite routines.
+
+```typescript
+// SEMANTIC CLARIFICATION from TimerPage.tsx:
+// - currentRep: Number of COMPLETED reps (0 = no reps completed, 8 = all 8 reps completed)
+// - currentSet: Current set index when exercising, completed sets when resting
+// - Display: Shows completed counts (currentRep completed, currentSet+1 of totalSets)
+// - Progress: Calculated as (currentRep / totalReps) * 100 for completion percentage
+
+// Constants from src/constants/index.ts
+const BASE_REP_TIME = 2; // Base seconds per rep
+const REST_TIME_BETWEEN_SETS = 30; // Rest between sets
+
+// CRITICAL BEHAVIOR CONSISTENCY:
+// A rep-based exercise (e.g., Cat-Cow Stretch 2×8) must have identical:
+// - Rep advancement timing and logic
+// - Set completion detection
+// - Rest period triggering
+// - Progress calculations
+// Whether running standalone OR as part of a workout composite routine
+```
+
 ### TypeScript Interface Design
 Core types in `src/types/index.ts`. Key interfaces:
-- `Exercise` - Core workout data with categories and tags
-- `ActivityLog` - Workout session tracking with timestamp conversion
-- `TimerState` - Real-time timer state with countdown support
-- `AppSettings` - User preferences including pre-timer countdown
+- `Exercise` - Core workout data with `exerciseType: 'time-based' | 'repetition-based'`
+- `WorkoutExercise` - Exercise within workout with custom overrides (customSets, customReps)
+- `TimerState` - Complex timer state supporting both standalone and workout modes
+- `AppSettings` - User preferences including `repSpeedFactor` and `preTimerCountdown`
+
+### Timer State Architecture
+```typescript
+interface TimerState {
+  // Basic timer state
+  isRunning: boolean;
+  currentTime: number;
+  isCountdown: boolean;
+  
+  // Rep-based exercise state (standalone mode)
+  currentSet?: number;      // 0-indexed, current set being worked on
+  currentRep?: number;      // number of completed reps in current set
+  totalSets?: number;
+  totalReps?: number;
+  isResting: boolean;       // true during 30s rest between sets
+  
+  // Workout mode (guided multi-exercise sessions)
+  workoutMode?: {
+    currentExerciseIndex: number;
+    exercises: WorkoutExercise[];
+    // ... rep/set tracking per exercise
+  };
+}
+```
 
 ### Testing Mock Patterns
 All browser APIs are mocked in `src/test/setup.ts`:
@@ -80,14 +130,19 @@ npm run build:serve  # Production build + Express server (port 3001)
 npm run pm2:start    # Deploy with PM2 process manager
 npm run lint         # ESLint validation
 npm run test:ui      # Interactive test interface with coverage
+npm run test:a11y    # Accessibility testing with axe-core
+npm run generate-splash  # Generate PWA splash screens
 ```
 
 ### Testing Strategy
-- **Comprehensive Coverage**: >350 tests passing with >90% coverage requirement
+- **Comprehensive Coverage**: >520 tests passing with >90% coverage requirement
 - **Service Testing**: Every service has dedicated `__tests__/` subdirectory
 - **Mock Architecture**: Browser APIs comprehensively mocked in `src/test/setup.ts`
-- **Test Organization**: Separate test files for complex features (e.g., `TimerPage.countdown.test.tsx`)
+- **Edge Case Testing**: Dedicated test files for complex scenarios (e.g., `TimerPage.rep-edge-cases.test.tsx`)
+- **Rep Logic Testing**: Critical timer logic has specific test coverage for completion edge cases
 - **Accessibility Testing**: E2e tests with axe-core for WCAG compliance
+- **UI Behavior Verification**: Components must behave exactly as expected - test actual user interactions
+- **Edge Case Priority**: Always consider boundary conditions, error states, and unusual user flows
 
 ### Pi-Specific Optimizations
 - **Memory Management**: PM2 config with 512MB memory limits (`ecosystem.config.cjs`)
@@ -101,22 +156,31 @@ npm run test:ui      # Interactive test interface with coverage
 ### Route Structure & Lazy Loading
 ```
 src/pages/
-├── HomePage.tsx        # Exercise grid with category filtering
-├── TimerPage.tsx       # Complex timer with pre-countdown, wake lock, audio
+├── HomePage.tsx        # Exercise grid with category filtering + upcoming workouts
+├── TimerPage.tsx       # Complex timer with pre-countdown, rep logic, wake lock, audio
 ├── ExercisePage.tsx    # Exercise details and CRUD operations
+├── WorkoutsPage.tsx    # Workout management and scheduling (replaces SchedulePage)
+├── CreateWorkoutPage.tsx  # Workout creation with exercise selection
+├── EditWorkoutPage.tsx    # Workout modification interface
 ├── ActivityLogPage.tsx # Workout history with export functionality
 └── SettingsPage.tsx    # App preferences with granular controls
 ```
 
 ### Timer State Management
-Complex timer implementation in `App.tsx` with multiple phases:
+Complex timer implementation in `App.tsx` with multiple modes:
 ```typescript
 interface TimerState {
   isRunning: boolean;
   currentTime: number;
   isCountdown: boolean;    // Pre-timer countdown phase
   countdownTime: number;   // Countdown seconds remaining
-  // ... other timer properties
+  isResting: boolean;      // Rest period between sets
+  restTimeRemaining?: number;
+  // Standalone exercise tracking
+  currentSet?: number;     // 0-indexed set position
+  currentRep?: number;     // completed reps count
+  // Workout mode for guided sessions
+  workoutMode?: { /* complex workout state */ };
 }
 ```
 
@@ -155,10 +219,39 @@ VitePWA({
 ## Data Architecture
 
 ### Exercise Data Structure
-- **Seeded Data**: 20 exercises across 5 categories in `src/data/exercises.ts`
-- **Categories**: Core, Cardio, Strength, Flexibility, Balance
+- **Seeded Data**: 20 exercises across 6 categories in `src/data/exercises.ts`
+- **Categories**: Core, Cardio, Strength, Flexibility, Balance, Hand-Warmup
+- **Exercise Types**: `'time-based'` (duration) vs `'repetition-based'` (sets/reps)
 - **Tags**: Multi-tag system for filtering and organization
 - **Persistence**: IndexedDB storage with import/export functionality
+
+### Workout System Architecture
+```typescript
+// Workout replaces the old Schedule system
+interface Workout {
+  id: string;
+  name: string;
+  exercises: WorkoutExercise[]; // Ordered sequence
+  scheduledDays: Weekday[];     // Direct scheduling
+  isActive: boolean;            // Pause/resume capability
+}
+
+// Exercise customization within workouts
+interface WorkoutExercise {
+  exerciseId: string;
+  order: number;
+  customSets?: number;    // Override exercise defaults
+  customReps?: number;
+  customRestTime?: number;
+}
+```
+
+**WORKOUT COMPOSITE PATTERN**: A workout is a composite routine made up of smaller routines (exercises). Each exercise within a workout must behave identically to its standalone counterpart. This includes:
+- Rep advancement timing and progression
+- Set completion detection and transitions
+- Rest period triggering and duration
+- Progress calculations and display logic
+- Audio cues and haptic feedback patterns
 
 ### Consent-Aware Persistence
 ```typescript
@@ -192,6 +285,33 @@ if (consentService.hasConsent()) {
 - **High Contrast**: Support for various lighting conditions and vision needs
 
 ## Advanced Integration Patterns
+
+### Rep Logic Debugging (Critical for Timer Issues)
+When debugging rep-based timer problems, check these key state transitions and common error scenarios:
+
+```typescript
+// Expected progression for 2 sets × 8 reps:
+// Initial: currentSet=0, currentRep=0 → Display: Set 1/2, Rep 0/8
+// After rep 1: currentSet=0, currentRep=1 → Display: Set 1/2, Rep 1/8
+// After rep 8: currentSet=0, currentRep=8 → Display: Set 1/2, Rep 8/8 → START REST
+// During rest: isResting=true → Set progress includes completed set
+// After rest: currentSet=1, currentRep=0 → Display: Set 2/2, Rep 0/8
+
+// COMMON ERROR SCENARIOS ENCOUNTERED:
+// 1. Progress bar skipping from 87.5% to 100% (off-by-one in rep advancement)
+// 2. Set progress showing 100% before exercise completion (premature set increment)
+// 3. Rest period not triggering after final rep of set (missing isResting transition)
+// 4. Exercise completing after 7 reps instead of 8 (< vs <= in completion logic)
+// 5. currentRep advancing before rep timer completes (timing race condition)
+// 6. Rest timer not resetting properly between sets (clearInterval safety)
+
+// Critical checks for rep-based exercise bugs:
+// - Exercise completion: currentRep >= totalReps (not totalReps-1)
+// - Set completion: triggers when currentRep reaches totalReps for current set
+// - Rest triggering: isResting=true when set completes but exercise continues
+// - Progress calculation: (currentRep / totalReps) must handle edge case of completion
+// - Timer intervals: Always clearInterval before setting new intervals
+```
 
 ### Audio Service Architecture
 Multi-layered audio system in `AudioService`:
