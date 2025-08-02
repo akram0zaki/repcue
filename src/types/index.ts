@@ -104,6 +104,16 @@ export interface ActivityLog {
   duration: number; // in seconds
   timestamp: Date;
   notes?: string;
+  // Workout-specific fields
+  workoutId?: string;
+  isWorkout?: boolean;
+  exercises?: {
+    exerciseId: string;
+    exerciseName: string;
+    duration: number;
+    sets?: number;
+    reps?: number;
+  }[];
 }
 
 // Timer state

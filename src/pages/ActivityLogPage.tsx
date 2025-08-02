@@ -24,6 +24,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<'all' | ExerciseCategory>('all');
   const [showStatsCard, setShowStatsCard] = useState(true);
+  const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<StatsData>({
     totalWorkouts: 0,
     totalDuration: 0,
@@ -109,9 +110,32 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     });
   };
 
+  // Toggle workout expansion
+  const toggleWorkoutExpansion = (workoutId: string) => {
+    setExpandedWorkouts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(workoutId)) {
+        newSet.delete(workoutId);
+      } else {
+        newSet.add(workoutId);
+      }
+      return newSet;
+    });
+  };
+
   // Filter logs based on selected category
   const filteredLogs = activityLogs.filter(log => {
     if (selectedFilter === 'all') return true;
+    
+    // For workout entries, check if any exercise in the workout matches the filter
+    if (log.isWorkout && log.exercises) {
+      return log.exercises.some(ex => {
+        const exercise = exercises.find(e => e.id === ex.exerciseId);
+        return exercise?.category === selectedFilter;
+      });
+    }
+    
+    // For individual exercise entries
     const exercise = exercises.find(ex => ex.id === log.exerciseId);
     return exercise?.category === selectedFilter;
   });
@@ -327,48 +351,133 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                     {logs
                       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
                       .map((log) => (
-                        <div
-                          key={log.id}
-                          className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700"
-                        >
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                <span
-                                  className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}
-                                ></span>
-                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                                  {log.exerciseName}
-                                </h4>
-                              </div>
-                              
-                              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                                <div className="flex items-center gap-1">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                  {formatTime(log.timestamp)}
+                        <div key={log.id}>
+                          {log.isWorkout ? (
+                            // Workout entry with expandable exercises
+                            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
+                              <div 
+                                className="flex items-start justify-between cursor-pointer"
+                                onClick={() => toggleWorkoutExpansion(log.id)}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                                      {log.exerciseName} (Workout)
+                                    </h4>
+                                    <svg 
+                                      className={`w-5 h-5 text-gray-500 transition-transform ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
+                                      fill="none" 
+                                      stroke="currentColor" 
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                      {formatTime(log.timestamp)}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                      </svg>
+                                      {formatDuration(log.duration)}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                      </svg>
+                                      {log.exercises?.length || 0} exercises
+                                    </div>
+                                  </div>
                                 </div>
                                 
-                                <div className="flex items-center gap-1">
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                  </svg>
-                                  {formatDuration(log.duration)}
+                                <div className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
+                                  Workout
                                 </div>
                               </div>
+                              
+                              {/* Expandable exercise list */}
+                              {expandedWorkouts.has(log.id) && log.exercises && (
+                                <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
+                                  <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Exercises:</h5>
+                                  <div className="space-y-2">
+                                    {log.exercises.map((exercise, index) => (
+                                      <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3">
+                                        <div className="flex items-center gap-2">
+                                          <span className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(exercise.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}></span>
+                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{exercise.exerciseName}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                          {exercise.sets && exercise.reps && (
+                                            <span>{exercise.sets} × {exercise.reps}</span>
+                                          )}
+                                          <span>{formatDuration(exercise.duration)}</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {log.notes && (
+                                <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {log.notes}
+                                  </p>
+                                </div>
+                              )}
                             </div>
-                            
-                            <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exerciseId)} ${getCategoryTextColor(log.exerciseId)}`}>
-                              {exercises.find(ex => ex.id === log.exerciseId)?.category.replace('-', ' ')}
-                            </div>
-                          </div>
-                          
-                          {log.notes && (
-                            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {log.notes}
-                              </p>
+                          ) : (
+                            // Individual exercise entry
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span
+                                      className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}
+                                    ></span>
+                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                                      {log.exerciseName}
+                                    </h4>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                      {formatTime(log.timestamp)}
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-1">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                      </svg>
+                                      {formatDuration(log.duration)}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exerciseId)} ${getCategoryTextColor(log.exerciseId)}`}>
+                                  {exercises.find(ex => ex.id === log.exerciseId)?.category.replace('-', ' ')}
+                                </div>
+                              </div>
+                              
+                              {log.notes && (
+                                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {log.notes}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>

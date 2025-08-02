@@ -314,6 +314,63 @@ describe('AudioService', () => {
     })
   })
 
+  describe('playRestStartFeedback', () => {
+    it('should play rest start sound and vibration when enabled', async () => {
+      vi.spyOn(audioService, 'playRestStartSound').mockResolvedValue()
+      
+      await audioService.playRestStartFeedback(true, true)
+      
+      expect(audioService.playRestStartSound).toHaveBeenCalled()
+      expect(navigator.vibrate).toHaveBeenCalledWith([200, 100, 200])
+    })
+
+    it('should only play sound when only sound enabled', async () => {
+      vi.spyOn(audioService, 'playRestStartSound').mockResolvedValue()
+      
+      await audioService.playRestStartFeedback(true, false)
+      
+      expect(audioService.playRestStartSound).toHaveBeenCalled()
+      expect(navigator.vibrate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('playRestEndFeedback', () => {
+    it('should play rest end sound and vibration when enabled', async () => {
+      vi.spyOn(audioService, 'playRestEndSound').mockResolvedValue()
+      
+      await audioService.playRestEndFeedback(true, true)
+      
+      expect(audioService.playRestEndSound).toHaveBeenCalled()
+      expect(navigator.vibrate).toHaveBeenCalledWith([100, 50, 100, 50, 300])
+    })
+  })
+
+  describe('playRestStartSound', () => {
+    it('should create low tone for rest start', async () => {
+      await audioService.playRestStartSound()
+
+      expect(mockAudioContext.createOscillator).toHaveBeenCalled()
+      expect(mockAudioContext.createGain).toHaveBeenCalled()
+      expect(mockOscillator.frequency.value).toBe(300) // Low tone for rest
+      expect(mockOscillator.type).toBe('sine')
+      expect(mockOscillator.start).toHaveBeenCalled()
+      expect(mockOscillator.stop).toHaveBeenCalled()
+    })
+  })
+
+  describe('playRestEndSound', () => {
+    it('should create ascending tones for rest end', async () => {
+      vi.spyOn(global, 'setTimeout')
+      
+      await audioService.playRestEndSound()
+
+      expect(mockAudioContext.createOscillator).toHaveBeenCalled()
+      expect(mockOscillator.frequency.value).toBe(500) // First tone
+      expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 150)
+      expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 300)
+    })
+  })
+
   describe('dispose', () => {
     it('should close audio context', () => {
       // Force initialize the audio context

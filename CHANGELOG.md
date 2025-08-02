@@ -1,6 +1,48 @@
 # RepCue - Fitness Tracking App Changelog
 
-## [2025-08-02] - Rep-Based Timer Logic Fixes
+## [2025-08-02] - Workout Timer Progress and Completion Fixes
+
+### Fixed
+- **Workout Progress Display**: Fixed critical workout progress and exercise count display issues
+  - **Exercise Count Bug**: Fixed "2/2" appearing immediately when exercise 2 starts instead of when workout completes
+  - **Progress Bar Completion**: Fixed workout progress bar not reaching 100% after completion
+  - **Workout Logging**: Fixed workout sessions not being logged when completed
+  - **Exercise Index Timing**: Fixed currentExerciseIndex advancing too early during rest periods
+  - **Multiple Triggers**: Prevented multiple timer completion useEffect triggers causing state inconsistencies
+  - **State Synchronization**: Improved synchronization between selectedExercise and workoutMode state
+  - **Completion Detection**: Enhanced workout completion detection during rest periods
+
+### Added
+- **Enhanced Activity Log**: Redesigned activity log to show workout entries with drill-down capability
+  - **Workout Entries**: Single workout entry instead of individual exercise entries
+  - **Expandable View**: Click workout entries to see constituent exercises
+  - **Exercise Details**: Shows sets, reps, and duration for each exercise within workouts
+  - **Visual Distinction**: Workout entries have blue styling to distinguish from individual exercises
+  - **Total Duration**: Displays total workout time and exercise count
+
+### Technical Improvements
+- Added completion flag (`completionProcessedRef`) to prevent duplicate timer processing
+- Improved useEffect dependencies to be more specific and prevent unnecessary re-triggers
+- Enhanced workout state logging for better debugging
+- Fixed TypeScript error with optional sessionId property
+- Extended ActivityLog interface to support workout entries with exercise details
+
+## [2025-08-02] - Workout Timer Transition Fixes
+
+### Fixed
+- **Workout Exercise Transitions**: Fixed critical issues with exercise transitions in workout mode
+  - **Rep Counter Bug**: Fixed "Rep 6 of 5" display issue when completing rep-based exercises
+  - **Auto-Start Next Exercise**: Fixed next exercise not automatically starting after rest periods
+  - **Exercise Completion Logic**: Properly detect and handle completion of all reps/sets in workout mode
+  - **Rest Period Display**: Show proper rest countdown instead of invalid rep counters
+
+### Enhanced
+- **Audio Feedback**: Increased volume for interval and rest sounds by 50% for better audibility
+  - **Interval Beeps**: Volume increased from 0.3 to 0.45
+  - **Rest Cues**: All rest sound volumes increased by 50%
+- **Workout Flow**: Seamless exercise-to-exercise transitions without manual intervention
+
+### Previous Fixes - Rep-Based Timer Logic
 
 ### Fixed
 - **Rep Progress Bar Issues**: Fixed progress tracking that was skipping values and showing incorrect completion states

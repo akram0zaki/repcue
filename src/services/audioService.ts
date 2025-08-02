@@ -51,7 +51,7 @@ export class AudioService {
   /**
    * Play interval beep sound
    */
-  public async playIntervalBeep(volume: number = 0.3): Promise<void> {
+  public async playIntervalBeep(volume: number = 0.45): Promise<void> {
     if (!this.audioContext) {
       this.initializeAudioContext();
     }
@@ -61,7 +61,7 @@ export class AudioService {
     }
 
     if (this.audioContext) {
-      this.createBeepSound(800, 0.2, volume); // 800Hz, 200ms duration, configurable volume
+      this.createBeepSound(800, 0.2, volume); // 800Hz, 200ms duration, 50% louder default volume
     }
   }
 
@@ -152,7 +152,7 @@ export class AudioService {
   /**
    * Play interval feedback (sound + vibration)
    */
-  public async playIntervalFeedback(soundEnabled: boolean, vibrationEnabled: boolean, volume: number = 0.3): Promise<void> {
+  public async playIntervalFeedback(soundEnabled: boolean, vibrationEnabled: boolean, volume: number = 0.45): Promise<void> {
     const promises: Promise<void>[] = [];
 
     if (soundEnabled) {
@@ -198,6 +198,82 @@ export class AudioService {
     }
 
     await Promise.all(promises);
+  }
+
+  /**
+   * Play rest start feedback (different tone to indicate rest period)
+   */
+  public async playRestStartFeedback(soundEnabled: boolean, vibrationEnabled: boolean): Promise<void> {
+    const promises: Promise<void>[] = [];
+
+    if (soundEnabled) {
+      promises.push(this.playRestStartSound());
+    }
+
+    if (vibrationEnabled) {
+      this.vibrate([200, 100, 200]); // Rest start vibration pattern
+    }
+
+    await Promise.all(promises);
+  }
+
+  /**
+   * Play rest end feedback (different tone to indicate rest ending)
+   */
+  public async playRestEndFeedback(soundEnabled: boolean, vibrationEnabled: boolean): Promise<void> {
+    const promises: Promise<void>[] = [];
+
+    if (soundEnabled) {
+      promises.push(this.playRestEndSound());
+    }
+
+    if (vibrationEnabled) {
+      this.vibrate([100, 50, 100, 50, 300]); // Rest end vibration pattern
+    }
+
+    await Promise.all(promises);
+  }
+
+  /**
+   * Play rest start sound (low tone to indicate rest period)
+   */
+  public async playRestStartSound(): Promise<void> {
+    if (!this.audioContext) {
+      this.initializeAudioContext();
+    }
+
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
+    }
+
+    if (this.audioContext) {
+      // Low tone for rest start (50% louder)
+      this.createBeepSound(300, 0.4, 0.225);
+    }
+  }
+
+  /**
+   * Play rest end sound (ascending tones to indicate rest ending)
+   */
+  public async playRestEndSound(): Promise<void> {
+    if (!this.audioContext) {
+      this.initializeAudioContext();
+    }
+
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
+    }
+
+    if (this.audioContext) {
+      // Ascending tones for rest end: low to high (50% louder)
+      this.createBeepSound(500, 0.15, 0.18);
+      setTimeout(() => {
+        this.createBeepSound(700, 0.15, 0.18);
+      }, 150);
+      setTimeout(() => {
+        this.createBeepSound(1000, 0.2, 0.225);
+      }, 300);
+    }
   }
 
   /**

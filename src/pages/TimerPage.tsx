@@ -37,8 +37,11 @@ const TimerPage: React.FC<TimerPageProps> = ({
 }) => {
   // Calculate display values
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
-  const remainingTime = targetTime ? Math.max(0, targetTime - currentTime) : 0;
+  
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
+  
+  // Use workout mode rest state if available, fallback to timer state
+  const actuallyResting = workoutMode?.isResting || isResting;
   
   // Countdown progress (reverse of normal progress)
   const countdownProgress = isCountdown && appSettings.preTimerCountdown > 0 
@@ -46,16 +49,54 @@ const TimerPage: React.FC<TimerPageProps> = ({
     : 0;
   
   // Rest time calculations
-  const displayTime = isResting && restTimeRemaining !== undefined 
+  const displayTime = actuallyResting && restTimeRemaining !== undefined 
     ? restTimeRemaining 
-    : (isCountdown ? countdownTime : remainingTime);
-  const displayProgress = isResting && restTimeRemaining !== undefined
+    : (isCountdown ? countdownTime : currentTime); // Show elapsed time, not remaining time
+  const displayProgress = actuallyResting && restTimeRemaining !== undefined
     ? ((REST_TIME_BETWEEN_SETS - restTimeRemaining) / REST_TIME_BETWEEN_SETS) * 100
     : (isCountdown ? countdownProgress : progress);
 
   // Workout mode calculations
   const isWorkoutMode = !!workoutMode;
-  const workoutProgress = workoutMode ? (workoutMode.currentExerciseIndex / workoutMode.exercises.length) * 100 : 0;
+  const workoutProgress = workoutMode ? 
+    // Calculate progress based on actual completion:
+    // - During exercise: completed exercises / total (don't count current until done)
+    // - During rest: (completed exercises + 1) / total (count the just-completed exercise)
+    // - After workout: 100% (all exercises completed)
+    (() => {
+      const totalExercises = workoutMode.exercises.length;
+      const currentIndex = workoutMode.currentExerciseIndex;
+      
+      // Check if workout is actually completed (currentIndex >= totalExercises)
+      if (currentIndex >= totalExercises) {
+        return 100; // Workout completed
+      }
+      
+      if (workoutMode.isResting) {
+        // During rest: we've completed the exercise we just finished
+        // currentIndex points to next exercise, so we've completed currentIndex exercises
+        return (currentIndex / totalExercises) * 100;
+      } else {
+        // During exercise: we've completed the exercises before the current one
+        return (currentIndex / totalExercises) * 100;
+      }
+    })()
+    : 0;
+  
+  // Get current exercise info for workout mode
+  const currentWorkoutExercise = workoutMode ? workoutMode.exercises[workoutMode.currentExerciseIndex] : null;
+  const workoutCurrentExercise = currentWorkoutExercise ? exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId) : null;
+  
+  // During rest periods, we want to show the previous exercise as "completed" and the next exercise as "coming up"
+  const previousWorkoutExercise = workoutMode && workoutMode.currentExerciseIndex > 0 
+    ? workoutMode.exercises[workoutMode.currentExerciseIndex - 1] 
+    : null;
+  const previousExercise = previousWorkoutExercise ? exercises.find(ex => ex.id === previousWorkoutExercise.exerciseId) : null;
+  
+  // Choose which exercise to display based on rest state
+  const displayExercise = isWorkoutMode 
+    ? (actuallyResting ? previousExercise || workoutCurrentExercise : workoutCurrentExercise || selectedExercise)
+    : selectedExercise;
   
   // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
   const isRepBased = selectedExercise?.exerciseType === 'repetition-based';
@@ -90,6 +131,18 @@ const TimerPage: React.FC<TimerPageProps> = ({
         : (currentRep / totalReps) * 100)  // Show completed reps in current set
     : 0;
 
+  // For rep-based exercises, use smooth time-based progress for inner circle instead of discrete seconds
+  const smoothRepProgress = isRepBased && targetTime && !isCountdown && !isResting
+    ? progress  // Use normal time-based progress for smooth rep progression
+    : 0;
+
+  // Override displayProgress for rep-based exercises to show smooth progression
+  const finalDisplayProgress = isResting && restTimeRemaining !== undefined
+    ? ((REST_TIME_BETWEEN_SETS - restTimeRemaining) / REST_TIME_BETWEEN_SETS) * 100
+    : (isCountdown ? countdownProgress : 
+       isRepBased && !isResting ? smoothRepProgress :  // Use smooth rep progress for rep-based exercises
+       displayProgress);
+
   // Format time display
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -110,7 +163,23 @@ const TimerPage: React.FC<TimerPageProps> = ({
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-semibold">{workoutMode.workoutName}</h2>
               <span className="text-sm bg-blue-500 px-2 py-1 rounded">
-                {workoutMode.currentExerciseIndex + 1} / {workoutMode.exercises.length}
+                {(() => {
+                  const currentIndex = workoutMode.currentExerciseIndex;
+                  const totalExercises = workoutMode.exercises.length;
+                  
+                  if (currentIndex >= totalExercises) {
+                    // Workout completed
+                    return `${totalExercises} / ${totalExercises}`;
+                  }
+                  
+                  if (workoutMode.isResting) {
+                    // During rest: show completed exercises
+                    return `${currentIndex} / ${totalExercises}`;
+                  } else {
+                    // During exercise: show current exercise
+                    return `${currentIndex + 1} / ${totalExercises}`;
+                  }
+                })()}
               </span>
             </div>
             
@@ -123,23 +192,34 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </div>
             
             <div className="text-sm opacity-90">
-              Exercise {workoutMode.currentExerciseIndex + 1}: {selectedExercise?.name || 'Loading...'}
+              {actuallyResting 
+                ? `Rest Period (Next: ${workoutCurrentExercise?.name || 'Loading...'})`
+                : `Exercise ${workoutMode.currentExerciseIndex + 1}: ${displayExercise?.name || 'Loading...'}`
+              }
             </div>
           </div>
         )}
 
         {/* Current Exercise Display - More prominent in workout mode */}
-        {isWorkoutMode && selectedExercise && (
+        {isWorkoutMode && displayExercise && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 text-center">
             <div className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-              {selectedExercise.name}
+              {actuallyResting ? 'Rest Period' : displayExercise.name}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              Current Exercise • {selectedExercise.category}
+              {actuallyResting 
+                ? `Next: ${workoutCurrentExercise?.name} • ${workoutCurrentExercise?.category}`
+                : `Current Exercise • ${displayExercise.category}`
+              }
             </div>
-            {selectedExercise.description && (
+            {displayExercise.description && !actuallyResting && (
               <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
-                {selectedExercise.description}
+                {displayExercise.description}
+              </div>
+            )}
+            {actuallyResting && (
+              <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
+                Take a break and prepare for the next exercise
               </div>
             )}
           </div>
@@ -327,7 +407,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     strokeWidth="8"
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 60}`}
-                    strokeDashoffset={`${2 * Math.PI * 60 * (1 - displayProgress / 100)}`}
+                    strokeDashoffset={`${2 * Math.PI * 60 * (1 - finalDisplayProgress / 100)}`}
                     className={`transition-all duration-300 ${
                       isCountdown 
                         ? 'text-orange-500' 
@@ -340,33 +420,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 </>
               ) : (
                 <>
-                  {/* Standard timer display for time-based exercises or standalone mode */}
-                  {/* Outer circle for workout progress (only in workout mode) */}
-                  {isWorkoutMode && (
-                    <>
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="75"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                        className="text-gray-200 dark:text-gray-700"
-                      />
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="75"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        fill="none"
-                        strokeDasharray={`${2 * Math.PI * 75}`}
-                        strokeDashoffset={`${2 * Math.PI * 75 * (1 - workoutProgress / 100)}`}
-                        className="text-purple-500 transition-all duration-300"
-                        strokeLinecap="round"
-                      />
-                    </>
-                  )}
+                  {/* Standard timer display for time-based exercises - single circle only */}
+                  {/* No outer circle for time-based exercises to keep UI clean */}
                   
                   {/* Inner circle for timer progress */}
                   <circle
@@ -386,7 +441,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     strokeWidth="8"
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 70}`}
-                    strokeDashoffset={`${2 * Math.PI * 70 * (1 - displayProgress / 100)}`}
+                    strokeDashoffset={`${2 * Math.PI * 70 * (1 - finalDisplayProgress / 100)}`}
                     className={`transition-all duration-300 ${
                       isCountdown 
                         ? 'text-orange-500' 
@@ -412,22 +467,42 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       Get ready...
                     </div>
                   </>
+                ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
+                  // Rep-based exercise display: show rep progress instead of time countdown
+                  // Only show when not all reps are completed
+                  <>
+                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                      Rep {(currentRep || 0) + 1}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
+                    </div>
+                  </>
                 ) : (
                   <>
                     <div className={`text-3xl font-bold ${
                       displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
-                        : isResting
+                        : actuallyResting
                         ? 'text-blue-500 dark:text-blue-400'
                         : 'text-gray-900 dark:text-gray-100'
                     }`}>
                       {formatTime(displayTime)}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {isResting 
-                        ? 'Rest between sets'
+                      {actuallyResting 
+                        ? 'Rest Period'
                         : isWorkoutMode 
-                          ? `Exercise ${workoutMode.currentExerciseIndex + 1}/${workoutMode.exercises.length}`
+                          ? (() => {
+                              const currentIndex = workoutMode.currentExerciseIndex;
+                              const totalExercises = workoutMode.exercises.length;
+                              
+                              if (currentIndex >= totalExercises) {
+                                return `Exercise ${totalExercises}/${totalExercises} - Complete!`;
+                              }
+                              
+                              return `Exercise ${currentIndex + 1}/${totalExercises}`;
+                            })()
                           : targetTime ? `of ${formatTime(targetTime)}` : 'Set duration'
                       }
                     </div>
