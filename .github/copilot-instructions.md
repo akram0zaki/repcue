@@ -5,6 +5,8 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 **CORE OBJECTIVE: USER EXPERIENCE IS PARAMOUNT**
 Every decision, feature, and code change must prioritize user experience and usability above all else. The application must be intuitive, responsive, and provide seamless interaction patterns that feel natural to users during their workouts.
 
+**DEVELOPMENT ENVIRONMENT**: Windows 11 with PowerShell as primary shell. All terminal commands should use PowerShell syntax. Always run non-interactive commands with appropriate flags to avoid hanging processes.
+
 ## Architecture Overview
 
 **Service-Oriented Design**: All business logic lives in singleton services (`src/services/`):
@@ -121,9 +123,9 @@ Object.defineProperty(navigator, 'vibrate', { value: vi.fn() });
 ## Development Workflow
 
 ### Essential Commands
-```bash
+```powershell
 npm run dev          # Development server (port 5173)
-npm test             # Vitest unit tests with coverage
+npm test             # Vitest unit tests with coverage (use -- --run for non-interactive)
 npm run build        # Full build with splash generation
 npm run build:prod   # Production-optimized build (Pi deployment)
 npm run build:serve  # Production build + Express server (port 3001)
@@ -132,10 +134,14 @@ npm run lint         # ESLint validation
 npm run test:ui      # Interactive test interface with coverage
 npm run test:a11y    # Accessibility testing with axe-core
 npm run generate-splash  # Generate PWA splash screens
+
+# PowerShell-specific commands for Windows development:
+# Copy splash assets: powershell -Command "Copy-Item -Recurse -Force public/splash dist/"
+# Always use npm test -- --run to avoid interactive mode hanging
 ```
 
 ### Testing Strategy
-- **Comprehensive Coverage**: >520 tests passing with >90% coverage requirement
+- **Comprehensive Coverage**: >556 tests passing with >90% coverage requirement
 - **Service Testing**: Every service has dedicated `__tests__/` subdirectory
 - **Mock Architecture**: Browser APIs comprehensively mocked in `src/test/setup.ts`
 - **Edge Case Testing**: Dedicated test files for complex scenarios (e.g., `TimerPage.rep-edge-cases.test.tsx`)
@@ -143,6 +149,7 @@ npm run generate-splash  # Generate PWA splash screens
 - **Accessibility Testing**: E2e tests with axe-core for WCAG compliance
 - **UI Behavior Verification**: Components must behave exactly as expected - test actual user interactions
 - **Edge Case Priority**: Always consider boundary conditions, error states, and unusual user flows
+- **Windows Testing**: Use `npm test -- --run` to avoid interactive mode in PowerShell environments
 
 ### Pi-Specific Optimizations
 - **Memory Management**: PM2 config with 512MB memory limits (`ecosystem.config.cjs`)
@@ -284,6 +291,38 @@ if (consentService.hasConsent()) {
 - **Focus Management**: Proper tab order and visible focus indicators
 - **High Contrast**: Support for various lighting conditions and vision needs
 
+## Critical Development Workflows
+
+### Rep-Based Exercise State Management (Critical Pattern)
+The most complex part of RepCue is rep-based exercise timing. **Critical bugs often occur here**:
+
+```typescript
+// CRITICAL: Workout mode must be preserved during timer execution
+// Bad: workoutMode: undefined (clears all workout context)
+// Good: workoutMode: prev.workoutMode || undefined (preserves for workouts)
+
+// In App.tsx startActualTimer():
+setTimerState(prev => ({
+  ...prev,
+  workoutMode: prev.workoutMode || undefined, // PRESERVE workout context
+  // other timer state...
+}));
+```
+
+**Common Workflow**: When user reports "workout stops after 1 rep", check `workoutMode` preservation in timer state updates.
+
+### PowerShell Development Commands
+```powershell
+# Non-interactive testing (critical for CI/automated workflows)
+npm test -- --run
+
+# Build with splash screen copying (Windows-specific)
+npm run build  # Includes PowerShell copy command
+
+# PM2 deployment for Pi
+npm run build:prod; pm2 start ecosystem.config.cjs
+```
+
 ## Advanced Integration Patterns
 
 ### Rep Logic Debugging (Critical for Timer Issues)
@@ -304,6 +343,7 @@ When debugging rep-based timer problems, check these key state transitions and c
 // 4. Exercise completing after 7 reps instead of 8 (< vs <= in completion logic)
 // 5. currentRep advancing before rep timer completes (timing race condition)
 // 6. Rest timer not resetting properly between sets (clearInterval safety)
+// 7. Workout mode state being cleared during timer execution (workoutMode preservation)
 
 // Critical checks for rep-based exercise bugs:
 // - Exercise completion: currentRep >= totalReps (not totalReps-1)
@@ -311,6 +351,7 @@ When debugging rep-based timer problems, check these key state transitions and c
 // - Rest triggering: isResting=true when set completes but exercise continues
 // - Progress calculation: (currentRep / totalReps) must handle edge case of completion
 // - Timer intervals: Always clearInterval before setting new intervals
+// - Workout mode preservation: startActualTimer() must preserve workoutMode state during workout execution
 ```
 
 ### Audio Service Architecture
@@ -377,5 +418,19 @@ Referrer-Policy: strict-origin-when-cross-origin
 - `src/types/index.ts` - Complete type definitions for the application
 - `src/constants/index.ts` - App-wide constants and default configurations
 - `package.json` - Build scripts optimized for Pi deployment
+
+## Integration Testing & Debugging
+
+### Timer Bug Investigation Workflow
+1. **Identify Exercise Type**: Check if issue is with time-based or rep-based exercises
+2. **Check State Preservation**: Verify `workoutMode` isn't being cleared during timer execution
+3. **Verify Rep Logic**: Check currentRep/currentSet advancement logic in completion handlers
+4. **Test Both Modes**: Ensure identical behavior in standalone vs workout modes
+
+### Common Error Patterns to Watch For
+- **workoutMode clearing**: Always preserve workout context during timer updates
+- **Off-by-one errors**: Rep counts use 0-based indexing but display 1-based
+- **Interval cleanup**: Always `clearInterval()` before setting new intervals
+- **Race conditions**: Rep advancement timing vs display updates
 
 This architecture enables a highly maintainable, accessible, and privacy-respecting fitness tracking application optimized for self-hosted deployment on resource-constrained devices.
