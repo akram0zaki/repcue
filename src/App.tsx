@@ -138,6 +138,52 @@ function App() {
   // Wake lock for keeping screen active
   const { isSupported: wakeLockSupported, isActive: wakeLockActive, requestWakeLock, releaseWakeLock } = useWakeLock();
 
+  // Helper function to create timer intervals with appropriate timing for exercise type
+  const createTimerInterval = useCallback((startTime: number, isForRepBasedExercise: boolean = false) => {
+    // Use 100ms intervals for rep-based exercises for smooth progress, 1000ms for time-based
+    const intervalDuration = isForRepBasedExercise ? 100 : 1000;
+    
+    return setInterval(() => {
+      const elapsed = isForRepBasedExercise 
+        ? (Date.now() - startTime) / 1000  // Use decimal seconds for smooth progress
+        : Math.floor((Date.now() - startTime) / 1000); // Use whole seconds for time-based
+      
+      setTimerState(prev => {
+        // Don't update if timer is not running or target time is not set
+        if (!prev.isRunning || !prev.targetTime) {
+          return prev;
+        }
+
+        const remaining = prev.targetTime - elapsed;
+
+        // Check if timer completed
+        if (remaining <= 0) {
+          // Timer finished - will be handled in useEffect
+          return { ...prev, currentTime: prev.targetTime };
+        }
+
+        // Update currentTime - for rep-based exercises, use smooth decimal values
+        const newCurrentTime = isForRepBasedExercise ? elapsed : Math.floor(elapsed);
+        if (newCurrentTime !== prev.currentTime) {
+          return { ...prev, currentTime: newCurrentTime };
+        }
+
+        return prev;
+      });
+
+      // Interval beeping: beep every intervalDuration seconds (only for whole seconds)
+      const wholeSecondsElapsed = Math.floor(elapsed);
+      if (wholeSecondsElapsed > 0 && wholeSecondsElapsed % appSettings.intervalDuration === 0) {
+        if (wholeSecondsElapsed !== lastBeepIntervalRef.current) {
+          if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
+            audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+          }
+          lastBeepIntervalRef.current = wholeSecondsElapsed;
+        }
+      }
+    }, intervalDuration);
+  }, [appSettings.intervalDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume, exercises]);
+
   // Separate function for the actual timer logic
   const startActualTimer = useCallback(() => {
     // Clear any existing interval first
@@ -191,50 +237,30 @@ function App() {
         targetTime: actualTargetTime,
         startTime: new Date(startTime),
         currentExercise: selectedExercise || undefined,
+        // Only clear workout mode for standalone exercises (preserve it for workout mode)
+        workoutMode: prev.workoutMode || undefined,
+        // Clear workout-specific rest state
+        isResting: false,
+        restTimeRemaining: undefined,
         ...repSetState
       };
     });
 
     // Start the main timer interval
     console.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
-    intervalRef.current = setInterval(() => {
-      const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      
-      setTimerState(prev => {
-        // Don't update if timer is not running or target time is not set
-        if (!prev.isRunning || !prev.targetTime) {
-          console.log('startActualTimer: Timer not running or no target time:', { isRunning: prev.isRunning, targetTime: prev.targetTime });
-          return prev;
-        }
-
-        const remaining = prev.targetTime - elapsed;
-
-        // Check if timer completed
-        if (remaining <= 0) {
-          console.log('startActualTimer: Timer completed, elapsed:', elapsed, 'targetTime:', prev.targetTime);
-          // Timer finished - will be handled in useEffect
-          return { ...prev, currentTime: prev.targetTime };
-        }
-
-        // Only update if the elapsed time has actually changed
-        if (elapsed !== prev.currentTime) {
-          return { ...prev, currentTime: elapsed };
-        }
-
-        return prev;
-      });
-
-      // Interval beeping: beep every intervalDuration seconds
-      if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
-        if (elapsed !== lastBeepIntervalRef.current) {
-          if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-            audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
-          }
-          lastBeepIntervalRef.current = elapsed;
-        }
-      }
-    }, 1000);
-  }, [selectedExercise, selectedDuration, appSettings, timerState.workoutMode]);
+    
+    // Use the helper function to create appropriate timer interval
+    // In workout mode, check the current exercise in the workout; otherwise use selectedExercise
+    let isRepBasedExercise = false;
+    if (timerState.workoutMode) {
+      const currentWorkoutExercise = timerState.workoutMode.exercises[timerState.workoutMode.currentExerciseIndex];
+      const currentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
+      isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+    } else {
+      isRepBasedExercise = selectedExercise?.exerciseType === 'repetition-based';
+    }
+    intervalRef.current = createTimerInterval(startTime, isRepBasedExercise);
+  }, [selectedExercise, selectedDuration, appSettings, timerState.workoutMode, exercises, createTimerInterval]);
 
   // Timer Functions
   const startTimer = useCallback(async () => {
@@ -258,7 +284,12 @@ function App() {
         countdownTime: appSettings.preTimerCountdown,
         currentTime: 0,
         targetTime: selectedDuration,
-        currentExercise: selectedExercise || undefined
+        currentExercise: selectedExercise || undefined,
+        // Only clear workout mode for standalone exercises (preserve it for workout mode)
+        workoutMode: prev.workoutMode || undefined,
+        // Clear workout-specific rest state
+        isResting: false,
+        restTimeRemaining: undefined
       }));
 
       // Announce countdown start
@@ -314,9 +345,9 @@ function App() {
         id: `log-${Date.now()}`,
         exerciseId: currentExercise.id,
         exerciseName: currentExercise.name,
-        duration: currentTime, // Use actual time completed, not target time
+        duration: Math.round(currentTime), // Round to avoid floating-point precision issues
         timestamp: new Date(),
-        notes: `Stopped after ${currentTime}s`
+        notes: `Stopped after ${Math.round(currentTime)}s`
       };
 
       if (consentService.hasConsent()) {
@@ -489,12 +520,12 @@ function App() {
           id: workoutMode.sessionId!,
           workoutId: workoutMode.workoutId,
           workoutName: workoutMode.workoutName,
-          startTime: new Date(Date.now() - (timerState.currentTime * 1000)), // Approximate start time
+          startTime: new Date(Date.now() - (Math.round(timerState.currentTime) * 1000)), // Approximate start time
           endTime: new Date(),
           exercises: [], // TODO: Track individual exercise completion in Phase 5
           isCompleted: true,
           completionPercentage: 100,
-          totalDuration: timerState.currentTime
+          totalDuration: Math.round(timerState.currentTime)
         };
         
         try {
@@ -531,7 +562,7 @@ function App() {
             };
           }).filter(Boolean);
           
-          const totalWorkoutDuration = workoutExerciseDetails.reduce((total, ex) => total + (ex?.duration || 0), 0);
+          const totalWorkoutDuration = Math.round(workoutExerciseDetails.reduce((total, ex) => total + (ex?.duration || 0), 0));
           
           const workoutActivityLog: ActivityLog = {
             id: `workout-${workoutMode.sessionId}`,
@@ -704,6 +735,7 @@ function App() {
       }
       
       console.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
+      
       if (workoutMode) {
         // Get the actual current exercise from workout mode for accurate logging
         const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
@@ -846,37 +878,8 @@ function App() {
               }
               
               const newStartTime = Date.now();
-              intervalRef.current = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - newStartTime) / 1000);
-                
-                setTimerState(prev => {
-                  if (!prev.isRunning || !prev.targetTime) {
-                    return prev;
-                  }
-
-                  const remaining = prev.targetTime - elapsed;
-
-                  if (remaining <= 0) {
-                    return { ...prev, currentTime: prev.targetTime };
-                  }
-
-                  if (elapsed !== prev.currentTime) {
-                    return { ...prev, currentTime: elapsed };
-                  }
-
-                  return prev;
-                });
-
-                // Interval beeping: beep every intervalDuration seconds
-                if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
-                  if (elapsed !== lastBeepIntervalRef.current) {
-                    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                      audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
-                    }
-                    lastBeepIntervalRef.current = elapsed;
-                  }
-                }
-              }, 1000);
+              // Use helper function for consistent smooth timing
+              intervalRef.current = createTimerInterval(newStartTime, true); // true = rep-based exercise
             } else if (nextRep === totalReps) {
               // Just completed the last rep of current set
               setTimerState(prev => ({
@@ -945,39 +948,10 @@ function App() {
                       
                       // Start new timer for next set immediately
                       const nextSetStartTime = Date.now();
-                      intervalRef.current = setInterval(() => {
-                        const elapsed = Math.floor((Date.now() - nextSetStartTime) / 1000);
-                        
-                        setTimerState(prev => {
-                          if (!prev.isRunning || prev.isResting || !prev.targetTime) {
-                            return prev;
-                          }
-
-                          const remaining = prev.targetTime - elapsed;
-
-                          if (remaining <= 0) {
-                            // Timer completed - clear interval immediately to prevent double triggers
-                            clearInterval(intervalRef.current!);
-                            return { ...prev, currentTime: prev.targetTime };
-                          }
-
-                          if (elapsed !== prev.currentTime) {
-                            return { ...prev, currentTime: elapsed };
-                          }
-
-                          return prev;
-                        });
-
-                        // Interval beeping: beep every intervalDuration seconds
-                        if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
-                          if (elapsed !== lastBeepIntervalRef.current) {
-                            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                              audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
-                            }
-                            lastBeepIntervalRef.current = elapsed;
-                          }
-                        }
-                      }, 1000);
+                      // Use helper function - check if current exercise is rep-based
+                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
+                      const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                      intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                       
                       return {
                         ...prev,
@@ -1051,39 +1025,8 @@ function App() {
               }
               
               const newStartTime = Date.now();
-              intervalRef.current = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - newStartTime) / 1000);
-                
-                setTimerState(prev => {
-                  if (!prev.isRunning || !prev.targetTime) {
-                    return prev;
-                  }
-
-                  const remaining = prev.targetTime - elapsed;
-
-                  if (remaining <= 0) {
-                    // Timer completed - clear interval immediately to prevent double triggers
-                    clearInterval(intervalRef.current!);
-                    return { ...prev, currentTime: prev.targetTime };
-                  }
-
-                  if (elapsed !== prev.currentTime) {
-                    return { ...prev, currentTime: elapsed };
-                  }
-
-                  return prev;
-                });
-
-                // Interval beeping: beep every intervalDuration seconds
-                if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
-                  if (elapsed !== lastBeepIntervalRef.current) {
-                    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                      audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
-                    }
-                    lastBeepIntervalRef.current = elapsed;
-                  }
-                }
-              }, 1000);
+              // Use helper function for consistent smooth timing
+              intervalRef.current = createTimerInterval(newStartTime, true); // true = rep-based exercise
             } else {
               // This was the last rep of the set, check if we need to advance to next set
               if (currentSet < totalSets - 1) {
@@ -1137,39 +1080,10 @@ function App() {
                       
                       // Start new timer for next set immediately
                       const nextSetStartTime = Date.now();
-                      intervalRef.current = setInterval(() => {
-                        const elapsed = Math.floor((Date.now() - nextSetStartTime) / 1000);
-                        
-                        setTimerState(prev => {
-                          if (!prev.isRunning || prev.isResting || !prev.targetTime) {
-                            return prev;
-                          }
-
-                          const remaining = prev.targetTime - elapsed;
-
-                          if (remaining <= 0) {
-                            // Timer completed - clear interval immediately to prevent double triggers
-                            clearInterval(intervalRef.current!);
-                            return { ...prev, currentTime: prev.targetTime };
-                          }
-
-                          if (elapsed !== prev.currentTime) {
-                            return { ...prev, currentTime: elapsed };
-                          }
-
-                          return prev;
-                        });
-
-                        // Interval beeping: beep every intervalDuration seconds
-                        if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
-                          if (elapsed !== lastBeepIntervalRef.current) {
-                            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                              audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
-                            }
-                            lastBeepIntervalRef.current = elapsed;
-                          }
-                        }
-                      }, 1000);
+                      // Use helper function - check if current exercise is rep-based
+                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
+                      const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                      intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                       
                       return {
                         ...prev,
@@ -1194,6 +1108,25 @@ function App() {
                 if (appSettings.soundEnabled) {
                   audioService.announceText('Exercise completed!');
                 }
+                
+                // Log the completed rep-based exercise activity
+                if (currentExercise) {
+                  const activityLog: ActivityLog = {
+                    id: `log-${Date.now()}`,
+                    exerciseId: currentExercise.id,
+                    exerciseName: currentExercise.name,
+                    duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
+                    timestamp: new Date(),
+                    notes: `Completed ${totalSets} sets of ${totalReps} reps`
+                  };
+
+                  if (consentService.hasConsent()) {
+                    storageService.saveActivityLog(activityLog);
+                  }
+                }
+                
+                // Stop the timer - exercise complete
+                stopTimer(true);
               }
             }
             
@@ -1252,39 +1185,10 @@ function App() {
                   
                   // Start new timer for next set immediately
                   const nextSetStartTime = Date.now();
-                  intervalRef.current = setInterval(() => {
-                    const elapsed = Math.floor((Date.now() - nextSetStartTime) / 1000);
-                    
-                    setTimerState(prev => {
-                      if (!prev.isRunning || prev.isResting || !prev.targetTime) {
-                        return prev;
-                      }
-
-                      const remaining = prev.targetTime - elapsed;
-
-                      if (remaining <= 0) {
-                        // Timer completed - clear interval immediately to prevent double triggers
-                        clearInterval(intervalRef.current!);
-                        return { ...prev, currentTime: prev.targetTime };
-                      }
-
-                      if (elapsed !== prev.currentTime) {
-                        return { ...prev, currentTime: elapsed };
-                      }
-
-                      return prev;
-                    });
-
-                    // Interval beeping: beep every intervalDuration seconds
-                    if (elapsed > 0 && elapsed % appSettings.intervalDuration === 0) {
-                      if (elapsed !== lastBeepIntervalRef.current) {
-                        if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                          audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
-                        }
-                        lastBeepIntervalRef.current = elapsed;
-                      }
-                    }
-                  }, 1000);
+                  // Use helper function - check if current exercise is rep-based
+                  const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
+                  const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                  intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                   
                   return { 
                     ...prev, 
@@ -1325,7 +1229,7 @@ function App() {
                 id: `log-${Date.now()}`,
                 exerciseId: currentExercise.id,
                 exerciseName: currentExercise.name,
-                duration: totalSets * totalReps * (targetTime || 0), // Total time for all reps/sets
+                duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                 timestamp: new Date(),
                 notes: `Completed ${totalSets} sets of ${totalReps} reps`
               };

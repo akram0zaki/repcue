@@ -65,14 +65,15 @@ describe('TimerPage - Rep Logic Edge Cases', () => {
     );
 
     // FIXED EXPECTATIONS:
-    // Set Progress: Should be 1/2 (NOT 2/2) because we're still working on set 2
-    expect(screen.getByText('2 / 2')).toBeInTheDocument(); // Shows current set being worked on
+    // Set Progress: Should show 1 of 2 sets completed because we're still working on set 2
+    expect(screen.getByText('1 of 2 sets completed')).toBeInTheDocument(); // Shows completed sets
     
     // Rep Progress: Should show 7/8 (7 completed, working on 8th)
     expect(screen.getByText('7 / 8')).toBeInTheDocument();
     
     // Set progress bar should be 50% (1 completed set out of 2)
-    const setProgressBar = screen.getByText('2 / 2').parentElement?.parentElement?.querySelector('.bg-blue-600');
+    const setProgressBar = screen.getByText('1 of 2 sets completed').parentElement?.parentElement?.querySelector('.bg-blue-600');
+    expect(setProgressBar).toHaveStyle('width: 50%');
     expect(setProgressBar).toHaveStyle('width: 50%');
     
     // Rep progress bar should be 87.5% (7 out of 8 completed)
@@ -103,14 +104,15 @@ describe('TimerPage - Rep Logic Edge Cases', () => {
       />
     );
 
-    // Set Progress: Should be 2/2 (set is complete)
-    expect(screen.getByText('2 / 2')).toBeInTheDocument();
+    // Set Progress: Should show 2 of 2 sets completed (exercise complete)
+    expect(screen.getByText('2 of 2 sets completed')).toBeInTheDocument();
     
     // Rep Progress: Should show 8/8 (all reps completed)
     expect(screen.getByText('8 / 8')).toBeInTheDocument();
     
     // Set progress bar should be 100% (exercise complete)
-    const setProgressBar = screen.getByText('2 / 2').parentElement?.parentElement?.querySelector('.bg-blue-600');
+    const setProgressBar = screen.getByText('2 of 2 sets completed').parentElement?.parentElement?.querySelector('.bg-blue-600');
+    expect(setProgressBar).toHaveStyle('width: 100%');
     expect(setProgressBar).toHaveStyle('width: 100%');
     
     // Rep progress bar should be 100% (all reps in set completed)
@@ -142,14 +144,15 @@ describe('TimerPage - Rep Logic Edge Cases', () => {
       />
     );
 
-    // Set Progress: Should show 1/2 (1 set completed, working on 2nd after rest)
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    // Set Progress: Should show 1 of 2 sets completed (1 set completed, resting before 2nd)
+    expect(screen.getByText('1 of 2 sets completed')).toBeInTheDocument();
     
     // Rep Progress: Should show 8/8 (all reps of current set completed)
     expect(screen.getByText('8 / 8')).toBeInTheDocument();
     
     // Set progress bar should be 50% (1 set complete out of 2)
-    const setProgressBar = screen.getByText('1 / 2').parentElement?.parentElement?.querySelector('.bg-blue-600');
+    const setProgressBar = screen.getByText('1 of 2 sets completed').parentElement?.parentElement?.querySelector('.bg-blue-600');
+    expect(setProgressBar).toHaveStyle('width: 50%');
     expect(setProgressBar).toHaveStyle('width: 50%');
     
     // Rep progress bar should be 100% (all reps in current set completed)

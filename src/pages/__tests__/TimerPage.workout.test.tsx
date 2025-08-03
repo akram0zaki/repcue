@@ -165,7 +165,7 @@ describe('TimerPage - Workout Mode', () => {
     );
 
     expect(screen.getByText('Set Progress')).toBeInTheDocument();
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument();
     expect(screen.getByText('Rep Progress')).toBeInTheDocument();
     expect(screen.getByText('0 / 15')).toBeInTheDocument(); // Shows completed reps (0 completed when starting)
   });
@@ -229,14 +229,28 @@ describe('TimerPage - Workout Mode', () => {
   });
 
   it('should display exercise progress in timer display', () => {
+    // Use a timer state with the second exercise (time-based, not rep-based)
+    const timeBasedWorkoutState = {
+      ...mockWorkoutTimerState,
+      workoutMode: {
+        ...mockWorkoutTimerState.workoutMode!,
+        currentExerciseIndex: 1, // Second exercise (time-based)
+        // Remove rep-based properties for time-based exercise
+        currentSet: undefined,
+        totalSets: undefined, 
+        currentRep: undefined,
+        totalReps: undefined
+      }
+    };
+
     render(
       <TimerPage
         {...defaultProps}
-        timerState={mockWorkoutTimerState}
+        timerState={timeBasedWorkoutState}
       />
     );
 
-    expect(screen.getByText('Exercise 1/2')).toBeInTheDocument();
+    expect(screen.getByText('Exercise 2/2')).toBeInTheDocument();
   });
 
   it('should call onStopTimer when Complete Exercise is clicked', () => {

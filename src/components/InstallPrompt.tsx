@@ -76,6 +76,8 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   const dismissButtonRef = useRef<HTMLButtonElement>(null);
   const installButtonRef = useRef<HTMLButtonElement>(null);
   const autoHideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hideAnimationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * iOS Add to Home Screen Instructions
@@ -168,7 +170,12 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
     setIsAnimating(true);
     setIsVisible(true);
     
-    setTimeout(() => {
+    // Clear any existing animation timeout
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    
+    animationTimeoutRef.current = setTimeout(() => {
       setIsAnimating(false);
       // Focus the install button for accessibility
       installButtonRef.current?.focus();
@@ -176,6 +183,10 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
 
     // Set auto-hide timer if specified
     if (autoHideAfter > 0) {
+      // Clear any existing auto-hide timeout
+      if (autoHideTimeoutRef.current) {
+        clearTimeout(autoHideTimeoutRef.current);
+      }
       autoHideTimeoutRef.current = setTimeout(() => {
         hideBanner();
       }, autoHideAfter);
@@ -188,7 +199,12 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   const hideBanner = (): void => {
     setIsAnimating(true);
     
-    setTimeout(() => {
+    // Clear any existing hide animation timeout
+    if (hideAnimationTimeoutRef.current) {
+      clearTimeout(hideAnimationTimeoutRef.current);
+    }
+    
+    hideAnimationTimeoutRef.current = setTimeout(() => {
       setIsVisible(false);
       setIsAnimating(false);
       setShowIOSInstructions(false);
@@ -256,15 +272,25 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   }, [isAvailable, canShowPrompt]);
 
   /**
-   * Clear error when component unmounts
+   * Clear error and timers when component unmounts
    */
   useEffect(() => {
     return () => {
       if (installError) {
         resetError();
       }
+      // Clear all timeouts to prevent memory leaks and test errors
       if (autoHideTimeoutRef.current) {
         clearTimeout(autoHideTimeoutRef.current);
+        autoHideTimeoutRef.current = null;
+      }
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+        animationTimeoutRef.current = null;
+      }
+      if (hideAnimationTimeoutRef.current) {
+        clearTimeout(hideAnimationTimeoutRef.current);
+        hideAnimationTimeoutRef.current = null;
       }
     };
   }, [installError, resetError]);

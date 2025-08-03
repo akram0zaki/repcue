@@ -100,7 +100,7 @@ describe('TimerPage', () => {
 
     render(<TimerPage {...defaultProps} timerState={runningTimerState} />);
     
-    // Should show remaining time: 120 - 65 = 55 seconds = 00:55
-    expect(screen.getByText('00:55')).toBeInTheDocument();
+    // Should show elapsed time: 65 seconds = 01:05 (not remaining time)
+    expect(screen.getByText('01:05')).toBeInTheDocument();
   });
 });

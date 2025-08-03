@@ -92,7 +92,7 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
 
     // Check that rep/set progress is displayed
     expect(screen.getByText('Set Progress')).toBeInTheDocument();
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument();
     expect(screen.getByText('Rep Progress')).toBeInTheDocument();
     expect(screen.getByText('0 / 8')).toBeInTheDocument(); // Shows completed reps (0 completed when starting)
   });
@@ -214,7 +214,7 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
     );
 
     // Check the display shows completed counts
-    expect(screen.getByText('1 / 3')).toBeInTheDocument(); // Set progress (still 1-based for sets)
+    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument(); // Set progress (0 completed when working on current set)
     expect(screen.getByText('0 / 8')).toBeInTheDocument(); // Rep progress (0 completed when currentRep is 0)
   });
 
@@ -252,7 +252,7 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
     );
 
     // Check that progress shows completed rep/set (2 reps completed, 1st set)
-    expect(screen.getByText('1 / 3')).toBeInTheDocument(); // Still set 1
+    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument(); // Still working on set 1, so 0 completed
     expect(screen.getByText('2 / 8')).toBeInTheDocument(); // 2 reps completed (was working on rep 3)
   });
 });

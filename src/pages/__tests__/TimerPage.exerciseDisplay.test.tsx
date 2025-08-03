@@ -154,12 +154,21 @@ describe('TimerPage - Exercise Display Improvements', () => {
   });
 
   it('should show loading state when exercise is not yet loaded', () => {
-    renderTimerPage({
-      workoutMode: mockWorkoutMode,
-    });
+    // Create a workout mode with an exercise ID that doesn't exist in the exercises array
+    const workoutModeWithMissingExercise = {
+      ...mockWorkoutMode,
+      exercises: [
+        {
+          id: 'ex-1',
+          exerciseId: 'missing-exercise-id', // This ID doesn't exist in the exercises array
+          order: 1,
+          customSets: 3,
+          customReps: 10
+        }
+      ]
+    };
 
-    // Render with no selected exercise
-    const propsWithoutExercise = {
+    const propsWithMissingExercise = {
       ...defaultProps,
       selectedExercise: null,
       timerState: {
@@ -172,17 +181,17 @@ describe('TimerPage - Exercise Display Improvements', () => {
         isCountdown: false,
         countdownTime: 0,
         isResting: false,
-        workoutMode: mockWorkoutMode,
+        workoutMode: workoutModeWithMissingExercise,
       }
     };
 
     render(
       <MemoryRouter>
-        <TimerPage {...propsWithoutExercise} />
+        <TimerPage {...propsWithMissingExercise} />
       </MemoryRouter>
     );
 
-    // Should show loading text in the header
+    // Should show loading text in the header when exercise is not found
     expect(screen.getByText('Exercise 1: Loading...')).toBeInTheDocument();
   });
 });

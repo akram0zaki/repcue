@@ -75,8 +75,8 @@ describe('TimerPage - Rep Flow', () => {
       />
     );
 
-    // Should show 1/3 (currentSet 0 displayed as 1)
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    // Should show 0 of 3 sets completed (currentSet 0 = 0 completed when working on current set)
+    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument();
     // Should show 0/8 (currentRep 0 means 0 completed reps)
     expect(screen.getByText('0 / 8')).toBeInTheDocument();
   });
@@ -122,8 +122,8 @@ describe('TimerPage - Rep Flow', () => {
     expect(screen.getByText('2 / 8')).toBeInTheDocument();
     
     // Should show nested circles (outer for rep progress, inner for current rep timer)
-    const timerContainer = screen.getByText('00:09').closest('div'); // Find timer container with time display
-    expect(timerContainer).toBeInTheDocument();
+    // For rep-based exercises, it shows "Rep 3" not time display
+    expect(screen.getByText('Rep 3')).toBeInTheDocument();
     
     // Look for SVG element within the timer section
     const svgElement = document.querySelector('svg');
@@ -173,6 +173,6 @@ describe('TimerPage - Rep Flow', () => {
     // Should show 4 completed reps (currentRep 4 means working on rep 5, so 4 completed)
     expect(screen.getByText('4 / 8')).toBeInTheDocument();
     // Should still be on set 1 of 3
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument();
   });
 });

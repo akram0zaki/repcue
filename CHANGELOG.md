@@ -1,5 +1,80 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [Latest] - 2025-08-03
+
+### Fixed
+- **Critical Workout Mode Timer Bug**: Fixed rep-based exercises stopping after 1 rep in workout mode instead of continuing through all reps and sets
+  - **Root Cause**: `startActualTimer` function was clearing `workoutMode` state for all exercises (standalone and workout), causing workout exercises to lose their rep/set tracking context
+  - **Solution**: Modified timer state logic to preserve `workoutMode` during workout execution and only clear it for standalone exercises
+  - **Impact**: Rep-based exercises in workouts now properly advance through all reps (e.g., 1→2→3→4→5) and sets, with rest periods between sets as designed
+- **Fixed Rep-Based Exercise Set Progress Display**: Corrected inconsistency between progress bar and text display for completed sets
+  - **Issue**: Progress bar showed completed sets while text showed current set number, causing user confusion
+  - **Solution**: Updated text display logic to consistently show "X of Y sets completed" matching the progress bar behavior
+  - **Impact**: Both progress indicators now accurately reflect the number of completed sets throughout the exercise
+- **Fixed Missing Activity Log for Rep-Based Exercises**: Rep-based exercise completions are now properly logged to Activity Log
+  - **Issue**: Standalone rep-based exercises (like Cat-Cow Stretch) weren't creating activity log entries upon completion
+  - **Solution**: Added activity logging to the rep-based exercise completion branch with proper duration calculation and completion notes
+  - **Impact**: All exercise completions now appear in Activity Log with duration and rep/set details
+
+### Technical Changes
+- **App.tsx**: Modified `startActualTimer` and countdown functions to preserve `workoutMode` state instead of clearing it unconditionally
+  - Changed `workoutMode: undefined` to `workoutMode: prev.workoutMode || undefined`
+  - Added debug logging to timer completion logic for workout mode troubleshooting
+- **App.tsx**: Added activity logging for standalone rep-based exercise completion with duration calculation and descriptive notes
+- **TimerPage.tsx**: Updated set progress text display logic to show completed sets consistently:
+  - During rest: Shows `currentSet + 1` completed sets (correct)
+  - Set complete but not resting: Shows `currentSet + 1` completed sets (correct)  
+  - Working on current set: Shows `currentSet` completed sets (fixed from currentSet + 1)
+- **Test Files**: Updated all rep-based exercise tests to match new "X of Y sets completed" format across multiple test files
+
+### Added
+- **Enhanced Debug Logging**: Added comprehensive debug logging for workout mode timer completion to help diagnose rep/set advancement issues
+- **Rep-Based Exercise Completion Logging**: Added proper activity log creation for standalone rep-based exercises with calculated duration and completion details
+
+## [Previous] - 2025-08-03
+
+### Fixed
+- **Fixed Milliseconds Display in Timer**: Time display now shows only whole seconds (e.g., "00:17") instead of decimal seconds (e.g., "00:17.313") across all timer modes
+  - **Root Cause**: `formatTime` function was displaying raw decimal seconds without flooring to whole numbers
+  - **Solution**: Added `Math.floor()` to seconds calculation in `formatTime` function to ensure clean time display
+  - **Impact**: Affects all timer displays - standalone timers, workout mode, rest periods, and countdown timers
+- **Improved Exercise Type Detection**: Fixed timer interval logic to correctly identify exercise type in workout mode context, ensuring time-based exercises use 1000ms intervals and rep-based exercises use 100ms intervals for smooth animation
+- **Fixed Red Color Timer Display**: Corrected timer color logic to only show red color during countdown phase (when countdown time ≤ 10 seconds), not during normal exercise timing
+
+### Technical Changes
+- Updated `formatTime` function in TimerPage.tsx: Changed `const secs = seconds % 60;` to `const secs = Math.floor(seconds % 60);`
+- Updated `startActualTimer` function in App.tsx to properly determine exercise type in workout mode by checking the current workout exercise instead of relying on `selectedExercise`
+- Added dependency `exercises` to `startActualTimer` callback to ensure proper exercise type detection
+- Enhanced timer color conditional logic in TimerPage.tsx to restrict red color to countdown phase only
+
+### Added
+- **Comprehensive Unit Tests**: Created comprehensive test coverage for time formatting fix
+  - **Format Time Tests**: Validates Math.floor() fix for decimal seconds across multiple scenarios
+  - **Edge Case Coverage**: Tests 59.999 seconds, minute boundaries, large values, NaN handling
+  - **Workout Mode Tests**: Ensures proper time formatting in workout context and rest periods
+  - **Countdown Tests**: Validates countdown timer formatting without decimals
+
+## [Previous] - 2025-08-03
+
+### Fixed
+- **Critical Timer Bug**: Fixed smooth rep progress animation that only worked on first rep
+  - **Root Cause**: Multiple timer interval creation points were using inconsistent timing logic
+  - **Solution**: Created centralized `createTimerInterval` helper function for consistent timer behavior
+  - **Fixed 6 Timer Creation Points**: Main timer start, rep advancement (standalone + workout), rest-to-next-set transitions (3 instances)
+  - **Smooth Animation**: Rep-based exercises now use 100ms intervals with decimal seconds for smooth circular progress
+  - **Performance**: Time-based exercises continue using 1000ms intervals for optimal performance
+
+### Added
+- **Comprehensive Unit Tests**: Created focused test suites for recent changes
+  - **Timer Logic Tests**: `smooth-rep-animation-unit.test.ts` - 8 passing tests for timer interval logic
+  - **Icon Integration Tests**: `svg-icons-integration.test.tsx` - Tests for SVG icon consistency and theming
+  - **Test Coverage**: Validates decimal seconds calculation, interval timing, and cleanup behavior
+
+### Technical Improvements
+- **Timer Helper Function**: `createTimerInterval(startTime, isForRepBasedExercise)` centralizes timer creation logic
+- **Consistent Timing**: All rep-based exercise timers now use smooth 100ms intervals throughout all reps and sets
+- **Code Deduplication**: Eliminated duplicate timer interval creation code across multiple locations
+
 ## [2025-08-02] - Icon System Conversion to Monotone SVG
 
 ### Changed

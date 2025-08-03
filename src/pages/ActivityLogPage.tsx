@@ -65,7 +65,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     }
 
     const totalWorkouts = logs.length;
-    const totalDuration = logs.reduce((sum, log) => sum + log.duration, 0);
+    const totalDuration = Math.round(logs.reduce((sum, log) => sum + log.duration, 0));
     
     // Find favorite exercise (most frequently done)
     const exerciseCounts: { [key: string]: number } = {};
@@ -152,9 +152,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
 
   // Format duration to readable string
   const formatDuration = (seconds: number): string => {
-    if (seconds < 60) return `${seconds}s`;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
+    // Round to avoid floating-point precision issues
+    const roundedSeconds = Math.round(seconds);
+    
+    if (roundedSeconds < 60) return `${roundedSeconds}s`;
+    const minutes = Math.floor(roundedSeconds / 60);
+    const remainingSeconds = roundedSeconds % 60;
     return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
   };
 

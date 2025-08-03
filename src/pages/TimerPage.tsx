@@ -147,7 +147,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   // Format time display
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60); // Use Math.floor to remove decimal places
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -321,10 +321,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <span>Set Progress</span>
                 <span>{
                   isResting 
-                    ? `${(currentSet || 0) + 1} / ${totalSets}`  // During rest: show completed sets
+                    ? `${(currentSet || 0) + 1} of ${totalSets} sets completed`  // During rest: show completed sets
                     : (currentRep !== undefined && currentRep >= (totalReps || 0))
-                      ? `${(currentSet || 0) + 1} / ${totalSets}`  // Set complete but not resting yet
-                      : `${(currentSet || 0) + 1} / ${totalSets}`  // Working on current set
+                      ? `${(currentSet || 0) + 1} of ${totalSets} sets completed`  // Set complete but not resting yet
+                      : `${currentSet || 0} of ${totalSets} sets completed`  // Working on current set - show actual completed sets
                 }</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -483,7 +483,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 ) : (
                   <>
                     <div className={`text-3xl font-bold ${
-                      displayTime <= 10 && displayTime > 0 
+                      isCountdown && displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
                         : actuallyResting
                         ? 'text-blue-500 dark:text-blue-400'
