@@ -24,9 +24,8 @@ import {
   CreateWorkoutPage,
   EditWorkoutPage,
   ChunkErrorBoundary,
-  preloadCriticalRoutes,
-  createRouteLoader
 } from './router/LazyRoutes';
+import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
 
 // Wrapper component to handle navigation state for TimerPage
 const TimerPageWrapper: React.FC<{
@@ -573,7 +572,13 @@ function App() {
             notes: `Workout completed with ${workoutMode.exercises.length} exercises`,
             workoutId: workoutMode.workoutId,
             isWorkout: true,
-            exercises: workoutExerciseDetails as any[]
+            exercises: workoutExerciseDetails as {
+              exerciseId: string;
+              exerciseName: string;
+              duration: number;
+              sets?: number;
+              reps?: number;
+            }[]
           };
           
           console.log(`📝 Saving workout activity log:`, workoutActivityLog);

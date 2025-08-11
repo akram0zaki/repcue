@@ -5,7 +5,7 @@ export interface QueueOperation {
   id?: number;
   type: 'POST' | 'PUT' | 'DELETE';
   endpoint: string;
-  data?: any;
+  data?: unknown;
   timestamp: number;
   retryCount: number;
   maxRetries: number;
@@ -247,10 +247,10 @@ export class QueueService {
   async getOperations(filter?: { 
     type?: QueueOperation['type']; 
     endpoint?: string; 
-    entityType?: string 
+    entityType?: QueueOperation['metadata'] extends { entityType: infer T } ? T : string 
   }): Promise<QueueOperation[]> {
     try {
-      let query = this.db.operations.orderBy('timestamp').reverse();
+      const query = this.db.operations.orderBy('timestamp').reverse();
       
       if (filter) {
         const operations = await query.toArray();

@@ -30,4 +30,19 @@ export default tseslint.config([
       ],
     },
   },
+  // Relax certain strict rules in test files to keep tests readable and maintainable
+  {
+    files: [
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/__tests__/**/*.{ts,tsx}',
+      'src/__tests__/**/*.{ts,tsx}',
+    ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      // Large or precise numeric literals in tests are acceptable
+      'no-loss-of-precision': 'off',
+    },
+  },
 ])

@@ -101,7 +101,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   // Main content styles with platform considerations
   const getMainStyles = (): string => {
-    let baseStyles = `min-h-screen ${pageConfig.className || 'pb-20'}`;
+  const baseStyles = `min-h-screen ${pageConfig.className || 'pb-20'}`;
     // No top padding needed since we removed the header
     return baseStyles;
   };
