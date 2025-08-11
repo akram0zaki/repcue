@@ -180,7 +180,7 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
     }
 
     // Check for iOS standalone
-    if ('standalone' in navigator && (navigator as any).standalone) {
+  if ('standalone' in navigator && (navigator as unknown as { standalone?: boolean }).standalone) {
       return true;
     }
 

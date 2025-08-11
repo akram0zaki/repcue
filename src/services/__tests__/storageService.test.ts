@@ -47,7 +47,6 @@ vi.mock('../consentService', () => ({
 
 describe('StorageService', () => {
   let storageService: StorageService
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockDb: any
 
   const mockExercise: Exercise = {
@@ -136,7 +135,6 @@ describe('StorageService', () => {
         count: vi.fn().mockImplementation(() => {
           return Promise.resolve(exerciseStorage.size)
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       activityLogs: {
         add: vi.fn().mockImplementation((log) => {
@@ -173,7 +171,6 @@ describe('StorageService', () => {
         count: vi.fn().mockImplementation(() => {
           return Promise.resolve(activityLogStorage.length)
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       userPreferences: {
         put: vi.fn().mockResolvedValue(undefined),
@@ -196,7 +193,6 @@ describe('StorageService', () => {
           userPreferencesStorage.length = 0
           return Promise.resolve(undefined)
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       appSettings: {
         put: vi.fn().mockResolvedValue(undefined),
@@ -219,10 +215,8 @@ describe('StorageService', () => {
           appSettingsStorage.length = 0
           return Promise.resolve(undefined)
         })
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
       close: vi.fn().mockResolvedValue(undefined)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
   })
 

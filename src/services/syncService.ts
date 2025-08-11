@@ -62,8 +62,8 @@ export class SyncService {
         console.log('🔄 Background sync capability detected');
         
         // Register for background sync event (requires proper service worker setup)
-        if ('sync' in registration) {
-          await (registration as any).sync.register('background-sync');
+        if ('sync' in registration && (registration as ServiceWorkerRegistration & { sync?: { register: (tag: string) => Promise<void> } }).sync) {
+          await (registration as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register('background-sync');
           console.log('📱 Background sync registered');
         }
       } catch (error) {
@@ -101,7 +101,7 @@ export class SyncService {
   async queueOperation(
     type: QueueOperation['type'],
     endpoint: string,
-    data?: any,
+  data?: unknown,
     options?: {
       priority?: 'high' | 'medium' | 'low';
       maxRetries?: number;

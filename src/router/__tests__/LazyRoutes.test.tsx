@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { ChunkErrorBoundary, PageLoader, createRouteLoader } from '../LazyRoutes';
+import { ChunkErrorBoundary, PageLoader } from '../LazyRoutes';
+import { createRouteLoader } from '../routeUtils';
 
 // Mock window.location.reload
 const mockReload = vi.fn();

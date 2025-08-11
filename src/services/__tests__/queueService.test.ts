@@ -4,7 +4,7 @@ import { QueueService, type QueueOperation } from '../queueService';
 // Mock Dexie
 vi.mock('dexie', () => {
   // Create a shared mock operations storage
-  let mockOperations = new Map<number, any>();
+  const mockOperations = new Map<number, any>();
   let nextId = 1;
 
   const mockTable = {

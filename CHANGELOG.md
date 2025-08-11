@@ -1,5 +1,18 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [Latest] - 2025-08-11
+
+### Chore
+- Post-merge housekeeping and lint/test stabilization
+  - Router: Extracted non-component utilities (`preloadCriticalRoutes`, `createRouteLoader`) from `LazyRoutes.tsx` into `router/routeUtils.tsx` to satisfy `react-refresh/only-export-components`
+  - ESLint: Replaced remaining `any` types with `unknown` in services (`syncService`, `queueService`), fixed `prefer-const`, and removed unused `eslint-disable` directives in tests
+  - Test updates: Adjusted `LazyRoutes.test.tsx` to import `createRouteLoader` from `routeUtils`; removed unnecessary Router nesting and aligned labels earlier in timer tests
+  - Lint status: 0 errors, a few non-blocking `react-hooks/exhaustive-deps` warnings remain for future tuning
+  - Test status: 50 files, 559 tests passing
+
+### Docs
+- Updated local developer notes for deployment and housekeeping workflow
+
 ## [Latest] - 2025-08-03
 
 ### Fixed

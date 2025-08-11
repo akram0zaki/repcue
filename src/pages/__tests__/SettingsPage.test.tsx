@@ -253,10 +253,8 @@ describe('SettingsPage', () => {
           download: '',
           click: mockClick,
           style: {}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any;
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return originalCreateElement.call(document, tagName as any);
     });
 

@@ -100,26 +100,5 @@ export const EditWorkoutPage = lazy(() =>
 );
 
 // Preload critical routes
-export const preloadCriticalRoutes = () => {
-  // Preload Timer and Home pages as they are most commonly used
-  if (typeof window !== 'undefined') {
-    const preloadTimer = () => import('../pages/TimerPage');
-    const preloadHome = () => import('../pages/HomePage');
-    
-    // Preload after a short delay to not interfere with initial load
-    setTimeout(() => {
-      preloadTimer();
-      preloadHome();
-    }, 2000);
-  }
-};
-
-// Route-specific loading fallbacks
-export const createRouteLoader = (routeName: string) => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="flex flex-col items-center space-y-4">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      <p className="text-gray-600 dark:text-gray-400">Loading {routeName}...</p>
-    </div>
-  </div>
-);
+// Non-component exports moved to separate util to satisfy react-refresh rule
+// See: src/router/routeUtils.tsx

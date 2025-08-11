@@ -3,11 +3,8 @@ import { AudioService } from '../audioService'
 
 describe('AudioService', () => {
   let audioService: AudioService
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockAudioContext: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockOscillator: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockGainNode: any
 
   beforeEach(() => {
@@ -33,7 +30,6 @@ describe('AudioService', () => {
         appendChild: vi.fn(),
         removeChild: vi.fn()
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any
 
     // Mock AudioContext and related objects
@@ -100,7 +96,6 @@ describe('AudioService', () => {
     })
 
     it('should handle missing AudioContext gracefully', () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       global.AudioContext = undefined as any
       const service = AudioService.getInstance()
       expect(service.isAudioSupported()).toBe(false)
@@ -116,7 +111,6 @@ describe('AudioService', () => {
       // Create a new navigator mock without the vibrate property at all
       const originalNavigator = global.navigator
       const { vibrate: _vibrate, ...navigatorWithoutVibrate } = originalNavigator
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       global.navigator = navigatorWithoutVibrate as any
       
       // Reset singleton to pick up the change
@@ -157,7 +151,6 @@ describe('AudioService', () => {
     })
 
     it('should handle missing audio context gracefully', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       global.AudioContext = undefined as any
       
       await expect(audioService.playIntervalBeep()).resolves.not.toThrow()
