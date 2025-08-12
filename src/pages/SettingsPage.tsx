@@ -264,6 +264,28 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               />
             </button>
           </div>
+          {/* Exercise Demo Videos (Phase 0) */}
+          <div className="flex items-center justify-between mt-4">
+            <label htmlFor="exercise-videos" className="text-gray-700 dark:text-gray-300 font-medium">
+              Show Exercise Demo Videos
+            </label>
+            <button
+              id="exercise-videos"
+              onClick={() => onUpdateSettings({ showExerciseVideos: !appSettings.showExerciseVideos })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                appSettings.showExerciseVideos ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  appSettings.showExerciseVideos ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Experimental: loop silent demo videos inside timer when available.
+          </p>
         </div>
 
         {/* Data Settings */}

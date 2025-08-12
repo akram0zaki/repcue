@@ -2,6 +2,26 @@
 
 ## [Latest] - 2025-08-12
 
+### Added (Video Demos Phase 0)
+- Video demo groundwork behind feature flag: introduced `VIDEO_DEMOS_ENABLED` (default `true`) plus per-user setting `showExerciseVideos` (default `true`) with accessible toggle in Settings ("Show Exercise Demo Videos").
+- Media metadata domain types: `ExerciseMedia` & `ExerciseMediaIndex` for strongly‑typed mapping of exercise IDs to available video variants (square / portrait / landscape) including `repsPerLoop` & `fps`.
+- Media loader utility `loadExerciseMedia()` providing single in‑memory cached fetch of `exercise_media.json` with defensive filtering and cache clear helper.
+
+### Internal
+- Extended `AppSettings` & `DEFAULT_APP_SETTINGS` with `showExerciseVideos` preference (graceful default preserves existing users). No persistence schema migration required.
+- Added feature flag module `src/config/features.ts` keeping video capability trivially disableable at build/runtime.
+- Added `src/utils/loadExerciseMedia.ts` (no-store fetch to avoid stale metadata; narrows list to valid objects; returns map keyed by exercise id) prepared for later variant selection logic.
+- Updated `SettingsPage` UI to surface toggle while feature still inert (no Timer UI integration yet) ensuring early user control & respecting future reduced-motion fallbacks.
+
+### Quality
+- All 559 tests still passing post Phase 0 (no behavioral change to timer, workouts, or persistence). Zero regression risk accepted before proceeding to Phase 1.
+- Security: No remote / third-party URLs embedded; loader fetches only local `exercise_media.json` (mitigates SSRF / injection vectors). No autoplay started yet—video elements not rendered until future phases.
+
+### Rationale
+- Ships the minimal, reversible slice required for safe incremental rollout of exercise demo videos without touching critical timer logic—establishing contract types & user opt-out path before UI integration.
+
+## [Latest] - 2025-08-12
+
 ### Added
 - Per-exercise repetition duration via optional `repDurationSeconds` field on `Exercise`. Timer now uses `(exercise.repDurationSeconds || BASE_REP_TIME) * repSpeedFactor` for all rep-based timing paths (standalone & workout), preserving identical semantics while enabling finer control for faster/slower movements (e.g., burpees at 3s, others at 2s).
 - `hasVideo` flag (default `false`) added to every exercise to prepare for future instructional media integration without schema migration overhead.

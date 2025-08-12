@@ -197,6 +197,7 @@ export interface AppSettings {
   preTimerCountdown: number; // 0-10 seconds countdown before timer starts
   defaultRestTime: number; // default rest time between exercises in seconds
   repSpeedFactor: number; // speed multiplier for repetition-based exercises (0.5 = faster, 2.0 = slower)
+  showExerciseVideos?: boolean; // feature flag preference for video demos
 }
 
 // Navigation routes
