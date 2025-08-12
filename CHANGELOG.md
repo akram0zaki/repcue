@@ -1,5 +1,20 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [Latest] - 2025-08-13
+
+### Fixed
+- Production occasionally missing `exercise_media.json` (served HTML at /exercise_media.json → JSON parse error, blocking demo videos). Root cause: file absent during build on Pi; Vite only copies existing public/ assets.
+
+### Added
+- `scripts/verify-media.mjs` pre/post build guard: verifies presence, attempts recovery from legacy `src/data/` if needed, copies into `dist/` when missing, logs actionable diagnostics.
+- Enhanced `loadExerciseMedia()` diagnostics: logs HTTP status, content-type, and response snippet when parsing fails for faster root-cause analysis (e.g., 404 HTML fallback).
+
+### Reliability
+- Prevents silent production regressions; graceful UI degradation retained (videos optional) while surfacing clear console warnings.
+
+### Security
+- No external sources introduced; still same-origin fetch only (mitigates SSRF). Defensive parsing avoids leaking full HTML, truncates snippet.
+
 ## [Latest] - 2025-08-12
 
 ### Completed (Video Demos Phase 3)
