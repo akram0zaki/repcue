@@ -2,6 +2,24 @@
 
 ## [Latest] - 2025-08-12
 
+### Added (Video Demos Phase 2 - Partial)
+- TimerPage circular video integration: conditional `<video>` rendered inside progress ring with circular crop, subtle overlay for contrast, and viewport-responsive variant selection (recomputed on resize).
+- Playback gating tied to: global feature flag, user setting (`showExerciseVideos`), reduced motion preference, timer running state (suppressed during pre-countdown), and exercise `hasVideo` field.
+
+### Internal
+- Utilized existing `useExerciseVideo` hook for metadata resolution & loop detection; added resize listener to update variant without reloading page.
+- Graceful fallback: if media JSON fetch fails in test/Node environment, logs warning and proceeds with ring-only UI (all tests still green).
+- Placeholder loop boundary handler registered (rep sync visual pulse will be implemented in T-2.2).
+
+### Quality
+- Full suite still passes: 565/565 tests (no new tests added this sub-phase; UI change is non-breaking and feature gated).
+- Accessibility: respects `prefers-reduced-motion`; video muted + `playsInline` to avoid autoplay policy issues.
+
+### Rationale
+- Delivers visual enhancement safely behind toggles before wiring rep counter synchronization (next sub-task), enabling early UX review without altering core timer mechanics.
+
+## [Latest] - 2025-08-12
+
 ### Added (Video Demos Phase 1)
 - Video variant selector utility `selectVideoVariant` choosing optimal asset (portrait / landscape / square) based on viewport aspect ratio with graceful fallback order.
 - `useExerciseVideo` hook (Phase 1 contract) providing:

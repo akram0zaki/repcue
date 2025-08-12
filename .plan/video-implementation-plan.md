@@ -114,8 +114,9 @@ Status: ✅ Completed 2025-08-12 (selector util + useExerciseVideo hook + unit t
 ---
 
 ### Phase 2 — TimerPage integration (UI/UX)
+Status: 🚧 In Progress (started 2025-08-12) — T-2.1 COMPLETE; T-2.2 & T-2.3 pending.
 
-**T-2.1 Inject circular video inside progress ring**
+**T-2.1 Inject circular video inside progress ring** ✅ Completed 2025-08-12
 - **Files:** `src/pages/TimerPage.tsx` (and any ring subcomponents).
 - **CSS:** Tailwind + mask/clip-path for circular crop.
   ```tsx
@@ -151,11 +152,11 @@ Status: ✅ Completed 2025-08-12 (selector util + useExerciseVideo hook + unit t
   ```
 - **Acceptance:** When `hasVideo` + media exists + flags on, the video appears inside the ring; otherwise ring-only.
 
-**T-2.2 Sync rep counter on loop boundary (rep-based only)**
+**T-2.2 Sync rep counter on loop boundary (rep-based only)** (NEXT)
 - Hook callback increments the **visual rep pulse** in lockstep with the video loop.
 - **Acceptance:** rep counter pulse matches each video loop with ≤50ms drift across 2 minutes of repeats.
 
-**T-2.3 Start/stop policy**
+**T-2.3 Start/stop policy** (PENDING REFINEMENT) – Basic gating implemented (play only when running, pause otherwise) but needs explicit reset handling & test coverage.
 - Only call `.play()` when the timer transitions to **running**. Pause on **pause**, stop on **reset/complete**.  
 - **Acceptance:** Autoplay never starts before timer run; iOS works (muted + playsInline).
 

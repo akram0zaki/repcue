@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Exercise, AppSettings, TimerState } from '../types';
 import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../constants';
 import { ReadyIcon, StarFilledIcon } from '../components/icons/NavigationIcons';
+import { VIDEO_DEMOS_ENABLED } from '../config/features';
+import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import selectVideoVariant from '../utils/selectVideoVariant';
+import { useExerciseVideo } from '../hooks/useExerciseVideo';
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -36,8 +40,48 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onStopTimer,
   onResetTimer
 }) => {
+  // ---------------- Video Demo Integration (Phase 2) ----------------
   // Calculate display values
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
+
+  // Rep-based exercise detection (needs selectedExercise so declare early for hook deps below)
+  const isRepBased = selectedExercise?.exerciseType === 'repetition-based';
+
+  // ---------------- Video Demo Integration (Phase 2) ----------------
+  const [mediaIndex, setMediaIndex] = useState<any | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && appSettings.showExerciseVideos && !prefersReducedMotion;
+
+  useEffect(() => {
+    if (!videoFeatureEnabled) return;
+    loadExerciseMedia().then(setMediaIndex).catch(err => { console.warn('Failed to load exercise media', err); });
+  }, [videoFeatureEnabled]);
+
+  const exerciseForVideo = selectedExercise && selectedExercise.hasVideo ? selectedExercise : null;
+
+  const exerciseVideo = useExerciseVideo({
+    exercise: exerciseForVideo,
+    mediaIndex,
+    enabled: !!videoFeatureEnabled,
+    isRunning: timerState.isRunning && !timerState.isCountdown,
+    isPaused: !timerState.isRunning
+  });
+
+  useEffect(() => {
+    if (!exerciseVideo.media) { setVideoUrl(null); return; }
+    const update = () => setVideoUrl(selectVideoVariant(exerciseVideo.media));
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [exerciseVideo.media]);
+
+  useEffect(() => {
+    if (!exerciseVideo || !isRepBased) return;
+    exerciseVideo.onLoop(() => { /* placeholder for rep pulse sync */ });
+  }, [exerciseVideo, isRepBased]);
+
+  const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown;
   
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
   
@@ -100,7 +144,6 @@ const TimerPage: React.FC<TimerPageProps> = ({
     : selectedExercise;
   
   // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
-  const isRepBased = selectedExercise?.exerciseType === 'repetition-based';
   
   // For workout mode, use workout mode rep/set data
   // For standalone, use timer state rep/set data
@@ -364,6 +407,22 @@ const TimerPage: React.FC<TimerPageProps> = ({
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-4">
           {/* Circular Progress */}
           <div className="relative w-40 h-40 mx-auto mb-4">
+            {showVideoInsideCircle && (
+              <div className="absolute inset-0 rounded-full overflow-hidden z-0">
+                <video
+                  ref={exerciseVideo.videoRef}
+                  src={videoUrl || undefined}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="h-full w-full object-cover"
+                  aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
+                />
+                {/* Subtle overlay to maintain ring contrast */}
+                <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />
+              </div>
+            )}
             <svg className="transform -rotate-90 w-40 h-40">
               {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
               {selectedExercise?.exerciseType === 'repetition-based' && totalReps && totalSets ? (
@@ -458,7 +517,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </svg>
             
             {/* Time Display */}
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-10">
               <div className="text-center">
                 {isCountdown ? (
                   <>
@@ -473,7 +532,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   // Rep-based exercise display: show rep progress instead of time countdown
                   // Only show when not all reps are completed
                   <>
-                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-sm">
                       Rep {(currentRep || 0) + 1}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -482,7 +541,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   </>
                 ) : (
                   <>
-                    <div className={`text-3xl font-bold ${
+                    <div className={`text-3xl font-bold drop-shadow-sm ${
                       isCountdown && displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
                         : actuallyResting
