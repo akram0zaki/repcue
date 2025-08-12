@@ -123,7 +123,8 @@ function App() {
   // Effect to ensure correct duration for rep-based exercises
   useEffect(() => {
     if (selectedExercise?.exerciseType === 'repetition-based' && appSettings.repSpeedFactor) {
-      const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+    const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
+    const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
       if (selectedDuration !== repDuration) {
         setSelectedDuration(repDuration as TimerPreset);
       }
@@ -405,7 +406,8 @@ function App() {
       if (selectedExercise.exerciseType === 'time-based') {
         setSelectedDuration(selectedExercise.defaultDuration as TimerPreset);
       } else if (selectedExercise.exerciseType === 'repetition-based') {
-        const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+  const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
+  const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
         setSelectedDuration(repDuration as TimerPreset);
       }
     }
@@ -454,23 +456,20 @@ function App() {
         // For rep-based exercises, we'll use a timer for each repetition
         const sets = firstWorkoutExercise.customSets || firstExercise.defaultSets || 1;
         const reps = firstWorkoutExercise.customReps || firstExercise.defaultReps || 10;
-        
-        // Calculate rep duration based on base time and speed factor
-        const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor); // BASE_REP_TIME * speed factor
-        
-        // Update workout mode with rep/set info
+        const repBase = firstExercise.repDurationSeconds || BASE_REP_TIME;
+        const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+
         setTimerState(prev => ({
           ...prev,
           workoutMode: prev.workoutMode ? {
             ...prev.workoutMode,
-            currentSet: 0, // Start at 0 to show 0/3 initially
+            currentSet: 0,
             totalSets: sets,
-            currentRep: 0, // Start at 0 to show 0/8 initially
+            currentRep: 0,
             totalReps: reps
           } : prev.workoutMode
         }));
-        
-        // Set timer duration for individual reps
+
         setSelectedDuration(repDuration as TimerPreset);
       }
     }
@@ -547,7 +546,8 @@ function App() {
             } else {
               sets = workoutExercise.customSets || exercise.defaultSets || 1;
               reps = workoutExercise.customReps || exercise.defaultReps || 10;
-              const repTime = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+              const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
+              const repTime = Math.round(baseRep * appSettings.repSpeedFactor);
               const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
               exerciseDuration = (sets * reps * repTime) + restTime;
             }
@@ -703,7 +703,8 @@ function App() {
           } else if (nextExercise.exerciseType === 'repetition-based') {
             const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
             const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
-            const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+            const repBase = nextExercise.repDurationSeconds || BASE_REP_TIME;
+            const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
             
             setTimerState(prev => ({
               ...prev,
@@ -802,7 +803,8 @@ function App() {
             } else if (nextExercise.exerciseType === 'repetition-based') {
               const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
               const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
-              const repDuration = Math.round(BASE_REP_TIME * appSettings.repSpeedFactor);
+              const repBase = nextExercise.repDurationSeconds || BASE_REP_TIME;
+              const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
               
               setSelectedDuration(repDuration as TimerPreset);
               
@@ -1421,7 +1423,8 @@ function App() {
     // Set appropriate duration for rep-based exercises
     if (exercise?.exerciseType === 'repetition-based') {
       const currentSettings = settings || appSettings;
-      const repDuration = Math.round(BASE_REP_TIME * currentSettings.repSpeedFactor);
+      const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * currentSettings.repSpeedFactor);
       setSelectedDuration(repDuration as TimerPreset);
     }
   };

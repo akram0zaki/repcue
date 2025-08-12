@@ -1,0 +1,262 @@
+[
+  {
+    "id": "plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/plank_v1_1080x1080.webm",
+      "portrait": "/videos/plank_v1_1080x1920.webm",
+      "landscape": "/videos/plank_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "side-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/side-plank_v1_1080x1080.webm",
+      "portrait": "/videos/side-plank_v1_1080x1920.webm",
+      "landscape": "/videos/side-plank_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "mountain-climbers",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/mountain-climbers_v1_1080x1080.webm",
+      "portrait": "/videos/mountain-climbers_v1_1080x1920.webm",
+      "landscape": "/videos/mountain-climbers_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "bicycle-crunches",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/bicycle-crunches_v1_1080x1080.webm",
+      "portrait": "/videos/bicycle-crunches_v1_1080x1920.webm",
+      "landscape": "/videos/bicycle-crunches_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "push-ups",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/push-ups_v1_1080x1080.webm",
+      "portrait": "/videos/push-ups_v1_1080x1920.webm",
+      "landscape": "/videos/push-ups_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "squats",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/squats_v1_1080x1080.webm",
+      "portrait": "/videos/squats_v1_1080x1920.webm",
+      "landscape": "/videos/squats_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "lunges",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/lunges_v1_1080x1080.webm",
+      "portrait": "/videos/lunges_v1_1080x1920.webm",
+      "landscape": "/videos/lunges_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "wall-sit",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/wall-sit_v1_1080x1080.webm",
+      "portrait": "/videos/wall-sit_v1_1080x1920.webm",
+      "landscape": "/videos/wall-sit_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "burpees",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/burpees_v1_1080x1080.webm",
+      "portrait": "/videos/burpees_v1_1080x1920.webm",
+      "landscape": "/videos/burpees_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "jumping-jacks",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/jumping-jacks_v1_1080x1080.webm",
+      "portrait": "/videos/jumping-jacks_v1_1080x1920.webm",
+      "landscape": "/videos/jumping-jacks_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "high-knees",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/high-knees_v1_1080x1080.webm",
+      "portrait": "/videos/high-knees_v1_1080x1920.webm",
+      "landscape": "/videos/high-knees_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "butt-kicks",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/butt-kicks_v1_1080x1080.webm",
+      "portrait": "/videos/butt-kicks_v1_1080x1920.webm",
+      "landscape": "/videos/butt-kicks_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "downward-dog",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/downward-dog_v1_1080x1080.webm",
+      "portrait": "/videos/downward-dog_v1_1080x1920.webm",
+      "landscape": "/videos/downward-dog_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "child-pose",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/child-pose_v1_1080x1080.webm",
+      "portrait": "/videos/child-pose_v1_1080x1920.webm",
+      "landscape": "/videos/child-pose_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "cat-cow",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/cat-cow_v1_1080x1080.webm",
+      "portrait": "/videos/cat-cow_v1_1080x1920.webm",
+      "landscape": "/videos/cat-cow_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "single-leg-stand",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/single-leg-stand_v1_1080x1080.webm",
+      "portrait": "/videos/single-leg-stand_v1_1080x1920.webm",
+      "landscape": "/videos/single-leg-stand_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "tree-pose",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/tree-pose_v1_1080x1080.webm",
+      "portrait": "/videos/tree-pose_v1_1080x1920.webm",
+      "landscape": "/videos/tree-pose_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "warrior-3",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/warrior-3_v1_1080x1080.webm",
+      "portrait": "/videos/warrior-3_v1_1080x1920.webm",
+      "landscape": "/videos/warrior-3_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "dead-bug",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/dead-bug_v1_1080x1080.webm",
+      "portrait": "/videos/dead-bug_v1_1080x1920.webm",
+      "landscape": "/videos/dead-bug_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "glute-bridges",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/glute-bridges_v1_1080x1080.webm",
+      "portrait": "/videos/glute-bridges_v1_1080x1920.webm",
+      "landscape": "/videos/glute-bridges_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "finger-roll",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/finger-roll_v1_1080x1080.webm",
+      "portrait": "/videos/finger-roll_v1_1080x1920.webm",
+      "landscape": "/videos/finger-roll_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "tricep-dips",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/tricep-dips_v1_1080x1080.webm",
+      "portrait": "/videos/tricep-dips_v1_1080x1920.webm",
+      "landscape": "/videos/tricep-dips_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "calf-raises",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/calf-raises_v1_1080x1080.webm",
+      "portrait": "/videos/calf-raises_v1_1080x1920.webm",
+      "landscape": "/videos/calf-raises_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "russian-twists",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/russian-twists_v1_1080x1080.webm",
+      "portrait": "/videos/russian-twists_v1_1080x1920.webm",
+      "landscape": "/videos/russian-twists_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "bear-crawl",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/bear-crawl_v1_1080x1080.webm",
+      "portrait": "/videos/bear-crawl_v1_1080x1920.webm",
+      "landscape": "/videos/bear-crawl_v1_1920x1080.webm"
+    }
+  },
+  {
+    "id": "forward-fold",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "square": "/videos/forward-fold_v1_1080x1080.webm",
+      "portrait": "/videos/forward-fold_v1_1080x1920.webm",
+      "landscape": "/videos/forward-fold_v1_1920x1080.webm"
+    }
+  }
+]

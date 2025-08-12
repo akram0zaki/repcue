@@ -1,0 +1,27 @@
+exercise_id,mixamo_search_terms,candidate_animation_names,notes,tempo_bpm,link
+plank,plank; idle,Static pose (create in Blender),"Side view, micro-sway idle 10s",,https://www.mixamo.com/#/?genres=&limit=96&page=1&query=plank&type=Motion%2CMotionPack
+side-plank,side plank; plank,Static pose (create in Blender),"Side view, micro-sway idle 10s",,None
+mountain-climbers,mountain climber; plank run,Mountain Climber; Plank Run In Place,"3/4 view, 1 rep = R or L drive",60–90,None
+bicycle-crunches,bicycle crunch; abs,Seated Bicycle; Ab Crunch Alt,Better via mocap; ensure opposite elbow–knee sync,40–60,https://www.mixamo.com/#/?genres=&limit=96&page=1&query=Bicycle+Crunch&type=Motion%2CMotionPack
+push-ups,push up,Push Up; Push Up Slow,"Elbows ~45°, neutral neck",30–40,https://www.mixamo.com/#/?genres=&limit=96&page=1&query=push+up&type=Motion%2CMotionPack
+squats,squat,Squat; Bodyweight Squat,Side view; hips below parallel optional,30–40,https://www.mixamo.com/#/?genres=&limit=96&page=1&query=squat&type=Motion%2CMotionPack
+lunges,lunge,Forward Lunge; Lunge Alternating,Side view; front knee over mid-foot,24–32,None
+wall-sit,sit; wall sit,Static pose (create in Blender),"Knees/hips ~90°, 10s",,None
+burpees,burpee,Burpee; Burpee Slow,3/4 view; avoid camera cuts,18–24,https://www.mixamo.com/#/?genres=Sport&limit=96&page=1&query=Burpee&type=Motion%2CMotionPack
+jumping-jacks,jumping jacks; star jump,Jumping Jacks,Front view; full overhead reach,60–90,https://www.mixamo.com/#/?genres=Sport&limit=96&page=1&query=Jumping+Jacks&type=Motion%2CMotionPack
+high-knees,run in place; high knees,Run In Place High Knees,Front view; 1 rep = each knee,90–120,None
+butt-kicks,jog in place; heel kick,Jog In Place; Heel Kick,Side view; heel to glute,90–120,None
+downward-dog,yoga; downward dog,Static pose (create in Blender),"Side view, breathe loop",,None
+child-pose,yoga; child pose,Static pose (create in Blender),"Side view, breathe loop",,None
+cat-cow,yoga; cat cow,Hand-key or mocap,2-key loop: flexion→extension,20–30,None
+single-leg-stand,balance; one leg stand,Static pose (create in Blender),Front view; tiny sway,,None
+tree-pose,yoga; tree,Static pose (create in Blender),Front view; tiny sway,,"None, change to Standing Quad Stretch"
+warrior-3,yoga; warrior 3,Static pose (create in Blender),Side view; tiny sway,,None
+dead-bug,dead bug; core,Mocap recommended,Top-down 3/4; alt limbs,20–30,None
+glute-bridges,hip thrust; bridge,Hip Thrust; Glute Bridge,Side view; neutral spine,30–40,None
+finger-roll,hand; finger curl; wrist warmup,Hand rig pose / mocap,Close-up asset; 10s gentle loop,,None
+tricep-dips,bench dip; tricep dip,Bench Dip; Tricep Dip,Side view; shoulders down/back,30–40,None
+calf-raises,calf raise; heel raise,Calf Raise; Heel Raise,Side view; full plantarflexion,45–60,None
+russian-twists,seated twist; russian twist,Seated Trunk Twist,3/4; L→R→center = 1 rep,24–32,None
+bear-crawl,bear crawl,Bear Crawl Forward,Side view; loop 1–2 strides,40–60,https://www.mixamo.com/#/?genres=&limit=96&page=1&query=low+crawl&type=Motion%2CMotionPack
+forward-fold,yoga; forward fold,Static pose (create in Blender),Side view; breathe loop,,None

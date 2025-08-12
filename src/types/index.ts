@@ -16,6 +16,14 @@ export interface Exercise {
   defaultDuration?: number; // in seconds - for time-based exercises
   defaultSets?: number; // for repetition-based exercises
   defaultReps?: number; // for repetition-based exercises
+  /**
+   * Optional per-exercise default duration for a single repetition (in seconds).
+   * If provided, this overrides BASE_REP_TIME for this exercise. The effective
+   * duration used in timers becomes (repDurationSeconds * repSpeedFactor).
+   */
+  repDurationSeconds?: number; // per-rep base time for repetition-based exercises
+  /** Indicates whether a guided video is available for this exercise */
+  hasVideo?: boolean; // default false in catalog initialization
   isFavorite: boolean;
   tags: string[];
 }

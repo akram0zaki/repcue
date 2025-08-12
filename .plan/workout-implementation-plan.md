@@ -242,8 +242,8 @@
 
 ## Phase 5: Log Enhancements
 
-* **T5.1**: Update log schema to support WorkoutSessions (models already exist ✅)
-* **T5.2**: Display workouts with expand/collapse detail view
+* **T5.1**: ✅ Update log schema to support WorkoutSessions (models already exist ✅)
+* **T5.2**: ✅ Display workouts with expand/collapse detail view
 * **T5.3**: Calculate and store completion percentages per exercise
 * **T5.4**: Filter and group logs by type (standalone timer vs workout) and date
 * **T5.5**: Add test coverage for log aggregation and display

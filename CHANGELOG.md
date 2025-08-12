@@ -1,5 +1,19 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [Latest] - 2025-08-12
+
+### Added
+- Per-exercise repetition duration via optional `repDurationSeconds` field on `Exercise`. Timer now uses `(exercise.repDurationSeconds || BASE_REP_TIME) * repSpeedFactor` for all rep-based timing paths (standalone & workout), preserving identical semantics while enabling finer control for faster/slower movements (e.g., burpees at 3s, others at 2s).
+- `hasVideo` flag (default `false`) added to every exercise to prepare for future instructional media integration without schema migration overhead.
+
+### Internal
+- Refactored `App.tsx` to remove hardcoded rep duration calculations that previously used only `BASE_REP_TIME`; unified logic so every rep-based interval derives from the exercise definition, ensuring workout transitions, rest periods, and activity logging all remain consistent.
+- Updated TypeScript `Exercise` interface and seed catalog; existing stored favorites remain intact because merge logic preserves user-specific metadata while adopting new fields.
+
+### Quality
+- Full test suite (559 tests) still passing post-refactor; no behavioral regressions detected in rep/set advancement, workout transitions, or logging.
+- Backward compatible: exercises lacking `repDurationSeconds` automatically fall back, requiring no data migration.
+
 ## [Latest] - 2025-08-11
 
 ### Chore
