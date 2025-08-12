@@ -85,7 +85,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     });
   }, [exerciseVideo, isRepBased]);
 
-  const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow;
+  const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow && !exerciseVideo.error;
   
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
   

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import useExerciseVideo from '../useExerciseVideo';
 import type { Exercise } from '../../types';
 import type { ExerciseMediaIndex } from '../../types/media';
@@ -55,5 +55,20 @@ describe('useExerciseVideo', () => {
     currentRunning = false;
     rerender();
     expect(currentTimeSet).toBe(0);
+  });
+  it.skip('gracefully falls back when video element fires error (pending integration test with DOM video element)', async () => {
+    const listeners: Record<string, Function[]> = { error: [], loadeddata: [], timeupdate: [] };
+    // @ts-ignore minimal mock with event system
+    global.HTMLVideoElement = class { 
+      play = vi.fn(); pause = vi.fn();
+      addEventListener(ev:string, cb:Function){ (listeners[ev] ||= []).push(cb); }
+      removeEventListener(){}
+    };
+  const { result, rerender } = renderHook(() => useExerciseVideo({ exercise, mediaIndex, enabled: true, isRunning: true, isActiveMovement: true, isPaused: false }));
+    // Simulate error
+  await act(async () => { listeners.error.forEach(fn => fn()); });
+  // Force rerender to flush updated state from internal hook setters
+  rerender();
+  expect(result.current.error).toBeTruthy();
   });
 });

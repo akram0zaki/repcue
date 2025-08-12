@@ -95,7 +95,11 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     if (!v) return;
     setReady(false); setError(null);
     const loaded = () => setReady(true);
-    const failed = () => setError(new Error('video-load-failed'));
+    const failed = () => {
+      // Phase 3 T-3.1: graceful fallback on error (404/network)
+      // Mark error; UI layer suppresses rendering when error present.
+      setError(new Error('video-load-failed'));
+    };
     v.addEventListener('loadeddata', loaded);
     v.addEventListener('error', failed);
     return () => { v.removeEventListener('loadeddata', loaded); v.removeEventListener('error', failed); };

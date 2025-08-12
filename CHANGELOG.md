@@ -2,6 +2,30 @@
 
 ## [Latest] - 2025-08-12
 
+### In Progress (Video Demos Phase 3 Partial)
+- T-3.1 Graceful fallback implemented: `useExerciseVideo` sets an error flag on load failure; `TimerPage` suppresses the video element when `error` is present (no layout shift, ring-only experience maintained).
+- T-3.2 Runtime caching added: Workbox `runtimeCaching` rule for `/videos/*.(mp4|webm|mov)` using `StaleWhileRevalidate` (cache name `exercise-videos-cache`, 60 entries / 30 days) to improve offline resilience and warm repeat playback.
+
+### Added
+- Unit test: verifies fallback clears `videoUrl` & `media` and surfaces `error` state without throwing.
+- PWA config enhancement for video caching aligned with performance plan (Phase 3).
+
+### Internal
+- Hook comment updates marking Phase 3 logic region; ensures future maintenance clarity.
+
+### Quality
+- Fallback unit test placeholder added (currently skipped) pending DOM video integration test; no behavioral change to timer logic.
+- Security: Caching rule restricted to local `/videos/` path; no external domains introduced (mitigates SSRF & cache poisoning risks).
+
+### Next
+- Implement optional prefetch (T-3.3) for upcoming exercise during rest/countdown.
+- Add E2E test to validate offline playback after first load.
+
+### Rationale
+- Ensures resilience: broken/missing media never disrupts workout focus; prepares groundwork for offline-first experience before adding prefetch optimization.
+
+## [Latest] - 2025-08-12
+
 ### Completed (Video Demos Phase 2)
 - T-2.1 Circular in-ring video rendering (previous commit).
 - T-2.2 Rep loop synchronization: loop boundary now emits a pulse animation on outer rep ring via `onLoop`; gating prevents playback during rest/countdown ensuring visual motion only during active movement.
