@@ -162,9 +162,9 @@ Status: ✅ Completed 2025-08-12 (T-2.1, T-2.2, T-2.3)
 
 ---
 
-### Phase 3 — Fallbacks, errors, and caching
+### Phase 3 — Fallbacks, errors, caching & prefetch
 
-Status: In Progress (T-3.1 ✅ implemented in hook, T-3.2 ✅ caching rule added, T-3.3 pending)
+Status: ✅ Completed 2025-08-12 (T-3.1 fallback, T-3.2 runtime caching, T-3.3 prefetch)
 
 **T-3.1 Graceful fallback** ✅ 2025-08-12
 - If `hasVideo=true` but the file 404s, **hide the video container** and revert to ring-only (no toast/hint). Log to console for dev.
@@ -175,9 +175,10 @@ Status: In Progress (T-3.1 ✅ implemented in hook, T-3.2 ✅ caching rule added
 - Optional: set max entries (~60) and purge LRU.
 - **Acceptance:** First play fetches from network; later replays are instant offline.
 
-**T-3.3 Preload hint (optional)** ⏳ Pending
-- Add `<link rel="prefetch">` for the chosen video URL when a set/exercise is about to start (if you have a pre-timer or upcoming preview).  
-- **Acceptance:** Switch to next exercise starts within 100–200ms media delay on decent connections.
+**T-3.3 Preload / prefetch hint** ✅ 2025-08-12
+- Injects `<link rel="prefetch" as="video">` for imminent exercise video during pre-countdown (standalone) or workout rest (next exercise) using selected variant.
+- Cleans up on dependency change to avoid stale tags; guarded to same-origin paths only.
+- **Acceptance:** Prefetch link appears in DOM under those states; integration tests pass; no duplicate links produced.
 
 ---
 

@@ -2,27 +2,30 @@
 
 ## [Latest] - 2025-08-12
 
-### In Progress (Video Demos Phase 3 Partial)
-- T-3.1 Graceful fallback implemented: `useExerciseVideo` sets an error flag on load failure; `TimerPage` suppresses the video element when `error` is present (no layout shift, ring-only experience maintained).
-- T-3.2 Runtime caching added: Workbox `runtimeCaching` rule for `/videos/*.(mp4|webm|mov)` using `StaleWhileRevalidate` (cache name `exercise-videos-cache`, 60 entries / 30 days) to improve offline resilience and warm repeat playback.
+### Completed (Video Demos Phase 3)
+- T-3.1 Graceful fallback: `useExerciseVideo` sets an error flag on load failure; `TimerPage` hides the video element when `error` is present (no layout shift, ring-only experience maintained).
+- T-3.2 Runtime caching: Workbox `runtimeCaching` rule for `/videos/*.(mp4|webm|mov)` using `StaleWhileRevalidate` (cache `exercise-videos-cache`, 60 entries / 30 days) for faster warm playback & offline resilience.
+- T-3.3 Prefetch optimization: During pre-countdown or workout rest the app injects `<link rel="prefetch" as="video">` for the next (or imminent) exercise’s best-fit variant, cutting initial playback delay.
 
 ### Added
-- Unit test: verifies fallback clears `videoUrl` & `media` and surfaces `error` state without throwing.
-- PWA config enhancement for video caching aligned with performance plan (Phase 3).
+- Integration test (`TimerPage.videoPrefetch.test.tsx`): asserts prefetch link appears in countdown & simulated rest scenarios.
+- Fallback unit test retained (skipped placeholder) plus updated hook tests; total tests now 569 passed / 1 skipped (570).
 
 ### Internal
-- Hook comment updates marking Phase 3 logic region; ensures future maintenance clarity.
+- `TimerPage` prefetch effect with idempotent cleanup (`data-ex-video` attribute) avoids duplicate hints and removes tag on dependency change/unmount.
+- Show-logic updated to include `!exerciseVideo.error` guard (prevents flashing failed element).
 
 ### Quality
-- Fallback unit test placeholder added (currently skipped) pending DOM video integration test; no behavioral change to timer logic.
-- Security: Caching rule restricted to local `/videos/` path; no external domains introduced (mitigates SSRF & cache poisoning risks).
-
-### Next
-- Implement optional prefetch (T-3.3) for upcoming exercise during rest/countdown.
-- Add E2E test to validate offline playback after first load.
+- Full suite: 53 files, 569 passing, 1 skipped (post-prefetch) – no timer/workout regressions.
+- Security: Prefetch limited to same-origin `/videos/` URLs (no user-controlled input → mitigates SSRF / cache poisoning). Runtime caching likewise scoped.
+- Performance: Anticipatory fetch + SW cache synergy should reduce perceived start latency for successive exercises, especially on Pi / mobile networks.
 
 ### Rationale
-- Ensures resilience: broken/missing media never disrupts workout focus; prepares groundwork for offline-first experience before adding prefetch optimization.
+- Phase 3 closes the resilience + performance layer: errors are silent, media is cached, and upcoming assets are opportunistically fetched to keep workouts fluid.
+
+### Next (Phase 5 preview)
+- Add offline video playback E2E scenario & long-loop drift validation.
+- Optionally tighten act() warnings in several TimerPage tests (non-functional noise).
 
 ## [Latest] - 2025-08-12
 
