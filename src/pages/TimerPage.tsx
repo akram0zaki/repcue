@@ -70,6 +70,38 @@ const TimerPage: React.FC<TimerPageProps> = ({
     isPaused: !timerState.isRunning
   });
 
+  // Phase 3 T-3.3: Prefetch upcoming exercise video during rest or pre-countdown
+  useEffect(() => {
+    if (!videoFeatureEnabled || !mediaIndex) return;
+    let prefetchUrl: string | null = null;
+    // During rest in workout mode: prefetch next exercise's video
+    if (workoutMode?.isResting) {
+      const nextWorkoutEx = workoutMode.currentExerciseIndex < workoutMode.exercises.length
+        ? workoutMode.exercises[workoutMode.currentExerciseIndex]
+        : null;
+      const nextExercise = nextWorkoutEx ? exercises.find(e => e.id === nextWorkoutEx.exerciseId) : null;
+      if (nextExercise?.hasVideo) {
+        const m = mediaIndex[nextExercise.id];
+        if (m) prefetchUrl = selectVideoVariant(m);
+      }
+    } else if (isCountdown && exerciseForVideo && exerciseVideo.media) {
+      // Standalone or workout about to start: prefetch current exercise video prior to playback
+      prefetchUrl = videoUrl || null;
+    }
+    if (prefetchUrl) {
+      const existing = document.querySelector(`link[rel="prefetch"][data-ex-video="${prefetchUrl}"]`);
+      if (!existing) {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.as = 'video';
+        link.href = prefetchUrl;
+        link.dataset.exVideo = prefetchUrl;
+        document.head.appendChild(link);
+        return () => { if (link.parentNode) link.parentNode.removeChild(link); };
+      }
+    }
+  }, [videoFeatureEnabled, mediaIndex, workoutMode?.isResting, workoutMode?.currentExerciseIndex, isCountdown, videoUrl, exercises, exerciseForVideo, exerciseVideo.media]);
+
   useEffect(() => {
     if (!exerciseVideo.media) { setVideoUrl(null); return; }
     const update = () => setVideoUrl(selectVideoVariant(exerciseVideo.media));
