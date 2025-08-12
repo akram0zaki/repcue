@@ -45,8 +45,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 15, // Standard rep range for ab exercises
     isFavorite: false,
-  hasVideo: false,
-  repDurationSeconds: 2, // Slightly slower controlled reps
+  hasVideo: true,
+  repDurationSeconds: 1.1, // Slightly slower controlled reps
     tags: ['dynamic', 'core', 'obliques']
   },
 

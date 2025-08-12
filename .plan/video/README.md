@@ -297,3 +297,23 @@ If you want the same avatar, camera, and style for all exercises, retarget the m
 - [Move.ai](https://www.move.ai/)  
 - [Blender – Constraints Manual](https://docs.blender.org/manual/en/latest/animation/constraints/introduction.html)  
 - [Mixamo](https://www.mixamo.com/)
+
+
+## 📂 Folder Layout for Media Assets
+
+To keep assets organized and avoid build/runtime issues, follow this structure:
+
+```
+src/
+  assets/
+    fbx_glb/             # FBX source files for Blender (not shipped to the browser)
+
+public/
+  videos/                # Rendered WebM/VP9 (and optional MP4) video files served to the browser
+  exercise_media.json    # Metadata mapping exercises to their video files (repo root `public/`)
+```
+
+**Important notes:**
+- Anything in `src/assets/fbx_glb/` is **only for Blender** and is never referenced directly in the browser.  
+- Anything in `public/videos/` is served at `/videos/...` in the app, so paths in `exercise_media.json` should be `/videos/<filename>`.
+- `exercise_media.json` must live in `public/` (repo root) so it is copied as-is to the build output.
