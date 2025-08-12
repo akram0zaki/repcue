@@ -2,6 +2,32 @@
 
 ## [Latest] - 2025-08-12
 
+### Added (Video Demos Phase 1)
+- Video variant selector utility `selectVideoVariant` choosing optimal asset (portrait / landscape / square) based on viewport aspect ratio with graceful fallback order.
+- `useExerciseVideo` hook (Phase 1 contract) providing:
+  - Metadata resolution & variant selection (square->portrait->landscape fallback) from `ExerciseMediaIndex`.
+  - Loop boundary detection via `timeupdate` wrap-around (handlers registered through `onLoop`).
+  - Playback gating using global feature flag, user setting, reduced-motion preference, and timer run/pause signals.
+  - Reduced-motion auto-disable (WCAG friendly) – no video playback when `(prefers-reduced-motion: reduce)`.
+  - Ready/error state signaling without throwing (graceful degradation).
+- Initial unit tests:
+  - `selectVideoVariant-unit.test.ts` (aspect selection + fallbacks)
+  - `useExerciseVideo.test.tsx` (metadata absence/presence, variant resolution)
+
+### Internal
+- Hook designed intentionally UI-agnostic; no TimerPage modifications yet, ensuring zero user-facing change pending Phase 2 integration.
+- Defensive error handling: playback `play()` promise rejection logged (autoplay policy) instead of propagating; prevents uncaught errors during timer operations.
+- Security: only static JSON-derived paths used; no dynamic code evaluation; honors user motion preferences (privacy/respect for accessibility settings).
+
+### Quality
+- Test suite increased from 559 to 565 passing tests (+6) confirming non-regressive addition.
+- No existing snapshots or timer behavior altered; all rep/time logic untouched.
+
+### Rationale
+- Establishes stable abstraction boundary so upcoming Phase 2 (TimerPage circular video integration) can focus purely on UI/visual layering & rep sync without reworking media plumbing.
+
+## [Latest] - 2025-08-12
+
 ### Added (Video Demos Phase 0)
 - Video demo groundwork behind feature flag: introduced `VIDEO_DEMOS_ENABLED` (default `true`) plus per-user setting `showExerciseVideos` (default `true`) with accessible toggle in Settings ("Show Exercise Demo Videos").
 - Media metadata domain types: `ExerciseMedia` & `ExerciseMediaIndex` for strongly‑typed mapping of exercise IDs to available video variants (square / portrait / landscape) including `repsPerLoop` & `fps`.

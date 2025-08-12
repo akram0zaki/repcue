@@ -81,6 +81,7 @@ Status: ✅ Completed 2025-08-12 (types, loader, feature flag, settings toggle).
 ---
 
 ### Phase 1 — Video selection & hook
+Status: ✅ Completed 2025-08-12 (selector util + useExerciseVideo hook + unit tests). No UI integration yet.
 
 **T-1.1 Video selector util**
 - **Files:** `src/utils/selectVideoVariant.ts`
