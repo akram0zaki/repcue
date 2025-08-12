@@ -118,6 +118,22 @@ const TimerPage: React.FC<TimerPageProps> = ({
   }, [exerciseVideo, isRepBased]);
 
   const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow && !exerciseVideo.error;
+
+  // Phase 3 debug aid: log reasons when an exercise marked hasVideo does not actually render
+  useEffect(() => {
+    if (!exerciseForVideo || !videoFeatureEnabled) return;
+    if (showVideoInsideCircle) return; // already visible
+    const reasons: string[] = [];
+    if (!exerciseVideo.media) reasons.push('missing media metadata');
+    if (!videoUrl) reasons.push('no variant chosen');
+    if (isCountdown) reasons.push('during countdown');
+    if (restingNow) reasons.push('rest state');
+    if (exerciseVideo.error) reasons.push('error state');
+    if (reasons.length) {
+      // One concise debug line (no PII) to assist diagnosing missing video rendering
+      console.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
+    }
+  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error]);
   
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
   
@@ -446,7 +462,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
             aria-live="off"
           >
             {showVideoInsideCircle && (
-              <div className="absolute inset-0 rounded-full overflow-hidden z-0">
+              // Inset the video slightly so progress ring(s) wrap AROUND, not over, the media
+              <div className="absolute inset-2 sm:inset-3 rounded-full overflow-hidden z-0">
                 <video
                   ref={exerciseVideo.videoRef}
                   src={videoUrl || undefined}
@@ -456,6 +473,12 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   preload="metadata"
                   className="h-full w-full object-cover"
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
+                  onLoadedData={() => {
+                    // Safety: ensure play attempt if hook's effect missed due to timing
+                    if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
+                      exerciseVideo.videoRef.current.play().catch(() => {});
+                    }
+                  }}
                 />
                 {/* Subtle overlay to maintain ring contrast */}
                 <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />

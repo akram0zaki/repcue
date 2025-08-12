@@ -69,14 +69,32 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     return () => v.removeEventListener('timeupdate', handleTimeUpdate);
   }, [videoUrl]);
 
-  // Playback management
+  // Reusable play condition
+  // Only play during active movement phase (timer running & not countdown/rest)
+  const shouldPlay = VIDEO_DEMOS_ENABLED && enabled && !reducedMotion && !!videoUrl && isActiveMovement && !isPaused && isRunning;
+
+  // Playback management (initial + dependency changes)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const shouldPlay = VIDEO_DEMOS_ENABLED && enabled && !reducedMotion && !!videoUrl && isActiveMovement && !isPaused;
     if (!shouldPlay) { if (!v.paused) v.pause(); return; }
-    v.play().catch(err => console.warn('Video play rejected', err));
-  }, [enabled, isActiveMovement, isPaused, videoUrl, reducedMotion]);
+    v.play().catch(err => console.debug('Video play rejected (likely transient)', err));
+  }, [shouldPlay]);
+
+  // Resume after visibility change (e.g., user switched tabs/routes and came back)
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const handler = () => {
+      if (document.visibilityState === 'visible') {
+        const v = videoRef.current;
+        if (v && shouldPlay && v.paused) {
+          v.play().catch(err => console.debug('Auto-resume play rejected', err));
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, [shouldPlay]);
 
   // When timer stops or resets, ensure video seeks to start for consistent next start
   useEffect(() => {
@@ -89,12 +107,18 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     }
   }, [isRunning]);
 
-  // Ready / error state tracking
+  // Ready / error state tracking (+ retry play on load for race conditions)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     setReady(false); setError(null);
-    const loaded = () => setReady(true);
+    const loaded = () => {
+      setReady(true);
+      // Attempt play again in case metadata arrived after initial effect
+      if (shouldPlay && v.paused) {
+        v.play().catch(() => {});
+      }
+    };
     const failed = () => {
       // Phase 3 T-3.1: graceful fallback on error (404/network)
       // Mark error; UI layer suppresses rendering when error present.
@@ -103,7 +127,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     v.addEventListener('loadeddata', loaded);
     v.addEventListener('error', failed);
     return () => { v.removeEventListener('loadeddata', loaded); v.removeEventListener('error', failed); };
-  }, [videoUrl]);
+  }, [videoUrl, shouldPlay]);
 
   return { videoRef, media, videoUrl, ready, error, onLoop };
 }
