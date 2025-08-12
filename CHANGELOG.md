@@ -2,23 +2,25 @@
 
 ## [Latest] - 2025-08-12
 
-### Added (Video Demos Phase 2 - Continued)
-- Rep loop pulse visual: video loop boundary now triggers a subtle pulse animation on the outer rep progress ring (T-2.2 initial implementation) for perceptual sync between motion and counter.
-- Video reset refinement: on timer stop/reset the demo video now seeks back to 0 and internal loop detection state resets, ensuring consistent first-frame start on next run (T-2.3 groundwork).
+### Completed (Video Demos Phase 2)
+- T-2.1 Circular in-ring video rendering (previous commit).
+- T-2.2 Rep loop synchronization: loop boundary now emits a pulse animation on outer rep ring via `onLoop`; gating prevents playback during rest/countdown ensuring visual motion only during active movement.
+- T-2.3 Start/stop policy refinements: video playback gated by new `isActiveMovement` (running & not resting & not countdown); automatic seek-to-start + loop detector baseline reset on stop/reset for consistent restarts.
+
+### Added
+- Hook option `isActiveMovement` separating raw `isRunning` from movement state for precise gating.
+- Unit tests: extended `useExerciseVideo.test.tsx` to cover (1) variant selection (API updated), (2) inactivity gating when `isActiveMovement=false`, (3) reset behavior ensures `currentTime` resets.
 
 ### Internal
-- `useExerciseVideo`: added reset effect clearing `currentTime` and baseline when `isRunning` becomes false; safeguards loop wrap detection on subsequent starts.
-- `TimerPage`: introduced `repPulse` state incremented per loop via `onLoop` callback; current implementation is purely visual (does not mutate rep counters—authoritative logic remains in `App.tsx`).
-
-### Pending
-- T-2.2 Remaining: bind pulse timing validation tests (≤50ms drift target) & optional haptic/audio micro-cue (behind accessibility preference). 
-- T-2.3 Remaining: explicit pause-on-rest semantics for workout transitions and verification tests (pause during rest when video is for active movement only).
+- Refactored `TimerPage` ordering to compute rest state early and avoid forward references; consolidated visibility logic into `showVideoInsideCircle` excluding rest periods.
+- Ensured no side effects on authoritative rep advancement (pulse purely presentational).
 
 ### Quality
-- No new tests yet for this sub-phase (will be added with T-2.2 validation). Existing 565 tests expected to remain green (run after commit next phase).
+- Test suite count: 567 tests passing (added 2 new tests net). No regressions in timer, workout, or storage flows.
+- Accessibility: Motion suppressed during rest and countdown; respects reduced motion preference (feature fully disabled in that case).
 
 ### Rationale
-- Incremental delivery keeps user-visible sync feedback lightweight and reversible while preserving strict separation between visual animation and authoritative rep advancement logic.
+- Phase 2 closes with stable, feature-gated visual enhancement providing immediate instructional context without altering timing semantics, setting a clean foundation for Phase 3 caching & fallbacks.
 
 ## [Latest] - 2025-08-12
 

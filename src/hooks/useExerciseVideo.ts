@@ -7,7 +7,11 @@ interface UseExerciseVideoOptions {
   exercise: Exercise | null | undefined;
   mediaIndex: ExerciseMediaIndex | null | undefined;
   enabled: boolean; // user + feature toggle
+  // Raw timer running state (used for reset handling)
   isRunning: boolean;
+  // Movement-active state (running & not resting/countdown) governing playback
+  isActiveMovement: boolean;
+  // Explicit paused state (manual pause UI, if any)
   isPaused: boolean;
 }
 
@@ -21,7 +25,7 @@ interface UseExerciseVideoResult {
 }
 
 // Phase 1 hook: metadata resolution + loop boundary detection + basic playback gating.
-export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isPaused }: UseExerciseVideoOptions): UseExerciseVideoResult {
+export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isActiveMovement, isPaused }: UseExerciseVideoOptions): UseExerciseVideoResult {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [media, setMedia] = useState<ExerciseMedia | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -69,10 +73,10 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isP
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const shouldPlay = VIDEO_DEMOS_ENABLED && enabled && !reducedMotion && !!videoUrl && isRunning && !isPaused;
+    const shouldPlay = VIDEO_DEMOS_ENABLED && enabled && !reducedMotion && !!videoUrl && isActiveMovement && !isPaused;
     if (!shouldPlay) { if (!v.paused) v.pause(); return; }
     v.play().catch(err => console.warn('Video play rejected', err));
-  }, [enabled, isRunning, isPaused, videoUrl, reducedMotion]);
+  }, [enabled, isActiveMovement, isPaused, videoUrl, reducedMotion]);
 
   // When timer stops or resets, ensure video seeks to start for consistent next start
   useEffect(() => {

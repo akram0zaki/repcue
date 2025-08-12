@@ -60,12 +60,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
   }, [videoFeatureEnabled]);
 
   const exerciseForVideo = selectedExercise && selectedExercise.hasVideo ? selectedExercise : null;
-
+  const restingNow = workoutMode?.isResting || isResting;
   const exerciseVideo = useExerciseVideo({
     exercise: exerciseForVideo,
     mediaIndex,
     enabled: !!videoFeatureEnabled,
-    isRunning: timerState.isRunning && !timerState.isCountdown,
+    isRunning: timerState.isRunning,
+    isActiveMovement: timerState.isRunning && !timerState.isCountdown && !restingNow,
     isPaused: !timerState.isRunning
   });
 
@@ -80,13 +81,11 @@ const TimerPage: React.FC<TimerPageProps> = ({
   useEffect(() => {
     if (!exerciseVideo || !isRepBased) return;
     exerciseVideo.onLoop(() => {
-      // Trigger a brief visual pulse to sync with video loop boundary
       setRepPulse(p => p + 1);
-      // NOTE: Actual rep advancement is controlled in App timer logic; here we purely animate.
     });
   }, [exerciseVideo, isRepBased]);
 
-  const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown;
+  const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow;
   
   const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
   
