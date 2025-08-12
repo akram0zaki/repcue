@@ -2,6 +2,26 @@
 
 ## [Latest] - 2025-08-12
 
+### Added (Video Demos Phase 2 - Continued)
+- Rep loop pulse visual: video loop boundary now triggers a subtle pulse animation on the outer rep progress ring (T-2.2 initial implementation) for perceptual sync between motion and counter.
+- Video reset refinement: on timer stop/reset the demo video now seeks back to 0 and internal loop detection state resets, ensuring consistent first-frame start on next run (T-2.3 groundwork).
+
+### Internal
+- `useExerciseVideo`: added reset effect clearing `currentTime` and baseline when `isRunning` becomes false; safeguards loop wrap detection on subsequent starts.
+- `TimerPage`: introduced `repPulse` state incremented per loop via `onLoop` callback; current implementation is purely visual (does not mutate rep counters—authoritative logic remains in `App.tsx`).
+
+### Pending
+- T-2.2 Remaining: bind pulse timing validation tests (≤50ms drift target) & optional haptic/audio micro-cue (behind accessibility preference). 
+- T-2.3 Remaining: explicit pause-on-rest semantics for workout transitions and verification tests (pause during rest when video is for active movement only).
+
+### Quality
+- No new tests yet for this sub-phase (will be added with T-2.2 validation). Existing 565 tests expected to remain green (run after commit next phase).
+
+### Rationale
+- Incremental delivery keeps user-visible sync feedback lightweight and reversible while preserving strict separation between visual animation and authoritative rep advancement logic.
+
+## [Latest] - 2025-08-12
+
 ### Added (Video Demos Phase 2 - Partial)
 - TimerPage circular video integration: conditional `<video>` rendered inside progress ring with circular crop, subtle overlay for contrast, and viewport-responsive variant selection (recomputed on resize).
 - Playback gating tied to: global feature flag, user setting (`showExerciseVideos`), reduced motion preference, timer running state (suppressed during pre-countdown), and exercise `hasVideo` field.

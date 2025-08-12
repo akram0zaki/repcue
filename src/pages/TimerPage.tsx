@@ -50,6 +50,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   // ---------------- Video Demo Integration (Phase 2) ----------------
   const [mediaIndex, setMediaIndex] = useState<any | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
   const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && appSettings.showExerciseVideos && !prefersReducedMotion;
 
@@ -78,7 +79,11 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
   useEffect(() => {
     if (!exerciseVideo || !isRepBased) return;
-    exerciseVideo.onLoop(() => { /* placeholder for rep pulse sync */ });
+    exerciseVideo.onLoop(() => {
+      // Trigger a brief visual pulse to sync with video loop boundary
+      setRepPulse(p => p + 1);
+      // NOTE: Actual rep advancement is controlled in App timer logic; here we purely animate.
+    });
   }, [exerciseVideo, isRepBased]);
 
   const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown;
@@ -406,7 +411,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Timer Display */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-4">
           {/* Circular Progress */}
-          <div className="relative w-40 h-40 mx-auto mb-4">
+          <div className={`relative w-40 h-40 mx-auto mb-4 ${repPulse ? 'transition-transform' : ''}`}
+            aria-live="off"
+          >
             {showVideoInsideCircle && (
               <div className="absolute inset-0 rounded-full overflow-hidden z-0">
                 <video
@@ -446,7 +453,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 75}`}
                     strokeDashoffset={`${2 * Math.PI * 75 * (1 - repProgressInSet / 100)}`}
-                    className="text-green-500 transition-all duration-300"
+                    className={`text-green-500 transition-all duration-300 ${repPulse ? 'animate-pulse' : ''}`}
                     strokeLinecap="round"
                   />
                   

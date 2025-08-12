@@ -152,11 +152,11 @@ Status: 🚧 In Progress (started 2025-08-12) — T-2.1 COMPLETE; T-2.2 & T-2.3 
   ```
 - **Acceptance:** When `hasVideo` + media exists + flags on, the video appears inside the ring; otherwise ring-only.
 
-**T-2.2 Sync rep counter on loop boundary (rep-based only)** (NEXT)
+**T-2.2 Sync rep counter on loop boundary (rep-based only)** (IN PROGRESS) – Visual pulse wired via `onLoop`; still need automated drift test + optional haptic/audio micro-cue.
 - Hook callback increments the **visual rep pulse** in lockstep with the video loop.
 - **Acceptance:** rep counter pulse matches each video loop with ≤50ms drift across 2 minutes of repeats.
 
-**T-2.3 Start/stop policy** (PENDING REFINEMENT) – Basic gating implemented (play only when running, pause otherwise) but needs explicit reset handling & test coverage.
+**T-2.3 Start/stop policy** (IN PROGRESS) – Added video seek-to-start & loop baseline reset when timer stops; pending: rest-period pause rules + unit/integration tests.
 - Only call `.play()` when the timer transitions to **running**. Pause on **pause**, stop on **reset/complete**.  
 - **Acceptance:** Autoplay never starts before timer run; iOS works (muted + playsInline).
 

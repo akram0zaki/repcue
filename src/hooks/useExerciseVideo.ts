@@ -74,6 +74,17 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isP
     v.play().catch(err => console.warn('Video play rejected', err));
   }, [enabled, isRunning, isPaused, videoUrl, reducedMotion]);
 
+  // When timer stops or resets, ensure video seeks to start for consistent next start
+  useEffect(() => {
+    if (!isRunning) {
+      const v = videoRef.current;
+      if (v) {
+        try { v.currentTime = 0; } catch { /* noop */ }
+      }
+      lastTimeRef.current = 0; // Reset loop detection baseline
+    }
+  }, [isRunning]);
+
   // Ready / error state tracking
   useEffect(() => {
     const v = videoRef.current;
