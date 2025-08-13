@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Exercise } from '../types';
 import type { ExerciseMediaIndex, ExerciseMedia } from '../types/media';
 import { VIDEO_DEMOS_ENABLED } from '../config/features';
+import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 
 interface UseExerciseVideoOptions {
   exercise: Exercise | null | undefined;
@@ -121,8 +122,11 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     };
     const failed = () => {
       // Phase 3 T-3.1: graceful fallback on error (404/network)
-      // Mark error; UI layer suppresses rendering when error present.
       setError(new Error('video-load-failed'));
+      // Phase 4 telemetry: consent-aware bounded local log
+      if (exercise && videoUrl) {
+        recordVideoLoadError({ exerciseId: exercise.id, url: videoUrl, reason: 'element-error' });
+      }
     };
     v.addEventListener('loadeddata', loaded);
     v.addEventListener('error', failed);

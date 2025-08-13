@@ -265,7 +265,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </button>
           </div>
           {/* Exercise Demo Videos (Phase 0) */}
-          <div className="flex items-center justify-between mt-4">
+      <div className="flex items-center justify-between mt-4" data-testid="setting-show-exercise-videos">
             <label htmlFor="exercise-videos" className="text-gray-700 dark:text-gray-300 font-medium">
               Show Exercise Demo Videos
             </label>
@@ -275,6 +275,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                 appSettings.showExerciseVideos ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
               }`}
+        data-testid="toggle-exercise-videos"
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

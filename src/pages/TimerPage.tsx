@@ -250,7 +250,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const favoriteExercises = exercises.filter(ex => ex.isFavorite).slice(0, 6);
 
   return (
-    <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+  <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900" data-testid="timer-page">
       <div className="container mx-auto px-4 py-2 max-w-md">
         
         {/* Workout Mode Header */}
@@ -458,12 +458,12 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Timer Display */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-4">
           {/* Circular Progress */}
-          <div className={`relative w-40 h-40 mx-auto mb-4 ${repPulse ? 'transition-transform' : ''}`}
+      <div className={`relative w-40 h-40 mx-auto mb-4 ${repPulse ? 'transition-transform' : ''}`}
             aria-live="off"
           >
             {showVideoInsideCircle && (
               // Inset the video slightly so progress ring(s) wrap AROUND, not over, the media
-              <div className="absolute inset-2 sm:inset-3 rounded-full overflow-hidden z-0">
+        <div className="absolute inset-2 sm:inset-3 rounded-full overflow-hidden z-0" data-testid="exercise-video-wrapper">
                 <video
                   ref={exerciseVideo.videoRef}
                   src={videoUrl || undefined}
@@ -473,6 +473,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   preload="metadata"
                   className="h-full w-full object-cover"
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
+          data-testid="exercise-video"
                   onLoadedData={() => {
                     // Safety: ensure play attempt if hook's effect missed due to timing
                     if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
@@ -578,7 +579,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </svg>
             
             {/* Time Display */}
-            <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="absolute inset-0 flex items-center justify-center z-10" data-testid="timer-display">
               <div className="text-center">
                 {isCountdown ? (
                   <>
@@ -641,6 +642,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 onClick={onStartTimer}
                 disabled={!selectedExercise}
                 className="btn-primary px-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="start-timer"
               >
                 Start
               </button>
@@ -648,6 +650,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <button
                 onClick={() => onStopTimer()}
                 className="btn-secondary px-8"
+                data-testid="stop-timer"
               >
                 {isCountdown ? 'Cancel' : 'Stop'}
               </button>
@@ -656,6 +659,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             <button
               onClick={onResetTimer}
               className="btn-ghost px-6"
+              data-testid="reset-timer"
             >
               Reset
             </button>
@@ -723,7 +727,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         )}
 
         {/* Timer Info */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 text-xs">
+  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 text-xs" data-testid={(!timerState.isRunning && !timerState.isCountdown && timerState.currentTime === (timerState.targetTime || 0) && timerState.targetTime) ? 'timer-complete' : undefined}>
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <div className="text-gray-500 dark:text-gray-400">Beep Interval</div>

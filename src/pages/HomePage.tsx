@@ -195,6 +195,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               </button>
               <button 
                 className="btn-secondary w-full"
+                data-testid="browse-exercises"
                 onClick={() => navigate(Routes.EXERCISES)}
               >
                 Browse Exercises

@@ -35,33 +35,38 @@ const Navigation: React.FC = () => {
       path: Routes.HOME,
       label: 'Home',
       icon: HomeIcon,
+  testId: 'nav-home'
     },
     {
       path: Routes.WORKOUTS, // Changed from SCHEDULE
       label: 'Workouts', // Changed from 'Schedule'
       icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
+  testId: 'nav-workouts'
     },
     {
       path: Routes.EXERCISES,
       label: 'Exercises',
       icon: ExercisesIcon,
+  testId: 'nav-exercises'
     },
     {
       path: Routes.TIMER,
       label: 'Timer',
       icon: TimerIcon,
+  testId: 'nav-timer'
     },
     {
       path: Routes.ACTIVITY_LOG,
       label: 'Log',
       icon: LogIcon,
+  testId: 'nav-activity'
     },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
       <div className="flex justify-around items-center py-2 px-4 max-w-md mx-auto">
-        {mainNavItems.map((item) => {
+    {mainNavItems.map((item) => {
           const IconComponent = item.icon;
           return (
             <button
@@ -73,6 +78,7 @@ const Navigation: React.FC = () => {
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
               aria-label={`Navigate to ${item.label}`}
+      data-testid={item.testId}
             >
               <IconComponent className="mb-1" size={20} />
               <span className="text-xs font-medium">{item.label}</span>
@@ -92,6 +98,7 @@ const Navigation: React.FC = () => {
             aria-label="More options"
             aria-expanded={showMoreMenu}
             aria-haspopup="true"
+            data-testid="nav-more"
           >
             <MoreIcon size={20} />
           </button>
@@ -105,6 +112,7 @@ const Navigation: React.FC = () => {
                   setShowMoreMenu(false);
                 }}
                 className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                data-testid="nav-settings"
               >
                 Settings
               </button>

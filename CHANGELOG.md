@@ -1,5 +1,25 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [Latest] - 2025-08-13 (Video Demos Phase 5 E2E Enhancements)
+
+### Added
+- Cypress E2E coverage for exercise demo videos: render path, user setting toggle (off -> on), reduced motion suppression, and global feature flag disabled scenario.
+- Feature flag override mechanism: window.__VIDEO_DEMOS_DISABLED__ used in tests to assert fail-closed behavior without rebuilding.
+- New test ids: nav-more, onboarding-flow, browse-exercises to stabilize navigation & gating flows.
+
+### Changed
+- Refactored settings navigation in tests to use existing More menu instead of hidden test-only button (removed nav-settings-direct hook).
+- Feature flag module now supports runtime disable override (no impact in production paths unless explicitly set by tests).
+
+### Fixed
+- Flaky consent/onboarding gating by seeding consent prior to app load in E2E environment (deterministic initial state).
+- Video test now reliably targets Bicycle Crunches (only seeded exercise with hasVideo=true) preventing false negatives when first card lacks media.
+
+### Security / Privacy
+- Override path restricted to local test harness via window global; production users have no UI to set it (fail-safe default true maintained).
+
+---
+
 ## [Latest] - 2025-08-13
 
 ### Fixed
@@ -14,6 +34,11 @@
 
 ### Security
 - No external sources introduced; still same-origin fetch only (mitigates SSRF). Defensive parsing avoids leaking full HTML, truncates snippet.
+
+### Video Demos Phase 4 (Settings & Telemetry) – Completed 2025-08-13
+- Settings toggle (`Show Exercise Demo Videos`) + global `VIDEO_DEMOS_ENABLED` flag confirmed functional gating.
+- Added consent-aware local telemetry (`recordVideoLoadError`) capturing failed demo video loads (same-origin `/videos/` only, max 50 entries, analytics consent required) with zero network transmission; aids cleanup of stale media references.
+- Updated `useExerciseVideo` to log bounded telemetry on `error` events without impacting user experience or autoplay gating.
 
 ## [Latest] - 2025-08-12
 
