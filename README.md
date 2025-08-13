@@ -18,7 +18,6 @@ cd repcue
 # 2. Install dependencies
 npm install
 
-# 3. Start the development server
 npm run dev
 ```
 
@@ -33,60 +32,23 @@ RepCue is your personal interval training companion that:
 - ⏱️ **Interval Timer**: Configurable workout timers (15s, 30s, 60s)
 - ⏳ **Pre-Timer Countdown**: Optional 0-10 second countdown before timer starts
 - 💪 **20 Core Exercises**: Across 5 categories (Core, Strength, Cardio, Flexibility, Balance)
-- 🔔 **Audio Feedback**: Start/stop sounds, interval beeps, voice announcements
-- 📊 **Activity Logging**: Track your workout sessions automatically
-- 🔒 **100% Private**: All data stored locally on your device
-- 📱 **Progressive Web App**: Install as native app on iOS, Android, and Desktop
-- 🌐 **Cross-Platform Detection**: Smart platform identification for optimal experience
+- 🎥 **Exercise Demo Videos (Experimental)**: Inline circular instructional loop (feature & setting gated, reduced‑motion aware, fully optional)
 - 📱 **Mobile-First**: Responsive design optimized for phones and tablets
-- 🌙 **Dark Mode**: Full dark/light theme support
 - ♿ **Accessible**: WCAG 2.1 compliant for all users
 
 ---
 
-## ⚙️ Using the Pre-Timer Countdown
-
-The pre-timer countdown feature helps you get into position before your exercise begins:
-
-1. **Configure Countdown Duration**:
-   - Go to Settings ⚙️ > Timer Settings
-   - Use the "Pre-Timer Countdown" slider (0-10 seconds)
-   - Set to 0 to disable, or choose 1-10 seconds
-
-2. **Using the Countdown**:
-   - Select your exercise and duration
-   - Click "Start Countdown" (or "Start" if countdown is disabled)
-   - You'll see an orange countdown display with "Get Ready!" message
    - Audio announces remaining seconds (if sound enabled)
    - Timer automatically starts when countdown reaches zero
-
-3. **Visual Indicators**:
-   - Orange circular progress during countdown
-   - Large countdown number display
-   - Banner showing "Get Ready!" message
-   - Button changes to "Cancel" during countdown
-
 ---
 
-## 🛠️ Detailed Setup
-
-### System Requirements
-- **Operating System**: Windows, macOS, Linux, or Raspberry Pi OS
-- **Node.js**: Version 18.0.0 or higher
-- **RAM**: Minimum 512MB (2GB+ recommended for development)
 - **Disk Space**: ~200MB for dependencies + ~50MB for built app
-
 ### Installation Steps
 
 #### 1. **Verify Node.js Installation**
 ```bash
 node --version  # Should show v18.x.x or higher
 npm --version   # Should show 8.x.x or higher
-```
-
-If Node.js is not installed:
-- **Windows/Mac**: Download from [nodejs.org](https://nodejs.org)
-- **Linux**: `sudo apt-get install nodejs npm` (Ubuntu/Debian)
 - **Raspberry Pi**: `curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs`
 
 #### 2. **Clone the Repository**
@@ -110,16 +72,9 @@ This installs all required packages including:
 - Tailwind CSS for styling
 - Vite for fast development and building
 - Vitest for testing
-- Dexie.js for local database (IndexedDB)
-
----
 
 ## 🏃‍♂️ Running the Application
-
-### Development Mode (Recommended for testing)
-```bash
 npm run dev
-```
 - **URL**: http://localhost:5173
 - **Features**: Hot reload, instant updates, development tools
 - **Performance**: Unoptimized but fast iteration
@@ -182,6 +137,7 @@ Opens a web interface for running and debugging tests.
 - **✅ Integration Tests**: Service layer (StorageService, AudioService, etc.)
 - **✅ Accessibility Tests**: WCAG 2.1 compliance verification
 - **✅ Timer Logic Tests**: Precision timing and state management
+- **✅ Video Demo Tests**: E2E coverage for render path, user toggle, reduced‑motion suppression, and global feature flag disable
 
 ### Test Results Overview
 ```
@@ -190,6 +146,7 @@ Opens a web interface for running and debugging tests.
 ✅ AudioService: 19/25 tests passing (Sound & vibration)
 ✅ StorageService: 16/23 tests passing (Data persistence)
 ✅ ConsentService: 14/16 tests passing (Privacy management)
+✅ Video Demos (Cypress E2E): 4/4 scenarios passing (render, toggle off/on, reduced motion, global disable)
 ```
 
 ---

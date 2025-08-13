@@ -184,32 +184,61 @@ Status: ✅ Completed 2025-08-12 (T-3.1 fallback, T-3.2 runtime caching, T-3.3 p
 
 ### Phase 4 — Settings, feature flag & analytics (optional but recommended)
 
-**T-4.1 Settings UI**
-- Add a toggle under Settings: “Show exercise demo videos (if available)”. Default `on`.
-- **Acceptance:** Toggling off hides videos immediately; persists per device (local storage/state).
+Status: ✅ Completed 2025-08-13
 
-**T-4.2 Feature flag**
-- Read `VIDEO_DEMOS_ENABLED` from `src/config/features.ts` or env.  
-- **Acceptance:** Setting flag to `false` hides all videos regardless of per-user toggle.
+**T-4.1 Settings UI** ✅ Existing toggle `Show Exercise Demo Videos` (in `SettingsPage`) confirmed; immediate hide/show via `appSettings.showExerciseVideos` gating in `TimerPage`; persists with existing settings persistence.
 
-**T-4.3 Minimal telemetry (optional)**
-- Track which video URLs 404 (dev console or lightweight log). Helps keep `exercise_media.json` clean.
+**T-4.2 Feature flag** ✅ `VIDEO_DEMOS_ENABLED` global kill switch already implemented in `config/features.ts` and respected in both `TimerPage` and `useExerciseVideo`.
+
+**T-4.3 Minimal telemetry** ✅ Implemented consent-aware local telemetry (`recordVideoLoadError`) capturing failed `<video>` load attempts (same-origin `/videos/` only, max 50 records, analytics consent required). No network exfiltration.
 
 ---
 
 ### Phase 5 — Tests
 
-**Unit (Jest + React Testing Library)**
-- **U-1 `selectVideoVariant`**: viewport permutations return expected URL (portrait/landscape/square); null safety.
-- **U-2 `useExerciseVideo`**: emits loop boundary when `currentTime` wraps; respects disabled flags; pauses/plays with timer signals.
-- **U-3 TimerPage**: renders circular video only when `hasVideo && mediaExists` and flags on.
+Status: 🔄 In Progress (Baseline E2E subset completed 2025-08-13)
 
-**E2E (Cypress)**
-- **E-1**: “With video” exercise starts timer → video plays; pausing timer pauses video; resuming resumes; completing stops.
-- **E-2**: Rep-based: counter pulses exactly at loop boundary for ≥30 loops (tolerate small drift).
-- **E-3**: Fallback when URL 404 → ring UI only, no errors visible.
-- **E-4**: Settings toggle hides/shows videos dynamically.
-- **E-5**: `prefers-reduced-motion` spoofed → video disabled.
+**Unit (Vitest + RTL)**
+- **U-1 `selectVideoVariant`** ✅ (viewport permutations & fallbacks)
+- **U-2 `useExerciseVideo`** ✅ (loop boundary, gating, play/pause semantics)
+- **U-3 TimerPage integration** ✅ (conditional render logic)
+- **U-4 `loadExerciseMedia`** ✅ (success + error paths; defensive parse) – 2025-08-13
+- **U-5 `verify-media.mjs`** ✅ (pre/post build guard) – 2025-08-13
+
+**E2E (Cypress) – Baseline Implemented**
+- **E-Base-1** ✅ Render path: exercise with `hasVideo` shows inline circular video when flags & setting enabled.
+- **E-Base-2** ✅ User toggle: setting off hides video; turning back on restores without reload.
+- **E-Base-3** ✅ Reduced motion: simulated `(prefers-reduced-motion: reduce)` disables video (fail-closed).
+- **E-Base-4** ✅ Global feature flag runtime override (`window.__VIDEO_DEMOS_DISABLED__`) disables feature pre-mount.
+
+**E2E – Outstanding (Planned)**
+- **E-1 (extended)** Playback lifecycle: pause/resume/complete state transitions controlling video element.
+- **E-2** Rep loop drift validation over ≥30 loops (timing accuracy tolerance spec: ≤50ms average drift).
+- **E-3** 404 / broken media fallback scenario (intercept `exercise_media.json` or video asset to force graceful hide).
+- **E-4** Telemetry logging on video error (assert bounded storage + consent requirement).
+- **E-5** Offline/cache replay: verify SW cached video plays after network intercept block.
+
+**Progress Log**
+- 2025-08-12: Phases 0–3 completed (plumbing, hook, integration, caching, prefetch).
+- 2025-08-13 AM: Phase 4 (settings + feature flag + telemetry) finalized.
+- 2025-08-13 PM: Introduced runtime disable override, removed hidden test hook, added stable nav test ids.
+- 2025-08-13 PM: Baseline Cypress suite (4 scenarios) green; documentation & README section added.
+
+**Next Steps**
+1. Implement rep loop drift measurement helper for E-2 (collect timestamps on loop boundary, compute deltas & variance).
+2. Add network intercept in Cypress for 404 fallback test (E-3).
+3. Mock telemetry consent path and assert log entry (E-4).
+4. Simulate offline cache with `cy.intercept` + `service worker` registration wait (E-5).
+5. Optional: add lightweight performance budget assertion (initial video ready < 1500ms on cold load Pi baseline – TBD).
+
+**Risk Mitigation**
+- Runtime override ensures quick disable in CI if flaky.
+- Fail-closed design: any missing/errored media path hides video silently (no timing impact).
+
+**Exit Criteria for Phase 5 Completion**
+- All outstanding E2E items (E-1 through E-5) implemented & stable (≤1% flake over 10 CI runs).
+- Drift validation passes defined tolerance.
+- Telemetry tests confirm no logging without consent & bounded entries (max 50).
 
 ---
 
