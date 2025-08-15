@@ -10,15 +10,22 @@
 
 // Custom command to accept consent banner
 Cypress.Commands.add('acceptConsent', () => {
-  cy.get('[data-testid="consent-banner"]', { timeout: 5000 })
-    .should('be.visible')
-    .within(() => {
-      cy.get('button').contains('Accept All').click()
-    })
-  
-  // Wait for consent banner to disappear
-  cy.get('[data-testid="consent-banner"]', { timeout: 5000 }).should('not.exist')
-})
+  cy.get('body').then(($body) => {
+    const banner = $body.find('[data-testid="consent-banner"]');
+    if (!banner.length) {
+      return;
+    }
+    cy.wrap(banner).should('be.visible').within(() => {
+      cy.contains('button', /accept all/i).click();
+    });
+  });
+  // Ensure banner gone
+  cy.get('[data-testid="consent-banner"]', { timeout: 10000 }).should('not.exist');
+  // Wait for loading phase then navigation
+  cy.contains('Loading RepCue...', { timeout: 8000 }).should('exist');
+  cy.contains('Loading RepCue...', { timeout: 15000 }).should('not.exist');
+  cy.get('[data-testid="nav-exercises"]', { timeout: 15000 }).should('be.visible');
+});
 
 // Custom command to clear all app data
 Cypress.Commands.add('clearAppData', () => {
@@ -37,3 +44,5 @@ Cypress.Commands.add('clearAppData', () => {
     }
   })
 })
+
+// (Type declarations moved to cypress/support/index.d.ts)

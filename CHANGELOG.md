@@ -1,5 +1,172 @@
 # RepCue - Fitness Tracking App Changelog
 
+## [Latest] - 2025-08-13 (Video Demos Phase 5 E2E Enhancements)
+
+### Added
+- Cypress E2E coverage for exercise demo videos: render path, user setting toggle (off -> on), reduced motion suppression, and global feature flag disabled scenario.
+- Feature flag override mechanism: window.__VIDEO_DEMOS_DISABLED__ used in tests to assert fail-closed behavior without rebuilding.
+- New test ids: nav-more, onboarding-flow, browse-exercises to stabilize navigation & gating flows.
+
+### Changed
+- Refactored settings navigation in tests to use existing More menu instead of hidden test-only button (removed nav-settings-direct hook).
+- Feature flag module now supports runtime disable override (no impact in production paths unless explicitly set by tests).
+
+### Fixed
+- Flaky consent/onboarding gating by seeding consent prior to app load in E2E environment (deterministic initial state).
+- Video test now reliably targets Bicycle Crunches (only seeded exercise with hasVideo=true) preventing false negatives when first card lacks media.
+
+### Security / Privacy
+- Override path restricted to local test harness via window global; production users have no UI to set it (fail-safe default true maintained).
+
+---
+
+## [Latest] - 2025-08-13
+
+### Fixed
+- Production occasionally missing `exercise_media.json` (served HTML at /exercise_media.json → JSON parse error, blocking demo videos). Root cause: file absent during build on Pi; Vite only copies existing public/ assets.
+
+### Added
+- `scripts/verify-media.mjs` pre/post build guard: verifies presence, attempts recovery from legacy `src/data/` if needed, copies into `dist/` when missing, logs actionable diagnostics.
+- Enhanced `loadExerciseMedia()` diagnostics: logs HTTP status, content-type, and response snippet when parsing fails for faster root-cause analysis (e.g., 404 HTML fallback).
+
+### Reliability
+- Prevents silent production regressions; graceful UI degradation retained (videos optional) while surfacing clear console warnings.
+
+### Security
+- No external sources introduced; still same-origin fetch only (mitigates SSRF). Defensive parsing avoids leaking full HTML, truncates snippet.
+
+### Video Demos Phase 4 (Settings & Telemetry) – Completed 2025-08-13
+- Settings toggle (`Show Exercise Demo Videos`) + global `VIDEO_DEMOS_ENABLED` flag confirmed functional gating.
+- Added consent-aware local telemetry (`recordVideoLoadError`) capturing failed demo video loads (same-origin `/videos/` only, max 50 entries, analytics consent required) with zero network transmission; aids cleanup of stale media references.
+- Updated `useExerciseVideo` to log bounded telemetry on `error` events without impacting user experience or autoplay gating.
+
+## [Latest] - 2025-08-12
+
+### Completed (Video Demos Phase 3)
+- T-3.1 Graceful fallback: `useExerciseVideo` sets an error flag on load failure; `TimerPage` hides the video element when `error` is present (no layout shift, ring-only experience maintained).
+- T-3.2 Runtime caching: Workbox `runtimeCaching` rule for `/videos/*.(mp4|webm|mov)` using `StaleWhileRevalidate` (cache `exercise-videos-cache`, 60 entries / 30 days) for faster warm playback & offline resilience.
+- T-3.3 Prefetch optimization: During pre-countdown or workout rest the app injects `<link rel="prefetch" as="video">` for the next (or imminent) exercise’s best-fit variant, cutting initial playback delay.
+
+### Added
+- Integration test (`TimerPage.videoPrefetch.test.tsx`): asserts prefetch link appears in countdown & simulated rest scenarios.
+- Fallback unit test retained (skipped placeholder) plus updated hook tests; total tests now 569 passed / 1 skipped (570).
+
+### Internal
+- `TimerPage` prefetch effect with idempotent cleanup (`data-ex-video` attribute) avoids duplicate hints and removes tag on dependency change/unmount.
+- Show-logic updated to include `!exerciseVideo.error` guard (prevents flashing failed element).
+
+### Quality
+- Full suite: 53 files, 569 passing, 1 skipped (post-prefetch) – no timer/workout regressions.
+- Security: Prefetch limited to same-origin `/videos/` URLs (no user-controlled input → mitigates SSRF / cache poisoning). Runtime caching likewise scoped.
+- Performance: Anticipatory fetch + SW cache synergy should reduce perceived start latency for successive exercises, especially on Pi / mobile networks.
+
+### Rationale
+- Phase 3 closes the resilience + performance layer: errors are silent, media is cached, and upcoming assets are opportunistically fetched to keep workouts fluid.
+
+### Next (Phase 5 preview)
+- Add offline video playback E2E scenario & long-loop drift validation.
+- Optionally tighten act() warnings in several TimerPage tests (non-functional noise).
+
+## [Latest] - 2025-08-12
+
+### Completed (Video Demos Phase 2)
+- T-2.1 Circular in-ring video rendering (previous commit).
+- T-2.2 Rep loop synchronization: loop boundary now emits a pulse animation on outer rep ring via `onLoop`; gating prevents playback during rest/countdown ensuring visual motion only during active movement.
+- T-2.3 Start/stop policy refinements: video playback gated by new `isActiveMovement` (running & not resting & not countdown); automatic seek-to-start + loop detector baseline reset on stop/reset for consistent restarts.
+
+### Added
+- Hook option `isActiveMovement` separating raw `isRunning` from movement state for precise gating.
+- Unit tests: extended `useExerciseVideo.test.tsx` to cover (1) variant selection (API updated), (2) inactivity gating when `isActiveMovement=false`, (3) reset behavior ensures `currentTime` resets.
+
+### Internal
+- Refactored `TimerPage` ordering to compute rest state early and avoid forward references; consolidated visibility logic into `showVideoInsideCircle` excluding rest periods.
+- Ensured no side effects on authoritative rep advancement (pulse purely presentational).
+
+### Quality
+- Test suite count: 567 tests passing (added 2 new tests net). No regressions in timer, workout, or storage flows.
+- Accessibility: Motion suppressed during rest and countdown; respects reduced motion preference (feature fully disabled in that case).
+
+### Rationale
+- Phase 2 closes with stable, feature-gated visual enhancement providing immediate instructional context without altering timing semantics, setting a clean foundation for Phase 3 caching & fallbacks.
+
+## [Latest] - 2025-08-12
+
+### Added (Video Demos Phase 2 - Partial)
+- TimerPage circular video integration: conditional `<video>` rendered inside progress ring with circular crop, subtle overlay for contrast, and viewport-responsive variant selection (recomputed on resize).
+- Playback gating tied to: global feature flag, user setting (`showExerciseVideos`), reduced motion preference, timer running state (suppressed during pre-countdown), and exercise `hasVideo` field.
+
+### Internal
+- Utilized existing `useExerciseVideo` hook for metadata resolution & loop detection; added resize listener to update variant without reloading page.
+- Graceful fallback: if media JSON fetch fails in test/Node environment, logs warning and proceeds with ring-only UI (all tests still green).
+- Placeholder loop boundary handler registered (rep sync visual pulse will be implemented in T-2.2).
+
+### Quality
+- Full suite still passes: 565/565 tests (no new tests added this sub-phase; UI change is non-breaking and feature gated).
+- Accessibility: respects `prefers-reduced-motion`; video muted + `playsInline` to avoid autoplay policy issues.
+
+### Rationale
+- Delivers visual enhancement safely behind toggles before wiring rep counter synchronization (next sub-task), enabling early UX review without altering core timer mechanics.
+
+## [Latest] - 2025-08-12
+
+### Added (Video Demos Phase 1)
+- Video variant selector utility `selectVideoVariant` choosing optimal asset (portrait / landscape / square) based on viewport aspect ratio with graceful fallback order.
+- `useExerciseVideo` hook (Phase 1 contract) providing:
+  - Metadata resolution & variant selection (square->portrait->landscape fallback) from `ExerciseMediaIndex`.
+  - Loop boundary detection via `timeupdate` wrap-around (handlers registered through `onLoop`).
+  - Playback gating using global feature flag, user setting, reduced-motion preference, and timer run/pause signals.
+  - Reduced-motion auto-disable (WCAG friendly) – no video playback when `(prefers-reduced-motion: reduce)`.
+  - Ready/error state signaling without throwing (graceful degradation).
+- Initial unit tests:
+  - `selectVideoVariant-unit.test.ts` (aspect selection + fallbacks)
+  - `useExerciseVideo.test.tsx` (metadata absence/presence, variant resolution)
+
+### Internal
+- Hook designed intentionally UI-agnostic; no TimerPage modifications yet, ensuring zero user-facing change pending Phase 2 integration.
+- Defensive error handling: playback `play()` promise rejection logged (autoplay policy) instead of propagating; prevents uncaught errors during timer operations.
+- Security: only static JSON-derived paths used; no dynamic code evaluation; honors user motion preferences (privacy/respect for accessibility settings).
+
+### Quality
+- Test suite increased from 559 to 565 passing tests (+6) confirming non-regressive addition.
+- No existing snapshots or timer behavior altered; all rep/time logic untouched.
+
+### Rationale
+- Establishes stable abstraction boundary so upcoming Phase 2 (TimerPage circular video integration) can focus purely on UI/visual layering & rep sync without reworking media plumbing.
+
+## [Latest] - 2025-08-12
+
+### Added (Video Demos Phase 0)
+- Video demo groundwork behind feature flag: introduced `VIDEO_DEMOS_ENABLED` (default `true`) plus per-user setting `showExerciseVideos` (default `true`) with accessible toggle in Settings ("Show Exercise Demo Videos").
+- Media metadata domain types: `ExerciseMedia` & `ExerciseMediaIndex` for strongly‑typed mapping of exercise IDs to available video variants (square / portrait / landscape) including `repsPerLoop` & `fps`.
+- Media loader utility `loadExerciseMedia()` providing single in‑memory cached fetch of `exercise_media.json` with defensive filtering and cache clear helper.
+
+### Internal
+- Extended `AppSettings` & `DEFAULT_APP_SETTINGS` with `showExerciseVideos` preference (graceful default preserves existing users). No persistence schema migration required.
+- Added feature flag module `src/config/features.ts` keeping video capability trivially disableable at build/runtime.
+- Added `src/utils/loadExerciseMedia.ts` (no-store fetch to avoid stale metadata; narrows list to valid objects; returns map keyed by exercise id) prepared for later variant selection logic.
+- Updated `SettingsPage` UI to surface toggle while feature still inert (no Timer UI integration yet) ensuring early user control & respecting future reduced-motion fallbacks.
+
+### Quality
+- All 559 tests still passing post Phase 0 (no behavioral change to timer, workouts, or persistence). Zero regression risk accepted before proceeding to Phase 1.
+- Security: No remote / third-party URLs embedded; loader fetches only local `exercise_media.json` (mitigates SSRF / injection vectors). No autoplay started yet—video elements not rendered until future phases.
+
+### Rationale
+- Ships the minimal, reversible slice required for safe incremental rollout of exercise demo videos without touching critical timer logic—establishing contract types & user opt-out path before UI integration.
+
+## [Latest] - 2025-08-12
+
+### Added
+- Per-exercise repetition duration via optional `repDurationSeconds` field on `Exercise`. Timer now uses `(exercise.repDurationSeconds || BASE_REP_TIME) * repSpeedFactor` for all rep-based timing paths (standalone & workout), preserving identical semantics while enabling finer control for faster/slower movements (e.g., burpees at 3s, others at 2s).
+- `hasVideo` flag (default `false`) added to every exercise to prepare for future instructional media integration without schema migration overhead.
+
+### Internal
+- Refactored `App.tsx` to remove hardcoded rep duration calculations that previously used only `BASE_REP_TIME`; unified logic so every rep-based interval derives from the exercise definition, ensuring workout transitions, rest periods, and activity logging all remain consistent.
+- Updated TypeScript `Exercise` interface and seed catalog; existing stored favorites remain intact because merge logic preserves user-specific metadata while adopting new fields.
+
+### Quality
+- Full test suite (559 tests) still passing post-refactor; no behavioral regressions detected in rep/set advancement, workout transitions, or logging.
+- Backward compatible: exercises lacking `repDurationSeconds` automatically fall back, requiring no data migration.
+
 ## [Latest] - 2025-08-11
 
 ### Chore

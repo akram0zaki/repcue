@@ -47,6 +47,18 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
             }
+          },
+          // Phase 3 T-3.2: runtime caching for exercise demo videos
+          {
+            urlPattern: /^\/videos\/.*\.(mp4|webm|mov)$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'exercise-videos-cache',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
           }
         ]
       },

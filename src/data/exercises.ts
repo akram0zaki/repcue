@@ -11,6 +11,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Beginner-friendly: 30 seconds (research shows 20-60s range)
     isFavorite: false,
+  hasVideo: false,
     tags: ['isometric', 'core', 'stability']
   },
   {
@@ -21,6 +22,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 20, // Harder than regular plank, shorter duration
     isFavorite: false,
+  hasVideo: false,
     tags: ['isometric', 'core', 'obliques']
   },
   {
@@ -31,6 +33,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // High intensity cardio movement
     isFavorite: false,
+  hasVideo: false,
     tags: ['dynamic', 'core', 'cardio']
   },
   {
@@ -42,6 +45,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 15, // Standard rep range for ab exercises
     isFavorite: false,
+  hasVideo: true,
+  repDurationSeconds: 1.1, // Slightly slower controlled reps
     tags: ['dynamic', 'core', 'obliques']
   },
 
@@ -55,6 +60,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 8, // Beginner to intermediate range (research shows 8-15 for strength)
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['upper-body', 'chest', 'arms']
   },
   {
@@ -66,6 +73,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 12, // Classic strength training rep range
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['lower-body', 'glutes', 'legs']
   },
   {
@@ -77,6 +86,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 10, // Per leg, so 20 total alternating
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['lower-body', 'glutes', 'legs', 'balance']
   },
   {
@@ -87,6 +98,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Beginner-friendly isometric hold
     isFavorite: false,
+  hasVideo: false,
     tags: ['isometric', 'lower-body', 'quads']
   },
   {
@@ -98,6 +110,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 5, // Very demanding exercise, lower rep count
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 3, // Slightly longer due to complexity
     tags: ['full-body', 'cardio', 'explosive']
   },
 
@@ -110,6 +124,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Standard cardio interval
     isFavorite: false,
+  hasVideo: false,
     tags: ['cardio', 'full-body', 'coordination']
   },
   {
@@ -120,6 +135,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // High intensity, shorter duration
     isFavorite: false,
+  hasVideo: false,
     tags: ['cardio', 'lower-body', 'explosive']
   },
   {
@@ -130,6 +146,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Consistent with other high-intensity cardio
     isFavorite: false,
+  hasVideo: false,
     tags: ['cardio', 'lower-body', 'hamstrings']
   },
 
@@ -142,6 +159,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Standard yoga pose hold
     isFavorite: false,
+  hasVideo: false,
     tags: ['yoga', 'stretch', 'shoulders', 'hamstrings']
   },
   {
@@ -152,6 +170,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 45, // Relaxation pose, longer hold
     isFavorite: false,
+  hasVideo: false,
     tags: ['yoga', 'stretch', 'relaxation', 'back']
   },
   {
@@ -163,6 +182,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 2,
     defaultReps: 8, // Gentle mobility movement
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['yoga', 'stretch', 'spine', 'mobility']
   },
 
@@ -175,6 +196,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Per leg
     isFavorite: false,
+  hasVideo: false,
     tags: ['balance', 'stability', 'proprioception']
   },
   {
@@ -185,6 +207,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Standard yoga balance pose
     isFavorite: false,
+  hasVideo: false,
     tags: ['yoga', 'balance', 'stability', 'focus']
   },
   {
@@ -195,6 +218,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 20, // More challenging, shorter hold
     isFavorite: false,
+  hasVideo: false,
     tags: ['yoga', 'balance', 'strength', 'core']
   },
 
@@ -208,6 +232,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 6, // Per side, 12 total alternating
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['core', 'stability', 'coordination']
   },
   {
@@ -219,6 +245,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 12, // Standard strength training range
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['glutes', 'lower-body', 'posterior-chain']
   },
 
@@ -231,6 +259,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Standard mobility/warmup duration
     isFavorite: false,
+  hasVideo: false,
     tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity']
   },
 
@@ -244,6 +273,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 8, // Challenging upper body exercise
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['upper-body', 'triceps', 'arms', 'bodyweight']
   },
   {
@@ -255,6 +286,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 15, // Higher reps for smaller muscle group
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['lower-body', 'calves', 'balance']
   },
 
@@ -268,6 +301,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 16, // 8 per side
     isFavorite: false,
+  hasVideo: false,
+  repDurationSeconds: 2,
     tags: ['core', 'obliques', 'rotation']
   },
   {
@@ -278,6 +313,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Full-body stability exercise
     isFavorite: false,
+  hasVideo: false,
     tags: ['core', 'full-body', 'stability', 'cardio']
   },
 
@@ -290,6 +326,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Standard stretch hold
     isFavorite: false,
+  hasVideo: false,
     tags: ['yoga', 'hamstrings', 'back', 'stretch']
   }
 ];

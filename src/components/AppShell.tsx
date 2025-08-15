@@ -109,7 +109,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   // Show onboarding flow if active
   if (onboarding.isFirstTime && onboarding.isOnboardingActive) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900" data-testid="onboarding-flow">
         <OnboardingFlow
           onComplete={onboarding.completeOnboarding}
           onSkip={onboarding.skipOnboarding}

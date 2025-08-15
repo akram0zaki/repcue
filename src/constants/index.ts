@@ -25,4 +25,5 @@ export const DEFAULT_APP_SETTINGS = {
   preTimerCountdown: 3, // Default 3 seconds countdown
   defaultRestTime: 60, // Default 60 seconds rest between exercises
   repSpeedFactor: 1.0, // Default 1x speed (5 seconds per rep)
+  showExerciseVideos: true, // default opt-in (feature gated)
 }; 

@@ -280,7 +280,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation">
+  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation" data-testid="exercise-card">
       {/* Category Header */}
       <div className={`${getCategoryColor(exercise.category)} h-2`}></div>
       
@@ -294,6 +294,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             onClick={() => onToggleFavorite(exercise.id)}
             className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
             title={exercise.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={`${exercise.isFavorite ? 'remove' : 'add'} ${exercise.name} toggle favorite`}
           >
             {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
           </button>
@@ -380,6 +381,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <button
             onClick={() => onStartTimer(exercise)}
             className="w-full sm:w-auto px-3 py-2.5 sm:py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px] sm:min-h-0"
+            data-testid="start-exercise-timer"
           >
             Start Timer
           </button>
