@@ -1,4 +1,63 @@
+## 2025-08-18
+
+### Added
+- Completed Phase 4 of i18n: localized remaining UI (CreateWorkout, ActivityLog, EditWorkout) using nested keys (common:common.*) with pluralization and ARIA labels.
+
+### Changed
+- Expanded `public/locales/en/common.json` with workouts and activity sections; mirrored keys in test seed.
+- Replaced literals in `src/pages/EditWorkoutPage.tsx` with i18n keys.
+
+### Testing
+- Full unit suite green after changes (57 files, 582 tests passed, 3 skipped).
+
 # RepCue - Fitness Tracking App Changelog
+
+## [Latest] - 2025-08-17 (Internationalization Phase 4 UI Instrumentation – Workouts & Exercises)
+
+### Added
+- English locale keys for Workouts (`common.workouts.*`) and Exercises (`common.exercises.*`) including pluralization and ARIA labels.
+- Test resource seeding in `src/test/setup.ts` for new keys to avoid HTTP backend fetch during unit tests.
+
+### Changed
+- Instrumented `WorkoutsPage.tsx` with i18n: titles, buttons, empty states, consent gate, tooltips, exercise count pluralization, delete confirmation, and scheduled days fallback.
+- Instrumented `ExercisePage.tsx` (main + ExerciseCard): header/subtitle, search and filters, category options, favorites toggle, results count, empty state, type badges, default values, tags controls, and start timer button.
+
+### Notes
+- Remaining Phase 4: Create/Edit Workout pages and Activity Log instrumentation.
+
+## [Latest] - 2025-08-17 (Internationalization Phase 3 RTL & Detection)
+
+### Changed
+- Language detection refined: prioritizes persisted choice (localStorage) → system language (navigator) → html tag.
+- Automatic application of HTML `lang` and `dir` attributes based on current language.
+- Added `body.rtl` toggle for Arabic to aid RTL-specific styling when needed.
+
+### Added
+- Unit tests verifying `lang/dir` updates and `rtl` class toggling with persistence.
+
+## [Latest] - 2025-08-17 (Internationalization Phase 2 Init)
+
+### Added
+- Internationalization (i18n) initialization wired without user-visible changes:
+  - i18next + react-i18next setup with LanguageDetector and HttpBackend (`src/i18n.ts`, imported in `src/main.tsx`).
+  - English base locale scaffolded at `public/locales/en/` with `common.json`, `a11y.json`, and `titles.json`.
+  - Minimal non-critical usage: accessibility strings in `AppShell` now use `t()`.
+  - Smoke test added to validate initialization.
+
+### Notes
+- No behavior change for users yet; groundwork for future locale additions.
+
+## [Latest] - 2025-08-17 (Internationalization Phase 1 Docs)
+
+### Added
+- Internationalization (i18n) Phase 1 design artifacts:
+  - `docs/i18n/string-inventory.md`
+  - `docs/i18n/key-styleguide.md`
+  - `docs/i18n/rtl.md`
+  - `docs/i18n/tech-choice.md`
+
+### Notes
+- No runtime code changes yet. These documents define the contract for Phase 2 wiring.
 
 ## [Latest] - 2025-08-13 (Video Demos Phase 5 E2E Enhancements)
 

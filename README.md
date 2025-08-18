@@ -37,15 +37,34 @@ RepCue is your personal interval training companion that:
 - ♿ **Accessible**: WCAG 2.1 compliant for all users
 
 ---
-
-   - Audio announces remaining seconds (if sound enabled)
-   - Timer automatically starts when countdown reaches zero
----
-
 - **Disk Space**: ~200MB for dependencies + ~50MB for built app
-### Installation Steps
 
 #### 1. **Verify Node.js Installation**
+
+---
+
+## 🌍 Internationalization (i18n)
+
+Phase 1 design artifacts are available:
+
+- docs/i18n/README.md
+- docs/i18n/string-inventory.md
+- docs/i18n/key-styleguide.md
+- docs/i18n/rtl.md
+- docs/i18n/tech-choice.md
+
+These documents define the conventions and scope for adding multi-language support.
+
+Phase 2 (initialization) is complete with no user-visible changes:
+- i18next + react-i18next are initialized in `src/i18n.ts` and loaded at app start via `src/main.tsx`.
+- Base English translations live in `public/locales/en/` (`common.json`, `a11y.json`, `titles.json`).
+- Minimal internal usage: accessibility labels in `AppShell` use `t()`; app text remains English by default.
+- Tests include an i18n smoke spec to ensure initialization is healthy.
+
+Phase 3 brings functional behavior for language attributes and RTL:
+- The app now applies `<html lang>` and `<html dir>` automatically based on the current language.
+- `body.rtl` class toggles for Arabic to enable optional RTL-specific helpers (prefer CSS logical properties).
+- Detection order: `localStorage` → `navigator` → `html` tag. Unsupported languages fall back to English.
 ```bash
 node --version  # Should show v18.x.x or higher
 npm --version   # Should show 8.x.x or higher

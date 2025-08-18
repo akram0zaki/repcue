@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Optional RTL helper: toggled via body.rtl from i18n init */
+/* Prefer CSS logical properties in components; this is a light global helper */
+:root {
+  /* Logical property safety defaults already provided by Tailwind */
+}
+
+body.rtl {
+  direction: rtl;
+}
+
 @layer base {
   html {
     @apply h-full;

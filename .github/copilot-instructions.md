@@ -1,5 +1,66 @@
 # RepCue - AI Coding Agent Instructions
 
+## AI Agent Quickstart (TL;DR)
+- Stack: React 19 + TypeScript + Vite + Tailwind; PWA with Express server for prod; Windows 11 + PowerShell for local dev; Raspberry Pi 5 + PM2 for deploy.
+- Prime directive: UX first and WCAG 2.1 AA. Respect reduced motion; never regress timer feel or clarity during workouts.
+- State model: Centralized in `src/App.tsx` (no Redux). Business logic lives in singleton services under `src/services/` (use `.getInstance()` pattern).
+- Data flow: `App.tsx` → Services → IndexedDB (Dexie). All persistence is consent-aware via `ConsentService`.
+- Timer semantics (critical):
+  - Rep-based uses completed counts: `currentRep` = completed reps, `currentSet` is 0-indexed. Display shows completed values.
+  - Preserve `workoutMode` during timer updates (never set to `undefined` mid-workout). Clear intervals before setting new ones.
+  - Constants in `src/constants/index.ts` drive durations; rep time = `exercise.repDurationSeconds || BASE_REP_TIME`.
+- Video demos (experimental):
+  - Gated by `src/config/features.ts` (`VIDEO_DEMOS_ENABLED`) + user setting (Settings → Show Exercise Demo Videos) + reduced motion.
+  - Test override: set `window.__VIDEO_DEMOS_DISABLED__ = true` before app mounts to force fail-closed behavior.
+  - Media loader: `src/utils/loadExerciseMedia.ts`; variant selection: `src/utils/selectVideoVariant.ts`; hook: `src/hooks/useExerciseVideo.ts`.
+  - UI integration in `src/pages/TimerPage.tsx` (circular in-ring video). E2E spec: `cypress/e2e/videoDemos.cy.ts`.
+- Testing:
+  - Unit/integration with Vitest (jsdom). Run `npm test -- --run` in PowerShell to avoid interactive mode.
+  - Mocks in `src/test/setup.ts` (AudioContext, vibrate, etc.).
+  - Cypress E2E config `cypress.config.mjs`; consent is typically seeded in tests to avoid onboarding flake.
+- Build & deploy:
+  - Dev: `npm run dev` (5173). Prod build: `npm run build` or `npm run build:prod` (Pi-optimized). Serve with Express/PM2 (`npm run pm2:start`).
+  - PWA/Workbox tweaks in `vite.config.ts` (runtime caching for `/videos/**`, navigateFallback, manifest).
+- Security & privacy:
+  - Same-origin only for media; no third-party calls. Services return booleans/null (avoid throws). Respect consent; provide erase paths.
+- Conventions:
+  - Types: `src/types/index.ts` (+ `src/types/media.ts`). Constants: `src/constants/index.ts`.
+  - Tests colocated under `src/**/__tests__` and `src/__tests__` for shared utilities.
+  - Navigation has `data-testid` hooks (e.g., `nav-more`, `nav-settings`) used by E2E tests—prefer real UI paths over hidden test hooks.
+- Common pitfalls to avoid:
+  - Off‑by‑one in reps/sets; premature set increment; not triggering rest after final rep; clearing `workoutMode` mid-run; forgetting to clear intervals; ignoring reduced motion.
+- Quick links: Timer logic in `src/pages/TimerPage.tsx` and `src/App.tsx`; feature flags in `src/config/features.ts`; media JSON in `public/exercise_media.json`.
+
+### How to add a new exercise (example)
+1) Add to `src/data/exercises.ts` with required fields from `Exercise` (see `src/types/index.ts`). For rep-based, prefer `repDurationSeconds` if it differs from `BASE_REP_TIME`.
+2) If a demo video exists, set `hasVideo: true` and ensure an entry in `public/exercise_media.json` with the same `id` and at least one variant URL.
+3) Tests: add/adjust a small unit test if logic depends on new fields; no schema migration needed (catalog is seed data).
+
+Minimal shape:
+```ts
+{
+  id: 'bicycle-crunches',
+  name: 'Bicycle Crunches',
+  description: 'Alternating elbow-to-knee core exercise',
+  category: ExerciseCategory.CORE,
+  exerciseType: ExerciseType.REPETITION_BASED,
+  defaultSets: 2,
+  defaultReps: 8,
+  repDurationSeconds: 2,
+  hasVideo: true,
+  isFavorite: false,
+  tags: ['core','abs']
+}
+```
+
+### How to add a new workout flow (example)
+1) Compose a `Workout` object (see `src/types/index.ts`) and persist via `StorageService` (consent-aware). Use `WorkoutExercise.customSets/customReps/customRestTime` to override exercise defaults.
+2) UI: list and manage workouts in `src/pages/WorkoutsPage.tsx` (create/edit flows under `CreateWorkoutPage.tsx` / `EditWorkoutPage.tsx`). Ensure ordering via `order` and compute `estimatedDuration`.
+3) Timer integration: launching a workout sets `timerState.workoutMode` with the exercises sequence. The timer must preserve `workoutMode` across updates. Rest handling is driven by `defaultRestTime` or per-exercise `customRestTime`.
+4) Tests: add an integration test ensuring workout exercises behave identically to standalone (rep advancement, rest triggers, completion logging).
+
+
+
 RepCue is a privacy-first fitness tracking PWA for interval training, optimized for mobile devices and self-hosting on Raspberry Pi. Built with React 19, TypeScript, Vite, and Tailwind CSS.
 
 **CORE OBJECTIVE: USER EXPERIENCE IS PARAMOUNT**

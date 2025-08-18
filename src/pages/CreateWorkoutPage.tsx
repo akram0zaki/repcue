@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
@@ -14,6 +15,7 @@ interface SelectedExercise extends Exercise {
 }
 
 const CreateWorkoutPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [hasConsent, setHasConsent] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ const CreateWorkoutPage: React.FC = () => {
           setAvailableExercises(exercises);
         } catch (error) {
           console.error('Failed to load exercises:', error);
-          setError('Failed to load exercises');
+          setError(t('common:common.workouts.loadExercisesError'));
         }
       }
       setLoading(false);
@@ -243,11 +245,11 @@ const CreateWorkoutPage: React.FC = () => {
         <div className="p-6 max-w-md mx-auto">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Create Workout
+              {t('common:common.workouts.createTitle')}
             </h1>
             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
               <p className="text-yellow-800 dark:text-yellow-200">
-                Please enable data storage in Settings to create workouts.
+                {t('common:common.workouts.dataRequiredBody')}
               </p>
             </div>
           </div>
@@ -262,12 +264,12 @@ const CreateWorkoutPage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Create Workout
+            {t('common:common.workouts.createTitle')}
           </h1>
           <button
             onClick={handleCancel}
             className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 p-2"
-            aria-label="Cancel"
+            aria-label={t('common:common.cancel')}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -287,7 +289,7 @@ const CreateWorkoutPage: React.FC = () => {
           {/* Workout Name */}
           <div>
             <label htmlFor="workoutName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Workout Name
+              {t('common:common.workouts.nameLabel')}
             </label>
             <input
               id="workoutName"
@@ -306,7 +308,7 @@ const CreateWorkoutPage: React.FC = () => {
                   ? 'border-red-300 dark:border-red-600'
                   : 'border-gray-300 dark:border-gray-600'
               } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-              placeholder="e.g., Morning Core Routine"
+              placeholder={t('common:common.workouts.namePlaceholder')}
               disabled={saving}
             />
             {validationErrors.workoutName && (
@@ -317,7 +319,7 @@ const CreateWorkoutPage: React.FC = () => {
           {/* Workout Description */}
           <div>
             <label htmlFor="workoutDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Description (Optional)
+              {t('common:common.workouts.descriptionLabel')}
             </label>
             <textarea
               id="workoutDescription"
@@ -325,7 +327,7 @@ const CreateWorkoutPage: React.FC = () => {
               onChange={(e) => setWorkoutDescription(e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Brief description of the workout..."
+              placeholder={t('common:common.workouts.descriptionPlaceholder')}
               disabled={saving}
             />
           </div>
@@ -333,7 +335,7 @@ const CreateWorkoutPage: React.FC = () => {
           {/* Workout Schedule */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Schedule (Optional)
+              {t('common:common.workouts.scheduleLabel')}
             </label>
             <div className="space-y-3">
               {/* Active Status */}
@@ -347,14 +349,14 @@ const CreateWorkoutPage: React.FC = () => {
                   disabled={saving}
                 />
                 <label htmlFor="isActive" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  Active workout (can be scheduled for training)
+                  {t('common:common.workouts.isActiveLabel')}
                 </label>
               </div>
               
               {/* Days of Week */}
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Scheduled Days
+                  {t('common:common.workouts.scheduledDaysLabel')}
                 </label>
                 <div className="grid grid-cols-7 gap-2">
                   {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as Weekday[]).map((day) => {
@@ -395,7 +397,7 @@ const CreateWorkoutPage: React.FC = () => {
                 </div>
                 {scheduledDays.length > 0 && (
                   <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    Scheduled for {scheduledDays.length} day{scheduledDays.length !== 1 ? 's' : ''} per week
+                    {t('common:common.workouts.scheduledPerWeek', { count: scheduledDays.length })}
                   </p>
                 )}
               </div>
@@ -406,10 +408,10 @@ const CreateWorkoutPage: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Exercises ({selectedExercises.length})
+                {t('common:common.workouts.exercisesLabel', { count: selectedExercises.length })}
               </label>
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                Est. {formatDuration(calculateEstimatedDuration())}
+                {t('common:common.workouts.estimatedAbbrev')} {formatDuration(calculateEstimatedDuration())}
               </span>
             </div>
             
@@ -419,13 +421,13 @@ const CreateWorkoutPage: React.FC = () => {
 
             {selectedExercises.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No exercises added yet</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t('common:common.workouts.noneSelectedTitle')}</p>
                 <button
                   onClick={() => setShowExercisePicker(true)}
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                   disabled={saving}
                 >
-                  Add First Exercise
+                  {t('common:common.workouts.addFirstExercise')}
                 </button>
               </div>
             ) : (
@@ -447,7 +449,7 @@ const CreateWorkoutPage: React.FC = () => {
                             onClick={() => moveExercise(index, index - 1)}
                             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                             disabled={saving}
-                            aria-label="Move up"
+                            aria-label={t('common:common.workouts.moveUpAria')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -459,7 +461,7 @@ const CreateWorkoutPage: React.FC = () => {
                             onClick={() => moveExercise(index, index + 1)}
                             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                             disabled={saving}
-                            aria-label="Move down"
+                            aria-label={t('common:common.workouts.moveDownAria')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -470,7 +472,7 @@ const CreateWorkoutPage: React.FC = () => {
                           onClick={() => removeExercise(index)}
                           className="p-1 text-red-400 hover:text-red-600"
                           disabled={saving}
-                          aria-label="Remove exercise"
+                          aria-label={t('common:common.workouts.removeExerciseAria')}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -484,7 +486,7 @@ const CreateWorkoutPage: React.FC = () => {
                       {exercise.exerciseType === 'time-based' ? (
                         <div>
                           <label htmlFor={`exercise_${index}_duration`} className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                            Duration (seconds)
+                            {t('common:common.workouts.durationSeconds')}
                           </label>
                           <input
                             id={`exercise_${index}_duration`}
@@ -501,7 +503,7 @@ const CreateWorkoutPage: React.FC = () => {
                           />
                           {validationErrors[`exercise_${index}_duration`] && (
                             <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                              {validationErrors[`exercise_${index}_duration`]}
+                              {t('common:common.workouts.errors.durationPositive')}
                             </p>
                           )}
                         </div>
@@ -509,7 +511,7 @@ const CreateWorkoutPage: React.FC = () => {
                         <>
                           <div>
                             <label htmlFor={`exercise_${index}_sets`} className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                              Sets
+                              {t('common:common.workouts.sets')}
                             </label>
                             <input
                               id={`exercise_${index}_sets`}
@@ -526,13 +528,13 @@ const CreateWorkoutPage: React.FC = () => {
                             />
                             {validationErrors[`exercise_${index}_sets`] && (
                               <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                {validationErrors[`exercise_${index}_sets`]}
+                                {t('common:common.workouts.errors.setsPositive')}
                               </p>
                             )}
                           </div>
                           <div>
                             <label htmlFor={`exercise_${index}_reps`} className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                              Reps
+                              {t('common:common.workouts.reps')}
                             </label>
                             <input
                               id={`exercise_${index}_reps`}
@@ -549,7 +551,7 @@ const CreateWorkoutPage: React.FC = () => {
                             />
                             {validationErrors[`exercise_${index}_reps`] && (
                               <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                {validationErrors[`exercise_${index}_reps`]}
+                                {t('common:common.workouts.errors.repsPositive')}
                               </p>
                             )}
                           </div>
@@ -558,7 +560,7 @@ const CreateWorkoutPage: React.FC = () => {
                       
                       <div className="col-span-2">
                         <label htmlFor={`exercise_${index}_rest`} className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                          Rest Time (seconds)
+                          {t('common:common.workouts.restSeconds')}
                         </label>
                         <input
                           id={`exercise_${index}_rest`}
@@ -575,7 +577,7 @@ const CreateWorkoutPage: React.FC = () => {
                         />
                         {validationErrors[`exercise_${index}_rest`] && (
                           <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                            {validationErrors[`exercise_${index}_rest`]}
+                            {t('common:common.workouts.errors.restNonNegative')}
                           </p>
                         )}
                       </div>
@@ -588,7 +590,7 @@ const CreateWorkoutPage: React.FC = () => {
                   className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   disabled={saving}
                 >
-                  + Add Another Exercise
+                  + {t('common:common.workouts.addAnotherExercise')}
                 </button>
               </div>
             )}
@@ -601,7 +603,7 @@ const CreateWorkoutPage: React.FC = () => {
               disabled={saving}
               className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t('common:common.cancel')}
             </button>
             <button
               onClick={handleSave}
@@ -614,10 +616,10 @@ const CreateWorkoutPage: React.FC = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Saving...
+                  {t('common:common.workouts.saving')}
                 </>
               ) : (
-                'Create Workout'
+                t('common:common.workouts.createWorkout')
               )}
             </button>
           </div>
@@ -630,7 +632,7 @@ const CreateWorkoutPage: React.FC = () => {
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Add Exercise
+                    {t('common:common.workouts.addExerciseTitle')}
                   </h3>
                   <button
                     onClick={() => setShowExercisePicker(false)}
@@ -666,7 +668,7 @@ const CreateWorkoutPage: React.FC = () => {
                 </div>
                 {availableExercises.filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id)).length === 0 && (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                    All exercises have been added to this workout.
+                    {t('common:common.workouts.allExercisesAdded')}
                   </p>
                 )}
               </div>

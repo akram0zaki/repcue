@@ -4,9 +4,11 @@ import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import type { Workout, Weekday } from '../types';
 import { Routes } from '../types';
+import { useTranslation } from 'react-i18next';
 
 const WorkoutsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasConsent, setHasConsent] = useState(false);
@@ -65,7 +67,7 @@ const WorkoutsPage: React.FC = () => {
 
   const formatScheduledDays = (scheduledDays: Weekday[]): string => {
     if (!scheduledDays || scheduledDays.length === 0) {
-      return 'Not scheduled';
+  return t('common:common.workouts.notScheduled');
     }
     
     const dayNames = {
@@ -78,7 +80,7 @@ const WorkoutsPage: React.FC = () => {
       sunday: 'Sun'
     };
     
-    return scheduledDays.map(day => dayNames[day as keyof typeof dayNames]).join(', ');
+  return scheduledDays.map(day => dayNames[day as keyof typeof dayNames]).join(', ');
   };
 
   const calculateDuration = (workout: Workout): string => {
@@ -110,7 +112,7 @@ const WorkoutsPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Workouts</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('common:common.workouts.title')}</h1>
             <div className="w-24 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           </div>
           <div className="space-y-4">
@@ -131,7 +133,7 @@ const WorkoutsPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">My Workouts</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('common:common.workouts.title')}</h1>
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
@@ -141,17 +143,17 @@ const WorkoutsPage: React.FC = () => {
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                  Data Storage Required
+                  {t('common:common.workouts.dataRequiredTitle')}
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                  <p>You need to enable data storage to create and manage workouts.</p>
+                  <p>{t('common:common.workouts.dataRequiredBody')}</p>
                 </div>
                 <div className="mt-4">
                   <button
                     onClick={() => navigate(Routes.SETTINGS)}
                     className="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                   >
-                    Go to Settings
+                    {t('common:common.goToSettings')}
                   </button>
                 </div>
               </div>
@@ -167,13 +169,13 @@ const WorkoutsPage: React.FC = () => {
       <div className="p-6 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            My Workouts
+            {t('common:common.workouts.title')}
           </h1>
           <button
             onClick={handleCreateWorkout}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
-            Create Workout
+            {t('common:common.workouts.createWorkout')}
           </button>
         </div>
 
@@ -185,16 +187,16 @@ const WorkoutsPage: React.FC = () => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No workouts yet
+              {t('common:common.workouts.emptyTitle')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              Create your first workout to get started with your fitness routine.
+              {t('common:common.workouts.emptyBody')}
             </p>
             <button
               onClick={handleCreateWorkout}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
-              Create Your First Workout
+              {t('common:common.workouts.createFirstWorkout')}
             </button>
           </div>
         ) : (
@@ -212,7 +214,7 @@ const WorkoutsPage: React.FC = () => {
                       </h3>
                       {!workout.isActive && (
                         <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
-                          Paused
+                          {t('common:common.workouts.paused')}
                         </span>
                       )}
                     </div>
@@ -229,17 +231,17 @@ const WorkoutsPage: React.FC = () => {
                       onClick={() => handleStartWorkout(workout)}
                       disabled={!workout.isActive}
                       className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
-                      title={workout.isActive ? "Start workout" : "Workout is paused"}
+                      title={workout.isActive ? t('common:common.workouts.startWorkout') : t('common:common.workouts.workoutPaused')}
                     >
                       <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" />
                       </svg>
-                      Start
+                      {t('common:common.start')}
                     </button>
                     <button
                       onClick={() => handleEditWorkout(workout.id)}
                       className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
-                      title="Edit workout"
+                      title={t('common:common.workouts.editWorkout')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -248,7 +250,7 @@ const WorkoutsPage: React.FC = () => {
                     <button
                       onClick={() => setDeleteConfirm(workout.id)}
                       className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                      title="Delete workout"
+                      title={t('common:common.workouts.deleteWorkout')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -263,7 +265,7 @@ const WorkoutsPage: React.FC = () => {
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                       </svg>
-                      {workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}
+                      {t('common:common.workouts.exerciseCount', { count: workout.exercises.length })}
                     </span>
                     <span className="flex items-center">
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,20 +283,20 @@ const WorkoutsPage: React.FC = () => {
                 {deleteConfirm === workout.id && (
                   <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
                     <p className="text-sm text-red-800 dark:text-red-300 mb-3">
-                      Are you sure you want to delete "{workout.name}"? This action cannot be undone.
+                      {t('common:common.workouts.deleteConfirm', { name: workout.name })}
                     </p>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleDeleteWorkout(workout.id)}
                         className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
                       >
-                        Delete
+                        {t('common:common.workouts.delete')}
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(null)}
                         className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm font-medium rounded transition-colors"
                       >
-                        Cancel
+                        {t('common:common.cancel')}
                       </button>
                     </div>
                   </div>

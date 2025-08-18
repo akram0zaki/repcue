@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Exercise, AppSettings, Workout } from '../types';
 import { Routes, Weekday } from '../types';
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
@@ -15,6 +16,7 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation(['common']);
   const [upcomingWorkout, setUpcomingWorkout] = useState<{
     workout: Workout;
     weekday: string;
@@ -62,14 +64,14 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             
             if (targetWorkout) {
               const weekdayNames = {
-                [Weekday.MONDAY]: 'Monday',
-                [Weekday.TUESDAY]: 'Tuesday',
-                [Weekday.WEDNESDAY]: 'Wednesday',
-                [Weekday.THURSDAY]: 'Thursday',
-                [Weekday.FRIDAY]: 'Friday',
-                [Weekday.SATURDAY]: 'Saturday',
-                [Weekday.SUNDAY]: 'Sunday'
-              };
+                [Weekday.MONDAY]: t('common:common.weekday.monday'),
+                [Weekday.TUESDAY]: t('common:common.weekday.tuesday'),
+                [Weekday.WEDNESDAY]: t('common:common.weekday.wednesday'),
+                [Weekday.THURSDAY]: t('common:common.weekday.thursday'),
+                [Weekday.FRIDAY]: t('common:common.weekday.friday'),
+                [Weekday.SATURDAY]: t('common:common.weekday.saturday'),
+                [Weekday.SUNDAY]: t('common:common.weekday.sunday')
+              } as const;
               
               // Calculate the date for the workout
               const workoutDate = new Date();
@@ -79,7 +81,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               setUpcomingWorkout({
                 workout: targetWorkout,
                 weekday: weekdayNames[targetWeekday],
-                date: workoutDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                date: workoutDate.toLocaleDateString(i18n.resolvedLanguage || 'en', { month: 'short', day: 'numeric' })
               });
             }
           }
@@ -90,7 +92,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
     };
 
     checkConsentAndLoadUpcoming();
-  }, []);
+  }, [t, i18n.resolvedLanguage]);
 
   const handleStartTimer = (exercise?: Exercise) => {
     if (exercise) {
@@ -124,7 +126,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Upcoming Workout
+                      {t('common:common.home.upcomingWorkout')}
                     </h2>
                     <div className="flex items-center space-x-4">
                       <div>
@@ -160,23 +162,23 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                   >
-                    Start Now
+                    {t('common:common.home.startNow')}
                   </button>
                 </div>
               </div>
             ) : (
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 text-center">
                 <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  No Schedule Set
+                  {t('common:common.home.noScheduleTitle')}
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                  Create a workout schedule to see your upcoming workouts here
+                  {t('common:common.home.noScheduleBody')}
                 </p>
                 <button
                   onClick={() => navigate(Routes.WORKOUTS)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  Add Workout
+                  {t('common:common.home.addWorkout')}
                 </button>
               </div>
             )}
@@ -191,14 +193,14 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 className="btn-primary w-full"
                 onClick={() => handleStartTimer()}
               >
-                Start Timer
+                {t('common:common.home.startTimer')}
               </button>
               <button 
                 className="btn-secondary w-full"
                 data-testid="browse-exercises"
                 onClick={() => navigate(Routes.EXERCISES)}
               >
-                Browse Exercises
+                {t('common:common.home.browseExercises')}
               </button>
             </div>
           </section>
@@ -206,7 +208,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
           {/* Favorites Section */}
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-              Favorite Exercises
+              {t('common:common.home.favoriteExercises')}
             </h2>
             {exercises.filter(ex => ex.isFavorite).length > 0 ? (
               <div className="space-y-2">
@@ -228,7 +230,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                           <button
                             onClick={() => onToggleFavorite(exercise.id)}
                             className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
-                            aria-label={`Remove ${exercise.name} from favorites`}
+                            aria-label={t('common:common.home.removeFromFavoritesAria', { name: exercise.name })}
                           >
                             <StarFilledIcon size={16} />
                           </button>
@@ -236,7 +238,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                             className="btn-primary px-3 py-1 text-sm"
                             onClick={() => handleStartTimer(exercise)}
                           >
-                            Start
+                            {t('common:common.start')}
                           </button>
                         </div>
                       </div>
@@ -245,7 +247,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               </div>
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-3 text-sm">
-                No favorite exercises yet. Mark some exercises as favorites to see them here!
+                {t('common:common.home.noFavorites')}
               </p>
             )}
           </section>
@@ -258,7 +260,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                   {exercises.length}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Available Exercises
+                  {t('common:common.home.availableExercises')}
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { usePlatform } from '../utils/platformDetection';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
@@ -57,6 +58,7 @@ const PAGE_CONFIGS: Record<string, PageConfig> = {
  * - Skeleton loading states
  */
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+  const { t } = useTranslation(['a11y', 'titles']);
   const location = useLocation();
   const platform = usePlatform();
   const installPrompt = useInstallPrompt();
@@ -82,7 +84,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
     
     // Default configuration
     return {
-      title: 'RepCue',
+      title: t('titles.app', { ns: 'titles', defaultValue: 'RepCue' }),
       className: 'pb-20',
     };
   };
@@ -125,7 +127,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         href="#main-content" 
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-blue-600 text-white px-4 py-2 rounded-md font-medium"
       >
-        Skip to main content
+        {t('a11y.skipToMain', { defaultValue: 'Skip to main content' })}
       </a>
 
       {/* Network status banner */}
@@ -143,7 +145,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         id="main-content"
         className={getMainStyles()}
         role="main"
-        aria-label="Main content"
+  aria-label={t('a11y.mainRegion', { defaultValue: 'Main content' })}
       >
         {/* Page content */}
         {children}
