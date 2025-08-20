@@ -26,6 +26,9 @@
     "test:e2e": "start-server-and-test dev http://localhost:5173 cypress:run",
     "test:a11y": "start-server-and-test dev http://localhost:5173 'cypress run --spec cypress/e2e/axe.cy.ts'",
     "test:all": "npm run test:unit && npm run test:e2e",
+  "i18n:scan": "node scripts/i18n-scan.mjs",
+  "i18n:report": "node scripts/i18n-scan.mjs || exit 0",
+  "precommit": "lint-staged",
     "generate-favicons": "node scripts/generate-favicons.js",
     "generate-favicons:full": "node scripts/generate-favicons.js --full",
     "generate-splash": "node scripts/generate-splash.mjs"
@@ -72,6 +75,17 @@
     "vite": "^7.0.0",
     "vite-plugin-pwa": "^1.0.1",
     "vitest": "^3.2.4",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
     "workbox-window": "^7.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,css,scss}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.{ts,tsx}": [
+      "node scripts/i18n-scan.mjs"
+    ]
   }
 }

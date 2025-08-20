@@ -45,4 +45,18 @@ export default tseslint.config([
       'no-loss-of-precision': 'off',
     },
   },
+  // Soft i18n guard: warn on bare string literals in JSX in app code
+  {
+    files: ['src/**/*.{tsx,jsx}'],
+    ignores: ['src/__tests__/**'],
+    rules: {
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector: "JSXElement > JSXExpressionContainer Literal[value=/[A-Za-z]/]",
+          message: 'Avoid hardcoded strings in JSX; use i18n t() keys instead (add // i18n-exempt with rationale if needed).'
+        }
+      ]
+    }
+  }
 ])

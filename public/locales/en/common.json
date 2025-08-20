@@ -32,7 +32,8 @@
   "settings": {
     "audioSettings": "Audio Settings",
     "enableSound": "Enable Sound",
-    "beepVolume": "Beep Volume",
+  "beepVolume": "Beep Volume",
+  "beepIntervalHelp": "Play a short beep every N seconds during time-based exercises.",
     "enableVibration": "Enable Vibration",
     "timerSettings": "⏱️ Timer Settings",
     "preTimerCountdown": "Pre-Timer Countdown",
@@ -237,6 +238,9 @@
     "showFewerTags": "Show fewer tags",
     "showMoreTags_one": "Show {{count}} more tag",
     "showMoreTags_other": "Show {{count}} more tags",
-    "showLess": "Show less"
+  "showLess": "Show less",
+  "preview": "Preview",
+  "previewVideo": "Preview video",
+  "previewUnavailable": "Preview unavailable for this exercise."
   }
 }
