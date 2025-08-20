@@ -222,10 +222,10 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {t('common:common.activity.title')}
+            {t('activity.title')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {t('common:common.activity.subtitle')}
+            {t('activity.subtitle')}
           </p>
         </div>
 
@@ -234,12 +234,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-start mb-3">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t('common:common.activity.yourProgress')}
+                {t('activity.yourProgress')}
               </h2>
               <button
                 onClick={() => setShowStatsCard(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                aria-label={t('common:common.activity.closeStatsAria')}
+                aria-label={t('activity.closeStatsAria')}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -252,35 +252,35 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {stats.totalWorkouts}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('common:common.activity.totalWorkouts')}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.totalWorkouts')}</div>
               </div>
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {formatDuration(stats.totalDuration)}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('common:common.activity.totalTime')}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.totalTime')}</div>
               </div>
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                   {stats.currentStreak}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('common:common.activity.dayStreak')}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.dayStreak')}</div>
               </div>
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {stats.thisWeekWorkouts}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('common:common.activity.thisWeek')}</div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.thisWeek')}</div>
               </div>
             </div>
             
             {stats.favoriteExercise !== 'None yet' && (
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="text-center">
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">{t('common:common.activity.favoriteExercise')}</div>
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">{t('activity.favoriteExercise')}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     {stats.favoriteExercise}
                   </div>
@@ -301,7 +301,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
               }`}
             >
-              {t('common:common.activity.all')}
+              {t('activity.all')}
             </button>
             {Object.values(ExerciseCategory).map(category => (
               <button
@@ -328,10 +328,10 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              {selectedFilter === 'all' ? t('common:common.activity.noWorkoutsYet') : t('common:common.activity.noCategoryWorkoutsYet', { category: selectedFilter.replace('-', ' ') })}
+              {selectedFilter === 'all' ? t('activity.noWorkoutsYet') : t('activity.noCategoryWorkoutsYet', { category: selectedFilter.replace('-', ' ') })}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {t('common:common.activity.emptySubtitle')}
+              {t('activity.emptySubtitle')}
             </p>
           </div>
         ) : (
@@ -397,20 +397,20 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                       </svg>
-                                      {t('common:common.activity.exerciseCount', { count: log.exercises?.length || 0 })}
+                                      {t('activity.exerciseCount', { count: log.exercises?.length || 0 })}
                                     </div>
                                   </div>
                                 </div>
                                 
                                 <div className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
-                                    {t('common:common.activity.workoutBadge')}
+                                    {t('activity.workoutBadge')}
                                 </div>
                               </div>
                               
                               {/* Expandable exercise list */}
                               {expandedWorkouts.has(log.id) && log.exercises && (
                                 <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
-                                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('common:common.activity.exercisesHeading')}</h5>
+                                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('activity.exercisesHeading')}</h5>
                                   <div className="space-y-2">
                                     {log.exercises.map((exercise, index) => (
                                       <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3">

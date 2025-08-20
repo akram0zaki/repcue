@@ -128,8 +128,9 @@ npm run preview
 | `npm test` | Run all tests | Development/CI |
 | `npm run test:ui` | Visual test runner | Debugging tests |
 | `npm run test:coverage` | Test coverage report | Quality assurance |
+| `npm run test:unit` | Unit/integration (fast, parallel) | Fast testing |
+| `npm run test:stable` | Stable mode (single-threaded, Windows-friendly) | Stable testing |
 
----
 
 ## 🧪 Testing
 

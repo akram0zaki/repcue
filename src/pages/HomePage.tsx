@@ -64,13 +64,13 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             
             if (targetWorkout) {
               const weekdayNames = {
-                [Weekday.MONDAY]: t('common:common.weekday.monday'),
-                [Weekday.TUESDAY]: t('common:common.weekday.tuesday'),
-                [Weekday.WEDNESDAY]: t('common:common.weekday.wednesday'),
-                [Weekday.THURSDAY]: t('common:common.weekday.thursday'),
-                [Weekday.FRIDAY]: t('common:common.weekday.friday'),
-                [Weekday.SATURDAY]: t('common:common.weekday.saturday'),
-                [Weekday.SUNDAY]: t('common:common.weekday.sunday')
+                [Weekday.MONDAY]: t('weekday.monday'),
+                [Weekday.TUESDAY]: t('weekday.tuesday'),
+                [Weekday.WEDNESDAY]: t('weekday.wednesday'),
+                [Weekday.THURSDAY]: t('weekday.thursday'),
+                [Weekday.FRIDAY]: t('weekday.friday'),
+                [Weekday.SATURDAY]: t('weekday.saturday'),
+                [Weekday.SUNDAY]: t('weekday.sunday')
               } as const;
               
               // Calculate the date for the workout
@@ -126,7 +126,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      {t('common:common.home.upcomingWorkout')}
+                      {t('home.upcomingWorkout')}
                     </h2>
                     <div className="flex items-center space-x-4">
                       <div>
@@ -162,23 +162,23 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                   >
-                    {t('common:common.home.startNow')}
+                    {t('home.startNow')}
                   </button>
                 </div>
               </div>
             ) : (
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 text-center">
                 <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  {t('common:common.home.noScheduleTitle')}
+                  {t('home.noScheduleTitle')}
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                  {t('common:common.home.noScheduleBody')}
+                  {t('home.noScheduleBody')}
                 </p>
                 <button
                   onClick={() => navigate(Routes.WORKOUTS)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  {t('common:common.home.addWorkout')}
+                  {t('home.addWorkout')}
                 </button>
               </div>
             )}
@@ -193,14 +193,14 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 className="btn-primary w-full"
                 onClick={() => handleStartTimer()}
               >
-                {t('common:common.home.startTimer')}
+                {t('home.startTimer')}
               </button>
               <button 
                 className="btn-secondary w-full"
                 data-testid="browse-exercises"
                 onClick={() => navigate(Routes.EXERCISES)}
               >
-                {t('common:common.home.browseExercises')}
+                {t('home.browseExercises')}
               </button>
             </div>
           </section>
@@ -208,7 +208,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
           {/* Favorites Section */}
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-              {t('common:common.home.favoriteExercises')}
+              {t('home.favoriteExercises')}
             </h2>
             {exercises.filter(ex => ex.isFavorite).length > 0 ? (
               <div className="space-y-2">
@@ -230,7 +230,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                           <button
                             onClick={() => onToggleFavorite(exercise.id)}
                             className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
-                            aria-label={t('common:common.home.removeFromFavoritesAria', { name: exercise.name })}
+                            aria-label={t('home.removeFromFavoritesAria', { name: exercise.name })}
                           >
                             <StarFilledIcon size={16} />
                           </button>
@@ -238,7 +238,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                             className="btn-primary px-3 py-1 text-sm"
                             onClick={() => handleStartTimer(exercise)}
                           >
-                            {t('common:common.start')}
+                            {t('common.start')}
                           </button>
                         </div>
                       </div>
@@ -247,7 +247,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               </div>
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-3 text-sm">
-                {t('common:common.home.noFavorites')}
+                {t('home.noFavorites')}
               </p>
             )}
           </section>
@@ -260,7 +260,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                   {exercises.length}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('common:common.home.availableExercises')}
+                  {t('home.availableExercises')}
                 </div>
               </div>
             </div>

@@ -105,13 +105,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
             <SpeakerIcon size={20} className="text-blue-600 dark:text-blue-400" />
-            {t('common:common.settings.audioSettings')}
+            {t('settings.audioSettings')}
           </h2>
           
           {/* Sound Enable/Disable */}
           <div className="flex items-center justify-between mb-3">
             <label htmlFor="sound-enabled" className="text-gray-700 dark:text-gray-300 font-medium">
-              {t('common:common.settings.enableSound')}
+              {t('settings.enableSound')}
             </label>
             <button
               id="sound-enabled"
@@ -134,7 +134,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <label htmlFor="beep-volume" className="text-gray-700 dark:text-gray-300 font-medium">
-                {t('common:common.settings.beepVolume')}
+                {t('settings.beepVolume')}
               </label>
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {Math.round(appSettings.beepVolume * 100)}%
@@ -152,16 +152,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
             />
             <div className="grid grid-cols-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
-              <span className="text-left">{t('common:common.low')}</span>
-              <span className="text-center">{t('common:common.medium')}</span>
-              <span className="text-right">{t('common:common.high')}</span>
+              <span className="text-left">{t('common.low')}</span>
+              <span className="text-center">{t('common.medium')}</span>
+              <span className="text-right">{t('common.high')}</span>
             </div>
           </div>
 
           {/* Vibration Enable/Disable */}
           <div className="flex items-center justify-between">
             <label htmlFor="vibration-enabled" className="text-gray-700 dark:text-gray-300 font-medium">
-              {t('common:common.settings.enableVibration')}
+              {t('settings.enableVibration')}
             </label>
             <button
               id="vibration-enabled"
@@ -184,17 +184,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         {/* Timer Settings */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('common:common.settings.timerSettings')}
+            {t('settings.timerSettings')}
           </h2>
           
           {/* Pre-Timer Countdown */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <label htmlFor="pre-timer-countdown" className="text-gray-700 dark:text-gray-300 font-medium">
-                {t('common:common.settings.preTimerCountdown')}
+                {t('settings.preTimerCountdown')}
               </label>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {appSettings.preTimerCountdown === 0 ? t('common:common.off') : `${appSettings.preTimerCountdown}${t('common:common.secondsShortSuffix')}`}
+                {appSettings.preTimerCountdown === 0 ? t('common.off') : `${appSettings.preTimerCountdown}${t('common.secondsShortSuffix')}`}
               </span>
             </div>
             <input
@@ -208,19 +208,19 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
             />
             <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-              <span>{t('common:common.off')}</span>
+              <span>{t('common.off')}</span>
               <span>5s</span>
               <span>10s</span>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {t('common:common.settings.preTimerCountdownHelp')}
+              {t('settings.preTimerCountdownHelp')}
             </p>
           </div>
           
           {/* Interval Duration */}
           <div>
             <label htmlFor="interval-duration" className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
-              {t('common:common.timer.beepInterval')}
+              {t('timer.beepInterval')}
             </label>
             <select
               id="interval-duration"
@@ -234,7 +234,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <option value={60}>Every 60 seconds</option>
             </select>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {t('common:common.settings.beepIntervalHelp')}
+              {t('settings.beepIntervalHelp')}
             </p>
           </div>
         </div>
@@ -242,13 +242,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         {/* Appearance Settings */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('common:common.settings.appearance')}
+            {t('settings.appearance')}
           </h2>
           
           {/* Dark Mode */}
           <div className="flex items-center justify-between">
             <label htmlFor="dark-mode" className="text-gray-700 dark:text-gray-300 font-medium">
-              {t('common:common.settings.darkMode')}
+              {t('settings.darkMode')}
             </label>
             <button
               id="dark-mode"
@@ -269,7 +269,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           {/* Exercise Demo Videos */}
       <div className="flex items-center justify-between mt-4" data-testid="setting-show-exercise-videos">
             <label htmlFor="exercise-videos" className="text-gray-700 dark:text-gray-300 font-medium">
-              {t('common:common.settings.showExerciseVideos')}
+              {t('settings.showExerciseVideos')}
             </label>
             <button
               id="exercise-videos"
@@ -287,20 +287,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </button>
           </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            {t('common:common.settings.showExerciseVideosHelp')}
+            {t('settings.showExerciseVideosHelp')}
           </p>
         </div>
 
         {/* Data Settings */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('common:common.settings.data')}
+            {t('settings.data')}
           </h2>
           
           {/* Auto Save */}
           <div className="flex items-center justify-between mb-4">
             <label htmlFor="auto-save" className="text-gray-700 dark:text-gray-300 font-medium">
-              {t('common:common.settings.autoSave')}
+              {t('settings.autoSave')}
             </label>
             <button
               id="auto-save"
@@ -323,7 +323,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <div className="flex justify-between items-center mb-2">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('common:common.settings.dataStorageLabel')} <span className="font-medium">{hasConsent ? t('common:common.settings.enabled') : t('common:common.settings.disabled')}</span>
+                {t('settings.dataStorageLabel')} <span className="font-medium">{hasConsent ? t('settings.enabled') : t('settings.disabled')}</span>
               </p>
               <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
                 v{consentStatus.version}
@@ -331,17 +331,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </div>
             {hasConsent && (
               <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                {t('common:common.settings.dataStoredLocally')}
+                {t('settings.dataStoredLocally')}
               </p>
             )}
             {!hasConsent && (
               <p className="text-xs text-red-500 dark:text-red-400 mt-1">
-                {t('common:common.settings.pleaseAcceptConsent')}
+                {t('settings.pleaseAcceptConsent')}
               </p>
             )}
             {!consentStatus.isLatestVersion && (
               <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                {t('common:common.settings.consentMigrationWarning')}
+                {t('settings.consentMigrationWarning')}
               </p>
             )}
           </div>
@@ -353,10 +353,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               disabled={!hasConsent}
               className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
-              {t('common:common.settings.exportData')}
+              {t('settings.exportData')}
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {t('common:common.settings.exportDataHelp')}
+              {t('settings.exportDataHelp')}
             </p>
           </div>
 
@@ -367,10 +367,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               disabled={!hasConsent}
               className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
-              {t('common:common.settings.refreshExercises')}
+              {t('settings.refreshExercises')}
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {t('common:common.settings.refreshExercisesHelp')}
+              {t('settings.refreshExercisesHelp')}
             </p>
           </div>
 
@@ -381,10 +381,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               disabled={!hasConsent}
               className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
-              {t('common:common.settings.clearAllDataAndReset')}
+              {t('settings.clearAllDataAndReset')}
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {t('common:common.settings.clearAllDataHelp')}
+              {t('settings.clearAllDataHelp')}
             </p>
           </div>
         </div>
@@ -396,10 +396,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         onClose={() => setShowClearDataToast(false)}
         onConfirm={confirmClearData}
         type="danger"
-        title={t('common:common.settings.clearAllDataAndReset')}
-        message={t('common:common.settings.clearAllDataMessage')}
-        confirmText={t('common:common.settings.clearAllData')}
-        cancelText={t('common:common.cancel')}
+        title={t('settings.clearAllDataAndReset')}
+        message={t('settings.clearAllDataMessage')}
+        confirmText={t('settings.clearAllData')}
+        cancelText={t('cancel')}
       />
     </div>
   );

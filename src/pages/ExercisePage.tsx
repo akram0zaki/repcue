@@ -112,12 +112,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <WorkoutIcon size={24} className="text-blue-600 dark:text-blue-400" />
-              {t('common:common.exercises.title')}
+              {t('exercises.title')}
             </h1>
           </div>
           
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
-            {t('common:common.exercises.subtitle')}
+            {t('exercises.subtitle')}
           </p>
         </div>
 
@@ -125,7 +125,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4 sm:mb-6">
           {/* Search Bar */}
           <div className="mb-3 sm:mb-4">
-            <label htmlFor="search" className="sr-only">{t('common:common.exercises.searchLabel')}</label>
+            <label htmlFor="search" className="sr-only">{t('exercises.searchLabel')}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               <input
                 id="search"
                 type="text"
-                placeholder={t('common:common.exercises.searchPlaceholder')}
+                placeholder={t('exercises.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -151,13 +151,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               onChange={(e) => setSelectedCategory(e.target.value as ExerciseCategory | 'all')}
               className="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">{t('common:common.exercises.allCategories')}</option>
-              <option value={Categories.CORE}>{t('common:common.exercises.category.core')}</option>
-              <option value={Categories.STRENGTH}>{t('common:common.exercises.category.strength')}</option>
-              <option value={Categories.CARDIO}>{t('common:common.exercises.category.cardio')}</option>
-              <option value={Categories.FLEXIBILITY}>{t('common:common.exercises.category.flexibility')}</option>
-              <option value={Categories.BALANCE}>{t('common:common.exercises.category.balance')}</option>
-              <option value={Categories.HAND_WARMUP}>{t('common:common.exercises.category.handWarmup')}</option>
+              <option value="all">{t('exercises.allCategories')}</option>
+              <option value={Categories.CORE}>{t('exercises.category.core')}</option>
+              <option value={Categories.STRENGTH}>{t('exercises.category.strength')}</option>
+              <option value={Categories.CARDIO}>{t('exercises.category.cardio')}</option>
+              <option value={Categories.FLEXIBILITY}>{t('exercises.category.flexibility')}</option>
+              <option value={Categories.BALANCE}>{t('exercises.category.balance')}</option>
+              <option value={Categories.HAND_WARMUP}>{t('exercises.category.handWarmup')}</option>
             </select>
 
             {/* Favorites Toggle */}
@@ -170,13 +170,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               }`}
             >
               <StarIcon size={16} />
-              <span className="text-sm font-medium">{t('common:common.exercises.favoritesOnly')}</span>
+              <span className="text-sm font-medium">{t('exercises.favoritesOnly')}</span>
             </button>
           </div>
 
           {/* Results Count */}
           <div className="mt-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            {t('common:common.exercises.showingCount', { count: filteredExercises.length, total: exercises.length })}
+            {t('exercises.showingCount', { count: filteredExercises.length, total: exercises.length })}
           </div>
         </div>
 
@@ -233,10 +233,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              {t('common:common.exercises.emptyTitle')}
+              {t('exercises.emptyTitle')}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
-              {t('common:common.exercises.emptyBody')}
+              {t('exercises.emptyBody')}
             </p>
             <button
               onClick={() => {
@@ -246,7 +246,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               }}
               className="px-4 py-2.5 bg-blue-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px]"
             >
-              {t('common:common.exercises.clearFilters')}
+              {t('exercises.clearFilters')}
             </button>
           </div>
         )}
@@ -296,8 +296,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <button
             onClick={() => onToggleFavorite(exercise.id)}
             className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
-            title={exercise.isFavorite ? t('common:common.exercises.removeFromFavorites') : t('common:common.exercises.addToFavorites')}
-            aria-label={exercise.isFavorite ? t('common:common.home.removeFromFavoritesAria', { name: exercise.name }) : t('common:common.exercises.addToFavoritesAria', { name: exercise.name })}
+            title={exercise.isFavorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
+            aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: exercise.name }) : t('exercises.addToFavoritesAria', { name: exercise.name })}
           >
             {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
           </button>
@@ -324,14 +324,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                {t('common:exercises.timeBased')}
+                {t('exercises.timeBased')}
                 </>
               ) : (
                 <>
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                {t('common:exercises.repBased')}
+                {t('exercises.repBased')}
                 </>
               )}
             </span>
@@ -339,9 +339,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {/* Default Values */}
             <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               {exercise.exerciseType === 'time-based' ? (
-                t('common:common.exercises.defaultDuration', { duration: formatDuration(exercise.defaultDuration) })
+                t('exercises.defaultDuration', { duration: formatDuration(exercise.defaultDuration) })
               ) : (
-                t('common:common.exercises.defaultSetsReps', { sets: exercise.defaultSets || 1, reps: exercise.defaultReps || 1 })
+                t('exercises.defaultSetsReps', { sets: exercise.defaultSets || 1, reps: exercise.defaultReps || 1 })
               )}
             </span>
           </div>
@@ -368,12 +368,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                 aria-label={
                   isTagsExpanded 
-                    ? t('common:common.exercises.showFewerTags') 
-                    : t('common:common.exercises.showMoreTags', { count: additionalTagsCount })
+          ? t('exercises.showFewerTags') 
+          : t('exercises.showMoreTags', { count: additionalTagsCount })
                 }
                 aria-expanded={isTagsExpanded}
               >
-                {isTagsExpanded ? t('common:common.exercises.showLess') : `+${additionalTagsCount}`}
+        {isTagsExpanded ? t('exercises.showLess') : `+${additionalTagsCount}`}
               </button>
             )}
           </div>
@@ -386,7 +386,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             className="w-full sm:w-auto px-3 py-2.5 sm:py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px] sm:min-h-0"
             data-testid="start-exercise-timer"
           >
-            {t('common:common.home.startTimer')}
+            {t('home.startTimer')}
           </button>
         </div>
       </div>

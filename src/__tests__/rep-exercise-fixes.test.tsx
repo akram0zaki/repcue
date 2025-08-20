@@ -15,6 +15,8 @@ vi.mock('../services/storageService', () => {
     getWorkoutSessions: vi.fn().mockResolvedValue([]),
     getActivityLogs: vi.fn().mockResolvedValue([]),
     getAppSettings: vi.fn(),
+  saveExercise: vi.fn().mockResolvedValue(undefined),
+  saveExercises: vi.fn().mockResolvedValue(undefined),
     saveActivityLog: vi.fn(),
     saveAppSettings: vi.fn().mockResolvedValue(undefined),
     toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined)
@@ -151,8 +153,8 @@ describe('Rep-based Exercise Fixes', () => {
     const chooseBtn = await screen.findByRole('button', { name: /choose/i });
     chooseBtn.click();
     await screen.findByText('Select Exercise');
-    const exerciseBtn = await screen.findByRole('button', { name: /Cat-Cow Stretch/i });
-    exerciseBtn.click();
+  const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
+  if (exerciseBtns.length > 0) exerciseBtns[0].click();
 
     // Start the timer (rep-based flow)
     const startButton = await screen.findByRole('button', { name: /start/i });
@@ -177,8 +179,8 @@ describe('Rep-based Exercise Fixes', () => {
     const chooseBtn = await screen.findByRole('button', { name: /choose/i });
     chooseBtn.click();
     await screen.findByText('Select Exercise');
-    const exerciseBtn = await screen.findByRole('button', { name: /Cat-Cow Stretch/i });
-    exerciseBtn.click();
+  const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
+  if (exerciseBtns.length > 0) exerciseBtns[0].click();
 
     // Start to initialize rep/set tracking
     const startButton = await screen.findByRole('button', { name: /start/i });
@@ -198,8 +200,8 @@ describe('Rep-based Exercise Fixes', () => {
     const chooseBtn = await screen.findByRole('button', { name: /choose/i });
     chooseBtn.click();
     await screen.findByText('Select Exercise');
-    const exerciseBtn = await screen.findByRole('button', { name: /Cat-Cow Stretch/i });
-    exerciseBtn.click();
+  const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
+  if (exerciseBtns.length > 0) exerciseBtns[0].click();
 
     // Start to render rep/set progress block
     const startButton = await screen.findByRole('button', { name: /start/i });

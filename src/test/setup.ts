@@ -5,7 +5,6 @@ import i18n from '../i18n'
 // Provide minimal i18n resources for tests (avoids backend fetch in JSDOM)
 try {
   const enBundle = {
-    common: {
       start: 'Start',
       stop: 'Stop',
       cancel: 'Cancel',
@@ -50,7 +49,7 @@ try {
         clearAllDataMessage: 'Are you sure you want to clear all data? This action cannot be undone. You will be redirected to the home screen and asked for consent again.',
         clearAllData: 'Clear All Data'
       },
-      home: {
+  home: {
         upcomingWorkout: 'Upcoming Workout',
         startNow: 'Start Now',
         noScheduleTitle: 'No Schedule Set',
@@ -63,7 +62,7 @@ try {
         noFavorites: 'No favorite exercises yet. Mark some exercises as favorites to see them here!',
         availableExercises: 'Available Exercises'
       },
-      timer: {
+  timer: {
         restNext: 'Rest Period (Next: {{next}})',
         exerciseWithName: 'Exercise {{index}}: {{name}}',
         restPeriod: 'Rest Period',
@@ -95,7 +94,7 @@ try {
         wakeLock: 'Wake Lock',
         selectExercise: 'Select Exercise'
       },
-      workouts: {
+  workouts: {
         title: 'Workouts',
         createWorkout: 'Create Workout',
         createTitle: 'Create Workout',
@@ -156,7 +155,7 @@ try {
         retry: 'Retry',
         saveWorkout: 'Save Workout'
       },
-      activity: {
+  activity: {
         title: 'Activity Log',
         subtitle: 'Track your fitness journey and progress',
         yourProgress: 'Your Progress',
@@ -175,7 +174,7 @@ try {
         exerciseCount_one: '{{count}} exercise',
         exerciseCount_other: '{{count}} exercises'
       },
-      exercises: {
+  exercises: {
         title: 'Exercises',
         subtitle: 'Browse, filter, and start exercises. Mark favorites for quick access.',
         searchLabel: 'Search exercises',
@@ -205,18 +204,19 @@ try {
         showMoreTags_one: 'Show {{count}} more tag',
         showMoreTags_other: 'Show {{count}} more tags',
         showLess: 'Show less'
-      }
-    }
+  }
   };
-  if (!i18n.hasResourceBundle('en', 'common')) {
-    i18n.addResourceBundle('en', 'common', enBundle, true, true);
-  } else {
-    // Merge to ensure new keys are present when bundle already exists
-    i18n.addResourceBundle('en', 'common', enBundle, true, true);
-  }
-  if (!i18n.language || i18n.language.split('-')[0] !== 'en') {
-    await i18n.changeLanguage('en');
-  }
+  // Reinitialize i18n for tests with in-memory resources to avoid async backend
+  await i18n.init({
+    lng: 'en',
+    fallbackLng: 'en',
+    // Provide both flattened keys and nested compatibility under common.common
+    resources: { en: { common: { ...enBundle, common: enBundle } } },
+    ns: ['common'],
+    defaultNS: 'common',
+    interpolation: { escapeValue: false },
+    react: { useSuspense: false },
+  });
 } catch {
   // Non-fatal in tests; keys will render if i18n import changes
 }

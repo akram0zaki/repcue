@@ -5,6 +5,7 @@ import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../cons
 import { ReadyIcon, StarFilledIcon } from '../components/icons/NavigationIcons';
 import { VIDEO_DEMOS_ENABLED } from '../config/features';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import { useExerciseVideo } from '../hooks/useExerciseVideo';
 
@@ -50,7 +51,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const isRepBased = selectedExercise?.exerciseType === 'repetition-based';
 
   // ---------------- Video Demo Integration (Phase 2) ----------------
-  const [mediaIndex, setMediaIndex] = useState<any | null>(null);
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
   const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -291,8 +292,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
             
             <div className="text-sm opacity-90">
               {actuallyResting 
-                ? t('common:common.timer.restNext', { next: workoutCurrentExercise?.name || t('common:common.loading') })
-                : t('common:common.timer.exerciseWithName', { index: workoutMode.currentExerciseIndex + 1, name: displayExercise?.name || t('common:common.loading') })
+                ? t('timer.restNext', { next: workoutCurrentExercise?.name || t('common.loading') })
+                : t('timer.exerciseWithName', { index: workoutMode.currentExerciseIndex + 1, name: displayExercise?.name || t('common.loading') })
               }
             </div>
           </div>
@@ -302,12 +303,12 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {isWorkoutMode && displayExercise && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 text-center">
             <div className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-              {actuallyResting ? t('common:common.timer.restPeriod') : displayExercise.name}
+              {actuallyResting ? t('timer.restPeriod') : displayExercise.name}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               {actuallyResting 
-                ? t('common:common.timer.nextWithCategory', { next: workoutCurrentExercise?.name, category: workoutCurrentExercise?.category })
-                : t('common:common.timer.currentWithCategory', { category: displayExercise.category })
+                ? t('timer.nextWithCategory', { next: workoutCurrentExercise?.name, category: workoutCurrentExercise?.category })
+                : t('timer.currentWithCategory', { category: displayExercise.category })
               }
             </div>
             {displayExercise.description && !actuallyResting && (
@@ -317,7 +318,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             )}
             {actuallyResting && (
               <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
-                {t('common:common.timer.restHint')}
+                {t('timer.restHint')}
               </div>
             )}
           </div>
@@ -327,12 +328,12 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {!isWorkoutMode && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('common:common.timer.exerciseLabel')}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.exerciseLabel')}</span>
               <button
                 onClick={() => onSetShowExerciseSelector(true)}
                 className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
               >
-                {t('common:common.choose')}
+                {t('common.choose')}
               </button>
             </div>
             
@@ -347,14 +348,14 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </div>
           ) : (
             <p className="text-gray-500 dark:text-gray-400 text-center text-sm">
-              {t('common:common.timer.noExerciseSelected')}
+              {t('timer.noExerciseSelected')}
             </p>
           )}
 
           {/* Favorite exercises quick access */}
           {!selectedExercise && favoriteExercises.length > 0 && (
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('common:common.timer.quickSelectFavorites')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.quickSelectFavorites')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {favoriteExercises.map(exercise => (
                   <button
@@ -374,7 +375,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
         {!isWorkoutMode && selectedExercise?.exerciseType !== 'repetition-based' && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('common:common.timer.duration')}</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.duration')}</p>
           <div className="grid grid-cols-3 gap-2">
             {TIMER_PRESETS.map(duration => (
               <button
@@ -396,7 +397,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Rep Duration Display - Shown for repetition-based exercises in standalone mode */}
         {!isWorkoutMode && selectedExercise?.exerciseType === 'repetition-based' && (
         <div className="mb-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('common:common.timer.repDuration')}</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.repDuration')}</p>
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-3">
             <div className="text-center">
               <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -415,13 +416,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
             <div className="mb-3">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                <span>{t('common:common.timer.setProgress')}</span>
+                <span>{t('timer.setProgress')}</span>
                 <span>{
                   isResting 
-                    ? t('common:common.timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets })
+                    ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets })
                     : (currentRep !== undefined && currentRep >= (totalReps || 0))
-                      ? t('common:common.timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets })
-                      : t('common:common.timer.setsCompleted', { completed: (currentSet || 0), total: totalSets })
+                      ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets })
+                      : t('timer.setsCompleted', { completed: (currentSet || 0), total: totalSets })
                 }</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -434,7 +435,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             
             <div>
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                <span>{t('common:common.timer.repProgress')}</span>
+                <span>{t('timer.repProgress')}</span>
                 <span>{isResting ? totalReps : (currentRep || 0)} / {totalReps}</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -452,7 +453,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
           <div className="bg-orange-100 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-3 mb-4 text-center">
             <div className="text-orange-800 dark:text-orange-300 font-medium text-sm flex items-center justify-center gap-2">
               <ReadyIcon size={16} />
-              {t('common:common.timer.getReadyStartsIn', { count: countdownTime })}
+              {t('timer.getReadyStartsIn', { count: countdownTime })}
             </div>
           </div>
         )}
@@ -589,7 +590,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       {countdownTime}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {t('common:common.timer.getReadyEllipsis')}
+                      {t('timer.getReadyEllipsis')}
                     </div>
                   </>
                 ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
@@ -616,17 +617,17 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {actuallyResting 
-                        ? t('common:common.timer.restPeriod')
+                        ? t('timer.restPeriod')
                         : isWorkoutMode 
                           ? (() => {
                               const currentIndex = workoutMode.currentExerciseIndex;
                               const totalExercises = workoutMode.exercises.length;
                               if (currentIndex >= totalExercises) {
-                                return t('common:common.timer.exerciseComplete', { total: totalExercises });
+                                return t('timer.exerciseComplete', { total: totalExercises });
                               }
-                              return t('common:common.timer.exerciseIndexOf', { index: currentIndex + 1, total: totalExercises });
+                              return t('timer.exerciseIndexOf', { index: currentIndex + 1, total: totalExercises });
                             })()
-                          : targetTime ? t('common:common.timer.ofDuration', { duration: formatTime(targetTime) }) : t('common:common.timer.setDuration')
+                          : targetTime ? t('timer.ofDuration', { duration: formatTime(targetTime) }) : t('timer.setDuration')
                       }
                     </div>
                   </>
@@ -644,7 +645,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 className="btn-primary px-8 disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="start-timer"
               >
-                {t('common:common.start')}
+                {t('common.start')}
               </button>
             ) : (
               <button
@@ -652,7 +653,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 className="btn-secondary px-8"
                 data-testid="stop-timer"
               >
-                {isCountdown ? t('common:common.cancel') : t('common:common.stop')}
+                {isCountdown ? t('common.cancel') : t('common.stop')}
               </button>
             )}
             
@@ -661,7 +662,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               className="btn-ghost px-6"
               data-testid="reset-timer"
             >
-              {t('common:common.reset')}
+              {t('common.reset')}
             </button>
           </div>
         </div>
@@ -670,7 +671,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {(isWorkoutMode || (selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps)) && (
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
             <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">
-              {isWorkoutMode ? t('common:common.timer.workoutControls') : t('common:common.timer.exerciseControls')}
+              {isWorkoutMode ? t('timer.workoutControls') : t('timer.exerciseControls')}
             </h3>
             
             {selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps && (
@@ -685,7 +686,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     disabled={(currentRep || 0) >= (totalReps || 0)}
                     className="btn-secondary text-xs py-2 disabled:opacity-50"
                   >
-                    {t('common:common.timer.nextRep', { current: (currentRep || 0) + 1, total: totalReps })}
+                    {t('timer.nextRep', { current: (currentRep || 0) + 1, total: totalReps })}
                   </button>
                   
                   <button
@@ -703,8 +704,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     className="btn-primary text-xs py-2"
                   >
                     {((currentSet || 0) + 1) >= (totalSets || 1)
-                      ? t('common:common.timer.completeExercise')
-                      : t('common:common.timer.nextSet', { current: (currentSet || 0) + 1, total: totalSets })}
+                      ? t('timer.completeExercise')
+                      : t('timer.nextSet', { current: (currentSet || 0) + 1, total: totalSets })}
                   </button>
                 </div>
               </div>
@@ -715,14 +716,14 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 onClick={() => onStopTimer(true)}
                 className="btn-secondary text-xs py-2"
               >
-                {t('common:common.timer.completeExercise')}
+                {t('timer.completeExercise')}
               </button>
               
               <button
                 onClick={onResetTimer}
                 className="btn-ghost text-xs py-2"
               >
-                {t('common:common.timer.exitWorkout')}
+                {t('timer.exitWorkout')}
               </button>
             </div>
           </div>
@@ -732,15 +733,15 @@ const TimerPage: React.FC<TimerPageProps> = ({
   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 text-xs" data-testid={(!timerState.isRunning && !timerState.isCountdown && timerState.currentTime === (timerState.targetTime || 0) && timerState.targetTime) ? 'timer-complete' : undefined}>
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
-              <div className="text-gray-500 dark:text-gray-400">{t('common:common.timer.beepInterval')}</div>
+              <div className="text-gray-500 dark:text-gray-400">{t('timer.beepInterval')}</div>
               <div className="font-medium text-gray-900 dark:text-gray-100">
                 {appSettings.intervalDuration}s
               </div>
             </div>
             <div>
-              <div className="text-gray-500 dark:text-gray-400">{t('common:common.timer.wakeLock')}</div>
+              <div className="text-gray-500 dark:text-gray-400">{t('timer.wakeLock')}</div>
               <div className="font-medium text-gray-900 dark:text-gray-100">
-                {wakeLockSupported ? (wakeLockActive ? t('common:common.on') : t('common:common.off')) : t('common:common.notSupported')}
+                {wakeLockSupported ? (wakeLockActive ? t('common.on') : t('common.off')) : t('common.notSupported')}
               </div>
             </div>
           </div>
@@ -753,7 +754,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-600">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {t('common:common.timer.selectExercise')}
+                    {t('timer.selectExercise')}
                   </h3>
                   <button
                     onClick={() => onSetShowExerciseSelector(false)}

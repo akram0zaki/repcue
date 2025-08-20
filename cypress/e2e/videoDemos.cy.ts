@@ -115,7 +115,8 @@ describe('Exercise Demo Videos', () => {
           marketingAccepted: false,
           dataRetentionDays: 365
         }));
-        (win as any).__VIDEO_DEMOS_DISABLED__ = true;
+        // Window is augmented in Cypress types to allow this flag
+        (win as Window).__VIDEO_DEMOS_DISABLED__ = true;
       }
     });
     cy.get('[data-testid="nav-exercises"]', { timeout: 15000 }).click();
