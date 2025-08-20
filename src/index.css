@@ -25,6 +25,15 @@ body.rtl select {
   direction: rtl;
 }
 
+/* RTL-aware toggle switches */
+body.rtl .toggle-switch-off {
+  transform: translateX(-1.5rem); /* Move to right side when off in RTL */
+}
+
+body.rtl .toggle-switch-on {
+  transform: translateX(-0.25rem); /* Move to left side when on in RTL */
+}
+
 /* Ensure consistent alignment for RTL */
 body.rtl .text-left {
   text-align: right;

@@ -1,5 +1,26 @@
 ## 2025-08-20
 
+### ✅ COMPLETED: RTL Toggle Switch Fix
+- **Fixed Toggle Positioning**: Resolved incorrect toggle switch positioning in RTL languages (Arabic)
+- **CSS RTL Support**: Added RTL-specific CSS classes for proper toggle indicator placement
+  - Added `.toggle-switch-off` and `.toggle-switch-on` classes with RTL-aware transforms
+  - In RTL mode: disabled state moves indicator to right, enabled state moves to left
+- **Settings Page Updates**: Updated all toggle switches in SettingsPage to use RTL-aware classes
+  - Sound enabled/disabled toggle
+  - Vibration enabled/disabled toggle  
+  - Dark mode toggle
+  - Exercise videos toggle
+  - Auto-save toggle
+- **i18n Language Normalization**: Fixed language code normalization for Arabic variants
+  - `ar-EG` now correctly sets `document.lang` to `ar` while preserving RTL direction
+  - Ensures consistent behavior across Arabic regional variants
+
+#### Technical Details
+- **CSS Implementation**: Added `body.rtl .toggle-switch-*` selectors with proper translateX values
+- **Component Updates**: All toggle buttons now include conditional RTL-aware CSS classes
+- **Test Compatibility**: Fixed i18n test that expected language normalization for regional variants
+- **Cross-Platform**: Ensures toggle switches work correctly in both LTR and RTL layouts
+
 ### ✅ COMPLETED: Egyptian Arabic Locale Enhancement - Colloquial Slang Update
 - **Enhanced Egyptian Dialect**: Updated all string literals in ar-EG locale to use authentic Egyptian slang and colloquial expressions
 - **Natural Language Experience**: Replaced formal Arabic terms with everyday Egyptian expressions users actually speak

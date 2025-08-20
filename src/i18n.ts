@@ -42,7 +42,8 @@ const applyDir = (lng: string | undefined) => {
   if (typeof document === 'undefined') return;
   const language = (lng || i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
   const isRTL = language === 'ar';
-  document.documentElement.lang = lng || language;
+  // Always use the normalized language code (ar) for Arabic variants in HTML lang attribute
+  document.documentElement.lang = language;
   document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   try {
     document.body.classList.toggle('rtl', isRTL);

@@ -125,7 +125,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.soundEnabled ? 'translate-x-6' : 'translate-x-1'
+                  appSettings.soundEnabled 
+                    ? 'translate-x-6 toggle-switch-on' 
+                    : 'translate-x-1 toggle-switch-off'
                 }`}
               />
             </button>
@@ -175,7 +177,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.vibrationEnabled ? 'translate-x-6' : 'translate-x-1'
+                  appSettings.vibrationEnabled 
+                    ? 'translate-x-6 toggle-switch-on' 
+                    : 'translate-x-1 toggle-switch-off'
                 }`}
               />
             </button>
@@ -262,7 +266,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.darkMode ? 'translate-x-6' : 'translate-x-1'
+                  appSettings.darkMode 
+                    ? 'translate-x-6 toggle-switch-on' 
+                    : 'translate-x-1 toggle-switch-off'
                 }`}
               />
             </button>
@@ -282,7 +288,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.showExerciseVideos ? 'translate-x-6' : 'translate-x-1'
+                  appSettings.showExerciseVideos 
+                    ? 'translate-x-6 toggle-switch-on' 
+                    : 'translate-x-1 toggle-switch-off'
                 }`}
               />
             </button>
@@ -328,7 +336,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.autoSave ? 'translate-x-6' : 'translate-x-1'
+                  appSettings.autoSave 
+                    ? 'translate-x-6 toggle-switch-on' 
+                    : 'translate-x-1 toggle-switch-off'
                 }`}
               />
             </button>
