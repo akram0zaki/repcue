@@ -1,11 +1,11 @@
 {
   "titles": {
     "app": "RepCue",
-    "home": "RepCue - Exercise Timer",
-    "exercises": "Exercises",
-    "exerciseDetails": "Exercise Details", 
-    "timer": "Timer",
-    "activityLog": "Activity Log",
-    "settings": "Settings"
+    "home": "RepCue - Cronómetro de ejercicio",
+    "exercises": "Ejercicios",
+    "exerciseDetails": "Detalles del ejercicio", 
+    "timer": "Cronómetro",
+    "activityLog": "Registro de actividad",
+    "settings": "Configuración"
   }
 }

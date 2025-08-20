@@ -1,11 +1,11 @@
 {
   "titles": {
     "app": "RepCue",
-    "home": "RepCue - Exercise Timer",
-    "exercises": "Exercises",
-    "exerciseDetails": "Exercise Details", 
+    "home": "RepCue - Oefening Timer",
+    "exercises": "Oefeningen",
+    "exerciseDetails": "Oefening Details",
     "timer": "Timer",
-    "activityLog": "Activity Log",
-    "settings": "Settings"
+    "activityLog": "Activiteiten Log",
+    "settings": "Instellingen"
   }
 }

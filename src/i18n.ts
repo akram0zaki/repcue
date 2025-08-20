@@ -7,14 +7,17 @@ import HttpBackend from 'i18next-http-backend';
 // Security: Backend constrained to same-origin /locales path.
 
 // Supported languages (expand locales progressively; fallback ensures safety)
-const supportedLngs = ['en', 'nl', 'ar', 'de', 'es', 'fr'] as const;
+const supportedLngs = ['en', 'nl', 'ar', 'ar-EG', 'de', 'es', 'fr'] as const;
 
 i18n
   .use(HttpBackend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    fallbackLng: 'en',
+    fallbackLng: {
+      'ar-EG': ['ar', 'en'],
+      'default': ['en']
+    },
     supportedLngs: Array.from(supportedLngs),
     ns: ['common', 'titles', 'a11y'],
     defaultNS: 'common',
@@ -34,12 +37,12 @@ i18n
     },
   });
 
-// Phase 3: Apply HTML lang/dir and toggle body.rtl for Arabic
+// Phase 3: Apply HTML lang/dir and toggle body.rtl for Arabic (including Egyptian)
 const applyDir = (lng: string | undefined) => {
   if (typeof document === 'undefined') return;
   const language = (lng || i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
   const isRTL = language === 'ar';
-  document.documentElement.lang = language;
+  document.documentElement.lang = lng || language;
   document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   try {
     document.body.classList.toggle('rtl', isRTL);
