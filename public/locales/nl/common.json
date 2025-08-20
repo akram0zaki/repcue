@@ -1,0 +1,33 @@
+{
+  "common": {
+    "welcomeUser": "Welkom terug, {{name}}!",
+    "lastWorkoutOn": "Laatste training op {{date}}",
+    "workoutDuration": "Duur: {{duration}}",
+    "completedAt": "Voltooid om {{time}}",
+    "workoutSummary": "{{exerciseCount}} oefeningen in {{duration}}"
+  },
+  "timer": {
+    "setsCompleted_one": "{{completed}} van {{total}} set voltooid",
+    "setsCompleted_other": "{{completed}} van {{total}} sets voltooid", 
+    "repsCompleted_one": "{{completed}} van {{total}} herhaling voltooid",
+    "repsCompleted_other": "{{completed}} van {{total}} herhalingen voltooid",
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} seconden",
+    "minutes_one": "{{count}} minuut",
+    "minutes_other": "{{count}} minuten",
+    "exercises_one": "{{count}} oefening",
+    "exercises_other": "{{count}} oefeningen",
+    "exercisesRemaining_one": "{{count}} oefening resterend",
+    "exercisesRemaining_other": "{{count}} oefeningen resterend",
+    "getReadyStartsIn_one": "Maak je klaar! Timer start over {{count}} seconde",
+    "getReadyStartsIn_other": "Maak je klaar! Timer start over {{count}} seconden"
+  },
+  "settings": {
+    "language": "🌐 Taal",
+    "selectLanguage": "Selecteer Taal",
+    "languageHelp": "Kies uw voorkeurstaal. De app onthoudt uw keuze."
+  },
+  "home": {
+    "changeLanguage": "Taal wijzigen"
+  }
+}

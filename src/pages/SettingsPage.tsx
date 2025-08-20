@@ -6,6 +6,7 @@ import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import { SpeakerIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -289,6 +290,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             {t('settings.showExerciseVideosHelp')}
           </p>
+        </div>
+
+        {/* Language Settings */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            {t('settings.language')}
+          </h2>
+          
+          <div className="space-y-3">
+            <LanguageSwitcher compact={false} />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('settings.languageHelp')}
+            </p>
+          </div>
         </div>
 
         {/* Data Settings */}

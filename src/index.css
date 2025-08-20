@@ -12,6 +12,28 @@ body.rtl {
   direction: rtl;
 }
 
+/* RTL-aware input and text area styling */
+body.rtl input[type="text"],
+body.rtl input[type="email"], 
+body.rtl input[type="search"],
+body.rtl textarea {
+  text-align: right;
+  direction: rtl;
+}
+
+body.rtl select {
+  direction: rtl;
+}
+
+/* Ensure consistent alignment for RTL */
+body.rtl .text-left {
+  text-align: right;
+}
+
+body.rtl .text-right {
+  text-align: left;
+}
+
 @layer base {
   html {
     @apply h-full;

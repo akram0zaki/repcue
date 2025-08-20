@@ -1,0 +1,33 @@
+{
+  "common": {
+    "welcomeUser": "Bon retour, {{name}} !",
+    "lastWorkoutOn": "Dernier entraînement le {{date}}",
+    "workoutDuration": "Durée : {{duration}}",
+    "completedAt": "Terminé à {{time}}",
+    "workoutSummary": "{{exerciseCount}} exercices en {{duration}}"
+  },
+  "timer": {
+    "setsCompleted_one": "{{completed}} sur {{total}} série terminée",
+    "setsCompleted_other": "{{completed}} sur {{total}} séries terminées",
+    "repsCompleted_one": "{{completed}} sur {{total}} répétition terminée",
+    "repsCompleted_other": "{{completed}} sur {{total}} répétitions terminées",
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} secondes",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "exercises_one": "{{count}} exercice",
+    "exercises_other": "{{count}} exercices",
+    "exercisesRemaining_one": "{{count}} exercice restant",
+    "exercisesRemaining_other": "{{count}} exercices restants",
+    "getReadyStartsIn_one": "Préparez-vous ! Le minuteur démarre dans {{count}} seconde",
+    "getReadyStartsIn_other": "Préparez-vous ! Le minuteur démarre dans {{count}} secondes"
+  },
+  "settings": {
+    "language": "🌐 Langue",
+    "selectLanguage": "Sélectionner la Langue",
+    "languageHelp": "Choisissez votre langue préférée. L'application se souviendra de votre sélection."
+  },
+  "home": {
+    "changeLanguage": "Changer de langue"
+  }
+}

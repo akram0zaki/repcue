@@ -1,0 +1,33 @@
+{
+  "common": {
+    "welcomeUser": "¡Bienvenido de nuevo, {{name}}!",
+    "lastWorkoutOn": "Último entrenamiento el {{date}}",
+    "workoutDuration": "Duración: {{duration}}",
+    "completedAt": "Completado a las {{time}}",
+    "workoutSummary": "{{exerciseCount}} ejercicios en {{duration}}"
+  },
+  "timer": {
+    "setsCompleted_one": "{{completed}} de {{total}} serie completada",
+    "setsCompleted_other": "{{completed}} de {{total}} series completadas",
+    "repsCompleted_one": "{{completed}} de {{total}} repetición completada",
+    "repsCompleted_other": "{{completed}} de {{total}} repeticiones completadas",
+    "seconds_one": "{{count}} segundo",
+    "seconds_other": "{{count}} segundos",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minutos",
+    "exercises_one": "{{count}} ejercicio",
+    "exercises_other": "{{count}} ejercicios",
+    "exercisesRemaining_one": "{{count}} ejercicio restante",
+    "exercisesRemaining_other": "{{count}} ejercicios restantes",
+    "getReadyStartsIn_one": "¡Prepárate! El cronómetro comienza en {{count}} segundo",
+    "getReadyStartsIn_other": "¡Prepárate! El cronómetro comienza en {{count}} segundos"
+  },
+  "settings": {
+    "language": "🌐 Idioma",
+    "selectLanguage": "Seleccionar Idioma",
+    "languageHelp": "Elige tu idioma preferido. La aplicación recordará tu selección."
+  },
+  "home": {
+    "changeLanguage": "Cambiar idioma"
+  }
+}

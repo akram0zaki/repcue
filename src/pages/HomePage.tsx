@@ -7,6 +7,7 @@ import { APP_NAME, APP_DESCRIPTION } from '../constants';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import { StarFilledIcon } from '../components/icons/NavigationIcons';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -265,6 +266,16 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               </div>
             </div>
           </section>
+
+          {/* Language Selection Footer */}
+          <footer className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                {t('home.changeLanguage')}
+              </p>
+              <LanguageSwitcher compact={true} className="justify-center" />
+            </div>
+          </footer>
         </div>
       </div>
     </div>

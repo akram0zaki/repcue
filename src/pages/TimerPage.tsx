@@ -419,10 +419,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <span>{t('timer.setProgress')}</span>
                 <span>{
                   isResting 
-                    ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets })
+                    ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets, count: totalSets })
                     : (currentRep !== undefined && currentRep >= (totalReps || 0))
-                      ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets })
-                      : t('timer.setsCompleted', { completed: (currentSet || 0), total: totalSets })
+                      ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets, count: totalSets })
+                      : t('timer.setsCompleted', { completed: (currentSet || 0), total: totalSets, count: totalSets })
                 }</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">

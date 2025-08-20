@@ -1,0 +1,33 @@
+{
+  "common": {
+    "welcomeUser": "مرحباً بعودتك، {{name}}!",
+    "lastWorkoutOn": "آخر تمرين في {{date}}",
+    "workoutDuration": "المدة: {{duration}}",
+    "completedAt": "اكتمل في {{time}}",
+    "workoutSummary": "{{exerciseCount}} تمارين في {{duration}}"
+  },
+  "timer": {
+    "setsCompleted_one": "{{completed}} من {{total}} مجموعة مكتملة",
+    "setsCompleted_other": "{{completed}} من {{total}} مجموعات مكتملة",
+    "repsCompleted_one": "{{completed}} من {{total}} تكرار مكتمل",
+    "repsCompleted_other": "{{completed}} من {{total}} تكرارات مكتملة",
+    "seconds_one": "{{count}} ثانية",
+    "seconds_other": "{{count}} ثواني",
+    "minutes_one": "{{count}} دقيقة",
+    "minutes_other": "{{count}} دقائق",
+    "exercises_one": "{{count}} تمرين",
+    "exercises_other": "{{count}} تمارين",
+    "exercisesRemaining_one": "{{count}} تمرين متبقي",
+    "exercisesRemaining_other": "{{count}} تمارين متبقية",
+    "getReadyStartsIn_one": "استعد! المؤقت يبدأ خلال {{count}} ثانية",
+    "getReadyStartsIn_other": "استعد! المؤقت يبدأ خلال {{count}} ثانية"
+  },
+  "settings": {
+    "language": "🌐 اللغة",
+    "selectLanguage": "اختر اللغة",
+    "languageHelp": "اختر لغتك المفضلة. سيتذكر التطبيق اختيارك."
+  },
+  "home": {
+    "changeLanguage": "تغيير اللغة"
+  }
+}

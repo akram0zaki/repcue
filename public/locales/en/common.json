@@ -14,7 +14,12 @@
     "medium": "Medium",
     "high": "High",
     "secondsShortSuffix": "s",
-    "goToSettings": "Go to Settings"
+    "goToSettings": "Go to Settings",
+    "welcomeUser": "Welcome back, {{name}}!",
+    "lastWorkoutOn": "Last workout on {{date}}",
+    "workoutDuration": "Duration: {{duration}}",
+    "completedAt": "Completed at {{time}}",
+    "workoutSummary": "{{exerciseCount}} exercises in {{duration}}"
   },
   "settings": {
     "audioSettings": "Audio Settings",
@@ -28,6 +33,9 @@
     "darkMode": "Dark Mode",
     "showExerciseVideos": "Show Exercise Demo Videos",
     "showExerciseVideosHelp": "Experimental: loop silent demo videos inside timer when available.",
+    "language": "🌐 Language",
+    "selectLanguage": "Select Language",
+    "languageHelp": "Choose your preferred language. The app will remember your selection.",
     "data": "💾 Data",
     "autoSave": "Auto Save",
     "dataStorageLabel": "Data Storage:",
@@ -59,6 +67,18 @@
     "repDuration": "Rep Duration",
     "setProgress": "Set Progress",
     "setsCompleted": "{{completed}} of {{total}} sets completed",
+    "setsCompleted_one": "{{completed}} of {{total}} set completed",
+    "setsCompleted_other": "{{completed}} of {{total}} sets completed",
+    "repsCompleted_one": "{{completed}} of {{total}} rep completed",
+    "repsCompleted_other": "{{completed}} of {{total}} reps completed",
+    "seconds_one": "{{count}} second",
+    "seconds_other": "{{count}} seconds",
+    "minutes_one": "{{count}} minute", 
+    "minutes_other": "{{count}} minutes",
+    "exercises_one": "{{count}} exercise",
+    "exercises_other": "{{count}} exercises",
+    "exercisesRemaining_one": "{{count}} exercise remaining",
+    "exercisesRemaining_other": "{{count}} exercises remaining",
     "repProgress": "Rep Progress",
     "getReadyStartsIn_one": "Get Ready! Timer starts in {{count}} second",
     "getReadyStartsIn_other": "Get Ready! Timer starts in {{count}} seconds",
@@ -97,7 +117,8 @@
     "favoriteExercises": "Favorite Exercises",
     "removeFromFavoritesAria": "Remove {{name}} from favorites",
     "noFavorites": "No favorite exercises yet. Mark some exercises as favorites to see them here!",
-    "availableExercises": "Available Exercises"
+    "availableExercises": "Available Exercises",
+    "changeLanguage": "Change language"
   },
   "workouts": {
     "title": "Workouts",

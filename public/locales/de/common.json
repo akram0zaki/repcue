@@ -1,0 +1,33 @@
+{
+  "common": {
+    "welcomeUser": "Willkommen zurück, {{name}}!",
+    "lastWorkoutOn": "Letztes Training am {{date}}",
+    "workoutDuration": "Dauer: {{duration}}",
+    "completedAt": "Abgeschlossen um {{time}}",
+    "workoutSummary": "{{exerciseCount}} Übungen in {{duration}}"
+  },
+  "timer": {
+    "setsCompleted_one": "{{completed}} von {{total}} Satz abgeschlossen",
+    "setsCompleted_other": "{{completed}} von {{total}} Sätzen abgeschlossen",
+    "repsCompleted_one": "{{completed}} von {{total}} Wiederholung abgeschlossen", 
+    "repsCompleted_other": "{{completed}} von {{total}} Wiederholungen abgeschlossen",
+    "seconds_one": "{{count}} Sekunde",
+    "seconds_other": "{{count}} Sekunden",
+    "minutes_one": "{{count}} Minute",
+    "minutes_other": "{{count}} Minuten",
+    "exercises_one": "{{count}} Übung",
+    "exercises_other": "{{count}} Übungen",
+    "exercisesRemaining_one": "{{count}} Übung verbleibend",
+    "exercisesRemaining_other": "{{count}} Übungen verbleibend",
+    "getReadyStartsIn_one": "Bereit machen! Timer startet in {{count}} Sekunde",
+    "getReadyStartsIn_other": "Bereit machen! Timer startet in {{count}} Sekunden"
+  },
+  "settings": {
+    "language": "🌐 Sprache",
+    "selectLanguage": "Sprache auswählen",
+    "languageHelp": "Wählen Sie Ihre bevorzugte Sprache. Die App merkt sich Ihre Auswahl."
+  },
+  "home": {
+    "changeLanguage": "Sprache ändern"
+  }
+}
