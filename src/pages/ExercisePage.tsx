@@ -13,10 +13,14 @@ import {
   HandWarmupIcon, 
   RunnerIcon,
   StarIcon,
-  StarFilledIcon
+  StarFilledIcon,
+  PlayIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
+import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import selectVideoVariant from '../utils/selectVideoVariant';
+import type { ExerciseMediaIndex } from '../types/media';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -29,6 +33,44 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const [selectedCategory, setSelectedCategory] = useState<ExerciseCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  // Video preview state
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Lazy-load media index only when needed
+  const ensureMediaIndex = async (): Promise<ExerciseMediaIndex | null> => {
+    if (mediaIndex) return mediaIndex;
+    try {
+      const idx = await loadExerciseMedia();
+      setMediaIndex(idx);
+      return idx;
+    } catch (err) {
+      console.warn('[exercise-preview] failed to load media index', err);
+      return null;
+    }
+  };
+
+  const openPreview = async (exercise: Exercise) => {
+    const idx = await ensureMediaIndex();
+    if (!idx) return;
+    const media = idx[exercise.id];
+    const url = selectVideoVariant(
+      media,
+      typeof window !== 'undefined' ? window.innerWidth : undefined,
+      typeof window !== 'undefined' ? window.innerHeight : undefined
+    );
+    setPreviewExercise(exercise);
+    setPreviewUrl(url);
+    setPreviewOpen(!!url);
+  };
+
+  const closePreview = () => {
+    setPreviewOpen(false);
+    setPreviewExercise(null);
+    setPreviewUrl(null);
+  };
 
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
@@ -109,6 +151,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   return (
+    <>
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-4xl">
         {/* Header */}
@@ -209,6 +252,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         onStartTimer={handleStartTimer}
                         getCategoryColor={getCategoryColor}
                         formatDuration={formatDuration}
+                        onPreview={openPreview}
                       />
                     ))}
                   </div>
@@ -227,13 +271,14 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 onStartTimer={handleStartTimer}
                 getCategoryColor={getCategoryColor}
                 formatDuration={formatDuration}
+                onPreview={openPreview}
               />
             ))}
           </div>
         )}
 
         {/* Empty State */}
-        {filteredExercises.length === 0 && (
+  {filteredExercises.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -256,6 +301,57 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         )}
       </div>
     </div>
+    {/* Preview Modal */}
+    {previewOpen && (
+      <div className="fixed inset-0 z-[100]" aria-hidden={!previewOpen}>
+        <div
+          className="absolute inset-0 bg-black/50"
+          onClick={closePreview}
+          data-testid="preview-backdrop"
+        />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="exercise-preview-title"
+          className="absolute inset-0 flex items-center justify-center p-4"
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md sm:max-w-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+              <h2 id="exercise-preview-title" className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {previewExercise ? localizeExercise(previewExercise, t).name : t('exercises.preview', { defaultValue: 'Preview' })}
+              </h2>
+              <button
+                onClick={closePreview}
+                aria-label={t('common.close')}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-3 sm:p-4">
+              {previewUrl ? (
+                <video
+                  src={previewUrl}
+                  className="w-full h-auto rounded-md bg-black"
+                  controls
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {t('exercises.previewUnavailable', { defaultValue: 'Preview unavailable for this exercise.' })}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
@@ -266,6 +362,7 @@ interface ExerciseCardProps {
   onStartTimer: (exercise: Exercise) => void;
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
+  onPreview?: (exercise: Exercise) => void;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -273,7 +370,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onToggleFavorite,
   onStartTimer,
   getCategoryColor,
-  formatDuration
+  formatDuration,
+  onPreview
 }) => {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const { t } = useTranslation(['common', 'exercises']);
@@ -298,14 +396,26 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1 mr-2">
             {loc.name}
           </h3>
-          <button
-            onClick={() => onToggleFavorite(exercise.id)}
-            className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
-            title={exercise.isFavorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
-            aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
-          >
-            {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
-          </button>
+          <div className="flex items-center gap-2">
+            {exercise.hasVideo && (
+              <button
+                onClick={() => onPreview && onPreview(exercise)}
+                className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                title={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
+                aria-label={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
+              >
+                <PlayIcon size={20} />
+              </button>
+            )}
+            <button
+              onClick={() => onToggleFavorite(exercise.id)}
+              className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
+              title={exercise.isFavorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
+              aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
+            >
+              {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
+            </button>
+          </div>
         </div>
 
         {/* Description */}

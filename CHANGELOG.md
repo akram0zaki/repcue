@@ -1,5 +1,12 @@
 ## 2025-08-20
 
+### ✅ ADDED: Exercise Page Video Preview
+- Added a preview/play button on Exercise cards that have demo videos. Clicking opens an accessible modal dialog with inline video playback (muted, looped, playsInline).
+- Lazy-loads `exercise_media.json` on first use and selects the best-fit variant via `selectVideoVariant` (portrait/landscape/square) based on viewport.
+- Accessible: role="dialog", aria-modal, labelled title, backdrop click and close button supported.
+- Localization: Strings use i18n with safe defaultValue fallbacks until keys are propagated to all locales.
+- New unit test: `src/pages/__tests__/ExercisePage.preview.test.tsx` verifies button presence, dialog open, and backdrop close behavior with a mocked media index.
+
 ### ✅ UPDATED: Test i18n Setup & Navigation Labels
 - Test seed updated in `src/test/setup.ts` to include `navigation.*` keys (Home, Workouts, Exercises, Timer, Activity Log, Settings, More).
 - Removed duplicate `navigation` object collision in the test bundle (fixed duplicate keys error).
