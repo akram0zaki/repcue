@@ -308,9 +308,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           <div className="space-y-3">
             <LanguageSwitcher compact={false} />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {t('settings.languageHelp')}
-            </p>
           </div>
         </div>
 
