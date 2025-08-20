@@ -13,8 +13,14 @@ import {
   HandWarmupIcon, 
   RunnerIcon,
   StarIcon,
-  StarFilledIcon
+  StarFilledIcon,
+  PlayIcon
 } from '../components/icons/NavigationIcons';
+import { useTranslation } from 'react-i18next';
+import { localizeExercise } from '../utils/localizeExercise';
+import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import selectVideoVariant from '../utils/selectVideoVariant';
+import type { ExerciseMediaIndex } from '../types/media';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -23,22 +29,64 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation(['common', 'exercises']);
   const [selectedCategory, setSelectedCategory] = useState<ExerciseCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  // Video preview state
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Lazy-load media index only when needed
+  const ensureMediaIndex = async (): Promise<ExerciseMediaIndex | null> => {
+    if (mediaIndex) return mediaIndex;
+    try {
+      const idx = await loadExerciseMedia();
+      setMediaIndex(idx);
+      return idx;
+    } catch (err) {
+      console.warn('[exercise-preview] failed to load media index', err);
+      return null;
+    }
+  };
+
+  const openPreview = async (exercise: Exercise) => {
+    const idx = await ensureMediaIndex();
+    if (!idx) return;
+    const media = idx[exercise.id];
+    const url = selectVideoVariant(
+      media,
+      typeof window !== 'undefined' ? window.innerWidth : undefined,
+      typeof window !== 'undefined' ? window.innerHeight : undefined
+    );
+    setPreviewExercise(exercise);
+    setPreviewUrl(url);
+    setPreviewOpen(!!url);
+  };
+
+  const closePreview = () => {
+    setPreviewOpen(false);
+    setPreviewExercise(null);
+    setPreviewUrl(null);
+  };
 
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
     return exercises.filter(exercise => {
       const matchesCategory = selectedCategory === 'all' || exercise.category === selectedCategory;
-      const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           exercise.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           exercise.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      // Use localized name/description for search while preserving canonical tags
+      const loc = localizeExercise(exercise, t);
+      const matchesSearch = term.length === 0
+        || loc.name.toLowerCase().includes(term)
+        || (loc.description || '').toLowerCase().includes(term)
+        || exercise.tags.some(tag => tag.toLowerCase().includes(term));
       const matchesFavorites = !showFavoritesOnly || exercise.isFavorite;
-      
       return matchesCategory && matchesSearch && matchesFavorites;
     });
-  }, [exercises, selectedCategory, searchTerm, showFavoritesOnly]);
+  }, [exercises, selectedCategory, searchTerm, showFavoritesOnly, t]);
 
   // Group exercises by category for better organization
   const exercisesByCategory = useMemo(() => {
@@ -59,7 +107,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   }, [filteredExercises]);
 
   const formatDuration = (seconds?: number): string => {
-    if (!seconds) return 'Variable';
+    if (!seconds) return t('exercises.variable');
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     if (minutes > 0) {
@@ -103,6 +151,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   return (
+    <>
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-4xl">
         {/* Header */}
@@ -110,12 +159,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
               <WorkoutIcon size={24} className="text-blue-600 dark:text-blue-400" />
-              Exercises
+              {t('exercises.title')}
             </h1>
           </div>
           
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
-            Browse and select exercises for your workout
+            {t('exercises.subtitle')}
           </p>
         </div>
 
@@ -123,7 +172,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4 sm:mb-6">
           {/* Search Bar */}
           <div className="mb-3 sm:mb-4">
-            <label htmlFor="search" className="sr-only">Search exercises</label>
+            <label htmlFor="search" className="sr-only">{t('exercises.searchLabel')}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +182,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               <input
                 id="search"
                 type="text"
-                placeholder="Search exercises..."
+                placeholder={t('exercises.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -149,13 +198,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               onChange={(e) => setSelectedCategory(e.target.value as ExerciseCategory | 'all')}
               className="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Categories</option>
-              <option value={Categories.CORE}>Core</option>
-              <option value={Categories.STRENGTH}>Strength</option>
-              <option value={Categories.CARDIO}>Cardio</option>
-              <option value={Categories.FLEXIBILITY}>Flexibility</option>
-              <option value={Categories.BALANCE}>Balance</option>
-              <option value={Categories.HAND_WARMUP}>Hand Warmup</option>
+              <option value="all">{t('exercises.allCategories')}</option>
+              <option value={Categories.CORE}>{t('exercises.category.core')}</option>
+              <option value={Categories.STRENGTH}>{t('exercises.category.strength')}</option>
+              <option value={Categories.CARDIO}>{t('exercises.category.cardio')}</option>
+              <option value={Categories.FLEXIBILITY}>{t('exercises.category.flexibility')}</option>
+              <option value={Categories.BALANCE}>{t('exercises.category.balance')}</option>
+              <option value={Categories.HAND_WARMUP}>{t('exercises.category.handWarmup')}</option>
             </select>
 
             {/* Favorites Toggle */}
@@ -168,13 +217,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               }`}
             >
               <StarIcon size={16} />
-              <span className="text-sm font-medium">Favorites Only</span>
+              <span className="text-sm font-medium">{t('exercises.favoritesOnly')}</span>
             </button>
           </div>
 
           {/* Results Count */}
           <div className="mt-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            Showing {filteredExercises.length} of {exercises.length} exercises
+            {t('exercises.showingCount', { count: filteredExercises.length, total: exercises.length })}
           </div>
         </div>
 
@@ -195,7 +244,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                     </span>
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                    {categoryExercises.map((exercise) => (
+        {categoryExercises.map((exercise) => (
                       <ExerciseCard
                         key={exercise.id}
                         exercise={exercise}
@@ -203,6 +252,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         onStartTimer={handleStartTimer}
                         getCategoryColor={getCategoryColor}
                         formatDuration={formatDuration}
+                        onPreview={openPreview}
                       />
                     ))}
                   </div>
@@ -213,7 +263,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         ) : (
           // Show flat grid when filtering by category or search
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {filteredExercises.map((exercise) => (
+      {filteredExercises.map((exercise) => (
               <ExerciseCard
                 key={exercise.id}
                 exercise={exercise}
@@ -221,20 +271,21 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 onStartTimer={handleStartTimer}
                 getCategoryColor={getCategoryColor}
                 formatDuration={formatDuration}
+                onPreview={openPreview}
               />
             ))}
           </div>
         )}
 
         {/* Empty State */}
-        {filteredExercises.length === 0 && (
+  {filteredExercises.length === 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No exercises found
+              {t('exercises.emptyTitle')}
             </h3>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
-              Try adjusting your search terms or filters
+              {t('exercises.emptyBody')}
             </p>
             <button
               onClick={() => {
@@ -244,12 +295,63 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               }}
               className="px-4 py-2.5 bg-blue-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px]"
             >
-              Clear Filters
+              {t('exercises.clearFilters')}
             </button>
           </div>
         )}
       </div>
     </div>
+    {/* Preview Modal */}
+    {previewOpen && (
+      <div className="fixed inset-0 z-[100]" aria-hidden={!previewOpen}>
+        <div
+          className="absolute inset-0 bg-black/50"
+          onClick={closePreview}
+          data-testid="preview-backdrop"
+        />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="exercise-preview-title"
+          className="absolute inset-0 flex items-center justify-center p-4"
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md sm:max-w-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+              <h2 id="exercise-preview-title" className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {previewExercise ? localizeExercise(previewExercise, t).name : t('exercises.preview', { defaultValue: 'Preview' })}
+              </h2>
+              <button
+                onClick={closePreview}
+                aria-label={t('common.close')}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <div className="p-3 sm:p-4">
+              {previewUrl ? (
+                <video
+                  src={previewUrl}
+                  className="w-full h-auto rounded-md bg-black"
+                  controls
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {t('exercises.previewUnavailable', { defaultValue: 'Preview unavailable for this exercise.' })}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
@@ -260,6 +362,7 @@ interface ExerciseCardProps {
   onStartTimer: (exercise: Exercise) => void;
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
+  onPreview?: (exercise: Exercise) => void;
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -267,9 +370,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onToggleFavorite,
   onStartTimer,
   getCategoryColor,
-  formatDuration
+  formatDuration,
+  onPreview
 }) => {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
+  const { t } = useTranslation(['common', 'exercises']);
+  const loc = localizeExercise(exercise, t);
   
   const visibleTags = isTagsExpanded ? exercise.tags : exercise.tags.slice(0, 2);
   const additionalTagsCount = exercise.tags.length - 2;
@@ -288,21 +394,33 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {/* Exercise Header */}
         <div className="flex items-start justify-between mb-2 sm:mb-3">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1 mr-2">
-            {exercise.name}
+            {loc.name}
           </h3>
-          <button
-            onClick={() => onToggleFavorite(exercise.id)}
-            className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
-            title={exercise.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-            aria-label={`${exercise.isFavorite ? 'remove' : 'add'} ${exercise.name} toggle favorite`}
-          >
-            {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
-          </button>
+          <div className="flex items-center gap-2">
+            {exercise.hasVideo && (
+              <button
+                onClick={() => onPreview && onPreview(exercise)}
+                className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                title={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
+                aria-label={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
+              >
+                <PlayIcon size={20} />
+              </button>
+            )}
+            <button
+              onClick={() => onToggleFavorite(exercise.id)}
+              className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
+              title={exercise.isFavorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
+              aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
+            >
+              {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
+            </button>
+          </div>
         </div>
 
         {/* Description */}
         <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2 leading-relaxed">
-          {exercise.description}
+          {loc.description}
         </p>
 
         {/* Exercise Type and Default Values */}
@@ -321,14 +439,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Time-based
+                {t('exercises.timeBased')}
                 </>
               ) : (
                 <>
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                  Rep-based
+                {t('exercises.repBased')}
                 </>
               )}
             </span>
@@ -336,9 +454,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {/* Default Values */}
             <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               {exercise.exerciseType === 'time-based' ? (
-                `Default: ${formatDuration(exercise.defaultDuration)}`
+                t('exercises.defaultDuration', { duration: formatDuration(exercise.defaultDuration) })
               ) : (
-                `Default: ${exercise.defaultSets || 1}×${exercise.defaultReps || 1}`
+                t('exercises.defaultSetsReps', { sets: exercise.defaultSets || 1, reps: exercise.defaultReps || 1 })
               )}
             </span>
           </div>
@@ -365,12 +483,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                 aria-label={
                   isTagsExpanded 
-                    ? 'Show fewer tags' 
-                    : `Show ${additionalTagsCount} more tag${additionalTagsCount === 1 ? '' : 's'}`
+          ? t('exercises.showFewerTags') 
+          : t('exercises.showMoreTags', { count: additionalTagsCount })
                 }
                 aria-expanded={isTagsExpanded}
               >
-                {isTagsExpanded ? 'Show less' : `+${additionalTagsCount}`}
+        {isTagsExpanded ? t('exercises.showLess') : `+${additionalTagsCount}`}
               </button>
             )}
           </div>
@@ -383,7 +501,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             className="w-full sm:w-auto px-3 py-2.5 sm:py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px] sm:min-h-0"
             data-testid="start-exercise-timer"
           >
-            Start Timer
+            {t('home.startTimer')}
           </button>
         </div>
       </div>

@@ -12,7 +12,10 @@ function run(mode: 'pre' | 'post', cwd: string) {
   return { stdout: res.stdout, stderr: res.stderr, exitCode: res.status };
 }
 
-function stripAnsi(s: string){ return s.replace(/\x1b\[[0-9;]*m/g,''); }
+function stripAnsi(s: string){
+  const ansiPattern = new RegExp(String.fromCharCode(27) + "\\[[0-9;]*m", 'g');
+  return s.replace(ansiPattern, '');
+}
 
 let tempRoot: string;
 

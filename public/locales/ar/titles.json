@@ -1,0 +1,11 @@
+{
+  "titles": {
+    "app": "RepCue",
+    "home": "RepCue - مؤقت التمرين",
+    "exercises": "التمارين",
+    "exerciseDetails": "تفاصيل التمرين", 
+    "timer": "المؤقت",
+    "activityLog": "سجل النشاط",
+    "settings": "الإعدادات"
+  }
+}

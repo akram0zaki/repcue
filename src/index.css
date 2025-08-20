@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Optional RTL helper: toggled via body.rtl from i18n init */
+/* Prefer CSS logical properties in components; this is a light global helper */
+:root {
+  /* Logical property safety defaults already provided by Tailwind */
+}
+
+body.rtl {
+  direction: rtl;
+}
+
+/* RTL-aware input and text area styling */
+body.rtl input[type="text"],
+body.rtl input[type="email"], 
+body.rtl input[type="search"],
+body.rtl textarea {
+  text-align: right;
+  direction: rtl;
+}
+
+body.rtl select {
+  direction: rtl;
+}
+
+/* RTL-aware toggle switches */
+body.rtl .toggle-switch-off {
+  transform: translateX(-1.5rem); /* Move to right side when off in RTL */
+}
+
+body.rtl .toggle-switch-on {
+  transform: translateX(-0.25rem); /* Move to left side when on in RTL */
+}
+
+/* Ensure consistent alignment for RTL */
+body.rtl .text-left {
+  text-align: right;
+}
+
+body.rtl .text-right {
+  text-align: left;
+}
+
 @layer base {
   html {
     @apply h-full;

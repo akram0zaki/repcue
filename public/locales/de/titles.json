@@ -1,0 +1,11 @@
+{
+  "titles": {
+    "app": "RepCue",
+    "home": "RepCue - Übungs-Timer",
+    "exercises": "Übungen",
+    "exerciseDetails": "Übungs-Details", 
+    "timer": "Timer",
+    "activityLog": "Aktivitäts-Log",
+    "settings": "Einstellungen"
+  }
+}

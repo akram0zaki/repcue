@@ -58,8 +58,8 @@ describe('Navigation - More Icon', () => {
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Workouts')).toBeInTheDocument();
     expect(screen.getByText('Exercises')).toBeInTheDocument();
-    expect(screen.getByText('Timer')).toBeInTheDocument();
-    expect(screen.getByText('Log')).toBeInTheDocument();
+  expect(screen.getByText('Timer')).toBeInTheDocument();
+  expect(screen.getByText('Activity Log')).toBeInTheDocument();
     
     // But "More" should not be visible
     expect(screen.queryByText('More')).not.toBeInTheDocument();

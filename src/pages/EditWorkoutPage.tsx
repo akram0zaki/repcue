@@ -4,6 +4,7 @@ import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import type { Exercise, Workout, WorkoutExercise, Weekday } from '../types';
 import { Routes } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -17,6 +18,7 @@ const EditWorkoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const workoutId = searchParams.get('id');
+  const { t } = useTranslation();
 
   const [hasConsent, setHasConsent] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -43,7 +45,7 @@ const EditWorkoutPage: React.FC = () => {
       }
 
       if (!workoutId) {
-        setError('No workout ID provided');
+        setError(t('workouts.missingId'));
         setLoading(false);
         return;
       }
@@ -57,7 +59,7 @@ const EditWorkoutPage: React.FC = () => {
         setAvailableExercises(exercises);
 
         if (!workoutData) {
-          setError('Workout not found');
+          setError(t('workouts.loadFailed'));
           setLoading(false);
           return;
         }
@@ -87,7 +89,7 @@ const EditWorkoutPage: React.FC = () => {
         setSelectedExercises(selectedExs);
       } catch (error) {
         console.error('Failed to load workout:', error);
-        setError('Failed to load workout data');
+        setError(t('workouts.loadFailed'));
       }
       setLoading(false);
     };
@@ -113,7 +115,7 @@ const EditWorkoutPage: React.FC = () => {
   const handleSave = async () => {
     if (!hasConsent || !workout) return;
 
-    if (!validateForm()) {
+  if (!validateForm()) {
       return;
     }
 
@@ -150,7 +152,7 @@ const EditWorkoutPage: React.FC = () => {
       navigate(Routes.WORKOUTS);
     } catch (error) {
       console.error('Failed to update workout:', error);
-      setError('Failed to update workout. Please try again.');
+      setError(t('workouts.updateFailed'));
     } finally {
       setSaving(false);
     }
@@ -248,7 +250,7 @@ const EditWorkoutPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Workout</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('workouts.editTitle')}</h1>
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
@@ -258,17 +260,17 @@ const EditWorkoutPage: React.FC = () => {
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                  Data Storage Required
+                  {t('workouts.dataRequiredTitle')}
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                  <p>You need to enable data storage to edit workouts.</p>
+                  <p>{t('workouts.dataRequiredBody')}</p>
                 </div>
                 <div className="mt-4">
                   <button
                     onClick={() => navigate(Routes.SETTINGS)}
                     className="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                   >
-                    Go to Settings
+                    {t('common.goToSettings')}
                   </button>
                 </div>
               </div>
@@ -283,7 +285,7 @@ const EditWorkoutPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Workout</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('workouts.editTitle')}</h1>
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
@@ -293,7 +295,7 @@ const EditWorkoutPage: React.FC = () => {
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                  Error Loading Workout
+                  {t('workouts.errorLoadingTitle')}
                 </h3>
                 <div className="mt-2 text-sm text-red-700 dark:text-red-300">
                   <p>{error}</p>
@@ -303,13 +305,13 @@ const EditWorkoutPage: React.FC = () => {
                     onClick={() => navigate(Routes.WORKOUTS)}
                     className="bg-red-100 hover:bg-red-200 dark:bg-red-800 dark:hover:bg-red-700 text-red-800 dark:text-red-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                   >
-                    Back to Workouts
+                    {t('workouts.backToWorkouts')}
                   </button>
                   <button
                     onClick={() => window.location.reload()}
                     className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                   >
-                    Retry
+                    {t('workouts.retry')}
                   </button>
                 </div>
               </div>
@@ -324,7 +326,7 @@ const EditWorkoutPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
       <div className="p-6 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Workout</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('workouts.editTitle')}</h1>
           <button
             onClick={() => navigate(Routes.WORKOUTS)}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -336,10 +338,10 @@ const EditWorkoutPage: React.FC = () => {
         </div>
 
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
-          {/* Workout Name */}
+      {/* Workout Name */}
           <div>
             <label htmlFor="workoutName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Workout Name
+        {t('workouts.nameLabel')}
             </label>
             <input
               type="text"
@@ -347,7 +349,7 @@ const EditWorkoutPage: React.FC = () => {
               value={workoutName}
               onChange={(e) => setWorkoutName(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter workout name"
+        placeholder={t('workouts.namePlaceholder')}
               disabled={saving}
               required
             />
@@ -357,9 +359,9 @@ const EditWorkoutPage: React.FC = () => {
           </div>
 
           {/* Workout Description */}
-          <div>
+      <div>
             <label htmlFor="workoutDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Description (Optional)
+        {t('workouts.descriptionLabel')}
             </label>
             <textarea
               id="workoutDescription"
@@ -367,7 +369,7 @@ const EditWorkoutPage: React.FC = () => {
               onChange={(e) => setWorkoutDescription(e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Brief description of the workout..."
+        placeholder={t('workouts.descriptionPlaceholder')}
               disabled={saving}
             />
           </div>
@@ -375,7 +377,7 @@ const EditWorkoutPage: React.FC = () => {
           {/* Workout Schedule */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Schedule (Optional)
+              {t('workouts.scheduleLabel')}
             </label>
             <div className="space-y-3">
               {/* Active Status */}
@@ -389,26 +391,26 @@ const EditWorkoutPage: React.FC = () => {
                   disabled={saving}
                 />
                 <label htmlFor="isActive" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  Active workout (can be scheduled for training)
+                  {t('workouts.isActiveLabel')}
                 </label>
               </div>
               
               {/* Days of Week */}
               <div>
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-                  Scheduled Days
+                  {t('workouts.scheduledDaysLabel')}
                 </label>
                 <div className="grid grid-cols-7 gap-2">
                   {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as Weekday[]).map((day) => {
                     const dayLabels = {
-                      monday: 'Mon',
-                      tuesday: 'Tue', 
-                      wednesday: 'Wed',
-                      thursday: 'Thu',
-                      friday: 'Fri',
-                      saturday: 'Sat',
-                      sunday: 'Sun'
-                    };
+                      monday: t('weekday.monday').slice(0, 3),
+                      tuesday: t('weekday.tuesday').slice(0, 3), 
+                      wednesday: t('weekday.wednesday').slice(0, 3),
+                      thursday: t('weekday.thursday').slice(0, 3),
+                      friday: t('weekday.friday').slice(0, 3),
+                      saturday: t('weekday.saturday').slice(0, 3),
+                      sunday: t('weekday.sunday').slice(0, 3)
+                    } as Record<Weekday, string>;
                     
                     const isSelected = scheduledDays.includes(day);
                     
@@ -437,7 +439,7 @@ const EditWorkoutPage: React.FC = () => {
                 </div>
                 {scheduledDays.length > 0 && (
                   <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    Scheduled for {scheduledDays.length} day{scheduledDays.length !== 1 ? 's' : ''} per week
+                    {t('workouts.scheduledPerWeek', { count: scheduledDays.length })}
                   </p>
                 )}
               </div>
@@ -448,10 +450,10 @@ const EditWorkoutPage: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Exercises ({selectedExercises.length})
+                {t('workouts.exercisesLabel', { count: selectedExercises.length })}
               </label>
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                Est. {formatDuration(calculateEstimatedDuration())}
+                {t('workouts.estimatedAbbrev')} {formatDuration(calculateEstimatedDuration())}
               </span>
             </div>
             
@@ -461,14 +463,14 @@ const EditWorkoutPage: React.FC = () => {
 
             {selectedExercises.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No exercises selected</p>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t('workouts.noExercisesSelected')}</p>
                 <button
                   type="button"
                   onClick={() => setShowExercisePicker(true)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   disabled={saving}
                 >
-                  Add Exercise
+                  {t('workouts.addExercise')}
                 </button>
               </div>
             ) : (
@@ -492,6 +494,7 @@ const EditWorkoutPage: React.FC = () => {
                             onClick={() => handleMoveExercise(exercise.id, 'up')}
                             disabled={index === 0 || saving}
                             className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label={t('workouts.moveUpAria')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -502,6 +505,7 @@ const EditWorkoutPage: React.FC = () => {
                             onClick={() => handleMoveExercise(exercise.id, 'down')}
                             disabled={index === selectedExercises.length - 1 || saving}
                             className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label={t('workouts.moveDownAria')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -512,6 +516,7 @@ const EditWorkoutPage: React.FC = () => {
                             onClick={() => handleRemoveExercise(exercise.id)}
                             className="p-1 text-red-500 hover:text-red-700"
                             disabled={saving}
+                            aria-label={t('workouts.removeExerciseAria')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -524,7 +529,7 @@ const EditWorkoutPage: React.FC = () => {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                            Duration (seconds)
+                            {t('workouts.durationSeconds')}
                           </label>
                           <input
                             type="number"
@@ -540,7 +545,7 @@ const EditWorkoutPage: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                            Sets
+                            {t('workouts.sets')}
                           </label>
                           <input
                             type="number"
@@ -556,7 +561,7 @@ const EditWorkoutPage: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                            Reps
+                            {t('workouts.reps')}
                           </label>
                           <input
                             type="number"
@@ -572,7 +577,7 @@ const EditWorkoutPage: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                            Rest (seconds)
+                            {t('workouts.restSeconds')}
                           </label>
                           <input
                             type="number"
@@ -600,7 +605,7 @@ const EditWorkoutPage: React.FC = () => {
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add Another Exercise
+                    {t('workouts.addAnotherExercise')}
                   </span>
                 </button>
               </div>
@@ -608,32 +613,32 @@ const EditWorkoutPage: React.FC = () => {
           </div>
 
           {/* Save Button */}
-          <div className="flex space-x-3">
+      <div className="flex space-x-3">
             <button
               type="button"
               onClick={() => navigate(Routes.WORKOUTS)}
               className="flex-1 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={saving}
             >
-              Cancel
+        {t('common.cancel')}
             </button>
             <button
               type="submit"
               disabled={saving || selectedExercises.length === 0 || !workoutName.trim()}
               className="flex-1 py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
-              {saving ? 'Saving...' : 'Save Workout'}
+        {saving ? t('workouts.saving') : t('workouts.saveWorkout')}
             </button>
           </div>
         </form>
 
         {/* Exercise Picker Modal */}
-        {showExercisePicker && (
+  {showExercisePicker && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden">
               <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Add Exercise
+      {t('workouts.addExerciseTitle')}
                 </h3>
                 <button
                   onClick={() => setShowExercisePicker(false)}

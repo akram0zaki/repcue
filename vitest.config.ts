@@ -9,18 +9,13 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-  // Stabilize tests on Windows: avoid worker fetch timeouts and race conditions
-  // - Use process-based pool instead of threads
-  // - Run single-threaded to reduce Vite RPC contention
-  pool: 'forks',
-  minThreads: 1,
-  maxThreads: 1,
+  // Default parallel execution with threads for speed
+  // (Use vitest.stable.config.ts when you need the old single-threaded mode)
   // Increase timeouts to prevent premature teardown while Vite serves virtual modules
   testTimeout: 30000,
   hookTimeout: 30000,
   teardownTimeout: 30000,
-  // Execute tests sequentially to further reduce concurrency issues
-  fileParallelism: false,
+  // Keep default fileParallelism (true) for better performance
     typecheck: {
       tsconfig: './tsconfig.test.json'
     }

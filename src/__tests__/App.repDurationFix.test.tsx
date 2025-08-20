@@ -28,6 +28,7 @@ vi.mock('../services/storageService', () => {
         repSpeedFactor: 1.0
       }),
       saveAppSettings: vi.fn().mockResolvedValue(undefined),
+  saveExercise: vi.fn().mockResolvedValue(undefined),
       saveExercises: vi.fn().mockResolvedValue(undefined),
       getWorkouts: vi.fn().mockResolvedValue([]),
       toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined)

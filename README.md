@@ -37,15 +37,42 @@ RepCue is your personal interval training companion that:
 - ♿ **Accessible**: WCAG 2.1 compliant for all users
 
 ---
-
-   - Audio announces remaining seconds (if sound enabled)
-   - Timer automatically starts when countdown reaches zero
----
-
 - **Disk Space**: ~200MB for dependencies + ~50MB for built app
-### Installation Steps
 
 #### 1. **Verify Node.js Installation**
+
+---
+
+## 🌍 Internationalization (i18n)
+
+## 🌍 Internationalization (i18n)
+
+RepCue supports 6 languages (English, Dutch, Arabic, German, Spanish, French) with full RTL support for Arabic.
+
+### i18n Contributor & Dev Guide
+- All UI strings use i18n keys (see `/docs/i18n/key-styleguide.md`).
+- To add or update translations:
+    1. Edit `public/locales/en/common.json` (or the correct namespace file).
+    2. Run `npm run i18n:scan` to check for missing keys in other locales.
+    3. Add translations for all supported languages.
+    4. Test in the UI and with `npm run test`.
+- For new languages, mirror the EN structure and add to `supportedLngs` in `src/i18n.ts`.
+- See `/docs/i18n/contributing.md` for full process, key naming, and RTL tips.
+
+### i18n Scripts
+- `npm run i18n:scan` — Fails if any EN keys are missing; warns for other locales.
+- `npm run i18n:report` — Reports missing keys but does not fail (for CI stats).
+
+### Docs
+- `/docs/i18n/README.md` — Overview
+- `/docs/i18n/key-styleguide.md` — Key naming
+- `/docs/i18n/contributing.md` — How to add/translate
+- `/docs/i18n/rtl.md` — RTL/Arabic tips
+- `/docs/i18n/string-inventory.md` — All keys
+- `/docs/i18n/CHANGELOG.md` — i18n structure changes
+- `/docs/i18n/screenshots/` — Screenshots for review
+
+---
 ```bash
 node --version  # Should show v18.x.x or higher
 npm --version   # Should show 8.x.x or higher
@@ -109,8 +136,9 @@ npm run preview
 | `npm test` | Run all tests | Development/CI |
 | `npm run test:ui` | Visual test runner | Debugging tests |
 | `npm run test:coverage` | Test coverage report | Quality assurance |
+| `npm run test:unit` | Unit/integration (fast, parallel) | Fast testing |
+| `npm run test:stable` | Stable mode (single-threaded, Windows-friendly) | Stable testing |
 
----
 
 ## 🧪 Testing
 

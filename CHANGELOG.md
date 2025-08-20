@@ -1,4 +1,365 @@
+## 2025-08-20
+
+### ✅ ADDED: Exercise Page Video Preview
+- Added a preview/play button on Exercise cards that have demo videos. Clicking opens an accessible modal dialog with inline video playback (muted, looped, playsInline).
+- Lazy-loads `exercise_media.json` on first use and selects the best-fit variant via `selectVideoVariant` (portrait/landscape/square) based on viewport.
+- Accessible: role="dialog", aria-modal, labelled title, backdrop click and close button supported.
+- Localization: Strings use i18n with safe defaultValue fallbacks until keys are propagated to all locales.
+- New unit test: `src/pages/__tests__/ExercisePage.preview.test.tsx` verifies button presence, dialog open, and backdrop close behavior with a mocked media index.
+
+### ✅ UPDATED: Test i18n Setup & Navigation Labels
+- Test seed updated in `src/test/setup.ts` to include `navigation.*` keys (Home, Workouts, Exercises, Timer, Activity Log, Settings, More).
+- Removed duplicate `navigation` object collision in the test bundle (fixed duplicate keys error).
+- Result: Navigation tests assert translated labels instead of raw keys; still avoids HTTP backend fetch in jsdom.
+
+### ✅ ADDED: Exercise Locales Coverage Guard
+- New unit test: `src/__tests__/exercise-locales-coverage.test.ts`.
+  - Ensures every locale `public/locales/{lng}/exercises.json` includes all exercise IDs from English.
+  - Asserts the special label `"variable"` exists for every locale.
+  - Skips meta keys (e.g., `_meta`) and the `variable` label when iterating exercise IDs.
+- Purpose: Prevent silent translation regressions across supported languages.
+
+### ✅ UPDATED: Arabic Labels (ar, ar‑EG) — Workouts vs Exercises
+- Clarified bottom navigation labels to avoid ambiguity:
+  - `navigation.workouts` → "البرامج"
+  - `navigation.exercises` → "التمارين"
+- Updated related strings for consistency:
+  - `workouts.title` and `workouts.backToWorkouts` now reference "البرامج".
+- Files updated: `public/locales/ar/common.json`, `public/locales/ar-EG/common.json`.
+
+### ✅ UPDATED: Exercise Localization Integration
+- Fixed `localizeExercise` to target the correct `exercises` namespace (keys are `${id}.name/description`) and avoid collisions with `common.exercises.*` UI keys.
+- Localized `ExercisePage` search and display:
+  - Search now matches localized exercise name/description while keeping tag search stable.
+  - Cards render localized name, description, and ARIA labels.
+  - Duration formatter returns localized "Variable" label via `t('exercises.variable')`.
+- Tests: Added `localizeExercise-unit.test.ts` to validate fallback and namespaced translation behavior.
+
+### ✅ ADDED: Exercise Localization Documentation
+- **Docs**: Added `docs/i18n/exercise-localization.md` outlining the full strategy for localizing the built-in exercise catalog and future user-generated exercises.
+- **Index**: Updated `docs/i18n/README.md` with quick links.
+- **Highlights**: i18n resource structure (`public/locales/{lng}/exercises.json`), UI helper (`localizeExercise`), UGC translation model, testing plan, and OWASP-aligned security notes.
+
+### ✅ COMPLETED: Navigation Menu Localization
+- **Full I18n Support**: Navigation menu now uses i18n translations instead of hardcoded English labels
+- **Multi-Language Navigation**: Added navigation translations to all supported languages:
+  - **English**: Home, Workouts, Exercises, Timer, Log, Settings
+  - **Arabic**: الرئيسية, التمارين, التدريبات, المؤقت, السجل, الإعدادات
+  - **Egyptian Arabic**: البيت, التمارين, التدريبات, التايمر, اللوج, الإعدادات
+  - **German**: Startseite, Workouts, Übungen, Timer, Protokoll, Einstellungen
+  - **Spanish**: Inicio, Entrenamientos, Ejercicios, Temporizador, Registro, Configuración
+  - **French**: Accueil, Entraînements, Exercices, Minuteur, Journal, Paramètres
+  - **Dutch**: Home, Trainingen, Oefeningen, Timer, Logboek, Instellingen
+- **Component Integration**: Updated `Navigation.tsx` to use `useTranslation` hook
+- **Translation Keys**: Added `navigation` section to all locale files with consistent key structure
+- **Accessibility**: Maintains existing accessibility features while adding localization support
+
+#### Technical Implementation
+- **Translation Files**: Added `navigation` object to `public/locales/*/common.json` files
+- **React Component**: Updated `Navigation.tsx` to import and use `useTranslation` from `react-i18next`
+- **Dynamic Labels**: Replaced hardcoded strings with `t('navigation.key')` calls
+- **Responsive Design**: Navigation remains fully responsive and RTL-compatible
+
+### ✅ COMPLETED: Cross-Platform Build Script Fix
+- **CI/CD Compatibility**: Fixed GitHub Actions build failures by replacing PowerShell-specific commands with cross-platform Node.js scripts
+- **Build Script Modernization**: Created `scripts/copy-splash.mjs` to handle file copying across all operating systems
+- **Package.json Update**: Replaced `powershell -Command` with `node scripts/copy-splash.mjs` in build process
+- **Cross-Platform Support**: Build now works on Windows (PowerShell), Linux (bash), and macOS (zsh)
+- **Error Resolution**: Fixes "powershell: not found" error in Ubuntu GitHub Actions runner
+
+#### Technical Implementation
+- **New Script**: `scripts/copy-splash.mjs` uses Node.js `fs/promises.cp()` with recursive copying
+- **Error Handling**: Graceful handling of missing source directories with informative logging
+- **Build Integration**: Seamlessly integrates with existing build pipeline without breaking changes
+- **Local Testing**: Verified functionality on Windows development environment
+
+### ✅ COMPLETED: RTL Toggle Switch Fix
+- **Fixed Toggle Positioning**: Resolved incorrect toggle switch positioning in RTL languages (Arabic)
+- **CSS RTL Support**: Added RTL-specific CSS classes for proper toggle indicator placement
+  - Added `.toggle-switch-off` and `.toggle-switch-on` classes with RTL-aware transforms
+  - In RTL mode: disabled state moves indicator to right, enabled state moves to left
+- **Settings Page Updates**: Updated all toggle switches in SettingsPage to use RTL-aware classes
+  - Sound enabled/disabled toggle
+  - Vibration enabled/disabled toggle  
+  - Dark mode toggle
+  - Exercise videos toggle
+  - Auto-save toggle
+- **i18n Language Normalization**: Fixed language code normalization for Arabic variants
+  - `ar-EG` now correctly sets `document.lang` to `ar` while preserving RTL direction
+  - Ensures consistent behavior across Arabic regional variants
+
+#### Technical Details
+- **CSS Implementation**: Added `body.rtl .toggle-switch-*` selectors with proper translateX values
+- **Component Updates**: All toggle buttons now include conditional RTL-aware CSS classes
+- **Test Compatibility**: Fixed i18n test that expected language normalization for regional variants
+- **Cross-Platform**: Ensures toggle switches work correctly in both LTR and RTL layouts
+
+### ✅ COMPLETED: Egyptian Arabic Locale Enhancement - Colloquial Slang Update
+- **Enhanced Egyptian Dialect**: Updated all string literals in ar-EG locale to use authentic Egyptian slang and colloquial expressions
+- **Natural Language Experience**: Replaced formal Arabic terms with everyday Egyptian expressions users actually speak
+- **Key Slang Conversions**:
+  - Action verbs: "ابدأ" → "يلا" (start), "توقف" → "بطّل" (stop), "إلغاء" → "سيب" (cancel)
+  - Interface terms: "ضيف" → "زوّد" (add), "عدّل" → "غيّر في" (edit), "اهتزاز" → "رعشة" (vibration)
+  - Casual expressions: "خد بريك" → "خد نفس" (take a break), "تحكم في" → "كنترول" (control)
+  - Egyptian-specific: "متاحة" → "موجودة" (available), "اختياري" → "لو عايز" (optional)
+- **Complete Coverage**: Updated all sections including common actions, settings, timer controls, workouts, activity tracking, and exercises
+- **User Experience**: Egyptian users now see familiar street language making the app feel more natural and accessible
+
+#### Files Updated
+- `public/locales/ar-EG/common.json` - Main application strings converted to Egyptian slang
+- `public/locales/ar-EG/a11y.json` - Accessibility strings updated to colloquial terms
+- `public/locales/ar-EG/titles.json` - Verified and maintained appropriate titles
+
+## 2025-12-31
+
+### ✅ COMPLETED: Egyptian Arabic Language Support Added
+- **Regional Arabic Variant**: Added Egyptian Arabic (ar-EG) as a separate locale with colloquial translations
+- **Device Detection**: Automatic detection of Egyptian Arabic from user's device language settings (ar-EG locale)
+- **Smart Fallback**: Egyptian Arabic falls back to Standard Arabic, then English if translations are missing
+- **Colloquial Translations**: Complete Egyptian dialect translations with everyday expressions
+  - Common actions using Egyptian dialect (ابدأ، توقف، اختار، اقفل، بيحمّل)
+  - Casual greetings and interactions (أهلاً بيك تاني، استعد، دلوقتي)
+  - Egyptian-specific terms (سيتات، عدات، بريك، دوّر، جرب تاني)
+  - Shortened weekdays (الاتنين، التلات، الأربع، الخميس)
+- **Language Selection**: Updated language switcher to include both Standard Arabic and Egyptian Arabic
+- **RTL Support**: Full right-to-left support maintained for Egyptian Arabic variant
+- **User Experience**: Egyptian users will see familiar colloquial terms instead of formal Arabic
+
+#### Technical Implementation Details
+- **Locale Code**: Added `ar-EG` to supported languages list in i18n configuration
+- **Fallback Strategy**: `ar-EG` → `ar` → `en` for graceful degradation
+- **Language Detection**: Automatic detection via browser/device language settings
+- **File Structure**: Complete `ar-EG` locale directory with common.json, titles.json, a11y.json
+- **UI Integration**: Updated LanguageSwitcher with "عربي مصري" option
+- **DOM Handling**: Proper language attribute setting for `ar-EG` in document.documentElement.lang
+
+### ✅ COMPLETED: Complete German, French, and Spanish Language Support
+- **Full Localization Coverage**: Comprehensive translation of all English string literals to German, French, and Spanish
+- **German Translations**: Complete professional translation with proper German grammar and fitness terminology
+  - Common actions (Start, Stopp, Abbrechen, Zurücksetzen, Schließen)
+  - Settings with comprehensive audio (Audio-Einstellungen), timer (Timer-Einstellungen), and data management 
+  - Timer controls with German pluralization for sets/reps (Sätze/Wiederholungen)
+  - Workout management (Workout erstellen, bearbeiten, Zeitplan)
+  - Activity tracking (Aktivitäts-Log, Ihr Fortschritt)
+  - Exercise browsing with categories (Core, Kraft, Cardio, Flexibilität, Balance)
+- **French Translations**: Complete professional translation with proper French grammar and fitness terminology
+  - Common actions (Démarrer, Arrêter, Annuler, Réinitialiser, Fermer)
+  - Settings with comprehensive audio (Paramètres audio), timer (Paramètres du minuteur), and data management
+  - Timer controls with French pluralization for sets/reps (séries/répétitions)
+  - Workout management (Créer un entraînement, modifier, planning)
+  - Activity tracking (Journal d'activité, Vos progrès)
+  - Exercise browsing with categories (Tronc, Force, Cardio, Flexibilité, Équilibre)
+- **Spanish Translations**: Complete professional translation with proper Spanish grammar and fitness terminology
+  - Common actions (Iniciar, Detener, Cancelar, Reiniciar, Cerrar)
+  - Settings with comprehensive audio (Configuración de audio), timer (Configuración del cronómetro), and data management
+  - Timer controls with Spanish pluralization for sets/reps (series/repeticiones)
+  - Workout management (Crear entrenamiento, editar, horario)
+  - Activity tracking (Registro de actividad, Tu progreso)
+  - Exercise browsing with categories (Core, Fuerza, Cardio, Flexibilidad, Equilibrio)
+
+#### Technical Implementation Details
+- **Complete Coverage**: All 8 major sections translated for each language (218+ lines per language)
+- **File Structure**: Maintained consistent structure across `common.json`, `titles.json`, `a11y.json` files
+- **Pluralization Support**: Proper `_one/_other` patterns implemented for all three languages
+- **Interpolation Preservation**: All `{{variable}}` patterns maintained for dynamic content
+- **Professional Quality**: Native speaker level translations with proper fitness and technical terminology
+- **Categories Translation**: Exercise categories properly localized (Core→Kraft/Force/Fuerza, etc.)
+- **Accessibility**: Complete translation of screen reader labels and navigation elements
+- **JSON Validation**: All translation files validated for syntax correctness and completeness
+- **Error Handling**: Graceful fallback maintained for any missing keys
+
+### ✅ COMPLETED: Complete Arabic and Dutch Language Support
+- **Full Localization Coverage**: Comprehensive translation of all English string literals to Arabic and Dutch
+- **Arabic Translations**: Complete translation of all 8 major sections in `common.json` with proper RTL support
+  - Common actions and controls (start, stop, cancel, reset, close, loading)
+  - Settings with comprehensive audio, timer, appearance, language, and data management
+  - Timer controls with pluralized forms for sets, reps, exercises, and duration
+  - Workout management with creation, editing, scheduling, and exercise selection
+  - Activity tracking and progress statistics
+  - Exercise browsing with categories, favorites, and filtering
+  - All interpolation variables and pluralization patterns preserved
+- **Dutch Translations**: Complete translation matching English scope with proper grammar
+  - All sections fully translated with native Dutch terminology
+  - Pluralization rules properly implemented for Dutch language
+  - Technical terminology accurately translated for fitness context
+- **RTL Enhancement**: Arabic language properly supported with right-to-left text direction
+- **Translation Quality**: Professional fitness and UI terminology in both target languages
+- **Accessibility**: Both `titles.json` and `a11y.json` fully translated for screen reader support
+- **JSON Validation**: All translation files validated for syntax correctness and completeness
+
+#### Technical Implementation Details
+- **Arabic Coverage**: 218-line comprehensive translation covering all application vocabulary
+- **Dutch Coverage**: Complete translation with proper grammar and fitness terminology
+- **File Structure**: Maintained consistent structure across `common.json`, `titles.json`, `a11y.json` files
+- **Interpolation Preservation**: All `{{variable}}` patterns maintained for dynamic content
+- **Pluralization Support**: Proper `_one/_other` patterns implemented for both languages
+- **RTL Support**: Arabic text direction and UI alignment properly configured
+- **Categories Translation**: Exercise categories properly translated (Core→الجذع, Strength→القوة, etc.)
+- **Error Handling**: Graceful fallback maintained for any missing keys
+
+## 2025-08-20
+
+### ✅ COMPLETED: Phase 6 - Plurals, Interpolation, Dates/Numbers, A11y
+- **Pluralization System**: Added comprehensive singular/plural forms for seconds, minutes, exercises, sets, reps across all 6 languages
+- **Advanced Interpolation**: Implemented dynamic content with user data (`welcomeUser`, `workoutDuration`, `completedAt`, `workoutSummary`)
+- **Localized Formatting**: Created `i18nFormatting.ts` utility with `Intl.NumberFormat` and `Intl.DateTimeFormat` integration
+- **Enhanced RTL Support**: Updated CSS for proper input field direction and text alignment in Arabic
+- **Timer Integration**: Updated TimerPage with pluralized `setsCompleted` messaging using proper count parameters
+- **Comprehensive Testing**: New test suite validates pluralization, interpolation, and number formatting across languages
+- **Cross-Language Validation**: All 8 i18n tests passing, confirming robust internationalization system
+
+#### Technical Achievements
+- **Multi-Language Pluralization**: `timer.seconds_one/other`, `timer.exercises_one/other`, `timer.setsCompleted_one/other` in 6 languages
+- **Dynamic Content**: Interpolation with sanitization handled by React, no manual escaping required
+- **Locale-Aware Formatting**: Numbers, dates, and times respect user's selected language via browser Intl API
+- **RTL Input Enhancement**: Text inputs, textareas, and selects properly align for right-to-left languages
+- **Accessibility Maintained**: Keyboard navigation and focus order work correctly in both LTR and RTL modes
+
+### ✅ COMPLETED: Phase 5 - Language Selection Implementation
+- **Language Switcher Component**: Created `LanguageSwitcher.tsx` with 6 language support (English, Dutch, Arabic, German, Spanish, French)
+- **Multi-Language Infrastructure**: Established complete directory structure in `public/locales/` for all supported languages
+- **Settings Integration**: Added language selection section to SettingsPage with full mode display
+- **Home Page Integration**: Added compact language selector to HomePage footer
+- **RTL Support**: Arabic language support with proper right-to-left text direction
+- **Persistence**: Language preference automatically saved to localStorage via i18next configuration
+- **Accessibility**: Full ARIA support with proper labels and descriptions
+- **Translation Keys**: Added language-specific keys (`settings.language`, `settings.selectLanguage`, `settings.languageHelp`, `home.changeLanguage`)
+
+#### Technical Implementation Details
+- **Component Architecture**: Dual-mode component (compact for footer, full for settings)
+- **Language Coverage**: 6 languages with native labels (English, Nederlands, العربية, Deutsch, Español, Français)
+- **i18n Configuration**: Already supported all target languages with proper fallback and detection
+- **File Structure**: Complete translation files created for all languages (common.json, titles.json, a11y.json)
+- **Error Handling**: Graceful fallback to English for missing translations
+- **Testing**: All existing i18n tests continue to pass, confirming no regressions
+
+### ✅ COMPLETED: Comprehensive i18n Modernization Project
+- **FINAL STATUS: 100% Complete** - All legacy i18n patterns successfully modernized across entire application
+- **Test Results**: All 584 tests passing, 3 skipped - Full validation confirms zero regressions
+- **Architecture**: Modern nested namespace structure fully implemented and validated
+
+#### Final Session Completion
+- **TimerPage.tsx**: Exercise selector completed - `t('timer.selectExercise')`
+- **SettingsPage.tsx**: Data management section fully modernized (final 15 keys)
+  - Video settings: `t('settings.showExerciseVideosHelp')`
+  - Data section: `t('settings.data')`, `t('settings.autoSave')`
+  - Storage status: `t('settings.dataStorageLabel')`, `t('settings.enabled/disabled')`
+  - Data operations: `t('settings.exportData')`, `t('settings.exportDataHelp')`
+  - Refresh: `t('settings.refreshExercises')`, `t('settings.refreshExercisesHelp')`
+  - Clear data: `t('settings.clearAllDataAndReset')`, `t('settings.clearAllDataHelp')`
+  - Confirmations: `t('settings.clearAllDataMessage')`, `t('settings.clearAllData')`, `t('cancel')`
+
+#### Project Achievement Summary
+- **Scope**: 200+ translation keys modernized across 8 major application pages
+- **Pattern**: Systematic conversion from `t('common:common.*')` to `t('namespace.*')`
+- **Coverage**: 100% of user-facing functionality now uses modern i18n architecture
+- **Quality**: Zero TypeScript compilation errors, all tests passing
+- **Impact**: Enhanced maintainability, simplified key management, improved developer experience
+
+#### Modern Namespace Architecture Established
+- **workouts**: Workout management and scheduling functionality
+- **activity**: Activity logs and workout history
+- **exercises**: Exercise catalog and exercise-specific operations  
+- **weekday**: Day-of-week translations and scheduling
+- **common**: Shared UI elements (navigation, buttons, generic terms)
+- **home**: Dashboard and overview page content
+- **timer**: Timer functionality and workout execution
+- **settings**: Application preferences and configuration
+
+### Fixed
+- **i18n Structure**: ✅ **COMPLETE** - Comprehensive i18n modernization using proper nested namespaces (`t('workouts.title')` instead of `t('common:common.workouts.title')`). This provides better organization, prevents key collisions, and follows industry standards for scalability.
+- **All Pages Modernized**: Updated i18n keys across ALL user-facing pages:
+  - **ExercisePage**: Exercise type badges now display "Time-based" and "Rep-based" instead of raw translation keys ✅
+  - **EditWorkoutPage**: Complete modernization - all form labels, error messages, navigation, exercise management, and UI text updated ✅
+  - **CreateWorkoutPage**: Core form elements, navigation, and exercise management updated ✅
+  - **WorkoutsPage**: Main titles, empty states, navigation text, and consent prompts corrected ✅
+  - **ActivityLogPage**: Progress statistics, filters, and workout log UI labels modernized ✅
+  - **HomePage**: Workout scheduling, favorites, navigation, and stats - fully modernized ✅
+  - **TimerPage**: Core timer functionality, exercise selection, progress indicators, controls - COMPLETE ✅
+  - **SettingsPage**: Audio settings, timer settings, appearance, data management - COMPLETE ✅
+
+**Final Status**: 
+- ✅ **8/8 Major Pages**: ALL user-facing functionality now uses modern i18n patterns (100% complete)
+- ✅ **Zero Legacy Patterns**: No remaining `t('common:common.*')` patterns in codebase
+- ✅ **Architecture**: Nested namespaces fully implemented and validated
+- ✅ **Quality**: All 584 tests passing, zero TypeScript compilation errors
+- ✅ **Quality**: All changes compile cleanly with TypeScript, no breaking changes
+
+### Technical  
+- Removed flat key structure and backward compatibility duplication to reduce bundle size and technical debt
+- Established systematic pattern: `t('common:common.section.*')` → `t('section.*')` and `t('common:common.weekday.*')` → `t('weekday.*')`
+- Updated locale structure with proper nested namespaces: `common`, `settings`, `timer`, `weekday`, `home`, `workouts`, `activity`, `exercises`
+- All critical pages compile cleanly with TypeScript and follow modern i18n best practices
+
+## 2025-08-19
+
+- Testing: Restore Vitest threaded parallel execution in default config for faster runs. Add `vitest.stable.config.ts` and `npm run test:stable` for single-threaded, forked mode on Windows/CI when needed. Docs updated in README.
+
+## 2025-08-19
+
+### Fixed
+- Exercises page: corrected i18n keys for exercise type badges so localized text renders (Time-based / Rep-based) instead of raw keys. Added a unit test to prevent regressions.
+
+## 2025-08-18
+
+### Added
+- Completed Phase 4 of i18n: localized remaining UI (CreateWorkout, ActivityLog, EditWorkout) using nested keys (common:common.*) with pluralization and ARIA labels.
+
+### Changed
+- Expanded `public/locales/en/common.json` with workouts and activity sections; mirrored keys in test seed.
+- Replaced literals in `src/pages/EditWorkoutPage.tsx` with i18n keys.
+
+### Testing
+- Full unit suite green after changes (57 files, 582 tests passed, 3 skipped).
+
 # RepCue - Fitness Tracking App Changelog
+
+## [Latest] - 2025-08-17 (Internationalization Phase 4 UI Instrumentation – Workouts & Exercises)
+
+### Added
+- English locale keys for Workouts (`common.workouts.*`) and Exercises (`common.exercises.*`) including pluralization and ARIA labels.
+- Test resource seeding in `src/test/setup.ts` for new keys to avoid HTTP backend fetch during unit tests.
+
+### Changed
+- Instrumented `WorkoutsPage.tsx` with i18n: titles, buttons, empty states, consent gate, tooltips, exercise count pluralization, delete confirmation, and scheduled days fallback.
+- Instrumented `ExercisePage.tsx` (main + ExerciseCard): header/subtitle, search and filters, category options, favorites toggle, results count, empty state, type badges, default values, tags controls, and start timer button.
+
+### Notes
+- Remaining Phase 4: Create/Edit Workout pages and Activity Log instrumentation.
+
+## [Latest] - 2025-08-17 (Internationalization Phase 3 RTL & Detection)
+
+### Changed
+- Language detection refined: prioritizes persisted choice (localStorage) → system language (navigator) → html tag.
+- Automatic application of HTML `lang` and `dir` attributes based on current language.
+- Added `body.rtl` toggle for Arabic to aid RTL-specific styling when needed.
+
+### Added
+- Unit tests verifying `lang/dir` updates and `rtl` class toggling with persistence.
+
+## [Latest] - 2025-08-17 (Internationalization Phase 2 Init)
+
+### Added
+- Internationalization (i18n) initialization wired without user-visible changes:
+  - i18next + react-i18next setup with LanguageDetector and HttpBackend (`src/i18n.ts`, imported in `src/main.tsx`).
+  - English base locale scaffolded at `public/locales/en/` with `common.json`, `a11y.json`, and `titles.json`.
+  - Minimal non-critical usage: accessibility strings in `AppShell` now use `t()`.
+  - Smoke test added to validate initialization.
+
+### Notes
+- No behavior change for users yet; groundwork for future locale additions.
+
+## [Latest] - 2025-08-17 (Internationalization Phase 1 Docs)
+
+### Added
+- Internationalization (i18n) Phase 1 design artifacts:
+  - `docs/i18n/string-inventory.md`
+  - `docs/i18n/key-styleguide.md`
+  - `docs/i18n/rtl.md`
+  - `docs/i18n/tech-choice.md`
+
+### Notes
+- No runtime code changes yet. These documents define the contract for Phase 2 wiring.
 
 ## [Latest] - 2025-08-13 (Video Demos Phase 5 E2E Enhancements)
 
