@@ -33,6 +33,7 @@
     "audioSettings": "إعدادات الصوت",
     "enableSound": "شغّل الصوت",
     "beepVolume": "صوت البيب",
+  "beepIntervalHelp": "شغّل بيب قصير كل N ثانية أثناء التمارين المعتمدة على الوقت.",
     "enableVibration": "شغّل الرعشة",
     "timerSettings": "⏱️ إعدادات المؤقت",
     "preTimerCountdown": "العدّ قبل المؤقت",
@@ -237,6 +238,9 @@
     "showFewerTags": "ورّي تاجات أقل",
     "showMoreTags_one": "ورّي {{count}} تاج أكتر",
     "showMoreTags_other": "ورّي {{count}} تاجات أكتر",
-    "showLess": "ورّي أقل"
+  "showLess": "ورّي أقل",
+  "preview": "معاينة",
+  "previewVideo": "معاينة الفيديو",
+  "previewUnavailable": "المعاينة مش متاحة للتمرين ده."
   }
 }

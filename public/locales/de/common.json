@@ -33,6 +33,7 @@
     "audioSettings": "Audio-Einstellungen",
     "enableSound": "Ton aktivieren",
     "beepVolume": "Piep-Lautstärke",
+  "beepIntervalHelp": "Alle N Sekunden während zeitbasierten Übungen einen kurzen Piepton abspielen.",
     "enableVibration": "Vibration aktivieren",
     "timerSettings": "⏱️ Timer-Einstellungen",
     "preTimerCountdown": "Vorlauf-Countdown",
@@ -237,6 +238,9 @@
     "showFewerTags": "Weniger Tags anzeigen",
     "showMoreTags_one": "{{count}} weiteres Tag anzeigen",
     "showMoreTags_other": "{{count}} weitere Tags anzeigen",
-    "showLess": "Weniger anzeigen"
+  "showLess": "Weniger anzeigen",
+  "preview": "Vorschau",
+  "previewVideo": "Video-Vorschau",
+  "previewUnavailable": "Für diese Übung ist keine Vorschau verfügbar."
   }
 }

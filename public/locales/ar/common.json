@@ -33,6 +33,7 @@
     "audioSettings": "إعدادات الصوت",
     "enableSound": "تفعيل الصوت",
     "beepVolume": "مستوى الصوت",
+  "beepIntervalHelp": "تشغيل صوت قصير كل N ثوانٍ أثناء التمارين المعتمدة على الوقت.",
     "enableVibration": "تفعيل الاهتزاز",
     "timerSettings": "⏱️ إعدادات المؤقت",
     "preTimerCountdown": "العد التنازلي قبل المؤقت",
@@ -237,6 +238,9 @@
     "showFewerTags": "عرض علامات أقل",
     "showMoreTags_one": "عرض {{count}} علامة أكثر",
     "showMoreTags_other": "عرض {{count}} علامات أكثر",
-    "showLess": "عرض أقل"
+  "showLess": "عرض أقل",
+  "preview": "معاينة",
+  "previewVideo": "معاينة الفيديو",
+  "previewUnavailable": "المعاينة غير متاحة لهذا التمرين."
   }
 }

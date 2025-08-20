@@ -33,6 +33,7 @@
     "audioSettings": "Configuración de audio",
     "enableSound": "Activar sonido",
     "beepVolume": "Volumen del pitido",
+  "beepIntervalHelp": "Reproduce un pitido corto cada N segundos durante ejercicios basados en tiempo.",
     "enableVibration": "Activar vibración",
     "timerSettings": "⏱️ Configuración del cronómetro",
     "preTimerCountdown": "Cuenta regresiva previa",
@@ -237,6 +238,9 @@
     "showFewerTags": "Mostrar menos etiquetas",
     "showMoreTags_one": "Mostrar {{count}} etiqueta más",
     "showMoreTags_other": "Mostrar {{count}} etiquetas más",
-    "showLess": "Mostrar menos"
+  "showLess": "Mostrar menos",
+  "preview": "Vista previa",
+  "previewVideo": "Vista previa del video",
+  "previewUnavailable": "No hay vista previa disponible para este ejercicio."
   }
 }

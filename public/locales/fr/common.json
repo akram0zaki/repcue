@@ -33,6 +33,7 @@
     "audioSettings": "Paramètres audio",
     "enableSound": "Activer le son",
     "beepVolume": "Volume du bip",
+  "beepIntervalHelp": "Lire un court bip toutes les N secondes pendant les exercices basés sur le temps.",
     "enableVibration": "Activer la vibration",
     "timerSettings": "⏱️ Paramètres du minuteur",
     "preTimerCountdown": "Compte à rebours pré-minuteur",
@@ -237,6 +238,9 @@
     "showFewerTags": "Afficher moins de tags",
     "showMoreTags_one": "Afficher {{count}} tag de plus",
     "showMoreTags_other": "Afficher {{count}} tags de plus",
-    "showLess": "Afficher moins"
+  "showLess": "Afficher moins",
+  "preview": "Aperçu",
+  "previewVideo": "Aperçu de la vidéo",
+  "previewUnavailable": "Aucun aperçu disponible pour cet exercice."
   }
 }

@@ -33,6 +33,7 @@
     "audioSettings": "Audio Instellingen",
     "enableSound": "Geluid Inschakelen",
     "beepVolume": "Piep Volume",
+  "beepIntervalHelp": "Speel elke N seconden een korte piep tijdens tijd-gebaseerde oefeningen.",
     "enableVibration": "Trillen Inschakelen",
     "timerSettings": "⏱️ Timer Instellingen",
     "preTimerCountdown": "Pre-Timer Aftelling",
@@ -237,6 +238,9 @@
     "showFewerTags": "Minder tags weergeven",
     "showMoreTags_one": "{{count}} tag meer weergeven",
     "showMoreTags_other": "{{count}} tags meer weergeven",
-    "showLess": "Minder weergeven"
+  "showLess": "Minder weergeven",
+  "preview": "Voorbeeld",
+  "previewVideo": "Video voorbeeld",
+  "previewUnavailable": "Voor deze oefening is geen voorbeeld beschikbaar."
   }
 }
