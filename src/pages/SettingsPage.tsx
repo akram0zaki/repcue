@@ -307,7 +307,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </h2>
           
           <div className="space-y-3">
-            <LanguageSwitcher compact={false} />
+            <LanguageSwitcher compact={false} showLabel={false} />
           </div>
         </div>
 

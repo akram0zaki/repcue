@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 interface LanguageSwitcherProps {
   compact?: boolean;
+  showLabel?: boolean;
   className?: string;
 }
 
@@ -18,6 +19,7 @@ const supportedLanguages = [
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ 
   compact = false, 
+  showLabel = true,
   className = '' 
 }) => {
   const { i18n, t } = useTranslation();
@@ -53,12 +55,14 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
-      <label 
-        htmlFor="language-selector"
-        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
-        {t('settings.language')}
-      </label>
+      {showLabel && (
+        <label 
+          htmlFor="language-selector"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          {t('settings.language')}
+        </label>
+      )}
       <select
         id="language-selector"
         value={currentLanguage}

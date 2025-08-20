@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run generate-splash && node scripts/verify-media.mjs pre && tsc -b && vite build && node scripts/verify-media.mjs post && npm run copy-splash",
-    "copy-splash": "powershell -Command \"Copy-Item -Recurse -Force public/splash dist/\"",
+    "copy-splash": "node scripts/copy-splash.mjs",
     "build:prod": "npm run generate-splash && node scripts/verify-media.mjs pre && vite build && node scripts/verify-media.mjs post",
     "lint": "eslint .",
     "preview": "vite preview",
