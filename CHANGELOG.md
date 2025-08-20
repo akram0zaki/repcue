@@ -1,5 +1,18 @@
 ## 2025-08-20
 
+### ✅ COMPLETED: Cross-Platform Build Script Fix
+- **CI/CD Compatibility**: Fixed GitHub Actions build failures by replacing PowerShell-specific commands with cross-platform Node.js scripts
+- **Build Script Modernization**: Created `scripts/copy-splash.mjs` to handle file copying across all operating systems
+- **Package.json Update**: Replaced `powershell -Command` with `node scripts/copy-splash.mjs` in build process
+- **Cross-Platform Support**: Build now works on Windows (PowerShell), Linux (bash), and macOS (zsh)
+- **Error Resolution**: Fixes "powershell: not found" error in Ubuntu GitHub Actions runner
+
+#### Technical Implementation
+- **New Script**: `scripts/copy-splash.mjs` uses Node.js `fs/promises.cp()` with recursive copying
+- **Error Handling**: Graceful handling of missing source directories with informative logging
+- **Build Integration**: Seamlessly integrates with existing build pipeline without breaking changes
+- **Local Testing**: Verified functionality on Windows development environment
+
 ### ✅ COMPLETED: RTL Toggle Switch Fix
 - **Fixed Toggle Positioning**: Resolved incorrect toggle switch positioning in RTL languages (Arabic)
 - **CSS RTL Support**: Added RTL-specific CSS classes for proper toggle indicator placement
