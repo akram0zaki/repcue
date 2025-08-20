@@ -45,26 +45,34 @@ RepCue is your personal interval training companion that:
 
 ## 🌍 Internationalization (i18n)
 
-Phase 1 design artifacts are available:
+## 🌍 Internationalization (i18n)
 
-- docs/i18n/README.md
-- docs/i18n/string-inventory.md
-- docs/i18n/key-styleguide.md
-- docs/i18n/rtl.md
-- docs/i18n/tech-choice.md
+RepCue supports 6 languages (English, Dutch, Arabic, German, Spanish, French) with full RTL support for Arabic.
 
-These documents define the conventions and scope for adding multi-language support.
+### i18n Contributor & Dev Guide
+- All UI strings use i18n keys (see `/docs/i18n/key-styleguide.md`).
+- To add or update translations:
+    1. Edit `public/locales/en/common.json` (or the correct namespace file).
+    2. Run `npm run i18n:scan` to check for missing keys in other locales.
+    3. Add translations for all supported languages.
+    4. Test in the UI and with `npm run test`.
+- For new languages, mirror the EN structure and add to `supportedLngs` in `src/i18n.ts`.
+- See `/docs/i18n/contributing.md` for full process, key naming, and RTL tips.
 
-Phase 2 (initialization) is complete with no user-visible changes:
-- i18next + react-i18next are initialized in `src/i18n.ts` and loaded at app start via `src/main.tsx`.
-- Base English translations live in `public/locales/en/` (`common.json`, `a11y.json`, `titles.json`).
-- Minimal internal usage: accessibility labels in `AppShell` use `t()`; app text remains English by default.
-- Tests include an i18n smoke spec to ensure initialization is healthy.
+### i18n Scripts
+- `npm run i18n:scan` — Fails if any EN keys are missing; warns for other locales.
+- `npm run i18n:report` — Reports missing keys but does not fail (for CI stats).
 
-Phase 3 brings functional behavior for language attributes and RTL:
-- The app now applies `<html lang>` and `<html dir>` automatically based on the current language.
-- `body.rtl` class toggles for Arabic to enable optional RTL-specific helpers (prefer CSS logical properties).
-- Detection order: `localStorage` → `navigator` → `html` tag. Unsupported languages fall back to English.
+### Docs
+- `/docs/i18n/README.md` — Overview
+- `/docs/i18n/key-styleguide.md` — Key naming
+- `/docs/i18n/contributing.md` — How to add/translate
+- `/docs/i18n/rtl.md` — RTL/Arabic tips
+- `/docs/i18n/string-inventory.md` — All keys
+- `/docs/i18n/CHANGELOG.md` — i18n structure changes
+- `/docs/i18n/screenshots/` — Screenshots for review
+
+---
 ```bash
 node --version  # Should show v18.x.x or higher
 npm --version   # Should show 8.x.x or higher

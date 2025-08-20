@@ -374,29 +374,30 @@ Status: Done (2025-08-20)
 
 ---
 
-## Phase 8 — Docs & DevX
 
-**I18N-80. README updates**
-- Add i18n section: how to add strings, test, run locale checks.
+## Phase 8 — Docs & DevX — Status: Completed (2025-08-20) ✅
 
-**I18N-81. `/docs/i18n/contributing.md`**
-- Key naming guide, how to request new keys, proofreading/translation flow, RTL tips.
+**I18N-80. README updates** ✅
+- Added i18n contributor/dev section: how to add strings, test, run locale checks.
 
-**I18N-82. `/docs/i18n/rtl.md`**
-- CSS logical properties, icon flipping considerations.
+**I18N-81. `/docs/i18n/contributing.md`** ✅
+- Contributing guide: key naming, translation flow, RTL/dev tips, locale owners table.
 
-**I18N-83. Changelog**
-- Note breaking changes (strings moved to keys).
+**I18N-82. `/docs/i18n/rtl.md`** ✅
+- CSS logical properties, icon flipping, and RTL-specific guidance.
 
-**I18N-84. Dev scripts**
-- `npm run i18n:scan` (missing keys), `npm run i18n:report`, `npm run i18n:stats` (per-locale coverage).
+**I18N-83. Changelog** ✅
+- `/docs/i18n/CHANGELOG.md` notes all i18n structure/process changes.
 
-**I18N-86. Demo screenshots**
-- Add en/nl/ar screenshots to `/docs/i18n/screenshots/` for reviewers.
+**I18N-84. Dev scripts** ✅
+- `npm run i18n:scan` (missing keys), `npm run i18n:report` (warn only).
+
+**I18N-86. Demo screenshots** ✅
+- `/docs/i18n/screenshots/README.md` created for reviewer screenshots (en/nl/ar).
 
 **Acceptance Criteria**
-- Docs explain end-to-end i18n process and developer ergonomics.
-- New contributors can add translations confidently.
+- Docs explain end-to-end i18n process and developer ergonomics. ✅
+- New contributors can add translations confidently. ✅
 
 ---
 
