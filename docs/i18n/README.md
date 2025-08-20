@@ -1,13 +1,11 @@
-# Internationalization (i18n) - Phase 1
+## i18n Documentation
 
-Artifacts produced in Phase 1:
+This folder contains documentation for internationalization (i18n) in RepCue.
 
-- String inventory: `docs/i18n/string-inventory.md`
-- Key styleguide: `docs/i18n/key-styleguide.md`
-- RTL strategy: `docs/i18n/rtl.md`
-- Tech choice: `docs/i18n/tech-choice.md`
+- [key-styleguide.md](./key-styleguide.md) — the i18n styleguide.
 
-Next up (Phase 2):
-- Add i18n dependencies and initialize i18next (no user-visible changes)
-- Wire provider and basic `t()` usage for a small, non-critical component
-- Set up `public/locales/en/*.json` scaffolding
+- [rtl.md](./rtl.md) — Right-to-Left strategy for RTL languages (e.g. Arabic).
+
+- [tech-choice.md](./tech-choice.md) — documenting the choice of i18n technology and rationale.
+
+- [exercise-localization.md](./exercise-localization.md) — End-to-end strategy to localize the exercise catalog and prepare for user-generated exercise translations.

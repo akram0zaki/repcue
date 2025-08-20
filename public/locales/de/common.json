@@ -21,6 +21,14 @@
     "completedAt": "Abgeschlossen um {{time}}",
     "workoutSummary": "{{exerciseCount}} Übungen in {{duration}}"
   },
+  "navigation": {
+    "home": "Startseite",
+    "workouts": "Trainings",
+    "exercises": "Übungen",
+    "timer": "Timer",
+    "activityLog": "Protokoll",
+    "settings": "Einstellungen"
+  },
   "settings": {
     "audioSettings": "Audio-Einstellungen",
     "enableSound": "Ton aktivieren",

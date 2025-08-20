@@ -21,6 +21,14 @@
     "completedAt": "Completed at {{time}}",
     "workoutSummary": "{{exerciseCount}} exercises in {{duration}}"
   },
+  "navigation": {
+    "home": "Home",
+    "workouts": "Workouts",
+    "exercises": "Exercises",
+    "timer": "Timer",
+    "activityLog": "Log",
+    "settings": "Settings"
+  },
   "settings": {
     "audioSettings": "Audio Settings",
     "enableSound": "Enable Sound",

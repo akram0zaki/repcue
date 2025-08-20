@@ -21,6 +21,14 @@
     "completedAt": "خلص الساعة {{time}}",
     "workoutSummary": "{{exerciseCount}} تمارين في {{duration}}"
   },
+  "navigation": {
+    "home": "البيت",
+  "workouts": "البرامج",
+  "exercises": "التمارين",
+    "timer": "المؤقت",
+    "activityLog": "السجل",
+    "settings": "الإعدادات"
+  },
   "settings": {
     "audioSettings": "إعدادات الصوت",
     "enableSound": "شغّل الصوت",
@@ -121,7 +129,7 @@
     "changeLanguage": "غيّر اللغة"
   },
   "workouts": {
-    "title": "التمارين",
+    "title": "البرامج",
     "createWorkout": "اعمل تمرين",
     "createTitle": "اعمل تمرين",
     "emptyTitle": "مافيش تمارين لسه",
@@ -177,7 +185,7 @@
     "loadFailed": "مقدرش أحمّل بيانات التمرين",
     "updateFailed": "مقدرش أحدّث التمرين. جرب تاني.",
     "errorLoadingTitle": "خطأ في تحميل التمرين",
-    "backToWorkouts": "ارجع للتمارين",
+  "backToWorkouts": "ارجع للبرامج",
     "retry": "جرب تاني",
     "saveWorkout": "احفظ التمرين"
   },

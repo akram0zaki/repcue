@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Routes } from '../types';
 import { 
   HomeIcon, 
@@ -13,6 +14,7 @@ import {
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
@@ -33,31 +35,31 @@ const Navigation: React.FC = () => {
   const mainNavItems = [
     {
       path: Routes.HOME,
-      label: 'Home',
+      label: t('navigation.home'),
       icon: HomeIcon,
   testId: 'nav-home'
     },
     {
       path: Routes.WORKOUTS, // Changed from SCHEDULE
-      label: 'Workouts', // Changed from 'Schedule'
+      label: t('navigation.workouts'), // Changed from 'Schedule'
       icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
   testId: 'nav-workouts'
     },
     {
       path: Routes.EXERCISES,
-      label: 'Exercises',
+      label: t('navigation.exercises'),
       icon: ExercisesIcon,
   testId: 'nav-exercises'
     },
     {
       path: Routes.TIMER,
-      label: 'Timer',
+      label: t('navigation.timer'),
       icon: TimerIcon,
   testId: 'nav-timer'
     },
     {
       path: Routes.ACTIVITY_LOG,
-      label: 'Log',
+      label: t('navigation.activityLog'),
       icon: LogIcon,
   testId: 'nav-activity'
     },
@@ -114,7 +116,7 @@ const Navigation: React.FC = () => {
                 className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 data-testid="nav-settings"
               >
-                Settings
+                {t('navigation.settings')}
               </button>
             </div>
           )}

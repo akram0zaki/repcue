@@ -21,6 +21,14 @@
     "completedAt": "Voltooid om {{time}}",
     "workoutSummary": "{{exerciseCount}} oefeningen in {{duration}}"
   },
+  "navigation": {
+    "home": "Home",
+    "workouts": "Trainingen",
+    "exercises": "Oefeningen",
+    "timer": "Timer",
+    "activityLog": "Logboek",
+    "settings": "Instellingen"
+  },
   "settings": {
     "audioSettings": "Audio Instellingen",
     "enableSound": "Geluid Inschakelen",

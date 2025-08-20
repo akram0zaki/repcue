@@ -16,6 +16,7 @@ import {
   StarFilledIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
+import { localizeExercise } from '../utils/localizeExercise';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -24,23 +25,26 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'exercises']);
   const [selectedCategory, setSelectedCategory] = useState<ExerciseCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
     return exercises.filter(exercise => {
       const matchesCategory = selectedCategory === 'all' || exercise.category === selectedCategory;
-      const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           exercise.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           exercise.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      // Use localized name/description for search while preserving canonical tags
+      const loc = localizeExercise(exercise, t);
+      const matchesSearch = term.length === 0
+        || loc.name.toLowerCase().includes(term)
+        || (loc.description || '').toLowerCase().includes(term)
+        || exercise.tags.some(tag => tag.toLowerCase().includes(term));
       const matchesFavorites = !showFavoritesOnly || exercise.isFavorite;
-      
       return matchesCategory && matchesSearch && matchesFavorites;
     });
-  }, [exercises, selectedCategory, searchTerm, showFavoritesOnly]);
+  }, [exercises, selectedCategory, searchTerm, showFavoritesOnly, t]);
 
   // Group exercises by category for better organization
   const exercisesByCategory = useMemo(() => {
@@ -61,7 +65,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   }, [filteredExercises]);
 
   const formatDuration = (seconds?: number): string => {
-    if (!seconds) return 'Variable';
+    if (!seconds) return t('exercises.variable');
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     if (minutes > 0) {
@@ -197,7 +201,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                     </span>
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                    {categoryExercises.map((exercise) => (
+        {categoryExercises.map((exercise) => (
                       <ExerciseCard
                         key={exercise.id}
                         exercise={exercise}
@@ -215,7 +219,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         ) : (
           // Show flat grid when filtering by category or search
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {filteredExercises.map((exercise) => (
+      {filteredExercises.map((exercise) => (
               <ExerciseCard
                 key={exercise.id}
                 exercise={exercise}
@@ -272,7 +276,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   formatDuration
 }) => {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'exercises']);
+  const loc = localizeExercise(exercise, t);
   
   const visibleTags = isTagsExpanded ? exercise.tags : exercise.tags.slice(0, 2);
   const additionalTagsCount = exercise.tags.length - 2;
@@ -291,13 +296,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {/* Exercise Header */}
         <div className="flex items-start justify-between mb-2 sm:mb-3">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1 mr-2">
-            {exercise.name}
+            {loc.name}
           </h3>
           <button
             onClick={() => onToggleFavorite(exercise.id)}
             className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
             title={exercise.isFavorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
-            aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: exercise.name }) : t('exercises.addToFavoritesAria', { name: exercise.name })}
+            aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
           >
             {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
           </button>
@@ -305,7 +310,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
         {/* Description */}
         <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2 leading-relaxed">
-          {exercise.description}
+          {loc.description}
         </p>
 
         {/* Exercise Type and Default Values */}

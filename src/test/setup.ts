@@ -49,6 +49,15 @@ try {
         clearAllDataMessage: 'Are you sure you want to clear all data? This action cannot be undone. You will be redirected to the home screen and asked for consent again.',
         clearAllData: 'Clear All Data'
       },
+      navigation: {
+        home: 'Home',
+        workouts: 'Workouts',
+        exercises: 'Exercises',
+        timer: 'Timer',
+        activityLog: 'Activity Log',
+        settings: 'Settings',
+        more: 'More'
+      },
   home: {
         upcomingWorkout: 'Upcoming Workout',
         startNow: 'Start Now',

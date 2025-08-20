@@ -21,6 +21,14 @@
     "completedAt": "اكتمل في {{time}}",
     "workoutSummary": "{{exerciseCount}} تمارين في {{duration}}"
   },
+  "navigation": {
+    "home": "الرئيسية",
+  "workouts": "البرامج",
+  "exercises": "التمارين",
+    "timer": "المؤقت",
+    "activityLog": "السجل",
+    "settings": "الإعدادات"
+  },
   "settings": {
     "audioSettings": "إعدادات الصوت",
     "enableSound": "تفعيل الصوت",
@@ -121,7 +129,7 @@
     "changeLanguage": "تغيير اللغة"
   },
   "workouts": {
-    "title": "التمارين",
+    "title": "البرامج",
     "createWorkout": "إنشاء تمرين",
     "createTitle": "إنشاء تمرين",
     "emptyTitle": "لا توجد تمارين بعد",
@@ -177,7 +185,7 @@
     "loadFailed": "فشل في تحميل بيانات التمرين",
     "updateFailed": "فشل في تحديث التمرين. يرجى المحاولة مرة أخرى.",
     "errorLoadingTitle": "خطأ في تحميل التمرين",
-    "backToWorkouts": "العودة إلى التمارين",
+  "backToWorkouts": "العودة إلى البرامج",
     "retry": "إعادة المحاولة",
     "saveWorkout": "حفظ التمرين"
   },

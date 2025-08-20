@@ -1,5 +1,58 @@
 ## 2025-08-20
 
+### ✅ UPDATED: Test i18n Setup & Navigation Labels
+- Test seed updated in `src/test/setup.ts` to include `navigation.*` keys (Home, Workouts, Exercises, Timer, Activity Log, Settings, More).
+- Removed duplicate `navigation` object collision in the test bundle (fixed duplicate keys error).
+- Result: Navigation tests assert translated labels instead of raw keys; still avoids HTTP backend fetch in jsdom.
+
+### ✅ ADDED: Exercise Locales Coverage Guard
+- New unit test: `src/__tests__/exercise-locales-coverage.test.ts`.
+  - Ensures every locale `public/locales/{lng}/exercises.json` includes all exercise IDs from English.
+  - Asserts the special label `"variable"` exists for every locale.
+  - Skips meta keys (e.g., `_meta`) and the `variable` label when iterating exercise IDs.
+- Purpose: Prevent silent translation regressions across supported languages.
+
+### ✅ UPDATED: Arabic Labels (ar, ar‑EG) — Workouts vs Exercises
+- Clarified bottom navigation labels to avoid ambiguity:
+  - `navigation.workouts` → "البرامج"
+  - `navigation.exercises` → "التمارين"
+- Updated related strings for consistency:
+  - `workouts.title` and `workouts.backToWorkouts` now reference "البرامج".
+- Files updated: `public/locales/ar/common.json`, `public/locales/ar-EG/common.json`.
+
+### ✅ UPDATED: Exercise Localization Integration
+- Fixed `localizeExercise` to target the correct `exercises` namespace (keys are `${id}.name/description`) and avoid collisions with `common.exercises.*` UI keys.
+- Localized `ExercisePage` search and display:
+  - Search now matches localized exercise name/description while keeping tag search stable.
+  - Cards render localized name, description, and ARIA labels.
+  - Duration formatter returns localized "Variable" label via `t('exercises.variable')`.
+- Tests: Added `localizeExercise-unit.test.ts` to validate fallback and namespaced translation behavior.
+
+### ✅ ADDED: Exercise Localization Documentation
+- **Docs**: Added `docs/i18n/exercise-localization.md` outlining the full strategy for localizing the built-in exercise catalog and future user-generated exercises.
+- **Index**: Updated `docs/i18n/README.md` with quick links.
+- **Highlights**: i18n resource structure (`public/locales/{lng}/exercises.json`), UI helper (`localizeExercise`), UGC translation model, testing plan, and OWASP-aligned security notes.
+
+### ✅ COMPLETED: Navigation Menu Localization
+- **Full I18n Support**: Navigation menu now uses i18n translations instead of hardcoded English labels
+- **Multi-Language Navigation**: Added navigation translations to all supported languages:
+  - **English**: Home, Workouts, Exercises, Timer, Log, Settings
+  - **Arabic**: الرئيسية, التمارين, التدريبات, المؤقت, السجل, الإعدادات
+  - **Egyptian Arabic**: البيت, التمارين, التدريبات, التايمر, اللوج, الإعدادات
+  - **German**: Startseite, Workouts, Übungen, Timer, Protokoll, Einstellungen
+  - **Spanish**: Inicio, Entrenamientos, Ejercicios, Temporizador, Registro, Configuración
+  - **French**: Accueil, Entraînements, Exercices, Minuteur, Journal, Paramètres
+  - **Dutch**: Home, Trainingen, Oefeningen, Timer, Logboek, Instellingen
+- **Component Integration**: Updated `Navigation.tsx` to use `useTranslation` hook
+- **Translation Keys**: Added `navigation` section to all locale files with consistent key structure
+- **Accessibility**: Maintains existing accessibility features while adding localization support
+
+#### Technical Implementation
+- **Translation Files**: Added `navigation` object to `public/locales/*/common.json` files
+- **React Component**: Updated `Navigation.tsx` to import and use `useTranslation` from `react-i18next`
+- **Dynamic Labels**: Replaced hardcoded strings with `t('navigation.key')` calls
+- **Responsive Design**: Navigation remains fully responsive and RTL-compatible
+
 ### ✅ COMPLETED: Cross-Platform Build Script Fix
 - **CI/CD Compatibility**: Fixed GitHub Actions build failures by replacing PowerShell-specific commands with cross-platform Node.js scripts
 - **Build Script Modernization**: Created `scripts/copy-splash.mjs` to handle file copying across all operating systems

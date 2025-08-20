@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localizeExercise } from '../utils/localizeExercise';
 import type { Exercise, AppSettings, TimerState } from '../types';
 import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../constants';
 import { ReadyIcon, StarFilledIcon } from '../components/icons/NavigationIcons';
@@ -42,7 +43,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onStopTimer,
   onResetTimer
 }) => {
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['common', 'exercises']);
   // ---------------- Video Demo Integration (Phase 2) ----------------
   // Calculate display values
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
@@ -303,17 +304,17 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {isWorkoutMode && displayExercise && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 text-center">
             <div className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-              {actuallyResting ? t('timer.restPeriod') : displayExercise.name}
+              {actuallyResting ? t('timer.restPeriod') : localizeExercise(displayExercise, t).name}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">
               {actuallyResting 
-                ? t('timer.nextWithCategory', { next: workoutCurrentExercise?.name, category: workoutCurrentExercise?.category })
+                ? t('timer.nextWithCategory', { next: workoutCurrentExercise ? localizeExercise(workoutCurrentExercise, t).name : undefined, category: workoutCurrentExercise?.category })
                 : t('timer.currentWithCategory', { category: displayExercise.category })
               }
             </div>
-            {displayExercise.description && !actuallyResting && (
+      {localizeExercise(displayExercise, t).description && !actuallyResting && (
               <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
-                {displayExercise.description}
+        {localizeExercise(displayExercise, t).description}
               </div>
             )}
             {actuallyResting && (
@@ -340,10 +341,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
             {selectedExercise ? (
               <div className="text-center">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  {selectedExercise.name}
+                  {localizeExercise(selectedExercise, t).name}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {selectedExercise.description}
+                  {localizeExercise(selectedExercise, t).description}
                 </p>
             </div>
           ) : (
@@ -357,13 +358,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.quickSelectFavorites')}</p>
               <div className="grid grid-cols-2 gap-2">
-                {favoriteExercises.map(exercise => (
+          {favoriteExercises.map(exercise => (
                   <button
                     key={exercise.id}
                     onClick={() => onSetSelectedExercise(exercise)}
                     className="text-xs py-2 px-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors truncate"
                   >
-                    {exercise.name}
+            {localizeExercise(exercise, t).name}
                   </button>
                 ))}
               </div>
@@ -778,7 +779,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          {exercise.name}
+                          {localizeExercise(exercise, t).name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {exercise.category}
