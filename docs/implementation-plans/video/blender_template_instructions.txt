@@ -7,7 +7,7 @@ This template ensures consistent lighting, camera, and world setup for all exerc
    - Start a new Blender scene (File > New > General).
    - Delete default cube, light, camera.
    - Go to Scene Properties > Units: set Unit Scale = 1.0, Length = Metric.
-   - In World Properties, enable 'Use Nodes' and set Background color to mid-gray: RGBA = (0.1, 0.1, 0.1, 1.0), Strength = 1.0.
+   - In World Properties, enable 'Use Nodes' and set Background color to mid-gray: RGBA = (0.1, 0.1, 0.1, 1.0) or Hex #1a1a1aff, Strength = 1.0.
 
 2. **Ground Plane**
    - Add > Mesh > Plane, scale to 20 m.

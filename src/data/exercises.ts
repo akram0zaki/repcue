@@ -11,7 +11,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Beginner-friendly: 30 seconds (research shows 20-60s range)
     isFavorite: false,
-  hasVideo: false,
+    hasVideo: true,
     tags: ['isometric', 'core', 'stability']
   },
   {
@@ -33,7 +33,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // High intensity cardio movement
     isFavorite: false,
-  hasVideo: false,
+   hasVideo: false,
     tags: ['dynamic', 'core', 'cardio']
   },
   {
@@ -45,8 +45,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 15, // Standard rep range for ab exercises
     isFavorite: false,
-  hasVideo: true,
-  repDurationSeconds: 1.1, // Slightly slower controlled reps
+    hasVideo: true,
+    repDurationSeconds: 1.1, // Slightly slower controlled reps
     tags: ['dynamic', 'core', 'obliques']
   },
 
@@ -60,8 +60,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 8, // Beginner to intermediate range (research shows 8-15 for strength)
     isFavorite: false,
-  hasVideo: false,
-  repDurationSeconds: 2,
+    hasVideo: true,
+    repDurationSeconds: 2.86,
     tags: ['upper-body', 'chest', 'arms']
   },
   {
@@ -73,8 +73,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 12, // Classic strength training rep range
     isFavorite: false,
-  hasVideo: false,
-  repDurationSeconds: 2,
+    hasVideo: false,
+    repDurationSeconds: 2,
     tags: ['lower-body', 'glutes', 'legs']
   },
   {
@@ -86,8 +86,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 10, // Per leg, so 20 total alternating
     isFavorite: false,
-  hasVideo: false,
-  repDurationSeconds: 2,
+    hasVideo: false,
+    repDurationSeconds: 2,
     tags: ['lower-body', 'glutes', 'legs', 'balance']
   },
   {
@@ -98,7 +98,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Beginner-friendly isometric hold
     isFavorite: false,
-  hasVideo: false,
+    hasVideo: false,
     tags: ['isometric', 'lower-body', 'quads']
   },
   {
@@ -110,8 +110,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     defaultSets: 3,
     defaultReps: 5, // Very demanding exercise, lower rep count
     isFavorite: false,
-  hasVideo: false,
-  repDurationSeconds: 3, // Slightly longer due to complexity
+    hasVideo: true,
+    repDurationSeconds: 4.2, // Slightly longer due to complexity
     tags: ['full-body', 'cardio', 'explosive']
   },
 
