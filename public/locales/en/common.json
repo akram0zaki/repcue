@@ -14,6 +14,7 @@
     "medium": "Medium",
     "high": "High",
     "secondsShortSuffix": "s",
+    "minutesShortSuffix": "m",
     "goToSettings": "Go to Settings",
     "welcomeUser": "Welcome back, {{name}}!",
     "lastWorkoutOn": "Last workout on {{date}}",
@@ -115,8 +116,18 @@
     "saturday": "Saturday",
     "sunday": "Sunday"
   },
+  "weekdayAbbrev": {
+    "monday": "Mon",
+    "tuesday": "Tue",
+    "wednesday": "Wed",
+    "thursday": "Thu",
+    "friday": "Fri",
+    "saturday": "Sat",
+    "sunday": "Sun"
+  },
   "home": {
     "upcomingWorkout": "Upcoming Workout",
+    "tagline": "Your personal exercise timer",
     "startNow": "Start Now",
     "noScheduleTitle": "No Schedule Set",
     "noScheduleBody": "Create a workout schedule to see your upcoming workouts here",
@@ -207,7 +218,12 @@
     "workoutBadge": "Workout",
     "exercisesHeading": "Exercises:",
     "exerciseCount_one": "{{count}} exercise",
-    "exerciseCount_other": "{{count}} exercises"
+    "exerciseCount_other": "{{count}} exercises",
+    "status": {
+      "stoppedAfter": "Stopped after {{duration}}",
+      "completedSetsReps": "Completed {{sets}} sets of {{reps}} reps",
+      "completedTime": "Completed {{duration}} interval timer"
+    }
   },
   "exercises": {
     "title": "Exercises",

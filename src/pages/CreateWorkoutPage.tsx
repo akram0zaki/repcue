@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localizeExercise } from '../utils/localizeExercise';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
@@ -361,14 +362,14 @@ const CreateWorkoutPage: React.FC = () => {
                 <div className="grid grid-cols-7 gap-2">
                   {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as Weekday[]).map((day) => {
                     const dayLabels = {
-                      monday: 'Mon',
-                      tuesday: 'Tue', 
-                      wednesday: 'Wed',
-                      thursday: 'Thu',
-                      friday: 'Fri',
-                      saturday: 'Sat',
-                      sunday: 'Sun'
-                    };
+                      monday: t('weekdayAbbrev.monday', { defaultValue: 'Mon' }),
+                      tuesday: t('weekdayAbbrev.tuesday', { defaultValue: 'Tue' }), 
+                      wednesday: t('weekdayAbbrev.wednesday', { defaultValue: 'Wed' }),
+                      thursday: t('weekdayAbbrev.thursday', { defaultValue: 'Thu' }),
+                      friday: t('weekdayAbbrev.friday', { defaultValue: 'Fri' }),
+                      saturday: t('weekdayAbbrev.saturday', { defaultValue: 'Sat' }),
+                      sunday: t('weekdayAbbrev.sunday', { defaultValue: 'Sun' })
+                    } as const;
                     
                     const isSelected = scheduledDays.includes(day);
                     
@@ -655,10 +656,10 @@ const CreateWorkoutPage: React.FC = () => {
                         className="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       >
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {exercise.name}
+                          {localizeExercise(exercise, t).name}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {exercise.category} • {exercise.exerciseType}
+                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exerciseType === 'time-based' ? t('exercises.timeBased') : t('exercises.repBased')}
                           {exercise.exerciseType === 'time-based' 
                             ? ` • ${exercise.defaultDuration}s` 
                             : ` • ${exercise.defaultSets}×${exercise.defaultReps}`}

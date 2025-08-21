@@ -14,6 +14,7 @@
     "medium": "Mittel",
     "high": "Hoch",
     "secondsShortSuffix": "s",
+    "minutesShortSuffix": "m",
     "goToSettings": "Zu Einstellungen",
     "welcomeUser": "Willkommen zurück, {{name}}!",
     "lastWorkoutOn": "Letztes Training am {{date}}",
@@ -115,6 +116,15 @@
     "saturday": "Samstag",
     "sunday": "Sonntag"
   },
+  "weekdayAbbrev": {
+    "monday": "Mo",
+    "tuesday": "Di",
+    "wednesday": "Mi",
+    "thursday": "Do",
+    "friday": "Fr",
+    "saturday": "Sa",
+    "sunday": "So"
+  },
   "home": {
     "upcomingWorkout": "Anstehendes Workout",
     "startNow": "Jetzt starten",
@@ -207,7 +217,12 @@
     "workoutBadge": "Workout",
     "exercisesHeading": "Übungen:",
     "exerciseCount_one": "{{count}} Übung",
-    "exerciseCount_other": "{{count}} Übungen"
+    "exerciseCount_other": "{{count}} Übungen",
+    "status": {
+      "stoppedAfter": "Angehalten nach {{duration}}",
+      "completedSetsReps": "{{sets}} Sätze à {{reps}} Wiederholungen abgeschlossen",
+      "completedTime": "Intervalltimer {{duration}} abgeschlossen"
+    }
   },
   "exercises": {
     "title": "Übungen",

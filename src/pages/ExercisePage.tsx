@@ -238,7 +238,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 <div key={category}>
                   <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 flex items-center gap-2">
                     <span>{getCategoryIcon(category as ExerciseCategory)}</span>
-                    <span className="capitalize">{category}</span>
+                    <span className="capitalize">{t(`exercises.category.${String(category).replace('-', '')}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
                     <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                       ({categoryExercises.length})
                     </span>
@@ -474,7 +474,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 key={tag}
                 className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
               >
-                {tag}
+                {t(`tags.${tag}`, { ns: 'exercises', defaultValue: tag })}
               </span>
             ))}
             {hasMoreTags && (

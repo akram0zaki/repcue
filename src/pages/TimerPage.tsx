@@ -782,7 +782,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                           {localizeExercise(exercise, t).name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {exercise.category}
+                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
                         </p>
                       </div>
                       {exercise.isFavorite && (

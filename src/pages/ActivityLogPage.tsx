@@ -21,7 +21,7 @@ interface StatsData {
 }
 
 const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<'all' | ExerciseCategory>('all');
@@ -59,7 +59,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       setStats({
         totalWorkouts: 0,
         totalDuration: 0,
-        favoriteExercise: 'None yet',
+        favoriteExercise: '',
         currentStreak: 0,
         thisWeekWorkouts: 0
       });
@@ -69,14 +69,22 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     const totalWorkouts = logs.length;
     const totalDuration = Math.round(logs.reduce((sum, log) => sum + log.duration, 0));
     
-    // Find favorite exercise (most frequently done)
-    const exerciseCounts: { [key: string]: number } = {};
+    // Find favorite exercise (most frequently done) by ID for reliable localization
+    const exerciseCounts: { [exerciseId: string]: number } = {};
     logs.forEach(log => {
-      exerciseCounts[log.exerciseName] = (exerciseCounts[log.exerciseName] || 0) + 1;
+      const id = log.exerciseId;
+      exerciseCounts[id] = (exerciseCounts[id] || 0) + 1;
     });
-    
-    const favoriteExercise = Object.entries(exerciseCounts)
-      .sort(([,a], [,b]) => b - a)[0]?.[0] || 'None yet';
+    const favoriteExerciseId = Object.entries(exerciseCounts)
+      .sort(([,a], [,b]) => b - a)[0]?.[0];
+    const favoriteExercise = favoriteExerciseId
+      ? (() => {
+          const ex = exercises.find(e => e.id === favoriteExerciseId);
+          if (!ex) return '';
+          const base = `${ex.id}`;
+          return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+        })()
+      : '';
 
     // Calculate current streak (consecutive days with workouts)
     const sortedLogs = [...logs].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
@@ -157,16 +165,23 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     // Round to avoid floating-point precision issues
     const roundedSeconds = Math.round(seconds);
     
-    if (roundedSeconds < 60) return `${roundedSeconds}s`;
+    const secSuffix = t('common.secondsShortSuffix');
+    const minSuffix = t('common.minutesShortSuffix', { defaultValue: 'm' });
+    if (roundedSeconds < 60) return `${roundedSeconds}${secSuffix}`;
     const minutes = Math.floor(roundedSeconds / 60);
     const remainingSeconds = roundedSeconds % 60;
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+    return remainingSeconds > 0
+      ? `${minutes}${minSuffix} ${remainingSeconds}${secSuffix}`
+      : `${minutes}${minSuffix}`;
   };
 
   // Format time to readable string
   const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const locale = i18n.resolvedLanguage || i18n.language || undefined;
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   };
+  const categoryKey = (cat: string): string => cat.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
 
   // Get exercise category color
   const getCategoryColor = (exerciseId: string): string => {
@@ -196,6 +211,28 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       case ExerciseCategory.BALANCE: return 'text-yellow-700 dark:text-yellow-300';
       default: return 'text-gray-600 dark:text-gray-400';
     }
+  };
+
+  // Localize legacy English notes generated at log creation time
+  const localizeNotes = (notes?: string): string | null => {
+    if (!notes) return null;
+    const stoppedMatch = notes.match(/^Stopped after (\d+)s$/);
+    if (stoppedMatch) {
+      const seconds = parseInt(stoppedMatch[1], 10);
+      return t('activity.status.stoppedAfter', { duration: formatDuration(seconds) });
+    }
+    const completedSetsRepsMatch = notes.match(/^Completed (\d+) sets of (\d+) reps$/);
+    if (completedSetsRepsMatch) {
+      const sets = parseInt(completedSetsRepsMatch[1], 10);
+      const reps = parseInt(completedSetsRepsMatch[2], 10);
+      return t('activity.status.completedSetsReps', { sets, reps });
+    }
+    const completedTimerMatch = notes.match(/^Completed (\d+)s interval timer$/);
+    if (completedTimerMatch) {
+      const seconds = parseInt(completedTimerMatch[1], 10);
+      return t('activity.status.completedTime', { duration: formatDuration(seconds) });
+    }
+    return notes;
   };
 
   if (isLoading) {
@@ -277,7 +314,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               </div>
             </div>
             
-            {stats.favoriteExercise !== 'None yet' && (
+            {stats.favoriteExercise && (
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="text-center">
                   <div className="text-sm font-medium text-gray-900 dark:text-white">{t('activity.favoriteExercise')}</div>
@@ -313,7 +350,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
                 }`}
               >
-                {category.replace('-', ' ')}
+                {t(`exercises.category.${categoryKey(category)}`, { defaultValue: category.replace('-', ' ') })}
               </button>
             ))}
           </div>
@@ -328,7 +365,9 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              {selectedFilter === 'all' ? t('activity.noWorkoutsYet') : t('activity.noCategoryWorkoutsYet', { category: selectedFilter.replace('-', ' ') })}
+              {selectedFilter === 'all' 
+                ? t('activity.noWorkoutsYet') 
+                : t('activity.noCategoryWorkoutsYet', { category: t(`exercises.category.${categoryKey(selectedFilter)}`, { defaultValue: selectedFilter.replace('-', ' ') }) })}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {t('activity.emptySubtitle')}
@@ -342,7 +381,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                 <div key={date}>
                   <div className="sticky top-0 bg-gray-50 dark:bg-gray-900 py-2 mb-3">
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {new Date(date).toLocaleDateString([], { 
+                      {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
                         weekday: 'long', 
                         month: 'short', 
                         day: 'numeric' 
@@ -366,7 +405,13 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                   <div className="flex items-center gap-2 mb-2">
                                     <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
                                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                                      {log.exerciseName} (Workout)
+                                      {(() => {
+                                        const ex = exercises.find(e => e.id === log.exerciseId);
+                                        if (!ex) return `${log.exerciseName} (Workout)`;
+                                        const base = `${ex.id}`;
+                                        const name = t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                        return `${name} (Workout)`;
+                                      })()}
                                     </h4>
                                     <svg 
                                       className={`w-5 h-5 text-gray-500 transition-transform ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
@@ -416,11 +461,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3">
                                         <div className="flex items-center gap-2">
                                           <span className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(exercise.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}></span>
-                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{exercise.exerciseName}</span>
+                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{(() => {
+                                            const ex = exercises.find(e => e.id === exercise.exerciseId);
+                                            if (!ex) return exercise.exerciseName;
+                                            const base = `${ex.id}`;
+                                            return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                          })()}</span>
                                         </div>
                                         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                                           {exercise.sets && exercise.reps && (
-                                            <span>{exercise.sets} × {exercise.reps}</span>
+                                            <span>{t('exercises.defaultSetsReps', { sets: exercise.sets, reps: exercise.reps })}</span>
                                           )}
                                           <span>{formatDuration(exercise.duration)}</span>
                                         </div>
@@ -433,7 +483,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                               {log.notes && (
                                 <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
                                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {log.notes}
+                                    {localizeNotes(log.notes) ?? log.notes}
                                   </p>
                                 </div>
                               )}
@@ -448,7 +498,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}
                                     ></span>
                                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                                      {log.exerciseName}
+                                      {(() => {
+                                        const ex = exercises.find(e => e.id === log.exerciseId);
+                                        if (!ex) return log.exerciseName;
+                                        const base = `${ex.id}`;
+                                        return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                      })()}
                                     </h4>
                                   </div>
                                   
@@ -470,14 +525,14 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                 </div>
                                 
                                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exerciseId)} ${getCategoryTextColor(log.exerciseId)}`}>
-                                  {exercises.find(ex => ex.id === log.exerciseId)?.category.replace('-', ' ')}
+                                  {t(`exercises.category.${(exercises.find(ex => ex.id === log.exerciseId)?.category || '').replace('-', '')}`, { defaultValue: (exercises.find(ex => ex.id === log.exerciseId)?.category || '').replace('-', ' ') })}
                                 </div>
                               </div>
                               
                               {log.notes && (
                                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {log.notes}
+                                    {localizeNotes(log.notes) ?? log.notes}
                                   </p>
                                 </div>
                               )}

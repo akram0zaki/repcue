@@ -124,7 +124,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exerciseType: ExerciseType.TIME_BASED,
     defaultDuration: 30, // Standard cardio interval
     isFavorite: false,
-  hasVideo: false,
+    hasVideo: true,
+    repDurationSeconds: 1.5,
     tags: ['cardio', 'full-body', 'coordination']
   },
   {

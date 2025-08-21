@@ -1,3 +1,24 @@
+## 2025-08-21 (i18n Arabic fixes and UX polish)
+
+### Fixed / Updated
+- Home tagline localized via `home.tagline` (ar, ar‑EG) and wired in `HomePage.tsx`.
+- Workouts listing: exercise count uses pluralized key in `common` namespace and Arabic now renders correctly; duration uses localized minute/second suffixes (`minutesShortSuffix`, `secondsShortSuffix`).
+- Create/Edit Workout: weekday chips now use `weekdayAbbrev.*` (consistent across pages); added Arabic short forms in `ar` and `ar‑EG`.
+- Create/Edit Workout: Arabic copy revised to use "البرامج" consistently instead of "التمارين" (name label, create/edit/delete/paused/save, empty states, errors) for both `ar` and `ar‑EG`.
+- Arabic pluralization for `workouts.scheduledPerWeek_*` completed (zero/one/two/few/many/other) to prevent English fallback when selecting 2+ days.
+- Exercises page: tags treated as an enumeration; added `exercises.tags.{...}` across all locales (en, ar, ar‑EG, de, es, fr, nl) and UI now reads from the exercises namespace.
+- Category labels localized in Exercises (section headers) and exercise selectors (Timer page).
+- Activity Log:
+  - Localized category chips and empty-state category name; fixed Hand Warmup mapping.
+  - Dates/times now formatted with active locale; durations use localized suffixes.
+  - Exercise names localized; favorite exercise name in stats localized.
+  - Localized legacy notes (stopped/completed sets+reps/completed time) with new `activity.status.*` keys.
+
+### Developer notes
+- Added/adjusted locale keys across: `public/locales/*/common.json` and `public/locales/*/exercises.json`.
+- Updated `EditWorkoutPage.tsx`, `CreateWorkoutPage.tsx`, `WorkoutsPage.tsx`, `ExercisePage.tsx`, `TimerPage.tsx`, and `ActivityLogPage.tsx` to consume the new keys.
+
+---
 ## 2025-08-21
 
 ### ✅ UPDATED: AI Coding Agent Playbook
