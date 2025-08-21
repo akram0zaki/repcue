@@ -2,6 +2,9 @@
 
 ### ✅ UPDATED: AI Coding Agent Playbook
 - Rewrote `.github/copilot-instructions.md` into a concise, actionable ~40-line playbook tailored to this repo.
+- ### 📝 ADDED: Cookies and Storage Documentation
+- - New `cookies.md` clarifies that the app sets no cookies, lists all `localStorage`/`IndexedDB` keys with purposes and retention, documents PWA caches, and explains first-run consent choices (Essential Only vs Accept All & Continue).
+
 - Captures big-picture architecture (App.tsx state + services), critical timer semantics (rep-based completed counts, workoutMode preservation), and daily workflows.
 - Maps feature-gated video demos (features.ts + useExerciseVideo) and key file locations for quick onboarding.
 - Aligns with Windows/PowerShell dev and Raspberry Pi + PM2 deploy processes.
