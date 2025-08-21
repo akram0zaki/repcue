@@ -1,3 +1,12 @@
+## 2025-08-21
+
+### ✅ UPDATED: AI Coding Agent Playbook
+- Rewrote `.github/copilot-instructions.md` into a concise, actionable ~40-line playbook tailored to this repo.
+- Captures big-picture architecture (App.tsx state + services), critical timer semantics (rep-based completed counts, workoutMode preservation), and daily workflows.
+- Maps feature-gated video demos (features.ts + useExerciseVideo) and key file locations for quick onboarding.
+- Aligns with Windows/PowerShell dev and Raspberry Pi + PM2 deploy processes.
+- References OWASP guidance in `.github/instructions/owasp.instructions.md` and i18n workflows.
+
 ## 2025-08-20
 
 ### ✅ ADDED: Exercise Page Video Preview
