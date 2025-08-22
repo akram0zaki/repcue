@@ -1,3 +1,13 @@
+## 2025-08-22
+
+- Tests: Fix unit test failures caused by temporal dead zone in hooks/components.
+  - Reordered `useCallback` declarations before effects that depended on them in `src/App.tsx`, `src/pages/ActivityLogPage.tsx`, `src/hooks/useInstallPrompt.ts`, and `src/components/InstallPrompt.tsx`.
+  - Result: `npm run test:unit` now passes 100% locally (64 files, 599 passed, 3 skipped).
+
+- Fix: Exercise preview now shows a warning toast and fallback panel when a video fails to load (e.g., exercise marked `hasVideo = true` but media missing). Also records consent-aware telemetry for preview video errors.
+- UX: Prevent modal from opening if media is missing via 1s HEAD precheck; only the bottom snackbar appears. Timer inline video remains silent (debug logged) to avoid intrusive UI.
+- Tests: Hardened preview tests: Router+Snackbar wrappers, jsdom media play stubs, resilient role-based assertions. ActivityLogPage tests updated for case-insensitive button queries and robust empty-state matching.
+
 ## 2025-08-21 (i18n Arabic fixes and UX polish)
 
 ### Fixed / Updated

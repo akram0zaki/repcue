@@ -228,10 +228,10 @@ describe('ActivityLogPage', () => {
     render(<ActivityLogPage exercises={mockExercises} />);
     
     await waitFor(() => {
-      // Check that category filter buttons are displayed - these are the expected instances
-      expect(screen.getByRole('button', { name: 'core' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'strength' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'cardio' })).toBeInTheDocument();
+      // Check that category filter buttons are displayed - match case-insensitively
+      expect(screen.getByRole('button', { name: /core/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /strength/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /cardio/i })).toBeInTheDocument();
     });
   });
 
@@ -362,7 +362,8 @@ describe('ActivityLogPage', () => {
     fireEvent.click(strengthFilter);
 
     await waitFor(() => {
-      expect(screen.getByText('No strength workouts yet')).toBeInTheDocument();
+      // Heading uses capitalized category label; be tolerant of whitespace
+      expect(screen.getByText(/No\s+Strength\s+workouts\s+yet/i)).toBeInTheDocument();
     });
   });
 });

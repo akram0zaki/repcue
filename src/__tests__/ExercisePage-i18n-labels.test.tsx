@@ -3,6 +3,7 @@ import React from 'react'
 import ExercisePage from '../pages/ExercisePage'
 import { MemoryRouter } from 'react-router-dom'
 import { ExerciseCategory } from '../types'
+import { SnackbarProvider } from '../components/SnackbarProvider'
 
 const makeExercise = (overrides: Partial<any> = {}) => ({
   id: 'ex-1',
@@ -24,10 +25,12 @@ describe('ExercisePage exercise type labels', () => {
     const exercises = [makeExercise({ exerciseType: 'time-based' })]
     render(
       <MemoryRouter initialEntries={['/exercises']}>
-        <ExercisePage
-          exercises={exercises as any}
-          onToggleFavorite={() => {}}
-        />
+        <SnackbarProvider>
+          <ExercisePage
+            exercises={exercises as any}
+            onToggleFavorite={() => {}}
+          />
+        </SnackbarProvider>
       </MemoryRouter>
     )
     expect(screen.getByText(/Time-based/i)).toBeInTheDocument()
@@ -37,10 +40,12 @@ describe('ExercisePage exercise type labels', () => {
     const exercises = [makeExercise({ id: 'ex-2', name: 'Push Ups', exerciseType: 'repetition-based' })]
     render(
       <MemoryRouter initialEntries={['/exercises']}>
-        <ExercisePage
-          exercises={exercises as any}
-          onToggleFavorite={() => {}}
-        />
+        <SnackbarProvider>
+          <ExercisePage
+            exercises={exercises as any}
+            onToggleFavorite={() => {}}
+          />
+        </SnackbarProvider>
       </MemoryRouter>
     )
     expect(screen.getByText(/Rep-based/i)).toBeInTheDocument()

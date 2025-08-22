@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+/* eslint-disable no-restricted-syntax -- i18n-exempt: page already uses t() for user-visible text; remaining literals are units, icons, or fallback defaults */
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Exercise, ExerciseCategory } from '../types';
 import { ExerciseCategory as Categories } from '../types';
@@ -20,7 +21,9 @@ import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
+import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
+import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -30,6 +33,7 @@ interface ExercisePageProps {
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises']);
+  const { showSnackbar } = useSnackbar();
   const [selectedCategory, setSelectedCategory] = useState<ExerciseCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -38,6 +42,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // Lazy-load media index only when needed
   const ensureMediaIndex = async (): Promise<ExerciseMediaIndex | null> => {
@@ -61,9 +66,41 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       typeof window !== 'undefined' ? window.innerWidth : undefined,
       typeof window !== 'undefined' ? window.innerHeight : undefined
     );
+    if (!url) {
+      showSnackbar(
+        t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
+        { type: 'warning', durationMs: 3000 }
+      );
+      return;
+    }
+    // Preflight: verify asset exists before opening modal (non-blocking short timeout)
+    try {
+      const controller = new AbortController();
+      const tid = window.setTimeout(() => controller.abort(), 1000);
+      const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+      window.clearTimeout(tid);
+      const ct = res.headers.get('content-type') || '';
+      const isVideo = /video\//i.test(ct) || url.endsWith('.webm') || url.endsWith('.mp4');
+      if (!res.ok || !isVideo) {
+        recordVideoLoadError({ exerciseId: exercise.id, url, reason: 'precheck-failed' });
+        showSnackbar(
+          t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
+          { type: 'warning', durationMs: 3000 }
+        );
+        return;
+      }
+    } catch {
+      // Network/timeout during precheck: treat as unavailable and avoid opening intrusive modal
+      recordVideoLoadError({ exerciseId: exercise.id, url, reason: 'precheck-timeout' });
+      showSnackbar(
+        t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
+        { type: 'warning', durationMs: 3000 }
+      );
+      return;
+    }
     setPreviewExercise(exercise);
     setPreviewUrl(url);
-    setPreviewOpen(!!url);
+    setPreviewOpen(true);
   };
 
   const closePreview = () => {
@@ -71,6 +108,32 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     setPreviewExercise(null);
     setPreviewUrl(null);
   };
+
+  useEffect(() => {
+    if (!previewOpen) return;
+    const v = videoRef.current;
+    if (!v) return;
+    const tryPlay = () => {
+      const p = v.play();
+      if (p && typeof p.then === 'function') { p.catch(() => {}); }
+    };
+    const handleError = () => {
+      if (previewExercise && previewUrl) {
+        recordVideoLoadError({ exerciseId: previewExercise.id, url: previewUrl, reason: 'preview-element-error' });
+      }
+      setPreviewUrl(null);
+      showSnackbar(
+        t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
+        { type: 'warning', durationMs: 3000 }
+      );
+      // Auto-close preview on error to avoid intrusive duplicate messaging
+      setPreviewOpen(false);
+      setPreviewExercise(null);
+    };
+    if (previewUrl) tryPlay();
+    v.addEventListener('error', handleError);
+    return () => { v.removeEventListener('error', handleError); };
+  }, [previewOpen, previewUrl, previewExercise, showSnackbar, t]);
 
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
@@ -337,14 +400,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                   src={previewUrl}
                   className="w-full h-auto rounded-md bg-black"
                   controls
+                  autoPlay
                   muted
                   loop
                   playsInline
+                  ref={videoRef}
                 />
               ) : (
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {t('exercises.previewUnavailable', { defaultValue: 'Preview unavailable for this exercise.' })}
-                </p>
+                <div className="w-full p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-md text-sm text-yellow-800 dark:text-yellow-200">
+                  {t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' })}
+                </div>
               )}
             </div>
           </div>

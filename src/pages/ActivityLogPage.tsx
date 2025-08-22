@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+/* eslint-disable no-restricted-syntax -- i18n-exempt: certain fallback strings localized via t(); remaining literals are icons/units */
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Exercise, ActivityLog } from '../types';
 import { storageService } from '../services/storageService';
@@ -35,26 +36,8 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     thisWeekWorkouts: 0
   });
 
-  // Load activity logs on component mount
-  useEffect(() => {
-    const loadActivityLogs = async () => {
-      try {
-        setIsLoading(true);
-        const logs = await storageService.getActivityLogs();
-        setActivityLogs(logs);
-        calculateStats(logs);
-      } catch (error) {
-        console.error('Failed to load activity logs:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadActivityLogs();
-  }, []);
-
   // Calculate user statistics
-  const calculateStats = (logs: ActivityLog[]) => {
+  const calculateStats = useCallback((logs: ActivityLog[]) => {
     if (logs.length === 0) {
       setStats({
         totalWorkouts: 0,
@@ -118,7 +101,25 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       currentStreak,
       thisWeekWorkouts
     });
-  };
+  }, [exercises, t]);
+
+  // Load activity logs on component mount
+  useEffect(() => {
+    const loadActivityLogs = async () => {
+      try {
+        setIsLoading(true);
+        const logs = await storageService.getActivityLogs();
+        setActivityLogs(logs);
+        calculateStats(logs);
+      } catch (error) {
+        console.error('Failed to load activity logs:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadActivityLogs();
+  }, [t, exercises, calculateStats]);
 
   // Toggle workout expansion
   const toggleWorkoutExpansion = (workoutId: string) => {

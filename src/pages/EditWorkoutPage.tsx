@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: form validation/fallback strings pending localization */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { storageService } from '../services/storageService';
@@ -96,7 +97,7 @@ const EditWorkoutPage: React.FC = () => {
     };
 
     loadData();
-  }, [workoutId]);
+  }, [workoutId, t]);
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};

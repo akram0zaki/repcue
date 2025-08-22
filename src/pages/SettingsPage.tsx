@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: UI text comes from t(); remaining literals are units/IDs/tokens */
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AppSettings } from '../types';

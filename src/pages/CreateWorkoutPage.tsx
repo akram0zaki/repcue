@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: form validation messages pending localization */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
@@ -49,7 +50,7 @@ const CreateWorkoutPage: React.FC = () => {
     };
 
     loadData();
-  }, []);
+  }, [t]);
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};

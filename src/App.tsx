@@ -182,7 +182,7 @@ function App() {
         }
       }
     }, intervalDuration);
-  }, [appSettings.intervalDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume, exercises]);
+  }, [appSettings.intervalDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume]);
 
   // Separate function for the actual timer logic
   const startActualTimer = useCallback(() => {
@@ -260,7 +260,7 @@ function App() {
       isRepBasedExercise = selectedExercise?.exerciseType === 'repetition-based';
     }
     intervalRef.current = createTimerInterval(startTime, isRepBasedExercise);
-  }, [selectedExercise, selectedDuration, appSettings, timerState.workoutMode, exercises, createTimerInterval]);
+  }, [selectedExercise, selectedDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, timerState.workoutMode, createTimerInterval, timerState.targetTime, exercises]);
 
   // Timer Functions
   const startTimer = useCallback(async () => {
@@ -330,7 +330,7 @@ function App() {
       // No countdown, start timer immediately
       startActualTimer();
     }
-  }, [selectedExercise, selectedDuration, appSettings, wakeLockSupported, requestWakeLock, startActualTimer]);
+  }, [selectedExercise, selectedDuration, appSettings.preTimerCountdown, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume, wakeLockSupported, requestWakeLock, startActualTimer]);
 
   const stopTimer = useCallback(async (isCompletion: boolean = false) => {
     if (intervalRef.current) {
@@ -366,7 +366,7 @@ function App() {
     }
 
     setTimerState(prev => ({ ...prev, isRunning: false, isCountdown: false, countdownTime: 0 }));
-  }, [appSettings, wakeLockActive, releaseWakeLock, timerState]);
+  }, [appSettings.soundEnabled, appSettings.vibrationEnabled, wakeLockActive, releaseWakeLock, timerState]);
 
   const resetTimer = useCallback(async () => {
     if (intervalRef.current) {
@@ -478,7 +478,7 @@ function App() {
     if (appSettings.soundEnabled) {
       audioService.announceText(`Starting workout: ${workoutData.workoutName}. ${workoutData.exercises.length} exercises planned.`);
     }
-  }, [exercises, appSettings.soundEnabled]);
+  }, [exercises, appSettings.soundEnabled, appSettings.repSpeedFactor]);
 
   // Advance workout to next exercise or complete workout
   const advanceWorkout = useCallback(async () => {
@@ -726,7 +726,7 @@ function App() {
         }
       }
     }
-  }, [timerState, exercises, appSettings.soundEnabled, resetTimer]);
+  }, [timerState, selectedExercise?.name, exercises, appSettings.soundEnabled, appSettings.repSpeedFactor, resetTimer]);
 
   // Handle timer completion
   useEffect(() => {
@@ -1111,12 +1111,12 @@ function App() {
                   });
                 }, 1000);
               } else {
-                // All sets completed, exercise is done
+                // All reps and sets completed
                 if (appSettings.soundEnabled) {
-                  audioService.announceText('Exercise completed!');
+                  audioService.announceText(`Exercise completed! Great job on ${currentExercise.name}`);
                 }
                 
-                // Log the completed rep-based exercise activity
+                // Log the activity
                 if (currentExercise) {
                   const activityLog: ActivityLog = {
                     id: `log-${Date.now()}`,
@@ -1276,7 +1276,7 @@ function App() {
         }
       }
     }
-  }, [timerState.isRunning, timerState.currentTime, timerState.targetTime, timerState.isCountdown, timerState.workoutMode?.isResting, stopTimer, advanceWorkout, exercises, appSettings.soundEnabled, appSettings.repSpeedFactor]);
+  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.repSpeedFactor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
 
   // Cleanup timer interval on unmount
   useEffect(() => {
@@ -1286,6 +1286,33 @@ function App() {
       }
     };
   }, []);
+
+  // Update app settings
+  const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
+    if (!hasConsent) return;
+
+    const updatedSettings = { ...appSettings, ...newSettings };
+    setAppSettings(updatedSettings);
+
+    try {
+      await storageService.saveAppSettings(updatedSettings);
+    } catch (error) {
+      console.error('Failed to save app settings:', error);
+    }
+  }, [hasConsent, appSettings]);
+
+  const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
+    setSelectedExercise(exercise);
+    updateAppSettings({ lastSelectedExerciseId: exercise ? exercise.id : null });
+    
+    // Set appropriate duration for rep-based exercises
+    if (exercise?.exerciseType === 'repetition-based') {
+      const currentSettings = settings || appSettings;
+      const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * currentSettings.repSpeedFactor);
+      setSelectedDuration(repDuration as TimerPreset);
+    }
+  }, [appSettings, updateAppSettings]);
 
   // Initialize app data after consent
   useEffect(() => {
@@ -1385,7 +1412,7 @@ function App() {
     };
 
     initializeApp();
-  }, [hasConsent]);
+  }, [hasConsent, handleSetSelectedExercise]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1416,18 +1443,7 @@ function App() {
     setHasConsent(true);
   };
 
-  const handleSetSelectedExercise = (exercise: Exercise | null, settings?: AppSettings) => {
-    setSelectedExercise(exercise);
-    updateAppSettings({ lastSelectedExerciseId: exercise ? exercise.id : null });
-    
-    // Set appropriate duration for rep-based exercises
-    if (exercise?.exerciseType === 'repetition-based') {
-      const currentSettings = settings || appSettings;
-      const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
-      const repDuration = Math.round(baseRep * currentSettings.repSpeedFactor);
-      setSelectedDuration(repDuration as TimerPreset);
-    }
-  };
+  
 
   // Update exercise favorite status
   const toggleExerciseFavorite = async (exerciseId: string) => {
@@ -1447,19 +1463,7 @@ function App() {
     }
   };
 
-  // Update app settings
-  const updateAppSettings = async (newSettings: Partial<AppSettings>) => {
-    if (!hasConsent) return;
-
-    const updatedSettings = { ...appSettings, ...newSettings };
-    setAppSettings(updatedSettings);
-
-    try {
-      await storageService.saveAppSettings(updatedSettings);
-    } catch (error) {
-      console.error('Failed to save app settings:', error);
-    }
-  };
+  
 
   // Apply dark mode to document
   useEffect(() => {

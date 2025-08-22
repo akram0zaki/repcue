@@ -131,7 +131,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     v.addEventListener('loadeddata', loaded);
     v.addEventListener('error', failed);
     return () => { v.removeEventListener('loadeddata', loaded); v.removeEventListener('error', failed); };
-  }, [videoUrl, shouldPlay]);
+  }, [videoUrl, shouldPlay, exercise]);
 
   return { videoRef, media, videoUrl, ready, error, onLoop };
 }

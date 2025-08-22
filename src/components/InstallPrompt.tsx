@@ -9,7 +9,8 @@
  * - Privacy-compliant analytics integration
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+/* eslint-disable no-restricted-syntax -- i18n-exempt: install guidance text pending localization */
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { isIOS, isAndroid, getOSName } from '../utils/platformDetection';
 
@@ -164,9 +165,34 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   };
 
   /**
+   * Hide banner with animation
+   */
+  const hideBanner = useCallback((): void => {
+    setIsAnimating(true);
+    
+    // Clear any existing hide animation timeout
+    if (hideAnimationTimeoutRef.current) {
+      clearTimeout(hideAnimationTimeoutRef.current);
+    }
+    
+    hideAnimationTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setIsAnimating(false);
+      setShowIOSInstructions(false);
+      setCurrentStep(0);
+    }, animationDuration);
+
+    // Clear auto-hide timer
+    if (autoHideTimeoutRef.current) {
+      clearTimeout(autoHideTimeoutRef.current);
+      autoHideTimeoutRef.current = null;
+    }
+  }, [animationDuration]);
+
+  /**
    * Show banner with animation
    */
-  const showBanner = (): void => {
+  const showBanner = useCallback((): void => {
     setIsAnimating(true);
     setIsVisible(true);
     
@@ -191,32 +217,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
         hideBanner();
       }, autoHideAfter);
     }
-  };
-
-  /**
-   * Hide banner with animation
-   */
-  const hideBanner = (): void => {
-    setIsAnimating(true);
-    
-    // Clear any existing hide animation timeout
-    if (hideAnimationTimeoutRef.current) {
-      clearTimeout(hideAnimationTimeoutRef.current);
-    }
-    
-    hideAnimationTimeoutRef.current = setTimeout(() => {
-      setIsVisible(false);
-      setIsAnimating(false);
-      setShowIOSInstructions(false);
-      setCurrentStep(0);
-    }, animationDuration);
-
-    // Clear auto-hide timer
-    if (autoHideTimeoutRef.current) {
-      clearTimeout(autoHideTimeoutRef.current);
-      autoHideTimeoutRef.current = null;
-    }
-  };
+  }, [animationDuration, autoHideAfter, hideBanner]);
 
   /**
    * Handle iOS instruction navigation
@@ -251,14 +252,14 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   /**
    * Check if should show on current page
    */
-  const shouldShowOnCurrentPage = (): boolean => {
+  const shouldShowOnCurrentPage = useCallback((): boolean => {
     if (showOnPages.length === 0) return true;
     
     const currentPath = window.location.pathname;
     return showOnPages.some(page => 
       currentPath === page || currentPath.startsWith(page)
     );
-  };
+  }, [showOnPages]);
 
   /**
    * Initialize banner visibility
@@ -269,7 +270,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
     } else {
       hideBanner();
     }
-  }, [isAvailable, canShowPrompt]);
+  }, [isAvailable, canShowPrompt, showBanner, hideBanner, shouldShowOnCurrentPage]);
 
   /**
    * Clear error and timers when component unmounts

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { SnackbarProvider } from '../../components/SnackbarProvider';
 import { describe, it, vi, expect } from 'vitest';
 import ExercisePage from '../ExercisePage';
 import { INITIAL_EXERCISES } from '../../data/exercises';
@@ -37,10 +38,12 @@ describe('ExercisePage', () => {
   const renderExercisePage = (exercises: Exercise[] = INITIAL_EXERCISES) => {
     return render(
       <BrowserRouter>
-        <ExercisePage 
-          exercises={exercises} 
-          onToggleFavorite={mockOnToggleFavorite} 
-        />
+        <SnackbarProvider>
+          <ExercisePage 
+            exercises={exercises} 
+            onToggleFavorite={mockOnToggleFavorite} 
+          />
+        </SnackbarProvider>
       </BrowserRouter>
     );
   };

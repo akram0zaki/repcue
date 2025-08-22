@@ -18,8 +18,8 @@ function getLocaleFile(lng: string) {
 describe('exercise locales coverage', () => {
   it('every locale contains all exercise keys from EN and a "variable" label', () => {
     const en = readJson(getLocaleFile('en'));
-  // Only treat object entries as exercises (exclude helper strings like 'variable' and meta keys)
-  const exerciseIds = Object.keys(en).filter(k => !k.startsWith('_') && k !== 'variable');
+    // Only treat object entries as exercises (exclude helper strings/meta like 'variable' or 'tags')
+    const exerciseIds = Object.keys(en).filter(k => !k.startsWith('_') && k !== 'variable' && k !== 'tags');
     // sanity: name/description exist for at least one sample
     expect(en['plank']?.name).toBeTruthy();
 

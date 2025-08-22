@@ -25,27 +25,33 @@
 - ✅ Edit Workout Page - Arabic version: the workout I am editing is flagged for one day a week and the description is correct "مجدول لـ 1 يوم في الأسبوع", however when I select another day the description changes to English "Scheduled for 2 days per week".
 - ✅ The Arabic short weekday names in Edit Workout are different from Create Workout. The names used in Create Workout are correct. Fix it in Edit Workout to match Create Workout.
 
+- ✅ Video Enhancements:
+    - ✅ When user clicks the play button on one of the exercises, the video panel should open and the video should auto-play. Currently the user must click/tap Play on the video player.
+    - ✅ If an exercise is marked with hasVideo as true yet no video was found, then an error message should be displayed "Video is not available at this time", instead of opening the player anyway while there is no video.
+    - ✅ I marked the Side Plank exercise as hasVideo=true while it has no video to be able to test the error handling. Expected behavior is that an error toast should be displayed with message like "Video is not available at this time" but what happened is that the video panel opened trying to load a video that does not exist.
+
 - Add locales Turkish, Persian, and Frisian
 
-- Add remaining videos.
-
-- Video Enhancements:
-    - When user clicks the play button on one of the exercises, the video panel should open and the video should auto-play. Currently the user must click/tap Play on the video player.
-    - If an exercise is marked with hasVideo as true yet no video was found, then an error message should be displayed "Video is not available at this time", instead of opening the player anyway while there is no video.
+- 🔄 Add remaining videos.
 
 - Collect analytics on the server side about usage.
+
+- Create user agreement and privacy policy
+
+- Add accounts module, sign-up/sign-in, profile, etc
 
 - Gamification:
     - Add motivational feedback.
     - Add achievements and rewards.
     - Feature to add friends (and view them in the app) - requires registration.
     - Feature to introduce competitions or streaks where two or more users try to achieve some goals (time spent on exercises, frequency of workouts, etc).
+    - Share achievements via Share button
 
 - Add support to create tailored exercises.
 
 - Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
 
-- Use GenAI to have a chat with the user at the first run with the purpose of creating a workout schedule for them. During this onboarding chat, the AI assistant would ask questions about the user's patterns, goals, injuries, preferences, etc then suggest a workout tailored for them. For example it doesn't make sense to suggest Planks to someone who has a shoulder injury.
+- Smart onboarding: Use GenAI to have a chat with the user at the first run with the purpose of creating a workout schedule for them. During this onboarding chat, the AI assistant would ask questions about the user's patterns, goals, injuries, preferences, etc then suggest a workout tailored for them. For example it doesn't make sense to suggest Planks to someone who has a shoulder injury.
 
 ---
 
