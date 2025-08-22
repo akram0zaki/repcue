@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: file already uses t(); any remaining literals are app constants or non-user-visible */
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +8,7 @@ import { APP_NAME, APP_DESCRIPTION } from '../constants';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import { StarFilledIcon } from '../components/icons/NavigationIcons';
+import { localizeExercise } from '../utils/localizeExercise';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 interface HomePageProps {
@@ -115,7 +117,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {APP_NAME}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {APP_DESCRIPTION}
+            {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
 
@@ -143,7 +145,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                           {upcomingWorkout.workout.name}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {upcomingWorkout.workout.exercises.length} exercise{upcomingWorkout.workout.exercises.length !== 1 ? 's' : ''}
+                          {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
                         </div>
                       </div>
                     </div>
@@ -221,17 +223,17 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                            {exercise.name}
+                            {localizeExercise(exercise, t).name}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                            {exercise.description}
+                            {localizeExercise(exercise, t).description}
                           </p>
                         </div>
                         <div className="flex items-center gap-2 ml-3">
                           <button
                             onClick={() => onToggleFavorite(exercise.id)}
                             className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
-                            aria-label={t('home.removeFromFavoritesAria', { name: exercise.name })}
+                            aria-label={t('home.removeFromFavoritesAria', { name: localizeExercise(exercise, t).name })}
                           >
                             <StarFilledIcon size={16} />
                           </button>

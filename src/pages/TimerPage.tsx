@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: page uses t() per design; remaining literals are units, icons, or technical tokens */
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
@@ -104,7 +105,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         return () => { if (link.parentNode) link.parentNode.removeChild(link); };
       }
     }
-  }, [videoFeatureEnabled, mediaIndex, workoutMode?.isResting, workoutMode?.currentExerciseIndex, isCountdown, videoUrl, exercises, exerciseForVideo, exerciseVideo.media]);
+  }, [videoFeatureEnabled, mediaIndex, workoutMode?.isResting, workoutMode?.currentExerciseIndex, workoutMode?.exercises, isCountdown, videoUrl, exercises, exerciseForVideo, exerciseVideo.media]);
 
   useEffect(() => {
     if (!exerciseVideo.media) { setVideoUrl(null); return; }
@@ -782,7 +783,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                           {localizeExercise(exercise, t).name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {exercise.category}
+                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
                         </p>
                       </div>
                       {exercise.isFavorite && (

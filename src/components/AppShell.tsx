@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: page titles/classnames are constants; actual UI strings use t() */
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';

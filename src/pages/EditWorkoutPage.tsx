@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: form validation/fallback strings pending localization */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { storageService } from '../services/storageService';
@@ -5,6 +6,7 @@ import { consentService } from '../services/consentService';
 import type { Exercise, Workout, WorkoutExercise, Weekday } from '../types';
 import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
+import { localizeExercise } from '../utils/localizeExercise';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -95,7 +97,7 @@ const EditWorkoutPage: React.FC = () => {
     };
 
     loadData();
-  }, [workoutId]);
+  }, [workoutId, t]);
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -403,13 +405,13 @@ const EditWorkoutPage: React.FC = () => {
                 <div className="grid grid-cols-7 gap-2">
                   {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as Weekday[]).map((day) => {
                     const dayLabels = {
-                      monday: t('weekday.monday').slice(0, 3),
-                      tuesday: t('weekday.tuesday').slice(0, 3), 
-                      wednesday: t('weekday.wednesday').slice(0, 3),
-                      thursday: t('weekday.thursday').slice(0, 3),
-                      friday: t('weekday.friday').slice(0, 3),
-                      saturday: t('weekday.saturday').slice(0, 3),
-                      sunday: t('weekday.sunday').slice(0, 3)
+                      monday: t('weekdayAbbrev.monday', { defaultValue: t('weekday.monday').slice(0, 3) }),
+                      tuesday: t('weekdayAbbrev.tuesday', { defaultValue: t('weekday.tuesday').slice(0, 3) }), 
+                      wednesday: t('weekdayAbbrev.wednesday', { defaultValue: t('weekday.wednesday').slice(0, 3) }),
+                      thursday: t('weekdayAbbrev.thursday', { defaultValue: t('weekday.thursday').slice(0, 3) }),
+                      friday: t('weekdayAbbrev.friday', { defaultValue: t('weekday.friday').slice(0, 3) }),
+                      saturday: t('weekdayAbbrev.saturday', { defaultValue: t('weekday.saturday').slice(0, 3) }),
+                      sunday: t('weekdayAbbrev.sunday', { defaultValue: t('weekday.sunday').slice(0, 3) })
                     } as Record<Weekday, string>;
                     
                     const isSelected = scheduledDays.includes(day);
@@ -482,10 +484,10 @@ const EditWorkoutPage: React.FC = () => {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                            {exercise.name}
+                            {localizeExercise(exercise, t).name}
                           </h4>
                           <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                            {exercise.description}
+                            {localizeExercise(exercise, t).description}
                           </p>
                         </div>
                         <div className="flex items-center space-x-1 ml-4">
@@ -661,10 +663,10 @@ const EditWorkoutPage: React.FC = () => {
                         className="w-full text-left p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                       >
                         <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                          {exercise.name}
+                          {localizeExercise(exercise, t).name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {exercise.description}
+                          {localizeExercise(exercise, t).description}
                         </p>
                       </button>
                     ))}

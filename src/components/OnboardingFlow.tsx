@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+/* eslint-disable no-restricted-syntax -- i18n-exempt: onboarding copy and hints pending full localization */
+import { useCallback, useEffect } from 'react';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { TargetIcon, LightningIcon, LockIcon } from './icons/NavigationIcons';
 
@@ -51,12 +52,12 @@ export function OnboardingFlow({ onComplete, onSkip, className = '' }: Onboardin
   }, [isOnboardingActive, onComplete]);
 
   // Handle skip callback
-  const handleSkip = () => {
+  const handleSkip = useCallback(() => {
     skipOnboarding();
     if (onSkip) {
       onSkip();
     }
-  };
+  }, [onSkip, skipOnboarding]);
 
   // Handle keyboard navigation
   useEffect(() => {

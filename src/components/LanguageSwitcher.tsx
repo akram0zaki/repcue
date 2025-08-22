@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: language names shown in their native forms */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

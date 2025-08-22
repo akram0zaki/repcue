@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ExercisePage from '../ExercisePage';
+import { SnackbarProvider } from '../../components/SnackbarProvider';
 
 vi.mock('../../utils/loadExerciseMedia', async () => {
   return {
@@ -20,6 +21,19 @@ vi.mock('../../utils/loadExerciseMedia', async () => {
 describe('ExercisePage - video preview', () => {
   beforeEach(() => {
     (window as any).__VIDEO_DEMOS_DISABLED__ = true;
+    // Mock HEAD precheck as success so preview opens
+    const originalFetch: typeof fetch | undefined = (globalThis as any).fetch as any;
+    (globalThis as any).__origFetch = originalFetch;
+    (globalThis as any).fetch = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init && init.method === 'HEAD') {
+        return new Response('', { status: 200, headers: { 'content-type': 'video/webm' } });
+      }
+      return new Response('', { status: 200 });
+    });
+  });
+  afterEach(() => {
+    (globalThis as any).fetch = (globalThis as any).__origFetch;
+    delete (globalThis as any).__origFetch;
   });
 
   const baseExercise = {
@@ -39,10 +53,12 @@ describe('ExercisePage - video preview', () => {
   const renderPage = () =>
     render(
       <MemoryRouter>
-        <ExercisePage
-          exercises={[baseExercise]}
-          onToggleFavorite={vi.fn()}
-        />
+        <SnackbarProvider>
+          <ExercisePage
+            exercises={[baseExercise]}
+            onToggleFavorite={vi.fn()}
+          />
+        </SnackbarProvider>
       </MemoryRouter>
     );
 

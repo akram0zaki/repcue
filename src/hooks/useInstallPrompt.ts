@@ -209,6 +209,23 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
   }, [deferredPrompt]);
 
   /**
+   * Dismiss the install prompt
+   */
+  const dismissPrompt = useCallback((): void => {
+    setCanShowPrompt(false);
+    
+    // Store dismissal timestamp
+    try {
+      localStorage.setItem(STORAGE_KEYS.PROMPT_DISMISSED, new Date().toISOString());
+    } catch (error) {
+      console.warn('Failed to store prompt dismissal:', error);
+    }
+
+    // Track dismissal
+    trackInstallEvent('dismissed', deferredPrompt ? 'native_prompt' : 'manual_instructions');
+  }, [trackInstallEvent, deferredPrompt]);
+
+  /**
    * Handle beforeinstallprompt event
    */
   const handleBeforeInstallPrompt = useCallback((event: Event): void => {
@@ -306,24 +323,7 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
         promptTimeoutRef.current = null;
       }
     }
-  }, [deferredPrompt, isInstalling, trackInstallEvent]);
-
-  /**
-   * Dismiss the install prompt
-   */
-  const dismissPrompt = useCallback((): void => {
-    setCanShowPrompt(false);
-    
-    // Store dismissal timestamp
-    try {
-      localStorage.setItem(STORAGE_KEYS.PROMPT_DISMISSED, new Date().toISOString());
-    } catch (error) {
-      console.warn('Failed to store prompt dismissal:', error);
-    }
-
-    // Track dismissal
-    trackInstallEvent('dismissed', deferredPrompt ? 'native_prompt' : 'manual_instructions');
-  }, [deferredPrompt, trackInstallEvent]);
+  }, [deferredPrompt, isInstalling, trackInstallEvent, dismissPrompt]);
 
   /**
    * Reset install error

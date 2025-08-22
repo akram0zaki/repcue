@@ -14,6 +14,7 @@
     "medium": "Gemiddeld",
     "high": "Hoog",
     "secondsShortSuffix": "s",
+    "minutesShortSuffix": "m",
     "goToSettings": "Ga naar Instellingen",
     "welcomeUser": "Welkom terug, {{name}}!",
     "lastWorkoutOn": "Laatste training op {{date}}",
@@ -115,6 +116,15 @@
     "saturday": "Zaterdag",
     "sunday": "Zondag"
   },
+  "weekdayAbbrev": {
+    "monday": "Ma",
+    "tuesday": "Di",
+    "wednesday": "Wo",
+    "thursday": "Do",
+    "friday": "Vr",
+    "saturday": "Za",
+    "sunday": "Zo"
+  },
   "home": {
     "upcomingWorkout": "Aankomende Training",
     "startNow": "Nu Starten",
@@ -207,7 +217,12 @@
     "workoutBadge": "Training",
     "exercisesHeading": "Oefeningen:",
     "exerciseCount_one": "{{count}} oefening",
-    "exerciseCount_other": "{{count}} oefeningen"
+    "exerciseCount_other": "{{count}} oefeningen",
+    "status": {
+      "stoppedAfter": "Gestopt na {{duration}}",
+      "completedSetsReps": "{{sets}} sets van {{reps}} herhalingen voltooid",
+      "completedTime": "Intervaltimer van {{duration}} voltooid"
+    }
   },
   "exercises": {
     "title": "Oefeningen",

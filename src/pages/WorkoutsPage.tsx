@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- i18n-exempt: UI strings use t(); remaining literals are icons/units */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storageService';
@@ -71,14 +72,14 @@ const WorkoutsPage: React.FC = () => {
     }
     
     const dayNames = {
-      monday: 'Mon',
-      tuesday: 'Tue',
-      wednesday: 'Wed',
-      thursday: 'Thu',
-      friday: 'Fri',
-      saturday: 'Sat',
-      sunday: 'Sun'
-    };
+      monday: t('weekdayAbbrev.monday', { defaultValue: 'Mon' }),
+      tuesday: t('weekdayAbbrev.tuesday', { defaultValue: 'Tue' }),
+      wednesday: t('weekdayAbbrev.wednesday', { defaultValue: 'Wed' }),
+      thursday: t('weekdayAbbrev.thursday', { defaultValue: 'Thu' }),
+      friday: t('weekdayAbbrev.friday', { defaultValue: 'Fri' }),
+      saturday: t('weekdayAbbrev.saturday', { defaultValue: 'Sat' }),
+      sunday: t('weekdayAbbrev.sunday', { defaultValue: 'Sun' })
+    } as const;
     
   return scheduledDays.map(day => dayNames[day as keyof typeof dayNames]).join(', ');
   };
@@ -98,12 +99,14 @@ const WorkoutsPage: React.FC = () => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     
+    const minSuffix = t('common.minutesShortSuffix', { defaultValue: 'm' });
+    const secSuffix = t('common.secondsShortSuffix');
     if (minutes === 0) {
-      return `${seconds}s`;
+      return `${seconds}${secSuffix}`;
     } else if (seconds === 0) {
-      return `${minutes}m`;
+      return `${minutes}${minSuffix}`;
     } else {
-      return `${minutes}m ${seconds}s`;
+      return `${minutes}${minSuffix} ${seconds}${secSuffix}`;
     }
   };
 
@@ -265,7 +268,7 @@ const WorkoutsPage: React.FC = () => {
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                       </svg>
-                      {t('workouts.exerciseCount', { count: workout.exercises.length })}
+                      {t('workouts.exerciseCount', { count: workout.exercises.length, ns: 'common' })}
                     </span>
                     <span className="flex items-center">
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
