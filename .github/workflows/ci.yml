@@ -2,7 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: 
+      - main
+      - 'feature/*'   # matches feature/foo (one level)
+      - 'fixes/**'    # matches fixes/a or fixes/a/b (multi-level)
+
   pull_request:
     branches: [ develop, main ]
 
