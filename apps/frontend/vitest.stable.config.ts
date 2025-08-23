@@ -16,20 +16,16 @@ export default defineConfig({
     clearMocks: true,
     mockReset: true,
     // Stabilized settings for flaky environments (Windows CI, resource constrained)
+    fileParallelism: false,
     pool: 'forks',
     poolOptions: {
       forks: { singleFork: true }
     },
-    fileParallelism: false,
     testTimeout: 30000,
     hookTimeout: 30000,
     teardownTimeout: 30000,
     typecheck: {
       tsconfig: './tsconfig.test.json'
-    },
-    // Stabilize CI by running files serially and using a single fork
-    fileParallelism: false,
-    pool: 'forks',
-    poolOptions: { forks: { singleFork: true } }
+    }
   },
 })

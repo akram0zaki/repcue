@@ -1322,14 +1322,16 @@ function App() {
         try {
           // Register service worker for offline functionality
           console.log('🚀 Initializing PWA capabilities...');
-          registerServiceWorker().then((swInfo) => {
-            if (swInfo.updateAvailable) {
-              console.log('📦 App update available - refresh to update');
-              // Could show a toast notification here for updates
-            }
-          }).catch((error) => {
-            console.error('❌ Service worker registration failed:', error);
-          });
+          const maybePromise = registerServiceWorker();
+          if (maybePromise && typeof (maybePromise as any).then === 'function') {
+            (maybePromise as Promise<{ updateAvailable?: boolean }>).then((swInfo) => {
+              if (swInfo?.updateAvailable) {
+                console.log('📦 App update available - refresh to update');
+              }
+            }).catch((error) => {
+              console.error('❌ Service worker registration failed:', error);
+            });
+          }
 
           // Load exercises from storage or use initial data
           const storedExercises = await storageService.getExercises();

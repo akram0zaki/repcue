@@ -148,7 +148,9 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should save activity log when rep-based exercise completes all sets', async () => {
   const { container } = render(<App />);
-    // Ensure TimerPage mounted before querying for controls (CI can be slower)
+    // Navigate to Timer tab explicitly to ensure TimerPage mounts
+    const navTimer = await screen.findByTestId('nav-timer');
+    navTimer.click();
     await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Open exercise selector and choose our mock exercise
@@ -176,6 +178,8 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should display completed sets correctly in set progress text', async () => {
   render(<App />);
+    const navTimer2 = await screen.findByTestId('nav-timer');
+    navTimer2.click();
     await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Select the rep-based exercise first
@@ -198,6 +202,8 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should have consistent progress bar and text for set completion', async () => {
   render(<App />);
+    const navTimer3 = await screen.findByTestId('nav-timer');
+    navTimer3.click();
     await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Select the rep-based exercise first
