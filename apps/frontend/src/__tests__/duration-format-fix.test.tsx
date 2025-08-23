@@ -80,7 +80,7 @@ describe('Duration Format Fix', () => {
 
     // Check that the total duration is also formatted correctly
     // Total: 33 + 65 + 121 = 219 seconds = 3m 39s
-    expect(screen.getByText('3m 39s')).toBeInTheDocument();
+    expect(await screen.findByText('3m 39s')).toBeInTheDocument();
   });
 
   it('should handle whole number durations correctly', async () => {
@@ -114,7 +114,7 @@ describe('Duration Format Fix', () => {
     expect(screen.getByText('1m')).toBeInTheDocument(); // 60s should be formatted as 1m (no seconds part)
 
     // Total: 30 + 60 = 90 seconds = 1m 30s
-    expect(screen.getByText('1m 30s')).toBeInTheDocument();
+    expect(await screen.findByText('1m 30s')).toBeInTheDocument();
   });
 
   it('should handle edge cases correctly', async () => {
@@ -148,6 +148,6 @@ describe('Duration Format Fix', () => {
     expect(screen.getByText('1m')).toBeInTheDocument(); // 59.6 rounds to 60 -> 1m
 
     // Total: 1 + 60 = 61 seconds = 1m 1s
-    expect(screen.getByText('1m 1s')).toBeInTheDocument();
+    expect(await screen.findByText('1m 1s')).toBeInTheDocument();
   });
 });
