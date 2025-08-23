@@ -341,8 +341,7 @@ const __ORIGINAL_DOCUMENT__ = document
 const __ORIGINAL_ADD_EVENT_LISTENER__ = window.addEventListener
 const __ORIGINAL_REMOVE_EVENT_LISTENER__ = window.removeEventListener
 // Preserve original location (kept for parity and potential future use)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const __ORIGINAL_LOCATION__ = window.location
+const __ORIGINAL_LOCATION__ = window.location as Location
 
 // Patch timers to ensure no leaks across sequential tests
 try {
