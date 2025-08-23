@@ -25,7 +25,7 @@
     Auth + Realtime) or **PocketBase** (self‑host, single binary,
     built‑in auth, realtime).
     -   If you prefer zero‑ops now and strong SQL + policies:
-        **Supabase**.\
+        **Supabase**.
     -   If you prefer self‑hosting on your Pi easily: **PocketBase**.
 -   **Sync**: "**Local‑first** with client‑generated UUIDs, `updated_at`
     clocks, tombstones, and a small **op‑log** per table". Client
