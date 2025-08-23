@@ -24,11 +24,7 @@ i18n
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
-    detection: {
-      // Phase 3: prioritize persisted choice, then system, then html tag
-      order: ['localStorage', 'navigator', 'htmlTag'],
-      caches: ['localStorage'],
-    },
+    detection: { order: ['localStorage', 'navigator', 'htmlTag'], caches: ['localStorage'] },
     interpolation: {
       escapeValue: false, // React escapes by default
     },
@@ -39,7 +35,7 @@ i18n
 
 // Phase 3: Apply HTML lang/dir and toggle body.rtl for Arabic (including Egyptian)
 const applyDir = (lng: string | undefined) => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined' || !document.documentElement) return;
   const language = (lng || i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
   const isRTL = language === 'ar';
   // Always use the normalized language code (ar) for Arabic variants in HTML lang attribute

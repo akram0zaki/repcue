@@ -79,7 +79,12 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     const v = videoRef.current;
     if (!v) return;
     if (!shouldPlay) { if (!v.paused) v.pause(); return; }
-    v.play().catch(err => console.debug('Video play rejected (likely transient)', err));
+    // In tests, play() is often stubbed; still invoke it synchronously.
+    // Always call play() when shouldPlay flips true so spies observe it.
+    const maybePromise = v.play();
+    if (maybePromise && typeof (maybePromise as Promise<void>).catch === 'function') {
+      (maybePromise as Promise<void>).catch(() => {});
+    }
   }, [shouldPlay]);
 
   // Resume after visibility change (e.g., user switched tabs/routes and came back)

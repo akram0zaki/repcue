@@ -19,20 +19,20 @@ export interface PlatformInfo {
 }
 
 export const isIOS = (): boolean => {
-  const userAgent = navigator.userAgent.toLowerCase();
-  const platform = navigator.platform?.toLowerCase() || '';
-  
+  const ua = (globalThis?.navigator?.userAgent || '').toLowerCase();
+  const platform = (globalThis?.navigator?.platform || '').toLowerCase();
+  const maxTouch = (globalThis?.navigator as unknown as { maxTouchPoints?: number })?.maxTouchPoints || 0;
   return (
-    /ipad|iphone|ipod/.test(userAgent) ||
-    (platform === 'macintel' && navigator.maxTouchPoints > 1) ||
+    /ipad|iphone|ipod/.test(ua) ||
+    (platform === 'macintel' && maxTouch > 1) ||
     platform.includes('iphone') ||
     platform.includes('ipad')
   );
 };
 
 export const isAndroid = (): boolean => {
-  const userAgent = navigator.userAgent.toLowerCase();
-  return /android/.test(userAgent);
+  const ua = (globalThis?.navigator?.userAgent || '').toLowerCase();
+  return /android/.test(ua);
 };
 
 export const isMobile = (): boolean => {
@@ -40,11 +40,11 @@ export const isMobile = (): boolean => {
 };
 
 export const isTablet = (): boolean => {
-  const userAgent = navigator.userAgent.toLowerCase();
+  const ua = (globalThis?.navigator?.userAgent || '').toLowerCase();
   return (
-    /ipad/.test(userAgent) ||
-    (/android/.test(userAgent) && !/mobile/.test(userAgent)) ||
-    /tablet/.test(userAgent)
+    /ipad/.test(ua) ||
+    (/android/.test(ua) && !/mobile/.test(ua)) ||
+    /tablet/.test(ua)
   );
 };
 
@@ -54,57 +54,58 @@ export const isDesktop = (): boolean => {
 
 export const isStandalone = (): boolean => {
   if (isIOS()) {
-    return (navigator as unknown as Record<string, unknown>).standalone === true;
+    const nav = (globalThis?.navigator as unknown as { standalone?: boolean })
+    return nav?.standalone === true;
   }
-  
-  if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+  const w = ((globalThis as unknown as { window?: unknown }).window ?? (globalThis as unknown)) as { matchMedia?: (q: string) => { matches: boolean } };
+  const mm = w?.matchMedia as undefined | ((q: string) => { matches: boolean });
+  if (typeof mm === 'function' && mm('(display-mode: standalone)').matches) {
     return true;
   }
-  
-  if (isAndroid() && document.referrer.includes('android-app://')) {
+  const ref = (globalThis?.document?.referrer || '');
+  if (isAndroid() && ref.includes('android-app://')) {
     return true;
   }
-  
   return false;
 };
 
 export const getBrowserName = (): string => {
-  const userAgent = navigator.userAgent.toLowerCase();
-  
-  if (userAgent.includes('edg/')) return 'edge';
-  if (userAgent.includes('chrome') && !userAgent.includes('edg')) return 'chrome';
-  if (userAgent.includes('firefox')) return 'firefox';
-  if (userAgent.includes('safari') && !userAgent.includes('chrome')) return 'safari';
-  
+  const ua = (globalThis?.navigator?.userAgent || '').toLowerCase();
+  if (ua.includes('edg/')) return 'edge';
+  if (ua.includes('chrome') && !ua.includes('edg')) return 'chrome';
+  if (ua.includes('firefox')) return 'firefox';
+  if (ua.includes('safari') && !ua.includes('chrome')) return 'safari';
   return 'unknown';
 };
 
 export const getOSName = (): string => {
-  const platform = navigator.platform?.toLowerCase() || '';
-  
+  const platform = (globalThis?.navigator?.platform || '').toLowerCase();
   if (isIOS()) return 'ios';
   if (isAndroid()) return 'android';
   if (platform.includes('win')) return 'windows';
   if (platform.includes('mac')) return 'macos';
   if (platform.includes('linux')) return 'linux';
-  
   return 'unknown';
 };
 
 export const supportsBeforeInstallPrompt = (): boolean => {
-  return 'onbeforeinstallprompt' in window;
+  const w = ((globalThis as unknown as { window?: unknown }).window ?? (globalThis as unknown)) as Record<string, unknown>;
+  return !!w && 'onbeforeinstallprompt' in w;
 };
 
 export const supportsWebShare = (): boolean => {
-  return 'share' in navigator;
+  return typeof globalThis !== 'undefined' && 'share' in (globalThis.navigator || ({} as Navigator));
 };
 
 export const supportsFileSystemAccess = (): boolean => {
-  return 'showOpenFilePicker' in window;
+  const w = ((globalThis as unknown as { window?: unknown }).window ?? (globalThis as unknown)) as Record<string, unknown>;
+  return !!w && 'showOpenFilePicker' in w;
 };
 
 export const supportsPushNotifications = (): boolean => {
-  return 'Notification' in window && 'serviceWorker' in navigator;
+  const w = ((globalThis as unknown as { window?: unknown }).window ?? (globalThis as unknown)) as Record<string, unknown>;
+  const n = (globalThis?.navigator || ({} as Navigator));
+  return !!w && 'Notification' in w && 'serviceWorker' in n;
 };
 
 export const canInstall = (): boolean => {

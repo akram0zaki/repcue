@@ -38,7 +38,8 @@ describe('i18n HTML lang/dir application', () => {
     expect(document.documentElement.dir).toBe('rtl');
     expect(document.body.classList.contains('rtl')).toBe(true);
     // detector caches in localStorage
-    expect(localStorage.getItem('i18nextLng')).toMatch(/ar/);
+    const lng = localStorage.getItem('i18nextLng') as unknown as string | null
+    expect(typeof lng === 'string' ? lng : '').toMatch(/ar/)
   });
 
   it('normalizes regional variants and keeps dir consistent', async () => {

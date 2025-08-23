@@ -9,13 +9,18 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-  // Default parallel execution with threads for speed
-  // (Use vitest.stable.config.ts when you need the old single-threaded mode)
-  // Increase timeouts to prevent premature teardown while Vite serves virtual modules
-  testTimeout: 30000,
-  hookTimeout: 30000,
-  teardownTimeout: 30000,
-  // Keep default fileParallelism (true) for better performance
+    // Align with stable settings to avoid flaky parallelism issues on Windows
+    isolate: true,
+    restoreMocks: true,
+    clearMocks: true,
+    mockReset: true,
+    pool: 'forks',
+    poolOptions: { forks: { singleFork: true } },
+    fileParallelism: false,
+    // Increase timeouts to prevent premature teardown while Vite serves virtual modules
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    teardownTimeout: 30000,
     typecheck: {
       tsconfig: './tsconfig.test.json'
     }

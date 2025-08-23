@@ -1,3 +1,10 @@
+## 2025-08-23
+
+- Tests: Align default Vitest config with stable mode to eliminate flakiness between `npm run test:unit` and `npm run test:stable`.
+  - Updated `vitest.config.ts` to use single-fork pool with `fileParallelism: false`, `isolate: true`, and auto‑mock cleanup settings matching `vitest.stable.config.ts`.
+  - Hardened `src/test/setup.ts` to wrap `window.dispatchEvent` only once and avoid recursive wrapping that caused stack overflows under parallel workers.
+  - Result: Both `npm run test:unit` and `npm run test:stable` pass 100% locally (64 files, 599 passed, 3 skipped).
+
 ## 2025-08-22
 
 - Tests: Fix unit test failures caused by temporal dead zone in hooks/components.
@@ -7,6 +14,8 @@
 - Fix: Exercise preview now shows a warning toast and fallback panel when a video fails to load (e.g., exercise marked `hasVideo = true` but media missing). Also records consent-aware telemetry for preview video errors.
 - UX: Prevent modal from opening if media is missing via 1s HEAD precheck; only the bottom snackbar appears. Timer inline video remains silent (debug logged) to avoid intrusive UI.
 - Tests: Hardened preview tests: Router+Snackbar wrappers, jsdom media play stubs, resilient role-based assertions. ActivityLogPage tests updated for case-insensitive button queries and robust empty-state matching.
+
+- Test: Stabilized sequential Vitest runs; added isolation guards in `src/test/setup.ts` (auto-consent, localStorage/indexedDB mocks, window/document restoration), jsdom-safe audio/vibration cleanup, background sync guards, preview modal timing fixes, and video element error handling. Added `docs/devops/testing-practices.md` to document structure and best practices.
 
 ## 2025-08-21 (i18n Arabic fixes and UX polish)
 

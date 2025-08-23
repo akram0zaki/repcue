@@ -12,6 +12,6 @@ describe('i18n language switching and RTL side-effects', () => {
     expect(document.documentElement.lang).toBe('ar')
 
     const stored = window.localStorage.getItem('i18nextLng')
-    expect(stored?.startsWith('ar')).toBe(true)
+    expect(!!(typeof stored === 'string' && stored.startsWith('ar'))).toBe(true)
   })
 })

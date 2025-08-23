@@ -28,6 +28,8 @@ export default tseslint.config([
           destructuredArrayIgnorePattern: '^_',
         },
       ],
+      // Allow intentionally empty catch blocks used for optional platform APIs and test envs
+      'no-empty': ['error', { allowEmptyCatch: true }],
     },
   },
   // Relax certain strict rules in test files to keep tests readable and maintainable
@@ -37,6 +39,8 @@ export default tseslint.config([
       '**/*.test.tsx',
       '**/__tests__/**/*.{ts,tsx}',
       'src/__tests__/**/*.{ts,tsx}',
+      // Include shared test setup
+      'src/test/setup.ts',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

@@ -300,9 +300,17 @@ export class AudioService {
     document.body.appendChild(announcement);
     announcement.textContent = text;
 
-    // Remove after announcement
+    // Remove after announcement (guard in JSDOM where body might be reset)
     setTimeout(() => {
-      document.body.removeChild(announcement);
+      try {
+        if (announcement.parentNode === document.body) {
+          document.body.removeChild(announcement);
+        } else {
+          announcement.remove?.();
+        }
+      } catch {
+        // ignore
+      }
     }, 1000);
   }
 

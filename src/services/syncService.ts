@@ -56,7 +56,10 @@ export class SyncService {
    * Register service worker background sync
    */
   private async registerBackgroundSync(): Promise<void> {
-    if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+    // Guard for jsdom/tests where ServiceWorkerRegistration may be undefined
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SWR: any = (window as any).ServiceWorkerRegistration;
+    if ('serviceWorker' in navigator && SWR && 'prototype' in SWR && 'sync' in SWR.prototype) {
       try {
         const registration = await navigator.serviceWorker.ready;
         console.log('🔄 Background sync capability detected');
@@ -79,6 +82,10 @@ export class SyncService {
    */
   private async handleOnline(): Promise<void> {
     console.log('🌐 Device came online');
+    // Defensive: ensure consentService exists (sequential tests may dispatch before ctor completes)
+    if (!this.consentService) {
+      try { this.consentService = ConsentService.getInstance(); } catch { /* noop */ }
+    }
     this.isOnline = true;
     this.notifyListeners();
 
@@ -136,7 +143,15 @@ export class SyncService {
    * Process sync operations
    */
   async sync(force: boolean = false): Promise<SyncResult> {
-    if (!this.consentService.hasConsent()) {
+    // Ensure consent service is available and safe to call
+    let cs: ConsentService | null = this.consentService ?? null;
+    try {
+      if (!cs) cs = ConsentService.getInstance();
+      this.consentService = cs as ConsentService;
+    } catch {
+      cs = null;
+    }
+    if (!cs || !cs.hasConsent()) {
       console.log('🚫 Sync skipped: no storage consent');
       return {
         success: true,

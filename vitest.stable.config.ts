@@ -9,6 +9,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    // Ensure each test file has a fresh module context even in single worker
+    isolate: true,
+    // Auto-restore/clear mocks between tests to prevent leakage
+    restoreMocks: true,
+    clearMocks: true,
+    mockReset: true,
     // Stabilized settings for flaky environments (Windows CI, resource constrained)
     pool: 'forks',
     poolOptions: {

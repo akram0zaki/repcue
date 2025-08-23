@@ -161,6 +161,14 @@ export class ConsentService {
    * Check if user has given consent for data storage
    */
   public hasConsent(): boolean {
+    // In case consent was granted after instance creation (e.g., test seeding), lazily reload once
+    if (!this.consentData) {
+      try {
+        this.loadAndMigrateConsentData();
+      } catch {
+        // ignore
+      }
+    }
     return this.consentData?.hasConsented === true && this.consentData?.cookiesAccepted === true;
   }
 

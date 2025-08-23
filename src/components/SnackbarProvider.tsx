@@ -33,6 +33,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
   const [current, setCurrent] = useState<SnackbarItem | null>(null);
   const timerRef = useRef<number | null>(null);
   const nextId = useRef(1);
+  const currentRef = useRef<SnackbarItem | null>(null);
 
   const clearTimer = () => {
     if (timerRef.current) {
@@ -48,7 +49,12 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
       type: options?.type ?? 'warning',
       durationMs: options?.durationMs ?? 3000,
     };
-    setQueue(prev => [...prev, item]);
+    if (!currentRef.current) {
+      setCurrent(item);
+      currentRef.current = item;
+    } else {
+      setQueue(prev => [...prev, item]);
+    }
   }, []);
 
   useEffect(() => {
@@ -62,8 +68,10 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
   useEffect(() => {
     clearTimer();
     if (current) {
+      currentRef.current = current;
       timerRef.current = window.setTimeout(() => {
         setCurrent(null);
+        currentRef.current = null;
       }, current.durationMs);
     }
     return clearTimer;
@@ -85,6 +93,8 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
   return (
     <SnackbarContext.Provider value={value}>
       {children}
+      {/* Persistent live region for a11y/tests */}
+      <div role="status" aria-live="polite" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }} />
       {current && (
         <div
           role="status"
