@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run generate-splash && node scripts/verify-media.mjs pre && tsc -b && vite build && node scripts/verify-media.mjs post && npm run copy-splash",
+    "build": "pnpm generate-splash && node scripts/verify-media.mjs pre && tsc -b && vite build && node scripts/verify-media.mjs post && pnpm copy-splash",
     "copy-splash": "node scripts/copy-splash.mjs",
-    "build:prod": "npm run generate-splash && node scripts/verify-media.mjs pre && vite build && node scripts/verify-media.mjs post",
+    "build:prod": "pnpm generate-splash && node scripts/verify-media.mjs pre && vite build && node scripts/verify-media.mjs post",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
@@ -20,7 +20,7 @@
     "cypress:run": "cypress run --config-file ../../tests/e2e/cypress.config.mjs",
     "test:e2e": "start-server-and-test dev http://localhost:5173 \"cypress run --config-file ../../tests/e2e/cypress.config.mjs\"",
     "test:a11y": "start-server-and-test dev http://localhost:5173 \"cypress run --config-file ../../tests/e2e/cypress.config.mjs --spec cypress/e2e/axe.cy.ts\"",
-    "test:all": "npm run test:unit && npm run test:e2e",
+    "test:all": "pnpm test:unit && pnpm test:e2e",
     "i18n:scan": "node scripts/i18n-scan.mjs",
     "i18n:report": "node scripts/i18n-scan.mjs || exit 0",
     "generate-favicons": "node scripts/generate-favicons.js",
@@ -47,6 +47,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^24.3.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@types/react-router-dom": "^5.3.3",
@@ -67,4 +68,3 @@
     "vitest": "^3.2.4"
   }
 }
-

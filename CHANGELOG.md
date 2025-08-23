@@ -1,4 +1,14 @@
 ## 2025-08-23
+
+### Package Manager Migration
+- Migrated from npm to pnpm for improved performance and disk usage
+- Created `pnpm-workspace.yaml` to replace npm workspaces configuration  
+- Updated all workspace scripts to use `pnpm --filter` syntax
+- Added `packageManager` field to root `package.json` (pnpm@10.15.0)
+- Updated GitHub Actions CI to use pnpm with action-setup and frozen lockfile
+- Fixed TypeScript build errors by adding `@types/node` dependency
+- All build, lint, and test commands now work with pnpm
+
 ### Repo reorganization (monorepo)
 - Split workspace into `apps/frontend` (Vite + React), `apps/backend` (Express + PM2), and `packages/shared` (placeholder for shared types/constants).
 - Moved Cypress E2E to `tests/e2e` with its own workspace package.
