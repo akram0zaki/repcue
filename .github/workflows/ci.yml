@@ -24,8 +24,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
-      - name: Unit tests (non-interactive)
-        run: npm run test:unit
+      - name: Unit tests (stable)
+        run: npm run test:stable
       - name: i18n missing-keys scan
         run: npm run i18n:scan
       - name: Build
