@@ -118,6 +118,15 @@ if (!navigator.vibrate) {
 }
 
 describe('Rep-based Exercise Fixes', () => {
+  async function ensureTimerPageVisible(user: ReturnType<typeof userEvent.setup>) {
+    try {
+      await screen.findByTestId('timer-page', {}, { timeout: 1500 });
+    } catch {
+      const navTimer = await screen.findByTestId('nav-timer');
+      await user.click(navTimer);
+      await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+    }
+  }
   const mockRepExercise = {
     id: 'test-rep-exercise',
     name: 'Cat-Cow Stretch',
@@ -150,8 +159,7 @@ describe('Rep-based Exercise Fixes', () => {
   it('should save activity log when rep-based exercise completes all sets', async () => {
   const user = userEvent.setup();
   const { container } = render(<App />);
-    // Route is preset to /timer in beforeEach; wait for TimerPage to mount
-    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+    await ensureTimerPageVisible(user);
 
     // Open exercise selector and choose our mock exercise
     const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
@@ -179,7 +187,7 @@ describe('Rep-based Exercise Fixes', () => {
   it('should display completed sets correctly in set progress text', async () => {
   const user2 = userEvent.setup();
   render(<App />);
-    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+    await ensureTimerPageVisible(user2);
 
     // Select the rep-based exercise first
     const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
@@ -202,7 +210,7 @@ describe('Rep-based Exercise Fixes', () => {
   it('should have consistent progress bar and text for set completion', async () => {
   const user3 = userEvent.setup();
   render(<App />);
-    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+    await ensureTimerPageVisible(user3);
 
     // Select the rep-based exercise first
     const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
