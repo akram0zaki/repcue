@@ -127,6 +127,7 @@
   },
   "home": {
     "upcomingWorkout": "Anstehendes Workout",
+    "tagline": "Ihr persönlicher Übungstimer",
     "startNow": "Jetzt starten",
     "noScheduleTitle": "Kein Zeitplan gesetzt",
     "noScheduleBody": "Erstellen Sie einen Workout-Zeitplan, um Ihre anstehenden Workouts hier zu sehen",

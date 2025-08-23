@@ -127,6 +127,7 @@
   },
   "home": {
     "upcomingWorkout": "Próximo entrenamiento",
+    "tagline": "Tu temporizador personal de ejercicios",
     "startNow": "Comenzar ahora",
     "noScheduleTitle": "Sin horario establecido",
     "noScheduleBody": "Crea un horario de entrenamiento para ver tus próximos entrenamientos aquí",

@@ -127,6 +127,7 @@
   },
   "home": {
     "upcomingWorkout": "Entraînement à venir",
+    "tagline": "Votre minuteur d'exercices personnel",
     "startNow": "Commencer maintenant",
     "noScheduleTitle": "Aucun planning défini",
     "noScheduleBody": "Créez un planning d'entraînement pour voir vos entraînements à venir ici",

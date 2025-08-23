@@ -6,10 +6,15 @@
 // Security: reads only local files; does not execute code.
 
 import { readdirSync, readFileSync } from 'node:fs'
-import { join, extname } from 'node:path'
+import { join, extname, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const SRC_DIR = join(process.cwd(), 'src')
-const LOCALES_DIR = join(process.cwd(), 'public', 'locales')
+// Resolve paths relative to the frontend workspace so the script can run
+// from repository root or from apps/frontend
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const FRONTEND_DIR = join(__dirname, '..')
+const SRC_DIR = join(FRONTEND_DIR, 'src')
+const LOCALES_DIR = join(FRONTEND_DIR, 'public', 'locales')
 
 function walkFiles(dir, exts) {
   const out = []
