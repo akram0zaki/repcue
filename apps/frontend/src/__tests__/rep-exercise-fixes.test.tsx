@@ -6,6 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // Mock services with explicit factories (more reliable than post-assign)
 vi.mock('../services/storageService', () => {
@@ -147,10 +148,11 @@ describe('Rep-based Exercise Fixes', () => {
   });
 
   it('should save activity log when rep-based exercise completes all sets', async () => {
+  const user = userEvent.setup();
   const { container } = render(<App />);
     // Navigate to Timer tab explicitly to ensure TimerPage mounts
     const navTimer = await screen.findByTestId('nav-timer');
-    navTimer.click();
+    await user.click(navTimer);
     await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Open exercise selector and choose our mock exercise
@@ -177,9 +179,10 @@ describe('Rep-based Exercise Fixes', () => {
   });
 
   it('should display completed sets correctly in set progress text', async () => {
+  const user2 = userEvent.setup();
   render(<App />);
     const navTimer2 = await screen.findByTestId('nav-timer');
-    navTimer2.click();
+    await user2.click(navTimer2);
     await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Select the rep-based exercise first
@@ -201,9 +204,10 @@ describe('Rep-based Exercise Fixes', () => {
   });
 
   it('should have consistent progress bar and text for set completion', async () => {
+  const user3 = userEvent.setup();
   render(<App />);
     const navTimer3 = await screen.findByTestId('nav-timer');
-    navTimer3.click();
+    await user3.click(navTimer3);
     await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Select the rep-based exercise first
