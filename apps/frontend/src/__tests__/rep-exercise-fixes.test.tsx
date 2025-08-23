@@ -122,9 +122,23 @@ describe('Rep-based Exercise Fixes', () => {
     try {
       await screen.findByTestId('timer-page', {}, { timeout: 1500 });
     } catch {
-      const navTimer = await screen.findByTestId('nav-timer');
-      await user.click(navTimer);
-      await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+      // If timer page not visible, try navigation
+      try {
+        const navTimer = await screen.findByTestId('nav-timer');
+        await user.click(navTimer);
+        await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+      } catch {
+        // Fallback: try clicking Start Timer button from home page
+        try {
+          const startTimerBtn = await screen.findByRole('button', { name: /start timer/i });
+          await user.click(startTimerBtn);
+          await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+        } catch (error) {
+          console.error('Failed to navigate to timer page. Current page content:');
+          console.error(document.body.innerHTML);
+          throw error;
+        }
+      }
     }
   }
   const mockRepExercise = {
@@ -154,6 +168,9 @@ describe('Rep-based Exercise Fixes', () => {
 
     // Navigate to the Timer route so App routes correctly
     window.history.replaceState({}, '', '/timer');
+    
+    // Dispatch a popstate event to ensure the router responds to the URL change
+    window.dispatchEvent(new PopStateEvent('popstate', { state: {} }));
   });
 
   it('should save activity log when rep-based exercise completes all sets', async () => {
