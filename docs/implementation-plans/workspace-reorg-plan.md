@@ -1,5 +1,5 @@
 
-# RepCue Workspace Reorganization Proposal — Split Frontend & Backend
+# RepCue Workspace Reorganization Plan — Split Frontend & Backend
 
 **Date:** 2025‑08‑23  
 **Repo:** `github.com/akram0zaki/repcue`  
