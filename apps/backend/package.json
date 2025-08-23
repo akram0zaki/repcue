@@ -1,0 +1,23 @@
+{
+  "name": "@repcue/backend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo Backend has no build step",
+    "start": "node server.js",
+    "pm2:start": "pm2 start ecosystem.config.cjs --env production",
+    "pm2:stop": "pm2 delete repcue || exit 0",
+    "pm2:restart": "pm2 restart repcue || pm2 start ecosystem.config.cjs --env production",
+    "pm2:logs": "pm2 logs repcue"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "pm2": "^5.3.0"
+  }
+}
+

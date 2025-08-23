@@ -6,22 +6,28 @@ RepCue is a modern, privacy-first fitness tracking Progressive Web App (PWA) des
 
 ### Prerequisites
 - **Node.js 18+** (Download from [nodejs.org](https://nodejs.org))
-- **npm** (included with Node.js) or **yarn**
+- **pnpm** (Install with: `pnpm install -g pnpm`)
 
-### Get Running in 3 Steps
+### Get Running in 3 Steps (monorepo)
 
 ```bash
 # 1. Clone and navigate to the project
 git clone https://github.com/akram0zaki/repcue.git
 cd repcue
 
-# 2. Install dependencies
-npm install
+# 2. Install dependencies at the repo root
+ppnpm install
 
-npm run dev
+# 3. Start the frontend dev server (Vite)
+pnpm dev
+
+# (Optional) start backend placeholder server on another terminal
+pnpm dev:be
 ```
 
-**🎉 That's it!** Open http://localhost:5173 in your browser.
+**🎉 That's it!**
+- Frontend: http://localhost:5173
+- Backend (placeholder): http://localhost:3001 (Express, serves FE build in prod)
 
 ---
 
@@ -53,15 +59,15 @@ RepCue supports 6 languages (English, Dutch, Arabic, German, Spanish, French) wi
 - All UI strings use i18n keys (see `/docs/i18n/key-styleguide.md`).
 - To add or update translations:
     1. Edit `public/locales/en/common.json` (or the correct namespace file).
-    2. Run `npm run i18n:scan` to check for missing keys in other locales.
+    2. Run `pnpm i18n:scan` to check for missing keys in other locales.
     3. Add translations for all supported languages.
-    4. Test in the UI and with `npm run test`.
+    4. Test in the UI and with `ppnpm test`.
 - For new languages, mirror the EN structure and add to `supportedLngs` in `src/i18n.ts`.
 - See `/docs/i18n/contributing.md` for full process, key naming, and RTL tips.
 
 ### i18n Scripts
-- `npm run i18n:scan` — Fails if any EN keys are missing; warns for other locales.
-- `npm run i18n:report` — Reports missing keys but does not fail (for CI stats).
+- `pnpm i18n:scan` — Fails if any EN keys are missing; warns for other locales.
+- `pnpm i18n:report` — Reports missing keys but does not fail (for CI stats).
 
 ### Docs
 - `/docs/i18n/README.md` — Overview
@@ -87,7 +93,7 @@ cd repcue
 #### 3. **Install Dependencies**
 ```bash
 # Using npm (recommended)
-npm install
+pnpm install
 
 # Or using yarn
 yarn install
@@ -101,64 +107,78 @@ This installs all required packages including:
 - Vitest for testing
 
 ## 🏃‍♂️ Running the Application
-npm run dev
-- **URL**: http://localhost:5173
-- **Features**: Hot reload, instant updates, development tools
-- **Performance**: Unoptimized but fast iteration
+
+Frontend dev: `pnpm dev` → http://localhost:5173
+
+Backend dev (optional placeholder): `pnpm dev:be` → http://localhost:3001
 
 ### Production Preview
 ```bash
-# Build the application
-npm run build
+# Build the frontend app
+pnpm build
 
-# Preview the built version
-npm run preview
+# Preview the built version (serves http://localhost:4173)
+pnpm preview
 ```
 - **URL**: http://localhost:4173
 - **Features**: Optimized build, production-like environment
 - **Performance**: Full optimization, smaller bundle size
 
-### Available Scripts
+### Available Scripts (root)
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `npm run dev` | Development server | Daily development |
-| `npm run build` | Full build with TypeScript | Development/testing |
-| `npm run build:prod` | Production build (optimized) | Pi deployment |
-| `npm run preview` | Preview built app | Test production build |
-| `npm start` | Start Express server | Production server |
-| `npm run build:serve` | Build (prod) and serve | Quick production test |
-| `npm run pm2:start` | Deploy with PM2 | Production deployment |
-| `npm run pm2:stop` | Stop PM2 app | Stop production app |
-| `npm run pm2:restart` | Restart PM2 app | Update production app |
-| `npm run pm2:logs` | View PM2 logs | Monitor production app |
-| `npm run lint` | Check code quality | Before committing |
-| `npm test` | Run all tests | Development/CI |
-| `npm run test:ui` | Visual test runner | Debugging tests |
-| `npm run test:coverage` | Test coverage report | Quality assurance |
-| `npm run test:unit` | Unit/integration (fast, parallel) | Fast testing |
-| `npm run test:stable` | Stable mode (single-threaded, Windows-friendly) | Stable testing |
+| `pnpm dev` | Start frontend dev (Vite) | Daily development |
+| `pnpm dev:be` | Start backend dev (Express) | When testing API placeholder |
+| `pnpm build` | Build frontend | CI/builds |
+| `pnpm preview` | Preview built frontend (4173) | Verify production build |
+| `pnpm start` | Start backend (serves FE in prod) | Production start |
+| `pnpm pm2:start` | Start PM2 app | Deploy to Pi/server |
+| `pnpm pm2:stop` | Stop PM2 app | Stop production app |
+| `pnpm pm2:restart` | Restart PM2 app | Update production app |
+| `pnpm pm2:logs` | View PM2 logs | Monitor production app |
+| `pnpm lint` | Lint frontend | Before committing |
+| `ppnpm test` | Run unit/integration tests | Development/CI |
+| `ppnpm test:ui` | Vitest UI | Debugging tests |
+| `ppnpm test:coverage` | Coverage report | QA |
+| `ppnpm test:unit` | Unit/integration only | Fast testing |
+| `ppnpm test:stable` | Stable mode on Windows | Flake-free runs |
 
 
 ## 🧪 Testing
 
 RepCue includes comprehensive test coverage with **98 tests** across all components.
 
-### Run All Tests
+### Unit/Integration (frontend)
 ```bash
-npm test
+pnpm test
 ```
 
 ### Test with Coverage Report
 ```bash
-npm run test:coverage
+ppnpm test:coverage
 ```
 
 ### Interactive Test UI
 ```bash
-npm run test:ui
+ppnpm test:ui
 ```
 Opens a web interface for running and debugging tests.
+
+### End-to-End (Cypress)
+Tests live under `tests/e2e`.
+
+Option A — build + preview + run Cypress:
+```bash
+# 1) Build and preview frontend
+pnpm build
+pnpm preview
+
+# 2) In another terminal, run cypress from the e2e workspace
+pnpm cypress:run
+# or open the Cypress UI
+pnpm cypress:open
+```
 
 ### Test Categories
 - **✅ Unit Tests**: Individual components (ConsentBanner, TimerPage, etc.)
@@ -183,14 +203,14 @@ Opens a web interface for running and debugging tests.
 
 ### Common Issues & Solutions
 
-#### **Issue**: `npm install` fails with permission errors
+#### **Issue**: `pnpm install` fails with permission errors
 **Solution**:
 ```bash
 # Fix npm permissions (Linux/Mac)
 sudo chown -R $(whoami) ~/.npm
 
 # Or use yarn instead
-npm install -g yarn
+pnpm install -g yarn
 yarn install
 ```
 
@@ -201,7 +221,7 @@ yarn install
 pkill -f "vite"
 
 # Or use different port
-npm run dev -- --port 3000
+pnpm dev -- --port 3000
 ```
 
 #### **Issue**: App loads but buttons don't work
@@ -221,17 +241,17 @@ npm run dev
 npx tsc --noEmit
 
 # Fix common issues
-npm run lint
+pnpm lint
 ```
 
 #### **Issue**: Tests failing
 **Solution**:
 ```bash
 # Run tests in verbose mode
-npm test -- --reporter=verbose
+pnpm test -- --reporter=verbose
 
 # Clear test cache
-npm test -- --clearCache
+pnpm test -- --clearCache
 ```
 
 #### **Issue**: Audio not working
@@ -260,10 +280,10 @@ curl http://localhost:3001/health
 pm2 status
 
 # View detailed logs
-npm run pm2:logs
+pnpm pm2:logs
 
 # Restart if needed
-npm run pm2:restart
+pnpm pm2:restart
 ```
 
 ### Getting Help
@@ -275,7 +295,7 @@ npm run pm2:restart
    ```bash
    # Full reset
    rm -rf node_modules package-lock.json
-   npm install
+   pnpm install
    npm run dev
    ```
 
@@ -288,24 +308,24 @@ RepCue includes full PM2 support for production deployment with an Express serve
 ### Quick PM2 Setup
 
 ```bash
-# 1. Install dependencies (Express & compression are included)
-npm install
+# 1. Install dependencies
+pnpm install
 
-# 2. Build and start with PM2 in one command
-npm run pm2:start
+# 2. Build frontend and start backend via PM2 (serves FE dist)
+pnpm pm2:start
 
 # 3. Check status
 pm2 status
 
 # 4. View logs
-npm run pm2:logs
+pnpm pm2:logs
 ```
 
 ### Manual PM2 Setup
 
 ```bash
 # 1. Build the application for production
-npm run build:prod
+pnpm build:prod
 
 # 2. Start with PM2
 pm2 start ecosystem.config.cjs
@@ -321,17 +341,17 @@ pm2 startup
 
 | Command | Purpose |
 |---------|---------|
-| `npm run pm2:start` | Build and start application |
+| `pnpm pm2:start` | Build and start application |
 | `npm run pm2:stop` | Stop the application |
-| `npm run pm2:restart` | Restart the application |
-| `npm run pm2:logs` | View application logs |
+| `pnpm pm2:restart` | Restart the application |
+| `pnpm pm2:logs` | View application logs |
 | `pm2 status` | Check all PM2 processes |
 | `pm2 monit` | Real-time monitoring |
 | `pm2 save` | Save current configuration |
 
 ### PM2 Configuration
 
-The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
+The included `apps/backend/ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
 
 - **Single instance** for Pi resource efficiency
 - **512MB memory limit** with automatic restart
@@ -339,14 +359,15 @@ The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
 - **Automatic daily restart** at 4 AM
 - **Comprehensive logging** with timestamps
 
-### Build Commands for Production
+### Build for Production
 
-| Command | Use Case | TypeScript Compilation |
-|---------|----------|----------------------|
-| `npm run build` | Development/Testing | ✅ Full (includes test files) |
-| `npm run build:prod` | Production/Pi Deployment | ⚡ Optimized (excludes tests) |
+```bash
+# Build frontend
+npm run build
 
-**Note**: Use `build:prod` for Raspberry Pi deployment to avoid TypeScript test compilation errors and faster builds.
+# Start backend via PM2 (serves apps/frontend/dist)
+pnpm pm2:start
+```
 
 ### Nginx + Cloudflare Tunnel Setup
 
@@ -472,10 +493,10 @@ cd /var/www/repcue
 git clone https://github.com/akram0zaki/repcue.git .
 
 # Install dependencies (this may take 10-15 minutes on Pi)
-npm install
+pnpm install
 
 # Build for production (optimized, skips test compilation)
-npm run build:prod
+pnpm build:prod
 ```
 
 ### Step 3: Configure Nginx
@@ -543,7 +564,7 @@ After=network.target
 Type=oneshot
 User=pi
 WorkingDirectory=/var/www/repcue
-ExecStart=/bin/bash -c 'git pull && npm run build:prod'
+ExecStart=/bin/bash -c 'git pull && pnpm build:prod'
 
 [Install]
 WantedBy=multi-user.target
@@ -633,33 +654,35 @@ npm prune --production
 
 ## 🏗️ Development Guide
 
-### Project Structure
+### Project Structure (monorepo)
 ```
 repcue/
-├── src/
-│   ├── components/         # Reusable UI components
-│   │   ├── ConsentBanner.tsx
-│   │   └── Navigation.tsx
-│   ├── pages/              # Main app pages
-│   │   ├── HomePage.tsx
-│   │   ├── TimerPage.tsx
-│   │   ├── ExercisePage.tsx
-│   │   ├── ActivityLogPage.tsx
-│   │   └── SettingsPage.tsx
-│   ├── services/           # Business logic
-│   │   ├── audioService.ts
-│   │   ├── storageService.ts
-│   │   └── consentService.ts
-│   ├── types/              # TypeScript definitions
-│   │   └── index.ts
-│   ├── data/               # Static data
-│   │   └── exercises.ts
-│   └── test/               # Test utilities
-├── public/                 # Static assets
-├── dist/                   # Built application (generated)
-├── docs/                   # Documentation
-├── consent.md              # Consent system documentation
-└── CHANGELOG.md            # Version history
+├── apps/
+│   ├── frontend/                 # Vite + React + Tailwind (UI)
+│   │   ├── src/
+│   │   ├── public/
+│   │   ├── index.html
+│   │   ├── vite.config.ts
+│   │   ├── tailwind.config.js
+│   │   ├── vitest*.config.ts
+│   │   └── package.json
+│   └── backend/                  # Express + PM2 (serves FE in prod)
+│       ├── server.js
+│       ├── ecosystem.config.cjs
+│       └── package.json
+├── packages/
+│   └── shared/                   # Shared types/constants (placeholder)
+│       ├── src/index.ts
+│       └── package.json
+├── tests/
+│   └── e2e/                      # Cypress E2E workspace
+│       ├── cypress/
+│       ├── cypress.config.mjs
+│       └── package.json
+├── docs/
+├── .github/
+├── package.json                  # npm workspaces (root scripts)
+└── CHANGELOG.md
 ```
 
 ### Key Technologies
@@ -675,25 +698,64 @@ repcue/
 ### Development Workflow
 
 1. **Start Development**:
-   ```bash
-   npm run dev
-   ```
+   - Frontend: `npm run dev`
+   - Backend (optional): `pnpm dev:be`
 
-2. **Make Changes**: Edit files in `src/`
+2. **Make Changes**: Edit files in `apps/frontend/src/`
 
 3. **Test Changes**:
    ```bash
-   npm test
-   npm run lint
+   pnpm test
+   pnpm lint
    ```
 
 4. **Build & Test**:
    ```bash
-   npm run build:prod  # For production
-   npm run preview
+   npm run build && pnpm preview
    ```
 
-5. **Deploy**: Copy `dist/` folder to your web server
+5. **Deploy**: Use PM2 (`pnpm pm2:start`) to serve `apps/frontend/dist` via backend
+
+### Environment Variables
+
+- Frontend `.env`: place under `apps/frontend/.env` (Vite reads it by default). Only variables prefixed with `VITE_` are exposed to the client.
+- Backend `.env`: when backend features are added, use `apps/backend/.env` with `dotenv`.
+
+### Migration from single‑package repo (checklist)
+
+1) Create branch: `feat/workspaces-reorg`.
+
+2) Move files:
+- UI: move `src/`, `public/`, `index.html`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `vitest*.config.ts`, `tsconfig*.json` → `apps/frontend/`.
+- Backend: move `server.js`, `ecosystem.config.cjs` → `apps/backend/`.
+- Cypress: move `cypress/`, `cypress.config.mjs` → `tests/e2e/`.
+- Env: move root `.env` → `apps/frontend/.env` (ensure `VITE_` prefixes).
+
+3) Add workspaces: root `package.json` with `workspaces: ["apps/*","packages/*","tests/e2e"]` and scripts shown above.
+
+4) Update helper scripts to new paths (already wired here): `apps/frontend/scripts/*`.
+
+5) Install and validate:
+```bash
+pnpm install
+npm run build
+npm run dev       # FE at 5173
+pnpm dev:be    # BE at 3001 (optional placeholder)
+```
+
+6) PM2 on Pi/server:
+```bash
+npm run build
+pnpm pm2:start
+```
+
+7) Cypress E2E (now at `tests/e2e`):
+```bash
+pnpm build && pnpm preview   # FE preview at 4173
+pnpm cypress:run
+```
+
+8) CI (GitHub Actions): switch to workspace install (`pnpm install --frozen-lockfile` or cache), run `pnpm lint && pnpm test && pnpm build` from root.
 
 ### Adding New Features
 
@@ -727,7 +789,7 @@ RepCue is designed with privacy as the top priority:
 - **Self-Hosted**: You control your data completely
 
 ### Robust Consent System
-RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[consent.md](./consent.md)** which covers:
+RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[consent.md](docs/consent.md)** which covers:
 
 - GDPR/CCPA compliance features
 - Consent versioning and migration
@@ -762,8 +824,8 @@ We welcome contributions! Here's how to get started:
 1. **Fork the repository**
 2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
 3. **Make your changes** and add tests
-4. **Run the test suite**: `npm test`
-5. **Check linting**: `npm run lint`
+4. **Run the test suite**: `pnpm test`
+5. **Check linting**: `pnpm lint`
 6. **Commit changes**: `git commit -m 'Add amazing feature'`
 7. **Push to branch**: `git push origin feature/amazing-feature`
 8. **Create a Pull Request**
@@ -779,7 +841,7 @@ We welcome contributions! Here's how to get started:
 
 ## 🎯 Roadmap
 
-### Current Version (v0.1.0)
+### Current Version (v0.4.0)
 - ✅ Core interval timer functionality
 - ✅ 20 exercise library with categories
 - ✅ Expandable exercise tags with smooth animations
@@ -794,7 +856,7 @@ We welcome contributions! Here's how to get started:
 - ✅ **PWA Platform Detection**: Cross-platform detection system with comprehensive browser/OS identification
 - ✅ **TypeScript Integration**: Fully typed platform utilities with 100% test coverage
 
-### Planned Features (v0.2.0) - PWA Enhancement
+### Planned Features (v0.5.0) - PWA Enhancement
 - 🔄 **Install Experience**: Smart install prompts for iOS, Android, and Desktop
 - 🔄 **Offline Functionality**: Full offline workout capability with background sync
 - 🔄 **App Shell Architecture**: Instant loading with persistent navigation

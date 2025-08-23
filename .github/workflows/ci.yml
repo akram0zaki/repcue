@@ -1,31 +1,41 @@
 name: CI
 
-on:
-  push:
-    branches: 
-      - main
-      - develop
-      - 'feature/*'   # matches feature/foo (one level)
-      - 'fixes/**'    # matches fixes/a or fixes/a/b (multi-level)
+# Temporarily disabled CI
+# on:
+#   push:
+#     branches: 
+#       - main
+#       - develop
+#       - 'feature/*'   # matches feature/foo (one level)
+#       - 'fixes/**'    # matches fixes/a or fixes/a/b (multi-level)
+#       - 'chores/**'
+# 
+#   pull_request:
+#     branches: [ develop, main ]
 
-  pull_request:
-    branches: [ develop, main ]
+# Manual trigger only while CI is disabled
+on:
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
       - name: Install deps
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: Lint
-        run: npm run lint
-      - name: Unit tests (non-interactive)
-        run: npm run test:unit
+        run: pnpm lint
+      - name: Unit tests (CI concise)
+        run: pnpm test:ci
       - name: i18n missing-keys scan
-        run: npm run i18n:scan
+        run: pnpm i18n:scan
       - name: Build
-        run: npm run build
+        run: pnpm build

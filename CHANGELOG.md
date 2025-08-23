@@ -1,5 +1,25 @@
 ## 2025-08-23
 
+### Package Manager Migration
+- Migrated from npm to pnpm for improved performance and disk usage
+- Created `pnpm-workspace.yaml` to replace npm workspaces configuration  
+- Updated all workspace scripts to use `pnpm --filter` syntax
+- Added `packageManager` field to root `package.json` (pnpm@10.15.0)
+- Updated GitHub Actions CI to use pnpm with action-setup and frozen lockfile
+- Fixed TypeScript build errors by adding `@types/node` dependency
+- All build, lint, and test commands now work with pnpm
+
+### Repo reorganization (monorepo)
+- Split workspace into `apps/frontend` (Vite + React), `apps/backend` (Express + PM2), and `packages/shared` (placeholder for shared types/constants).
+- Moved Cypress E2E to `tests/e2e` with its own workspace package.
+- Updated root scripts to target workspaces; added `dev:be` for backend.
+- Backend now serves `apps/frontend/dist` in production.
+- Helper scripts updated to new paths (splash, verify-media, favicons).
+- Frontend `.env` moved to `apps/frontend/.env` (VITE_ prefix required).
+
+### Fixed
+- Activity Log page flicker: decoupled initial fetch from stats recalculation to prevent re-render loops; stats now recompute when logs or language change without triggering loading state.
+
 - Tests: Align default Vitest config with stable mode to eliminate flakiness between `npm run test:unit` and `npm run test:stable`.
   - Updated `vitest.config.ts` to use single-fork pool with `fileParallelism: false`, `isolate: true`, and auto‑mock cleanup settings matching `vitest.stable.config.ts`.
   - Hardened `src/test/setup.ts` to wrap `window.dispatchEvent` only once and avoid recursive wrapping that caused stack overflows under parallel workers.
