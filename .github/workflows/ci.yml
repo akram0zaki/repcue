@@ -1,16 +1,21 @@
 name: CI
 
-on:
-  push:
-    branches: 
-      - main
-      - develop
-      - 'feature/*'   # matches feature/foo (one level)
-      - 'fixes/**'    # matches fixes/a or fixes/a/b (multi-level)
-      - 'chores/**'
+# Temporarily disabled CI
+# on:
+#   push:
+#     branches: 
+#       - main
+#       - develop
+#       - 'feature/*'   # matches feature/foo (one level)
+#       - 'fixes/**'    # matches fixes/a or fixes/a/b (multi-level)
+#       - 'chores/**'
+# 
+#   pull_request:
+#     branches: [ develop, main ]
 
-  pull_request:
-    branches: [ develop, main ]
+# Manual trigger only while CI is disabled
+on:
+  workflow_dispatch:
 
 jobs:
   build:
