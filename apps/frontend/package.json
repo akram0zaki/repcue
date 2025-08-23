@@ -15,7 +15,7 @@
     "test:coverage": "vitest --coverage",
     "test:unit": "vitest run",
     "test:stable": "vitest -c vitest.stable.config.ts run",
-    "test:ci": "vitest -c vitest.stable.config.ts run --reporter=dot --reporter=github --silent",
+    "test:ci": "vitest -c vitest.stable.config.ts run --reporter=dot --silent",
     "cypress:open": "cypress open --config-file ../../tests/e2e/cypress.config.mjs",
     "cypress:run": "cypress run --config-file ../../tests/e2e/cypress.config.mjs",
     "test:e2e": "start-server-and-test dev http://localhost:5173 \"cypress run --config-file ../../tests/e2e/cypress.config.mjs\"",

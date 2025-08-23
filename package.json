@@ -25,6 +25,7 @@
     "test:coverage": "npm run test:coverage --workspace @repcue/frontend",
     "test:unit": "npm run test:unit --workspace @repcue/frontend",
     "test:stable": "npm run test:stable --workspace @repcue/frontend",
+    "test:ci": "npm run test:ci --workspace @repcue/frontend",
     "cypress:open": "npm run cypress:open --workspace @repcue/frontend",
     "cypress:run": "npm run cypress:run --workspace @repcue/frontend",
     "test:e2e": "npm run test:e2e --workspace @repcue/frontend",
