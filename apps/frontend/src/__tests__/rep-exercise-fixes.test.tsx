@@ -148,9 +148,11 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should save activity log when rep-based exercise completes all sets', async () => {
   const { container } = render(<App />);
+    // Ensure TimerPage mounted before querying for controls (CI can be slower)
+    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Open exercise selector and choose our mock exercise
-    const chooseBtn = await screen.findByTestId('open-exercise-selector');
+    const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
     chooseBtn.click();
     await screen.findByText('Select Exercise');
   const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
@@ -174,9 +176,10 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should display completed sets correctly in set progress text', async () => {
   render(<App />);
+    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Select the rep-based exercise first
-    const chooseBtn = await screen.findByTestId('open-exercise-selector');
+    const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
     chooseBtn.click();
     await screen.findByText('Select Exercise');
   const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
@@ -195,9 +198,10 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should have consistent progress bar and text for set completion', async () => {
   render(<App />);
+    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
 
     // Select the rep-based exercise first
-    const chooseBtn = await screen.findByTestId('open-exercise-selector');
+    const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
     chooseBtn.click();
     await screen.findByText('Select Exercise');
   const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });

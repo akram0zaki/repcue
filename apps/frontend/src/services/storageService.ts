@@ -447,8 +447,9 @@ export class StorageService {
    * Save workout data
    */
   public async saveWorkout(workout: Workout): Promise<void> {
-    if (!this.canStoreData()) {
-      throw new Error('Cannot store data without user consent');
+    // Double-guard: ensure Promise rejection even under odd mocking scenarios in tests/CI
+    if (!this.canStoreData() || typeof (consentService as any)?.hasConsent === 'function' && (consentService as any).hasConsent() !== true) {
+      return Promise.reject(new Error('Cannot store data without user consent'));
     }
 
     const storedWorkout: StoredWorkout = {
