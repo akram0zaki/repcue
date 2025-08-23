@@ -28,28 +28,23 @@ export default tseslint.config([
           destructuredArrayIgnorePattern: '^_',
         },
       ],
-      // Allow intentionally empty catch blocks used for optional platform APIs and test envs
       'no-empty': ['error', { allowEmptyCatch: true }],
     },
   },
-  // Relax certain strict rules in test files to keep tests readable and maintainable
   {
     files: [
       '**/*.test.ts',
       '**/*.test.tsx',
       '**/__tests__/**/*.{ts,tsx}',
       'src/__tests__/**/*.{ts,tsx}',
-      // Include shared test setup
       'src/test/setup.ts',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      // Large or precise numeric literals in tests are acceptable
       'no-loss-of-precision': 'off',
     },
   },
-  // Soft i18n guard: warn on bare string literals in JSX in app code
   {
     files: ['src/**/*.{tsx,jsx}'],
     ignores: ['src/__tests__/**'],
@@ -64,3 +59,4 @@ export default tseslint.config([
     }
   }
 ])
+

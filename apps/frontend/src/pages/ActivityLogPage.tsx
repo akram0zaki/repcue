@@ -103,14 +103,13 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     });
   }, [exercises, t]);
 
-  // Load activity logs on component mount
+  // Load activity logs once on mount
   useEffect(() => {
     const loadActivityLogs = async () => {
       try {
         setIsLoading(true);
         const logs = await storageService.getActivityLogs();
         setActivityLogs(logs);
-        calculateStats(logs);
       } catch (error) {
         console.error('Failed to load activity logs:', error);
       } finally {
@@ -119,7 +118,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     };
 
     loadActivityLogs();
-  }, [t, exercises, calculateStats]);
+  }, []);
+
+  // Recalculate stats when logs, exercises, or language change (no loading spinner)
+  useEffect(() => {
+    calculateStats(activityLogs);
+  }, [activityLogs, calculateStats, i18n.language]);
 
   // Toggle workout expansion
   const toggleWorkoutExpansion = (workoutId: string) => {

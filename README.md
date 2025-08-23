@@ -8,20 +8,26 @@ RepCue is a modern, privacy-first fitness tracking Progressive Web App (PWA) des
 - **Node.js 18+** (Download from [nodejs.org](https://nodejs.org))
 - **npm** (included with Node.js) or **yarn**
 
-### Get Running in 3 Steps
+### Get Running in 3 Steps (monorepo)
 
 ```bash
 # 1. Clone and navigate to the project
 git clone https://github.com/akram0zaki/repcue.git
 cd repcue
 
-# 2. Install dependencies
+# 2. Install dependencies at the repo root
 npm install
 
+# 3. Start the frontend dev server (Vite)
 npm run dev
+
+# (Optional) start backend placeholder server on another terminal
+npm run dev:be
 ```
 
-**🎉 That's it!** Open http://localhost:5173 in your browser.
+**🎉 That's it!**
+- Frontend: http://localhost:5173
+- Backend (placeholder): http://localhost:3001 (Express, serves FE build in prod)
 
 ---
 
@@ -101,50 +107,49 @@ This installs all required packages including:
 - Vitest for testing
 
 ## 🏃‍♂️ Running the Application
-npm run dev
-- **URL**: http://localhost:5173
-- **Features**: Hot reload, instant updates, development tools
-- **Performance**: Unoptimized but fast iteration
+
+Frontend dev: `npm run dev` → http://localhost:5173
+
+Backend dev (optional placeholder): `npm run dev:be` → http://localhost:3001
 
 ### Production Preview
 ```bash
-# Build the application
+# Build the frontend app
 npm run build
 
-# Preview the built version
+# Preview the built version (serves http://localhost:4173)
 npm run preview
 ```
 - **URL**: http://localhost:4173
 - **Features**: Optimized build, production-like environment
 - **Performance**: Full optimization, smaller bundle size
 
-### Available Scripts
+### Available Scripts (root)
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `npm run dev` | Development server | Daily development |
-| `npm run build` | Full build with TypeScript | Development/testing |
-| `npm run build:prod` | Production build (optimized) | Pi deployment |
-| `npm run preview` | Preview built app | Test production build |
-| `npm start` | Start Express server | Production server |
-| `npm run build:serve` | Build (prod) and serve | Quick production test |
-| `npm run pm2:start` | Deploy with PM2 | Production deployment |
+| `npm run dev` | Start frontend dev (Vite) | Daily development |
+| `npm run dev:be` | Start backend dev (Express) | When testing API placeholder |
+| `npm run build` | Build frontend | CI/builds |
+| `npm run preview` | Preview built frontend (4173) | Verify production build |
+| `npm start` | Start backend (serves FE in prod) | Production start |
+| `npm run pm2:start` | Start PM2 app | Deploy to Pi/server |
 | `npm run pm2:stop` | Stop PM2 app | Stop production app |
 | `npm run pm2:restart` | Restart PM2 app | Update production app |
 | `npm run pm2:logs` | View PM2 logs | Monitor production app |
-| `npm run lint` | Check code quality | Before committing |
-| `npm test` | Run all tests | Development/CI |
-| `npm run test:ui` | Visual test runner | Debugging tests |
-| `npm run test:coverage` | Test coverage report | Quality assurance |
-| `npm run test:unit` | Unit/integration (fast, parallel) | Fast testing |
-| `npm run test:stable` | Stable mode (single-threaded, Windows-friendly) | Stable testing |
+| `npm run lint` | Lint frontend | Before committing |
+| `npm test` | Run unit/integration tests | Development/CI |
+| `npm run test:ui` | Vitest UI | Debugging tests |
+| `npm run test:coverage` | Coverage report | QA |
+| `npm run test:unit` | Unit/integration only | Fast testing |
+| `npm run test:stable` | Stable mode on Windows | Flake-free runs |
 
 
 ## 🧪 Testing
 
 RepCue includes comprehensive test coverage with **98 tests** across all components.
 
-### Run All Tests
+### Unit/Integration (frontend)
 ```bash
 npm test
 ```
@@ -159,6 +164,21 @@ npm run test:coverage
 npm run test:ui
 ```
 Opens a web interface for running and debugging tests.
+
+### End-to-End (Cypress)
+Tests live under `tests/e2e`.
+
+Option A — build + preview + run Cypress:
+```bash
+# 1) Build and preview frontend
+npm run build
+npm run preview
+
+# 2) In another terminal, run cypress from the e2e workspace
+npm run cypress:run --workspace @repcue/e2e
+# or open the Cypress UI
+npm run cypress:open --workspace @repcue/e2e
+```
 
 ### Test Categories
 - **✅ Unit Tests**: Individual components (ConsentBanner, TimerPage, etc.)
@@ -288,10 +308,10 @@ RepCue includes full PM2 support for production deployment with an Express serve
 ### Quick PM2 Setup
 
 ```bash
-# 1. Install dependencies (Express & compression are included)
+# 1. Install dependencies
 npm install
 
-# 2. Build and start with PM2 in one command
+# 2. Build frontend and start backend via PM2 (serves FE dist)
 npm run pm2:start
 
 # 3. Check status
@@ -331,7 +351,7 @@ pm2 startup
 
 ### PM2 Configuration
 
-The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
+The included `apps/backend/ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
 
 - **Single instance** for Pi resource efficiency
 - **512MB memory limit** with automatic restart
@@ -339,14 +359,15 @@ The included `ecosystem.config.cjs` is optimized for Raspberry Pi deployment:
 - **Automatic daily restart** at 4 AM
 - **Comprehensive logging** with timestamps
 
-### Build Commands for Production
+### Build for Production
 
-| Command | Use Case | TypeScript Compilation |
-|---------|----------|----------------------|
-| `npm run build` | Development/Testing | ✅ Full (includes test files) |
-| `npm run build:prod` | Production/Pi Deployment | ⚡ Optimized (excludes tests) |
+```bash
+# Build frontend
+npm run build
 
-**Note**: Use `build:prod` for Raspberry Pi deployment to avoid TypeScript test compilation errors and faster builds.
+# Start backend via PM2 (serves apps/frontend/dist)
+npm run pm2:start
+```
 
 ### Nginx + Cloudflare Tunnel Setup
 
@@ -633,33 +654,35 @@ npm prune --production
 
 ## 🏗️ Development Guide
 
-### Project Structure
+### Project Structure (monorepo)
 ```
 repcue/
-├── src/
-│   ├── components/         # Reusable UI components
-│   │   ├── ConsentBanner.tsx
-│   │   └── Navigation.tsx
-│   ├── pages/              # Main app pages
-│   │   ├── HomePage.tsx
-│   │   ├── TimerPage.tsx
-│   │   ├── ExercisePage.tsx
-│   │   ├── ActivityLogPage.tsx
-│   │   └── SettingsPage.tsx
-│   ├── services/           # Business logic
-│   │   ├── audioService.ts
-│   │   ├── storageService.ts
-│   │   └── consentService.ts
-│   ├── types/              # TypeScript definitions
-│   │   └── index.ts
-│   ├── data/               # Static data
-│   │   └── exercises.ts
-│   └── test/               # Test utilities
-├── public/                 # Static assets
-├── dist/                   # Built application (generated)
-├── docs/                   # Documentation
-├── consent.md              # Consent system documentation
-└── CHANGELOG.md            # Version history
+├── apps/
+│   ├── frontend/                 # Vite + React + Tailwind (UI)
+│   │   ├── src/
+│   │   ├── public/
+│   │   ├── index.html
+│   │   ├── vite.config.ts
+│   │   ├── tailwind.config.js
+│   │   ├── vitest*.config.ts
+│   │   └── package.json
+│   └── backend/                  # Express + PM2 (serves FE in prod)
+│       ├── server.js
+│       ├── ecosystem.config.cjs
+│       └── package.json
+├── packages/
+│   └── shared/                   # Shared types/constants (placeholder)
+│       ├── src/index.ts
+│       └── package.json
+├── tests/
+│   └── e2e/                      # Cypress E2E workspace
+│       ├── cypress/
+│       ├── cypress.config.mjs
+│       └── package.json
+├── docs/
+├── .github/
+├── package.json                  # npm workspaces (root scripts)
+└── CHANGELOG.md
 ```
 
 ### Key Technologies
@@ -675,11 +698,10 @@ repcue/
 ### Development Workflow
 
 1. **Start Development**:
-   ```bash
-   npm run dev
-   ```
+   - Frontend: `npm run dev`
+   - Backend (optional): `npm run dev:be`
 
-2. **Make Changes**: Edit files in `src/`
+2. **Make Changes**: Edit files in `apps/frontend/src/`
 
 3. **Test Changes**:
    ```bash
@@ -689,11 +711,51 @@ repcue/
 
 4. **Build & Test**:
    ```bash
-   npm run build:prod  # For production
-   npm run preview
+   npm run build && npm run preview
    ```
 
-5. **Deploy**: Copy `dist/` folder to your web server
+5. **Deploy**: Use PM2 (`npm run pm2:start`) to serve `apps/frontend/dist` via backend
+
+### Environment Variables
+
+- Frontend `.env`: place under `apps/frontend/.env` (Vite reads it by default). Only variables prefixed with `VITE_` are exposed to the client.
+- Backend `.env`: when backend features are added, use `apps/backend/.env` with `dotenv`.
+
+### Migration from single‑package repo (checklist)
+
+1) Create branch: `feat/workspaces-reorg`.
+
+2) Move files:
+- UI: move `src/`, `public/`, `index.html`, `vite.config.ts`, `tailwind.config.js`, `postcss.config.js`, `vitest*.config.ts`, `tsconfig*.json` → `apps/frontend/`.
+- Backend: move `server.js`, `ecosystem.config.cjs` → `apps/backend/`.
+- Cypress: move `cypress/`, `cypress.config.mjs` → `tests/e2e/`.
+- Env: move root `.env` → `apps/frontend/.env` (ensure `VITE_` prefixes).
+
+3) Add workspaces: root `package.json` with `workspaces: ["apps/*","packages/*","tests/e2e"]` and scripts shown above.
+
+4) Update helper scripts to new paths (already wired here): `apps/frontend/scripts/*`.
+
+5) Install and validate:
+```bash
+npm install
+npm run build
+npm run dev       # FE at 5173
+npm run dev:be    # BE at 3001 (optional placeholder)
+```
+
+6) PM2 on Pi/server:
+```bash
+npm run build
+npm run pm2:start
+```
+
+7) Cypress E2E (now at `tests/e2e`):
+```bash
+npm run build && npm run preview   # FE preview at 4173
+npm run cypress:run --workspace @repcue/e2e
+```
+
+8) CI (GitHub Actions): switch to workspace install (`npm ci` or cache), run `npm run lint && npm run test && npm run build` from root.
 
 ### Adding New Features
 
@@ -727,7 +789,7 @@ RepCue is designed with privacy as the top priority:
 - **Self-Hosted**: You control your data completely
 
 ### Robust Consent System
-RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[consent.md](./consent.md)** which covers:
+RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[consent.md](docs/consent.md)** which covers:
 
 - GDPR/CCPA compliance features
 - Consent versioning and migration
@@ -779,7 +841,7 @@ We welcome contributions! Here's how to get started:
 
 ## 🎯 Roadmap
 
-### Current Version (v0.1.0)
+### Current Version (v0.4.0)
 - ✅ Core interval timer functionality
 - ✅ 20 exercise library with categories
 - ✅ Expandable exercise tags with smooth animations
@@ -794,7 +856,7 @@ We welcome contributions! Here's how to get started:
 - ✅ **PWA Platform Detection**: Cross-platform detection system with comprehensive browser/OS identification
 - ✅ **TypeScript Integration**: Fully typed platform utilities with 100% test coverage
 
-### Planned Features (v0.2.0) - PWA Enhancement
+### Planned Features (v0.5.0) - PWA Enhancement
 - 🔄 **Install Experience**: Smart install prompts for iOS, Android, and Desktop
 - 🔄 **Offline Functionality**: Full offline workout capability with background sync
 - 🔄 **App Shell Architecture**: Instant loading with persistent navigation

@@ -4,6 +4,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': 'http://localhost:3001'
+    }
+  },
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg'],
   plugins: [
     react(),

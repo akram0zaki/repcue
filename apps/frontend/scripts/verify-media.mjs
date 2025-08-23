@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 
 const mode = process.argv[2] || 'pre';
+// Run from the frontend workspace (apps/frontend)
 const root = process.cwd();
 const publicPath = path.join(root, 'public', 'exercise_media.json');
 const legacySrcPath = path.join(root, 'src', 'data', 'exercise_media.json');

@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 // Simple favicon generator using built-in Node.js modules
 async function generateFavicons() {
-  const publicDir = path.join(__dirname, '../public');
+  const publicDir = path.join(__dirname, '..', '..', 'public');
   const svgPath = path.join(publicDir, 'favicon.svg');
   
   console.log('📁 Public directory:', publicDir);
@@ -41,7 +41,7 @@ async function generateFavicons() {
 async function generateFaviconsWithSharp() {
   try {
     const { default: sharp } = await import('sharp');
-    const publicDir = path.join(__dirname, '../public');
+    const publicDir = path.join(__dirname, '..', '..', 'public');
     const svgPath = path.join(publicDir, 'favicon.svg');
     
     if (!fs.existsSync(svgPath)) {

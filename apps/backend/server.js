@@ -33,8 +33,8 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Serve static files with caching for Pi optimization
-app.use(express.static(path.join(__dirname, 'dist'), {
+// Serve static files with caching for Pi optimization (serve FE build)
+app.use(express.static(path.join(__dirname, '../frontend/dist'), {
   maxAge: '1d', // Cache static assets for 1 day
   etag: true,
   lastModified: true
@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, 'dist'), {
 
 // Handle React Router (SPA routing)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
 });
 
 // Error handling
