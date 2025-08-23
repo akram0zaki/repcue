@@ -150,7 +150,7 @@ describe('Rep-based Exercise Fixes', () => {
   const { container } = render(<App />);
 
     // Open exercise selector and choose our mock exercise
-    const chooseBtn = await screen.findByRole('button', { name: /choose/i });
+    const chooseBtn = await screen.findByTestId('open-exercise-selector');
     chooseBtn.click();
     await screen.findByText('Select Exercise');
   const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
@@ -176,7 +176,7 @@ describe('Rep-based Exercise Fixes', () => {
   render(<App />);
 
     // Select the rep-based exercise first
-    const chooseBtn = await screen.findByRole('button', { name: /choose/i });
+    const chooseBtn = await screen.findByTestId('open-exercise-selector');
     chooseBtn.click();
     await screen.findByText('Select Exercise');
   const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
@@ -197,7 +197,7 @@ describe('Rep-based Exercise Fixes', () => {
   render(<App />);
 
     // Select the rep-based exercise first
-    const chooseBtn = await screen.findByRole('button', { name: /choose/i });
+    const chooseBtn = await screen.findByTestId('open-exercise-selector');
     chooseBtn.click();
     await screen.findByText('Select Exercise');
   const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });

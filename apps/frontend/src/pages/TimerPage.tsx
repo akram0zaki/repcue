@@ -334,6 +334,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <button
                 onClick={() => onSetShowExerciseSelector(true)}
                 className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                data-testid="open-exercise-selector"
               >
                 {t('common.choose')}
               </button>
