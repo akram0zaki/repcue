@@ -9,14 +9,14 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-    // Align with stable settings to avoid flaky parallelism issues on Windows
+    // Align with stable settings to avoid race conditions on CI
     isolate: true,
     restoreMocks: true,
     clearMocks: true,
     mockReset: true,
+    fileParallelism: false,
     pool: 'forks',
     poolOptions: { forks: { singleFork: true } },
-    fileParallelism: false,
     // Increase timeouts to prevent premature teardown while Vite serves virtual modules
     testTimeout: 30000,
     hookTimeout: 30000,

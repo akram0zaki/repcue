@@ -26,6 +26,10 @@ export default defineConfig({
     teardownTimeout: 30000,
     typecheck: {
       tsconfig: './tsconfig.test.json'
-    }
+    },
+    // Stabilize CI by running files serially and using a single fork
+    fileParallelism: false,
+    pool: 'forks',
+    poolOptions: { forks: { singleFork: true } }
   },
 })

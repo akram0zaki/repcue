@@ -283,6 +283,8 @@ try {
     defaultNS: 'common',
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
+    // Ensure synchronous init during tests to avoid race conditions on CI
+    initImmediate: false,
   });
 } catch {
   // Non-fatal in tests; keys will render if i18n import changes
