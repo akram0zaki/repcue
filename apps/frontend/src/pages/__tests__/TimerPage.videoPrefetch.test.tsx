@@ -3,17 +3,18 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Minimal exercise with video flag
-const exercise: Exercise = {
+const exercise: Exercise = createMockExercise({
   id: 'jumping-jacks', name: 'Jumping Jacks', description: 'Cardio move', category: 'cardio',
   exerciseType: 'repetition-based', defaultSets: 1, defaultReps: 2, isFavorite: false, tags: [], hasVideo: true
-};
+});
 
-const baseSettings: AppSettings = {
+const baseSettings: AppSettings = createMockAppSettings({
   theme: 'light', intervalDuration: 5, repSpeedFactor: 1, preTimerCountdown: 3, showExerciseVideos: true,
   enableSound: true, enableHaptics: true, defaultRestTime: 30
-} as any;
+} as any);
 
 const noop = async () => {};
 

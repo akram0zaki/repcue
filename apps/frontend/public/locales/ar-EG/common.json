@@ -7,6 +7,7 @@
     "choose": "اختار",
     "close": "اقفل",
     "loading": "بيحمّل...",
+    "optional": "اختياري",
     "on": "شغال",
     "off": "مقفول",
     "notSupported": "مش شغال",
@@ -128,6 +129,9 @@
   "home": {
     "upcomingWorkout": "التمرين الجاي",
     "tagline": "مؤقت التمارين بتاعك",
+    "signInMessage": "تقدر ",
+    "signInLink": "تسجل دخولك",
+    "signInSuffix": " عشان تتابع تقدمك من أجهزة مختلفة.",
     "startNow": "ابدأ دلوقتي",
     "noScheduleTitle": "مافيش جدول اتحط",
     "noScheduleBody": "اعمل جدول تمرين عشان تشوف تمارينك الجاية هنا",

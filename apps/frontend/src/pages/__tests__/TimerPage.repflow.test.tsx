@@ -4,9 +4,10 @@ import { describe, it, expect, vi } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 describe('TimerPage - Rep Flow', () => {
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'ex1',
     name: 'Push-ups',
     description: 'Classic push-up exercise',
@@ -16,12 +17,12 @@ describe('TimerPage - Rep Flow', () => {
     defaultReps: 8,
     isFavorite: false,
     tags: []
-  };
+  });
 
-  const mockAppSettings: AppSettings = {
+  const mockAppSettings: AppSettings = createMockAppSettings({
     ...DEFAULT_APP_SETTINGS,
     repSpeedFactor: 1.0
-  };
+  });
 
   const defaultProps = {
     exercises: [mockExercise],

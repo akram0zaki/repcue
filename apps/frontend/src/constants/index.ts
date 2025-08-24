@@ -1,3 +1,5 @@
+import type { AppSettings } from '../types';
+
 // Application Constants
 export const APP_NAME = 'RepCue';
 export const APP_DESCRIPTION = 'Your personal exercise timer';
@@ -14,7 +16,8 @@ export const REP_SPEED_FACTORS = [0.5, 0.75, 1.0, 1.5, 2.0] as const;
 export type RepSpeedFactor = typeof REP_SPEED_FACTORS[number];
 
 // Default Settings
-export const DEFAULT_APP_SETTINGS = {
+export const DEFAULT_APP_SETTINGS: AppSettings = {
+  id: 'default-app-settings',
   intervalDuration: 30, // Default 30 seconds
   soundEnabled: true,
   vibrationEnabled: true,
@@ -26,4 +29,8 @@ export const DEFAULT_APP_SETTINGS = {
   defaultRestTime: 60, // Default 60 seconds rest between exercises
   repSpeedFactor: 1.0, // Default 1x speed (5 seconds per rep)
   showExerciseVideos: true, // default opt-in (feature gated)
+  updatedAt: new Date().toISOString(),
+  deleted: false,
+  version: 1,
+  dirty: false
 }; 

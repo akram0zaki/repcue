@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TimerPage from '../pages/TimerPage';
 import type { TimerState, Exercise, AppSettings } from '../types';
+import { createMockExercise, createMockAppSettings } from '../test/testUtils';
 
 /**
  * Test for workout to standalone exercise transition fix
@@ -12,7 +13,7 @@ import type { TimerState, Exercise, AppSettings } from '../types';
  */
 
 describe('Workout to Standalone Exercise Transition', () => {
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'exercise-1',
     name: 'Plank',
     description: 'Core strengthening exercise',
@@ -21,9 +22,9 @@ describe('Workout to Standalone Exercise Transition', () => {
     defaultDuration: 60,
     isFavorite: false,
     tags: ['core']
-  };
+  });
 
-  const mockAppSettings: AppSettings = {
+  const mockAppSettings: AppSettings = createMockAppSettings({
     intervalDuration: 30,
     soundEnabled: false,
     vibrationEnabled: false,
@@ -33,7 +34,7 @@ describe('Workout to Standalone Exercise Transition', () => {
     repSpeedFactor: 1.0,
     preTimerCountdown: 0,
     defaultRestTime: 30
-  };
+  });
 
   const standaloneTimerState: TimerState = {
     isRunning: false,

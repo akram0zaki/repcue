@@ -49,7 +49,9 @@ const mockWorkout: Workout = {
   isActive: true,
   scheduledDays: ['monday', 'wednesday', 'friday'],
   createdAt: new Date('2024-01-01T00:00:00.000Z'),
-  updatedAt: new Date('2024-01-01T00:00:00.000Z')
+  updatedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
+  deleted: false,
+  version: 1
 };
 
 const mockPausedWorkout: Workout = {

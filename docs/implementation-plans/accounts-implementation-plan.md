@@ -159,19 +159,19 @@ Row Level Security (if using Postgres/Supabase):
 
 ## Step‑by‑step implementation plan
 
-### Phase 0 --- Prep (types & Dexie schema)
+### ✅ Phase 0 --- Prep (types & Dexie schema) [COMPLETED]
 
--   Introduce metadata columns (`id`, `ownerId`, `updatedAt`, `deleted`,
+-   ✅ Introduce metadata columns (`id`, `ownerId`, `updatedAt`, `deleted`,
     `dirty`, `op`, `syncedAt`).
--   Wrap all writes in helpers (set `updatedAt`, mark dirty, tombstones
+-   ✅ Wrap all writes in helpers (set `updatedAt`, mark dirty, tombstones
     on delete).
--   Backfill existing data.
+-   ✅ Backfill existing data.
 
-### Phase 1 --- Auth
+### ✅ Phase 1 --- Auth [COMPLETED]
 
--   Pick provider (Supabase or PocketBase).
--   Add Auth Store + UI.
--   Persist tokens securely.
+-   ✅ Pick provider (Supabase or PocketBase).
+-   ✅ Add Auth Store + UI.
+-   ✅ Persist tokens securely.
 
 ### Phase 2 --- Sync API
 

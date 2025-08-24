@@ -5,6 +5,7 @@ import TimerPage from '../../pages/TimerPage';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { ExerciseType } from '../../types';
+import { createMockExercise } from '../../test/testUtils';
 
 // Mock services
 vi.mock('../../services/audioService', () => ({
@@ -27,7 +28,7 @@ vi.mock('../../services/consentService', () => ({
   },
 }));
 
-const mockExercise: Exercise = {
+const mockExercise: Exercise = createMockExercise({
   id: 'test-exercise',
   name: 'Test Exercise',
   description: 'Test description for countdown',
@@ -36,7 +37,7 @@ const mockExercise: Exercise = {
   defaultDuration: 30,
   isFavorite: false,
   tags: ['test']
-};
+});
 
 describe('Pre-Timer Countdown Feature', () => {
   beforeEach(() => {

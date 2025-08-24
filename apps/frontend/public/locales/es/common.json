@@ -7,6 +7,7 @@
     "choose": "Elegir",
     "close": "Cerrar",
     "loading": "Cargando...",
+    "optional": "opcional",
     "on": "Activado",
     "off": "Desactivado",
     "notSupported": "No compatible",
@@ -128,6 +129,9 @@
   "home": {
     "upcomingWorkout": "Próximo entrenamiento",
     "tagline": "Tu temporizador personal de ejercicios",
+    "signInMessage": "Puedes ",
+    "signInLink": "iniciar sesión",
+    "signInSuffix": " para hacer seguimiento de tu progreso desde diferentes dispositivos.",
     "startNow": "Comenzar ahora",
     "noScheduleTitle": "Sin horario establecido",
     "noScheduleBody": "Crea un horario de entrenamiento para ver tus próximos entrenamientos aquí",

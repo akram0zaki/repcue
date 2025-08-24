@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Mock audio service
 vi.mock('../../services/audioService', () => ({
@@ -17,7 +18,7 @@ vi.mock('../../services/audioService', () => ({
 
 describe('TimerPage - Workout Mode', () => {
   const mockExercises: Exercise[] = [
-    {
+    createMockExercise({
       id: 'ex1',
       name: 'Push-ups',
       description: 'Classic push-up exercise',
@@ -27,8 +28,8 @@ describe('TimerPage - Workout Mode', () => {
       defaultReps: 12,
       isFavorite: false,
       tags: []
-    },
-    {
+    }),
+    createMockExercise({
       id: 'ex2', 
       name: 'Plank',
       description: 'Core strengthening exercise',
@@ -37,12 +38,12 @@ describe('TimerPage - Workout Mode', () => {
       defaultDuration: 60,
       isFavorite: false,
       tags: []
-    }
+    })
   ];
 
-  const mockAppSettings: AppSettings = {
+  const mockAppSettings: AppSettings = createMockAppSettings({
     ...DEFAULT_APP_SETTINGS
-  };
+  });
 
   const mockWorkoutTimerState: TimerState = {
     isRunning: false,

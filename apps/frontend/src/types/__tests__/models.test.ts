@@ -9,6 +9,7 @@ import {
   type WorkoutSession,
   type WorkoutSessionExercise
 } from '../../types'
+import { createMockExercise, createMockWorkout, createMockWorkoutSession } from '../../test/testUtils'
 
 describe('Types and Models', () => {
   describe('ExerciseType', () => {
@@ -27,7 +28,7 @@ describe('Types and Models', () => {
 
   describe('Exercise Model', () => {
     it('should create a valid time-based exercise', () => {
-      const exercise: Exercise = {
+      const exercise: Exercise = createMockExercise({
         id: 'plank',
         name: 'Plank',
         description: 'Hold plank position',
@@ -36,7 +37,7 @@ describe('Types and Models', () => {
         defaultDuration: 60,
         isFavorite: false,
         tags: ['core', 'isometric']
-      }
+      })
 
       expect(exercise.exerciseType).toBe('time-based')
       expect(exercise.defaultDuration).toBe(60)
@@ -45,7 +46,7 @@ describe('Types and Models', () => {
     })
 
     it('should create a valid repetition-based exercise', () => {
-      const exercise: Exercise = {
+      const exercise: Exercise = createMockExercise({
         id: 'push-ups',
         name: 'Push-ups',
         description: 'Standard push-ups',
@@ -53,9 +54,10 @@ describe('Types and Models', () => {
         exerciseType: ExerciseType.REPETITION_BASED,
         defaultSets: 3,
         defaultReps: 12,
+        defaultDuration: undefined,
         isFavorite: false,
         tags: ['chest', 'arms']
-      }
+      })
 
       expect(exercise.exerciseType).toBe('repetition-based')
       expect(exercise.defaultSets).toBe(3)
@@ -117,7 +119,7 @@ describe('Types and Models', () => {
   describe('Workout Model', () => {
     it('should create a valid workout', () => {
       const now = new Date()
-      const workout: Workout = {
+      const workout: Workout = createMockWorkout({
         id: 'workout-1',
         name: 'Morning Routine',
         description: 'Quick morning workout',
@@ -140,8 +142,8 @@ describe('Types and Models', () => {
         scheduledDays: ['monday', 'wednesday', 'friday'],
         isActive: true,
         createdAt: now,
-        updatedAt: now
-      }
+        updatedAt: now.toISOString()
+      })
 
       expect(workout.exercises).toHaveLength(2)
       expect(workout.exercises[0].order).toBe(1)
@@ -178,7 +180,7 @@ describe('Types and Models', () => {
       const startTime = new Date()
       const endTime = new Date(startTime.getTime() + 1800000) // 30 minutes later
       
-      const session: WorkoutSession = {
+      const session: WorkoutSession = createMockWorkoutSession({
         id: 'session-1',
         workoutId: 'workout-1',
         workoutName: 'Morning Routine',
@@ -197,7 +199,7 @@ describe('Types and Models', () => {
         isCompleted: true,
         completionPercentage: 100,
         totalDuration: 1800
-      }
+      })
 
       expect(session.exercises).toHaveLength(1)
       expect(session.completionPercentage).toBe(100)
@@ -208,7 +210,7 @@ describe('Types and Models', () => {
     it('should handle incomplete workout session', () => {
       const startTime = new Date()
       
-      const session: WorkoutSession = {
+      const session: WorkoutSession = createMockWorkoutSession({
         id: 'session-2',
         workoutId: 'workout-1',
         workoutName: 'Morning Routine',
@@ -231,8 +233,9 @@ describe('Types and Models', () => {
           }
         ],
         isCompleted: false,
-        completionPercentage: 50
-      }
+        completionPercentage: 50,
+        totalDuration: undefined
+      })
 
       expect(session.endTime).toBeUndefined()
       expect(session.isCompleted).toBe(false)
@@ -244,7 +247,7 @@ describe('Types and Models', () => {
   describe('Type Safety', () => {
     it('should enforce exercise type constraints', () => {
       // This test ensures TypeScript compilation enforces correct types
-      const timeBasedExercise: Exercise = {
+      const timeBasedExercise: Exercise = createMockExercise({
         id: 'test',
         name: 'Test',
         description: 'Test exercise',
@@ -253,9 +256,9 @@ describe('Types and Models', () => {
         defaultDuration: 60, // Valid for time-based
         isFavorite: false,
         tags: []
-      }
+      })
 
-      const repBasedExercise: Exercise = {
+      const repBasedExercise: Exercise = createMockExercise({
         id: 'test2',
         name: 'Test 2',
         description: 'Test exercise 2',
@@ -265,7 +268,7 @@ describe('Types and Models', () => {
         defaultReps: 12, // Valid for rep-based
         isFavorite: false,
         tags: []
-      }
+      })
 
       expect(timeBasedExercise.exerciseType).toBe('time-based')
       expect(repBasedExercise.exerciseType).toBe('repetition-based')

@@ -7,6 +7,7 @@
     "choose": "Kiezen",
     "close": "Sluiten",
     "loading": "Laden...",
+    "optional": "optioneel",
     "on": "Aan",
     "off": "Uit",
     "notSupported": "Niet Ondersteund",
@@ -128,6 +129,9 @@
   "home": {
     "upcomingWorkout": "Aankomende Training",
     "tagline": "Uw persoonlijke oefeningentimer",
+    "signInMessage": "Je kunt ",
+    "signInLink": "inloggen",
+    "signInSuffix": " om je vooruitgang bij te houden vanaf verschillende apparaten.",
     "startNow": "Nu Starten",
     "noScheduleTitle": "Geen Schema Ingesteld",
     "noScheduleBody": "Maak een trainingsschema om uw aankomende trainingen hier te zien",

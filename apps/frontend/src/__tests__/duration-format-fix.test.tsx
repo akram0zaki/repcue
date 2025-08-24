@@ -10,6 +10,7 @@ import { render, screen } from '@testing-library/react';
 import ActivityLogPage from '../pages/ActivityLogPage';
 import type { Exercise, ActivityLog } from '../types';
 import { ExerciseCategory } from '../types';
+import { createMockExercise, createMockActivityLog } from '../test/testUtils';
 
 // Mock the storage service
 vi.mock('../services/storageService', () => ({
@@ -22,7 +23,7 @@ import { storageService } from '../services/storageService';
 const mockStorageService = vi.mocked(storageService);
 
 describe('Duration Format Fix', () => {
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'exercise-1',
     name: 'Test Exercise',
     description: 'A test exercise',
@@ -31,7 +32,7 @@ describe('Duration Format Fix', () => {
     defaultDuration: 30,
     isFavorite: false,
     tags: ['test']
-  };
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -40,30 +41,30 @@ describe('Duration Format Fix', () => {
   it('should format floating-point durations correctly', async () => {
     // Create activity logs with floating-point duration values (like what might come from performance.now())
     const mockLogs: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-1',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 32.900999999999984, // This should be formatted as "33s"
         timestamp: new Date('2024-01-01T10:00:00Z'),
         notes: 'Test log 1'
-      },
-      {
+      }),
+      createMockActivityLog({
         id: 'log-2',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 65.15999999999999, // This should be formatted as "1m 5s"
         timestamp: new Date('2024-01-01T11:00:00Z'),
         notes: 'Test log 2'
-      },
-      {
+      }),
+      createMockActivityLog({
         id: 'log-3',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 120.99999999999999, // This should be formatted as "2m 1s"
         timestamp: new Date('2024-01-01T12:00:00Z'),
         notes: 'Test log 3'
-      }
+      })
     ];
 
     mockStorageService.getActivityLogs.mockResolvedValue(mockLogs);
@@ -85,22 +86,22 @@ describe('Duration Format Fix', () => {
 
   it('should handle whole number durations correctly', async () => {
     const mockLogs: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-1',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 30, // Exact whole number
         timestamp: new Date('2024-01-01T10:00:00Z'),
         notes: 'Test log'
-      },
-      {
+      }),
+      createMockActivityLog({
         id: 'log-2',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 60, // Exact minute
         timestamp: new Date('2024-01-01T11:00:00Z'),
         notes: 'Test log'
-      }
+      })
     ];
 
     mockStorageService.getActivityLogs.mockResolvedValue(mockLogs);
@@ -119,22 +120,22 @@ describe('Duration Format Fix', () => {
 
   it('should handle edge cases correctly', async () => {
     const mockLogs: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-1',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 0.9, // Should round to 1s
         timestamp: new Date('2024-01-01T10:00:00Z'),
         notes: 'Very short exercise'
-      },
-      {
+      }),
+      createMockActivityLog({
         id: 'log-2',
         exerciseId: 'exercise-1',
         exerciseName: 'Test Exercise',
         duration: 59.6, // Should round to 60s -> 1m
         timestamp: new Date('2024-01-01T11:00:00Z'),
         notes: 'Almost a minute'
-      }
+      })
     ];
 
     mockStorageService.getActivityLogs.mockResolvedValue(mockLogs);

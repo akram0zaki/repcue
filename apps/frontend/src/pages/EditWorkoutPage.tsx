@@ -145,7 +145,7 @@ const EditWorkoutPage: React.FC = () => {
         estimatedDuration: calculateEstimatedDuration(),
         scheduledDays: scheduledDays,
         isActive: isActive,
-        updatedAt: new Date()
+        updatedAt: new Date().toISOString()
       };
 
       await storageService.saveWorkout(updatedWorkout);

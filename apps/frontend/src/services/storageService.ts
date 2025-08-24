@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import type { Table } from 'dexie';
+import type { Table, Transaction } from 'dexie';
 import type { 
   Exercise, 
   ActivityLog, 
@@ -9,30 +9,26 @@ import type {
   WorkoutSession
 } from '../types';
 import { consentService } from './consentService';
+import { 
+  prepareUpsert, 
+  prepareSoftDelete, 
+  filterActiveRecords 
+} from './syncHelpers';
 
-// Database schema interfaces
+// Database schema interfaces with sync metadata
 interface StoredActivityLog extends Omit<ActivityLog, 'timestamp'> {
   timestamp: string; // ISO string for IndexedDB storage
 }
 
-interface StoredUserPreferences extends UserPreferences {
-  id?: number;
-  updatedAt: string;
-}
+type StoredUserPreferences = UserPreferences;
 
-interface StoredAppSettings extends AppSettings {
-  id?: number;
-  updatedAt: string;
-}
+type StoredAppSettings = AppSettings;
 
-interface StoredExercise extends Exercise {
-  updatedAt: string;
-}
+type StoredExercise = Exercise;
 
-// New interfaces for workout-related data
-interface StoredWorkout extends Omit<Workout, 'createdAt' | 'updatedAt'> {
-  createdAt: string;
-  updatedAt: string;
+// Workout-related data interfaces
+interface StoredWorkout extends Omit<Workout, 'createdAt'> {
+  createdAt: string; // Store as ISO string for IndexedDB
 }
 
 interface StoredWorkoutSession extends Omit<WorkoutSession, 'startTime' | 'endTime'> {
@@ -57,6 +53,7 @@ class RepCueDatabase extends Dexie {
   constructor() {
     super('RepCueDB');
     
+    // Version 3: Original schema
     this.version(3).stores({
       exercises: 'id, name, category, exerciseType, isFavorite, updatedAt',
       activityLogs: '++id, exerciseId, timestamp, duration',
@@ -65,14 +62,92 @@ class RepCueDatabase extends Dexie {
       workouts: 'id, name, createdAt, updatedAt',
       workoutSessions: 'id, workoutId, startTime, endTime, isCompleted'
     });
+
+    // Version 4: Add sync metadata fields
+    this.version(4).stores({
+      exercises: 'id, name, category, exerciseType, isFavorite, updatedAt, ownerId, deleted, version, dirty',
+      activityLogs: '++id, exerciseId, timestamp, duration, updatedAt, ownerId, deleted, version, dirty',
+      userPreferences: 'id, updatedAt, ownerId, deleted, version, dirty',
+      appSettings: 'id, updatedAt, ownerId, deleted, version, dirty',
+      workouts: 'id, name, createdAt, updatedAt, ownerId, deleted, version, dirty',
+      workoutSessions: 'id, workoutId, startTime, endTime, isCompleted, updatedAt, ownerId, deleted, version, dirty'
+    }).upgrade(trans => {
+      // Migration function to add sync metadata to existing records
+      return this.migrateToSyncMetadata(trans);
+    });
+  }
+
+  /**
+   * Migration function to add sync metadata to existing records
+   */
+  private async migrateToSyncMetadata(trans: Transaction): Promise<void> {
+    const now = new Date().toISOString();
+    
+    // Migrate exercises
+    await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+      if (!exercise.ownerId) exercise.ownerId = null;
+      if (!exercise.deleted) exercise.deleted = false;
+      if (!exercise.version) exercise.version = 1;
+      if (!exercise.dirty) exercise.dirty = false;
+      if (!exercise.op) exercise.op = 'upsert';
+    });
+
+    // Migrate activity logs
+    await trans.table('activityLogs').toCollection().modify((log: Record<string, unknown>) => {
+      if (!log.id) log.id = crypto.randomUUID();
+      if (!log.updatedAt) log.updatedAt = now;
+      if (!log.ownerId) log.ownerId = null;
+      if (!log.deleted) log.deleted = false;
+      if (!log.version) log.version = 1;
+      if (!log.dirty) log.dirty = false;
+      if (!log.op) log.op = 'upsert';
+    });
+
+    // Migrate user preferences
+    await trans.table('userPreferences').toCollection().modify((prefs: Record<string, unknown>) => {
+      if (!prefs.id) prefs.id = crypto.randomUUID();
+      if (!prefs.ownerId) prefs.ownerId = null;
+      if (!prefs.deleted) prefs.deleted = false;
+      if (!prefs.version) prefs.version = 1;
+      if (!prefs.dirty) prefs.dirty = false;
+      if (!prefs.op) prefs.op = 'upsert';
+    });
+
+    // Migrate app settings
+    await trans.table('appSettings').toCollection().modify((settings: Record<string, unknown>) => {
+      if (!settings.id) settings.id = crypto.randomUUID();
+      if (!settings.ownerId) settings.ownerId = null;
+      if (!settings.deleted) settings.deleted = false;
+      if (!settings.version) settings.version = 1;
+      if (!settings.dirty) settings.dirty = false;
+      if (!settings.op) settings.op = 'upsert';
+    });
+
+    // Migrate workouts
+    await trans.table('workouts').toCollection().modify((workout: Record<string, unknown>) => {
+      if (!workout.ownerId) workout.ownerId = null;
+      if (!workout.deleted) workout.deleted = false;
+      if (!workout.version) workout.version = 1;
+      if (!workout.dirty) workout.dirty = false;
+      if (!workout.op) workout.op = 'upsert';
+    });
+
+    // Migrate workout sessions
+    await trans.table('workoutSessions').toCollection().modify((session: Record<string, unknown>) => {
+      if (!session.updatedAt) session.updatedAt = now;
+      if (!session.ownerId) session.ownerId = null;
+      if (!session.deleted) session.deleted = false;
+      if (!session.version) session.version = 1;
+      if (!session.dirty) session.dirty = false;
+      if (!session.op) session.op = 'upsert';
+    });
   }
 }
 
 export class StorageService {
   private static instance: StorageService;
   private db: RepCueDatabase;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private fallbackStorage = new Map<string, any>();
+  private fallbackStorage = new Map<string, unknown>();
 
   private constructor() {
     this.db = new RepCueDatabase();
@@ -112,10 +187,7 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const storedExercise: StoredExercise = {
-      ...exercise,
-      updatedAt: new Date().toISOString()
-    };
+    const storedExercise: StoredExercise = prepareUpsert(exercise, exercise.id);
 
     try {
       await this.db.exercises.put(storedExercise);
@@ -126,7 +198,7 @@ export class StorageService {
   }
 
   /**
-   * Get all exercises
+   * Get all exercises (filtered to exclude deleted records)
    */
   public async getExercises(): Promise<Exercise[]> {
     if (!this.canStoreData()) {
@@ -135,17 +207,18 @@ export class StorageService {
 
     try {
       const storedExercises = await this.db.exercises.toArray();
-      return storedExercises.map(this.convertStoredExercise);
+      const allExercises = storedExercises.map(this.convertStoredExercise);
+      return filterActiveRecords(allExercises);
     } catch (error) {
       console.warn('Failed to load exercises from IndexedDB:', error);
       // Try fallback storage
       const exercises: Exercise[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('exercise_')) {
-          exercises.push(this.convertStoredExercise(value));
+          exercises.push(this.convertStoredExercise(value as StoredExercise));
         }
       });
-      return exercises;
+      return filterActiveRecords(exercises);
     }
   }
 
@@ -160,16 +233,17 @@ export class StorageService {
     try {
       const exercise = await this.db.exercises.get(exerciseId);
       if (exercise) {
-        await this.db.exercises.update(exerciseId, {
-          isFavorite: !exercise.isFavorite,
-          updatedAt: new Date().toISOString()
-        });
+        const updatedExercise = prepareUpsert({
+          ...exercise,
+          isFavorite: !exercise.isFavorite
+        }, exerciseId);
+        await this.db.exercises.put(updatedExercise);
       }
     } catch (error) {
       console.warn('Failed to update exercise favorite:', error);
       // Try fallback storage
       const key = `exercise_${exerciseId}`;
-      const exercise = this.fallbackStorage.get(key);
+      const exercise = this.fallbackStorage.get(key) as StoredExercise | undefined;
       if (exercise) {
         exercise.isFavorite = !exercise.isFavorite;
         exercise.updatedAt = new Date().toISOString();
@@ -186,13 +260,14 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
+    const logWithSync = prepareUpsert(log, log.id);
     const storedLog: StoredActivityLog = {
-      ...log,
+      ...logWithSync,
       timestamp: log.timestamp.toISOString()
     };
 
     try {
-      await this.db.activityLogs.add(storedLog);
+      await this.db.activityLogs.put(storedLog);
     } catch (error) {
       console.warn('Failed to save activity log to IndexedDB:', error);
       this.fallbackStorage.set(`log_${log.id}`, storedLog);
@@ -234,7 +309,7 @@ export class StorageService {
       const logs: ActivityLog[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('log_')) {
-          logs.push(this.convertStoredActivityLog(value));
+          logs.push(this.convertStoredActivityLog(value as StoredActivityLog));
         }
       });
       return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, limit);
@@ -275,16 +350,14 @@ export class StorageService {
     try {
       const storedPreferences = await this.db.userPreferences.orderBy('updatedAt').last();
       if (storedPreferences) {
-        const { id: _id, updatedAt: _updatedAt, ...preferences } = storedPreferences;
-        return preferences;
+        return storedPreferences;
       }
       return null;
     } catch (error) {
       console.warn('Failed to load user preferences from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('userPreferences');
+      const fallback = this.fallbackStorage.get('userPreferences') as UserPreferences | undefined;
       if (fallback) {
-        const { id: _id, updatedAt: _updatedAt, ...preferences } = fallback;
-        return preferences;
+        return fallback;
       }
       return null;
     }
@@ -324,16 +397,14 @@ export class StorageService {
     try {
       const storedSettings = await this.db.appSettings.orderBy('updatedAt').last();
       if (storedSettings) {
-        const { id: _id, updatedAt: _updatedAt, ...settings } = storedSettings;
-        return settings;
+        return storedSettings;
       }
       return null;
     } catch (error) {
       console.warn('Failed to load app settings from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('appSettings');
+      const fallback = this.fallbackStorage.get('appSettings') as AppSettings | undefined;
       if (fallback) {
-        const { id: _id, updatedAt: _updatedAt, ...settings } = fallback;
-        return settings;
+        return fallback;
       }
       return null;
     }
@@ -455,10 +526,10 @@ export class StorageService {
       return Promise.reject(new Error('Cannot store data without user consent'));
     }
 
+    const workoutWithSync = prepareUpsert(workout, workout.id);
     const storedWorkout: StoredWorkout = {
-      ...workout,
-      createdAt: workout.createdAt.toISOString(),
-      updatedAt: workout.updatedAt.toISOString()
+      ...workoutWithSync,
+      createdAt: workout.createdAt.toISOString()
     };
 
     try {
@@ -485,7 +556,7 @@ export class StorageService {
       const workouts: Workout[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('workout_')) {
-          workouts.push(this.convertStoredWorkout(value));
+          workouts.push(this.convertStoredWorkout(value as StoredWorkout));
         }
       });
       return workouts;
@@ -506,7 +577,7 @@ export class StorageService {
     } catch (error) {
       console.warn('Failed to get workout from IndexedDB:', error);
       const fallback = this.fallbackStorage.get(`workout_${workoutId}`);
-      return fallback ? this.convertStoredWorkout(fallback) : null;
+      return fallback ? this.convertStoredWorkout(fallback as StoredWorkout) : null;
     }
   }
 
@@ -519,10 +590,15 @@ export class StorageService {
     }
 
     try {
-      await this.db.workouts.delete(workoutId);
-      console.log(`Workout ${workoutId} deleted successfully`);
+      const workout = await this.db.workouts.get(workoutId);
+      if (workout) {
+        const deletedWorkout = prepareSoftDelete(workout);
+        await this.db.workouts.put(deletedWorkout);
+        console.log(`Workout ${workoutId} soft deleted successfully`);
+      }
     } catch (error) {
-      console.error('Failed to delete workout from IndexedDB:', error);
+      console.error('Failed to soft delete workout from IndexedDB:', error);
+      // For fallback storage, we can still use hard delete since it's temporary
       this.fallbackStorage.delete(`workout_${workoutId}`);
     }
   }
@@ -539,8 +615,9 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
+    const sessionWithSync = prepareUpsert(session, session.id);
     const storedSession: StoredWorkoutSession = {
-      ...session,
+      ...sessionWithSync,
       startTime: session.startTime.toISOString(),
       endTime: session.endTime?.toISOString()
     };
@@ -587,7 +664,7 @@ export class StorageService {
       const sessions: WorkoutSession[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('session_')) {
-          sessions.push(this.convertStoredWorkoutSession(value));
+          sessions.push(this.convertStoredWorkoutSession(value as StoredWorkoutSession));
         }
       });
       return sessions
@@ -597,7 +674,7 @@ export class StorageService {
   }
 
   /**
-   * Delete workout session data
+   * Delete workout session data (soft delete)
    */
   public async deleteWorkoutSession(sessionId: string): Promise<void> {
     if (!this.canStoreData()) {
@@ -605,16 +682,20 @@ export class StorageService {
     }
 
     try {
-      await this.db.workoutSessions.delete(sessionId);
-      console.log(`Workout session ${sessionId} deleted successfully`);
+      const session = await this.db.workoutSessions.get(sessionId);
+      if (session) {
+        const deletedSession = prepareSoftDelete(session);
+        await this.db.workoutSessions.put(deletedSession);
+        console.log(`Workout session ${sessionId} soft deleted successfully`);
+      }
     } catch (error) {
-      console.error('Failed to delete workout session from IndexedDB:', error);
+      console.error('Failed to soft delete workout session from IndexedDB:', error);
       this.fallbackStorage.delete(`session_${sessionId}`);
     }
   }
 
   /**
-   * Delete exercise data
+   * Delete exercise data (soft delete)
    */
   public async deleteExercise(exerciseId: string): Promise<void> {
     if (!this.canStoreData()) {
@@ -622,17 +703,21 @@ export class StorageService {
     }
 
     try {
-      await this.db.exercises.delete(exerciseId);
-      console.log(`Exercise ${exerciseId} deleted successfully`);
+      const exercise = await this.db.exercises.get(exerciseId);
+      if (exercise) {
+        const deletedExercise = prepareSoftDelete(exercise);
+        await this.db.exercises.put(deletedExercise);
+        console.log(`Exercise ${exerciseId} soft deleted successfully`);
+      }
     } catch (error) {
-      console.error('Failed to delete exercise from IndexedDB:', error);
+      console.error('Failed to soft delete exercise from IndexedDB:', error);
       // Remove from fallback storage
       this.fallbackStorage.delete(`exercise_${exerciseId}`);
     }
   }
 
   /**
-   * Delete activity log data
+   * Delete activity log data (soft delete)
    */
   public async deleteActivityLog(activityLogId: string): Promise<void> {
     if (!this.canStoreData()) {
@@ -640,13 +725,142 @@ export class StorageService {
     }
 
     try {
-      const id = parseInt(activityLogId, 10);
-      await this.db.activityLogs.delete(id);
-      console.log(`Activity log ${activityLogId} deleted successfully`);
+      const log = await this.db.activityLogs.get(activityLogId);
+      if (log) {
+        const deletedLog = prepareSoftDelete(log);
+        await this.db.activityLogs.put(deletedLog);
+        console.log(`Activity log ${activityLogId} soft deleted successfully`);
+      }
     } catch (error) {
-      console.error('Failed to delete activity log from IndexedDB:', error);
+      console.error('Failed to soft delete activity log from IndexedDB:', error);
       // Remove from fallback storage
       this.fallbackStorage.delete(`activityLog_${activityLogId}`);
+    }
+  }
+
+  // ===============================
+  // Sync Management Methods
+  // ===============================
+
+  /**
+   * Get all dirty records that need to be synced
+   */
+  public async getDirtyRecords(): Promise<{
+    exercises: Exercise[];
+    activityLogs: ActivityLog[];
+    userPreferences: UserPreferences[];
+    appSettings: AppSettings[];
+    workouts: Workout[];
+    workoutSessions: WorkoutSession[];
+  }> {
+    if (!this.canStoreData()) {
+      return {
+        exercises: [],
+        activityLogs: [],
+        userPreferences: [],
+        appSettings: [],
+        workouts: [],
+        workoutSessions: []
+      };
+    }
+
+    try {
+      const [exercises, activityLogs, userPreferences, appSettings, workouts, workoutSessions] = await Promise.all([
+        this.db.exercises.where('dirty').equals(1).toArray(),
+        this.db.activityLogs.where('dirty').equals(1).toArray(),
+        this.db.userPreferences.where('dirty').equals(1).toArray(),
+        this.db.appSettings.where('dirty').equals(1).toArray(),
+        this.db.workouts.where('dirty').equals(1).toArray(),
+        this.db.workoutSessions.where('dirty').equals(1).toArray()
+      ]);
+
+      return {
+        exercises: exercises.map(this.convertStoredExercise),
+        activityLogs: activityLogs.map(this.convertStoredActivityLog),
+        userPreferences: userPreferences.map(this.convertStoredUserPreferences),
+        appSettings: appSettings.map(this.convertStoredAppSettings),
+        workouts: workouts.map(this.convertStoredWorkout),
+        workoutSessions: workoutSessions.map(this.convertStoredWorkoutSession)
+      };
+    } catch (error) {
+      console.warn('Failed to get dirty records:', error);
+      return {
+        exercises: [],
+        activityLogs: [],
+        userPreferences: [],
+        appSettings: [],
+        workouts: [],
+        workoutSessions: []
+      };
+    }
+  }
+
+  /**
+   * Mark records as synced (clean)
+   */
+  public async markAsSynced(table: string, ids: string[]): Promise<void> {
+    if (!this.canStoreData() || ids.length === 0) {
+      return;
+    }
+
+    try {
+      const now = new Date().toISOString();
+      const updateData = { dirty: false, syncedAt: now };
+
+      switch (table) {
+        case 'exercises':
+          await this.db.exercises.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+          break;
+        case 'activityLogs':
+          await this.db.activityLogs.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+          break;
+        case 'userPreferences':
+          await this.db.userPreferences.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+          break;
+        case 'appSettings':
+          await this.db.appSettings.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+          break;
+        case 'workouts':
+          await this.db.workouts.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+          break;
+        case 'workoutSessions':
+          await this.db.workoutSessions.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+          break;
+      }
+    } catch (error) {
+      console.warn(`Failed to mark ${table} records as synced:`, error);
+    }
+  }
+
+  /**
+   * Claim ownership of anonymous records during first sync
+   */
+  public async claimOwnership(ownerId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      return;
+    }
+
+    try {
+      const now = new Date().toISOString();
+      const claimData = { 
+        ownerId, 
+        updatedAt: now, 
+        dirty: true, 
+        version: 1 
+      };
+
+      await Promise.all([
+        this.db.exercises.where('ownerId').equals('').modify(claimData),
+        this.db.activityLogs.where('ownerId').equals('').modify(claimData),
+        this.db.userPreferences.where('ownerId').equals('').modify(claimData),
+        this.db.appSettings.where('ownerId').equals('').modify(claimData),
+        this.db.workouts.where('ownerId').equals('').modify(claimData),
+        this.db.workoutSessions.where('ownerId').equals('').modify(claimData)
+      ]);
+
+      console.log(`Claimed ownership of anonymous records for user ${ownerId}`);
+    } catch (error) {
+      console.warn('Failed to claim ownership of records:', error);
     }
   }
 
@@ -654,8 +868,10 @@ export class StorageService {
    * Convert stored exercise to runtime format
    */
   private convertStoredExercise(stored: StoredExercise): Exercise {
-    const { updatedAt: _updatedAt, ...exercise } = stored;
-    return exercise;
+    return {
+      ...stored,
+      updatedAt: stored.updatedAt
+    };
   }
 
   /**
@@ -675,11 +891,24 @@ export class StorageService {
     return {
       ...stored,
       createdAt: new Date(stored.createdAt),
-      updatedAt: new Date(stored.updatedAt)
+      updatedAt: stored.updatedAt
     };
   }
 
   /**
+   * Convert stored user preferences to runtime format
+   */
+  private convertStoredUserPreferences(stored: StoredUserPreferences): UserPreferences {
+    return stored;
+  }
+
+  /**
+   * Convert stored app settings to runtime format
+   */
+  private convertStoredAppSettings(stored: StoredAppSettings): AppSettings {
+    return stored;
+  }
+
   /**
    * Convert stored workout session to runtime format
    */

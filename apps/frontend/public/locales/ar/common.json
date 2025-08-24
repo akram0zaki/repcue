@@ -7,6 +7,7 @@
     "choose": "اختر",
     "close": "إغلاق",
     "loading": "تحميل...",
+    "optional": "اختياري",
     "on": "تشغيل",
     "off": "إيقاف",
     "notSupported": "غير مدعوم",
@@ -128,6 +129,9 @@
   "home": {
     "upcomingWorkout": "التمرين القادم",
     "tagline": "مؤقت التمارين الشخصي",
+    "signInMessage": "يمكنك ",
+    "signInLink": "تسجيل الدخول",
+    "signInSuffix": " لتتبع تقدمك من أجهزة مختلفة.",
     "startNow": "ابدأ الآن",
     "noScheduleTitle": "لا يوجد جدول محدد",
     "noScheduleBody": "أنشئ جدول تمرين لرؤية تمارينك القادمة هنا",

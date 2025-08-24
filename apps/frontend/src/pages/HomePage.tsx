@@ -10,6 +10,8 @@ import { consentService } from '../services/consentService';
 import { StarFilledIcon } from '../components/icons/NavigationIcons';
 import { localizeExercise } from '../utils/localizeExercise';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { SignInButton } from '../components/auth';
+import { useAuth } from '../hooks/useAuth';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -20,6 +22,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['common']);
+  const { isAuthenticated } = useAuth();
   const [upcomingWorkout, setUpcomingWorkout] = useState<{
     workout: Workout;
     weekday: string;
@@ -120,6 +123,23 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
+
+        {/* Sign-in prompt - only show if not authenticated */}
+        {!isAuthenticated && (
+          <div className="text-center mb-6">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {t('home.signInMessage', { 
+                defaultValue: 'You can ' 
+              })}
+              <SignInButton variant="minimal" size="sm" className="inline p-0 h-auto font-normal underline hover:no-underline">
+                {t('home.signInLink', { defaultValue: 'sign-in' })}
+              </SignInButton>
+              {t('home.signInSuffix', { 
+                defaultValue: ' to track your progress from different devices.' 
+              })}
+            </p>
+          </div>
+        )}
 
         {/* Upcoming Workout Section */}
         {hasConsent && (

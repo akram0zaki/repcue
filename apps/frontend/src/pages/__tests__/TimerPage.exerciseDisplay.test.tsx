@@ -5,8 +5,9 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
-const mockExercise: Exercise = {
+const mockExercise: Exercise = createMockExercise({
   id: 'exercise-1',
   name: 'Push-ups',
   description: 'Classic upper body exercise',
@@ -16,7 +17,7 @@ const mockExercise: Exercise = {
   defaultReps: 10,
   isFavorite: false,
   tags: ['upper-body', 'bodyweight']
-};
+});
 
 const mockWorkoutMode = {
   workoutId: 'workout-1',
@@ -126,10 +127,10 @@ describe('TimerPage - Exercise Display Improvements', () => {
   });
 
   it('should handle exercise without description gracefully', () => {
-    const exerciseWithoutDescription: Exercise = {
+    const exerciseWithoutDescription: Exercise = createMockExercise({
       ...mockExercise,
       description: undefined as any
-    };
+    });
 
     renderTimerPage({
       workoutMode: mockWorkoutMode

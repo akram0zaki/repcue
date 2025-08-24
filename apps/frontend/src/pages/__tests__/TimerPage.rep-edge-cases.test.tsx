@@ -4,9 +4,10 @@ import { describe, it, expect, vi } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise } from '../../test/testUtils';
 
 describe('TimerPage - Rep Logic Edge Cases', () => {
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'ex1',
     name: 'Cat-Cow Stretch',
     description: 'Alternate arching and rounding spine on hands and knees',
@@ -16,7 +17,7 @@ describe('TimerPage - Rep Logic Edge Cases', () => {
     defaultReps: 8,
     isFavorite: false,
     tags: []
-  };
+  });
 
   const mockAppSettings: AppSettings = {
     ...DEFAULT_APP_SETTINGS,

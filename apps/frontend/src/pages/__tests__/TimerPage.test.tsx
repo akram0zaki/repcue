@@ -5,9 +5,10 @@ import TimerPage from '../TimerPage';
 import type { Exercise, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
 import { ExerciseType } from '../../types';
+import { createMockExercise } from '../../test/testUtils';
 
 // Mock data
-const mockExercise: Exercise = {
+const mockExercise: Exercise = createMockExercise({
   id: 'test-exercise',
   name: 'Test Exercise',
   description: 'Test description',
@@ -16,7 +17,7 @@ const mockExercise: Exercise = {
   defaultDuration: 30,
   isFavorite: false,
   tags: ['test']
-};
+});
 
 const defaultTimerState: TimerState = {
   isRunning: false,

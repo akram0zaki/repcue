@@ -16,6 +16,8 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - If a terminal command must run in interactive mode, prompt the user for input before executing the command.
 
+- This project is using pnpm as the package manager. Use pnpm and its syntax for running any task related to the project like running unit tests, lint, build, etc
+
 - This application is being developed on a Windows 11 machine and deployed to production on a Raspberry Pi 5 running the default Pi OS where nginx and cloudflare tunnel are set up.
 
 - Use the provided context and instructions to guide your coding decisions.
@@ -28,12 +30,12 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - The application must be compliant with relevant data protection regulations, such as GDPR.
 
-- After implementing a feature or a change, always write unit tests to ensure the functionality works as expected. Also revisit README.md to update any relevant documentation. Make sure to track the changes in CHANGELOG.md under a headline with the date of the change.
-
-- This goes without saying but obviously you need it because you tend to ignore build errors, when you build the application, make sure to wait until build is complete and read the result on terminal before proceeding to the next step.
+- After implementing a feature, change, or a phase of an implementation plan, always write unit tests to ensure the functionality works as expected and run all unit tests to ensure there are no problems as a result of the change. Also revisit README.md to update any relevant documentation. Make sure to track the changes in CHANGELOG.md under a headline with the date of the change.
 
 - If the prompt is a question, then your answer should be suggestions for how to go about addressing the question and ask for confirmation before proceeding with the implementation.
 
-- When requested to create an implementation plan, save it to the .plan/ directory in markdown (.md) format.
+- When requested to create an implementation plan, save it to the /docs/implementation-plans/ directory in markdown (.md) format.
 
 - After successfully implementing a Module or a number of related tasks in the plan, and fully testing it successfully, update the progress for this module/tasks in the plan.
+
+- The project is multi-lingual with many locales. Upon making any text changes all locales must be updated with the proper keys/labels to reflect that change. Also must run (pnpm i18n:scan) and resolve any problems in the output.

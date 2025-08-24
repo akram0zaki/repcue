@@ -7,9 +7,10 @@ import ExercisePage from '../ExercisePage';
 import { INITIAL_EXERCISES } from '../../data/exercises';
 import type { Exercise } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
+import { createMockExercise } from '../../test/testUtils';
 
 // Mock exercise with many tags for testing expandable functionality
-const mockExerciseWithManyTags: Exercise = {
+const mockExerciseWithManyTags: Exercise = createMockExercise({
   id: 'test-exercise',
   name: 'Test Exercise',
   description: 'A test exercise with many tags',
@@ -18,10 +19,10 @@ const mockExerciseWithManyTags: Exercise = {
   defaultDuration: 30,
   isFavorite: false,
   tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5']
-};
+});
 
 // Mock exercise with few tags
-const mockExerciseWithFewTags: Exercise = {
+const mockExerciseWithFewTags: Exercise = createMockExercise({
   id: 'test-exercise-few',
   name: 'Test Exercise Few',
   description: 'A test exercise with few tags',
@@ -30,7 +31,7 @@ const mockExerciseWithFewTags: Exercise = {
   defaultDuration: 60,
   isFavorite: true,
   tags: ['tag1', 'tag2']
-};
+});
 
 describe('ExercisePage', () => {
   const mockOnToggleFavorite = vi.fn();

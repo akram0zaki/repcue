@@ -5,6 +5,7 @@ import ActivityLogPage from '../ActivityLogPage';
 import { storageService } from '../../services/storageService';
 import type { Exercise, ActivityLog } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
+import { createMockExercise, createMockActivityLog } from '../../test/testUtils';
 
 // Mock the storage service
 vi.mock('../../services/storageService', () => ({
@@ -14,7 +15,7 @@ vi.mock('../../services/storageService', () => ({
 }));
 
 const mockExercises: Exercise[] = [
-  {
+  createMockExercise({
     id: 'plank',
     name: 'Plank',
     description: 'Hold your body in a straight line',
@@ -23,8 +24,8 @@ const mockExercises: Exercise[] = [
     defaultDuration: 60,
     isFavorite: false,
     tags: ['core', 'stability']
-  },
-  {
+  }),
+  createMockExercise({
     id: 'push-ups',
     name: 'Push-ups',
     description: 'Lower and raise body using arms',
@@ -33,8 +34,8 @@ const mockExercises: Exercise[] = [
     defaultDuration: 60,
     isFavorite: false,
     tags: ['strength', 'arms']
-  },
-  {
+  }),
+  createMockExercise({
     id: 'running',
     name: 'Running',
     description: 'Cardiovascular exercise',
@@ -43,42 +44,42 @@ const mockExercises: Exercise[] = [
     defaultDuration: 300,
     isFavorite: false,
     tags: ['cardio', 'endurance']
-  }
+  })
 ];
 
 const mockActivityLogs: ActivityLog[] = [
-  {
+  createMockActivityLog({
     id: 'log-1',
     exerciseId: 'plank',
     exerciseName: 'Plank',
     duration: 60,
     timestamp: new Date('2024-01-15T10:30:00'),
     notes: '60s interval timer'
-  },
-  {
+  }),
+  createMockActivityLog({
     id: 'log-2',
     exerciseId: 'push-ups',
     exerciseName: 'Push-ups',
     duration: 45,
     timestamp: new Date('2024-01-15T11:00:00'),
     notes: '45s interval timer'
-  },
-  {
+  }),
+  createMockActivityLog({
     id: 'log-3',
     exerciseId: 'plank',
     exerciseName: 'Plank',
     duration: 90,
     timestamp: new Date('2024-01-14T09:15:00'),
     notes: '90s interval timer'
-  },
-  {
+  }),
+  createMockActivityLog({
     id: 'log-4',
     exerciseId: 'running',
     exerciseName: 'Running',
     duration: 300,
     timestamp: new Date('2024-01-13T07:00:00'),
     notes: '300s interval timer'
-  }
+  })
 ];
 
 describe('ActivityLogPage', () => {
@@ -180,14 +181,14 @@ describe('ActivityLogPage', () => {
 
   it('formats duration correctly', async () => {
     const shortDurationLogs: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-short',
         exerciseId: 'plank',
         exerciseName: 'Plank',
         duration: 30,
         timestamp: new Date(),
         notes: '30s interval timer'
-      }
+      })
     ];
 
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(shortDurationLogs);
@@ -202,14 +203,14 @@ describe('ActivityLogPage', () => {
 
   it('formats time correctly', async () => {
     const logWithSpecificTime: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-time',
         exerciseId: 'plank',
         exerciseName: 'Plank',
         duration: 60,
         timestamp: new Date('2024-01-15T14:30:00'),
         notes: '60s interval timer'
-      }
+      })
     ];
 
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(logWithSpecificTime);
@@ -278,30 +279,30 @@ describe('ActivityLogPage', () => {
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
     const streakLogs: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-today',
         exerciseId: 'plank',
         exerciseName: 'Plank',
         duration: 60,
         timestamp: today,
         notes: 'Today workout'
-      },
-      {
+      }),
+      createMockActivityLog({
         id: 'log-yesterday',
         exerciseId: 'push-ups',
         exerciseName: 'Push-ups',
         duration: 45,
         timestamp: yesterday,
         notes: 'Yesterday workout'
-      },
-      {
+      }),
+      createMockActivityLog({
         id: 'log-two-days',
         exerciseId: 'running',
         exerciseName: 'Running',
         duration: 300,
         timestamp: twoDaysAgo,
         notes: 'Two days ago workout'
-      }
+      })
     ];
 
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(streakLogs);
@@ -318,14 +319,14 @@ describe('ActivityLogPage', () => {
 
   it('shows notes when present', async () => {
     const logsWithNotes: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-with-notes',
         exerciseId: 'plank',
         exerciseName: 'Plank',
         duration: 60,
         timestamp: new Date(),
         notes: 'Great workout today!'
-      }
+      })
     ];
 
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(logsWithNotes);
@@ -339,14 +340,14 @@ describe('ActivityLogPage', () => {
 
   it('shows empty state for specific category filter', async () => {
     const coreOnlyLogs: ActivityLog[] = [
-      {
+      createMockActivityLog({
         id: 'log-core',
         exerciseId: 'plank',
         exerciseName: 'Plank',
         duration: 60,
         timestamp: new Date(),
         notes: 'Core workout'
-      }
+      })
     ];
 
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(coreOnlyLogs);

@@ -7,6 +7,7 @@
     "choose": "Choose",
     "close": "Close",
     "loading": "Loading...",
+    "optional": "optional",
     "on": "On",
     "off": "Off",
     "notSupported": "Not Supported",
@@ -128,6 +129,9 @@
   "home": {
     "upcomingWorkout": "Upcoming Workout",
     "tagline": "Your personal exercise timer",
+    "signInMessage": "You can ",
+    "signInLink": "sign-in",
+    "signInSuffix": " to track your progress from different devices.",
     "startNow": "Start Now",
     "noScheduleTitle": "No Schedule Set",
     "noScheduleBody": "Create a workout schedule to see your upcoming workouts here",

@@ -1,3 +1,16 @@
+// Sync and accounts types (defined first to be used by other types)
+export interface SyncMetadata {
+  id: string; // UUID v4
+  ownerId?: string | null; // null for anonymous users, UUID for authenticated users
+  updatedAt: string; // ISO timestamp
+  deleted: boolean; // tombstone flag for soft deletes
+  version: number; // version counter for conflict resolution
+  // Local-only fields (not synced to server)
+  dirty?: boolean; // true if local changes need to be synced
+  op?: 'upsert' | 'delete'; // pending operation type
+  syncedAt?: string; // ISO timestamp of last successful sync
+}
+
 // Exercise types
 export const ExerciseType = {
   TIME_BASED: 'time-based',
@@ -7,8 +20,7 @@ export const ExerciseType = {
 export type ExerciseType = typeof ExerciseType[keyof typeof ExerciseType];
 
 // Core exercise types
-export interface Exercise {
-  id: string;
+export interface Exercise extends SyncMetadata {
   name: string;
   description: string;
   category: ExerciseCategory;
@@ -51,8 +63,7 @@ export interface WorkoutExercise {
   customRestTime?: number; // rest time after this exercise (in seconds)
 }
 
-export interface Workout {
-  id: string;
+export interface Workout extends SyncMetadata {
   name: string;
   description?: string;
   exercises: WorkoutExercise[];
@@ -60,7 +71,6 @@ export interface Workout {
   isActive: boolean; // Added: Allow pause/resume without deletion
   estimatedDuration?: number; // calculated total time in seconds
   createdAt: Date;
-  updatedAt: Date;
 }
 
 // Weekday structure
@@ -92,8 +102,7 @@ export interface WorkoutSessionExercise {
   endTime?: Date;
 }
 
-export interface WorkoutSession {
-  id: string;
+export interface WorkoutSession extends SyncMetadata {
   workoutId: string;
   workoutName: string;
   startTime: Date;
@@ -105,8 +114,7 @@ export interface WorkoutSession {
 }
 
 // Activity logging
-export interface ActivityLog {
-  id: string;
+export interface ActivityLog extends SyncMetadata {
   exerciseId: string;
   exerciseName: string;
   duration: number; // in seconds
@@ -159,14 +167,7 @@ export interface TimerState {
 }
 
 // User preferences and profile
-export interface UserProfile {
-  id: string;
-  preferences: UserPreferences;
-  createdAt: Date;
-  lastActive: Date;
-}
-
-export interface UserPreferences {
+export interface UserPreferences extends SyncMetadata {
   soundEnabled: boolean;
   vibrationEnabled: boolean;
   defaultIntervalDuration: number; // in seconds
@@ -186,7 +187,7 @@ export interface ConsentData {
 export * from './consent';
 
 // Settings
-export interface AppSettings {
+export interface AppSettings extends SyncMetadata {
   intervalDuration: number;
   soundEnabled: boolean;
   vibrationEnabled: boolean;
@@ -210,7 +211,8 @@ export const Routes = {
   PRIVACY: '/privacy',
   WORKOUTS: '/workouts', // Changed from SCHEDULE
   CREATE_WORKOUT: '/workout/create',
-  EDIT_WORKOUT: '/workout/edit'
+  EDIT_WORKOUT: '/workout/edit',
+  AUTH_CALLBACK: '/auth/callback'
 } as const;
 
 export type Routes = typeof Routes[keyof typeof Routes];
@@ -222,8 +224,42 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+// Additional sync types
+
 export interface SyncStatus {
   lastSyncDate?: Date;
   pendingChanges: number;
   isOnline: boolean;
+  isAuthenticated: boolean;
+  lastSyncCursor?: string; // server cursor for incremental sync
+}
+
+// Sync operation types for batching
+export interface SyncOperation {
+  table: string;
+  operation: 'upsert' | 'delete';
+  data: Record<string, unknown>;
+  id: string;
+}
+
+export interface SyncBatch {
+  operations: SyncOperation[];
+  cursor?: string;
+}
+
+// Auth types
+export interface AuthUserProfile {
+  id: string;
+  displayName?: string;
+  avatarUrl?: string;
+  email?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user?: AuthUserProfile;
+  accessToken?: string;
+  refreshToken?: string;
 }

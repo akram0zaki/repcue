@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import HomePage from '../HomePage';
 import type { Exercise, AppSettings } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -17,7 +18,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 const mockExercises: Exercise[] = [
-  {
+  createMockExercise({
     id: 'plank',
     name: 'Plank',
     description: 'Hold your body in a straight line',
@@ -26,8 +27,8 @@ const mockExercises: Exercise[] = [
     defaultDuration: 60,
     isFavorite: true,
     tags: ['core', 'stability']
-  },
-  {
+  }),
+  createMockExercise({
     id: 'push-ups',
     name: 'Push-ups',
     description: 'Lower and raise body using arms',
@@ -36,8 +37,8 @@ const mockExercises: Exercise[] = [
     defaultDuration: 45,
     isFavorite: false,
     tags: ['strength', 'arms']
-  },
-  {
+  }),
+  createMockExercise({
     id: 'jumping-jacks',
     name: 'Jumping Jacks',
     description: 'Jump with legs apart and arms overhead',
@@ -46,10 +47,10 @@ const mockExercises: Exercise[] = [
     defaultDuration: 30,
     isFavorite: false,
     tags: ['cardio', 'full-body']
-  }
+  })
 ];
 
-const mockAppSettings: AppSettings = {
+const mockAppSettings: AppSettings = createMockAppSettings({
   intervalDuration: 30,
   soundEnabled: true,
   vibrationEnabled: true,
@@ -60,7 +61,7 @@ const mockAppSettings: AppSettings = {
   preTimerCountdown: 3,
   defaultRestTime: 60,
   repSpeedFactor: 1.0
-};
+});
 
 const mockOnToggleFavorite = vi.fn();
 
@@ -172,14 +173,14 @@ describe('HomePage', () => {
   });
 
   it('shows message when no favorite exercises exist', () => {
-    const exercisesWithoutFavorites = mockExercises.map(ex => ({ ...ex, isFavorite: false }));
+    const exercisesWithoutFavorites = mockExercises.map(ex => createMockExercise({ ...ex, isFavorite: false }));
     renderHomePage({ exercises: exercisesWithoutFavorites });
     
     expect(screen.getByText('No favorite exercises yet. Mark some exercises as favorites to see them here!')).toBeInTheDocument();
   });
 
   it('applies correct styling for dark mode', () => {
-    const darkModeSettings = { ...mockAppSettings, darkMode: true };
+    const darkModeSettings = createMockAppSettings({ ...mockAppSettings, darkMode: true });
     renderHomePage({ appSettings: darkModeSettings });
     
     const mainContent = document.getElementById('main-content');

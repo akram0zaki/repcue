@@ -5,6 +5,7 @@ import SettingsPage from '../SettingsPage';
 import { consentService } from '../../services/consentService';
 import { storageService } from '../../services/storageService';
 import type { AppSettings, Exercise } from '../../types';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Mock the services
 vi.mock('../../services/consentService', () => ({
@@ -29,7 +30,7 @@ vi.mock('../../services/storageService', () => ({
 // Mock the dynamic import for exercises data
 vi.mock('../../data/exercises', () => ({
   INITIAL_EXERCISES: [
-    {
+    createMockExercise({
       id: '1',
       name: 'Test Exercise 1',
       description: 'Test description 1',
@@ -39,8 +40,8 @@ vi.mock('../../data/exercises', () => ({
       category: 'strength',
       tags: [],
       isFavorite: false
-    },
-    {
+    }),
+    createMockExercise({
       id: '2', 
       name: 'Test Exercise 2',
       description: 'Test description 2',
@@ -50,11 +51,11 @@ vi.mock('../../data/exercises', () => ({
       category: 'cardio',
       tags: [],
       isFavorite: false
-    }
+    })
   ]
 }));
 
-const mockAppSettings: AppSettings = {
+const mockAppSettings: AppSettings = createMockAppSettings({
   intervalDuration: 30,
   soundEnabled: true,
   vibrationEnabled: true,
@@ -65,7 +66,7 @@ const mockAppSettings: AppSettings = {
   preTimerCountdown: 3,
   defaultRestTime: 60,
   repSpeedFactor: 1.0
-};
+});
 
 const mockOnUpdateSettings = vi.fn();
 
@@ -298,7 +299,7 @@ describe('SettingsPage', () => {
   it('refreshes exercises when refresh button is clicked', async () => {
     // Mock current exercises with some having favorites
     const currentExercises: Exercise[] = [
-      {
+      createMockExercise({
         id: '1',
         name: 'Old Exercise 1',
         description: 'Old description',
@@ -308,8 +309,8 @@ describe('SettingsPage', () => {
         defaultSets: 2,
         defaultReps: 10,
         tags: []
-      },
-      {
+      }),
+      createMockExercise({
         id: '2',
         name: 'Old Exercise 2',
         description: 'Old description 2', 
@@ -319,7 +320,7 @@ describe('SettingsPage', () => {
         defaultSets: 1,
         defaultDuration: 30,
         tags: []
-      }
+      })
     ];
 
     vi.mocked(storageService.getExercises).mockResolvedValue(currentExercises);
@@ -519,7 +520,7 @@ describe('SettingsPage', () => {
   });
 
   it('displays correct interval duration in select', () => {
-    const settingsWithLongInterval = { ...mockAppSettings, intervalDuration: 60 };
+    const settingsWithLongInterval = createMockAppSettings({ ...mockAppSettings, intervalDuration: 60 });
     renderSettingsPage({ appSettings: settingsWithLongInterval });
     
     const select = screen.getByLabelText(/beep interval/i);

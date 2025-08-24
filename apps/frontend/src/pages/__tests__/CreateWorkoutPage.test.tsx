@@ -6,6 +6,7 @@ import { storageService } from '../../services/storageService';
 import { consentService } from '../../services/consentService';
 import type { Exercise } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
+import { createMockExercise } from '../../test/testUtils';
 
 // Mock dependencies
 vi.mock('../../services/storageService');
@@ -15,7 +16,7 @@ const mockStorageService = vi.mocked(storageService);
 const mockConsentService = vi.mocked(consentService);
 
 const mockExercises: Exercise[] = [
-  {
+  createMockExercise({
     id: 'plank',
     name: 'Plank',
     description: 'Hold your body in a straight line',
@@ -24,8 +25,8 @@ const mockExercises: Exercise[] = [
     defaultDuration: 60,
     isFavorite: false,
     tags: ['core', 'stability']
-  },
-  {
+  }),
+  createMockExercise({
     id: 'push-ups',
     name: 'Push-ups',
     description: 'Lower and raise your body using arms',
@@ -35,7 +36,7 @@ const mockExercises: Exercise[] = [
     defaultReps: 10,
     isFavorite: false,
     tags: ['strength', 'chest']
-  }
+  })
 ];
 
 const renderCreateWorkoutPage = () => {

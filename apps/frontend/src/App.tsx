@@ -23,6 +23,7 @@ import {
   WorkoutsPage,
   CreateWorkoutPage,
   EditWorkoutPage,
+  AuthCallbackPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -348,7 +349,10 @@ function App() {
         exerciseName: currentExercise.name,
         duration: Math.round(currentTime), // Round to avoid floating-point precision issues
         timestamp: new Date(),
-        notes: `Stopped after ${Math.round(currentTime)}s`
+        notes: `Stopped after ${Math.round(currentTime)}s`,
+        updatedAt: new Date().toISOString(),
+        deleted: false,
+        version: 1
       };
 
       if (consentService.hasConsent()) {
@@ -524,7 +528,10 @@ function App() {
           exercises: [], // TODO: Track individual exercise completion in Phase 5
           isCompleted: true,
           completionPercentage: 100,
-          totalDuration: Math.round(timerState.currentTime)
+          totalDuration: Math.round(timerState.currentTime),
+          updatedAt: new Date().toISOString(),
+          deleted: false,
+          version: 1
         };
         
         try {
@@ -579,7 +586,10 @@ function App() {
               duration: number;
               sets?: number;
               reps?: number;
-            }[]
+            }[],
+            updatedAt: new Date().toISOString(),
+            deleted: false,
+            version: 1
           };
           
           console.log(`📝 Saving workout activity log:`, workoutActivityLog);
@@ -1125,7 +1135,10 @@ function App() {
                     exerciseName: currentExercise.name,
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                     timestamp: new Date(),
-                    notes: `Completed ${totalSets} sets of ${totalReps} reps`
+                    notes: `Completed ${totalSets} sets of ${totalReps} reps`,
+                    updatedAt: new Date().toISOString(),
+                    deleted: false,
+                    version: 1
                   };
 
                   if (consentService.hasConsent()) {
@@ -1239,7 +1252,10 @@ function App() {
                 exerciseName: currentExercise.name,
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                 timestamp: new Date(),
-                notes: `Completed ${totalSets} sets of ${totalReps} reps`
+                notes: `Completed ${totalSets} sets of ${totalReps} reps`,
+                updatedAt: new Date().toISOString(),
+                deleted: false,
+                version: 1
               };
 
               if (consentService.hasConsent()) {
@@ -1259,7 +1275,10 @@ function App() {
               exerciseName: currentExercise.name,
               duration: targetTime,
               timestamp: new Date(),
-              notes: `Completed ${targetTime}s interval timer`
+              notes: `Completed ${targetTime}s interval timer`,
+              updatedAt: new Date().toISOString(),
+              deleted: false,
+              version: 1
             };
 
             if (consentService.hasConsent()) {
@@ -1474,12 +1493,41 @@ function App() {
 
   
 
+  // Early theme detection to prevent flash - check immediately
+  useEffect(() => {
+    // Immediate synchronous check for cached theme preference
+    const cachedTheme = localStorage.getItem('repcue-theme');
+    if (cachedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+    
+    // Also do async check for full settings
+    const checkEarlyTheme = async () => {
+      try {
+        const storedSettings = await storageService.getAppSettings();
+        if (storedSettings?.darkMode) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('repcue-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('repcue-theme', 'light');
+        }
+      } catch (error) {
+        console.error('Failed to load early theme setting:', error);
+      }
+    };
+    
+    checkEarlyTheme();
+  }, []);
+
   // Apply dark mode to document
   useEffect(() => {
     if (appSettings.darkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('repcue-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('repcue-theme', 'light');
     }
   }, [appSettings.darkMode]);
 
@@ -1597,6 +1645,14 @@ function App() {
                       appSettings={appSettings}
                       onUpdateSettings={updateAppSettings}
                     />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.AUTH_CALLBACK} 
+                element={
+                  <Suspense fallback={createRouteLoader('Auth Callback')}>
+                    <AuthCallbackPage />
                   </Suspense>
                 } 
               />

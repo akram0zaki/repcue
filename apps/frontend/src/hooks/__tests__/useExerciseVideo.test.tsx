@@ -5,8 +5,9 @@ import * as telemetry from '../../telemetry/videoTelemetry';
 import { ConsentService } from '../../services/consentService';
 import type { Exercise } from '../../types';
 import type { ExerciseMediaIndex } from '../../types/media';
+import { createMockExercise } from '../../test/testUtils';
 
-const exercise: Exercise = {
+const exercise: Exercise = createMockExercise({
   id: 'jumping-jacks',
   name: 'Jumping Jacks',
   description: 'A basic warmup move',
@@ -17,7 +18,7 @@ const exercise: Exercise = {
   isFavorite: false,
   tags: [],
   hasVideo: true
-};
+});
 
 const mediaIndex: ExerciseMediaIndex = {
   'jumping-jacks': { id: 'jumping-jacks', repsPerLoop: 1, fps: 30, video: { square: '/videos/jumping-jacks-square.mp4' } }

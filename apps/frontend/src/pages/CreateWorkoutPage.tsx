@@ -196,7 +196,9 @@ const CreateWorkoutPage: React.FC = () => {
         scheduledDays: scheduledDays,
         isActive: isActive,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date().toISOString(),
+        deleted: false,
+        version: 1
       };
 
       await storageService.saveWorkout(newWorkout);

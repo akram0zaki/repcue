@@ -7,6 +7,7 @@
     "choose": "Auswählen",
     "close": "Schließen",
     "loading": "Lädt...",
+    "optional": "optional",
     "on": "Ein",
     "off": "Aus",
     "notSupported": "Nicht unterstützt",
@@ -128,6 +129,9 @@
   "home": {
     "upcomingWorkout": "Anstehendes Workout",
     "tagline": "Ihr persönlicher Übungstimer",
+    "signInMessage": "Sie können sich ",
+    "signInLink": "anmelden",
+    "signInSuffix": ", um Ihren Fortschritt auf verschiedenen Geräten zu verfolgen.",
     "startNow": "Jetzt starten",
     "noScheduleTitle": "Kein Zeitplan gesetzt",
     "noScheduleBody": "Erstellen Sie einen Workout-Zeitplan, um Ihre anstehenden Workouts hier zu sehen",
