@@ -1383,6 +1383,10 @@ function App() {
     const initializeApp = async () => {
       if (hasConsent) {
         try {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🚀 Initializing app with consent granted');
+          }
+
           // Register service worker for offline functionality
           console.log('🚀 Initializing PWA capabilities...');
           const maybePromise = registerServiceWorker();
@@ -1451,11 +1455,19 @@ function App() {
           // Load app settings
           const storedSettings = await storageService.getAppSettings();
           
+          if (process.env.NODE_ENV === 'development') {
+            console.log('⚙️ Loaded stored settings:', storedSettings);
+          }
+          
           // Merge with defaults to handle new settings properties
           const settingsToSet = storedSettings ? {
             ...DEFAULT_APP_SETTINGS,
             ...storedSettings
           } : DEFAULT_APP_SETTINGS;
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('⚙️ Final settings to set:', settingsToSet);
+          }
           
           if (!storedSettings) {
             await storageService.saveAppSettings(DEFAULT_APP_SETTINGS);
@@ -1551,9 +1563,23 @@ useEffect(() => {
       document.documentElement.classList.add('dark');
     }
     
-    // Also do async check for full settings
+    // Also do async check for full settings - but handle consent properly
     const checkEarlyTheme = async () => {
       try {
+        // Check if consent exists first - bypass the service layer check
+        const consentStatus = consentService.hasConsent();
+        if (!consentStatus) {
+          // No consent, but check if we have a cached theme preference
+          const cachedTheme = localStorage.getItem('repcue-theme');
+          if (cachedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          return;
+        }
+
+        // We have consent, try to load full settings
         const storedSettings = await storageService.getAppSettings();
         if (storedSettings?.darkMode) {
           document.documentElement.classList.add('dark');
@@ -1564,6 +1590,13 @@ useEffect(() => {
         }
       } catch (error) {
         console.error('Failed to load early theme setting:', error);
+        // Fallback to cached theme
+        const cachedTheme = localStorage.getItem('repcue-theme');
+        if (cachedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
       }
     };
     
@@ -1579,7 +1612,16 @@ useEffect(() => {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('repcue-theme', 'light');
     }
-  }, [appSettings.darkMode]);
+
+    // Debug logging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🎨 Theme applied:', appSettings.darkMode ? 'dark' : 'light', {
+        hasConsent,
+        darkMode: appSettings.darkMode,
+        localStorage: localStorage.getItem('repcue-theme')
+      });
+    }
+  }, [appSettings.darkMode, hasConsent]);
 
   // Show consent banner if no consent
   if (!hasConsent) {

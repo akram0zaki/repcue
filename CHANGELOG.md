@@ -1,3 +1,14 @@
+## 2025-08-24 (5)
+
+### Fixed
+- **Data Persistence**: Resolved dark mode and favorites persistence issues on page refresh
+  - **Theme Persistence Robustness**: Enhanced early theme detection to handle consent edge cases and timing issues
+  - **App Settings Access**: Modified storage service to allow reading critical UI preferences (theme, settings) even during consent validation
+  - **Consent State Management**: Improved handling of consent state during app initialization to prevent data loss
+  - **Debug Logging**: Added development-mode logging for better troubleshooting of persistence issues
+  - **Fallback Mechanisms**: Enhanced error handling with localStorage fallbacks for critical app preferences
+  - **Race Condition Prevention**: Fixed timing issues between consent checking and settings loading
+
 ## 2025-08-24 (4)
 
 ### Fixed
