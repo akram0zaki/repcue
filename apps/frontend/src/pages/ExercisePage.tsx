@@ -342,7 +342,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         {selectedCategory === 'all' ? (
           // Show by category when viewing all
           <div className="space-y-6 sm:space-y-8">
-            {Object.entries(exercisesByCategory).map(([category, categoryExercises]) => {
+            {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
               if (categoryExercises.length === 0) return null;
               
               return (
