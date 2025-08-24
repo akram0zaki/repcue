@@ -59,6 +59,7 @@ vi.mock('../services/authService', () => {
       refreshToken: undefined
     }),
     onAuthStateChange: vi.fn(() => () => {}),
+    getCurrentSession: vi.fn().mockReturnValue(null),
     signInWithPassword: vi.fn(),
     signInWithMagicLink: vi.fn(),
     signInWithOAuth: vi.fn(),

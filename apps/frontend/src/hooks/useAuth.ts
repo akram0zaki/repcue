@@ -92,11 +92,11 @@ export function useAuth() {
 
   return {
     // State
-    ...authState,
+    ...(authState || {}),
     loading,
     
     // User info
-    user: authState.user,
+    user: authState?.user,
     session: authService.getCurrentSession(),
     
     // Methods

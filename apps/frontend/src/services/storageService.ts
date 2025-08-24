@@ -180,6 +180,13 @@ export class StorageService {
   }
 
   /**
+   * Get the database instance for sync operations
+   */
+  public getDatabase(): RepCueDatabase {
+    return this.db;
+  }
+
+  /**
    * Store exercise data
    */
   public async saveExercise(exercise: Exercise): Promise<void> {
@@ -873,7 +880,23 @@ export class StorageService {
         tablesToClaim.map(async ({ table, name }) => {
           try {
             // Claim records with null, undefined, or empty ownerId
-            const modifiedCount = await table.where('ownerId').anyOf([null, undefined, '']).modify(claimData);
+            // Handle empty string case
+            const emptyStringCount = await table.where('ownerId').equals('').modify(claimData);
+            
+            // Handle null/undefined cases by finding all records and filtering
+            const allRecords = await table.toArray();
+            const nullOrUndefinedRecords = allRecords.filter(record => 
+              record.ownerId == null || record.ownerId === undefined
+            );
+            
+            // Update null/undefined records
+            let nullUndefinedCount = 0;
+            for (const record of nullOrUndefinedRecords) {
+              await table.update(record.id, claimData);
+              nullUndefinedCount++;
+            }
+            
+            const modifiedCount = emptyStringCount + nullUndefinedCount;
             return { name, count: modifiedCount };
           } catch (error) {
             console.warn(`Failed to claim ${name}:`, error);

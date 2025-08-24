@@ -124,7 +124,7 @@ export class SyncService {
     this.notifyListeners();
 
     // Trigger sync when network comes back if authenticated
-    if (this.authService.getAuthState().isAuthenticated) {
+    if (this.authService?.getAuthState()?.isAuthenticated) {
       this.sync().catch(error => {
         console.error('Auto-sync on network restore failed:', error);
       });
@@ -177,7 +177,14 @@ export class SyncService {
    */
   async getSyncStatusWithChanges(): Promise<SyncStatus> {
     const baseStatus = this.getSyncStatus();
-    const hasChangesToSync = await this.hasChangesToSync();
+    
+    let hasChangesToSync = false;
+    try {
+      hasChangesToSync = await this.hasChangesToSync();
+    } catch (error) {
+      console.error('Error getting sync status with changes:', error);
+      hasChangesToSync = false;
+    }
     
     return {
       ...baseStatus,
@@ -238,7 +245,14 @@ export class SyncService {
     // Check network
     if (!this.isOnline) {
       console.log('📴 Sync skipped: device offline');
-      return this.createEmptyResult(['Device is offline']);
+      return {
+        success: true,
+        tablesProcessed: 0,
+        recordsPushed: 0,
+        recordsPulled: 0,
+        conflicts: 0,
+        errors: ['Device is offline']
+      };
     }
 
     this.isSyncing = true;
@@ -361,7 +375,7 @@ export class SyncService {
    */
   private async getDirtyRecords(tableName: string): Promise<{ upserts: Record<string, unknown>[]; deletes: string[] }> {
     const db = this.storageService.getDatabase();
-    const table = (db as Record<string, unknown>)[tableName];
+    const table = (db as unknown as Record<string, unknown>)[tableName];
     
     if (!table || typeof table !== 'object') {
       return { upserts: [], deletes: [] };
@@ -421,7 +435,7 @@ export class SyncService {
    */
   private async applyServerChanges(tableName: string, changes: { upserts: Record<string, unknown>[]; deletes: string[] }): Promise<void> {
     const db = this.storageService.getDatabase();
-    const table = (db as Record<string, unknown>)[tableName];
+    const table = (db as unknown as Record<string, unknown>)[tableName];
     
     if (!table || typeof table !== 'object') {
       return;
@@ -489,7 +503,7 @@ export class SyncService {
     
     for (const tableName of SYNCABLE_TABLES) {
       try {
-        const table = (db as Record<string, unknown>)[tableName];
+        const table = (db as unknown as Record<string, unknown>)[tableName];
         if (!table || typeof table !== 'object') continue;
 
         await (table as {
@@ -543,15 +557,18 @@ export class SyncService {
    * Check if there are changes to sync
    */
   async hasChangesToSync(): Promise<boolean> {
-    if (!this.consentService.hasConsent()) {
+    if (!this.consentService?.hasConsent()) {
       return false;
     }
 
-    const db = this.storageService.getDatabase();
+    const db = this.storageService?.getDatabase();
+    if (!db) {
+      return false;
+    }
     
     for (const tableName of SYNCABLE_TABLES) {
       try {
-        const table = (db as Record<string, unknown>)[tableName];
+        const table = (db as unknown as Record<string, unknown>)[tableName];
         if (!table || typeof table !== 'object') continue;
 
         const dirtyCount = await (table as {

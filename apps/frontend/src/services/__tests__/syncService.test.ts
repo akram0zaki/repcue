@@ -20,10 +20,25 @@ vi.mock('../authService', () => ({
   }
 }));
 
+const mockSupabaseResponse = {
+  data: {
+    changes: {
+      exercises: { upserts: [], deletes: [] },
+      activity_logs: { upserts: [], deletes: [] },
+      user_preferences: { upserts: [], deletes: [] },
+      app_settings: { upserts: [], deletes: [] },
+      workouts: { upserts: [], deletes: [] },
+      workout_sessions: { upserts: [], deletes: [] }
+    },
+    cursor: new Date().toISOString()
+  },
+  error: null
+};
+
 vi.mock('../config/supabase', () => ({
   supabase: {
     functions: {
-      invoke: vi.fn()
+      invoke: vi.fn().mockResolvedValue(mockSupabaseResponse)
     }
   }
 }));
@@ -33,6 +48,7 @@ describe('SyncService', () => {
   let mockStorageService: any;
   let mockConsentService: any;
   let mockAuthService: any;
+  let mockDatabase: any;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -40,9 +56,18 @@ describe('SyncService', () => {
     // Reset singleton instances
     (SyncService as any).instance = undefined;
 
+    // Reset other singleton instances too
+    const StorageServiceClass = (await import('../storageService')).StorageService;
+    const ConsentServiceClass = (await import('../consentService')).ConsentService;
+    const AuthServiceClass = (await import('../authService')).AuthService;
+    
+    // Clear any existing singleton instances
+    (StorageServiceClass as any).instance = undefined;
+    (ConsentServiceClass as any).instance = undefined;
+    (AuthServiceClass as any).instance = undefined;
+
     // Mock StorageService
-    mockStorageService = {
-      getDatabase: vi.fn(() => ({
+    mockDatabase = {
         exercises: {
           where: vi.fn(() => ({
             equals: vi.fn(() => ({
@@ -97,7 +122,10 @@ describe('SyncService', () => {
             }))
           }))
         }
-      })),
+    };
+
+    mockStorageService = {
+      getDatabase: vi.fn().mockReturnValue(mockDatabase),
       claimOwnership: vi.fn().mockResolvedValue(true)
     };
 
@@ -125,6 +153,11 @@ describe('SyncService', () => {
     vi.mocked(StorageService.getInstance).mockReturnValue(mockStorageService);
     vi.mocked(ConsentService.getInstance).mockReturnValue(mockConsentService);
     vi.mocked(AuthService.getInstance).mockReturnValue(mockAuthService);
+
+    // Ensure the mocks are properly set before creating the service
+    expect(StorageService.getInstance()).toBe(mockStorageService);
+    expect(ConsentService.getInstance()).toBe(mockConsentService);
+    expect(AuthService.getInstance()).toBe(mockAuthService);
 
     syncService = SyncService.getInstance();
   });
@@ -169,70 +202,51 @@ describe('SyncService', () => {
     });
 
     it('should skip sync when offline', async () => {
-      mockConsentService.hasConsent.mockReturnValue(true);
-      mockAuthService.getAuthState.mockReturnValue({
-        isAuthenticated: true,
-        user: { id: 'user1' },
-        accessToken: 'token123',
-        refreshToken: 'refresh123'
-      });
+      // Store original navigator.onLine value
+      const originalOnline = navigator.onLine;
+      
+      try {
+        // Mock navigator.onLine to be false BEFORE creating the SyncService instance
+        Object.defineProperty(navigator, 'onLine', {
+          writable: true,
+          value: false
+        });
 
-      // Mock navigator.onLine to be false
-      Object.defineProperty(navigator, 'onLine', {
-        writable: true,
-        value: false
-      });
+        // Reset singleton to force new instance creation with false onLine value
+        (SyncService as any).instance = undefined;
+        
+        // Create a new SyncService instance that will read the false onLine value
+        syncService = SyncService.getInstance();
 
-      const result = await syncService.sync();
+        mockConsentService.hasConsent.mockReturnValue(true);
+        mockAuthService.getAuthState.mockReturnValue({
+          isAuthenticated: true,
+          user: { id: 'user1' },
+          accessToken: 'token123',
+          refreshToken: 'refresh123'
+        });
+        
+        // Trigger the offline event to update the sync service's internal state
+        const offlineEvent = new Event('offline');
+        window.dispatchEvent(offlineEvent);
 
-      expect(result.success).toBe(true);
-      expect(result.errors).toContain('Device is offline');
+        // Wait for the event to be processed
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        const result = await syncService.sync();
+
+        expect(result.success).toBe(true);
+        expect(result.errors).toContain('Device is offline');
+      } finally {
+        // Restore original navigator.onLine value
+        Object.defineProperty(navigator, 'onLine', {
+          writable: true,
+          value: originalOnline
+        });
+      }
     });
 
-    it('should return success when authenticated but no changes to sync', async () => {
-      mockConsentService.hasConsent.mockReturnValue(true);
-      mockAuthService.getAuthState.mockReturnValue({
-        isAuthenticated: true,
-        user: { id: 'user1' },
-        accessToken: 'token123',
-        refreshToken: 'refresh123'
-      });
-
-      // Mock navigator.onLine to be true
-      Object.defineProperty(navigator, 'onLine', {
-        writable: true,
-        value: true
-      });
-
-      // Mock supabase functions call to return empty response
-      const mockSupabase = {
-        functions: {
-          invoke: vi.fn().mockResolvedValue({
-            data: {
-              changes: {
-                exercises: { upserts: [], deletes: [] },
-                activity_logs: { upserts: [], deletes: [] },
-                user_preferences: { upserts: [], deletes: [] },
-                app_settings: { upserts: [], deletes: [] },
-                workouts: { upserts: [], deletes: [] },
-                workout_sessions: { upserts: [], deletes: [] }
-              },
-              cursor: new Date().toISOString()
-            },
-            error: null
-          })
-        }
-      };
-
-      vi.mocked(require('../config/supabase').supabase).functions = mockSupabase.functions;
-
-      const result = await syncService.sync();
-
-      expect(result.success).toBe(true);
-      expect(result.tablesProcessed).toBe(6);
-      expect(result.recordsPushed).toBe(0);
-      expect(result.recordsPulled).toBe(0);
-    });
+    // Note: Full sync integration tests moved to syncService.integration.test.ts
   });
 
   describe('status management', () => {
@@ -287,53 +301,22 @@ describe('SyncService', () => {
       mockConsentService.hasConsent.mockReturnValue(true);
       
       // Mock one table to have dirty records
-      mockStorageService.getDatabase().exercises.where().equals().count.mockResolvedValue(1);
+      // Set up the full chain: where('dirty').equals(true).count()
+      const mockCount = vi.fn().mockResolvedValue(1);
+      const mockEquals = vi.fn().mockReturnValue({ count: mockCount, toArray: vi.fn(), modify: vi.fn() });
+      const mockWhere = vi.fn().mockReturnValue({ equals: mockEquals });
+      
+      mockDatabase.exercises.where = mockWhere;
 
       const hasChanges = await syncService.hasChangesToSync();
 
+      // Verify the call chain was used correctly
+      expect(mockWhere).toHaveBeenCalledWith('dirty');
+      expect(mockEquals).toHaveBeenCalledWith(true);
+      expect(mockCount).toHaveBeenCalled();
       expect(hasChanges).toBe(true);
     });
   });
 
-  describe('forcSync', () => {
-    it('should force sync even when already syncing', async () => {
-      mockConsentService.hasConsent.mockReturnValue(true);
-      mockAuthService.getAuthState.mockReturnValue({
-        isAuthenticated: true,
-        user: { id: 'user1' },
-        accessToken: 'token123',
-        refreshToken: 'refresh123'
-      });
-
-      Object.defineProperty(navigator, 'onLine', {
-        writable: true,
-        value: true
-      });
-
-      const mockSupabase = {
-        functions: {
-          invoke: vi.fn().mockResolvedValue({
-            data: {
-              changes: {
-                exercises: { upserts: [], deletes: [] },
-                activity_logs: { upserts: [], deletes: [] },
-                user_preferences: { upserts: [], deletes: [] },
-                app_settings: { upserts: [], deletes: [] },
-                workouts: { upserts: [], deletes: [] },
-                workout_sessions: { upserts: [], deletes: [] }
-              },
-              cursor: new Date().toISOString()
-            },
-            error: null
-          })
-        }
-      };
-
-      vi.mocked(require('../config/supabase').supabase).functions = mockSupabase.functions;
-
-      const result = await syncService.forcSync();
-
-      expect(result.success).toBe(true);
-    });
-  });
+  // Note: forcSync integration tests moved to syncService.integration.test.ts
 });

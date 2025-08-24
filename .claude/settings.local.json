@@ -10,7 +10,8 @@
       "Bash(pnpm dev:*)",
       "WebFetch(domain:localhost)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(del:*)"
     ],
     "deny": [],
     "ask": []
