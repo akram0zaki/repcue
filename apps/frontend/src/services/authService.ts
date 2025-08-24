@@ -85,6 +85,9 @@ export class AuthService {
 
       // Claim ownership of anonymous data on first sign-in
       await this.claimAnonymousData();
+
+      // Trigger sync after successful sign-in
+      this.triggerSync();
     } else {
       this.authState = {
         isAuthenticated: false,
@@ -118,10 +121,53 @@ export class AuthService {
     if (!this.authState.user?.id) return;
 
     try {
-      await storageService.claimOwnership(this.authState.user.id);
-      console.log('Successfully claimed ownership of anonymous data');
+      console.log('🔄 Starting anonymous data migration...');
+      const migrationResult = await storageService.claimOwnership(this.authState.user.id);
+      
+      if (migrationResult.success && migrationResult.recordsClaimed > 0) {
+        console.log(`✅ Migration successful! Claimed ${migrationResult.recordsClaimed} records:`, migrationResult.tableStats);
+        
+        // Show migration success notification
+        this.showMigrationSuccess(migrationResult);
+      } else if (migrationResult.recordsClaimed === 0) {
+        console.log('ℹ️ No anonymous data found to migrate (new user or already migrated)');
+      } else {
+        console.warn('⚠️ Migration encountered issues:', migrationResult.error);
+      }
     } catch (error) {
-      console.warn('Failed to claim ownership of anonymous data:', error);
+      console.error('❌ Failed to claim ownership of anonymous data:', error);
+    }
+  }
+
+  /**
+   * Show migration success feedback to user
+   */
+  private showMigrationSuccess(migrationResult: { recordsClaimed: number; tableStats: Record<string, number> }): void {
+    // Create a custom event to notify the UI about successful migration
+    const migrationEvent = new CustomEvent('data-migration-success', {
+      detail: {
+        recordsClaimed: migrationResult.recordsClaimed,
+        tableStats: migrationResult.tableStats,
+        timestamp: new Date().toISOString()
+      }
+    });
+    
+    window.dispatchEvent(migrationEvent);
+  }
+
+  /**
+   * Trigger sync after authentication changes
+   */
+  private triggerSync(): void {
+    try {
+      // Dynamically import and trigger sync to avoid circular dependencies
+      import('./syncService').then(({ syncService }) => {
+        syncService.sync().catch(error => {
+          console.warn('Post-login sync failed:', error);
+        });
+      });
+    } catch (error) {
+      console.warn('Failed to trigger sync:', error);
     }
   }
 

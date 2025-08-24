@@ -835,9 +835,19 @@ export class StorageService {
   /**
    * Claim ownership of anonymous records during first sync
    */
-  public async claimOwnership(ownerId: string): Promise<void> {
+  public async claimOwnership(ownerId: string): Promise<{
+    success: boolean;
+    recordsClaimed: number;
+    tableStats: Record<string, number>;
+    error?: string;
+  }> {
     if (!this.canStoreData()) {
-      return;
+      return {
+        success: false,
+        recordsClaimed: 0,
+        tableStats: {},
+        error: 'Data storage not available'
+      };
     }
 
     try {
@@ -849,18 +859,52 @@ export class StorageService {
         version: 1 
       };
 
-      await Promise.all([
-        this.db.exercises.where('ownerId').equals('').modify(claimData),
-        this.db.activityLogs.where('ownerId').equals('').modify(claimData),
-        this.db.userPreferences.where('ownerId').equals('').modify(claimData),
-        this.db.appSettings.where('ownerId').equals('').modify(claimData),
-        this.db.workouts.where('ownerId').equals('').modify(claimData),
-        this.db.workoutSessions.where('ownerId').equals('').modify(claimData)
-      ]);
+      // Define tables to claim with friendly names
+      const tablesToClaim = [
+        { table: this.db.exercises, name: 'exercises' },
+        { table: this.db.activityLogs, name: 'activityLogs' },
+        { table: this.db.userPreferences, name: 'userPreferences' },
+        { table: this.db.appSettings, name: 'appSettings' },
+        { table: this.db.workouts, name: 'workouts' },
+        { table: this.db.workoutSessions, name: 'workoutSessions' }
+      ];
 
-      console.log(`Claimed ownership of anonymous records for user ${ownerId}`);
+      const results = await Promise.all(
+        tablesToClaim.map(async ({ table, name }) => {
+          try {
+            // Claim records with null, undefined, or empty ownerId
+            const modifiedCount = await table.where('ownerId').anyOf([null, undefined, '']).modify(claimData);
+            return { name, count: modifiedCount };
+          } catch (error) {
+            console.warn(`Failed to claim ${name}:`, error);
+            return { name, count: 0 };
+          }
+        })
+      );
+
+      const tableStats: Record<string, number> = {};
+      let totalClaimed = 0;
+
+      results.forEach(({ name, count }) => {
+        tableStats[name] = count;
+        totalClaimed += count;
+      });
+
+      console.log(`✅ Successfully claimed ${totalClaimed} anonymous records for user ${ownerId}:`, tableStats);
+
+      return {
+        success: true,
+        recordsClaimed: totalClaimed,
+        tableStats,
+      };
     } catch (error) {
-      console.warn('Failed to claim ownership of records:', error);
+      console.error('Failed to claim ownership of records:', error);
+      return {
+        success: false,
+        recordsClaimed: 0,
+        tableStats: {},
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
     }
   }
 

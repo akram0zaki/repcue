@@ -9,7 +9,8 @@
       "Bash(npx eslint:*)",
       "Bash(pnpm dev:*)",
       "WebFetch(domain:localhost)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

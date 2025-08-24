@@ -16,21 +16,62 @@ vi.mock('../services/storageService', () => {
     getWorkoutSessions: vi.fn().mockResolvedValue([]),
     getActivityLogs: vi.fn().mockResolvedValue([]),
     getAppSettings: vi.fn(),
-  saveExercise: vi.fn().mockResolvedValue(undefined),
-  saveExercises: vi.fn().mockResolvedValue(undefined),
+    saveExercise: vi.fn().mockResolvedValue(undefined),
+    saveExercises: vi.fn().mockResolvedValue(undefined),
     saveActivityLog: vi.fn(),
     saveAppSettings: vi.fn().mockResolvedValue(undefined),
-    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined)
+    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
+    getDatabase: vi.fn(() => ({})),
+    claimOwnership: vi.fn().mockResolvedValue(true)
   };
-  return { storageService: api };
+  return { 
+    StorageService: {
+      getInstance: vi.fn(() => api)
+    },
+    storageService: api 
+  };
 });
 
-vi.mock('../services/consentService', () => ({
-  consentService: {
+
+
+vi.mock('../services/consentService', () => {
+  const mockConsentInstance = {
     hasConsent: vi.fn().mockReturnValue(true),
     getConsentData: vi.fn().mockReturnValue({ hasConsented: true })
-  }
-}));
+  };
+
+  return {
+    ConsentService: {
+      getInstance: vi.fn(() => mockConsentInstance)
+    },
+    consentService: mockConsentInstance
+  };
+});
+
+
+
+vi.mock('../services/authService', () => {
+  const mockAuthInstance = {
+    getAuthState: vi.fn().mockReturnValue({
+      isAuthenticated: false,
+      user: undefined,
+      accessToken: undefined,
+      refreshToken: undefined
+    }),
+    onAuthStateChange: vi.fn(() => () => {}),
+    signInWithPassword: vi.fn(),
+    signInWithMagicLink: vi.fn(),
+    signInWithOAuth: vi.fn(),
+    signOut: vi.fn()
+  };
+
+  return {
+    AuthService: {
+      getInstance: vi.fn(() => mockAuthInstance)
+    },
+    authService: mockAuthInstance
+  };
+});
 
 vi.mock('../services/audioService', () => ({
   audioService: {

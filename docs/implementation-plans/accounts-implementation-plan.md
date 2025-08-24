@@ -173,17 +173,17 @@ Row Level Security (if using Postgres/Supabase):
 -   ✅ Add Auth Store + UI.
 -   ✅ Persist tokens securely.
 
-### Phase 2 --- Sync API
+### ✅ Phase 2 --- Sync API [COMPLETED]
 
--   Implement `/sync` endpoint (validate JWT, accept/push rows, build
+-   ✅ Implement `/sync` endpoint (validate JWT, accept/push rows, build
     response).
--   Client SyncService: push dirty → pull → mark clean → update cursor.
--   Trigger on login, foreground, network regain, periodic.
--   Add sync indicator.
+-   ✅ Client SyncService: push dirty → pull → mark clean → update cursor.
+-   ✅ Trigger on login, foreground, network regain, periodic.
+-   ✅ Add sync indicator.
 
-### Phase 3 --- Migration: Signup without losing data
+### ✅ Phase 3 --- Migration: Signup without losing data [COMPLETED]
 
--   On first login: claim local data → push → resolve conflicts →
+-   ✅ On first login: claim local data → push → resolve conflicts →
     banner.
 
 ### Phase 4 --- Security & Privacy

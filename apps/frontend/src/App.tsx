@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import { consentService } from './services/consentService';
 import { storageService } from './services/storageService';
 import { audioService } from './services/audioService';
+import { syncService } from './services/syncService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import ConsentBanner from './components/ConsentBanner';
+import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import { registerServiceWorker } from './utils/serviceWorker';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
@@ -96,6 +98,48 @@ const TimerPageWrapper: React.FC<{
   }, [timerState.workoutMode, navigate, props]);
 
   return <TimerPage {...props} onResetTimer={handleResetTimer} />;
+};
+
+// Setup sync triggers for various app lifecycle events
+const setupSyncTriggers = () => {
+  // Trigger sync on page visibility change (app foreground)
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      console.log('📱 App came to foreground - triggering sync');
+      syncService.sync().catch(error => {
+        console.warn('Foreground sync failed:', error);
+      });
+    }
+  };
+
+  // Setup periodic sync (every 5 minutes when active)
+  let syncInterval: NodeJS.Timeout | null = null;
+  const setupPeriodicSync = () => {
+    if (syncInterval) {
+      clearInterval(syncInterval);
+    }
+    
+    syncInterval = setInterval(() => {
+      if (!document.hidden) {
+        console.log('⏰ Periodic sync triggered');
+        syncService.sync().catch(error => {
+          console.warn('Periodic sync failed:', error);
+        });
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  };
+
+  // Setup event listeners
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  setupPeriodicSync();
+
+  // Cleanup function
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    if (syncInterval) {
+      clearInterval(syncInterval);
+    }
+  };
 };
 
 function App() {
@@ -1429,18 +1473,24 @@ function App() {
             if (lastExercise) {
               handleSetSelectedExercise(lastExercise, settingsToSet);
             }
-          }
-        } catch (error) {
-          console.error('Failed to initialize app data:', error);
-          // Fallback to initial exercises
-          setExercises(INITIAL_EXERCISES);
-        }
+                  }
+      } catch (error) {
+        console.error('Failed to initialize app data:', error);
+        // Fallback to initial exercises
+        setExercises(INITIAL_EXERCISES);
       }
-      setIsLoading(false);
-    };
+    }
+    setIsLoading(false);
+  };
 
-    initializeApp();
-  }, [hasConsent, handleSetSelectedExercise]);
+  initializeApp();
+}, [hasConsent, handleSetSelectedExercise]);
+
+// Cleanup sync triggers on unmount
+useEffect(() => {
+  const cleanup = setupSyncTriggers();
+  return cleanup;
+}, []);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1555,6 +1605,7 @@ function App() {
     canUseBrowserRouter ? (
       <Router>
       <ChunkErrorBoundary>
+        <MigrationSuccessBanner />
         <AppShell>
           <Suspense fallback={createRouteLoader('page')}>
             <Routes>

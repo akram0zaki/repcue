@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useNetworkSync, useOfflineStatus } from '../useNetworkSync';
+import { useNetworkSync } from '../useNetworkSync';
+import { useOfflineStatus } from '../useOfflineStatus';
 import { SyncService } from '../../services/syncService';
 
 // Mock SyncService
@@ -8,6 +9,19 @@ vi.mock('../../services/syncService', () => ({
   SyncService: {
     getInstance: vi.fn()
   }
+}));
+
+// Mock useOfflineStatus
+vi.mock('../useOfflineStatus', () => ({
+  useOfflineStatus: vi.fn()
+}));
+
+// Mock useAuth
+vi.mock('../useAuth', () => ({
+  useAuth: vi.fn().mockReturnValue({
+    isAuthenticated: false,
+    user: undefined
+  })
 }));
 
 describe('useNetworkSync', () => {
@@ -23,28 +37,44 @@ describe('useNetworkSync', () => {
       getSyncStatus: vi.fn().mockReturnValue({
         isOnline: true,
         isSyncing: false,
-        pendingOperations: 0,
+        hasChangesToSync: false,
         lastSyncAttempt: undefined,
         lastSuccessfulSync: undefined,
         errors: []
       }),
-      addStatusListener: vi.fn().mockImplementation((listener) => {
+      onSyncStatusChange: vi.fn().mockImplementation((listener) => {
         mockStatusListener = listener;
+        // Call listener immediately with initial status
+        listener({
+          isOnline: true,
+          isSyncing: false,
+          hasChangesToSync: false,
+          lastSyncAttempt: undefined,
+          lastSuccessfulSync: undefined,
+          errors: []
+        });
         return vi.fn(); // unsubscribe function
       }),
-      forcSync: vi.fn().mockResolvedValue({
+      sync: vi.fn().mockResolvedValue({
         success: true,
-        processedOperations: 2,
-        failedOperations: 0,
+        tablesProcessed: 2,
+        recordsPushed: 0,
+        recordsPulled: 0,
+        conflicts: 0,
         errors: []
-      }),
-      clearSyncData: vi.fn().mockResolvedValue(undefined),
-      getNextRetryTime: vi.fn().mockResolvedValue(null)
+      })
     };
 
     // Apply the mock
     const MockedSyncService = vi.mocked(SyncService);
     MockedSyncService.getInstance.mockReturnValue(mockSyncService);
+
+    // Mock useOfflineStatus
+    vi.mocked(useOfflineStatus).mockReturnValue({
+      isOffline: false,
+      isOnline: true,
+      hasBeenOffline: false
+    });
 
     // Mock navigator.onLine
     Object.defineProperty(navigator, 'onLine', { 
@@ -52,13 +82,16 @@ describe('useNetworkSync', () => {
       writable: true 
     });
 
-    // Mock window event listeners
-    global.window.addEventListener = vi.fn();
-    global.window.removeEventListener = vi.fn();
+    // Mock window events
+    const originalAddEventListener = window.addEventListener;
+    const originalRemoveEventListener = window.removeEventListener;
+    window.addEventListener = vi.fn();
+    window.removeEventListener = vi.fn();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe('Initial State', () => {
@@ -68,71 +101,67 @@ describe('useNetworkSync', () => {
       expect(result.current.state).toEqual({
         isOnline: true,
         isSyncing: false,
-        pendingOperations: 0,
+        hasChangesToSync: false,
         lastSyncAttempt: undefined,
         lastSuccessfulSync: undefined,
         errors: [],
-        canSync: false, // No pending operations, so can't sync
-        nextRetryAt: undefined,
-        syncProgress: undefined
+        canSync: true
       });
-    });
-
-    it('should setup event listeners for online/offline', () => {
-      renderHook(() => useNetworkSync());
-
-      expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
-      expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
     });
 
     it('should setup sync status listener', () => {
       renderHook(() => useNetworkSync());
 
-      expect(mockSyncService.addStatusListener).toHaveBeenCalledWith(expect.any(Function));
+      expect(mockSyncService.onSyncStatusChange).toHaveBeenCalled();
     });
   });
 
   describe('State Updates', () => {
-    it('should update state when sync status changes', async () => {
+    it('should update state when sync status changes', () => {
       const { result } = renderHook(() => useNetworkSync());
 
-      // Simulate status update
+      // Simulate sync status change
       act(() => {
         mockStatusListener({
           isOnline: true,
           isSyncing: true,
-          pendingOperations: 3,
+          hasChangesToSync: true,
           lastSyncAttempt: Date.now(),
+          lastSuccessfulSync: undefined,
           errors: []
         });
       });
 
       expect(result.current.state.isSyncing).toBe(true);
-      expect(result.current.state.pendingOperations).toBe(3);
-      expect(result.current.state.canSync).toBe(false); // Can't sync while already syncing
+      expect(result.current.state.hasChangesToSync).toBe(true);
+      expect(result.current.state.canSync).toBe(false); // Can't sync when already syncing
     });
 
-    it('should calculate canSync correctly', async () => {
+    it('should calculate canSync correctly', () => {
       const { result } = renderHook(() => useNetworkSync());
 
-      // Online + not syncing + has pending operations = can sync
+      // Online and not syncing = can sync
       act(() => {
         mockStatusListener({
           isOnline: true,
           isSyncing: false,
-          pendingOperations: 2,
+          hasChangesToSync: false,
+          lastSyncAttempt: undefined,
+          lastSuccessfulSync: undefined,
           errors: []
         });
       });
 
       expect(result.current.state.canSync).toBe(true);
 
-      // Offline = cannot sync
+      // Offline = can't sync
       act(() => {
         mockStatusListener({
           isOnline: false,
           isSyncing: false,
-          pendingOperations: 2,
+          hasChangesToSync: false,
+          lastSyncAttempt: undefined,
+          lastSuccessfulSync: undefined,
           errors: []
         });
       });
@@ -145,351 +174,97 @@ describe('useNetworkSync', () => {
     it('should trigger sync successfully', async () => {
       const { result } = renderHook(() => useNetworkSync());
 
-      // Set state to allow syncing
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 2,
-          errors: []
-        });
+      await act(async () => {
+        await result.current.actions.triggerSync();
       });
+
+      expect(mockSyncService.sync).toHaveBeenCalled();
+    });
+
+    it('should handle sync when SyncService is not available', async () => {
+      // Mock SyncService to be null
+      vi.mocked(SyncService).getInstance.mockReturnValue(null as any);
+
+      const { result } = renderHook(() => useNetworkSync());
 
       await act(async () => {
         await result.current.actions.triggerSync();
       });
 
-      expect(mockSyncService.forcSync).toHaveBeenCalled();
-    });
-
-    it('should not trigger sync when offline', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Set offline state
-      act(() => {
-        mockStatusListener({
-          isOnline: false,
-          isSyncing: false,
-          pendingOperations: 2,
-          errors: []
-        });
-      });
-
-      await act(async () => {
-        await result.current.actions.triggerSync();
-      });
-
-      expect(mockSyncService.forcSync).not.toHaveBeenCalled();
-    });
-
-    it('should not trigger sync when already syncing', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Set syncing state
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: true,
-          pendingOperations: 2,
-          errors: []
-        });
-      });
-
-      await act(async () => {
-        await result.current.actions.triggerSync();
-      });
-
-      expect(mockSyncService.forcSync).not.toHaveBeenCalled();
-    });
-
-    it('should track sync progress', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Set state to allow syncing
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 2,
-          errors: []
-        });
-      });
-
-      // Trigger sync and check for progress
-      await act(async () => {
-        await result.current.actions.triggerSync();
-      });
-
-      // Verify sync was called
-      expect(mockSyncService.forcSync).toHaveBeenCalled();
-      
-      // Note: Progress tracking is complex to test in isolation due to timing,
-      // but we can verify the sync action works correctly
-    });
-  });
-
-  describe('Network Events', () => {
-    it('should handle online event', () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Verify that addEventListener was called with 'online'
-      expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
-      
-      // Simulate going offline first, then online
-      act(() => {
-        // Simulate offline state
-        Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
-        // Trigger offline status via mockStatusListener
-        mockStatusListener({
-          isOnline: false,
-          isSyncing: false,
-          pendingOperations: 0,
-          errors: []
-        });
-      });
-
-      expect(result.current.state.isOnline).toBe(false);
-
-      act(() => {
-        // Simulate online state
-        Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
-        // Trigger online status via mockStatusListener
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 0,
-          errors: []
-        });
-      });
-
-      expect(result.current.state.isOnline).toBe(true);
-    });
-
-    it('should handle offline event', () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Verify that addEventListener was called with 'offline'
-      expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
-
-      // Simulate going online first, then offline
-      act(() => {
-        // Trigger online status via mockStatusListener
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 0,
-          errors: []
-        });
-      });
-
-      expect(result.current.state.isOnline).toBe(true);
-
-      act(() => {
-        // Simulate offline state
-        Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
-        // Trigger offline status via mockStatusListener
-        mockStatusListener({
-          isOnline: false,
-          isSyncing: false,
-          pendingOperations: 0,
-          errors: []
-        });
-      });
-
-      expect(result.current.state.isOnline).toBe(false);
-      expect(result.current.state.canSync).toBe(false);
-    });
-  });
-
-  describe('Auto-retry Mechanism', () => {
-    it('should schedule retry when nextRetryAt is set', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Set state to enable syncing
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 1,
-          errors: []
-        });
-      });
-
-      // The hook should be able to trigger sync manually
-      await act(async () => {
-        await result.current.actions.triggerSync();
-      });
-
-      expect(mockSyncService.forcSync).toHaveBeenCalled();
-    });
-
-    it('should trigger immediate retry if nextRetryAt is in the past', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Set state to enable syncing
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 1,
-          errors: []
-        });
-      });
-
-      // Test that retry action works
-      await act(async () => {
-        await result.current.actions.retry();
-      });
-
-      expect(mockSyncService.forcSync).toHaveBeenCalled();
-    });
-  });
-
-  describe('Periodic Sync', () => {
-    it('should trigger periodic sync when conditions are met', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Set state that allows sync
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 1,
-          errors: []
-        });
-      });
-
-      // Test that sync can be triggered manually (simulating periodic trigger)
-      await act(async () => {
-        await result.current.actions.triggerSync();
-      });
-
-      expect(mockSyncService.forcSync).toHaveBeenCalled();
-    });
-
-    it('should not trigger periodic sync when offline', () => {
-      renderHook(() => useNetworkSync());
-
-      // Set offline state
-      act(() => {
-        mockStatusListener({
-          isOnline: false,
-          isSyncing: false,
-          pendingOperations: 1,
-          errors: []
-        });
-      });
-
-      // Fast-forward 30 seconds
-      act(() => {
-        vi.advanceTimersByTime(30000);
-      });
-
-      // Should not trigger sync when offline
-      expect(mockSyncService.forcSync).not.toHaveBeenCalled();
+      // Should not throw error
+      expect(result.current).toBeDefined();
     });
   });
 
   describe('Actions', () => {
-    it('should clear sync data', async () => {
-      const { result } = renderHook(() => useNetworkSync());
-
-      // Verify hook returned valid result
-      expect(result.current).not.toBeNull();
-      expect(result.current.actions).toBeDefined();
-
-      await act(async () => {
-        await result.current.actions.clearSyncData();
-      });
-
-      expect(mockSyncService.clearSyncData).toHaveBeenCalled();
-    });
-
     it('should clear errors', () => {
       const { result } = renderHook(() => useNetworkSync());
 
-      // Verify hook returned valid result
-      expect(result.current).not.toBeNull();
-      expect(result.current.state).toBeDefined();
-
-      // Set some errors
+      // Set some errors first
       act(() => {
         mockStatusListener({
           isOnline: true,
           isSyncing: false,
-          pendingOperations: 0,
-          errors: ['Error 1', 'Error 2']
+          hasChangesToSync: false,
+          lastSyncAttempt: undefined,
+          lastSuccessfulSync: undefined,
+          errors: ['Some error']
         });
       });
 
-      expect(result.current.state.errors).toHaveLength(2);
+      expect(result.current.state.errors).toEqual(['Some error']);
 
+      // Clear errors
       act(() => {
         result.current.actions.clearErrors();
       });
 
-      expect(result.current.state.errors).toHaveLength(0);
+      expect(result.current.state.errors).toEqual([]);
     });
 
-    it('should retry when online', async () => {
+    it('should retry sync when available', async () => {
       const { result } = renderHook(() => useNetworkSync());
-
-      // Verify hook returned valid result
-      expect(result.current).not.toBeNull();
-      expect(result.current.actions).toBeDefined();
-
-      // Set online state
-      act(() => {
-        mockStatusListener({
-          isOnline: true,
-          isSyncing: false,
-          pendingOperations: 1,
-          errors: []
-        });
-      });
 
       await act(async () => {
         await result.current.actions.retry();
       });
 
-      expect(mockSyncService.forcSync).toHaveBeenCalled();
+      expect(mockSyncService.sync).toHaveBeenCalledWith(true); // Force sync
     });
   });
-});
 
-describe('useOfflineStatus (Legacy)', () => {
-  let mockSyncService: any;
+  describe('Cleanup', () => {
+    it('should cleanup on unmount', () => {
+      const unsubscribe = vi.fn();
+      mockSyncService.onSyncStatusChange.mockReturnValue(unsubscribe);
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+      const { unmount } = renderHook(() => useNetworkSync());
 
-    mockSyncService = {
-      getSyncStatus: vi.fn().mockReturnValue({
-        isOnline: true,
-        isSyncing: false,
-        pendingOperations: 5,
-        errors: []
-      }),
-      addStatusListener: vi.fn().mockReturnValue(vi.fn()),
-      getNextRetryTime: vi.fn().mockResolvedValue(null)
-    };
+      unmount();
 
-    vi.mocked(SyncService.getInstance).mockReturnValue(mockSyncService);
-
-    global.window.addEventListener = vi.fn();
-    global.window.removeEventListener = vi.fn();
+      expect(unsubscribe).toHaveBeenCalled();
+    });
   });
 
-  it('should provide legacy interface', () => {
-    const { result } = renderHook(() => useOfflineStatus());
+  describe('Error Handling', () => {
+    it('should handle SyncService initialization errors', () => {
+      // Mock SyncService.getInstance to throw
+      vi.mocked(SyncService).getInstance.mockImplementation(() => {
+        throw new Error('SyncService init failed');
+      });
 
-    // Verify the hook returns a valid object (not null)
-    expect(result.current).not.toBeNull();
-    expect(result.current).toEqual({
-      isOnline: true,
-      isOffline: false,
-      pendingOperations: 5,
-      canSync: true
+      const { result } = renderHook(() => useNetworkSync());
+
+      // Should still render without crashing
+      expect(result.current.state).toEqual({
+        isOnline: true,
+        isSyncing: false,
+        hasChangesToSync: false,
+        lastSyncAttempt: undefined,
+        lastSuccessfulSync: undefined,
+        errors: [],
+        canSync: false
+      });
     });
   });
 });

@@ -8,7 +8,7 @@ import { useOnboarding } from '../hooks/useOnboarding';
 import Navigation from './Navigation';
 import InstallPrompt from './InstallPrompt';
 import OnboardingFlow from './OnboardingFlow';
-import OfflineBanner from './OfflineBanner';
+import SyncStatusBanner from './SyncStatusBanner';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -131,8 +131,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         {t('a11y.skipToMain', { defaultValue: 'Skip to main content' })}
       </a>
 
-      {/* Network status banner */}
-      <OfflineBanner />
+      {/* Network and sync status banner */}
+      <SyncStatusBanner />
 
       {/* Install prompt integration */}
       {installPrompt.canShowPrompt && !platform.isStandalone && (

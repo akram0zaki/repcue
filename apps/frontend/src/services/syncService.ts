@@ -1,12 +1,14 @@
-import { QueueService, type QueueOperation } from './queueService';
 import { StorageService } from './storageService';
 import { ConsentService } from './consentService';
-import type { Exercise, ActivityLog, AppSettings } from '../types';
+import { AuthService } from './authService';
+import { supabase } from '../config/supabase';
 
 export interface SyncResult {
   success: boolean;
-  processedOperations: number;
-  failedOperations: number;
+  tablesProcessed: number;
+  recordsPushed: number;
+  recordsPulled: number;
+  conflicts: number;
   errors: string[];
 }
 
@@ -15,34 +17,69 @@ export interface SyncStatus {
   isSyncing: boolean;
   lastSyncAttempt?: number;
   lastSuccessfulSync?: number;
-  pendingOperations: number;
+  hasChangesToSync: boolean;
   errors: string[];
 }
 
+export interface SyncRequest {
+  since?: string;
+  tables: {
+    [tableName: string]: {
+      upserts: Record<string, unknown>[];
+      deletes: string[];
+    };
+  };
+  clientInfo?: {
+    appVersion: string;
+    deviceId: string;
+  };
+}
+
+export interface SyncResponse {
+  changes: {
+    [tableName: string]: {
+      upserts: Record<string, unknown>[];
+      deletes: string[];
+    };
+  };
+  cursor: string;
+}
+
+// List of syncable tables in the order they should be processed
+const SYNCABLE_TABLES = [
+  'user_preferences',
+  'app_settings', 
+  'exercises',
+  'workouts',
+  'activity_logs',
+  'workout_sessions'
+] as const;
+
 export class SyncService {
   private static instance: SyncService;
-  private queueService: QueueService;
   private storageService: StorageService;
   private consentService: ConsentService;
+  private authService: AuthService;
   private isOnline: boolean = navigator.onLine;
   private isSyncing: boolean = false;
   private syncInProgress: Promise<SyncResult> | null = null;
   private lastSyncAttempt?: number;
   private lastSuccessfulSync?: number;
+  private lastSyncCursor?: string;
   private syncErrors: string[] = [];
   private listeners: ((status: SyncStatus) => void)[] = [];
 
   private constructor() {
-    this.queueService = QueueService.getInstance();
     this.storageService = StorageService.getInstance();
     this.consentService = ConsentService.getInstance();
+    this.authService = AuthService.getInstance();
 
     // Listen for online/offline events
     window.addEventListener('online', this.handleOnline.bind(this));
     window.addEventListener('offline', this.handleOffline.bind(this));
 
-    // Register service worker for background sync if available
-    this.registerBackgroundSync();
+    // Load last sync cursor from localStorage
+    this.loadSyncCursor();
   }
 
   public static getInstance(): SyncService {
@@ -53,334 +90,72 @@ export class SyncService {
   }
 
   /**
-   * Register service worker background sync
+   * Load last sync cursor from localStorage
    */
-  private async registerBackgroundSync(): Promise<void> {
-    // Guard for jsdom/tests where ServiceWorkerRegistration may be undefined
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SWR: any = (window as any).ServiceWorkerRegistration;
-    if ('serviceWorker' in navigator && SWR && 'prototype' in SWR && 'sync' in SWR.prototype) {
-      try {
-        const registration = await navigator.serviceWorker.ready;
-        console.log('🔄 Background sync capability detected');
-        
-        // Register for background sync event (requires proper service worker setup)
-        if ('sync' in registration && (registration as ServiceWorkerRegistration & { sync?: { register: (tag: string) => Promise<void> } }).sync) {
-          await (registration as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }).sync.register('background-sync');
-          console.log('📱 Background sync registered');
-        }
-      } catch (error) {
-        console.warn('Background sync registration failed:', error);
+  private loadSyncCursor(): void {
+    try {
+      const stored = localStorage.getItem('repcue_last_sync_cursor');
+      if (stored) {
+        this.lastSyncCursor = stored;
       }
-    } else {
-      console.log('📱 Background sync not supported, using manual sync');
+    } catch (error) {
+      console.warn('Failed to load sync cursor:', error);
     }
   }
 
   /**
-   * Handle coming online
+   * Save sync cursor to localStorage
    */
-  private async handleOnline(): Promise<void> {
-    console.log('🌐 Device came online');
-    // Defensive: ensure consentService exists (sequential tests may dispatch before ctor completes)
-    if (!this.consentService) {
-      try { this.consentService = ConsentService.getInstance(); } catch { /* noop */ }
+  private saveSyncCursor(cursor: string): void {
+    try {
+      localStorage.setItem('repcue_last_sync_cursor', cursor);
+      this.lastSyncCursor = cursor;
+    } catch (error) {
+      console.warn('Failed to save sync cursor:', error);
     }
+  }
+
+  /**
+   * Handle network coming back online
+   */
+  private handleOnline(): void {
+    console.log('📶 Network connected - scheduling sync');
     this.isOnline = true;
     this.notifyListeners();
 
-    // Automatically sync when coming online
-    await this.sync();
+    // Trigger sync when network comes back if authenticated
+    if (this.authService.getAuthState().isAuthenticated) {
+      this.sync().catch(error => {
+        console.error('Auto-sync on network restore failed:', error);
+      });
+    }
   }
 
   /**
-   * Handle going offline
+   * Handle network going offline
    */
   private handleOffline(): void {
-    console.log('📴 Device went offline');
+    console.log('📵 Network disconnected');
     this.isOnline = false;
     this.notifyListeners();
   }
 
   /**
-   * Add operation to sync queue
+   * Add a listener for sync status changes
    */
-  async queueOperation(
-    type: QueueOperation['type'],
-    endpoint: string,
-  data?: unknown,
-    options?: {
-      priority?: 'high' | 'medium' | 'low';
-      maxRetries?: number;
-      metadata?: QueueOperation['metadata'];
-    }
-  ): Promise<number> {
-    const operation: Omit<QueueOperation, 'id' | 'timestamp' | 'retryCount' | 'nextRetryAt' | 'maxRetries'> & { maxRetries?: number } = {
-      type,
-      endpoint,
-      data,
-      priority: options?.priority || 'medium',
-      maxRetries: options?.maxRetries,
-      metadata: options?.metadata
-    };
-
-    const operationId = await this.queueService.enqueue(operation);
-    console.log(`📋 Operation queued for sync: ${type} ${endpoint}`, { operationId });
-
-    this.notifyListeners();
-
-    // Try immediate sync if online
-    if (this.isOnline && !this.isSyncing) {
-      this.sync().catch(error => {
-        console.warn('Immediate sync failed:', error);
-      });
-    }
-
-    return operationId;
-  }
-
-  /**
-   * Process sync operations
-   */
-  async sync(force: boolean = false): Promise<SyncResult> {
-    // Ensure consent service is available and safe to call
-    let cs: ConsentService | null = this.consentService ?? null;
-    try {
-      if (!cs) cs = ConsentService.getInstance();
-      this.consentService = cs as ConsentService;
-    } catch {
-      cs = null;
-    }
-    if (!cs || !cs.hasConsent()) {
-      console.log('🚫 Sync skipped: no storage consent');
-      return {
-        success: true,
-        processedOperations: 0,
-        failedOperations: 0,
-        errors: []
-      };
-    }
-
-    if (this.isSyncing && !force) {
-      console.log('🔄 Sync already in progress, returning existing promise');
-      return this.syncInProgress || this.createEmptyResult();
-    }
-
-    if (!this.isOnline) {
-      console.log('📴 Sync skipped: device offline');
-      return this.createEmptyResult(['Device is offline']);
-    }
-
-    this.isSyncing = true;
-    this.lastSyncAttempt = Date.now();
-    this.syncErrors = [];
-    this.notifyListeners();
-
-    try {
-      console.log('🔄 Starting sync process...');
-      
-      const result = await this.processSyncQueue();
-      
-      if (result.success && result.failedOperations === 0) {
-        this.lastSuccessfulSync = Date.now();
-        console.log(`✅ Sync completed successfully: ${result.processedOperations} operations processed`);
-      } else {
-        console.warn(`⚠️ Sync completed with issues: ${result.processedOperations} processed, ${result.failedOperations} failed`);
-        this.syncErrors = result.errors;
-      }
-
-      return result;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown sync error';
-      console.error('❌ Sync failed:', errorMessage);
-      this.syncErrors = [errorMessage];
-      
-      return {
-        success: false,
-        processedOperations: 0,
-        failedOperations: 0,
-        errors: [errorMessage]
-      };
-    } finally {
-      this.isSyncing = false;
-      this.syncInProgress = null;
-      this.notifyListeners();
-    }
-  }
-
-  /**
-   * Process the sync queue
-   */
-  private async processSyncQueue(): Promise<SyncResult> {
-    const operations = await this.queueService.getNextOperations(50); // Process in batches
+  onSyncStatusChange(listener: (status: SyncStatus) => void): () => void {
+    this.listeners.push(listener);
     
-    if (operations.length === 0) {
-      return {
-        success: true,
-        processedOperations: 0,
-        failedOperations: 0,
-        errors: []
-      };
-    }
-
-    console.log(`📊 Processing ${operations.length} queued operations`);
-
-    let processedOperations = 0;
-    let failedOperations = 0;
-    const errors: string[] = [];
-
-    for (const operation of operations) {
-      try {
-        const result = await this.processOperation(operation);
-        
-        if (result.success) {
-          await this.queueService.markSuccess(operation.id!);
-          processedOperations++;
-          console.log(`✅ Operation ${operation.id} processed successfully`);
-        } else {
-          await this.queueService.markFailure(operation.id!, result.error || 'Operation processing failed');
-          failedOperations++;
-          errors.push(`Operation ${operation.id} failed: ${result.error || 'Unknown error'}`);
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        await this.queueService.markFailure(operation.id!, errorMessage);
-        failedOperations++;
-        errors.push(`Operation ${operation.id} error: ${errorMessage}`);
-        console.error(`❌ Operation ${operation.id} failed:`, errorMessage);
+    // Immediately call with current status
+    listener(this.getSyncStatus());
+    
+    // Return unsubscribe function
+    return () => {
+      const index = this.listeners.indexOf(listener);
+      if (index > -1) {
+        this.listeners.splice(index, 1);
       }
-
-      // Add small delay between operations to prevent overwhelming
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    return {
-      success: failedOperations === 0,
-      processedOperations,
-      failedOperations,
-      errors
     };
-  }
-
-  /**
-   * Process individual operation
-   */
-  private async processOperation(operation: QueueOperation): Promise<{ success: boolean; error?: string }> {
-    console.log(`🔄 Processing operation: ${operation.type} ${operation.endpoint}`, operation.data);
-
-    try {
-      let success: boolean;
-      switch (operation.type) {
-        case 'POST':
-          success = await this.handlePostOperation(operation);
-          break;
-        case 'PUT':
-          success = await this.handlePutOperation(operation);
-          break;
-        case 'DELETE':
-          success = await this.handleDeleteOperation(operation);
-          break;
-        default:
-          console.warn(`Unknown operation type: ${operation.type}`);
-          return { success: false, error: `Unknown operation type: ${operation.type}` };
-      }
-      return { success };
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Operation processing error:`, error);
-      return { success: false, error: errorMessage };
-    }
-  }
-
-  /**
-   * Handle POST operations (create new items)
-   */
-  private async handlePostOperation(operation: QueueOperation): Promise<boolean> {
-    const { endpoint, data, metadata } = operation;
-
-    switch (metadata?.entityType) {
-      case 'exercise':
-        if (endpoint === '/api/exercises' && data) {
-          await this.storageService.saveExercise(data as Exercise);
-          return true;
-        }
-        break;
-
-      case 'activityLog':
-        if (endpoint === '/api/activity-logs' && data) {
-          await this.storageService.saveActivityLog(data as ActivityLog);
-          return true;
-        }
-        break;
-
-      default:
-        console.warn(`Unhandled POST operation for ${metadata?.entityType}`);
-    }
-
-    return false;
-  }
-
-  /**
-   * Handle PUT operations (update existing items)
-   */
-  private async handlePutOperation(operation: QueueOperation): Promise<boolean> {
-    const { endpoint, data, metadata } = operation;
-
-    switch (metadata?.entityType) {
-      case 'exercise':
-        if (endpoint.startsWith('/api/exercises/') && data) {
-          await this.storageService.saveExercise(data as Exercise);
-          return true;
-        }
-        break;
-
-      case 'activityLog':
-        if (endpoint.startsWith('/api/activity-logs/') && data) {
-          await this.storageService.saveActivityLog(data as ActivityLog);
-          return true;
-        }
-        break;
-
-      case 'settings':
-        if (endpoint === '/api/settings' && data) {
-          await this.storageService.saveAppSettings(data as AppSettings);
-          return true;
-        }
-        break;
-
-      default:
-        console.warn(`Unhandled PUT operation for ${metadata?.entityType}`);
-    }
-
-    return false;
-  }
-
-  /**
-   * Handle DELETE operations (remove items)
-   */
-  private async handleDeleteOperation(operation: QueueOperation): Promise<boolean> {
-    const { endpoint, metadata } = operation;
-
-    switch (metadata?.entityType) {
-      case 'exercise':
-        if (endpoint.startsWith('/api/exercises/') && metadata.entityId) {
-          await this.storageService.deleteExercise(metadata.entityId);
-          return true;
-        }
-        break;
-
-      case 'activityLog':
-        if (endpoint.startsWith('/api/activity-logs/') && metadata.entityId) {
-          await this.storageService.deleteActivityLog(metadata.entityId);
-          return true;
-        }
-        break;
-
-      default:
-        console.warn(`Unhandled DELETE operation for ${metadata?.entityType}`);
-    }
-
-    return false;
   }
 
   /**
@@ -392,91 +167,471 @@ export class SyncService {
       isSyncing: this.isSyncing,
       lastSyncAttempt: this.lastSyncAttempt,
       lastSuccessfulSync: this.lastSuccessfulSync,
-      pendingOperations: 0, // Will be updated by listeners
+      hasChangesToSync: false, // Will be updated by notifyListeners when needed
       errors: this.syncErrors
     };
   }
 
   /**
-   * Add status change listener
+   * Get sync status with up-to-date hasChangesToSync calculation
    */
-  addStatusListener(listener: (status: SyncStatus) => void): () => void {
-    this.listeners.push(listener);
+  async getSyncStatusWithChanges(): Promise<SyncStatus> {
+    const baseStatus = this.getSyncStatus();
+    const hasChangesToSync = await this.hasChangesToSync();
     
-    // Immediately call listener with current status
-    this.updateAndNotifyStatus(listener);
-
-    // Return unsubscribe function
-    return () => {
-      const index = this.listeners.indexOf(listener);
-      if (index > -1) {
-        this.listeners.splice(index, 1);
-      }
+    return {
+      ...baseStatus,
+      hasChangesToSync
     };
   }
 
   /**
-   * Update status with current pending operations and notify listener
+   * Notify all listeners of status change
    */
-  private async updateAndNotifyStatus(listener: (status: SyncStatus) => void): Promise<void> {
-    try {
-      const stats = await this.queueService.getStats();
-      const status = {
-        ...this.getSyncStatus(),
-        pendingOperations: stats.pendingOperations
-      };
-      listener(status);
-    } catch (error) {
-      console.error('Failed to update sync status:', error);
-      listener(this.getSyncStatus());
-    }
+  private notifyListeners(): void {
+    // Use async method to get accurate hasChangesToSync status
+    this.getSyncStatusWithChanges().then(status => {
+      this.listeners.forEach(listener => {
+        try {
+          listener(status);
+        } catch (error) {
+          console.error('Error in sync status listener:', error);
+        }
+      });
+    }).catch(error => {
+      console.error('Error getting sync status with changes:', error);
+      // Fallback to basic status
+      const status = this.getSyncStatus();
+      this.listeners.forEach(listener => {
+        try {
+          listener(status);
+        } catch (error) {
+          console.error('Error in sync status listener:', error);
+        }
+      });
+    });
   }
 
   /**
-   * Notify all status listeners
+   * Main sync function - implements the full sync protocol
    */
-  private async notifyListeners(): Promise<void> {
-    for (const listener of this.listeners) {
-      await this.updateAndNotifyStatus(listener);
+  async sync(force: boolean = false): Promise<SyncResult> {
+    // Check consent
+    if (!this.consentService.hasConsent()) {
+      console.log('🚫 Sync skipped: no storage consent');
+      return this.createEmptyResult();
     }
-  }
 
-  /**
-   * Clear all sync data
-   */
-  async clearSyncData(): Promise<void> {
-    await this.queueService.clear();
-    this.lastSyncAttempt = undefined;
-    this.lastSuccessfulSync = undefined;
+    // Check authentication
+    const authState = this.authService.getAuthState();
+    if (!authState.isAuthenticated || !authState.accessToken) {
+      console.log('🚫 Sync skipped: not authenticated');
+      return this.createEmptyResult();
+    }
+
+    // Prevent concurrent syncs
+    if (this.isSyncing && !force) {
+      console.log('🔄 Sync already in progress');
+      return this.syncInProgress || this.createEmptyResult();
+    }
+
+    // Check network
+    if (!this.isOnline) {
+      console.log('📴 Sync skipped: device offline');
+      return this.createEmptyResult(['Device is offline']);
+    }
+
+    this.isSyncing = true;
+    this.lastSyncAttempt = Date.now();
     this.syncErrors = [];
     this.notifyListeners();
-    console.log('🧹 Sync data cleared');
+
+    const syncPromise = this.performSync(authState.accessToken);
+    this.syncInProgress = syncPromise;
+
+    try {
+      const result = await syncPromise;
+      
+      if (result.success) {
+        this.lastSuccessfulSync = Date.now();
+        console.log(`✅ Sync completed: ${result.tablesProcessed} tables, ${result.recordsPushed} pushed, ${result.recordsPulled} pulled`);
+      } else {
+        console.warn(`⚠️ Sync completed with errors:`, result.errors);
+        this.syncErrors = result.errors;
+      }
+
+      return result;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown sync error';
+      console.error('❌ Sync failed:', errorMessage);
+      this.syncErrors = [errorMessage];
+      
+      return {
+        success: false,
+        tablesProcessed: 0,
+        recordsPushed: 0,
+        recordsPulled: 0,
+        conflicts: 0,
+        errors: [errorMessage]
+      };
+    } finally {
+      this.isSyncing = false;
+      this.syncInProgress = null;
+      this.notifyListeners();
+    }
   }
 
   /**
-   * Force immediate sync
+   * Perform the actual sync operation
+   */
+  private async performSync(accessToken: string): Promise<SyncResult> {
+    const result: SyncResult = {
+        success: true,
+      tablesProcessed: 0,
+      recordsPushed: 0,
+      recordsPulled: 0,
+      conflicts: 0,
+        errors: []
+    };
+
+    try {
+      // Step 1: Gather dirty records from all tables
+      const syncRequest: SyncRequest = {
+        since: this.lastSyncCursor,
+        tables: {},
+        clientInfo: {
+          appVersion: '1.0.0', // TODO: get from package.json
+          deviceId: this.getDeviceId()
+        }
+      };
+
+      for (const tableName of SYNCABLE_TABLES) {
+        try {
+          const dirtyRecords = await this.getDirtyRecords(tableName);
+          syncRequest.tables[tableName] = dirtyRecords;
+          
+          if (dirtyRecords.upserts.length > 0 || dirtyRecords.deletes.length > 0) {
+            result.recordsPushed += dirtyRecords.upserts.length + dirtyRecords.deletes.length;
+          }
+        } catch (error) {
+          console.error(`Error gathering dirty records for ${tableName}:`, error);
+          result.errors.push(`Failed to gather dirty records for ${tableName}`);
+        }
+      }
+
+      // Step 2: Call sync endpoint
+      const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
+
+      // Step 3: Apply server changes locally
+      for (const tableName of SYNCABLE_TABLES) {
+        try {
+          const changes = syncResponse.changes[tableName];
+          if (changes) {
+            await this.applyServerChanges(tableName, changes);
+            result.recordsPulled += changes.upserts.length + changes.deletes.length;
+          }
+          result.tablesProcessed++;
+        } catch (error) {
+          console.error(`Error applying server changes for ${tableName}:`, error);
+          result.errors.push(`Failed to apply server changes for ${tableName}`);
+        }
+      }
+
+      // Step 4: Mark local records as clean
+      await this.markRecordsAsClean();
+
+      // Step 5: Update sync cursor
+      this.saveSyncCursor(syncResponse.cursor);
+
+      if (result.errors.length > 0) {
+        result.success = false;
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Sync operation failed:', error);
+      result.success = false;
+      result.errors.push(error instanceof Error ? error.message : 'Unknown error');
+      return result;
+    }
+  }
+
+  /**
+   * Get dirty records for a table
+   */
+  private async getDirtyRecords(tableName: string): Promise<{ upserts: Record<string, unknown>[]; deletes: string[] }> {
+    const db = this.storageService.getDatabase();
+    const table = (db as Record<string, unknown>)[tableName];
+    
+    if (!table || typeof table !== 'object') {
+      return { upserts: [], deletes: [] };
+    }
+
+    try {
+      // Get all dirty records
+      const dirtyRecords = await (table as {
+        where: (field: string) => {
+          equals: (value: boolean) => {
+            toArray: () => Promise<Record<string, unknown>[]>;
+          };
+        };
+      }).where('dirty').equals(true).toArray();
+      
+      const upserts: Record<string, unknown>[] = [];
+      const deletes: string[] = [];
+
+      for (const record of dirtyRecords) {
+        if (record.op === 'delete' || record.deleted) {
+          deletes.push(record.id as string);
+        } else {
+          // Remove local-only sync metadata before sending
+          const { dirty: _dirty, op: _op, syncedAt: _syncedAt, ...cleanRecord } = record;
+          upserts.push(cleanRecord);
+        }
+      }
+
+      return { upserts, deletes };
+    } catch (error) {
+      console.error(`Error getting dirty records for ${tableName}:`, error);
+      return { upserts: [], deletes: [] };
+    }
+  }
+
+  /**
+   * Call the sync endpoint
+   */
+  private async callSyncEndpoint(syncRequest: SyncRequest, accessToken: string): Promise<SyncResponse> {
+    const { data, error } = await supabase.functions.invoke('sync', {
+      body: syncRequest,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (error) {
+      throw new Error(`Sync endpoint error: ${error.message}`);
+    }
+
+    return data as SyncResponse;
+  }
+
+  /**
+   * Apply server changes to local database
+   */
+  private async applyServerChanges(tableName: string, changes: { upserts: Record<string, unknown>[]; deletes: string[] }): Promise<void> {
+    const db = this.storageService.getDatabase();
+    const table = (db as Record<string, unknown>)[tableName];
+    
+    if (!table || typeof table !== 'object') {
+      return;
+    }
+
+    try {
+      const typedTable = table as {
+        get: (id: string) => Promise<Record<string, unknown> | undefined>;
+        put: (record: Record<string, unknown>) => Promise<void>;
+        update: (id: string, changes: Record<string, unknown>) => Promise<void>;
+      };
+
+      // Apply upserts with enhanced conflict resolution
+      for (const serverRecord of changes.upserts) {
+        try {
+          // Get local record to check for conflicts
+          const localRecord = await typedTable.get(serverRecord.id as string);
+          
+          if (localRecord) {
+            // Handle conflict resolution
+            const resolvedRecord = await this.resolveConflict(tableName, localRecord, serverRecord);
+            
+            // Apply resolved record with sync metadata
+            await typedTable.put({
+              ...resolvedRecord,
+              dirty: false,
+              op: undefined,
+              syncedAt: new Date().toISOString()
+            });
+          } else {
+            // No local record - apply server record directly
+            await typedTable.put({
+              ...serverRecord,
+              dirty: false,
+              op: undefined,
+              syncedAt: new Date().toISOString()
+            });
+          }
+        } catch (error) {
+          console.error(`Error applying upsert for ${tableName}:${serverRecord.id}:`, error);
+          // Continue with other records
+        }
+      }
+
+      // Apply deletes
+      for (const recordId of changes.deletes) {
+        await typedTable.update(recordId, {
+          deleted: true,
+          dirty: false,
+          op: undefined,
+          syncedAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error(`Error applying server changes for ${tableName}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mark all dirty records as clean
+   */
+  private async markRecordsAsClean(): Promise<void> {
+    const db = this.storageService.getDatabase();
+    
+    for (const tableName of SYNCABLE_TABLES) {
+      try {
+        const table = (db as Record<string, unknown>)[tableName];
+        if (!table || typeof table !== 'object') continue;
+
+        await (table as {
+          where: (field: string) => {
+            equals: (value: boolean) => {
+              modify: (changes: Record<string, unknown>) => Promise<void>;
+            };
+          };
+        }).where('dirty').equals(true).modify({
+          dirty: false,
+          op: undefined,
+          syncedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error(`Error marking records as clean for ${tableName}:`, error);
+      }
+    }
+  }
+
+  /**
+   * Get or generate device ID
+   */
+  private getDeviceId(): string {
+    try {
+      let deviceId = localStorage.getItem('repcue_device_id');
+      if (!deviceId) {
+        deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('repcue_device_id', deviceId);
+      }
+      return deviceId;
+    } catch {
+      return `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+  }
+
+  /**
+   * Create empty sync result
+   */
+  private createEmptyResult(errors: string[] = []): SyncResult {
+    return {
+      success: errors.length === 0,
+      tablesProcessed: 0,
+      recordsPushed: 0,
+      recordsPulled: 0,
+      conflicts: 0,
+      errors
+    };
+  }
+
+  /**
+   * Check if there are changes to sync
+   */
+  async hasChangesToSync(): Promise<boolean> {
+    if (!this.consentService.hasConsent()) {
+      return false;
+    }
+
+    const db = this.storageService.getDatabase();
+    
+    for (const tableName of SYNCABLE_TABLES) {
+      try {
+        const table = (db as Record<string, unknown>)[tableName];
+        if (!table || typeof table !== 'object') continue;
+
+        const dirtyCount = await (table as {
+          where: (field: string) => {
+            equals: (value: boolean) => {
+              count: () => Promise<number>;
+            };
+          };
+        }).where('dirty').equals(true).count();
+        if (dirtyCount > 0) {
+          return true;
+        }
+      } catch (error) {
+        console.error(`Error checking dirty records for ${tableName}:`, error);
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Force sync for testing/development
    */
   async forcSync(): Promise<SyncResult> {
     return this.sync(true);
   }
 
   /**
-   * Get next retry time for pending operations
+   * Resolve conflicts between local and server records
    */
-  async getNextRetryTime(): Promise<number | null> {
-    return this.queueService.getNextRetryTime();
+  private async resolveConflict(
+    tableName: string, 
+    localRecord: Record<string, unknown>, 
+    serverRecord: Record<string, unknown>
+  ): Promise<Record<string, unknown>> {
+    const localUpdatedAt = new Date(localRecord.updatedAt as string || 0);
+    const serverUpdatedAt = new Date(serverRecord.updated_at as string || 0);
+    
+    // Enhanced conflict resolution rules
+    if (localRecord.dirty) {
+      if (serverUpdatedAt > localUpdatedAt) {
+        // Server is newer - accept server version
+        console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (newer timestamp)`);
+        return serverRecord;
+      } else if (localUpdatedAt > serverUpdatedAt) {
+        // Local is newer - keep local changes (will be pushed to server in next sync)
+        console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - local wins (newer timestamp)`);
+        return localRecord;
+      } else {
+        // Same timestamp - handle special cases
+        return this.resolveTimestampTie(tableName, localRecord, serverRecord);
+      }
+    } else {
+      // Local record is clean - accept server version
+      console.log(`📥 Updating clean local record ${tableName}:${serverRecord.id} with server version`);
+      return serverRecord;
+    }
   }
 
   /**
-   * Helper to create empty result
+   * Handle cases where timestamps are equal
    */
-  private createEmptyResult(errors: string[] = []): SyncResult {
-    return {
-      success: errors.length === 0,
-      processedOperations: 0,
-      failedOperations: 0,
-      errors
-    };
+  private resolveTimestampTie(
+    tableName: string,
+    localRecord: Record<string, unknown>,
+    serverRecord: Record<string, unknown>
+  ): Record<string, unknown> {
+    // Special rule: prefer deletes for safety
+    if (localRecord.deleted !== serverRecord.deleted) {
+      const result = localRecord.deleted || serverRecord.deleted ? 
+        { ...serverRecord, deleted: true } : 
+        serverRecord;
+      
+      console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - preferring delete operation`);
+      return result;
+    }
+
+    // For other conflicts with equal timestamps, prefer server version
+    console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (timestamp tie)`);
+    return serverRecord;
   }
 }
 
