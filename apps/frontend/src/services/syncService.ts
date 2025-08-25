@@ -2,6 +2,7 @@ import { StorageService } from './storageService';
 import { ConsentService } from './consentService';
 import { AuthService } from './authService';
 import { supabase } from '../config/supabase';
+import { SYNC_ENABLED } from '../config/features';
 
 export interface SyncResult {
   success: boolean;
@@ -223,6 +224,12 @@ export class SyncService {
    * Main sync function - implements the full sync protocol
    */
   async sync(force: boolean = false): Promise<SyncResult> {
+    // Check if sync is enabled
+    if (!SYNC_ENABLED) {
+      console.log('🚫 Sync skipped: feature disabled');
+      return this.createEmptyResult();
+    }
+
     // Check consent
     if (!this.consentService.hasConsent()) {
       console.log('🚫 Sync skipped: no storage consent');
@@ -557,6 +564,10 @@ export class SyncService {
    * Check if there are changes to sync
    */
   async hasChangesToSync(): Promise<boolean> {
+    if (!SYNC_ENABLED) {
+      return false;
+    }
+
     if (!this.consentService?.hasConsent()) {
       return false;
     }
@@ -587,6 +598,14 @@ export class SyncService {
     }
 
     return false;
+  }
+
+  /**
+   * Clear sync errors
+   */
+  clearErrors(): void {
+    this.syncErrors = [];
+    this.notifyListeners();
   }
 
   /**

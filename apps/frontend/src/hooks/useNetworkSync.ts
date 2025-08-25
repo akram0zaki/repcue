@@ -107,8 +107,12 @@ export function useNetworkSync(): UseNetworkSyncResult {
   }, [syncService]);
 
   const clearErrors = useCallback(() => {
+    if (syncService) {
+      // Also clear errors from the sync service itself
+      syncService.clearErrors();
+    }
     setState(prev => ({ ...prev, errors: [] }));
-  }, []);
+  }, [syncService]);
 
   const retry = useCallback(async () => {
     if (!syncService) {

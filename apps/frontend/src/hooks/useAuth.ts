@@ -90,6 +90,34 @@ export function useAuth() {
     return authService.refreshSession();
   };
 
+  const registerPasskey = async (email: string) => {
+    setLoading(true);
+    try {
+      const result = await authService.registerPasskey(email);
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signInWithPasskey = async (email?: string) => {
+    setLoading(true);
+    try {
+      const result = await authService.signInWithPasskey(email);
+      return result;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isPasskeySupported = () => {
+    return authService.isPasskeySupported();
+  };
+
+  const isPlatformAuthenticatorAvailable = async () => {
+    return authService.isPlatformAuthenticatorAvailable();
+  };
+
   return {
     // State
     ...(authState || {}),
@@ -109,6 +137,10 @@ export function useAuth() {
     updatePassword,
     updateProfile,
     refreshSession,
+    registerPasskey,
+    signInWithPasskey,
+    isPasskeySupported,
+    isPlatformAuthenticatorAvailable,
   };
 }
 

@@ -8,6 +8,9 @@ import { consentService } from '../services/consentService';
 import { SpeakerIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useAuth } from '../hooks/useAuth';
+import DataExportButton from '../components/security/DataExportButton';
+import DeleteAccountModal from '../components/security/DeleteAccountModal';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -17,6 +20,8 @@ interface SettingsPageProps {
 const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettings }) => {
   const { t } = useTranslation(['common']);
   const [showClearDataToast, setShowClearDataToast] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -420,6 +425,39 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </p>
           </div>
         </div>
+
+        {/* Security & Privacy Settings */}
+        {isAuthenticated && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mt-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              Security & Privacy
+            </h2>
+            
+            {/* Data Export */}
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Export Your Data
+              </h3>
+              <DataExportButton className="w-full" />
+            </div>
+
+            {/* Account Deletion */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Delete Account
+              </h3>
+              <button
+                onClick={() => setShowDeleteAccountModal(true)}
+                className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+              >
+                Delete My Account
+              </button>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Permanently delete your account and all associated data. This action has a 30-day grace period.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Clear Data Confirmation Toast */}
@@ -432,6 +470,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         message={t('settings.clearAllDataMessage')}
         confirmText={t('settings.clearAllData')}
         cancelText={t('cancel')}
+      />
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteAccountModal}
+        onClose={() => setShowDeleteAccountModal(false)}
+        onSuccess={() => {
+          setShowDeleteAccountModal(false);
+          // User will be signed out automatically
+        }}
       />
     </div>
   );

@@ -62,7 +62,8 @@ describe('useNetworkSync', () => {
         recordsPulled: 0,
         conflicts: 0,
         errors: []
-      })
+      }),
+      clearErrors: vi.fn()
     };
 
     // Apply the mock
@@ -220,6 +221,7 @@ describe('useNetworkSync', () => {
       });
 
       expect(result.current.state.errors).toEqual([]);
+      expect(mockSyncService.clearErrors).toHaveBeenCalled();
     });
 
     it('should retry sync when available', async () => {

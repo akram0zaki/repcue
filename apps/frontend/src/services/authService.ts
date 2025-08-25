@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import type { AuthState, AuthUserProfile } from '../types';
 import { storageService } from './storageService';
+import { webauthnService, type PasskeyRegistrationResult, type PasskeyAuthenticationResult } from './webauthnService';
 
 /**
  * Authentication service using Supabase
@@ -273,6 +274,56 @@ export class AuthService {
       console.error('OAuth error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
+  }
+
+  /**
+   * Register a new passkey for the user
+   */
+  public async registerPasskey(email: string): Promise<PasskeyRegistrationResult> {
+    const result = await webauthnService.registerPasskey(email);
+    
+    if (result.success && result.session) {
+      // The session data from WebAuthn edge function contains the session info
+      // We need to refresh the current session to get the latest auth state
+      const { data, error } = await supabase.auth.getSession();
+      if (!error && data.session) {
+        await this.handleSessionChange(data.session);
+      }
+    }
+    
+    return result;
+  }
+
+  /**
+   * Sign in with passkey
+   */
+  public async signInWithPasskey(email?: string): Promise<PasskeyAuthenticationResult> {
+    const result = await webauthnService.authenticateWithPasskey(email);
+    
+    if (result.success && result.session) {
+      // The session data from WebAuthn edge function contains the session info
+      // We need to refresh the current session to get the latest auth state
+      const { data, error } = await supabase.auth.getSession();
+      if (!error && data.session) {
+        await this.handleSessionChange(data.session);
+      }
+    }
+    
+    return result;
+  }
+
+  /**
+   * Check if passkeys are supported in the current browser
+   */
+  public isPasskeySupported(): boolean {
+    return webauthnService.isSupported();
+  }
+
+  /**
+   * Check if platform authenticator (biometrics) is available
+   */
+  public async isPlatformAuthenticatorAvailable(): Promise<boolean> {
+    return await webauthnService.isPlatformAuthenticatorAvailable();
   }
 
   /**

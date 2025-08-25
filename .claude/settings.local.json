@@ -11,7 +11,10 @@
       "WebFetch(domain:localhost)",
       "Bash(git add:*)",
       "Bash(git push:*)",
-      "Bash(del:*)"
+      "Bash(del:*)",
+      "Read(/c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm add:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,13 @@
+{
+  "name": "repcue-edge-functions",
+  "version": "1.0.0",
+  "description": "Supabase Edge Functions for RepCue sync functionality",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

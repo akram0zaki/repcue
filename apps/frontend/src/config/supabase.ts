@@ -58,6 +58,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          id: string
+          user_id: string | null
+          action: string
+          resource_type: string
+          resource_id: string | null
+          details: Json
+          ip_address: string | null
+          user_agent: string | null
+          success: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          action: string
+          resource_type: string
+          resource_id?: string | null
+          details?: Json
+          ip_address?: string | null
+          user_agent?: string | null
+          success?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          action?: string
+          resource_type?: string
+          resource_id?: string | null
+          details?: Json
+          ip_address?: string | null
+          user_agent?: string | null
+          success?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
       activity_logs: {
         Row: {
           created_at: string | null
@@ -208,6 +247,14 @@ export type Database = {
           display_name: string | null
           updated_at: string | null
           user_id: string
+          last_login_at: string | null
+          last_login_ip: string | null
+          login_count: number | null
+          account_locked: boolean | null
+          locked_until: string | null
+          failed_login_attempts: number | null
+          data_export_requested_at: string | null
+          deletion_requested_at: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -215,6 +262,14 @@ export type Database = {
           display_name?: string | null
           updated_at?: string | null
           user_id: string
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          login_count?: number | null
+          account_locked?: boolean | null
+          locked_until?: string | null
+          failed_login_attempts?: number | null
+          data_export_requested_at?: string | null
+          deletion_requested_at?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -222,6 +277,74 @@ export type Database = {
           display_name?: string | null
           updated_at?: string | null
           user_id?: string
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          login_count?: number | null
+          account_locked?: boolean | null
+          locked_until?: string | null
+          failed_login_attempts?: number | null
+          data_export_requested_at?: string | null
+          deletion_requested_at?: string | null
+        }
+        Relationships: []
+      }
+      user_authenticators: {
+        Row: {
+          id: string
+          user_id: string
+          credential_id: string
+          credential_public_key: string
+          counter: number
+          created_at: string
+          last_used_at: string | null
+          device_name: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          credential_id: string
+          credential_public_key: string
+          counter?: number
+          created_at?: string
+          last_used_at?: string | null
+          device_name?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          credential_id?: string
+          credential_public_key?: string
+          counter?: number
+          created_at?: string
+          last_used_at?: string | null
+          device_name?: string | null
+        }
+        Relationships: []
+      }
+      webauthn_challenges: {
+        Row: {
+          id: string
+          user_id: string | null
+          challenge: string
+          type: string
+          expires_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          challenge: string
+          type: string
+          expires_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          challenge?: string
+          type?: string
+          expires_at?: string
+          created_at?: string
         }
         Relationships: []
       }
