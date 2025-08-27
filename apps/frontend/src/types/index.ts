@@ -6,7 +6,7 @@ export interface SyncMetadata {
   deleted: boolean; // tombstone flag for soft deletes
   version: number; // version counter for conflict resolution
   // Local-only fields (not synced to server)
-  dirty?: boolean; // true if local changes need to be synced
+  dirty?: number; // 1 if local changes need to be synced, 0 if not
   op?: 'upsert' | 'delete'; // pending operation type
   syncedAt?: string; // ISO timestamp of last successful sync
 }

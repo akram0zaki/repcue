@@ -28,7 +28,7 @@ export function createSyncMetadata(ownerId?: string | null): Omit<SyncMetadata, 
     updatedAt: nowISO(),
     deleted: false,
     version: 1,
-    dirty: true,
+    dirty: 1,
     op: 'upsert'
   };
 }
@@ -43,7 +43,7 @@ export function updateSyncMetadata(
   return {
     updatedAt: nowISO(),
     version: currentMetadata.version + 1,
-    dirty: true,
+    dirty: 1,
     op: 'upsert',
     ownerId: ownerId !== undefined ? ownerId : currentMetadata.ownerId
   };
@@ -60,7 +60,7 @@ export function markAsDeleted(
     updatedAt: nowISO(),
     version: currentMetadata.version + 1,
     deleted: true,
-    dirty: true,
+    dirty: 1,
     op: 'delete',
     ownerId: ownerId !== undefined ? ownerId : currentMetadata.ownerId
   };
@@ -71,7 +71,7 @@ export function markAsDeleted(
  */
 export function markAsSynced(syncedAt?: string): Partial<SyncMetadata> {
   return {
-    dirty: false,
+    dirty: 0,
     syncedAt: syncedAt || nowISO()
   };
 }
@@ -120,7 +120,7 @@ export function prepareSoftDelete<T extends SyncMetadata>(
  * Check if a record is dirty (needs sync)
  */
 export function isDirty(data: Partial<SyncMetadata>): boolean {
-  return data.dirty === true;
+  return data.dirty === 1;
 }
 
 /**

@@ -161,27 +161,8 @@ if (!navigator.vibrate) {
 
 describe('Rep-based Exercise Fixes', () => {
   async function ensureTimerPageVisible(user: ReturnType<typeof userEvent.setup>) {
-    try {
-      await screen.findByTestId('timer-page', {}, { timeout: 1500 });
-    } catch {
-      // If timer page not visible, try navigation
-      try {
-        const navTimer = await screen.findByTestId('nav-timer');
-        await user.click(navTimer);
-        await screen.findByTestId('timer-page', {}, { timeout: 5000 });
-      } catch {
-        // Fallback: try clicking Start Timer button from home page
-        try {
-          const startTimerBtn = await screen.findByRole('button', { name: /start timer/i });
-          await user.click(startTimerBtn);
-          await screen.findByTestId('timer-page', {}, { timeout: 5000 });
-        } catch (error) {
-          console.error('Failed to navigate to timer page. Current page content:');
-          console.error(document.body.innerHTML);
-          throw error;
-        }
-      }
-    }
+    // Since we start directly on the timer page, just wait for it to load
+    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
   }
   const mockRepExercise = {
     id: 'test-rep-exercise',
@@ -208,7 +189,7 @@ describe('Rep-based Exercise Fixes', () => {
       preTimerCountdown: 0 // start immediately so rep/set UI renders without waiting
     });
 
-    // Navigate to the Timer route so App routes correctly
+    // Navigate directly to timer page to avoid home navigation issues
     window.history.replaceState({}, '', '/timer');
     
     // Dispatch a popstate event to ensure the router responds to the URL change

@@ -110,10 +110,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const hasConsent = consentService.hasConsent();
   const consentStatus = consentService.getConsentStatus();
 
-  // Debug logging for production troubleshooting
-  console.log('SettingsPage - Consent Status:', consentStatus);
-  console.log('SettingsPage - hasConsent:', hasConsent);
-
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4 max-w-md">
@@ -469,7 +465,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         title={t('settings.clearAllDataAndReset')}
         message={t('settings.clearAllDataMessage')}
         confirmText={t('settings.clearAllData')}
-        cancelText={t('cancel')}
+        cancelText={t('common.cancel')}
       />
 
       {/* Delete Account Modal */}

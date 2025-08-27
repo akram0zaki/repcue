@@ -1355,9 +1355,11 @@ function App() {
   const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
     if (!hasConsent) return;
 
+    // Update state first
     const updatedSettings = { ...appSettings, ...newSettings };
     setAppSettings(updatedSettings);
-
+    
+    // Save to storage asynchronously, outside of setState to avoid race conditions
     try {
       await storageService.saveAppSettings(updatedSettings);
     } catch (error) {
@@ -1385,6 +1387,13 @@ function App() {
         try {
           if (process.env.NODE_ENV === 'development') {
             console.log('🚀 Initializing app with consent granted');
+            
+            // Add storage service to window for debugging
+            if (typeof window !== 'undefined') {
+              (window as any).storageService = storageService;
+              (window as any).resetDB = () => storageService.resetDatabase();
+              console.log('🔧 Debug helpers: window.storageService, window.resetDB()');
+            }
           }
 
           // Register service worker for offline functionality
@@ -1496,7 +1505,7 @@ function App() {
   };
 
   initializeApp();
-}, [hasConsent, handleSetSelectedExercise]);
+}, [hasConsent]);
 
 // Cleanup sync triggers on unmount
 useEffect(() => {

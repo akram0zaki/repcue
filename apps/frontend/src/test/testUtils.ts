@@ -9,7 +9,7 @@ export function createMockSyncMetadata(overrides: Partial<SyncMetadata> = {}): S
     updatedAt: new Date().toISOString(),
     deleted: false,
     version: 1,
-    dirty: false,
+    dirty: 0,
     ...overrides
   };
 }

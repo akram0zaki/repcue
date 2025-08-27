@@ -64,8 +64,75 @@ const TimerPage: React.FC<TimerPageProps> = ({
     loadExerciseMedia().then(setMediaIndex).catch(err => { console.warn('Failed to load exercise media', err); });
   }, [videoFeatureEnabled]);
 
-  const exerciseForVideo = selectedExercise && selectedExercise.hasVideo ? selectedExercise : null;
   const restingNow = workoutMode?.isResting || isResting;
+
+  
+  const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
+  
+  // Use workout mode rest state if available, fallback to timer state
+  const actuallyResting = workoutMode?.isResting || isResting;
+  
+  // Countdown progress (reverse of normal progress)
+  const countdownProgress = isCountdown && appSettings.preTimerCountdown > 0 
+    ? ((appSettings.preTimerCountdown - countdownTime) / appSettings.preTimerCountdown) * 100 
+    : 0;
+  
+  // Rest time calculations
+  const displayTime = actuallyResting && restTimeRemaining !== undefined 
+    ? restTimeRemaining 
+    : (isCountdown ? countdownTime : currentTime); // Show elapsed time, not remaining time
+  const displayProgress = actuallyResting && restTimeRemaining !== undefined
+    ? ((REST_TIME_BETWEEN_SETS - restTimeRemaining) / REST_TIME_BETWEEN_SETS) * 100
+    : (isCountdown ? countdownProgress : progress);
+
+  // Workout mode calculations
+  const isWorkoutMode = !!workoutMode;
+  const workoutProgress = workoutMode ? 
+    // Calculate progress based on actual completion:
+    // - During exercise: completed exercises / total (don't count current until done)
+    // - During rest: (completed exercises + 1) / total (count the just-completed exercise)
+    // - After workout: 100% (all exercises completed)
+    (() => {
+      const totalExercises = workoutMode.exercises.length;
+      const currentIndex = workoutMode.currentExerciseIndex;
+      
+      // Check if workout is actually completed (currentIndex >= totalExercises)
+      if (currentIndex >= totalExercises) {
+        return 100; // Workout completed
+      }
+      
+      if (workoutMode.isResting) {
+        // During rest: we've completed the exercise we just finished
+        // currentIndex points to next exercise, so we've completed currentIndex exercises
+        return (currentIndex / totalExercises) * 100;
+      } else {
+        // During exercise: we've completed the exercises before the current one
+        return (currentIndex / totalExercises) * 100;
+      }
+    })()
+    : 0;
+  
+  // Get current exercise info for workout mode
+  const currentWorkoutExercise = workoutMode ? workoutMode.exercises[workoutMode.currentExerciseIndex] : null;
+  const workoutCurrentExercise = currentWorkoutExercise ? exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId) : null;
+  
+  // During rest periods, we want to show the previous exercise as "completed" and the next exercise as "coming up"
+  const previousWorkoutExercise = workoutMode && workoutMode.currentExerciseIndex > 0 
+    ? workoutMode.exercises[workoutMode.currentExerciseIndex - 1] 
+    : null;
+  const previousExercise = previousWorkoutExercise ? exercises.find(ex => ex.id === previousWorkoutExercise.exerciseId) : null;
+  
+  // Choose which exercise to display based on rest state
+  const displayExercise = isWorkoutMode 
+    ? (actuallyResting ? previousExercise || workoutCurrentExercise : workoutCurrentExercise || selectedExercise)
+    : selectedExercise;
+  
+  // Define exerciseForVideo with proper workout mode support
+  const exerciseForVideo = isWorkoutMode 
+    ? (workoutCurrentExercise && workoutCurrentExercise.hasVideo ? workoutCurrentExercise : null)
+    : (selectedExercise && selectedExercise.hasVideo ? selectedExercise : null);
+    
+  // Initialize video hook with the correct exercise
   const exerciseVideo = useExerciseVideo({
     exercise: exerciseForVideo,
     mediaIndex,
@@ -74,7 +141,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     isActiveMovement: timerState.isRunning && !timerState.isCountdown && !restingNow,
     isPaused: !timerState.isRunning
   });
-
+  
   // Phase 3 T-3.3: Prefetch upcoming exercise video during rest or pre-countdown
   useEffect(() => {
     if (!videoFeatureEnabled || !mediaIndex) return;
@@ -139,66 +206,6 @@ const TimerPage: React.FC<TimerPageProps> = ({
       console.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
     }
   }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error]);
-  
-  const progress = targetTime ? (currentTime / targetTime) * 100 : 0;
-  
-  // Use workout mode rest state if available, fallback to timer state
-  const actuallyResting = workoutMode?.isResting || isResting;
-  
-  // Countdown progress (reverse of normal progress)
-  const countdownProgress = isCountdown && appSettings.preTimerCountdown > 0 
-    ? ((appSettings.preTimerCountdown - countdownTime) / appSettings.preTimerCountdown) * 100 
-    : 0;
-  
-  // Rest time calculations
-  const displayTime = actuallyResting && restTimeRemaining !== undefined 
-    ? restTimeRemaining 
-    : (isCountdown ? countdownTime : currentTime); // Show elapsed time, not remaining time
-  const displayProgress = actuallyResting && restTimeRemaining !== undefined
-    ? ((REST_TIME_BETWEEN_SETS - restTimeRemaining) / REST_TIME_BETWEEN_SETS) * 100
-    : (isCountdown ? countdownProgress : progress);
-
-  // Workout mode calculations
-  const isWorkoutMode = !!workoutMode;
-  const workoutProgress = workoutMode ? 
-    // Calculate progress based on actual completion:
-    // - During exercise: completed exercises / total (don't count current until done)
-    // - During rest: (completed exercises + 1) / total (count the just-completed exercise)
-    // - After workout: 100% (all exercises completed)
-    (() => {
-      const totalExercises = workoutMode.exercises.length;
-      const currentIndex = workoutMode.currentExerciseIndex;
-      
-      // Check if workout is actually completed (currentIndex >= totalExercises)
-      if (currentIndex >= totalExercises) {
-        return 100; // Workout completed
-      }
-      
-      if (workoutMode.isResting) {
-        // During rest: we've completed the exercise we just finished
-        // currentIndex points to next exercise, so we've completed currentIndex exercises
-        return (currentIndex / totalExercises) * 100;
-      } else {
-        // During exercise: we've completed the exercises before the current one
-        return (currentIndex / totalExercises) * 100;
-      }
-    })()
-    : 0;
-  
-  // Get current exercise info for workout mode
-  const currentWorkoutExercise = workoutMode ? workoutMode.exercises[workoutMode.currentExerciseIndex] : null;
-  const workoutCurrentExercise = currentWorkoutExercise ? exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId) : null;
-  
-  // During rest periods, we want to show the previous exercise as "completed" and the next exercise as "coming up"
-  const previousWorkoutExercise = workoutMode && workoutMode.currentExerciseIndex > 0 
-    ? workoutMode.exercises[workoutMode.currentExerciseIndex - 1] 
-    : null;
-  const previousExercise = previousWorkoutExercise ? exercises.find(ex => ex.id === previousWorkoutExercise.exerciseId) : null;
-  
-  // Choose which exercise to display based on rest state
-  const displayExercise = isWorkoutMode 
-    ? (actuallyResting ? previousExercise || workoutCurrentExercise : workoutCurrentExercise || selectedExercise)
-    : selectedExercise;
   
   // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
   

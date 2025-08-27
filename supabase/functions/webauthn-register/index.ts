@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
-import { validateJWT } from '../_shared/auth.ts'
 import { 
   generateRegistrationOptions, 
   verifyRegistrationResponse,
@@ -17,6 +16,11 @@ interface RegistrationRequest {
   step: 'challenge' | 'verify';
   email?: string;
   response?: any; // WebAuthn credential response
+  browserPreferences?: {
+    userVerification: 'required' | 'preferred' | 'discouraged';
+    residentKey: 'required' | 'preferred' | 'discouraged';
+    authenticatorAttachment?: 'platform' | 'cross-platform';
+  };
 }
 
 serve(async (req) => {
@@ -94,6 +98,31 @@ serve(async (req) => {
         .select('credential_id, credential_public_key, counter')
         .eq('user_id', userID)
 
+      // Use browser preferences if provided, otherwise use safe defaults
+      const prefs = body.browserPreferences || {
+        userVerification: 'preferred',
+        residentKey: 'preferred'
+      };
+
+      // Build authenticator selection based on browser preferences
+      const authenticatorSelection: {
+        userVerification: 'required' | 'preferred' | 'discouraged';
+        residentKey: 'required' | 'preferred' | 'discouraged';
+        authenticatorAttachment?: 'platform' | 'cross-platform';
+      } = {
+        userVerification: prefs.userVerification,
+        residentKey: prefs.residentKey
+      };
+
+      if (prefs.authenticatorAttachment) {
+        authenticatorSelection.authenticatorAttachment = prefs.authenticatorAttachment;
+      }
+
+      // Use conservative transport list for better cross-browser compatibility
+      const transports: AuthenticatorTransport[] = prefs.authenticatorAttachment === 'platform' 
+        ? ['internal'] 
+        : ['usb', 'ble', 'nfc', 'internal'];
+
       const options: GenerateRegistrationOptionsOpts = {
         rpName,
         rpID,
@@ -105,12 +134,9 @@ serve(async (req) => {
         excludeCredentials: existingAuthenticators?.map(auth => ({
           id: new Uint8Array(JSON.parse(auth.credential_id)),
           type: 'public-key',
-          transports: ['usb', 'ble', 'nfc', 'internal'] as AuthenticatorTransport[]
+          transports
         })) || [],
-        authenticatorSelection: {
-          userVerification: 'preferred',
-          residentKey: 'preferred'
-        }
+        authenticatorSelection
       }
 
       const registrationOptions = await generateRegistrationOptions(options)

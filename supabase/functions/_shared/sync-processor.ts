@@ -123,25 +123,51 @@ async function processClientUpsert(
     };
 
     // Check if record exists
-    const { data: existing } = await supabase
+    const { data: existing, error: selectError } = await supabase
       .from(tableName)
       .select('*')
       .eq('id', record.id)
       .single();
 
+    // If table doesn't exist, skip processing
+    if (selectError?.code === '42P01' || selectError?.message?.includes('does not exist')) {
+      console.warn(`Table ${tableName} does not exist, skipping upsert for ${record.id}`);
+      return;
+    }
+
     if (existing) {
       // Update existing record with conflict resolution
       const resolvedRecord = resolveConflict(existing, serverRecord);
       
-      await supabase
+      const { error: updateError } = await supabase
         .from(tableName)
         .update(resolvedRecord)
         .eq('id', record.id);
+        
+      if (updateError) {
+        if (updateError.code === '42P01' || updateError.message?.includes('does not exist')) {
+          console.warn(`Table ${tableName} does not exist, skipping update for ${record.id}`);
+          return;
+        } else {
+          console.error(`Update error for ${tableName}:${record.id}:`, updateError);
+          throw updateError;
+        }
+      }
     } else {
       // Insert new record
-      await supabase
+      const { error: insertError } = await supabase
         .from(tableName)
         .insert(serverRecord);
+        
+      if (insertError) {
+        if (insertError.code === '42P01' || insertError.message?.includes('does not exist')) {
+          console.warn(`Table ${tableName} does not exist, skipping insert for ${record.id}`);
+          return;
+        } else {
+          console.error(`Insert error for ${tableName}:${record.id}:`, insertError);
+          throw insertError;
+        }
+      }
     }
   } catch (error) {
     console.error(`Error processing upsert for ${tableName}:${record.id}:`, error);
@@ -159,7 +185,7 @@ async function processClientDelete(
     const now = new Date().toISOString();
     
     // Soft delete (tombstone)
-    await supabase
+    const { error } = await supabase
       .from(tableName)
       .update({
         deleted: true,
@@ -167,6 +193,12 @@ async function processClientDelete(
       })
       .eq('id', recordId)
       .eq('owner_id', userId);
+
+    // If table doesn't exist, skip processing
+    if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
+      console.warn(`Table ${tableName} does not exist, skipping delete for ${recordId}`);
+      return;
+    }
   } catch (error) {
     console.error(`Error processing delete for ${tableName}:${recordId}:`, error);
     // Continue processing other records
@@ -193,6 +225,11 @@ async function getServerChanges(
     const { data: records, error } = await query;
     
     if (error) {
+      // If table doesn't exist, return empty changes instead of throwing
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn(`Table ${tableName} does not exist, returning empty changes`);
+        return { upserts: [], deletes: [] };
+      }
       throw error;
     }
 
@@ -238,13 +275,19 @@ async function updateSyncCursor(
 ): Promise<void> {
   try {
     // Upsert sync cursor
-    await supabase
+    const { error } = await supabase
       .from('sync_cursors')
       .upsert({
         user_id: userId,
         last_ack_cursor: cursor,
         updated_at: new Date().toISOString()
       });
+
+    // If sync_cursors table doesn't exist, skip
+    if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
+      console.warn('sync_cursors table does not exist, skipping cursor update');
+      return;
+    }
   } catch (error) {
     console.error('Error updating sync cursor:', error);
     // Non-critical error, don't throw

@@ -40,6 +40,34 @@
 
 - Add accounts module, sign-up/sign-in, profile, etc
 
+- I signed up on Firefox where I had Planks, Burpees, and Finger rolls marked as favorites, then I logged on from Edge where I had Burpees and Planks marked as favorites.
+
+- Fix issues 2025-08-25:
+    - ✅ When I switch to Dark Mode and add a couple of exercises to favorites then reload the page (refresh), the dark mode is gone and the favorites are gone. This was supposedly fixed earlier (and verified).
+    - I opted to login via magic link, received the email with the link, clicked it, and the app opened with an error on top (Sync failed) (Sync endpoint error: Edge Function returned a non-2xx status code) with two actions to Dismiss or Retry. This error is persistent and doesn't disappear even when the server is online.
+    - On Mon 25-Aug I created a Workout for Tue and Fri and the Home screen workout panel said next exercise Tue 25-Aug, Start now. The correct date is Tue 26-Aug.
+    - I created a workout of Plank, Burpees, then Finger Rolls. The videos were not displayed for Plank or Burpees in the workout mode although both exercises have videos, and the "Show Exercise Demo Videos" toggle was enabled. The videos were displayed when the same exercises were run in standalone mode before I ran the workout. After completing the Workout the same exercises did not play the videos again in standalone mode, and there was a very thin small green line on the timer component, which may suggest some UI problem was there.
+    - A "cancel" label is not translated in the Arabic locale files.
+    - Sign-up with biometrics fails with error "Failed to send a request to the Edge Function"
+    - This text is repeated on the console in an endless loop: "🚀 Initializing app with consent granted
+App.tsx:1391 🚀 Initializing PWA capabilities...
+serviceWorker.ts:28 🔧 Service worker not registered in development mode
+App.tsx:1459 ⚙️ Loaded stored settings: {id: 'default-app-settings', intervalDuration: 30, soundEnabled: true, vibrationEnabled: true, beepVolume: 0.5, …}
+App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', intervalDuration: 30, soundEnabled: true, vibrationEnabled: true, beepVolume: 0.5, …}
+App.tsx:1387 🚀 Initializing app with consent granted
+App.tsx:1391 🚀 Initializing PWA capabilities...
+serviceWorker.ts:28 🔧 Service worker not registered in development mode
+App.tsx:1459 ⚙️ Loaded stored settings: {id: 'default-app-settings', intervalDuration: 30, soundEnabled: true, vibrationEnabled: true, beepVolume: 0.5, …}
+App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', intervalDuration: 30, soundEnabled: true, vibrationEnabled: true, beepVolume: 0.5, …}"
+    - I signed up on Firefox after entering email, screen name, and password. I tried to sign in from Edge with the email and password yet I get message "Invalid login credentials", while I entered the email address and password correctly.
+    - I signed in with magic link on Firefox, received the login link, then pasted it in a new tab in Firefox. I got a message in a green overlay saying "Welcome! Your Data is Safe Successfully migrated 27 records from your local storage Migrated: 26 exercises and 1 settings" but at the same time I got a Red toast on top of the screen wwith error "Sync failed Sync endpoint error: Edge Function returned a non-2xx status code • Last attempt: 2m ago", while the console in the developer tools is continuously printing text like it's in an endless loop.
+    - In this message "Welcome! Your Data is Safe Successfully migrated 27 records from your local storage Migrated: 26 exercises and 1 settings" I expect a lot more data to be synced. 26 exercises is the global exercise catalog. What I expect to be synced is also my own Workouts with their own settings, the activity log, and all the settings I set.
+    - There is no option to sign-out after I have signed-in. There should be a Profile part at the top of the settings page where users can view their profile or sign out, or sign-in/up.
+    - The sync failed error is not translated in non-English locales.
+    - I want the Profile section at the top of the Settings page, not on top of the Settings menu. The Profile section on the settings page should give the user options to view profile, sign-in or sign out depending on their login status.
+
+
+
 - Gamification:
     - Add motivational feedback.
     - Add achievements and rewards.

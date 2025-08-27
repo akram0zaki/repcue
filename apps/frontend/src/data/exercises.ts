@@ -10,7 +10,7 @@ function createExercise(exerciseData: Omit<Exercise, 'id' | 'updatedAt' | 'delet
     updatedAt: new Date().toISOString(),
     deleted: false,
     version: 1,
-    dirty: false
+    dirty: 0
   };
 }
 

@@ -15,6 +15,9 @@ interface AuthenticationRequest {
   step: 'challenge' | 'verify';
   email?: string;
   response?: any; // WebAuthn credential response
+  browserPreferences?: {
+    userVerification: 'required' | 'preferred' | 'discouraged';
+  };
 }
 
 serve(async (req) => {
@@ -86,18 +89,24 @@ serve(async (req) => {
           )
         }
 
+        // Use conservative transport list for better cross-browser compatibility
+        const transports: AuthenticatorTransport[] = ['internal', 'usb', 'ble', 'nfc'];
+        
         allowCredentials = userAuthenticators.map(auth => ({
           id: new Uint8Array(JSON.parse(auth.credential_id)),
           type: 'public-key',
-          transports: ['usb', 'ble', 'nfc', 'internal'] as AuthenticatorTransport[]
+          transports
         }))
       }
       // If no email provided, allow any credential (discoverable credentials)
 
+      // Use browser preferences if provided
+      const userVerification = body.browserPreferences?.userVerification || 'preferred';
+      
       const options: GenerateAuthenticationOptionsOpts = {
         rpID,
         timeout: 60000,
-        userVerification: 'preferred',
+        userVerification,
         allowCredentials: allowCredentials.length > 0 ? allowCredentials : undefined
       }
 

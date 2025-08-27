@@ -44,3 +44,5 @@ coverage
 
 # Other
 .local/*
+.mcp.json
+console.log

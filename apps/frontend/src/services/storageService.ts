@@ -53,7 +53,7 @@ class RepCueDatabase extends Dexie {
   constructor() {
     super('RepCueDB');
     
-    // Version 3: Original schema
+    // Version 3: Original schema (kept for historical reference)
     this.version(3).stores({
       exercises: 'id, name, category, exerciseType, isFavorite, updatedAt',
       activityLogs: '++id, exerciseId, timestamp, duration',
@@ -63,12 +63,23 @@ class RepCueDatabase extends Dexie {
       workoutSessions: 'id, workoutId, startTime, endTime, isCompleted'
     });
 
-    // Version 4: Add sync metadata fields
+    // Version 4: FAILED - Primary key changes not supported by Dexie
+    // This version caused migration failures due to changing ++id to id
     this.version(4).stores({
       exercises: 'id, name, category, exerciseType, isFavorite, updatedAt, ownerId, deleted, version, dirty',
       activityLogs: '++id, exerciseId, timestamp, duration, updatedAt, ownerId, deleted, version, dirty',
-      userPreferences: 'id, updatedAt, ownerId, deleted, version, dirty',
-      appSettings: 'id, updatedAt, ownerId, deleted, version, dirty',
+      userPreferences: '++id, updatedAt, ownerId, deleted, version, dirty', // Fixed: Keep ++id
+      appSettings: '++id, updatedAt, ownerId, deleted, version, dirty', // Fixed: Keep ++id
+      workouts: 'id, name, createdAt, updatedAt, ownerId, deleted, version, dirty',
+      workoutSessions: 'id, workoutId, startTime, endTime, isCompleted, updatedAt, ownerId, deleted, version, dirty'
+    });
+
+    // Version 5: Fixed schema with consistent primary keys and proper sync metadata
+    this.version(5).stores({
+      exercises: 'id, name, category, exerciseType, isFavorite, updatedAt, ownerId, deleted, version, dirty',
+      activityLogs: '++id, exerciseId, timestamp, duration, updatedAt, ownerId, deleted, version, dirty',
+      userPreferences: '++id, updatedAt, ownerId, deleted, version, dirty',
+      appSettings: '++id, updatedAt, ownerId, deleted, version, dirty',
       workouts: 'id, name, createdAt, updatedAt, ownerId, deleted, version, dirty',
       workoutSessions: 'id, workoutId, startTime, endTime, isCompleted, updatedAt, ownerId, deleted, version, dirty'
     }).upgrade(trans => {
@@ -88,7 +99,7 @@ class RepCueDatabase extends Dexie {
       if (!exercise.ownerId) exercise.ownerId = null;
       if (!exercise.deleted) exercise.deleted = false;
       if (!exercise.version) exercise.version = 1;
-      if (!exercise.dirty) exercise.dirty = false;
+      if (!exercise.dirty) exercise.dirty = 0;
       if (!exercise.op) exercise.op = 'upsert';
     });
 
@@ -99,7 +110,7 @@ class RepCueDatabase extends Dexie {
       if (!log.ownerId) log.ownerId = null;
       if (!log.deleted) log.deleted = false;
       if (!log.version) log.version = 1;
-      if (!log.dirty) log.dirty = false;
+      if (!log.dirty) log.dirty = 0;
       if (!log.op) log.op = 'upsert';
     });
 
@@ -109,7 +120,7 @@ class RepCueDatabase extends Dexie {
       if (!prefs.ownerId) prefs.ownerId = null;
       if (!prefs.deleted) prefs.deleted = false;
       if (!prefs.version) prefs.version = 1;
-      if (!prefs.dirty) prefs.dirty = false;
+      if (!prefs.dirty) prefs.dirty = 0;
       if (!prefs.op) prefs.op = 'upsert';
     });
 
@@ -119,7 +130,7 @@ class RepCueDatabase extends Dexie {
       if (!settings.ownerId) settings.ownerId = null;
       if (!settings.deleted) settings.deleted = false;
       if (!settings.version) settings.version = 1;
-      if (!settings.dirty) settings.dirty = false;
+      if (!settings.dirty) settings.dirty = 0;
       if (!settings.op) settings.op = 'upsert';
     });
 
@@ -128,7 +139,7 @@ class RepCueDatabase extends Dexie {
       if (!workout.ownerId) workout.ownerId = null;
       if (!workout.deleted) workout.deleted = false;
       if (!workout.version) workout.version = 1;
-      if (!workout.dirty) workout.dirty = false;
+      if (!workout.dirty) workout.dirty = 0;
       if (!workout.op) workout.op = 'upsert';
     });
 
@@ -138,7 +149,7 @@ class RepCueDatabase extends Dexie {
       if (!session.ownerId) session.ownerId = null;
       if (!session.deleted) session.deleted = false;
       if (!session.version) session.version = 1;
-      if (!session.dirty) session.dirty = false;
+      if (!session.dirty) session.dirty = 0;
       if (!session.op) session.op = 'upsert';
     });
   }
@@ -167,6 +178,14 @@ export class StorageService {
   private async initializeDatabase(): Promise<void> {
     try {
       await this.db.open();
+      
+      // Check database health after opening
+      const healthCheck = await this.checkAndRepairDatabase();
+      if (healthCheck.repaired) {
+        console.log('🔧 Database was automatically repaired during initialization');
+      } else if (!healthCheck.healthy) {
+        console.warn('⚠️ Database health check failed but could not be repaired:', healthCheck.error);
+      }
     } catch (error) {
       console.warn('IndexedDB not available, falling back to memory storage:', error);
     }
@@ -337,9 +356,8 @@ export class StorageService {
     };
 
     try {
-      // Clear existing preferences and save new ones
-      await this.db.userPreferences.clear();
-      await this.db.userPreferences.add(storedPreferences);
+      // Use put() to handle both insert and update operations
+      await this.db.userPreferences.put(storedPreferences);
     } catch (error) {
       console.warn('Failed to save user preferences to IndexedDB:', error);
       this.fallbackStorage.set('userPreferences', storedPreferences);
@@ -384,9 +402,8 @@ export class StorageService {
     };
 
     try {
-      // Clear existing settings and save new ones
-      await this.db.appSettings.clear();
-      await this.db.appSettings.add(storedSettings);
+      // Use put() to handle both insert and update operations
+      await this.db.appSettings.put(storedSettings);
     } catch (error) {
       console.warn('Failed to save app settings to IndexedDB:', error);
       this.fallbackStorage.set('appSettings', storedSettings);
@@ -816,7 +833,7 @@ export class StorageService {
 
     try {
       const now = new Date().toISOString();
-      const updateData = { dirty: false, syncedAt: now };
+      const updateData = { dirty: 0, syncedAt: now };
 
       switch (table) {
         case 'exercises':
@@ -866,7 +883,7 @@ export class StorageService {
       const claimData = { 
         ownerId, 
         updatedAt: now, 
-        dirty: true, 
+        dirty: 1, 
         version: 1 
       };
 
@@ -996,6 +1013,67 @@ export class StorageService {
    */
   public async close(): Promise<void> {
     await this.db.close();
+  }
+
+  /**
+   * Reset the database - CRITICAL recovery function
+   * Use this when the database is corrupted or has migration issues
+   */
+  public async resetDatabase(): Promise<void> {
+    try {
+      console.warn('🔄 Resetting RepCue database...');
+      
+      // Close the current connection
+      await this.db.close();
+      
+      // Delete the entire database
+      await this.db.delete();
+      
+      // Recreate the database instance
+      this.db = new RepCueDatabase();
+      await this.db.open();
+      
+      // Clear fallback storage as well
+      this.fallbackStorage.clear();
+      
+      console.log('✅ Database reset successfully');
+    } catch (error) {
+      console.error('❌ Failed to reset database:', error);
+      throw new Error('Database reset failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  }
+
+  /**
+   * Check database health and attempt recovery if needed
+   */
+  public async checkAndRepairDatabase(): Promise<{ 
+    healthy: boolean; 
+    repaired: boolean; 
+    error?: string 
+  }> {
+    try {
+      // Try a simple operation to test database health
+      await this.db.exercises.count();
+      await this.db.userPreferences.count();
+      await this.db.appSettings.count();
+      
+      return { healthy: true, repaired: false };
+    } catch (error) {
+      console.warn('🔧 Database health check failed, attempting repair:', error);
+      
+      try {
+        await this.resetDatabase();
+        return { healthy: true, repaired: true };
+      } catch (repairError) {
+        const errorMsg = repairError instanceof Error ? repairError.message : 'Unknown repair error';
+        console.error('❌ Database repair failed:', repairError);
+        return { 
+          healthy: false, 
+          repaired: false, 
+          error: errorMsg 
+        };
+      }
+    }
   }
 }
 

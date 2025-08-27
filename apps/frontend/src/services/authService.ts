@@ -87,8 +87,8 @@ export class AuthService {
       // Claim ownership of anonymous data on first sign-in
       await this.claimAnonymousData();
 
-      // Trigger sync after successful sign-in
-      this.triggerSync();
+      // Trigger sync after successful sign-in with a small delay to ensure auth state is settled
+      this.triggerDelayedSync();
     } else {
       this.authState = {
         isAuthenticated: false,
@@ -157,18 +157,39 @@ export class AuthService {
   }
 
   /**
-   * Trigger sync after authentication changes
+   * Trigger sync after authentication changes with proper delay and error handling
    */
-  private triggerSync(): void {
+  private triggerDelayedSync(): void {
     try {
-      // Dynamically import and trigger sync to avoid circular dependencies
-      import('./syncService').then(({ syncService }) => {
-        syncService.sync().catch(error => {
-          console.warn('Post-login sync failed:', error);
+      // Add a delay to ensure auth state and tokens are fully settled
+      setTimeout(() => {
+        // Verify we still have a valid auth state before syncing
+        if (!this.authState.isAuthenticated || !this.authState.accessToken) {
+          console.log('⚠️ Skipping post-auth sync: user no longer authenticated');
+          return;
+        }
+
+        // Dynamically import and trigger sync to avoid circular dependencies
+        import('./syncService').then(({ syncService }) => {
+          console.log('🔄 Starting post-authentication sync...');
+          syncService.sync().then(result => {
+            if (result.success) {
+              console.log('✅ Post-authentication sync completed successfully');
+            } else {
+              console.warn('⚠️ Post-authentication sync completed with errors:', result.errors);
+              // Don't show error toasts for initial sync issues to avoid overwhelming users
+              // who just successfully signed in and saw migration success
+            }
+          }).catch(error => {
+            console.warn('❌ Post-authentication sync failed:', error);
+            // Silent failure - don't show error toast to avoid conflicting with migration success
+          });
+        }).catch(error => {
+          console.warn('Failed to load sync service:', error);
         });
-      });
+      }, 1000); // 1 second delay to ensure auth state is settled
     } catch (error) {
-      console.warn('Failed to trigger sync:', error);
+      console.warn('Failed to trigger delayed sync:', error);
     }
   }
 

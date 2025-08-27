@@ -312,7 +312,7 @@ describe('SyncService', () => {
 
       // Verify the call chain was used correctly
       expect(mockWhere).toHaveBeenCalledWith('dirty');
-      expect(mockEquals).toHaveBeenCalledWith(true);
+      expect(mockEquals).toHaveBeenCalledWith(1);
       expect(mockCount).toHaveBeenCalled();
       expect(hasChanges).toBe(true);
     });

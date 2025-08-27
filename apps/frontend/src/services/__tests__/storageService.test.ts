@@ -288,7 +288,7 @@ describe('StorageService', () => {
         ...mockExercise,
         updatedAt: expect.any(String),
         deleted: false,
-        dirty: true,
+        dirty: 1,
         op: 'upsert',
         ownerId: null,
         version: 1
@@ -345,7 +345,7 @@ describe('StorageService', () => {
         isFavorite: true,
         updatedAt: expect.any(String),
         deleted: false,
-        dirty: true,
+        dirty: 1,
         op: 'upsert',
         ownerId: null,
         version: 1
@@ -369,7 +369,7 @@ describe('StorageService', () => {
         id: expect.any(String),
         timestamp: mockActivityLog.timestamp.toISOString(),
         deleted: false,
-        dirty: true,
+        dirty: 1,
         op: 'upsert',
         ownerId: null,
         version: 1,

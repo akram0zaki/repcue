@@ -3,7 +3,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 import { validateJWT } from '../_shared/auth.ts'
 import { processSyncRequest } from '../_shared/sync-processor.ts'
-import { RateLimiter, extractClientIP } from '../_shared/rate-limiter.ts'
 
 interface SyncRequest {
   since?: string;
@@ -73,8 +72,31 @@ serve(async (req) => {
       )
     }
 
-    // Parse request body
-    const body = await req.json() as SyncRequest
+    // Parse request body with better error handling
+    let body: SyncRequest;
+    try {
+      const rawBody = await req.text();
+      console.log('Raw request body length:', rawBody.length);
+      console.log('Raw request body preview:', rawBody.substring(0, 200) + '...');
+      
+      if (!rawBody || rawBody.trim() === '') {
+        throw new Error('Empty request body');
+      }
+      
+      body = JSON.parse(rawBody) as SyncRequest;
+    } catch (parseError) {
+      console.error('Error parsing request body:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid JSON in request body',
+          message: parseError instanceof Error ? parseError.message : 'Unknown parse error'
+        }), 
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
     
     // Validate request structure
     if (!body.tables || typeof body.tables !== 'object') {
@@ -98,65 +120,24 @@ serve(async (req) => {
       }
     })
 
-    // Extract client IP for rate limiting and audit logging
-    const clientIP = extractClientIP(req)
-
-    // Check rate limiting
-    const rateLimiter = new RateLimiter(supabase)
-    const rateLimitResult = await rateLimiter.checkRateLimit('sync', userId, clientIP)
-    
-    if (!rateLimitResult.allowed) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'Rate limit exceeded',
-          message: rateLimitResult.message,
-          retryAfter: rateLimitResult.resetTime?.toISOString()
-        }),
-        {
-          headers: { 
-            ...corsHeaders, 
-            'Content-Type': 'application/json',
-            'X-RateLimit-Remaining': rateLimitResult.remaining?.toString() || '0',
-            'X-RateLimit-Reset': rateLimitResult.resetTime?.getTime().toString() || ''
-          },
-          status: 429
-        }
-      )
-    }
-
-    // Log sync request start
-    await supabase.rpc('log_audit_event', {
-      p_user_id: userId,
-      p_action: 'SYNC_REQUEST_START',
-      p_resource_type: 'sync',
-      p_resource_id: userId,
-      p_details: {
-        tables: Object.keys(body.tables),
-        since: body.since,
-        client_info: body.clientInfo
-      },
-      p_ip_address: clientIP,
-      p_user_agent: req.headers.get('User-Agent'),
-      p_success: true
-    })
+    // Debug logging to understand sync request structure
+    console.log('Processing sync request for user:', userId)
+    console.log('Tables to sync:', Object.keys(body.tables))
+    console.log('Request details:', JSON.stringify({
+      since: body.since,
+      clientInfo: body.clientInfo,
+      tableData: Object.entries(body.tables).map(([table, data]) => ({
+        table,
+        upsertsCount: data.upserts?.length || 0,
+        deletesCount: data.deletes?.length || 0,
+        sampleUpsert: data.upserts?.[0] || null
+      }))
+    }, null, 2))
 
     // Process sync request
     const syncResponse = await processSyncRequest(supabase, userId, body)
-
-    // Log sync request completion
-    await supabase.rpc('log_audit_event', {
-      p_user_id: userId,
-      p_action: 'SYNC_REQUEST_COMPLETE',
-      p_resource_type: 'sync',
-      p_resource_id: userId,
-      p_details: {
-        tables_processed: Object.keys(syncResponse.changes).length,
-        cursor: syncResponse.cursor
-      },
-      p_ip_address: clientIP,
-      p_user_agent: req.headers.get('User-Agent'),
-      p_success: true
-    })
+    
+    console.log('Sync processing completed successfully')
 
     return new Response(
       JSON.stringify(syncResponse),

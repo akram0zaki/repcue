@@ -127,7 +127,7 @@ describe('StorageService - Workout Management', () => {
       updatedAt: '2023-01-01T10:00:00.000Z',
       deleted: false,
       version: 1,
-      dirty: false,
+      dirty: 0,
       op: 'upsert'
     }
 
@@ -141,7 +141,7 @@ describe('StorageService - Workout Management', () => {
         createdAt: '2023-01-01T10:00:00.000Z',
         updatedAt: expect.any(String),
         deleted: false,
-        dirty: true,
+        dirty: 1,
         op: 'upsert',
         ownerId: null,
         version: 2 // Version increments from 1 to 2
@@ -215,7 +215,7 @@ describe('StorageService - Workout Management', () => {
         id: 'workout-1',
         name: 'Test Workout',
         deleted: true,
-        dirty: true,
+        dirty: 1,
         op: 'delete',
         version: 2,
         updatedAt: expect.any(String)
@@ -248,7 +248,7 @@ describe('StorageService - Workout Management', () => {
       updatedAt: '2023-01-01T10:00:00.000Z',
       deleted: false,
       version: 1,
-      dirty: false,
+      dirty: 0,
       op: 'upsert'
     }
 
@@ -262,7 +262,7 @@ describe('StorageService - Workout Management', () => {
         startTime: '2023-01-01T10:00:00.000Z',
         endTime: '2023-01-01T10:30:00.000Z',
         deleted: false,
-        dirty: true,
+        dirty: 1,
         op: 'upsert',
         ownerId: null,
         version: 2, // Version increments from 1 to 2
@@ -313,7 +313,7 @@ describe('StorageService - Workout Management', () => {
         id: 'session-1',
         workoutId: 'workout-1',
         deleted: true,
-        dirty: true,
+        dirty: 1,
         op: 'delete',
         version: 2,
         updatedAt: expect.any(String)
@@ -337,7 +337,7 @@ describe('StorageService - Workout Management', () => {
         updatedAt: new Date().toISOString(),
         deleted: false,
         version: 1,
-        dirty: false,
+        dirty: 0,
         op: 'upsert'
       }
 

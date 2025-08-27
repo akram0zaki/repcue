@@ -14,9 +14,28 @@
       "Bash(del:*)",
       "Read(/c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
       "Bash(pnpm run:*)",
-      "Bash(pnpm add:*)"
+      "Bash(pnpm add:*)",
+      "Bash(npx supabase functions:*)",
+      "Bash(npx supabase:*)",
+      "Bash(env)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__list_edge_functions",
+      "mcp__supabase__execute_sql",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__list_branches",
+      "mcp__supabase__create_branch",
+      "mcp__supabase__list_extensions",
+      "mcp__supabase__list_migrations",
+      "mcp__supabase__deploy_edge_function",
+      "Bash(cat:*)",
+      "mcp__supabase__get_logs",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

@@ -1,5 +1,10 @@
 import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
-import type { AuthenticationResponseJSON, RegistrationResponseJSON } from '@simplewebauthn/types';
+import type { 
+  AuthenticationResponseJSON, 
+  RegistrationResponseJSON,
+  UserVerificationRequirement,
+  AuthenticatorAttachment
+} from '@simplewebauthn/types';
 import { supabase } from '../config/supabase';
 
 export interface PasskeyRegistrationResult {
@@ -44,6 +49,48 @@ export class WebAuthnService {
   }
 
   /**
+   * Get browser-specific WebAuthn preferences
+   */
+  private getBrowserPreferences(): {
+    userVerification: UserVerificationRequirement;
+    residentKey: 'required' | 'preferred' | 'discouraged';
+    authenticatorAttachment?: AuthenticatorAttachment;
+  } {
+    const userAgent = navigator.userAgent.toLowerCase();
+    
+    // Firefox has issues with 'preferred' settings, use 'discouraged' for better compatibility
+    if (userAgent.includes('firefox')) {
+      return {
+        userVerification: 'discouraged',
+        residentKey: 'discouraged'
+      };
+    }
+    
+    // Edge (Chromium) works well with platform authenticators
+    if (userAgent.includes('edg/')) {
+      return {
+        userVerification: 'preferred',
+        residentKey: 'preferred',
+        authenticatorAttachment: 'platform'
+      };
+    }
+    
+    // Chrome and other Chromium-based browsers
+    if (userAgent.includes('chrome')) {
+      return {
+        userVerification: 'preferred',
+        residentKey: 'preferred'
+      };
+    }
+    
+    // Safari and other browsers - conservative settings
+    return {
+      userVerification: 'discouraged',
+      residentKey: 'discouraged'
+    };
+  }
+
+  /**
    * Check if platform authenticator (Touch ID, Face ID, Windows Hello) is available
    */
   async isPlatformAuthenticatorAvailable(): Promise<boolean> {
@@ -71,11 +118,15 @@ export class WebAuthnService {
     }
 
     try {
+      // Get browser-specific preferences
+      const browserPrefs = this.getBrowserPreferences();
+      
       // Step 1: Get registration options from server
       const { data: challengeData, error: challengeError } = await supabase.functions.invoke('webauthn-register', {
         body: {
           step: 'challenge',
-          email
+          email,
+          browserPreferences: browserPrefs
         }
       });
 
@@ -154,11 +205,17 @@ export class WebAuthnService {
     }
 
     try {
+      // Get browser-specific preferences
+      const browserPrefs = this.getBrowserPreferences();
+      
       // Step 1: Get authentication options from server
       const { data: challengeData, error: challengeError } = await supabase.functions.invoke('webauthn-authenticate', {
         body: {
           step: 'challenge',
-          email
+          email,
+          browserPreferences: {
+            userVerification: browserPrefs.userVerification
+          }
         }
       });
 

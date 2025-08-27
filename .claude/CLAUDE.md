@@ -72,6 +72,10 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - This project is using pnpm as the package manager. Use pnpm and its syntax for running any task related to the project like running unit tests, lint, build, etc
 
+- Supabase database password is stored in environment variable SUPABASE_DB_PASSWORD
+
+- Supabase Personal Access Token is stored in environment variable SUPABASE_ACCESS_TOKEN
+
 - This application is being developed on a Windows 11 machine and deployed to production on a Raspberry Pi 5 running the default Pi OS where nginx and cloudflare tunnel are set up.
 
 - Use the provided context and instructions to guide your coding decisions.

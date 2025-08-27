@@ -32,5 +32,5 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   updatedAt: new Date().toISOString(),
   deleted: false,
   version: 1,
-  dirty: false
+  dirty: 0
 }; 

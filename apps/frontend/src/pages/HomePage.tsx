@@ -81,7 +81,21 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               
               // Calculate the date for the workout
               const workoutDate = new Date();
-              const daysUntilWorkout = (Object.values(Weekday).indexOf(targetWeekday) - today.getDay() + 7) % 7;
+              
+              // Convert JavaScript's getDay() (0=Sunday) to our Weekday enum index (0=Monday)
+              const jsWeekdayToWeekdayIndex = (jsDay: number): number => {
+                return (jsDay + 6) % 7; // Sunday(0) -> 6, Monday(1) -> 0, Tuesday(2) -> 1, etc.
+              };
+              
+              const currentWeekdayIndex = jsWeekdayToWeekdayIndex(today.getDay());
+              const targetWeekdayIndex = Object.values(Weekday).indexOf(targetWeekday);
+              
+              let daysUntilWorkout = (targetWeekdayIndex - currentWeekdayIndex + 7) % 7;
+              // If it's 0 (same day), and we're looking for next occurrence, make it 7
+              if (daysUntilWorkout === 0 && targetWeekday !== currentWeekday) {
+                daysUntilWorkout = 7;
+              }
+              
               workoutDate.setDate(today.getDate() + daysUntilWorkout);
               
               setUpcomingWorkout({
