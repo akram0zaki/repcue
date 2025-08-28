@@ -315,6 +315,48 @@ class RepCueDatabase extends Dexie {
       // Don't throw - let the migration continue with warnings
     }
   }
+
+  /**
+   * Get migration status and database info
+   */
+  async getMigrationStatus(): Promise<{
+    currentVersion: number;
+    isV6Schema: boolean;
+    tableStats: Record<string, number>;
+    migrationComplete: boolean;
+  }> {
+    try {
+      const currentVersion = this.verno;
+      const isV6Schema = currentVersion >= 6;
+      
+      const tableStats: Record<string, number> = {};
+      const tables = ['exercises', 'activity_logs', 'user_preferences', 'app_settings', 'workouts', 'workout_sessions'];
+      
+      for (const tableName of tables) {
+        try {
+          const count = await (this as any).table(tableName).count();
+          tableStats[tableName] = count;
+        } catch (error) {
+          tableStats[tableName] = 0;
+        }
+      }
+      
+      return {
+        currentVersion,
+        isV6Schema,
+        tableStats,
+        migrationComplete: isV6Schema && Object.values(tableStats).some(count => count > 0)
+      };
+    } catch (error) {
+      console.error('Error getting migration status:', error);
+      return {
+        currentVersion: 0,
+        isV6Schema: false,
+        tableStats: {},
+        migrationComplete: false
+      };
+    }
+  }
 }
 
 export class StorageService {
@@ -365,6 +407,47 @@ export class StorageService {
    */
   public getDatabase(): RepCueDatabase {
     return this.db;
+  }
+
+  /**
+   * Get migration status and database info
+   */
+  async getMigrationStatus() {
+    return await this.db.getMigrationStatus();
+  }
+
+  /**
+   * Export all data for backup purposes
+   */
+  async exportAllData(): Promise<Record<string, unknown[]>> {
+    try {
+      const status = await this.getMigrationStatus();
+      const data: Record<string, unknown[]> = {};
+      
+      const tables = ['exercises', 'activity_logs', 'user_preferences', 'app_settings', 'workouts', 'workout_sessions'];
+      
+      for (const tableName of tables) {
+        try {
+          data[tableName] = await this.db.table(tableName).toArray();
+        } catch (error) {
+          console.error(`Error exporting ${tableName}:`, error);
+          data[tableName] = [];
+        }
+      }
+      
+      return {
+        metadata: {
+          exportTimestamp: new Date().toISOString(),
+          databaseVersion: status.currentVersion,
+          isV6Schema: status.isV6Schema,
+          tableStats: status.tableStats
+        },
+        ...data
+      };
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      throw error;
+    }
   }
 
   /**
