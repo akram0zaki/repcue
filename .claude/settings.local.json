@@ -32,7 +32,8 @@
       "Bash(npm run build:*)",
       "Bash(git log:*)",
       "Bash(git commit:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
