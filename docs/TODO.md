@@ -64,7 +64,9 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - In this message "Welcome! Your Data is Safe Successfully migrated 27 records from your local storage Migrated: 26 exercises and 1 settings" I expect a lot more data to be synced. 26 exercises is the global exercise catalog. What I expect to be synced is also my own Workouts with their own settings, the activity log, and all the settings I set.
     - There is no option to sign-out after I have signed-in. There should be a Profile part at the top of the settings page where users can view their profile or sign out, or sign-in/up.
     - The sync failed error is not translated in non-English locales.
-    - I want the Profile section at the top of the Settings page, not on top of the Settings menu. The Profile section on the settings page should give the user options to view profile, sign-in or sign out depending on their login status.
+    - I want a Profile section at the top of the Settings page, not on top of the Settings menu. The Profile section on the settings page should give the user options to view profile, sign-in or sign out depending on their login status.
+    - When the user is logged on, a section appears on top of the Settings menu item displaying the user's email address. Since we added a profile section to the Settings page I find this redundant. Remove the profile info on top of the Settings menu in navigation for logged on users.
+    - ✅ Review all non-English translation files and translate any English strings there to the file's corresponding language. Note that ar-EG is the slang Egyptian Arabic.
 
 
 

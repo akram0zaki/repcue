@@ -55,7 +55,7 @@
   "single-leg-stand": { "name": "Equilibrio a una pierna", "description": "Manténte de pie sobre una pierna y luego cambia" },
   "tree-pose": { "name": "Postura del árbol", "description": "De pie en una pierna, coloca el pie contrario en la cara interna del muslo" },
   "warrior-3": { "name": "Guerrero III", "description": "Equilíbrate en una pierna con la otra extendida hacia atrás" },
-  "dead-bug": { "name": "Dead bug", "description": "Boca arriba, extiende brazo y pierna opuestos alternando" },
+  "dead-bug": { "name": "Bicho muerto", "description": "Boca arriba, extiende brazo y pierna opuestos alternando" },
   "glute-bridges": { "name": "Puente de glúteos", "description": "Boca arriba, eleva la cadera contrayendo los glúteos" },
   "finger-roll": { "name": "Rodar de dedos", "description": "Rueda los dedos de puño a extensión completa, uno por uno" },
   "tricep-dips": { "name": "Fondos de tríceps", "description": "Baja y sube el cuerpo usando los brazos apoyado en un borde" },

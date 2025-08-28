@@ -432,7 +432,7 @@ export class SyncService {
           } else {
           // Remove local-only sync metadata before sending and convert field names
           const { dirty: _dirty, op: _op, syncedAt: _syncedAt, ownerId, updatedAt, version, 
-                  exerciseType, defaultDuration, isFavorite, hasVideo, ...cleanRecord } = record;
+                  exerciseType, defaultDuration, isFavorite, hasVideo, ...cleanRecord } = record as any;
           
           // Helper function to transform exercise type for database compatibility
           const transformExerciseType = (type: string): string => {
@@ -453,7 +453,7 @@ export class SyncService {
             updated_at: updatedAt,
             version: version || 1,
             // Exercise-specific field mappings
-            ...(exerciseType && { exercise_type: transformExerciseType(exerciseType) }),
+            ...(exerciseType && typeof exerciseType === 'string' ? { exercise_type: transformExerciseType(exerciseType) } : {}),
             ...(typeof defaultDuration === 'number' && { rep_duration_seconds: defaultDuration }),
             ...(typeof isFavorite === 'boolean' && { is_favorite: isFavorite }),
             ...((record as any).tags !== undefined && { 
@@ -711,10 +711,10 @@ export class SyncService {
             ownerId: owner_id,
             updatedAt: updated_at,
             // Exercise-specific field mappings
-            ...(exercise_type && { exerciseType: transformExerciseTypeFromServer(exercise_type as string) }),
+            ...(exercise_type && typeof exercise_type === 'string' ? { exerciseType: transformExerciseTypeFromServer(exercise_type) } : {}),
             ...(typeof rep_duration_seconds === 'number' && { defaultDuration: rep_duration_seconds }),
             ...(typeof is_favorite === 'boolean' && { isFavorite: is_favorite }),
-            ...(tags && { tags: typeof tags === 'string' ? JSON.parse(tags) : tags }),
+            ...(tags ? { tags: typeof tags === 'string' ? JSON.parse(tags) : tags } : {}),
             // AppSettings field mappings
             ...(typeof interval_duration === 'number' && { intervalDuration: interval_duration }),
             ...(typeof sound_enabled === 'boolean' && { soundEnabled: sound_enabled }),

@@ -426,8 +426,7 @@ describe('StorageService', () => {
     it('should save user preferences to IndexedDB', async () => {
       await storageService.saveUserPreferences(mockUserPreferences)
       
-      expect(mockDb.userPreferences.clear).toHaveBeenCalled()
-      expect(mockDb.userPreferences.add).toHaveBeenCalledWith({
+      expect(mockDb.userPreferences.put).toHaveBeenCalledWith({
         ...mockUserPreferences,
         updatedAt: expect.any(String)
       })
@@ -458,8 +457,7 @@ describe('StorageService', () => {
     it('should save app settings to IndexedDB', async () => {
       await storageService.saveAppSettings(mockAppSettings)
       
-      expect(mockDb.appSettings.clear).toHaveBeenCalled()
-      expect(mockDb.appSettings.add).toHaveBeenCalledWith({
+      expect(mockDb.appSettings.put).toHaveBeenCalledWith({
         ...mockAppSettings,
         updatedAt: expect.any(String)
       })

@@ -39,7 +39,7 @@
   },
   "plank": { "name": "Unterarmstütz (Plank)", "description": "Körper in gerader Linie halten, auf Unterarmen und Zehen gestützt" },
   "side-plank": { "name": "Seitstütz", "description": "Seitlich stützen, auf einem Unterarm halten" },
-  "mountain-climbers": { "name": "Mountain Climbers", "description": "Abwechselnd Knie in der Plank-Position zur Brust ziehen" },
+  "mountain-climbers": { "name": "Bergsteiger", "description": "Abwechselnd Knie in der Plank-Position zur Brust ziehen" },
   "bicycle-crunches": { "name": "Fahrrad-Crunches", "description": "Ellenbogen zum gegenüberliegenden Knie im Wechsel" },
   "push-ups": { "name": "Liegestütze", "description": "Körper aus der Bauchlage mit den Armen senken und heben" },
   "squats": { "name": "Kniebeugen", "description": "Knie beugen zum Absenken und wieder aufrichten" },
@@ -55,12 +55,12 @@
   "single-leg-stand": { "name": "Einbeinstand", "description": "Auf einem Bein stehen und halten, dann wechseln" },
   "tree-pose": { "name": "Baum", "description": "Auf einem Bein stehen, anderen Fuß an die Innenseite des Oberschenkels setzen" },
   "warrior-3": { "name": "Krieger III", "description": "Auf einem Bein balancieren, anderes Bein nach hinten strecken" },
-  "dead-bug": { "name": "Dead Bug", "description": "Rückenlage, gegenüberliegenden Arm und das Bein abwechselnd strecken" },
+  "dead-bug": { "name": "Toter Käfer", "description": "Rückenlage, gegenüberliegenden Arm und das Bein abwechselnd strecken" },
   "glute-bridges": { "name": "Hüftbrücke", "description": "In Rückenlage die Hüfte durch Anspannen der Gesäßmuskeln anheben" },
   "finger-roll": { "name": "Fingerrollen", "description": "Finger von der Faust zur vollständigen Streckung einzeln abrollen" },
   "tricep-dips": { "name": "Trizeps-Dips", "description": "Körper mit den Armen an einer Kante senken und heben" },
   "calf-raises": { "name": "Wadenheben", "description": "Auf die Zehenspitzen heben, kurz halten und wieder absenken" },
-  "russian-twists": { "name": "Russian Twists", "description": "Sitz, Füße angehoben, Oberkörper nach rechts und links rotieren" },
+  "russian-twists": { "name": "Russische Drehungen", "description": "Sitz, Füße angehoben, Oberkörper nach rechts und links rotieren" },
   "bear-crawl": { "name": "Bärenlauf", "description": "Auf Händen und Füßen vorwärts krabbeln, Knie vom Boden abgehoben" },
   "forward-fold": { "name": "Vorbeuge", "description": "Im Stand nach vorn beugen und zu den Zehen greifen" }
 }

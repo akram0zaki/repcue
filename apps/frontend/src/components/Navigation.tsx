@@ -11,7 +11,6 @@ import {
   ScheduleIcon,
   MoreIcon
 } from './icons/NavigationIcons';
-import { UserProfile } from './auth';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
@@ -110,11 +109,6 @@ const Navigation: React.FC = () => {
           {/* Dropdown menu */}
           {showMoreMenu && (
             <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] max-w-[250px]">
-              {/* User Profile */}
-              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <UserProfile className="w-full" />
-              </div>
-              
               {/* Settings */}
               <button
                 onClick={() => {

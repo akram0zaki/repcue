@@ -1564,70 +1564,30 @@ useEffect(() => {
 
   
 
-  // Early theme detection to prevent flash - check immediately
+  // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {
-    // Immediate synchronous check for cached theme preference
-    const cachedTheme = localStorage.getItem('repcue-theme');
-    if (cachedTheme === 'dark') {
+    // Check system preference for initial theme
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (prefersDark) {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
-    
-    // Also do async check for full settings - but handle consent properly
-    const checkEarlyTheme = async () => {
-      try {
-        // Check if consent exists first - bypass the service layer check
-        const consentStatus = consentService.hasConsent();
-        if (!consentStatus) {
-          // No consent, but check if we have a cached theme preference
-          const cachedTheme = localStorage.getItem('repcue-theme');
-          if (cachedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-          return;
-        }
-
-        // We have consent, try to load full settings
-        const storedSettings = await storageService.getAppSettings();
-        if (storedSettings?.darkMode) {
-          document.documentElement.classList.add('dark');
-          localStorage.setItem('repcue-theme', 'dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-          localStorage.setItem('repcue-theme', 'light');
-        }
-      } catch (error) {
-        console.error('Failed to load early theme setting:', error);
-        // Fallback to cached theme
-        const cachedTheme = localStorage.getItem('repcue-theme');
-        if (cachedTheme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }
-    };
-    
-    checkEarlyTheme();
   }, []);
 
   // Apply dark mode to document
   useEffect(() => {
     if (appSettings.darkMode) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('repcue-theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('repcue-theme', 'light');
     }
 
     // Debug logging in development
     if (process.env.NODE_ENV === 'development') {
       console.log('🎨 Theme applied:', appSettings.darkMode ? 'dark' : 'light', {
         hasConsent,
-        darkMode: appSettings.darkMode,
-        localStorage: localStorage.getItem('repcue-theme')
+        darkMode: appSettings.darkMode
       });
     }
   }, [appSettings.darkMode, hasConsent]);

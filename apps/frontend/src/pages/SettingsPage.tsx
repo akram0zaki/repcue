@@ -11,6 +11,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
+import { ProfileSection } from '../components/ProfileSection';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -113,6 +114,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4 max-w-md">
+        {/* Profile Section */}
+        <ProfileSection 
+          onViewProfile={() => {
+            // TODO: Open profile settings modal
+            console.log('View profile clicked');
+          }}
+        />
+
         {/* Audio Settings */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">

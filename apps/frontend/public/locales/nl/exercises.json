@@ -39,7 +39,7 @@
   },
   "plank": { "name": "Plank", "description": "Houd je lichaam recht, steunend op onderarmen en tenen" },
   "side-plank": { "name": "Zijplank", "description": "Houd je lichaam zijwaarts, steunend op één onderarm" },
-  "mountain-climbers": { "name": "Mountain climbers", "description": "Breng in plankpositie afwisselend de knieën naar de borst" },
+  "mountain-climbers": { "name": "Bergklimmers", "description": "Breng in plankpositie afwisselend de knieën naar de borst" },
   "bicycle-crunches": { "name": "Fiets-crunches", "description": "Elleboog naar tegenovergestelde knie in wisselend tempo" },
   "push-ups": { "name": "Opdrukken", "description": "Laat je lichaam zakken en duw weer omhoog met je armen" },
   "squats": { "name": "Squats", "description": "Buig de knieën om te zakken en kom weer overeind" },
@@ -55,12 +55,12 @@
   "single-leg-stand": { "name": "Eenbenige stand", "description": "Sta op één been en wissel daarna" },
   "tree-pose": { "name": "Boomhouding", "description": "Sta op één been en plaats de andere voet aan de binnenkant van het bovenbeen" },
   "warrior-3": { "name": "Krijger III", "description": "Balans op één been met het andere been naar achteren gestrekt" },
-  "dead-bug": { "name": "Dead bug", "description": "Lig op je rug en strek afwisselend tegenovergestelde arm en been" },
+  "dead-bug": { "name": "Dode kever", "description": "Lig op je rug en strek afwisselend tegenovergestelde arm en been" },
   "glute-bridges": { "name": "Heupbrug", "description": "Lig op je rug en til de heupen op door de bilspieren aan te spannen" },
   "finger-roll": { "name": "Vingerrol", "description": "Rol de vingers van vuist naar volledige strekking, één voor één" },
   "tricep-dips": { "name": "Tricep dips", "description": "Laat je lichaam zakken en duw omhoog met ondersteuning achter je" },
   "calf-raises": { "name": "Kuitheffing", "description": "Kom op de tenen staan, kort vasthouden en weer laten zakken" },
-  "russian-twists": { "name": "Russische twists", "description": "Zittend met voeten omhoog, romp naar links en rechts draaien" },
+  "russian-twists": { "name": "Russische draaioefeningen", "description": "Zittend met voeten omhoog, romp naar links en rechts draaien" },
   "bear-crawl": { "name": "Berenkruipen", "description": "Kruip vooruit op handen en voeten met knieën van de grond" },
   "forward-fold": { "name": "Vooroverbuiging", "description": "Buig voorover vanuit stand en reik naar de tenen" }
 }
