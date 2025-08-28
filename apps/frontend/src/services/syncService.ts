@@ -10,7 +10,16 @@ export interface SyncResult {
   recordsPushed: number;
   recordsPulled: number;
   conflicts: number;
-  errors: string[];
+  errors: SyncError[];
+}
+
+export interface SyncError {
+  type: 'network' | 'validation' | 'conflict' | 'storage' | 'auth' | 'unknown';
+  message: string;
+  table?: string;
+  recordId?: string;
+  timestamp: string;
+  details?: Record<string, unknown>;
 }
 
 export interface SyncStatus {
@@ -19,7 +28,7 @@ export interface SyncStatus {
   lastSyncAttempt?: number;
   lastSuccessfulSync?: number;
   hasChangesToSync: boolean;
-  errors: string[];
+  errors: SyncError[];
 }
 
 export interface SyncRequest {
@@ -67,8 +76,172 @@ export class SyncService {
   private lastSyncAttempt?: number;
   private lastSuccessfulSync?: number;
   private lastSyncCursor?: string;
-  private syncErrors: string[] = [];
+  private syncErrors: SyncError[] = [];
   private listeners: ((status: SyncStatus) => void)[] = [];
+
+  /**
+   * Create a structured sync error
+   */
+  private createSyncError(
+    type: SyncError['type'],
+    message: string,
+    table?: string,
+    recordId?: string,
+    details?: Record<string, unknown>
+  ): SyncError {
+    return {
+      type,
+      message,
+      table,
+      recordId,
+      timestamp: new Date().toISOString(),
+      details
+    };
+  }
+
+  /**
+   * Validate a record before syncing
+   */
+  private validateRecord(record: Record<string, unknown>, tableName: string): SyncError | null {
+    // Check required fields
+    if (!record.id) {
+      return this.createSyncError(
+        'validation',
+        'Record missing required id field',
+        tableName,
+        record.id as string,
+        { record }
+      );
+    }
+
+    // Validate timestamp fields
+    if (record.updated_at && typeof record.updated_at === 'string') {
+      try {
+        new Date(record.updated_at);
+      } catch {
+        return this.createSyncError(
+          'validation',
+          'Invalid updated_at timestamp format',
+          tableName,
+          record.id as string,
+          { updated_at: record.updated_at }
+        );
+      }
+    }
+
+    // Validate version field
+    if (record.version && (typeof record.version !== 'number' || record.version < 1)) {
+      return this.createSyncError(
+        'validation',
+        'Invalid version field - must be a positive number',
+        tableName,
+        record.id as string,
+        { version: record.version }
+      );
+    }
+
+    // Table-specific validation
+    switch (tableName) {
+      case 'exercises':
+        if (!record.name || typeof record.name !== 'string') {
+          return this.createSyncError(
+            'validation',
+            'Exercise missing required name field',
+            tableName,
+            record.id as string,
+            { name: record.name }
+          );
+        }
+        if (!record.exercise_type || !['time_based', 'repetition_based'].includes(record.exercise_type as string)) {
+          return this.createSyncError(
+            'validation',
+            'Exercise has invalid exercise_type',
+            tableName,
+            record.id as string,
+            { exercise_type: record.exercise_type }
+          );
+        }
+        break;
+
+      case 'workouts':
+        if (!record.name || typeof record.name !== 'string') {
+          return this.createSyncError(
+            'validation',
+            'Workout missing required name field',
+            tableName,
+            record.id as string,
+            { name: record.name }
+          );
+        }
+        if (!Array.isArray(record.exercises)) {
+          return this.createSyncError(
+            'validation',
+            'Workout exercises field must be an array',
+            tableName,
+            record.id as string,
+            { exercises: record.exercises }
+          );
+        }
+        break;
+
+      case 'activity_logs':
+        if (!record.exercise_name || typeof record.exercise_name !== 'string') {
+          return this.createSyncError(
+            'validation',
+            'Activity log missing required exercise_name field',
+            tableName,
+            record.id as string,
+            { exercise_name: record.exercise_name }
+          );
+        }
+        if (typeof record.duration !== 'number' || record.duration < 0) {
+          return this.createSyncError(
+            'validation',
+            'Activity log duration must be a positive number',
+            tableName,
+            record.id as string,
+            { duration: record.duration }
+          );
+        }
+        break;
+    }
+
+    return null; // Validation passed
+  }
+
+  /**
+   * Rollback sync changes on failure
+   */
+  private async rollbackSyncChanges(tableName: string, recordIds: string[]): Promise<void> {
+    if (recordIds.length === 0) return;
+    
+    try {
+      const indexedDBTableName = this.getIndexedDBTableName(tableName);
+      const db = this.storageService.getDatabase();
+      const table = (db as unknown as Record<string, unknown>)[indexedDBTableName];
+      
+      if (!table || typeof table !== 'object') {
+        console.warn(`Cannot rollback: table ${indexedDBTableName} not found`);
+        return;
+      }
+
+      // Mark records as dirty again so they can be retried
+      for (const recordId of recordIds) {
+        try {
+          await (table as any).update(recordId, {
+            dirty: 1,
+            synced_at: undefined
+          });
+        } catch (error) {
+          console.error(`Failed to rollback record ${recordId} in ${tableName}:`, error);
+        }
+      }
+      
+      console.log(`🔄 Rolled back ${recordIds.length} records in ${tableName}`);
+    } catch (error) {
+      console.error(`Failed to rollback changes for ${tableName}:`, error);
+    }
+  }
 
   private constructor() {
     this.storageService = StorageService.getInstance();
@@ -283,9 +456,16 @@ export class SyncService {
 
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown sync error';
-      console.error('❌ Sync failed:', errorMessage);
-      this.syncErrors = [errorMessage];
+      const syncError = this.createSyncError(
+        error instanceof Error && error.message.includes('network') ? 'network' : 'unknown',
+        error instanceof Error ? error.message : 'Unknown sync error',
+        undefined,
+        undefined,
+        { originalError: error }
+      );
+      
+      console.error('❌ Sync failed:', syncError);
+      this.syncErrors = [syncError];
       
       return {
         success: false,
@@ -335,8 +515,15 @@ export class SyncService {
             result.recordsPushed += dirtyRecords.upserts.length + dirtyRecords.deletes.length;
           }
         } catch (error) {
-          console.error(`Error gathering dirty records for ${tableName}:`, error);
-          result.errors.push(`Failed to gather dirty records for ${tableName}`);
+          const syncError = this.createSyncError(
+            'storage',
+            `Failed to gather dirty records for ${tableName}`,
+            tableName,
+            undefined,
+            { originalError: error }
+          );
+          console.error(`Error gathering dirty records for ${tableName}:`, syncError);
+          result.errors.push(syncError);
         }
       }
 
@@ -383,8 +570,15 @@ export class SyncService {
           }
           result.tablesProcessed++;
         } catch (error) {
-          console.error(`Error applying server changes for ${tableName}:`, error);
-          result.errors.push(`Failed to apply server changes for ${tableName}`);
+          const syncError = this.createSyncError(
+            'storage',
+            `Failed to apply server changes for ${tableName}`,
+            tableName,
+            undefined,
+            { originalError: error }
+          );
+          console.error(`Error applying server changes for ${tableName}:`, syncError);
+          result.errors.push(syncError);
         }
       }
 
@@ -402,23 +596,24 @@ export class SyncService {
     } catch (error) {
       console.error('Sync operation failed:', error);
       result.success = false;
-      result.errors.push(error instanceof Error ? error.message : 'Unknown error');
+      result.errors.push(this.createSyncError(
+        'unknown',
+        error instanceof Error ? error.message : 'Unknown error',
+        undefined,
+        undefined,
+        { originalError: error }
+      ));
       return result;
     }
   }
 
   /**
    * Map database table names to IndexedDB table names
+   * Phase 2: No mapping needed - table names are consistent
    */
   private getIndexedDBTableName(tableName: string): string {
-    const tableNameMap: Record<string, string> = {
-      'activity_logs': 'activityLogs',
-      'workout_sessions': 'workoutSessions',
-      'user_preferences': 'userPreferences',
-      'app_settings': 'appSettings'
-    };
-    
-    return tableNameMap[tableName] || tableName;
+    // With Phase 2 complete, IndexedDB and server table names match exactly
+    return tableName;
   }
 
   /**
@@ -454,87 +649,19 @@ export class SyncService {
           if (record.op === 'delete' || record.deleted) {
             deletes.push(record.id as string);
           } else {
-          // Remove local-only sync metadata before sending and convert field names
-          const { dirty: _dirty, op: _op, syncedAt: _syncedAt, ownerId, updatedAt, version, 
-                  exerciseType, defaultDuration, isFavorite, hasVideo, ...cleanRecord } = record as any;
+          // Remove local-only sync metadata before sending
+          // With Phase 2 complete, no field mapping needed - direct assignment
+          const { dirty: _dirty, op: _op, synced_at: _synced_at, ...cleanRecord } = record as any;
           
-          // Helper function to transform exercise type for database compatibility
-          const transformExerciseType = (type: string): string => {
-            switch (type) {
-              case 'time-based':
-                return 'TIME_BASED';
-              case 'repetition-based':
-                return 'REPETITION_BASED';
-              default:
-                return type;
-            }
-          };
-
-          // Convert camelCase to snake_case for backend compatibility
-          const backendRecord = {
-            ...cleanRecord,
-            owner_id: ownerId,
-            updated_at: updatedAt,
-            version: version || 1,
-            // Exercise-specific field mappings
-            ...(exerciseType && typeof exerciseType === 'string' ? { exercise_type: transformExerciseType(exerciseType) } : {}),
-            ...(typeof defaultDuration === 'number' && { rep_duration_seconds: defaultDuration }),
-            ...(typeof isFavorite === 'boolean' && { is_favorite: isFavorite }),
-            ...((record as any).tags !== undefined && { 
-              tags: Array.isArray((record as any).tags) 
-                ? (record as any).tags  // Send as array, let Supabase handle JSONB conversion
-                : typeof (record as any).tags === 'string' 
-                  ? JSON.parse((record as any).tags)  // Parse string to array
-                  : (record as any).tags
-            }),
-            // AppSettings field mappings
-            ...(typeof (record as any).intervalDuration === 'number' && { interval_duration: (record as any).intervalDuration }),
-            ...(typeof (record as any).soundEnabled === 'boolean' && { sound_enabled: (record as any).soundEnabled }),
-            ...(typeof (record as any).beepVolume === 'number' && { beep_volume: (record as any).beepVolume }),
-            ...(typeof (record as any).autoSave === 'boolean' && { auto_save: (record as any).autoSave }),
-            ...((record as any).lastSelectedExerciseId !== undefined && { last_selected_exercise_id: (record as any).lastSelectedExerciseId }),
-            ...(typeof (record as any).preTimerCountdown === 'number' && { pre_timer_countdown: (record as any).preTimerCountdown }),
-            ...(typeof (record as any).repSpeedFactor === 'number' && { rep_speed_factor: (record as any).repSpeedFactor }),
-            ...(typeof (record as any).showExerciseVideos === 'boolean' && { show_exercise_videos: (record as any).showExerciseVideos }),
-            ...(typeof (record as any).defaultRestTime === 'number' && { default_rest_time: (record as any).defaultRestTime }),
-            ...(typeof (record as any).autoStartNext === 'boolean' && { auto_start_next: (record as any).autoStartNext }),
-            ...(typeof (record as any).reduceMotion === 'boolean' && { reduce_motion: (record as any).reduceMotion }),
-            // UserPreferences field mappings
-            ...(typeof (record as any).defaultIntervalDuration === 'number' && { default_interval_duration: (record as any).defaultIntervalDuration }),
-            ...(typeof (record as any).darkMode === 'boolean' && { dark_mode: (record as any).darkMode }),
-            ...(Array.isArray((record as any).favoriteExercises) && { favorite_exercises: (record as any).favoriteExercises }),
-            // Activity log field mappings
-            ...((record as any).exerciseId !== undefined && { exercise_id: (record as any).exerciseId }),
-            ...((record as any).exerciseName !== undefined && { exercise_name: (record as any).exerciseName }),
-            ...((record as any).workoutId !== undefined && { workout_id: (record as any).workoutId }),
-            ...(typeof (record as any).isWorkout === 'boolean' && { is_workout: (record as any).isWorkout }),
-            // Workout session field mappings
-            ...((record as any).workoutName !== undefined && { workout_name: (record as any).workoutName }),
-            ...(typeof (record as any).completionPercentage === 'number' && { completion_percentage: (record as any).completionPercentage }),
-            ...(typeof (record as any).totalDuration === 'number' && { total_duration: (record as any).totalDuration }),
-            ...(typeof (record as any).isCompleted === 'boolean' && { is_completed: (record as any).isCompleted }),
-            // Workout field mappings
-            ...(Array.isArray((record as any).scheduledDays) && { scheduled_days: (record as any).scheduledDays }),
-            ...(typeof (record as any).isActive === 'boolean' && { is_active: (record as any).isActive }),
-            ...(typeof (record as any).estimatedDuration === 'number' && { estimated_duration: (record as any).estimatedDuration }),
-            ...((record as any).createdAt !== undefined && { created_at: (record as any).createdAt }),
-            // Note: hasVideo doesn't exist in database schema, so we skip it
-          };
-          
-          // Debug logging for transformation
-          if (process.env.NODE_ENV === 'development' && tableName === 'exercises' && upserts.length === 0) {
-            console.log(`🔄 Field transformation for ${tableName}:`, {
-              original: { exerciseType, defaultDuration, isFavorite, hasVideo },
-              transformed: { 
-                exercise_type: backendRecord.exercise_type,
-                rep_duration_seconds: backendRecord.rep_duration_seconds,
-                is_favorite: backendRecord.is_favorite
-              },
-              fullRecord: JSON.stringify(backendRecord, null, 2)
-            });
+          // Validate record before adding to sync
+          const validationError = this.validateRecord(cleanRecord, tableName);
+          if (validationError) {
+            console.error(`Validation failed for record ${cleanRecord.id}:`, validationError);
+            // Skip invalid records to prevent sync failures
+            continue;
           }
           
-          upserts.push(backendRecord);
+          upserts.push(cleanRecord);
         }
         } catch (recordError) {
           console.error(`Error processing record ${record.id} for table ${tableName}:`, recordError);
@@ -611,7 +738,14 @@ export class SyncService {
       console.log('🔍 Supabase invoke response:', { data: !!data, error: !!error });
       
       if (error) {
-        console.error('🔴 Supabase invoke error:', error);
+        const networkError = this.createSyncError(
+          'network',
+          `Supabase invoke failed: ${error.message || 'Unknown error'}`,
+          undefined,
+          undefined,
+          { error, fallbackUsed: true }
+        );
+        console.error('🔴 Supabase invoke error:', networkError);
         
         // Always fall back to direct fetch on any invoke error
         // This resolves the "Edge Function returned a non-2xx status code" issue
@@ -700,78 +834,30 @@ export class SyncService {
       // Apply upserts with enhanced conflict resolution
       for (const serverRecord of changes.upserts) {
         try {
-          // Helper function to transform exercise type from database to client format
-          const transformExerciseTypeFromServer = (type: string): string => {
-            switch (type) {
-              case 'TIME_BASED':
-                return 'time-based';
-              case 'REPETITION_BASED':
-                return 'repetition-based';
-              default:
-                return type;
-            }
-          };
-
-          // Convert server record from snake_case to camelCase
-          const { 
-            owner_id, updated_at, exercise_type, rep_duration_seconds, is_favorite, tags,
-            // AppSettings fields
-            interval_duration, sound_enabled, beep_volume, auto_save, last_selected_exercise_id,
-            pre_timer_countdown, rep_speed_factor, show_exercise_videos, default_rest_time,
-            auto_start_next, reduce_motion,
-            // UserPreferences fields
-            default_interval_duration, dark_mode, favorite_exercises,
-            ...rest 
-          } = serverRecord;
-          
-          const clientRecord = {
-            ...rest,
-            ownerId: owner_id,
-            updatedAt: updated_at,
-            // Exercise-specific field mappings
-            ...(exercise_type && typeof exercise_type === 'string' ? { exerciseType: transformExerciseTypeFromServer(exercise_type) } : {}),
-            ...(typeof rep_duration_seconds === 'number' && { defaultDuration: rep_duration_seconds }),
-            ...(typeof is_favorite === 'boolean' && { isFavorite: is_favorite }),
-            ...(tags ? { tags: typeof tags === 'string' ? JSON.parse(tags) : tags } : {}),
-            // AppSettings field mappings
-            ...(typeof interval_duration === 'number' && { intervalDuration: interval_duration }),
-            ...(typeof sound_enabled === 'boolean' && { soundEnabled: sound_enabled }),
-            ...(typeof beep_volume === 'number' && { beepVolume: beep_volume }),
-            ...(typeof auto_save === 'boolean' && { autoSave: auto_save }),
-            ...(last_selected_exercise_id !== undefined && { lastSelectedExerciseId: last_selected_exercise_id }),
-            ...(typeof pre_timer_countdown === 'number' && { preTimerCountdown: pre_timer_countdown }),
-            ...(typeof rep_speed_factor === 'number' && { repSpeedFactor: rep_speed_factor }),
-            ...(typeof show_exercise_videos === 'boolean' && { showExerciseVideos: show_exercise_videos }),
-            ...(typeof default_rest_time === 'number' && { defaultRestTime: default_rest_time }),
-            ...(typeof auto_start_next === 'boolean' && { autoStartNext: auto_start_next }),
-            ...(typeof reduce_motion === 'boolean' && { reduceMotion: reduce_motion }),
-            // UserPreferences field mappings
-            ...(typeof default_interval_duration === 'number' && { defaultIntervalDuration: default_interval_duration }),
-            ...(typeof dark_mode === 'boolean' && { darkMode: dark_mode }),
-            ...(Array.isArray(favorite_exercises) && { favoriteExercises: favorite_exercises }),
-          };
+          // With Phase 2 complete, no field mapping needed - direct assignment
+          // serverRecord is already defined by the for loop
           
           // Get local record to check for conflicts
           const localRecord = await typedTable.get(serverRecord.id as string);
           
           if (localRecord) {
             // Handle conflict resolution
-            const resolvedRecord = await this.resolveConflict(tableName, localRecord, clientRecord);
+            const resolvedRecord = await this.resolveConflict(tableName, localRecord, serverRecord);
             
             // Apply resolved record with sync metadata
             await typedTable.put({
               ...resolvedRecord,
               dirty: 0,
               op: undefined,
-              syncedAt: new Date().toISOString()
+              synced_at: new Date().toISOString()
             });
           } else {
             // No local record - apply server record directly
             await typedTable.put({
-              ...clientRecord,
+              ...serverRecord,
               dirty: 0,
               op: undefined,
-              syncedAt: new Date().toISOString()
+              synced_at: new Date().toISOString()
             });
           }
         } catch (error) {
@@ -786,7 +872,7 @@ export class SyncService {
           deleted: true,
           dirty: 0,
           op: undefined,
-          syncedAt: new Date().toISOString()
+          synced_at: new Date().toISOString()
         });
       }
     } catch (error) {
