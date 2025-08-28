@@ -151,7 +151,7 @@ function App() {
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   
   // Authentication state
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -257,13 +257,13 @@ function App() {
     lastBeepIntervalRef.current = 0; // Reset interval counter
 
     // Check if this is a standalone rep-based exercise (not in workout mode)
-    const isStandaloneRepBased = selectedExercise?.exerciseType === 'repetition-based' && !timerState.workoutMode;
+    const isStandaloneRepBased = selectedExercise?.exercise_type === 'repetition_based' && !timerState.workoutMode;
     
     // For standalone rep-based exercises, set up rep/set tracking
     let repSetState = {};
     if (isStandaloneRepBased) {
-      const defaultSets = selectedExercise.defaultSets || 3;
-      const defaultReps = selectedExercise.defaultReps || 8;
+      const defaultSets = selectedExercise.default_sets || 3;
+      const defaultReps = selectedExercise.default_reps || 8;
       repSetState = {
         currentSet: 0,
         totalSets: defaultSets,
@@ -304,10 +304,10 @@ function App() {
     let isRepBasedExercise = false;
     if (timerState.workoutMode) {
       const currentWorkoutExercise = timerState.workoutMode.exercises[timerState.workoutMode.currentExerciseIndex];
-      const currentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
-      isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+      const currentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
+      isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
     } else {
-      isRepBasedExercise = selectedExercise?.exerciseType === 'repetition-based';
+      isRepBasedExercise = selectedExercise?.exercise_type === 'repetition_based';
     }
     intervalRef.current = createTimerInterval(startTime, isRepBasedExercise);
   }, [selectedExercise, selectedDuration, appSettings.sound_enabled, appSettings.vibration_enabled, timerState.workoutMode, createTimerInterval, timerState.targetTime, exercises]);
@@ -325,13 +325,13 @@ function App() {
     }
 
     // If pre-timer countdown is enabled, start countdown phase
-    if (appSettings.preTimerCountdown > 0) {
+    if (appSettings.pre_timer_countdown > 0) {
       // Start countdown phase
       setTimerState(prev => ({
         ...prev,
         isRunning: true,
         isCountdown: true,
-        countdownTime: appSettings.preTimerCountdown,
+        countdownTime: appSettings.pre_timer_countdown,
         currentTime: 0,
         targetTime: selectedDuration,
         currentExercise: selectedExercise || undefined,
@@ -344,7 +344,7 @@ function App() {
 
       // Announce countdown start
       if (appSettings.sound_enabled) {
-        audioService.announceText(`Get ready for ${selectedExercise.name}. Starting in ${appSettings.preTimerCountdown} seconds`);
+        audioService.announceText(`Get ready for ${selectedExercise.name}. Starting in ${appSettings.pre_timer_countdown} seconds`);
       }
 
       const countdownStartTime = Date.now();
@@ -352,7 +352,7 @@ function App() {
       // Countdown interval
       intervalRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - countdownStartTime) / 1000);
-        const remaining = appSettings.preTimerCountdown - elapsed;
+        const remaining = appSettings.pre_timer_countdown - elapsed;
 
         if (remaining <= 0) {
           // Countdown finished, start actual timer
@@ -366,7 +366,7 @@ function App() {
           }));
 
           // Beep on each countdown second
-          if (remaining <= 3 && elapsed > appSettings.preTimerCountdown - remaining - 1) {
+          if (remaining <= 3 && elapsed > appSettings.pre_timer_countdown - remaining - 1) {
             if (appSettings.sound_enabled || appSettings.vibration_enabled) {
               audioService.playIntervalFeedback(appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume);
             }
@@ -380,7 +380,7 @@ function App() {
       // No countdown, start timer immediately
       startActualTimer();
     }
-  }, [selectedExercise, selectedDuration, appSettings.preTimerCountdown, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume, wakeLockSupported, requestWakeLock, startActualTimer]);
+  }, [selectedExercise, selectedDuration, appSettings.pre_timer_countdown, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume, wakeLockSupported, requestWakeLock, startActualTimer]);
 
   const stopTimer = useCallback(async (isCompletion: boolean = false) => {
     if (intervalRef.current) {
@@ -393,12 +393,13 @@ function App() {
     if (!isCompletion && isRunning && currentExercise && currentTime > 0) {
       const activityLog: ActivityLog = {
         id: `log-${Date.now()}`,
-        exerciseId: currentExercise.id,
-        exerciseName: currentExercise.name,
+        exercise_id: currentExercise.id,
+        exercise_name: currentExercise.name,
         duration: Math.round(currentTime), // Round to avoid floating-point precision issues
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         notes: `Stopped after ${Math.round(currentTime)}s`,
-        updatedAt: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         deleted: false,
         version: 1
       };
@@ -456,15 +457,15 @@ function App() {
 
     // Reset duration to default for the current exercise
     if (selectedExercise) {
-      if (selectedExercise.exercise_type === 'time-based') {
-        setSelectedDuration(selectedExercise.defaultDuration as TimerPreset);
-      } else if (selectedExercise.exercise_type === 'repetition-based') {
-  const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
-  const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
+      if (selectedExercise.exercise_type === 'time_based') {
+        setSelectedDuration(selectedExercise.default_duration as TimerPreset);
+      } else if (selectedExercise.exercise_type === 'repetition_based') {
+  const baseRep = selectedExercise.rep_duration_seconds || BASE_REP_TIME;
+  const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
         setSelectedDuration(repDuration as TimerPreset);
       }
     }
-  }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.repSpeedFactor]);
+  }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.rep_speed_factor]);
 
   // Start workout-guided timer mode
   const startWorkoutMode = useCallback(async (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => {
@@ -496,21 +497,21 @@ function App() {
 
     // Find the first exercise and load it
     const firstWorkoutExercise = workoutData.exercises[0];
-    const firstExercise = exercises.find(ex => ex.id === firstWorkoutExercise.exerciseId);
+    const firstExercise = exercises.find(ex => ex.id === firstWorkoutExercise.exercise_id);
     
     if (firstExercise) {
       setSelectedExercise(firstExercise);
       
       // Set duration/reps based on exercise type and custom values
-      if (firstExercise.exerciseType === 'time-based') {
-        const duration = firstWorkoutExercise.customDuration || firstExercise.defaultDuration || 30;
+      if (firstExercise.exercise_type === 'time_based') {
+        const duration = firstWorkoutExercise.custom_duration || firstExercise.default_duration || 30;
         setSelectedDuration(duration as TimerPreset);
-      } else if (firstExercise.exerciseType === 'repetition-based') {
+      } else if (firstExercise.exercise_type === 'repetition_based') {
         // For rep-based exercises, we'll use a timer for each repetition
-        const sets = firstWorkoutExercise.customSets || firstExercise.defaultSets || 1;
-        const reps = firstWorkoutExercise.customReps || firstExercise.defaultReps || 10;
-        const repBase = firstExercise.repDurationSeconds || BASE_REP_TIME;
-        const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+        const sets = firstWorkoutExercise.custom_sets || firstExercise.default_sets || 1;
+        const reps = firstWorkoutExercise.custom_reps || firstExercise.default_reps || 10;
+        const repBase = firstExercise.rep_duration_seconds || BASE_REP_TIME;
+        const repDuration = Math.round(repBase * appSettings.rep_speed_factor);
 
         setTimerState(prev => ({
           ...prev,
@@ -531,7 +532,7 @@ function App() {
     if (appSettings.sound_enabled) {
       audioService.announceText(`Starting workout: ${workoutData.workoutName}. ${workoutData.exercises.length} exercises planned.`);
     }
-  }, [exercises, appSettings.sound_enabled, appSettings.repSpeedFactor]);
+  }, [exercises, appSettings.sound_enabled, appSettings.rep_speed_factor]);
 
   // Advance workout to next exercise or complete workout
   const advanceWorkout = useCallback(async () => {
@@ -569,15 +570,16 @@ function App() {
         console.log('✅ Creating workout session for logging...');
         const workoutSession: WorkoutSession = {
           id: workoutMode.sessionId!,
-          workoutId: workoutMode.workoutId,
-          workoutName: workoutMode.workoutName,
-          startTime: new Date(Date.now() - (Math.round(timerState.currentTime) * 1000)), // Approximate start time
-          endTime: new Date(),
+          workout_id: workoutMode.workoutId,
+          workout_name: workoutMode.workoutName,
+          start_time: new Date(Date.now() - (Math.round(timerState.currentTime) * 1000)).toISOString(), // Approximate start time
+          end_time: new Date().toISOString(),
           exercises: [], // TODO: Track individual exercise completion in Phase 5
-          isCompleted: true,
-          completionPercentage: 100,
-          totalDuration: Math.round(timerState.currentTime),
-          updatedAt: new Date().toISOString(),
+          is_completed: true,
+          completion_percentage: 100,
+          total_duration: Math.round(timerState.currentTime),
+          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
           deleted: false,
           version: 1
         };
@@ -597,20 +599,20 @@ function App() {
             let sets: number | undefined;
             let reps: number | undefined;
             
-            if (exercise.exercise_type === 'time-based') {
-              exerciseDuration = workoutExercise.custom_duration || exercise.defaultDuration || 30;
+            if (exercise.exercise_type === 'time_based') {
+              exerciseDuration = workoutExercise.custom_duration || exercise.default_duration || 30;
             } else {
               sets = workoutExercise.custom_sets || exercise.default_sets || 1;
               reps = workoutExercise.custom_reps || exercise.default_reps || 10;
-              const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
-              const repTime = Math.round(baseRep * appSettings.repSpeedFactor);
+              const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+              const repTime = Math.round(baseRep * appSettings.rep_speed_factor);
               const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
               exerciseDuration = (sets * reps * repTime) + restTime;
             }
             
             return {
-              exerciseId: exercise.id,
-              exerciseName: exercise.name,
+              exercise_id: exercise.id,
+              exercise_name: exercise.name,
               duration: exerciseDuration,
               sets,
               reps
@@ -621,21 +623,22 @@ function App() {
           
           const workoutActivityLog: ActivityLog = {
             id: `workout-${workoutMode.sessionId}`,
-            exerciseId: 'workout', // Special identifier for workout entries
-            exerciseName: workoutMode.workoutName,
+            exercise_id: 'workout', // Special identifier for workout entries
+            exercise_name: workoutMode.workoutName,
             duration: totalWorkoutDuration,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             notes: `Workout completed with ${workoutMode.exercises.length} exercises`,
-            workoutId: workoutMode.workoutId,
-            isWorkout: true,
+            workout_id: workoutMode.workoutId,
+            is_workout: true,
             exercises: workoutExerciseDetails as {
-              exerciseId: string;
-              exerciseName: string;
+              exercise_id: string;
+              exercise_name: string;
               duration: number;
               sets?: number;
               reps?: number;
             }[],
-            updatedAt: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
             deleted: false,
             version: 1
           };
@@ -673,12 +676,12 @@ function App() {
       // Move to next exercise
       const nextExerciseIndex = currentIndex + 1;
       const nextWorkoutExercise = workoutMode.exercises[nextExerciseIndex];
-      const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exerciseId);
+      const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exercise_id);
 
       if (nextExercise) {
         // Check if we need a rest period
         const currentWorkoutExercise = workoutMode.exercises[currentIndex];
-        const restTime = currentWorkoutExercise.customRestTime || 30; // Default 30s rest
+        const restTime = currentWorkoutExercise.custom_rest_time || 30; // Default 30s rest
 
         if (restTime > 0) {
           // Start rest period
@@ -756,14 +759,14 @@ function App() {
           }));
 
           // Set duration/reps for next exercise
-          if (nextExercise.exerciseType === 'time-based') {
-            const duration = nextWorkoutExercise.customDuration || nextExercise.defaultDuration || 30;
+          if (nextExercise.exercise_type === 'time_based') {
+            const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
             setSelectedDuration(duration as TimerPreset);
-          } else if (nextExercise.exerciseType === 'repetition-based') {
-            const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
-            const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
-            const repBase = nextExercise.repDurationSeconds || BASE_REP_TIME;
-            const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+          } else if (nextExercise.exercise_type === 'repetition_based') {
+            const sets = nextWorkoutExercise.custom_sets || nextExercise.default_sets || 1;
+            const reps = nextWorkoutExercise.custom_reps || nextExercise.default_reps || 10;
+            const repBase = nextExercise.rep_duration_seconds || BASE_REP_TIME;
+            const repDuration = Math.round(repBase * appSettings.rep_speed_factor);
             
             setTimerState(prev => ({
               ...prev,
@@ -785,7 +788,7 @@ function App() {
         }
       }
     }
-  }, [timerState, selectedExercise?.name, exercises, appSettings.sound_enabled, appSettings.repSpeedFactor, resetTimer]);
+  }, [timerState, selectedExercise?.name, exercises, appSettings.sound_enabled, appSettings.rep_speed_factor, resetTimer]);
 
   // Handle timer completion
   useEffect(() => {
@@ -804,7 +807,7 @@ function App() {
       if (workoutMode) {
         // Get the actual current exercise from workout mode for accurate logging
         const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
-        const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
+        const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
         console.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
         console.log('Workout state:', {
           currentExerciseIndex: workoutMode.currentExerciseIndex,
@@ -827,18 +830,18 @@ function App() {
           }
           
           const nextWorkoutExercise = workoutMode.exercises[nextExerciseIndex];
-          const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exerciseId);
+          const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exercise_id);
           
           if (nextExercise) {
             console.log('Rest completed, changing selectedExercise from', selectedExercise?.name, 'to', nextExercise.name);
             setSelectedExercise(nextExercise);
 
             // Set duration/reps for next exercise
-            if (nextExercise.exerciseType === 'time-based') {
-              const duration = nextWorkoutExercise.customDuration || nextExercise.defaultDuration || 30;
+            if (nextExercise.exercise_type === 'time_based') {
+              const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
               console.log('Setting duration for', nextExercise.name, ':', {
-                customDuration: nextWorkoutExercise.customDuration,
-                defaultDuration: nextExercise.defaultDuration,
+                custom_duration: nextWorkoutExercise.custom_duration,
+                default_duration: nextExercise.default_duration,
                 finalDuration: duration
               });
               setSelectedDuration(duration as TimerPreset);
@@ -859,11 +862,11 @@ function App() {
                 isCountdown: false,
                 countdownTime: 0
               }));
-            } else if (nextExercise.exerciseType === 'repetition-based') {
-              const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
-              const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
-              const repBase = nextExercise.repDurationSeconds || BASE_REP_TIME;
-              const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+            } else if (nextExercise.exercise_type === 'repetition_based') {
+              const sets = nextWorkoutExercise.custom_sets || nextExercise.default_sets || 1;
+              const reps = nextWorkoutExercise.custom_reps || nextExercise.default_reps || 10;
+              const repBase = nextExercise.rep_duration_seconds || BASE_REP_TIME;
+              const repDuration = Math.round(repBase * appSettings.rep_speed_factor);
               
               setSelectedDuration(repDuration as TimerPreset);
               
@@ -903,14 +906,14 @@ function App() {
           // Exercise completed (not in rest period)
           // Use the actual current exercise from workout mode for accurate processing
           const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
-          const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
+          const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
           
           console.log('Processing exercise completion for:', actualCurrentExercise?.name);
-          console.log('Exercise type:', actualCurrentExercise?.exerciseType);
+          console.log('Exercise type:', actualCurrentExercise?.exercise_type);
           console.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
           
           // Check if this is a repetition-based exercise that needs rep/set advancement
-          if (actualCurrentExercise?.exerciseType === 'repetition-based' && workoutMode.totalReps && workoutMode.totalSets) {
+          if (actualCurrentExercise?.exercise_type === 'repetition_based' && workoutMode.totalReps && workoutMode.totalSets) {
             console.log('Processing rep-based exercise completion...');
             const currentRep = workoutMode.currentRep || 0;
             const currentSet = workoutMode.currentSet || 0;
@@ -1015,8 +1018,8 @@ function App() {
                       // Start new timer for next set immediately
                       const nextSetStartTime = Date.now();
                       // Use helper function - check if current exercise is rep-based
-                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
-                      const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exercise_id);
+                      const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
                       intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                       
                       return {
@@ -1061,7 +1064,7 @@ function App() {
         // Standard timer completion (non-workout mode)
         
         // Check if this is a standalone repetition-based exercise
-        if (currentExercise?.exerciseType === 'repetition-based' && timerState.totalReps && timerState.totalSets) {
+        if (currentExercise?.exercise_type === 'repetition_based' && timerState.totalReps && timerState.totalSets) {
           const currentRep = timerState.currentRep || 0;
           const currentSet = timerState.currentSet || 0;
           const totalReps = timerState.totalReps;
@@ -1147,8 +1150,8 @@ function App() {
                       // Start new timer for next set immediately
                       const nextSetStartTime = Date.now();
                       // Use helper function - check if current exercise is rep-based
-                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
-                      const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exercise_id);
+                      const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
                       intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                       
                       return {
@@ -1179,12 +1182,13 @@ function App() {
                 if (currentExercise) {
                   const activityLog: ActivityLog = {
                     id: `log-${Date.now()}`,
-                    exerciseId: currentExercise.id,
-                    exerciseName: currentExercise.name,
+                    exercise_id: currentExercise.id,
+                    exercise_name: currentExercise.name,
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
-                    timestamp: new Date(),
+                    timestamp: new Date().toISOString(),
                     notes: `Completed ${totalSets} sets of ${totalReps} reps`,
-                    updatedAt: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
                     deleted: false,
                     version: 1
                   };
@@ -1255,8 +1259,8 @@ function App() {
                   // Start new timer for next set immediately
                   const nextSetStartTime = Date.now();
                   // Use helper function - check if current exercise is rep-based
-                  const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
-                  const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                  const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exercise_id);
+                  const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
                   intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                   
                   return { 
@@ -1296,12 +1300,13 @@ function App() {
             if (currentExercise) {
               const activityLog: ActivityLog = {
                 id: `log-${Date.now()}`,
-                exerciseId: currentExercise.id,
-                exerciseName: currentExercise.name,
+                exercise_id: currentExercise.id,
+                exercise_name: currentExercise.name,
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
-                timestamp: new Date(),
+                timestamp: new Date().toISOString(),
                 notes: `Completed ${totalSets} sets of ${totalReps} reps`,
-                updatedAt: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                created_at: new Date().toISOString(),
                 deleted: false,
                 version: 1
               };
@@ -1319,12 +1324,13 @@ function App() {
           if (currentExercise) {
             const activityLog: ActivityLog = {
               id: `log-${Date.now()}`,
-              exerciseId: currentExercise.id,
-              exerciseName: currentExercise.name,
+              exercise_id: currentExercise.id,
+              exercise_name: currentExercise.name,
               duration: targetTime,
-              timestamp: new Date(),
+              timestamp: new Date().toISOString(),
               notes: `Completed ${targetTime}s interval timer`,
-              updatedAt: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
               deleted: false,
               version: 1
             };
@@ -1344,7 +1350,7 @@ function App() {
         }
       }
     }
-  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.repSpeedFactor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
+  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.rep_speed_factor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
 
   // Cleanup timer interval on unmount
   useEffect(() => {
@@ -1373,13 +1379,13 @@ function App() {
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
     setSelectedExercise(exercise);
-    updateAppSettings({ lastSelectedExerciseId: exercise ? exercise.id : null });
+    updateAppSettings({ last_selected_exercise_id: exercise ? exercise.id : null });
     
     // Set appropriate duration for rep-based exercises
-    if (exercise?.exerciseType === 'repetition-based') {
+    if (exercise?.exercise_type === 'repetition_based') {
       const currentSettings = settings || appSettings;
-      const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
-      const repDuration = Math.round(baseRep * currentSettings.repSpeedFactor);
+      const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * currentSettings.rep_speed_factor);
       setSelectedDuration(repDuration as TimerPreset);
     }
   }, [appSettings, updateAppSettings]);
@@ -1444,7 +1450,7 @@ function App() {
                 // Use latest exercise data but preserve user's favorite status (automatic refresh)
                 return {
                   ...latestExercise,
-                  isFavorite: storedExercise.isFavorite
+                  is_favorite: storedExercise.is_favorite
                 };
               }
               return storedExercise; // Keep old exercise if not found in latest data
@@ -1491,9 +1497,9 @@ function App() {
           setAppSettings(settingsToSet);
 
           // Set last selected exercise
-          if (settingsToSet.lastSelectedExerciseId) {
+          if (settingsToSet.last_selected_exercise_id) {
             const lastExercise = allExercises.find(
-              (ex: Exercise) => ex.id === settingsToSet.lastSelectedExerciseId
+              (ex: Exercise) => ex.id === settingsToSet.last_selected_exercise_id
             );
             if (lastExercise) {
               handleSetSelectedExercise(lastExercise, settingsToSet);
@@ -1557,7 +1563,7 @@ useEffect(() => {
       setExercises(prev => 
         prev.map(exercise => 
           exercise.id === exerciseId 
-            ? { ...exercise, isFavorite: !exercise.isFavorite }
+            ? { ...exercise, is_favorite: !exercise.is_favorite }
             : exercise
         )
       );
@@ -1609,7 +1615,7 @@ useEffect(() => {
 
   // Apply dark mode to document
   useEffect(() => {
-    if (appSettings.darkMode) {
+    if (appSettings.dark_mode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
@@ -1617,12 +1623,12 @@ useEffect(() => {
 
     // Debug logging in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('🎨 Theme applied:', appSettings.darkMode ? 'dark' : 'light', {
+      console.log('🎨 Theme applied:', appSettings.dark_mode ? 'dark' : 'light', {
         hasConsent,
-        darkMode: appSettings.darkMode
+        dark_mode: appSettings.dark_mode
       });
     }
-  }, [appSettings.darkMode, hasConsent]);
+  }, [appSettings.dark_mode, hasConsent]);
 
   // Show consent banner if no consent
   if (!hasConsent) {

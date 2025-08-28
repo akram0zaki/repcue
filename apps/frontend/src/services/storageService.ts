@@ -423,7 +423,7 @@ export class StorageService {
       if (exercise) {
         const updatedExercise = prepareUpsert({
           ...exercise,
-          isFavorite: !exercise.isFavorite
+          is_favorite: !exercise.is_favorite
         }, exerciseId);
         await this.db.exercises.put(updatedExercise);
       }
@@ -433,8 +433,8 @@ export class StorageService {
       const key = `exercise_${exerciseId}`;
       const exercise = this.fallbackStorage.get(key) as StoredExercise | undefined;
       if (exercise) {
-        exercise.isFavorite = !exercise.isFavorite;
-        exercise.updatedAt = new Date().toISOString();
+        exercise.is_favorite = !exercise.is_favorite;
+        exercise.updated_at = new Date().toISOString();
         this.fallbackStorage.set(key, exercise);
       }
     }
@@ -451,11 +451,11 @@ export class StorageService {
     const logWithSync = prepareUpsert(log, log.id);
     const storedLog: StoredActivityLog = {
       ...logWithSync,
-      timestamp: log.timestamp.toISOString()
+      timestamp: typeof log.timestamp === 'string' ? log.timestamp : log.timestamp.toISOString()
     };
 
     try {
-      await this.db.activityLogs.put(storedLog);
+      await this.db.activity_logs.put(storedLog);
     } catch (error) {
       console.warn('Failed to save activity log to IndexedDB:', error);
       this.fallbackStorage.set(`log_${log.id}`, storedLog);
@@ -475,14 +475,14 @@ export class StorageService {
     }
 
     try {
-      let query = this.db.activityLogs.orderBy('timestamp').reverse();
+      let query = this.db.activity_logs.orderBy('timestamp').reverse();
 
       if (fromDate) {
         query = query.filter(log => log.timestamp >= fromDate.toISOString());
       }
 
       if (exerciseId) {
-        query = query.filter(log => log.exerciseId === exerciseId);
+        query = query.filter(log => log.exercise_id === exerciseId);
       }
 
       if (limit) {
@@ -512,17 +512,14 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const storedPreferences: StoredUserPreferences = {
-      ...preferences,
-      updatedAt: new Date().toISOString()
-    };
+    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, preferences.id);
 
     try {
       // Use put() to handle both insert and update operations
-      await this.db.userPreferences.put(storedPreferences);
+      await this.db.user_preferences.put(storedPreferences);
     } catch (error) {
       console.warn('Failed to save user preferences to IndexedDB:', error);
-      this.fallbackStorage.set('userPreferences', storedPreferences);
+      this.fallbackStorage.set('user_preferences', storedPreferences);
     }
   }
 
@@ -535,14 +532,14 @@ export class StorageService {
     }
 
     try {
-      const storedPreferences = await this.db.userPreferences.orderBy('updatedAt').last();
+      const storedPreferences = await this.db.user_preferences.orderBy('updated_at').last();
       if (storedPreferences) {
         return storedPreferences;
       }
       return null;
     } catch (error) {
       console.warn('Failed to load user preferences from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('userPreferences') as UserPreferences | undefined;
+      const fallback = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
       if (fallback) {
         return fallback;
       }
@@ -558,17 +555,14 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const storedSettings: StoredAppSettings = {
-      ...settings,
-      updatedAt: new Date().toISOString()
-    };
+    const storedSettings: StoredAppSettings = prepareUpsert(settings, settings.id);
 
     try {
       // Use put() to handle both insert and update operations
-      await this.db.appSettings.put(storedSettings);
+      await this.db.app_settings.put(storedSettings);
     } catch (error) {
       console.warn('Failed to save app settings to IndexedDB:', error);
-      this.fallbackStorage.set('appSettings', storedSettings);
+      this.fallbackStorage.set('app_settings', storedSettings);
     }
   }
 
@@ -585,14 +579,14 @@ export class StorageService {
     }
 
     try {
-      const storedSettings = await this.db.appSettings.orderBy('updatedAt').last();
+      const storedSettings = await this.db.app_settings.orderBy('updated_at').last();
       if (storedSettings) {
         return storedSettings;
       }
       return null;
     } catch (error) {
       console.warn('Failed to load app settings from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('appSettings') as AppSettings | undefined;
+      const fallback = this.fallbackStorage.get('app_settings') as AppSettings | undefined;
       if (fallback) {
         return fallback;
       }
@@ -644,9 +638,11 @@ export class StorageService {
     try {
       await Promise.all([
         this.db.exercises.clear(),
-        this.db.activityLogs.clear(),
-        this.db.userPreferences.clear(),
-        this.db.appSettings.clear()
+        this.db.activity_logs.clear(),
+        this.db.user_preferences.clear(),
+        this.db.app_settings.clear(),
+        this.db.workouts.clear(),
+        this.db.workout_sessions.clear()
       ]);
       
       // Clear fallback storage
@@ -678,7 +674,7 @@ export class StorageService {
     try {
       const [exerciseCount, logCount, preferences, settings] = await Promise.all([
         this.db.exercises.count(),
-        this.db.activityLogs.count(),
+        this.db.activity_logs.count(),
         this.getUserPreferences(),
         this.getAppSettings()
       ]);
@@ -719,7 +715,7 @@ export class StorageService {
     const workoutWithSync = prepareUpsert(workout, workout.id);
     const storedWorkout: StoredWorkout = {
       ...workoutWithSync,
-      createdAt: workout.createdAt.toISOString()
+      created_at: typeof workout.created_at === 'string' ? workout.created_at : workout.created_at.toISOString()
     };
 
     try {
@@ -739,7 +735,7 @@ export class StorageService {
     }
 
     try {
-      const storedWorkouts = await this.db.workouts.orderBy('updatedAt').reverse().toArray();
+      const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
       return storedWorkouts.map(this.convertStoredWorkout);
     } catch (error) {
       console.warn('Failed to load workouts from IndexedDB:', error);
@@ -808,12 +804,12 @@ export class StorageService {
     const sessionWithSync = prepareUpsert(session, session.id);
     const storedSession: StoredWorkoutSession = {
       ...sessionWithSync,
-      startTime: session.startTime.toISOString(),
-      endTime: session.endTime?.toISOString()
+      start_time: typeof session.start_time === 'string' ? session.start_time : session.start_time.toISOString(),
+      end_time: session.end_time ? (typeof session.end_time === 'string' ? session.end_time : session.end_time.toISOString()) : undefined
     };
 
     try {
-      await this.db.workoutSessions.put(storedSession);
+      await this.db.workout_sessions.put(storedSession);
     } catch (error) {
       console.warn('Failed to save workout session to IndexedDB:', error);
       this.fallbackStorage.set(`session_${session.id}`, storedSession);
@@ -833,14 +829,14 @@ export class StorageService {
     }
 
     try {
-      let query = this.db.workoutSessions.orderBy('startTime').reverse();
+      let query = this.db.workout_sessions.orderBy('start_time').reverse();
 
       if (fromDate) {
-        query = query.filter(session => session.startTime >= fromDate.toISOString());
+        query = query.filter(session => session.start_time >= fromDate.toISOString());
       }
 
       if (workoutId) {
-        query = query.filter(session => session.workoutId === workoutId);
+        query = query.filter(session => session.workout_id === workoutId);
       }
 
       if (limit) {
@@ -858,7 +854,7 @@ export class StorageService {
         }
       });
       return sessions
-        .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+        .sort((a, b) => b.start_time.getTime() - a.start_time.getTime())
         .slice(0, limit);
     }
   }
@@ -872,10 +868,10 @@ export class StorageService {
     }
 
     try {
-      const session = await this.db.workoutSessions.get(sessionId);
+      const session = await this.db.workout_sessions.get(sessionId);
       if (session) {
         const deletedSession = prepareSoftDelete(session);
-        await this.db.workoutSessions.put(deletedSession);
+        await this.db.workout_sessions.put(deletedSession);
         console.log(`Workout session ${sessionId} soft deleted successfully`);
       }
     } catch (error) {
@@ -915,10 +911,10 @@ export class StorageService {
     }
 
     try {
-      const log = await this.db.activityLogs.get(activityLogId);
+      const log = await this.db.activity_logs.get(activityLogId);
       if (log) {
         const deletedLog = prepareSoftDelete(log);
-        await this.db.activityLogs.put(deletedLog);
+        await this.db.activity_logs.put(deletedLog);
         console.log(`Activity log ${activityLogId} soft deleted successfully`);
       }
     } catch (error) {
@@ -957,11 +953,11 @@ export class StorageService {
     try {
       const [exercises, activityLogs, userPreferences, appSettings, workouts, workoutSessions] = await Promise.all([
         this.db.exercises.where('dirty').equals(1).toArray(),
-        this.db.activityLogs.where('dirty').equals(1).toArray(),
-        this.db.userPreferences.where('dirty').equals(1).toArray(),
-        this.db.appSettings.where('dirty').equals(1).toArray(),
+        this.db.activity_logs.where('dirty').equals(1).toArray(),
+        this.db.user_preferences.where('dirty').equals(1).toArray(),
+        this.db.app_settings.where('dirty').equals(1).toArray(),
         this.db.workouts.where('dirty').equals(1).toArray(),
-        this.db.workoutSessions.where('dirty').equals(1).toArray()
+        this.db.workout_sessions.where('dirty').equals(1).toArray()
       ]);
 
       return {
@@ -1001,20 +997,20 @@ export class StorageService {
         case 'exercises':
           await this.db.exercises.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
           break;
-        case 'activityLogs':
-          await this.db.activityLogs.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+        case 'activity_logs':
+          await this.db.activity_logs.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
           break;
-        case 'userPreferences':
-          await this.db.userPreferences.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+        case 'user_preferences':
+          await this.db.user_preferences.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
           break;
-        case 'appSettings':
-          await this.db.appSettings.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+        case 'app_settings':
+          await this.db.app_settings.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
           break;
         case 'workouts':
           await this.db.workouts.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
           break;
-        case 'workoutSessions':
-          await this.db.workoutSessions.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
+        case 'workout_sessions':
+          await this.db.workout_sessions.bulkUpdate(ids.map(id => ({ key: id, changes: updateData })));
           break;
       }
     } catch (error) {
@@ -1043,8 +1039,8 @@ export class StorageService {
     try {
       const now = new Date().toISOString();
       const claimData = { 
-        ownerId, 
-        updatedAt: now, 
+        owner_id: ownerId, 
+        updated_at: now, 
         dirty: 1, 
         version: 1 
       };
@@ -1052,11 +1048,11 @@ export class StorageService {
       // Define tables to claim with friendly names
       const tablesToClaim = [
         { table: this.db.exercises, name: 'exercises' },
-        { table: this.db.activityLogs, name: 'activityLogs' },
-        { table: this.db.userPreferences, name: 'userPreferences' },
-        { table: this.db.appSettings, name: 'appSettings' },
+        { table: this.db.activity_logs, name: 'activity_logs' },
+        { table: this.db.user_preferences, name: 'user_preferences' },
+        { table: this.db.app_settings, name: 'app_settings' },
         { table: this.db.workouts, name: 'workouts' },
-        { table: this.db.workoutSessions, name: 'workoutSessions' }
+        { table: this.db.workout_sessions, name: 'workout_sessions' }
       ];
 
       const results = await Promise.all(
@@ -1064,12 +1060,12 @@ export class StorageService {
           try {
             // Claim records with null, undefined, or empty ownerId
             // Handle empty string case
-            const emptyStringCount = await table.where('ownerId').equals('').modify(claimData);
+            const emptyStringCount = await table.where('owner_id').equals('').modify(claimData);
             
             // Handle null/undefined cases by finding all records and filtering
             const allRecords = await table.toArray();
             const nullOrUndefinedRecords = allRecords.filter(record => 
-              record.ownerId == null || record.ownerId === undefined
+              record.owner_id == null || record.owner_id === undefined
             );
             
             // Update null/undefined records
@@ -1119,8 +1115,7 @@ export class StorageService {
    */
   private convertStoredExercise(stored: StoredExercise): Exercise {
     return {
-      ...stored,
-      updatedAt: stored.updatedAt
+      ...stored
     };
   }
 
@@ -1140,8 +1135,7 @@ export class StorageService {
   private convertStoredWorkout(stored: StoredWorkout): Workout {
     return {
       ...stored,
-      createdAt: new Date(stored.createdAt),
-      updatedAt: stored.updatedAt
+      created_at: typeof stored.created_at === 'string' ? stored.created_at : new Date(stored.created_at).toISOString()
     };
   }
 
@@ -1165,8 +1159,8 @@ export class StorageService {
   private convertStoredWorkoutSession(stored: StoredWorkoutSession): WorkoutSession {
     return {
       ...stored,
-      startTime: new Date(stored.startTime),
-      endTime: stored.endTime ? new Date(stored.endTime) : undefined
+      start_time: typeof stored.start_time === 'string' ? stored.start_time : new Date(stored.start_time).toISOString(),
+      end_time: stored.end_time ? (typeof stored.end_time === 'string' ? stored.end_time : new Date(stored.end_time).toISOString()) : undefined
     };
   }
 
@@ -1216,8 +1210,8 @@ export class StorageService {
     try {
       // Try a simple operation to test database health
       await this.db.exercises.count();
-      await this.db.userPreferences.count();
-      await this.db.appSettings.count();
+      await this.db.user_preferences.count();
+      await this.db.app_settings.count();
       
       return { healthy: true, repaired: false };
     } catch (error) {

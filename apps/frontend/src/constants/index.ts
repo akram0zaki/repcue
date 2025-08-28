@@ -18,18 +18,21 @@ export type RepSpeedFactor = typeof REP_SPEED_FACTORS[number];
 // Default Settings
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   id: 'default-app-settings',
-  intervalDuration: 30, // Default 30 seconds
-  soundEnabled: true,
-  vibrationEnabled: true,
-  beepVolume: 0.5, // Default 50% volume
-  darkMode: false,
-  autoSave: true,
-  lastSelectedExerciseId: null,
-  preTimerCountdown: 3, // Default 3 seconds countdown
-  defaultRestTime: 60, // Default 60 seconds rest between exercises
-  repSpeedFactor: 1.0, // Default 1x speed (5 seconds per rep)
-  showExerciseVideos: true, // default opt-in (feature gated)
-  updatedAt: new Date().toISOString(),
+  interval_duration: 30, // Default 30 seconds
+  sound_enabled: true,
+  vibration_enabled: true,
+  beep_volume: 0.5, // Default 50% volume
+  dark_mode: false,
+  auto_save: true,
+  last_selected_exercise_id: null,
+  pre_timer_countdown: 3, // Default 3 seconds countdown
+  default_rest_time: 60, // Default 60 seconds rest between exercises
+  rep_speed_factor: 1.0, // Default 1x speed (5 seconds per rep)
+  show_exercise_videos: true, // default opt-in (feature gated)
+  reduce_motion: false,
+  auto_start_next: false,
+  updated_at: new Date().toISOString(),
+  created_at: new Date().toISOString(),
   deleted: false,
   version: 1,
   dirty: 0
