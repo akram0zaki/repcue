@@ -6,6 +6,7 @@ import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
+import { useAuth } from './hooks/useAuth';
 import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
@@ -148,6 +149,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
+  
+  // Authentication state
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -1563,6 +1567,34 @@ useEffect(() => {
   };
 
   
+
+  // Trigger sync when authentication state changes and refresh app state after sync
+  useEffect(() => {
+    if (isAuthenticated && hasConsent) {
+      console.log('🔐 User authenticated - triggering sync');
+      syncService.sync().then(async (result) => {
+        if (result.success && result.recordsPulled > 0) {
+          console.log('🔄 Sync pulled data from server, refreshing app state...');
+          
+          // Refresh exercises
+          const updatedExercises = await storageService.getExercises();
+          if (updatedExercises.length > 0) {
+            setExercises(updatedExercises);
+          }
+          
+          // Refresh app settings
+          const updatedSettings = await storageService.getAppSettings();
+          if (updatedSettings) {
+            setAppSettings(updatedSettings);
+          }
+          
+          console.log('✅ App state refreshed after sync');
+        }
+      }).catch(error => {
+        console.error('Auth sync failed:', error);
+      });
+    }
+  }, [isAuthenticated, hasConsent]);
 
   // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {

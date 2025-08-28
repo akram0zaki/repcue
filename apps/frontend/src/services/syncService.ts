@@ -267,7 +267,7 @@ export class SyncService {
     this.syncErrors = [];
     this.notifyListeners();
 
-    const syncPromise = this.performSync(authState.accessToken);
+    const syncPromise = this.performSync(authState.accessToken, force);
     this.syncInProgress = syncPromise;
 
     try {
@@ -305,7 +305,7 @@ export class SyncService {
   /**
    * Perform the actual sync operation
    */
-  private async performSync(accessToken: string): Promise<SyncResult> {
+  private async performSync(accessToken: string, force: boolean = false): Promise<SyncResult> {
     const result: SyncResult = {
         success: true,
       tablesProcessed: 0,
@@ -347,10 +347,17 @@ export class SyncService {
       
       console.log('🔍 Sync request has changes:', hasChanges);
       
-      // If no changes to push and no need to check for server changes, skip the sync call
-      if (!hasChanges && this.lastSyncCursor) {
-        console.log('📋 No local changes to sync and cursor exists, skipping sync call');
-        // Just return empty response instead of making a network call
+      // Only skip sync if we have no local changes AND we're certain we don't need server data
+      // We should always sync on first login (when lastSuccessfulSync is undefined)
+      // or when force sync is requested
+      const shouldSkipSync = !hasChanges && 
+                           this.lastSyncCursor && 
+                           this.lastSuccessfulSync && 
+                           !force &&
+                           (Date.now() - this.lastSuccessfulSync) < 30000; // Only skip if synced within last 30 seconds
+                           
+      if (shouldSkipSync) {
+        console.log('📋 No local changes to sync and recent successful sync exists, skipping sync call');
         return {
           success: true,
           tablesProcessed: SYNCABLE_TABLES.length,
@@ -360,6 +367,8 @@ export class SyncService {
           errors: []
         };
       }
+      
+      console.log('🔄 Proceeding with sync - hasChanges:', hasChanges, 'lastSuccessfulSync:', this.lastSuccessfulSync, 'force:', force);
 
       // Step 2: Call sync endpoint
       const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
@@ -399,11 +408,26 @@ export class SyncService {
   }
 
   /**
+   * Map database table names to IndexedDB table names
+   */
+  private getIndexedDBTableName(tableName: string): string {
+    const tableNameMap: Record<string, string> = {
+      'activity_logs': 'activityLogs',
+      'workout_sessions': 'workoutSessions',
+      'user_preferences': 'userPreferences',
+      'app_settings': 'appSettings'
+    };
+    
+    return tableNameMap[tableName] || tableName;
+  }
+
+  /**
    * Get dirty records for a table
    */
   private async getDirtyRecords(tableName: string): Promise<{ upserts: Record<string, unknown>[]; deletes: string[] }> {
     const db = this.storageService.getDatabase();
-    const table = (db as unknown as Record<string, unknown>)[tableName];
+    const indexedDBTableName = this.getIndexedDBTableName(tableName);
+    const table = (db as unknown as Record<string, unknown>)[indexedDBTableName];
     
     if (!table || typeof table !== 'object') {
       return { upserts: [], deletes: [] };
@@ -479,6 +503,21 @@ export class SyncService {
             ...(typeof (record as any).defaultIntervalDuration === 'number' && { default_interval_duration: (record as any).defaultIntervalDuration }),
             ...(typeof (record as any).darkMode === 'boolean' && { dark_mode: (record as any).darkMode }),
             ...(Array.isArray((record as any).favoriteExercises) && { favorite_exercises: (record as any).favoriteExercises }),
+            // Activity log field mappings
+            ...((record as any).exerciseId !== undefined && { exercise_id: (record as any).exerciseId }),
+            ...((record as any).exerciseName !== undefined && { exercise_name: (record as any).exerciseName }),
+            ...((record as any).workoutId !== undefined && { workout_id: (record as any).workoutId }),
+            ...(typeof (record as any).isWorkout === 'boolean' && { is_workout: (record as any).isWorkout }),
+            // Workout session field mappings
+            ...((record as any).workoutName !== undefined && { workout_name: (record as any).workoutName }),
+            ...(typeof (record as any).completionPercentage === 'number' && { completion_percentage: (record as any).completionPercentage }),
+            ...(typeof (record as any).totalDuration === 'number' && { total_duration: (record as any).totalDuration }),
+            ...(typeof (record as any).isCompleted === 'boolean' && { is_completed: (record as any).isCompleted }),
+            // Workout field mappings
+            ...(Array.isArray((record as any).scheduledDays) && { scheduled_days: (record as any).scheduledDays }),
+            ...(typeof (record as any).isActive === 'boolean' && { is_active: (record as any).isActive }),
+            ...(typeof (record as any).estimatedDuration === 'number' && { estimated_duration: (record as any).estimatedDuration }),
+            ...((record as any).createdAt !== undefined && { created_at: (record as any).createdAt }),
             // Note: hasVideo doesn't exist in database schema, so we skip it
           };
           
@@ -574,31 +613,14 @@ export class SyncService {
       if (error) {
         console.error('🔴 Supabase invoke error:', error);
         
-        // Check if this is an empty body error by examining the response
-        if (error && typeof error === 'object' && 'context' in error) {
-          const response = (error as any).context;
-          if (response && response.text && typeof response.text === 'function') {
-            try {
-              const responseText = await response.text();
-              if (responseText.includes('Empty request body') || responseText.includes('Invalid JSON in request body')) {
-                console.log('🔄 Detected empty body error, retrying with direct fetch...');
-                return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
-              }
-            } catch (textError) {
-              console.error('🔴 Error reading response text for fallback check:', textError);
-            }
-          }
-        }
-        
-        // Also trigger fallback for generic Edge Function errors that might be related
-        if (error.message?.includes('Edge Function returned a non-2xx status code')) {
-          console.log('🔄 Edge Function error detected, trying direct fetch as fallback...');
-          return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
-        }
+        // Always fall back to direct fetch on any invoke error
+        // This resolves the "Edge Function returned a non-2xx status code" issue
+        console.log('🔄 Supabase invoke failed, falling back to direct fetch...');
+        return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
       }
 
       if (data) {
-        console.log('🔍 Sync response received:', {
+        console.log('🔍 Sync response received via supabase.functions.invoke:', {
           hasCursor: !!data.cursor,
           tablesInResponse: Object.keys(data.changes || {}),
           changesCounts: Object.entries(data.changes || {}).map(([table, changes]) => 
@@ -607,15 +629,11 @@ export class SyncService {
         });
       }
 
-      if (error) {
-        console.error('🔴 Sync endpoint error details:', error);
-        throw new Error(`Sync endpoint error: ${error.message}`);
-      }
-
       return data as SyncResponse;
     } catch (invokeError) {
       console.error('🔴 Exception during supabase.functions.invoke:', invokeError);
-      throw invokeError;
+      console.log('🔄 Exception caught, falling back to direct fetch...');
+      return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
     }
   }
 

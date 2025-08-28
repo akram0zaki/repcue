@@ -68,6 +68,14 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - When the user is logged on, a section appears on top of the Settings menu item displaying the user's email address. Since we added a profile section to the Settings page I find this redundant. Remove the profile info on top of the Settings menu in navigation for logged on users.
     - ✅ Review all non-English translation files and translate any English strings there to the file's corresponding language. Note that ar-EG is the slang Egyptian Arabic.
 
+- Sync Issues: I accessed the application from Edge, logged on via magic link, created a workout of Plank (27s), rest (15s), Burpees (3x4), rest (15s), Finger Roll (25s). Then I accessed the application via Firefox, switched the locale to Arabic then logged on. Here are some findings:
+    - Although my Edge locale was English, when I logged on from Firefox the locale did not change from Arabic to English. This is expected behavior since language is one of the saved preferences.
+    - I ran the workout till the end on Edge and I got a successful sync message and it was added to the activity log. But when I logged on from Firefox it did not sync the activity log from server.
+    - The workout I created on Edge did not appear when I logged on from Firefox.
+    - It seems like the sync is working in one direction from client to server but not from server to client, which defeats the purpose of one profile across devices.
+    - All Edge function calls fail with error ( Supabase invoke error: FunctionsHttpError: Edge Function returned a non-2xx status code) and the application falls back to direct fetch. This needs investigation.
+
+- This application is still under development and has no real users yet. I don't mind deleting the entire supabase database and starting over with a clean and clear design to solve this sync issue once and for all. I would like you to be critical and if you think this is a good idea then you need to create a detailed implementation plan with phases and tasks how you would do this step by step  and write it to docs/implementation-plans/sync-resolution.md. Such plan must be thorough and include an analysis of existing indexeddb entities and relations and application functionality to make sure everything is addressed.
 
 
 - Gamification:

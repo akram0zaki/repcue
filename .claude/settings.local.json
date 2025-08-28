@@ -30,7 +30,8 @@
       "Bash(cat:*)",
       "mcp__supabase__get_logs",
       "Bash(npm run build:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

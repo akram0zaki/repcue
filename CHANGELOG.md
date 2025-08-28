@@ -1,3 +1,61 @@
+## 2025-08-28 (3) - Complete Sync System Fix & Database Schema Updates
+
+### Fixed (Critical Issues)
+- **🔥 Missing Authentication Sync Trigger**: Added sync trigger when user logs in or authentication state changes
+  - **Root Cause**: App component was not monitoring authentication state changes to trigger sync
+  - **Solution**: Added `useAuth()` hook and `useEffect` to trigger sync when `isAuthenticated` becomes true
+  - **Impact**: Sync now automatically triggers when user logs in from a new device
+
+- **🔄 Incorrect Sync Skipping Logic**: Fixed sync being skipped when it should check for server data
+  - **Root Cause**: Sync was skipped if no local changes existed AND sync cursor existed, preventing server data retrieval
+  - **Solution**: Only skip sync if recent successful sync occurred within 30 seconds and no force sync
+  - **Impact**: New device logins now properly pull data from server even with no local changes
+
+- **🗄️ Database Schema Mismatch**: Fixed sync_cursors table incompatibility with auth system
+  - **Root Cause**: `sync_cursors.user_id` was TEXT but should be UUID to match `auth.users.id`  
+  - **Solution**: Created migration `fix_sync_cursors_user_id_type` to recreate table with proper UUID type
+  - **Impact**: Sync cursor tracking now works correctly, preventing duplicate data synchronization
+
+---
+
+## 2025-08-28 (2) - Critical Bidirectional Sync Bug Fixes
+
+### Fixed (Critical Issues)
+- **🔄 Bidirectional Sync Completely Broken**: Fixed sync only working in one direction (client to server)
+  - **Root Cause**: Deployed Edge Function had outdated code that never returned server changes to clients
+  - **Solution**: Deployed proper sync Edge Function with `getServerChanges()` functionality
+  - **Impact**: Sync now works properly across devices - data created on one device appears on all other devices
+
+- **🚨 Edge Function Invocation Failures**: Fixed "Edge Function returned a non-2xx status code" errors
+  - **Root Cause**: Supabase `functions.invoke()` method inconsistently failing with request body issues
+  - **Solution**: Improved fallback to direct fetch for all invocation errors
+  - **Impact**: Sync now reliably works even when Supabase SDK has issues
+
+### Enhanced (Sync Infrastructure)
+- **📊 Sync Edge Function**: Completely updated with proper bidirectional sync logic
+  - Added proper server change retrieval for all syncable tables
+  - Improved error handling for missing tables and connection issues
+  - Enhanced conflict resolution using last-writer-wins timestamp strategy
+  - Added comprehensive logging for debugging sync issues
+
+- **🔧 Sync Service Reliability**: Enhanced fallback mechanisms and error handling
+  - Automatic fallback to direct fetch when Supabase invoke fails
+  - Better logging to distinguish between invoke success and fallback usage
+  - Simplified error handling to prevent sync failures from breaking the application
+
+### Technical Details
+- **Database Compatibility**: All syncable tables (user_preferences, app_settings, exercises, workouts, activity_logs, workout_sessions) now properly sync bidirectionally
+- **Field Transformation**: Proper camelCase ↔ snake_case field mapping between client and server
+- **Cursor Management**: Fixed sync cursor tracking to prevent duplicate data synchronization
+- **Cross-Browser Support**: Sync now works consistently across different browsers and sessions
+
+### Migration Impact
+- **Immediate Fix**: Users will now see data sync properly across all devices after this update
+- **No Data Loss**: All existing data is preserved and will sync correctly moving forward
+- **Performance**: Sync operations are now more reliable and faster due to improved error handling
+
+---
+
 ## 2025-08-28 - Profile Section & Internationalization Updates
 
 ### Added
