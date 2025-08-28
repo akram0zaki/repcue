@@ -26,14 +26,13 @@ type StoredAppSettings = AppSettings;
 
 type StoredExercise = Exercise;
 
-// Workout-related data interfaces
-interface StoredWorkout extends Omit<Workout, 'createdAt'> {
-  createdAt: string; // Store as ISO string for IndexedDB
+// Workout-related data interfaces  
+interface StoredWorkout extends Workout {
+  // All fields already use snake_case and ISO strings
 }
 
-interface StoredWorkoutSession extends Omit<WorkoutSession, 'startTime' | 'endTime'> {
-  startTime: string;
-  endTime?: string;
+interface StoredWorkoutSession extends WorkoutSession {
+  // All fields already use snake_case and ISO strings
 }
 
 
@@ -44,11 +43,11 @@ interface StoredWorkoutSession extends Omit<WorkoutSession, 'startTime' | 'endTi
  */
 class RepCueDatabase extends Dexie {
   exercises!: Table<StoredExercise>;
-  activityLogs!: Table<StoredActivityLog>;
-  userPreferences!: Table<StoredUserPreferences>;
-  appSettings!: Table<StoredAppSettings>;
+  activity_logs!: Table<StoredActivityLog>;
+  user_preferences!: Table<StoredUserPreferences>;
+  app_settings!: Table<StoredAppSettings>;
   workouts!: Table<StoredWorkout>;
-  workoutSessions!: Table<StoredWorkoutSession>;
+  workout_sessions!: Table<StoredWorkoutSession>;
 
   constructor() {
     super('RepCueDB');
@@ -85,6 +84,19 @@ class RepCueDatabase extends Dexie {
     }).upgrade(trans => {
       // Migration function to add sync metadata to existing records
       return this.migrateToSyncMetadata(trans);
+    });
+
+    // Version 6: Unified snake_case schema matching server exactly
+    this.version(6).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
+    }).upgrade(trans => {
+      // Migration function to convert from camelCase to snake_case
+      return this.migrateToUnifiedSchema(trans);
     });
   }
 
@@ -152,6 +164,156 @@ class RepCueDatabase extends Dexie {
       if (!session.dirty) session.dirty = 0;
       if (!session.op) session.op = 'upsert';
     });
+  }
+
+  /**
+   * Migration function to convert from camelCase to snake_case schema
+   */
+  private async migrateToUnifiedSchema(trans: Transaction): Promise<void> {
+    const now = new Date().toISOString();
+    
+    try {
+      // Migrate exercises: exerciseType -> exercise_type, isFavorite -> is_favorite, etc.
+      await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+        if (exercise.exerciseType) {
+          exercise.exercise_type = exercise.exerciseType === 'time-based' ? 'time_based' : 'repetition_based';
+          delete exercise.exerciseType;
+        }
+        if (exercise.isFavorite !== undefined) {
+          exercise.is_favorite = exercise.isFavorite;
+          delete exercise.isFavorite;
+        }
+        if (exercise.ownerId !== undefined) {
+          exercise.owner_id = exercise.ownerId;
+          delete exercise.ownerId;
+        }
+        if (exercise.updatedAt !== undefined) {
+          exercise.updated_at = exercise.updatedAt;
+          delete exercise.updatedAt;
+        }
+        if (!exercise.created_at) exercise.created_at = now;
+      });
+
+      // Migrate activity_logs: exerciseId -> exercise_id, etc.
+      // Note: This changes from activityLogs to activity_logs table
+      const oldActivityLogs = await trans.table('activityLogs').toArray();
+      if (oldActivityLogs.length > 0) {
+        await trans.table('activity_logs').bulkAdd(oldActivityLogs.map((log: Record<string, unknown>) => ({
+          ...log,
+          exercise_id: log.exerciseId,
+          exercise_name: log.exerciseName || 'Unknown Exercise',
+          owner_id: log.ownerId,
+          updated_at: log.updatedAt || now,
+          created_at: now,
+          // Remove old camelCase fields
+          exerciseId: undefined,
+          exerciseName: undefined,
+          ownerId: undefined,
+          updatedAt: undefined
+        })));
+      }
+
+      // Migrate user_preferences
+      const oldUserPrefs = await trans.table('userPreferences').toArray();
+      if (oldUserPrefs.length > 0) {
+        await trans.table('user_preferences').bulkAdd(oldUserPrefs.map((pref: Record<string, unknown>) => ({
+          ...pref,
+          owner_id: pref.ownerId,
+          updated_at: pref.updatedAt || now,
+          created_at: now,
+          sound_enabled: true,
+          vibration_enabled: true,
+          default_interval_duration: 30,
+          dark_mode: false,
+          favorite_exercises: [],
+          locale: 'en',
+          units: 'metric',
+          cues: {},
+          rep_speed_factor: 1.0,
+          // Remove old camelCase fields
+          ownerId: undefined,
+          updatedAt: undefined
+        })));
+      }
+
+      // Migrate app_settings
+      const oldAppSettings = await trans.table('appSettings').toArray();
+      if (oldAppSettings.length > 0) {
+        await trans.table('app_settings').bulkAdd(oldAppSettings.map((setting: Record<string, unknown>) => ({
+          ...setting,
+          owner_id: setting.ownerId,
+          updated_at: setting.updatedAt || now,
+          created_at: now,
+          interval_duration: 30,
+          sound_enabled: true,
+          vibration_enabled: true,
+          beep_volume: 0.5,
+          dark_mode: false,
+          auto_save: true,
+          pre_timer_countdown: 3,
+          default_rest_time: 60,
+          rep_speed_factor: 1.0,
+          show_exercise_videos: false,
+          reduce_motion: false,
+          auto_start_next: false,
+          // Remove old camelCase fields  
+          ownerId: undefined,
+          updatedAt: undefined
+        })));
+      }
+
+      // Migrate workouts
+      await trans.table('workouts').toCollection().modify((workout: Record<string, unknown>) => {
+        if (workout.ownerId !== undefined) {
+          workout.owner_id = workout.ownerId;
+          delete workout.ownerId;
+        }
+        if (workout.updatedAt !== undefined) {
+          workout.updated_at = workout.updatedAt;
+          delete workout.updatedAt;
+        }
+        if (workout.createdAt !== undefined) {
+          workout.created_at = workout.createdAt;
+          delete workout.createdAt;
+        } else {
+          workout.created_at = now;
+        }
+        if (!workout.scheduled_days) workout.scheduled_days = [];
+        if (workout.is_active === undefined) workout.is_active = true;
+      });
+
+      // Migrate workout_sessions
+      const oldWorkoutSessions = await trans.table('workoutSessions').toArray();
+      if (oldWorkoutSessions.length > 0) {
+        await trans.table('workout_sessions').bulkAdd(oldWorkoutSessions.map((session: Record<string, unknown>) => ({
+          ...session,
+          workout_id: session.workoutId,
+          workout_name: session.workoutName || 'Unknown Workout',
+          start_time: session.startTime,
+          end_time: session.endTime,
+          is_completed: session.isCompleted || false,
+          completion_percentage: 0,
+          total_duration: session.totalDuration,
+          owner_id: session.ownerId,
+          updated_at: session.updatedAt || now,
+          created_at: now,
+          exercises: [],
+          // Remove old camelCase fields
+          workoutId: undefined,
+          workoutName: undefined,
+          startTime: undefined,
+          endTime: undefined,
+          isCompleted: undefined,
+          totalDuration: undefined,
+          ownerId: undefined,
+          updatedAt: undefined
+        })));
+      }
+
+    } catch (error) {
+      console.error('Migration to unified schema failed:', error);
+      // Don't throw - let the migration continue with warnings
+    }
   }
 }
 

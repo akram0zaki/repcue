@@ -172,14 +172,14 @@ function App() {
 
   // Effect to ensure correct duration for rep-based exercises
   useEffect(() => {
-    if (selectedExercise?.exerciseType === 'repetition-based' && appSettings.repSpeedFactor) {
-    const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
-    const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
+    if (selectedExercise?.exercise_type === 'repetition_based' && appSettings.rep_speed_factor) {
+    const baseRep = selectedExercise.rep_duration_seconds || BASE_REP_TIME;
+    const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
       if (selectedDuration !== repDuration) {
         setSelectedDuration(repDuration as TimerPreset);
       }
     }
-  }, [selectedExercise, appSettings.repSpeedFactor, selectedDuration]);
+  }, [selectedExercise, appSettings.rep_speed_factor, selectedDuration]);
 
   // Timer refs for interval management
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -223,16 +223,16 @@ function App() {
 
       // Interval beeping: beep every intervalDuration seconds (only for whole seconds)
       const wholeSecondsElapsed = Math.floor(elapsed);
-      if (wholeSecondsElapsed > 0 && wholeSecondsElapsed % appSettings.intervalDuration === 0) {
+      if (wholeSecondsElapsed > 0 && wholeSecondsElapsed % appSettings.interval_duration === 0) {
         if (wholeSecondsElapsed !== lastBeepIntervalRef.current) {
-          if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-            audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+          if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+            audioService.playIntervalFeedback(appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume);
           }
           lastBeepIntervalRef.current = wholeSecondsElapsed;
         }
       }
     }, intervalDuration);
-  }, [appSettings.intervalDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume]);
+  }, [appSettings.interval_duration, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume]);
 
   // Separate function for the actual timer logic
   const startActualTimer = useCallback(() => {
@@ -243,12 +243,12 @@ function App() {
     }
 
     // Play start sound and vibration
-    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-      audioService.playStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+    if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+      audioService.playStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
     }
 
     // Announce timer start
-    if (appSettings.soundEnabled) {
+    if (appSettings.sound_enabled) {
       const actualTargetTime = timerState.targetTime || selectedDuration;
       audioService.announceText(`Timer started! ${actualTargetTime} seconds`);
     }
@@ -310,7 +310,7 @@ function App() {
       isRepBasedExercise = selectedExercise?.exerciseType === 'repetition-based';
     }
     intervalRef.current = createTimerInterval(startTime, isRepBasedExercise);
-  }, [selectedExercise, selectedDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, timerState.workoutMode, createTimerInterval, timerState.targetTime, exercises]);
+  }, [selectedExercise, selectedDuration, appSettings.sound_enabled, appSettings.vibration_enabled, timerState.workoutMode, createTimerInterval, timerState.targetTime, exercises]);
 
   // Timer Functions
   const startTimer = useCallback(async () => {
@@ -343,7 +343,7 @@ function App() {
       }));
 
       // Announce countdown start
-      if (appSettings.soundEnabled) {
+      if (appSettings.sound_enabled) {
         audioService.announceText(`Get ready for ${selectedExercise.name}. Starting in ${appSettings.preTimerCountdown} seconds`);
       }
 
@@ -367,10 +367,10 @@ function App() {
 
           // Beep on each countdown second
           if (remaining <= 3 && elapsed > appSettings.preTimerCountdown - remaining - 1) {
-            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-              audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+            if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+              audioService.playIntervalFeedback(appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume);
             }
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(remaining.toString());
             }
           }
@@ -380,7 +380,7 @@ function App() {
       // No countdown, start timer immediately
       startActualTimer();
     }
-  }, [selectedExercise, selectedDuration, appSettings.preTimerCountdown, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume, wakeLockSupported, requestWakeLock, startActualTimer]);
+  }, [selectedExercise, selectedDuration, appSettings.preTimerCountdown, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume, wakeLockSupported, requestWakeLock, startActualTimer]);
 
   const stopTimer = useCallback(async (isCompletion: boolean = false) => {
     if (intervalRef.current) {
@@ -409,8 +409,8 @@ function App() {
     }
 
     // Play stop sound and vibration
-    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-      await audioService.playStopFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+    if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+      await audioService.playStopFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
     }
 
     // Release wake lock when timer stops
@@ -419,7 +419,7 @@ function App() {
     }
 
     setTimerState(prev => ({ ...prev, isRunning: false, isCountdown: false, countdownTime: 0 }));
-  }, [appSettings.soundEnabled, appSettings.vibrationEnabled, wakeLockActive, releaseWakeLock, timerState]);
+  }, [appSettings.sound_enabled, appSettings.vibration_enabled, wakeLockActive, releaseWakeLock, timerState]);
 
   const resetTimer = useCallback(async () => {
     if (intervalRef.current) {
@@ -456,9 +456,9 @@ function App() {
 
     // Reset duration to default for the current exercise
     if (selectedExercise) {
-      if (selectedExercise.exerciseType === 'time-based') {
+      if (selectedExercise.exercise_type === 'time-based') {
         setSelectedDuration(selectedExercise.defaultDuration as TimerPreset);
-      } else if (selectedExercise.exerciseType === 'repetition-based') {
+      } else if (selectedExercise.exercise_type === 'repetition-based') {
   const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
   const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
         setSelectedDuration(repDuration as TimerPreset);
@@ -528,10 +528,10 @@ function App() {
     }
 
     // Announce workout start
-    if (appSettings.soundEnabled) {
+    if (appSettings.sound_enabled) {
       audioService.announceText(`Starting workout: ${workoutData.workoutName}. ${workoutData.exercises.length} exercises planned.`);
     }
-  }, [exercises, appSettings.soundEnabled, appSettings.repSpeedFactor]);
+  }, [exercises, appSettings.sound_enabled, appSettings.repSpeedFactor]);
 
   // Advance workout to next exercise or complete workout
   const advanceWorkout = useCallback(async () => {
@@ -552,7 +552,7 @@ function App() {
       // Workout completed
       console.log('🎉 Workout completed! Logging workout session...');
       console.log('🔍 About to check consent and session for workout logging...');
-      if (appSettings.soundEnabled) {
+      if (appSettings.sound_enabled) {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
 
@@ -590,18 +590,18 @@ function App() {
           // Create a single workout activity log entry for the activity log page
           console.log('📝 Creating workout activity log entry...');
           const workoutExerciseDetails = workoutMode.exercises.map((workoutExercise) => {
-            const exercise = exercises.find(ex => ex.id === workoutExercise.exerciseId);
+            const exercise = exercises.find(ex => ex.id === workoutExercise.exercise_id);
             if (!exercise) return null;
             
             let exerciseDuration: number;
             let sets: number | undefined;
             let reps: number | undefined;
             
-            if (exercise.exerciseType === 'time-based') {
-              exerciseDuration = workoutExercise.customDuration || exercise.defaultDuration || 30;
+            if (exercise.exercise_type === 'time-based') {
+              exerciseDuration = workoutExercise.custom_duration || exercise.defaultDuration || 30;
             } else {
-              sets = workoutExercise.customSets || exercise.defaultSets || 1;
-              reps = workoutExercise.customReps || exercise.defaultReps || 10;
+              sets = workoutExercise.custom_sets || exercise.default_sets || 1;
+              reps = workoutExercise.custom_reps || exercise.default_reps || 10;
               const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
               const repTime = Math.round(baseRep * appSettings.repSpeedFactor);
               const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
@@ -700,7 +700,7 @@ function App() {
             countdownTime: 0
           }));
 
-          if (appSettings.soundEnabled) {
+          if (appSettings.sound_enabled) {
             audioService.announceText(`Rest time: ${restTime} seconds. Next exercise: ${nextExercise.name}`);
           }
 
@@ -779,13 +779,13 @@ function App() {
             setSelectedDuration(repDuration as TimerPreset);
           }
 
-          if (appSettings.soundEnabled) {
+          if (appSettings.sound_enabled) {
             audioService.announceText(`Next exercise: ${nextExercise.name}`);
           }
         }
       }
     }
-  }, [timerState, selectedExercise?.name, exercises, appSettings.soundEnabled, appSettings.repSpeedFactor, resetTimer]);
+  }, [timerState, selectedExercise?.name, exercises, appSettings.sound_enabled, appSettings.repSpeedFactor, resetTimer]);
 
   // Handle timer completion
   useEffect(() => {
@@ -888,7 +888,7 @@ function App() {
               }));
             }
 
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(`Rest complete. Starting ${nextExercise.name}`);
             }
 
@@ -934,7 +934,7 @@ function App() {
               }));
               
               // More reps to go, announce next rep
-              if (appSettings.soundEnabled) {
+              if (appSettings.sound_enabled) {
                 audioService.announceText(`Rep ${nextRep + 1} of ${totalReps}`);
               }
               
@@ -974,13 +974,13 @@ function App() {
                   targetTime: REST_TIME_BETWEEN_SETS
                 }));
                 
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
                 }
                 
                 // Play rest start feedback
-                if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                  audioService.playRestStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                  audioService.playRestStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                 }
                 
                 // Start rest timer
@@ -1000,13 +1000,13 @@ function App() {
 
                     if (remaining <= 0) {
                       // Rest completed, transition to next set
-                      if (appSettings.soundEnabled) {
+                      if (appSettings.sound_enabled) {
                         audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
                       }
                       
                       // Play rest end feedback
-                      if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                        audioService.playRestEndFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                      if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                        audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                       }
                       
                       // Clear rest interval to prevent double triggers
@@ -1042,7 +1042,7 @@ function App() {
                 }, 1000);
               } else {
                 // All sets completed for this exercise, advance to next exercise
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText('Exercise completed!');
                 }
                 
@@ -1081,7 +1081,7 @@ function App() {
             
             if (nextRep < totalReps) {
               // More reps to go, announce next rep
-              if (appSettings.soundEnabled) {
+              if (appSettings.sound_enabled) {
                 audioService.announceText(`Rep ${nextRep + 1} of ${totalReps}`);
               }
               
@@ -1106,13 +1106,13 @@ function App() {
                   targetTime: REST_TIME_BETWEEN_SETS
                 }));
                 
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
                 }
                 
                 // Play rest start feedback
-                if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                  audioService.playRestStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                  audioService.playRestStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                 }
                 
                 // Start rest timer
@@ -1132,13 +1132,13 @@ function App() {
 
                     if (remaining <= 0) {
                       // Rest completed, transition to next set
-                      if (appSettings.soundEnabled) {
+                      if (appSettings.sound_enabled) {
                         audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
                       }
                       
                       // Play rest end feedback
-                      if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                        audioService.playRestEndFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                      if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                        audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                       }
                       
                       // Clear rest interval to prevent double triggers
@@ -1171,7 +1171,7 @@ function App() {
                 }, 1000);
               } else {
                 // All reps and sets completed
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(`Exercise completed! Great job on ${currentExercise.name}`);
                 }
                 
@@ -1211,13 +1211,13 @@ function App() {
               targetTime: REST_TIME_BETWEEN_SETS
             }));
             
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
             }
             
             // Play rest start feedback
-            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-              audioService.playRestStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+            if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+              audioService.playRestStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
             }
             
             // Start rest timer
@@ -1237,13 +1237,13 @@ function App() {
 
                 if (remaining <= 0) {
                   // Rest completed, transition to next set
-                  if (appSettings.soundEnabled) {
+                  if (appSettings.sound_enabled) {
                     audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
                   }
                   
                   // Play rest end feedback
-                  if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                    audioService.playRestEndFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                  if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                    audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                   }
                   
                   // Clear rest interval to prevent double triggers
@@ -1279,7 +1279,7 @@ function App() {
 
               // Beep at 3, 2, 1 seconds remaining during rest
               if (remaining <= 3 && remaining > 0) {
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(remaining.toString());
                 }
               }
@@ -1288,7 +1288,7 @@ function App() {
             return;
           } else {
             // All reps and sets completed
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(`Exercise completed! Great job on ${currentExercise.name}`);
             }
             
@@ -1338,13 +1338,13 @@ function App() {
           stopTimer(true);
 
           // Announce completion
-          if (appSettings.soundEnabled) {
+          if (appSettings.sound_enabled) {
             audioService.announceText(`Timer completed! Great job on ${currentExercise?.name}`);
           }
         }
       }
     }
-  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.repSpeedFactor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
+  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.repSpeedFactor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
 
   // Cleanup timer interval on unmount
   useEffect(() => {
