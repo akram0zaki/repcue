@@ -42,7 +42,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
   // Resolve metadata & choose initial variant (square -> portrait -> landscape)
   useEffect(() => {
-    if (!exercise || !mediaIndex || !exercise.hasVideo) {
+    if (!exercise || !mediaIndex || !exercise.has_video) {
       setMedia(null);
       setVideoUrl(null);
       setReady(false);

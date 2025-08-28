@@ -10,10 +10,10 @@ import { localizeExercise } from '../utils/localizeExercise';
 
 interface SelectedExercise extends Exercise {
   order: number;
-  customDuration?: number;
-  customSets?: number;
-  customReps?: number;
-  customRestTime?: number;
+  custom_duration?: number;
+  custom_sets?: number;
+  custom_reps?: number;
+  custom_rest_time?: number;
 }
 
 const EditWorkoutPage: React.FC = () => {
@@ -69,22 +69,22 @@ const EditWorkoutPage: React.FC = () => {
         setWorkout(workoutData);
         setWorkoutName(workoutData.name);
         setWorkoutDescription(workoutData.description || '');
-        setScheduledDays(workoutData.scheduledDays || []);
-        setIsActive(workoutData.isActive ?? true);
+        setScheduledDays(workoutData.scheduled_days || []);
+        setIsActive(workoutData.is_active ?? true);
 
         // Convert workout exercises to selected exercises
         const selectedExs: SelectedExercise[] = workoutData.exercises.map((we, index) => {
-          const exercise = exercises.find(e => e.id === we.exerciseId);
+          const exercise = exercises.find(e => e.id === we.exercise_id);
           if (!exercise) {
-            throw new Error(`Exercise not found: ${we.exerciseId}`);
+            throw new Error(`Exercise not found: ${we.exercise_id}`);
           }
           return {
             ...exercise,
             order: we.order || index,
-            customDuration: we.customDuration,
-            customSets: we.customSets,
-            customReps: we.customReps,
-            customRestTime: we.customRestTime
+            custom_duration: we.custom_duration,
+            custom_sets: we.custom_sets,
+            custom_reps: we.custom_reps,
+            custom_rest_time: we.custom_rest_time
           };
         });
 
@@ -128,12 +128,12 @@ const EditWorkoutPage: React.FC = () => {
       // Create workout exercises
       const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise, index) => ({
         id: `we_${Date.now()}_${index}`,
-        exerciseId: exercise.id,
+        exercise_id: exercise.id,
         order: exercise.order,
-        customDuration: exercise.customDuration,
-        customSets: exercise.customSets,
-        customReps: exercise.customReps,
-        customRestTime: exercise.customRestTime
+        custom_duration: exercise.custom_duration,
+        custom_sets: exercise.custom_sets,
+        custom_reps: exercise.custom_reps,
+        custom_rest_time: exercise.custom_rest_time
       }));
 
       // Update workout
@@ -142,10 +142,10 @@ const EditWorkoutPage: React.FC = () => {
         name: workoutName.trim(),
         description: workoutDescription.trim() || undefined,
         exercises: workoutExercises,
-        estimatedDuration: calculateEstimatedDuration(),
-        scheduledDays: scheduledDays,
-        isActive: isActive,
-        updatedAt: new Date().toISOString()
+        estimated_duration: calculateEstimatedDuration(),
+        scheduled_days: scheduledDays,
+        is_active: isActive,
+        updated_at: new Date().toISOString()
       };
 
       await storageService.saveWorkout(updatedWorkout);
@@ -164,9 +164,9 @@ const EditWorkoutPage: React.FC = () => {
     let totalSeconds = 0;
     
     selectedExercises.forEach(exercise => {
-      const duration = exercise.customDuration || 30;
-      const sets = exercise.customSets || 1;
-      const restTime = exercise.customRestTime || 30;
+      const duration = exercise.custom_duration || 30;
+      const sets = exercise.custom_sets || 1;
+      const restTime = exercise.custom_rest_time || 30;
       
       totalSeconds += (duration * sets) + restTime;
     });
@@ -536,11 +536,11 @@ const EditWorkoutPage: React.FC = () => {
                           <input
                             type="number"
                             min="1"
-                            value={exercise.customDuration || ''}
+                            value={exercise.custom_duration || ''}
                             onChange={(e) => handleUpdateExercise(exercise.id, { 
-                              customDuration: e.target.value ? parseInt(e.target.value) : undefined 
+                              custom_duration: e.target.value ? parseInt(e.target.value) : undefined 
                             })}
-                            placeholder={exercise.defaultDuration?.toString() || '30'}
+                            placeholder={exercise.default_duration?.toString() || '30'}
                             className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                             disabled={saving}
                           />
@@ -552,11 +552,11 @@ const EditWorkoutPage: React.FC = () => {
                           <input
                             type="number"
                             min="1"
-                            value={exercise.customSets || ''}
+                            value={exercise.custom_sets || ''}
                             onChange={(e) => handleUpdateExercise(exercise.id, { 
-                              customSets: e.target.value ? parseInt(e.target.value) : undefined 
+                              custom_sets: e.target.value ? parseInt(e.target.value) : undefined 
                             })}
-                            placeholder={exercise.defaultSets?.toString() || '1'}
+                            placeholder={exercise.default_sets?.toString() || '1'}
                             className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                             disabled={saving}
                           />
@@ -568,11 +568,11 @@ const EditWorkoutPage: React.FC = () => {
                           <input
                             type="number"
                             min="1"
-                            value={exercise.customReps || ''}
+                            value={exercise.custom_reps || ''}
                             onChange={(e) => handleUpdateExercise(exercise.id, { 
-                              customReps: e.target.value ? parseInt(e.target.value) : undefined 
+                              custom_reps: e.target.value ? parseInt(e.target.value) : undefined 
                             })}
-                            placeholder={exercise.defaultReps?.toString() || '-'}
+                            placeholder={exercise.default_reps?.toString() || '-'}
                             className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                             disabled={saving}
                           />
@@ -584,9 +584,9 @@ const EditWorkoutPage: React.FC = () => {
                           <input
                             type="number"
                             min="0"
-                            value={exercise.customRestTime || ''}
+                            value={exercise.custom_rest_time || ''}
                             onChange={(e) => handleUpdateExercise(exercise.id, { 
-                              customRestTime: e.target.value ? parseInt(e.target.value) : undefined 
+                              custom_rest_time: e.target.value ? parseInt(e.target.value) : undefined 
                             })}
                             placeholder={'30'}
                             className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"

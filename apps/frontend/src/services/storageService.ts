@@ -108,7 +108,7 @@ class RepCueDatabase extends Dexie {
     
     // Migrate exercises
     await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
-      if (!exercise.ownerId) exercise.ownerId = null;
+      if (!exercise.owner_id) exercise.owner_id = null;
       if (!exercise.deleted) exercise.deleted = false;
       if (!exercise.version) exercise.version = 1;
       if (!exercise.dirty) exercise.dirty = 0;
@@ -118,8 +118,8 @@ class RepCueDatabase extends Dexie {
     // Migrate activity logs
     await trans.table('activityLogs').toCollection().modify((log: Record<string, unknown>) => {
       if (!log.id) log.id = crypto.randomUUID();
-      if (!log.updatedAt) log.updatedAt = now;
-      if (!log.ownerId) log.ownerId = null;
+      if (!log.updated_at) log.updated_at = now;
+      if (!log.owner_id) log.owner_id = null;
       if (!log.deleted) log.deleted = false;
       if (!log.version) log.version = 1;
       if (!log.dirty) log.dirty = 0;
@@ -129,7 +129,7 @@ class RepCueDatabase extends Dexie {
     // Migrate user preferences
     await trans.table('userPreferences').toCollection().modify((prefs: Record<string, unknown>) => {
       if (!prefs.id) prefs.id = crypto.randomUUID();
-      if (!prefs.ownerId) prefs.ownerId = null;
+      if (!prefs.owner_id) prefs.owner_id = null;
       if (!prefs.deleted) prefs.deleted = false;
       if (!prefs.version) prefs.version = 1;
       if (!prefs.dirty) prefs.dirty = 0;
@@ -139,7 +139,7 @@ class RepCueDatabase extends Dexie {
     // Migrate app settings
     await trans.table('appSettings').toCollection().modify((settings: Record<string, unknown>) => {
       if (!settings.id) settings.id = crypto.randomUUID();
-      if (!settings.ownerId) settings.ownerId = null;
+      if (!settings.owner_id) settings.owner_id = null;
       if (!settings.deleted) settings.deleted = false;
       if (!settings.version) settings.version = 1;
       if (!settings.dirty) settings.dirty = 0;
@@ -148,7 +148,7 @@ class RepCueDatabase extends Dexie {
 
     // Migrate workouts
     await trans.table('workouts').toCollection().modify((workout: Record<string, unknown>) => {
-      if (!workout.ownerId) workout.ownerId = null;
+      if (!workout.owner_id) workout.owner_id = null;
       if (!workout.deleted) workout.deleted = false;
       if (!workout.version) workout.version = 1;
       if (!workout.dirty) workout.dirty = 0;
@@ -157,8 +157,8 @@ class RepCueDatabase extends Dexie {
 
     // Migrate workout sessions
     await trans.table('workoutSessions').toCollection().modify((session: Record<string, unknown>) => {
-      if (!session.updatedAt) session.updatedAt = now;
-      if (!session.ownerId) session.ownerId = null;
+      if (!session.updated_at) session.updated_at = now;
+      if (!session.owner_id) session.owner_id = null;
       if (!session.deleted) session.deleted = false;
       if (!session.version) session.version = 1;
       if (!session.dirty) session.dirty = 0;
@@ -375,7 +375,8 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const storedExercise: StoredExercise = prepareUpsert(exercise, exercise.id);
+    const exerciseId = exercise.id || crypto.randomUUID();
+    const storedExercise: StoredExercise = prepareUpsert(exercise, exerciseId);
 
     try {
       await this.db.exercises.put(storedExercise);
@@ -448,7 +449,8 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const logWithSync = prepareUpsert(log, log.id);
+    const logId = log.id || crypto.randomUUID();
+    const logWithSync = prepareUpsert(log, logId);
     const storedLog: StoredActivityLog = {
       ...logWithSync,
       timestamp: typeof log.timestamp === 'string' ? log.timestamp : log.timestamp.toISOString()
@@ -500,7 +502,7 @@ export class StorageService {
           logs.push(this.convertStoredActivityLog(value as StoredActivityLog));
         }
       });
-      return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, limit);
+      return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, limit);
     }
   }
 
@@ -512,7 +514,8 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, preferences.id);
+    const prefId = preferences.id || crypto.randomUUID();
+    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, prefId);
 
     try {
       // Use put() to handle both insert and update operations
@@ -555,7 +558,8 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const storedSettings: StoredAppSettings = prepareUpsert(settings, settings.id);
+    const settingsId = settings.id || crypto.randomUUID();
+    const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId);
 
     try {
       // Use put() to handle both insert and update operations
@@ -712,10 +716,11 @@ export class StorageService {
       return Promise.reject(new Error('Cannot store data without user consent'));
     }
 
-    const workoutWithSync = prepareUpsert(workout, workout.id);
+    const workoutId = workout.id || crypto.randomUUID();
+    const workoutWithSync = prepareUpsert(workout, workoutId);
     const storedWorkout: StoredWorkout = {
       ...workoutWithSync,
-      created_at: typeof workout.created_at === 'string' ? workout.created_at : workout.created_at.toISOString()
+      created_at: typeof workout.created_at === 'string' ? workout.created_at : new Date().toISOString()
     };
 
     try {
@@ -801,7 +806,8 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const sessionWithSync = prepareUpsert(session, session.id);
+    const sessionId = session.id || crypto.randomUUID();
+    const sessionWithSync = prepareUpsert(session, sessionId);
     const storedSession: StoredWorkoutSession = {
       ...sessionWithSync,
       start_time: typeof session.start_time === 'string' ? session.start_time : session.start_time.toISOString(),
@@ -991,7 +997,7 @@ export class StorageService {
 
     try {
       const now = new Date().toISOString();
-      const updateData = { dirty: 0, syncedAt: now };
+      const updateData = { dirty: 0, synced_at: now };
 
       switch (table) {
         case 'exercises':
@@ -1125,8 +1131,8 @@ export class StorageService {
   private convertStoredActivityLog(stored: StoredActivityLog): ActivityLog {
     return {
       ...stored,
-      timestamp: new Date(stored.timestamp)
-    };
+      timestamp: stored.timestamp
+    } as ActivityLog;
   }
 
   /**
@@ -1135,7 +1141,7 @@ export class StorageService {
   private convertStoredWorkout(stored: StoredWorkout): Workout {
     return {
       ...stored,
-      created_at: typeof stored.created_at === 'string' ? stored.created_at : new Date(stored.created_at).toISOString()
+      created_at: stored.created_at
     };
   }
 
@@ -1159,8 +1165,8 @@ export class StorageService {
   private convertStoredWorkoutSession(stored: StoredWorkoutSession): WorkoutSession {
     return {
       ...stored,
-      start_time: typeof stored.start_time === 'string' ? stored.start_time : new Date(stored.start_time).toISOString(),
-      end_time: stored.end_time ? (typeof stored.end_time === 'string' ? stored.end_time : new Date(stored.end_time).toISOString()) : undefined
+      start_time: stored.start_time,
+      end_time: stored.end_time
     };
   }
 

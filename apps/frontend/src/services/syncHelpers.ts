@@ -22,10 +22,11 @@ export function generateId(): string {
 /**
  * Create sync metadata for a new record
  */
-export function createSyncMetadata(ownerId?: string | null): Omit<SyncMetadata, 'id'> {
+export function createSyncMetadata(owner_id?: string | null): Omit<SyncMetadata, 'id'> {
   return {
-    ownerId: ownerId || null,
-    updatedAt: nowISO(),
+    owner_id: owner_id || null,
+    updated_at: nowISO(),
+    created_at: nowISO(),
     deleted: false,
     version: 1,
     dirty: 1,
@@ -38,14 +39,14 @@ export function createSyncMetadata(ownerId?: string | null): Omit<SyncMetadata, 
  */
 export function updateSyncMetadata(
   currentMetadata: SyncMetadata,
-  ownerId?: string | null
+  owner_id?: string | null
 ): Partial<SyncMetadata> {
   return {
-    updatedAt: nowISO(),
+    updated_at: nowISO(),
     version: currentMetadata.version + 1,
     dirty: 1,
     op: 'upsert',
-    ownerId: ownerId !== undefined ? ownerId : currentMetadata.ownerId
+    owner_id: owner_id !== undefined ? owner_id : currentMetadata.owner_id
   };
 }
 
@@ -54,25 +55,25 @@ export function updateSyncMetadata(
  */
 export function markAsDeleted(
   currentMetadata: SyncMetadata,
-  ownerId?: string | null
+  owner_id?: string | null
 ): Partial<SyncMetadata> {
   return {
-    updatedAt: nowISO(),
+    updated_at: nowISO(),
     version: currentMetadata.version + 1,
     deleted: true,
     dirty: 1,
     op: 'delete',
-    ownerId: ownerId !== undefined ? ownerId : currentMetadata.ownerId
+    owner_id: owner_id !== undefined ? owner_id : currentMetadata.owner_id
   };
 }
 
 /**
  * Mark a record as synced (clean)
  */
-export function markAsSynced(syncedAt?: string): Partial<SyncMetadata> {
+export function markAsSynced(synced_at?: string): Partial<SyncMetadata> {
   return {
     dirty: 0,
-    syncedAt: syncedAt || nowISO()
+    synced_at: synced_at || nowISO()
   };
 }
 
@@ -82,23 +83,23 @@ export function markAsSynced(syncedAt?: string): Partial<SyncMetadata> {
 export function prepareUpsert<T extends Partial<SyncMetadata>>(
   data: T,
   existingId?: string,
-  ownerId?: string | null
+  owner_id?: string | null
 ): T & SyncMetadata {
   const id = existingId || data.id || generateId();
   
-  if (data.id && data.updatedAt) {
+  if (data.id && data.updated_at) {
     // Updating existing record
     return {
       ...data,
       id,
-      ...updateSyncMetadata(data as SyncMetadata, ownerId)
+      ...updateSyncMetadata(data as SyncMetadata, owner_id)
     } as T & SyncMetadata;
   } else {
     // Creating new record
     return {
       ...data,
       id,
-      ...createSyncMetadata(ownerId)
+      ...createSyncMetadata(owner_id)
     } as T & SyncMetadata;
   }
 }
@@ -108,11 +109,11 @@ export function prepareUpsert<T extends Partial<SyncMetadata>>(
  */
 export function prepareSoftDelete<T extends SyncMetadata>(
   data: T,
-  ownerId?: string | null
+  owner_id?: string | null
 ): T {
   return {
     ...data,
-    ...markAsDeleted(data, ownerId)
+    ...markAsDeleted(data, owner_id)
   } as T;
 }
 
@@ -149,12 +150,12 @@ export function getDirtyRecords<T extends Partial<SyncMetadata>>(records: T[]): 
  */
 export function claimOwnership<T extends SyncMetadata>(
   data: T,
-  ownerId: string
+  owner_id: string
 ): T {
   return {
     ...data,
-    ownerId,
-    ...updateSyncMetadata(data, ownerId)
+    owner_id,
+    ...updateSyncMetadata(data, owner_id)
   };
 }
 
@@ -166,8 +167,8 @@ export function resolveConflict<T extends SyncMetadata>(
   localVersion: T,
   serverVersion: T
 ): { winner: T; action: 'keep-local' | 'accept-server' | 'prefer-delete' } {
-  const localTime = new Date(localVersion.updatedAt).getTime();
-  const serverTime = new Date(serverVersion.updatedAt).getTime();
+  const localTime = new Date(localVersion.updated_at).getTime();
+  const serverTime = new Date(serverVersion.updated_at).getTime();
   
   // If timestamps are equal and operations differ, prefer delete for safety
   if (localTime === serverTime && localVersion.op !== serverVersion.op) {

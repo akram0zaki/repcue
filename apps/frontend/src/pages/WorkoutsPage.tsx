@@ -38,36 +38,36 @@ const WorkoutsPage: React.FC = () => {
     navigate(Routes.CREATE_WORKOUT);
   };
 
-  const handleEditWorkout = (workoutId: string) => {
-    navigate(`${Routes.EDIT_WORKOUT}?id=${workoutId}`);
+  const handleEditWorkout = (workout_id: string) => {
+    navigate(`${Routes.EDIT_WORKOUT}?id=${workout_id}`);
   };
 
   const handleStartWorkout = (workout: Workout) => {
     navigate(Routes.TIMER, { 
       state: { 
         workoutMode: {
-          workoutId: workout.id,
-          workoutName: workout.name,
+          workout_id: workout.id,
+          workout_name: workout.name,
           exercises: workout.exercises
         }
       } 
     });
   };
 
-  const handleDeleteWorkout = async (workoutId: string) => {
+  const handleDeleteWorkout = async (workout_id: string) => {
     if (!hasConsent) return;
     
     try {
-      await storageService.deleteWorkout(workoutId);
-      setWorkouts(prev => prev.filter(w => w.id !== workoutId));
+      await storageService.deleteWorkout(workout_id);
+      setWorkouts(prev => prev.filter(w => w.id !== workout_id));
       setDeleteConfirm(null);
     } catch (error) {
       console.error('Failed to delete workout:', error);
     }
   };
 
-  const formatScheduledDays = (scheduledDays: Weekday[]): string => {
-    if (!scheduledDays || scheduledDays.length === 0) {
+  const formatScheduledDays = (scheduled_days: Weekday[]): string => {
+    if (!scheduled_days || scheduled_days.length === 0) {
   return t('workouts.notScheduled');
     }
     
@@ -81,7 +81,7 @@ const WorkoutsPage: React.FC = () => {
       sunday: t('weekdayAbbrev.sunday', { defaultValue: 'Sun' })
     } as const;
     
-  return scheduledDays.map(day => dayNames[day as keyof typeof dayNames]).join(', ');
+  return scheduled_days.map(day => dayNames[day as keyof typeof dayNames]).join(', ');
   };
 
   const calculateDuration = (workout: Workout): string => {
@@ -89,9 +89,9 @@ const WorkoutsPage: React.FC = () => {
     
     workout.exercises.forEach(workoutExercise => {
       // For now, estimate 30 seconds per exercise + rest time
-      const duration = workoutExercise.customDuration || 30;
-      const sets = workoutExercise.customSets || 1;
-      const restTime = workoutExercise.customRestTime || 30;
+      const duration = workoutExercise.custom_duration || 30;
+      const sets = workoutExercise.custom_sets || 1;
+      const restTime = workoutExercise.custom_rest_time || 30;
       
       totalSeconds += (duration * sets) + restTime;
     });
@@ -215,7 +215,7 @@ const WorkoutsPage: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {workout.name}
                       </h3>
-                      {!workout.isActive && (
+                      {!workout.is_active && (
                         <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
                           {t('workouts.paused')}
                         </span>
@@ -232,9 +232,9 @@ const WorkoutsPage: React.FC = () => {
                   <div className="flex items-center space-x-2 ml-4">
                     <button
                       onClick={() => handleStartWorkout(workout)}
-                      disabled={!workout.isActive}
+                      disabled={!workout.is_active}
                       className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
-                      title={workout.isActive ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
+                      title={workout.is_active ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
                     >
                       <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" />
@@ -278,7 +278,7 @@ const WorkoutsPage: React.FC = () => {
                     </span>
                   </div>
                   <span className="text-xs">
-                    {formatScheduledDays(workout.scheduledDays)}
+                    {formatScheduledDays(workout.scheduled_days)}
                   </span>
                 </div>
 

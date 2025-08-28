@@ -50,7 +50,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
 
   // Rep-based exercise detection (needs selectedExercise so declare early for hook deps below)
-  const isRepBased = selectedExercise?.exerciseType === 'repetition-based';
+  const isRepBased = selectedExercise?.exercise_type === 'repetition_based';
 
   // ---------------- Video Demo Integration (Phase 2) ----------------
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
@@ -114,13 +114,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
   
   // Get current exercise info for workout mode
   const currentWorkoutExercise = workoutMode ? workoutMode.exercises[workoutMode.currentExerciseIndex] : null;
-  const workoutCurrentExercise = currentWorkoutExercise ? exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId) : null;
+  const workoutCurrentExercise = currentWorkoutExercise ? exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id) : null;
   
   // During rest periods, we want to show the previous exercise as "completed" and the next exercise as "coming up"
   const previousWorkoutExercise = workoutMode && workoutMode.currentExerciseIndex > 0 
     ? workoutMode.exercises[workoutMode.currentExerciseIndex - 1] 
     : null;
-  const previousExercise = previousWorkoutExercise ? exercises.find(ex => ex.id === previousWorkoutExercise.exerciseId) : null;
+  const previousExercise = previousWorkoutExercise ? exercises.find(ex => ex.id === previousWorkoutExercise.exercise_id) : null;
   
   // Choose which exercise to display based on rest state
   const displayExercise = isWorkoutMode 
@@ -129,8 +129,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
   
   // Define exerciseForVideo with proper workout mode support
   const exerciseForVideo = isWorkoutMode 
-    ? (workoutCurrentExercise && workoutCurrentExercise.hasVideo ? workoutCurrentExercise : null)
-    : (selectedExercise && selectedExercise.hasVideo ? selectedExercise : null);
+    ? (workoutCurrentExercise && workoutCurrentExercise.has_video ? workoutCurrentExercise : null)
+    : (selectedExercise && selectedExercise.has_video ? selectedExercise : null);
     
   // Initialize video hook with the correct exercise
   const exerciseVideo = useExerciseVideo({
@@ -151,8 +151,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
       const nextWorkoutEx = workoutMode.currentExerciseIndex < workoutMode.exercises.length
         ? workoutMode.exercises[workoutMode.currentExerciseIndex]
         : null;
-      const nextExercise = nextWorkoutEx ? exercises.find(e => e.id === nextWorkoutEx.exerciseId) : null;
-      if (nextExercise?.hasVideo) {
+      const nextExercise = nextWorkoutEx ? exercises.find(e => e.id === nextWorkoutEx.exercise_id) : null;
+      if (nextExercise?.has_video) {
         const m = mediaIndex[nextExercise.id];
         if (m) prefetchUrl = selectVideoVariant(m);
       }
@@ -191,7 +191,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
   const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow && !exerciseVideo.error;
 
-  // Phase 3 debug aid: log reasons when an exercise marked hasVideo does not actually render
+  // Phase 3 debug aid: log reasons when an exercise marked has_video does not actually render
   useEffect(() => {
     if (!exerciseForVideo || !videoFeatureEnabled) return;
     if (showVideoInsideCircle) return; // already visible
@@ -259,7 +259,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   };
 
   // Filter favorite exercises for quick access
-  const favoriteExercises = exercises.filter(ex => ex.isFavorite).slice(0, 6);
+  const favoriteExercises = exercises.filter(ex => ex.is_favorite).slice(0, 6);
 
   return (
   <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900" data-testid="timer-page">
@@ -269,7 +269,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {isWorkoutMode && (
           <div className="bg-blue-600 text-white rounded-lg p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">{workoutMode.workoutName}</h2>
+              <h2 className="text-lg font-semibold">{workoutMode.workout_name}</h2>
               <span className="text-sm bg-blue-500 px-2 py-1 rounded">
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
@@ -383,7 +383,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         )}
 
         {/* Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
-        {!isWorkoutMode && selectedExercise?.exerciseType !== 'repetition-based' && (
+        {!isWorkoutMode && selectedExercise?.exercise_type !== 'repetition_based' && (
         <div className="mb-4">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.duration')}</p>
           <div className="grid grid-cols-3 gap-2">
@@ -405,7 +405,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         )}
 
         {/* Rep Duration Display - Shown for repetition-based exercises in standalone mode */}
-        {!isWorkoutMode && selectedExercise?.exerciseType === 'repetition-based' && (
+        {!isWorkoutMode && selectedExercise?.exercise_type === 'repetition_based' && (
         <div className="mb-4">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.repDuration')}</p>
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-3">
@@ -414,7 +414,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 {selectedDuration}s per rep
               </span>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {(selectedExercise.defaultSets || 3)} sets × {(selectedExercise.defaultReps || 8)} reps
+                {(selectedExercise.default_sets || 3)} sets × {(selectedExercise.default_reps || 8)} reps
               </div>
             </div>
           </div>
@@ -422,7 +422,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         )}
 
         {/* Rep/Set Progress - Shown for repetition-based exercises (both workout mode and standalone) */}
-        {selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps && (
+        {selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
             <div className="mb-3">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
@@ -500,7 +500,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             )}
             <svg className="transform -rotate-90 w-40 h-40">
               {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
-              {selectedExercise?.exerciseType === 'repetition-based' && totalReps && totalSets ? (
+              {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets ? (
                 <>
                   {/* Outer circle for set progress (reps within current set) */}
                   <circle
@@ -678,13 +678,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
 
         {/* Exercise Controls - Shown for workout mode or standalone rep-based exercises */}
-        {(isWorkoutMode || (selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps)) && (
+        {(isWorkoutMode || (selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps)) && (
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
             <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">
               {isWorkoutMode ? t('timer.workoutControls') : t('timer.exerciseControls')}
             </h3>
             
-            {selectedExercise?.exerciseType === 'repetition-based' && totalSets && totalReps && (
+            {selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps && (
               <div className="mb-3">
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -794,7 +794,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                           {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
                         </p>
                       </div>
-                      {exercise.isFavorite && (
+                      {exercise.is_favorite && (
                         <StarFilledIcon size={16} className="text-yellow-500" />
                       )}
                     </div>

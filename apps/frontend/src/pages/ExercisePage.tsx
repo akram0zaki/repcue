@@ -194,7 +194,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         || loc.name.toLowerCase().includes(term)
         || (loc.description || '').toLowerCase().includes(term)
         || exercise.tags.some(tag => tag.toLowerCase().includes(term));
-      const matchesFavorites = !showFavoritesOnly || exercise.isFavorite;
+      const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
       return matchesCategory && matchesSearch && matchesFavorites;
     });
   }, [exercises, selectedCategory, searchTerm, showFavoritesOnly, t]);
@@ -256,7 +256,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     navigate(AppRoutes.TIMER, { 
       state: { 
         selectedExercise: exercise,
-        selectedDuration: exercise.defaultDuration || 30
+        selectedDuration: exercise.default_duration || 30
       }
     });
   };
@@ -509,7 +509,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {loc.name}
           </h3>
           <div className="flex items-center gap-2">
-            {exercise.hasVideo && (
+            {exercise.has_video && (
               <button
                 onClick={() => onPreview && onPreview(exercise)}
                 className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -522,10 +522,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             <button
               onClick={() => onToggleFavorite(exercise.id)}
               className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
-              title={exercise.isFavorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
-              aria-label={exercise.isFavorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
+              title={exercise.is_favorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
+              aria-label={exercise.is_favorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
             >
-              {exercise.isFavorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
+              {exercise.is_favorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
             </button>
           </div>
         </div>
@@ -541,12 +541,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {/* Exercise Type Badge */}
             <span
               className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                exercise.exerciseType === 'time-based'
+                exercise.exercise_type === 'time_based'
                   ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                   : 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
               }`}
             >
-              {exercise.exerciseType === 'time-based' ? (
+              {exercise.exercise_type === 'time_based' ? (
                 <>
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -565,10 +565,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             
             {/* Default Values */}
             <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              {exercise.exerciseType === 'time-based' ? (
-                t('exercises.defaultDuration', { duration: formatDuration(exercise.defaultDuration) })
+              {exercise.exercise_type === 'time_based' ? (
+                t('exercises.defaultDuration', { duration: formatDuration(exercise.default_duration) })
               ) : (
-                t('exercises.defaultSetsReps', { sets: exercise.defaultSets || 1, reps: exercise.defaultReps || 1 })
+                t('exercises.defaultSetsReps', { sets: exercise.default_sets || 1, reps: exercise.default_reps || 1 })
               )}
             </span>
           </div>

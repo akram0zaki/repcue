@@ -16,7 +16,7 @@ import { useAuth } from '../hooks/useAuth';
 interface HomePageProps {
   exercises: Exercise[];
   appSettings: AppSettings;
-  onToggleFavorite: (exerciseId: string) => void;
+  onToggleFavorite: (exercise_id: string) => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
@@ -38,7 +38,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       if (consentStatus) {
         try {
           const workouts = await storageService.getWorkouts();
-          const activeWorkouts = workouts.filter(workout => workout.isActive);
+          const activeWorkouts = workouts.filter(workout => workout.is_active);
           
           if (activeWorkouts.length > 0) {
             const today = new Date();
@@ -46,7 +46,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             
             // Find today's workout or next upcoming workout
             let targetWorkout = activeWorkouts.find(workout => 
-              workout.scheduledDays.includes(currentWeekday)
+              workout.scheduled_days.includes(currentWeekday)
             );
             let targetWeekday = currentWeekday;
             
@@ -59,7 +59,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 const nextIndex = (currentIndex + i) % 7;
                 const nextWeekday = weekdayOrder[nextIndex] as Weekday;
                 targetWorkout = activeWorkouts.find(workout => 
-                  workout.scheduledDays.includes(nextWeekday)
+                  workout.scheduled_days.includes(nextWeekday)
                 );
                 if (targetWorkout) {
                   targetWeekday = nextWeekday;
@@ -119,7 +119,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       navigate(Routes.TIMER, { 
         state: { 
           selectedExercise: exercise,
-          selectedDuration: exercise.defaultDuration || 30
+          selectedDuration: exercise.default_duration || 30
         }
       });
     } else {
@@ -190,8 +190,8 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                       navigate(Routes.TIMER, {
                         state: {
                           workoutMode: {
-                            workoutId: upcomingWorkout.workout.id,
-                            workoutName: upcomingWorkout.workout.name,
+                            workout_id: upcomingWorkout.workout.id,
+                            workout_name: upcomingWorkout.workout.name,
                             exercises: upcomingWorkout.workout.exercises
                           }
                         }
@@ -247,10 +247,10 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
               {t('home.favoriteExercises')}
             </h2>
-            {exercises.filter(ex => ex.isFavorite).length > 0 ? (
+            {exercises.filter(ex => ex.is_favorite).length > 0 ? (
               <div className="space-y-2">
                 {exercises
-                  .filter(exercise => exercise.isFavorite)
+                  .filter(exercise => exercise.is_favorite)
                   .slice(0, 3)
                   .map(exercise => (
                     <div key={exercise.id} className="exercise-card w-full p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">

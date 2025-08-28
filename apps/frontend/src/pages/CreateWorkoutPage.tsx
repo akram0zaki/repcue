@@ -10,10 +10,10 @@ import { Routes } from '../types';
 
 interface SelectedExercise extends Exercise {
   order: number;
-  customDuration?: number;
-  customSets?: number;
-  customReps?: number;
-  customRestTime?: number;
+  custom_duration?: number;
+  custom_sets?: number;
+  custom_reps?: number;
+  custom_rest_time?: number;
 }
 
 const CreateWorkoutPage: React.FC = () => {
@@ -67,20 +67,20 @@ const CreateWorkoutPage: React.FC = () => {
 
     // Validate each exercise's custom values
     selectedExercises.forEach((exercise, index) => {
-      if (exercise.exerciseType === 'time-based') {
-        if (exercise.customDuration !== undefined && exercise.customDuration <= 0) {
+      if (exercise.exercise_type === 'time_based') {
+        if (exercise.custom_duration !== undefined && exercise.custom_duration <= 0) {
           errors[`exercise_${index}_duration`] = 'Duration must be greater than 0';
         }
-      } else if (exercise.exerciseType === 'repetition-based') {
-        if (exercise.customSets !== undefined && exercise.customSets <= 0) {
+      } else if (exercise.exercise_type === 'repetition_based') {
+        if (exercise.custom_sets !== undefined && exercise.custom_sets <= 0) {
           errors[`exercise_${index}_sets`] = 'Sets must be greater than 0';
         }
-        if (exercise.customReps !== undefined && exercise.customReps <= 0) {
+        if (exercise.custom_reps !== undefined && exercise.custom_reps <= 0) {
           errors[`exercise_${index}_reps`] = 'Reps must be greater than 0';
         }
       }
       
-      if (exercise.customRestTime !== undefined && exercise.customRestTime < 0) {
+      if (exercise.custom_rest_time !== undefined && exercise.custom_rest_time < 0) {
         errors[`exercise_${index}_rest`] = 'Rest time cannot be negative';
       }
     });
@@ -94,10 +94,10 @@ const CreateWorkoutPage: React.FC = () => {
     const selectedExercise: SelectedExercise = {
       ...exercise,
       order: newOrder,
-      customDuration: exercise.exerciseType === 'time-based' ? exercise.defaultDuration : undefined,
-      customSets: exercise.exerciseType === 'repetition-based' ? exercise.defaultSets : undefined,
-      customReps: exercise.exerciseType === 'repetition-based' ? exercise.defaultReps : undefined,
-      customRestTime: 60 // Default 60 seconds rest
+      custom_duration: exercise.exercise_type === 'time_based' ? exercise.default_duration : undefined,
+      custom_sets: exercise.exercise_type === 'repetition_based' ? exercise.default_sets : undefined,
+      custom_reps: exercise.exercise_type === 'repetition_based' ? exercise.default_reps : undefined,
+      custom_rest_time: 60 // Default 60 seconds rest
     };
 
     setSelectedExercises([...selectedExercises, selectedExercise]);
@@ -152,16 +152,16 @@ const CreateWorkoutPage: React.FC = () => {
     return selectedExercises.reduce((total, exercise) => {
       let exerciseTime = 0;
       
-      if (exercise.exerciseType === 'time-based') {
-        exerciseTime = exercise.customDuration || exercise.defaultDuration || 30;
-      } else if (exercise.exerciseType === 'repetition-based') {
+      if (exercise.exercise_type === 'time_based') {
+        exerciseTime = exercise.custom_duration || exercise.default_duration || 30;
+      } else if (exercise.exercise_type === 'repetition_based') {
         // Estimate 2 seconds per rep
-        const sets = exercise.customSets || exercise.defaultSets || 1;
-        const reps = exercise.customReps || exercise.defaultReps || 10;
+        const sets = exercise.custom_sets || exercise.default_sets || 1;
+        const reps = exercise.custom_reps || exercise.default_reps || 10;
         exerciseTime = sets * reps * 2;
       }
       
-      const restTime = exercise.customRestTime || 0;
+      const restTime = exercise.custom_rest_time || 0;
       return total + exerciseTime + restTime;
     }, 0);
   };
@@ -178,12 +178,12 @@ const CreateWorkoutPage: React.FC = () => {
       // Create workout exercises
       const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise, index) => ({
         id: `we_${Date.now()}_${index}`,
-        exerciseId: exercise.id,
+        exercise_id: exercise.id,
         order: exercise.order,
-        customDuration: exercise.customDuration,
-        customSets: exercise.customSets,
-        customReps: exercise.customReps,
-        customRestTime: exercise.customRestTime
+        custom_duration: exercise.custom_duration,
+        custom_sets: exercise.custom_sets,
+        custom_reps: exercise.custom_reps,
+        custom_rest_time: exercise.custom_rest_time
       }));
 
       // Create new workout
@@ -192,11 +192,11 @@ const CreateWorkoutPage: React.FC = () => {
         name: workoutName.trim(),
         description: workoutDescription.trim() || undefined,
         exercises: workoutExercises,
-        estimatedDuration: calculateEstimatedDuration(),
-        scheduledDays: scheduledDays,
-        isActive: isActive,
-        createdAt: new Date(),
-        updatedAt: new Date().toISOString(),
+        estimated_duration: calculateEstimatedDuration(),
+        scheduled_days: scheduledDays,
+        is_active: isActive,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         deleted: false,
         version: 1
       };
@@ -444,7 +444,7 @@ const CreateWorkoutPage: React.FC = () => {
                           {index + 1}. {exercise.name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {exercise.category} • {exercise.exerciseType}
+                          {exercise.category} • {exercise.exercise_type}
                         </p>
                       </div>
                       <div className="flex space-x-1 ml-2">
@@ -487,7 +487,7 @@ const CreateWorkoutPage: React.FC = () => {
 
                     {/* Exercise Configuration */}
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      {exercise.exerciseType === 'time-based' ? (
+                      {exercise.exercise_type === 'time_based' ? (
                         <div>
                           <label htmlFor={`exercise_${index}_duration`} className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                             {t('workouts.durationSeconds')}
@@ -496,8 +496,8 @@ const CreateWorkoutPage: React.FC = () => {
                             id={`exercise_${index}_duration`}
                             type="number"
                             min="1"
-                            value={exercise.customDuration || ''}
-                            onChange={(e) => updateExerciseValue(index, 'customDuration', parseInt(e.target.value) || 0)}
+                            value={exercise.custom_duration || ''}
+                            onChange={(e) => updateExerciseValue(index, 'custom_duration', parseInt(e.target.value) || 0)}
                             className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
                               validationErrors[`exercise_${index}_duration`]
                                 ? 'border-red-300 dark:border-red-600'
@@ -521,8 +521,8 @@ const CreateWorkoutPage: React.FC = () => {
                               id={`exercise_${index}_sets`}
                               type="number"
                               min="1"
-                              value={exercise.customSets || ''}
-                              onChange={(e) => updateExerciseValue(index, 'customSets', parseInt(e.target.value) || 0)}
+                              value={exercise.custom_sets || ''}
+                              onChange={(e) => updateExerciseValue(index, 'custom_sets', parseInt(e.target.value) || 0)}
                               className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
                                 validationErrors[`exercise_${index}_sets`]
                                   ? 'border-red-300 dark:border-red-600'
@@ -544,8 +544,8 @@ const CreateWorkoutPage: React.FC = () => {
                               id={`exercise_${index}_reps`}
                               type="number"
                               min="1"
-                              value={exercise.customReps || ''}
-                              onChange={(e) => updateExerciseValue(index, 'customReps', parseInt(e.target.value) || 0)}
+                              value={exercise.custom_reps || ''}
+                              onChange={(e) => updateExerciseValue(index, 'custom_reps', parseInt(e.target.value) || 0)}
                               className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
                                 validationErrors[`exercise_${index}_reps`]
                                   ? 'border-red-300 dark:border-red-600'
@@ -570,8 +570,8 @@ const CreateWorkoutPage: React.FC = () => {
                           id={`exercise_${index}_rest`}
                           type="number"
                           min="0"
-                          value={exercise.customRestTime || ''}
-                          onChange={(e) => updateExerciseValue(index, 'customRestTime', parseInt(e.target.value) || 0)}
+                          value={exercise.custom_rest_time || ''}
+                          onChange={(e) => updateExerciseValue(index, 'custom_rest_time', parseInt(e.target.value) || 0)}
                           className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
                             validationErrors[`exercise_${index}_rest`]
                               ? 'border-red-300 dark:border-red-600'
@@ -662,10 +662,10 @@ const CreateWorkoutPage: React.FC = () => {
                           {localizeExercise(exercise, t).name}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exerciseType === 'time-based' ? t('exercises.timeBased') : t('exercises.repBased')}
-                          {exercise.exerciseType === 'time-based' 
-                            ? ` • ${exercise.defaultDuration}s` 
-                            : ` • ${exercise.defaultSets}×${exercise.defaultReps}`}
+                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises.timeBased') : t('exercises.repBased')}
+                          {exercise.exercise_type === 'time_based' 
+                            ? ` • ${exercise.default_duration}s` 
+                            : ` • ${exercise.default_sets}×${exercise.default_reps}`}
                         </div>
                       </button>
                     ))}

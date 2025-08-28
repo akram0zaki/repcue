@@ -352,14 +352,14 @@ export const getExercisesByCategory = (category: ExerciseCategory): Exercise[] =
 };
 
 export const getFavoriteExercises = (exercises: Exercise[]): Exercise[] => {
-  return exercises.filter(exercise => exercise.isFavorite);
+  return exercises.filter(exercise => exercise.is_favorite);
 };
 
 export const searchExercises = (exercises: Exercise[], query: string): Exercise[] => {
   const lowercaseQuery = query.toLowerCase();
   return exercises.filter(exercise => 
     exercise.name.toLowerCase().includes(lowercaseQuery) ||
-    exercise.description.toLowerCase().includes(lowercaseQuery) ||
+    exercise.description?.toLowerCase().includes(lowercaseQuery) ||
     exercise.tags.some(tag => tag.toLowerCase().includes(lowercaseQuery))
   );
 };

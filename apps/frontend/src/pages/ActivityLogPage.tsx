@@ -15,7 +15,7 @@ interface GroupedLogs {
 
 interface StatsData {
   totalWorkouts: number;
-  totalDuration: number;
+  total_duration: number;
   favoriteExercise: string;
   currentStreak: number;
   thisWeekWorkouts: number;
@@ -30,7 +30,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<StatsData>({
     totalWorkouts: 0,
-    totalDuration: 0,
+    total_duration: 0,
     favoriteExercise: 'None yet',
     currentStreak: 0,
     thisWeekWorkouts: 0
@@ -41,7 +41,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     if (logs.length === 0) {
       setStats({
         totalWorkouts: 0,
-        totalDuration: 0,
+        total_duration: 0,
         favoriteExercise: '',
         currentStreak: 0,
         thisWeekWorkouts: 0
@@ -50,12 +50,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     }
 
     const totalWorkouts = logs.length;
-    const totalDuration = Math.round(logs.reduce((sum, log) => sum + log.duration, 0));
+    const total_duration = Math.round(logs.reduce((sum, log) => sum + log.duration, 0));
     
     // Find favorite exercise (most frequently done) by ID for reliable localization
-    const exerciseCounts: { [exerciseId: string]: number } = {};
+    const exerciseCounts: { [exercise_id: string]: number } = {};
     logs.forEach(log => {
-      const id = log.exerciseId;
+      const id = log.exercise_id;
       exerciseCounts[id] = (exerciseCounts[id] || 0) + 1;
     });
     const favoriteExerciseId = Object.entries(exerciseCounts)
@@ -70,7 +70,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       : '';
 
     // Calculate current streak (consecutive days with workouts)
-    const sortedLogs = [...logs].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    const sortedLogs = [...logs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     let currentStreak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -92,11 +92,11 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     // Calculate this week's workouts
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    const thisWeekWorkouts = logs.filter(log => log.timestamp >= oneWeekAgo).length;
+    const thisWeekWorkouts = logs.filter(log => new Date(log.timestamp) >= oneWeekAgo).length;
 
     setStats({
       totalWorkouts,
-      totalDuration,
+      total_duration,
       favoriteExercise,
       currentStreak,
       thisWeekWorkouts
@@ -126,13 +126,13 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   }, [activityLogs, calculateStats, i18n.language]);
 
   // Toggle workout expansion
-  const toggleWorkoutExpansion = (workoutId: string) => {
+  const toggleWorkoutExpansion = (workout_id: string) => {
     setExpandedWorkouts(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(workoutId)) {
-        newSet.delete(workoutId);
+      if (newSet.has(workout_id)) {
+        newSet.delete(workout_id);
       } else {
-        newSet.add(workoutId);
+        newSet.add(workout_id);
       }
       return newSet;
     });
@@ -143,21 +143,21 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     if (selectedFilter === 'all') return true;
     
     // For workout entries, check if any exercise in the workout matches the filter
-    if (log.isWorkout && log.exercises) {
+    if (log.is_workout && log.exercises) {
       return log.exercises.some(ex => {
-        const exercise = exercises.find(e => e.id === ex.exerciseId);
+        const exercise = exercises.find(e => e.id === ex.exercise_id);
         return exercise?.category === selectedFilter;
       });
     }
     
     // For individual exercise entries
-    const exercise = exercises.find(ex => ex.id === log.exerciseId);
+    const exercise = exercises.find(ex => ex.id === log.exercise_id);
     return exercise?.category === selectedFilter;
   });
 
   // Group logs by date
   const groupedLogs: GroupedLogs = filteredLogs.reduce((groups, log) => {
-    const date = log.timestamp.toDateString();
+    const date = new Date(log.timestamp).toDateString();
     if (!groups[date]) {
       groups[date] = [];
     }
@@ -189,8 +189,8 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
 
 
   // Get exercise category color
-  const getCategoryColor = (exerciseId: string): string => {
-    const exercise = exercises.find(ex => ex.id === exerciseId);
+  const getCategoryColor = (exercise_id: string): string => {
+    const exercise = exercises.find(ex => ex.id === exercise_id);
     if (!exercise) return 'bg-gray-100 dark:bg-gray-700';
     
     switch (exercise.category) {
@@ -204,8 +204,8 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   };
 
   // Get exercise category text color
-  const getCategoryTextColor = (exerciseId: string): string => {
-    const exercise = exercises.find(ex => ex.id === exerciseId);
+  const getCategoryTextColor = (exercise_id: string): string => {
+    const exercise = exercises.find(ex => ex.id === exercise_id);
     if (!exercise) return 'text-gray-600 dark:text-gray-400';
     
     switch (exercise.category) {
@@ -299,7 +299,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {formatDuration(stats.totalDuration)}
+                  {formatDuration(stats.total_duration)}
                 </div>
                 <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.totalTime')}</div>
               </div>
@@ -396,10 +396,10 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                   
                   <div className="space-y-3">
                     {logs
-                      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+                      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                       .map((log) => (
                         <div key={log.id}>
-                          {log.isWorkout ? (
+                          {log.is_workout ? (
                             // Workout entry with expandable exercises
                             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
                               <div 
@@ -411,8 +411,8 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
                                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                                       {(() => {
-                                        const ex = exercises.find(e => e.id === log.exerciseId);
-                                        if (!ex) return `${log.exerciseName} (Workout)`;
+                                        const ex = exercises.find(e => e.id === log.exercise_id);
+                                        if (!ex) return `${log.exercise_name} (Workout)`;
                                         const base = `${ex.id}`;
                                         const name = t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
                                         return `${name} (Workout)`;
@@ -433,7 +433,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                       </svg>
-                                      {formatTime(log.timestamp)}
+                                      {formatTime(new Date(log.timestamp))}
                                     </div>
                                     
                                     <div className="flex items-center gap-1">
@@ -465,10 +465,10 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     {log.exercises.map((exercise, index) => (
                                       <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3">
                                         <div className="flex items-center gap-2">
-                                          <span className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(exercise.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}></span>
+                                          <span className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(exercise.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}></span>
                                           <span className="text-sm font-medium text-gray-900 dark:text-white">{(() => {
-                                            const ex = exercises.find(e => e.id === exercise.exerciseId);
-                                            if (!ex) return exercise.exerciseName;
+                                            const ex = exercises.find(e => e.id === exercise.exercise_id);
+                                            if (!ex) return exercise.exercise_name;
                                             const base = `${ex.id}`;
                                             return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
                                           })()}</span>
@@ -500,12 +500,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span
-                                      className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exerciseId).replace('bg-', 'bg-').replace('/30', '')}`}
+                                      className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}
                                     ></span>
                                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                                       {(() => {
-                                        const ex = exercises.find(e => e.id === log.exerciseId);
-                                        if (!ex) return log.exerciseName;
+                                        const ex = exercises.find(e => e.id === log.exercise_id);
+                                        if (!ex) return log.exercise_name;
                                         const base = `${ex.id}`;
                                         return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
                                       })()}
@@ -517,7 +517,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                       </svg>
-                                      {formatTime(log.timestamp)}
+                                      {formatTime(new Date(log.timestamp))}
                                     </div>
                                     
                                     <div className="flex items-center gap-1">
@@ -529,8 +529,8 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                   </div>
                                 </div>
                                 
-                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exerciseId)} ${getCategoryTextColor(log.exerciseId)}`}>
-                                  {t(`exercises.category.${(exercises.find(ex => ex.id === log.exerciseId)?.category || '').replace('-', '')}`, { defaultValue: (exercises.find(ex => ex.id === log.exerciseId)?.category || '').replace('-', ' ') })}
+                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exercise_id)} ${getCategoryTextColor(log.exercise_id)}`}>
+                                  {t(`exercises.category.${(exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', '')}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
                                 </div>
                               </div>
                               
