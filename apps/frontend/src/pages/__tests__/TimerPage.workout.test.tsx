@@ -23,10 +23,10 @@ describe('TimerPage - Workout Mode', () => {
       name: 'Push-ups',
       description: 'Classic push-up exercise',
       category: 'strength',
-      exerciseType: 'repetition-based',
-      defaultSets: 3,
-      defaultReps: 12,
-      isFavorite: false,
+      exercise_type: 'repetition_based',
+      default_sets: 3,
+      default_reps: 12,
+      is_favorite: false,
       tags: []
     }),
     createMockExercise({
@@ -34,9 +34,9 @@ describe('TimerPage - Workout Mode', () => {
       name: 'Plank',
       description: 'Core strengthening exercise',
       category: 'core',
-      exerciseType: 'time-based',
-      defaultDuration: 60,
-      isFavorite: false,
+      exercise_type: 'time_based',
+      default_duration: 60,
+      is_favorite: false,
       tags: []
     })
   ];
@@ -58,18 +58,18 @@ describe('TimerPage - Workout Mode', () => {
       exercises: [
         {
           id: 'we1',
-          exerciseId: 'ex1',
+          exercise_id: 'ex1',
           order: 0,
-          customSets: 3,
-          customReps: 15,
-          customRestTime: 30
+          custom_sets: 3,
+          custom_reps: 15,
+          custom_rest_time: 30
         },
         {
           id: 'we2', 
-          exerciseId: 'ex2',
+          exercise_id: 'ex2',
           order: 1,
-          customDuration: 45,
-          customRestTime: 20
+          custom_duration: 45,
+          custom_rest_time: 20
         }
       ],
       currentExerciseIndex: 0,

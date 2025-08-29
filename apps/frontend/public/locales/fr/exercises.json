@@ -62,5 +62,11 @@
   "calf-raises": { "name": "Élévations des mollets", "description": "Monter sur la pointe des pieds, maintenir puis redescendre" },
   "russian-twists": { "name": "Rotations russes", "description": "Assis, pieds relevés, faire pivoter le buste de chaque côté" },
   "bear-crawl": { "name": "Marche de l’ours", "description": "Avancer sur mains et pieds, genoux décollés du sol" },
-  "forward-fold": { "name": "Flexion avant", "description": "Depuis la station debout, se pencher vers l’avant et atteindre les orteils" }
+  "forward-fold": { "name": "Flexion avant", "description": "Depuis la station debout, se pencher vers l'avant et atteindre les orteils" },
+  "timeBased": {
+    "name": "Basé sur le temps"
+  },
+  "repBased": {
+    "name": "Basé sur les répétitions"
+  }
 }

@@ -62,5 +62,11 @@
   "calf-raises": { "name": "Elevaciones de pantorrilla", "description": "Súbete a las puntas de los pies, mantén y baja" },
   "russian-twists": { "name": "Giros rusos", "description": "Sentado con pies elevados, rota el torso de lado a lado" },
   "bear-crawl": { "name": "Gateo del oso", "description": "Avanza en manos y pies con las rodillas sin tocar el suelo" },
-  "forward-fold": { "name": "Flexión hacia adelante", "description": "De pie, inclínate hacia delante y alcanza los dedos de los pies" }
+  "forward-fold": { "name": "Flexión hacia adelante", "description": "De pie, inclínate hacia delante y alcanza los dedos de los pies" },
+  "timeBased": {
+    "name": "Basado en tiempo"
+  },
+  "repBased": {
+    "name": "Basado en repeticiones"
+  }
 }

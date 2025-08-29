@@ -27,7 +27,7 @@ import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 
 interface ExercisePageProps {
   exercises: Exercise[];
-  onToggleFavorite: (exerciseId: string) => void;
+  onToggleFavorite: (exercise_id: string) => void;
 }
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite }) => {
@@ -89,7 +89,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         const ct = res.headers.get('content-type') || '';
         const isVideo = /video\//i.test(ct) || url.endsWith('.webm') || url.endsWith('.mp4');
         if (!res.ok || !isVideo) {
-          recordVideoLoadError({ exerciseId: exercise.id, url, reason: 'precheck-failed' });
+          recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-failed' });
           showSnackbar(
             t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
             { type: 'warning', durationMs: 3000 }
@@ -98,7 +98,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         }
       } catch {
         // Network/timeout during precheck: treat as unavailable and avoid opening intrusive modal
-        recordVideoLoadError({ exerciseId: exercise.id, url, reason: 'precheck-timeout' });
+        recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-timeout' });
         showSnackbar(
           t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
           { type: 'warning', durationMs: 3000 }
@@ -111,7 +111,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         const ct = res.headers.get('content-type') || '';
         const isVideo = /video\//i.test(ct) || url.endsWith('.webm') || url.endsWith('.mp4');
         if (!res.ok || !isVideo) {
-          recordVideoLoadError({ exerciseId: exercise.id, url, reason: 'precheck-failed' });
+          recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-failed' });
           showSnackbar(
             t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
             { type: 'warning', durationMs: 3000 }
@@ -122,7 +122,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           return;
         }
       } catch {
-        recordVideoLoadError({ exerciseId: exercise.id, url, reason: 'precheck-timeout' });
+        recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-timeout' });
         showSnackbar(
           t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
           { type: 'warning', durationMs: 3000 }
@@ -146,7 +146,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Ensure element-level error closes dialog reliably during tests
   const handleVideoError = React.useCallback(() => {
     if (previewExercise && previewUrl) {
-      recordVideoLoadError({ exerciseId: previewExercise.id, url: previewUrl, reason: 'preview-element-error' });
+      recordVideoLoadError({ exercise_id: previewExercise.id, url: previewUrl, reason: 'preview-element-error' });
     }
     setPreviewUrl(null);
     showSnackbar(
@@ -167,7 +167,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     };
     const handleError = () => {
       if (previewExercise && previewUrl) {
-        recordVideoLoadError({ exerciseId: previewExercise.id, url: previewUrl, reason: 'preview-element-error' });
+        recordVideoLoadError({ exercise_id: previewExercise.id, url: previewUrl, reason: 'preview-element-error' });
       }
       setPreviewUrl(null);
       showSnackbar(
@@ -470,7 +470,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 // Exercise Card Component
 interface ExerciseCardProps {
   exercise: Exercise;
-  onToggleFavorite: (exerciseId: string) => void;
+  onToggleFavorite: (exercise_id: string) => void;
   onStartTimer: (exercise: Exercise) => void;
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
@@ -551,14 +551,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                {t('exercises.timeBased')}
+                {t('exercises.timeBased.name')}
                 </>
               ) : (
                 <>
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                {t('exercises.repBased')}
+                {t('exercises.repBased.name')}
                 </>
               )}
             </span>

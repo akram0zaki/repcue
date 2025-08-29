@@ -8,12 +8,12 @@ import { createMockExercise, createMockAppSettings } from '../../test/testUtils'
 // Minimal exercise with video flag
 const exercise: Exercise = createMockExercise({
   id: 'jumping-jacks', name: 'Jumping Jacks', description: 'Cardio move', category: 'cardio',
-  exerciseType: 'repetition-based', defaultSets: 1, defaultReps: 2, isFavorite: false, tags: [], hasVideo: true
+  exercise_type: 'repetition_based', default_sets: 1, default_reps: 2, is_favorite: false, tags: [], has_video: true
 });
 
 const baseSettings: AppSettings = createMockAppSettings({
-  theme: 'light', intervalDuration: 5, repSpeedFactor: 1, preTimerCountdown: 3, showExerciseVideos: true,
-  enableSound: true, enableHaptics: true, defaultRestTime: 30
+  theme: 'light', interval_duration: 5, rep_speed_factor: 1, pre_timer_countdown: 3, show_exercise_videos: true,
+  enable_sound: true, enable_haptics: true, default_rest_time: 30
 } as any);
 
 const noop = async () => {};
@@ -57,7 +57,7 @@ describe('TimerPage video prefetch (Phase 3 T-3.3)', () => {
 
   it('adds prefetch link during workout rest for next exercise (simulated)', () => {
     // Simulate a workout mode rest state with upcoming exercise index 0
-  renderWithState({ workoutMode: { workoutId: 'w1', isResting: true, currentExerciseIndex: 0, exercises: [{ id: 'we1', order: 0, exerciseId: 'jumping-jacks' }], workoutName: 'Test', totalReps: 2, currentRep: 0, totalSets:1, currentSet:0 } });
+  renderWithState({ workoutMode: { workoutId: 'w1', isResting: true, currentExerciseIndex: 0, exercises: [{ id: 'we1', order: 0, exercise_id: 'jumping-jacks' }], workoutName: 'Test', totalReps: 2, currentRep: 0, totalSets:1, currentSet:0 } });
     const link = document.querySelector('link[rel="prefetch"][as="video"]');
     expect(link).toBeDefined();
   });

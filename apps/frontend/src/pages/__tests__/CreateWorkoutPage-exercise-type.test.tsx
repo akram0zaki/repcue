@@ -21,9 +21,9 @@ const mockExercises: Exercise[] = [
     name: 'Plank',
     description: 'Hold your body in a straight line',
     category: ExerciseCategory.CORE,
-    exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 60,
-    isFavorite: false,
+    exercise_type: ExerciseType.TIME_BASED,
+    default_duration: 60,
+    is_favorite: false,
     tags: ['core', 'stability']
   }),
   createMockExercise({
@@ -31,10 +31,10 @@ const mockExercises: Exercise[] = [
     name: 'Push-ups',
     description: 'Lower and raise your body using arms',
     category: ExerciseCategory.STRENGTH,
-    exerciseType: ExerciseType.REPETITION_BASED,
-    defaultSets: 3,
-    defaultReps: 10,
-    isFavorite: false,
+    exercise_type: ExerciseType.REPETITION_BASED,
+    default_sets: 3,
+    default_reps: 10,
+    is_favorite: false,
     tags: ['strength', 'chest']
   })
 ];

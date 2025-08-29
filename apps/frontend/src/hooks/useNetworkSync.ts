@@ -59,7 +59,7 @@ export function useNetworkSync(): UseNetworkSyncResult {
         hasChangesToSync: initialStatus.hasChangesToSync,
         lastSyncAttempt: initialStatus.lastSyncAttempt,
         lastSuccessfulSync: initialStatus.lastSuccessfulSync,
-        errors: initialStatus.errors,
+        errors: initialStatus.errors.map(err => typeof err === 'string' ? err : err.message),
         canSync: initialStatus.isOnline && !initialStatus.isSyncing
       };
     } catch (error) {
@@ -79,7 +79,7 @@ export function useNetworkSync(): UseNetworkSyncResult {
       hasChangesToSync: status.hasChangesToSync,
       lastSyncAttempt: status.lastSyncAttempt,
       lastSuccessfulSync: status.lastSuccessfulSync,
-      errors: status.errors,
+      errors: status.errors.map(err => typeof err === 'string' ? err : err.message),
       canSync: status.isOnline && !status.isSyncing
     }));
   }, []);

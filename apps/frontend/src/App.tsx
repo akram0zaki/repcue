@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { consentService } from './services/consentService';
-import { storageService } from './services/storageService';
+import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
 import { INITIAL_EXERCISES } from './data/exercises';
@@ -1400,8 +1400,8 @@ function App() {
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
-              (window as any).storageService = storageService;
-              (window as any).resetDB = () => storageService.resetDatabase();
+              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
               console.log('🔧 Debug helpers: window.storageService, window.resetDB()');
             }
           }
@@ -1555,14 +1555,14 @@ useEffect(() => {
   
 
   // Update exercise favorite status
-  const toggleExerciseFavorite = async (exerciseId: string) => {
+  const toggleExerciseFavorite = async (exercise_id: string) => {
     if (!hasConsent) return;
 
     try {
-      await storageService.toggleExerciseFavorite(exerciseId);
+      await storageService.toggleExerciseFavorite(exercise_id);
       setExercises(prev => 
         prev.map(exercise => 
-          exercise.id === exerciseId 
+          exercise.id === exercise_id 
             ? { ...exercise, is_favorite: !exercise.is_favorite }
             : exercise
         )

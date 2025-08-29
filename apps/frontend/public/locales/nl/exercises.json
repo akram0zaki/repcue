@@ -62,5 +62,11 @@
   "calf-raises": { "name": "Kuitheffing", "description": "Kom op de tenen staan, kort vasthouden en weer laten zakken" },
   "russian-twists": { "name": "Russische draaioefeningen", "description": "Zittend met voeten omhoog, romp naar links en rechts draaien" },
   "bear-crawl": { "name": "Berenkruipen", "description": "Kruip vooruit op handen en voeten met knieën van de grond" },
-  "forward-fold": { "name": "Vooroverbuiging", "description": "Buig voorover vanuit stand en reik naar de tenen" }
+  "forward-fold": { "name": "Vooroverbuiging", "description": "Buig voorover vanuit stand en reik naar de tenen" },
+  "timeBased": {
+    "name": "Op tijd gebaseerd"
+  },
+  "repBased": {
+    "name": "Op herhalingen gebaseerd"
+  }
 }

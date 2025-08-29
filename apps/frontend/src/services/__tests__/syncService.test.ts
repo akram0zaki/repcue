@@ -236,7 +236,11 @@ describe('SyncService', () => {
         const result = await syncService.sync();
 
         expect(result.success).toBe(true);
-        expect(result.errors).toContain('Device is offline');
+        expect(result.errors).toEqual(expect.arrayContaining([
+          expect.objectContaining({
+            type: 'network'
+          })
+        ]));
       } finally {
         // Restore original navigator.onLine value
         Object.defineProperty(navigator, 'onLine', {

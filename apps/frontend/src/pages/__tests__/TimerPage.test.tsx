@@ -13,9 +13,9 @@ const mockExercise: Exercise = createMockExercise({
   name: 'Test Exercise',
   description: 'Test description',
   category: 'core',
-  exerciseType: ExerciseType.TIME_BASED,
-  defaultDuration: 30,
-  isFavorite: false,
+  exercise_type: ExerciseType.TIME_BASED,
+  default_duration: 30,
+  is_favorite: false,
   tags: ['test']
 });
 

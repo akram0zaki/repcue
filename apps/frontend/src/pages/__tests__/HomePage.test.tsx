@@ -23,9 +23,9 @@ const mockExercises: Exercise[] = [
     name: 'Plank',
     description: 'Hold your body in a straight line',
     category: ExerciseCategory.CORE,
-    exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 60,
-    isFavorite: true,
+    exercise_type: ExerciseType.TIME_BASED,
+    default_duration: 60,
+    is_favorite: true,
     tags: ['core', 'stability']
   }),
   createMockExercise({
@@ -33,9 +33,9 @@ const mockExercises: Exercise[] = [
     name: 'Push-ups',
     description: 'Lower and raise body using arms',
     category: ExerciseCategory.STRENGTH,
-    exerciseType: ExerciseType.REPETITION_BASED,
-    defaultDuration: 45,
-    isFavorite: false,
+    exercise_type: ExerciseType.REPETITION_BASED,
+    default_duration: 45,
+    is_favorite: false,
     tags: ['strength', 'arms']
   }),
   createMockExercise({
@@ -43,24 +43,24 @@ const mockExercises: Exercise[] = [
     name: 'Jumping Jacks',
     description: 'Jump with legs apart and arms overhead',
     category: ExerciseCategory.CARDIO,
-    exerciseType: ExerciseType.TIME_BASED,
-    defaultDuration: 30,
-    isFavorite: false,
+    exercise_type: ExerciseType.TIME_BASED,
+    default_duration: 30,
+    is_favorite: false,
     tags: ['cardio', 'full-body']
   })
 ];
 
 const mockAppSettings: AppSettings = createMockAppSettings({
-  intervalDuration: 30,
-  soundEnabled: true,
-  vibrationEnabled: true,
-  beepVolume: 0.5,
-  darkMode: false,
-  autoSave: true,
-  lastSelectedExerciseId: 'plank',
-  preTimerCountdown: 3,
-  defaultRestTime: 60,
-  repSpeedFactor: 1.0
+  interval_duration: 30,
+  sound_enabled: true,
+  vibration_enabled: true,
+  beep_volume: 0.5,
+  dark_mode: false,
+  auto_save: true,
+  last_selected_exercise_id: 'plank',
+  pre_timer_countdown: 3,
+  default_rest_time: 60,
+  rep_speed_factor: 1.0
 });
 
 const mockOnToggleFavorite = vi.fn();
@@ -153,7 +153,7 @@ describe('HomePage', () => {
           selectedExercise: expect.objectContaining({
             id: 'plank',
             name: 'Plank',
-            defaultDuration: 60
+            default_duration: 60
           }),
           selectedDuration: 60
         }
@@ -173,14 +173,14 @@ describe('HomePage', () => {
   });
 
   it('shows message when no favorite exercises exist', () => {
-    const exercisesWithoutFavorites = mockExercises.map(ex => createMockExercise({ ...ex, isFavorite: false }));
+    const exercisesWithoutFavorites = mockExercises.map(ex => createMockExercise({ ...ex, is_favorite: false }));
     renderHomePage({ exercises: exercisesWithoutFavorites });
     
     expect(screen.getByText('No favorite exercises yet. Mark some exercises as favorites to see them here!')).toBeInTheDocument();
   });
 
   it('applies correct styling for dark mode', () => {
-    const darkModeSettings = createMockAppSettings({ ...mockAppSettings, darkMode: true });
+    const darkModeSettings = createMockAppSettings({ ...mockAppSettings, dark_mode: true });
     renderHomePage({ appSettings: darkModeSettings });
     
     const mainContent = document.getElementById('main-content');

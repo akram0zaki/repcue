@@ -209,39 +209,6 @@ export class SyncService {
     return null; // Validation passed
   }
 
-  /**
-   * Rollback sync changes on failure
-   */
-  private async rollbackSyncChanges(tableName: string, recordIds: string[]): Promise<void> {
-    if (recordIds.length === 0) return;
-    
-    try {
-      const indexedDBTableName = this.getIndexedDBTableName(tableName);
-      const db = this.storageService.getDatabase();
-      const table = (db as unknown as Record<string, unknown>)[indexedDBTableName];
-      
-      if (!table || typeof table !== 'object') {
-        console.warn(`Cannot rollback: table ${indexedDBTableName} not found`);
-        return;
-      }
-
-      // Mark records as dirty again so they can be retried
-      for (const recordId of recordIds) {
-        try {
-          await (table as any).update(recordId, {
-            dirty: 1,
-            synced_at: undefined
-          });
-        } catch (error) {
-          console.error(`Failed to rollback record ${recordId} in ${tableName}:`, error);
-        }
-      }
-      
-      console.log(`🔄 Rolled back ${recordIds.length} records in ${tableName}`);
-    } catch (error) {
-      console.error(`Failed to rollback changes for ${tableName}:`, error);
-    }
-  }
 
   private constructor() {
     this.storageService = StorageService.getInstance();
@@ -431,7 +398,7 @@ export class SyncService {
         recordsPushed: 0,
         recordsPulled: 0,
         conflicts: 0,
-        errors: ['Device is offline']
+        errors: [this.createSyncError('network', 'Device is offline')]
       };
     }
 
@@ -473,7 +440,7 @@ export class SyncService {
         recordsPushed: 0,
         recordsPulled: 0,
         conflicts: 0,
-        errors: [errorMessage]
+        errors: [syncError]
       };
     } finally {
       this.isSyncing = false;
@@ -651,7 +618,7 @@ export class SyncService {
           } else {
           // Remove local-only sync metadata before sending
           // With Phase 2 complete, no field mapping needed - direct assignment
-          const { dirty: _dirty, op: _op, synced_at: _synced_at, ...cleanRecord } = record as any;
+          const { dirty: _dirty, op: _op, synced_at: _synced_at, ...cleanRecord } = record as Record<string, unknown>;
           
           // Validate record before adding to sync
           const validationError = this.validateRecord(cleanRecord, tableName);
@@ -757,9 +724,10 @@ export class SyncService {
         console.log('🔍 Sync response received via supabase.functions.invoke:', {
           hasCursor: !!data.cursor,
           tablesInResponse: Object.keys(data.changes || {}),
-          changesCounts: Object.entries(data.changes || {}).map(([table, changes]) => 
-            `${table}: ${(changes as any).upserts?.length || 0} upserts, ${(changes as any).deletes?.length || 0} deletes`
-          )
+          changesCounts: Object.entries(data.changes || {}).map(([table, changes]) => {
+            const typedChanges = changes as { upserts?: unknown[]; deletes?: unknown[] };
+            return `${table}: ${typedChanges.upserts?.length || 0} upserts, ${typedChanges.deletes?.length || 0} deletes`;
+          })
         });
       }
 
@@ -928,7 +896,7 @@ export class SyncService {
   /**
    * Create empty sync result
    */
-  private createEmptyResult(errors: string[] = []): SyncResult {
+  private createEmptyResult(errors: SyncError[] = []): SyncResult {
     return {
       success: errors.length === 0,
       tablesProcessed: 0,

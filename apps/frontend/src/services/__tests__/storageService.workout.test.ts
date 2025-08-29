@@ -12,6 +12,7 @@ vi.mock('dexie', () => {
     get: vi.fn(),
     delete: vi.fn(),
     update: vi.fn(),
+    count: vi.fn().mockResolvedValue(0),
     toArray: vi.fn().mockResolvedValue([]),
     filter: vi.fn(() => ({
       first: vi.fn().mockResolvedValue(null),
@@ -39,6 +40,7 @@ vi.mock('dexie', () => {
       })),
       open: vi.fn().mockResolvedValue(undefined),
       close: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
       exercises: new MockTable(),
       activityLogs: new MockTable(),
       userPreferences: new MockTable(),
@@ -76,23 +78,51 @@ describe('StorageService - Workout Management', () => {
       put: vi.fn(),
       get: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn().mockResolvedValue(0),
+      clear: vi.fn(),
+      where: vi.fn(() => ({
+        equals: vi.fn(() => ({
+          toArray: vi.fn().mockResolvedValue([])
+        }))
+      })),
+      bulkUpdate: vi.fn(),
       orderBy: vi.fn(() => ({
         reverse: vi.fn(() => ({
           toArray: vi.fn().mockResolvedValue([])
         }))
       }))
     }
-    mockDb.workoutSessions = {
+    mockDb.workout_sessions = {
       put: vi.fn(),
       get: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn().mockResolvedValue(0),
+      clear: vi.fn(),
+      where: vi.fn(() => ({
+        equals: vi.fn(() => ({
+          toArray: vi.fn().mockResolvedValue([])
+        }))
+      })),
+      bulkUpdate: vi.fn(),
       orderBy: vi.fn(() => ({
         reverse: vi.fn(() => ({
           filter: vi.fn(() => ({
             limit: vi.fn().mockResolvedValue([])
-          }))
+          })),
+          toArray: vi.fn().mockResolvedValue([])
         }))
       }))
+    }
+    
+    // Add other required tables for health check
+    mockDb.exercises = {
+      count: vi.fn().mockResolvedValue(0)
+    }
+    mockDb.user_preferences = {
+      count: vi.fn().mockResolvedValue(0)
+    }
+    mockDb.app_settings = {
+      count: vi.fn().mockResolvedValue(0)
     }
     
     // Mock consent service to return true by default
@@ -111,20 +141,20 @@ describe('StorageService - Workout Management', () => {
       exercises: [
         {
           id: 'exercise-1',
-          exerciseId: 'push-ups',
+          exercise_id: 'push-ups',
           order: 1,
-          customSets: 3,
-          customReps: 15,
-          customRestTime: 60
+          custom_sets: 3,
+          custom_reps: 15,
+          custom_rest_time: 60
         } as WorkoutExercise
       ],
-      estimatedDuration: 1800,
-      scheduledDays: ['monday', 'wednesday', 'friday'],
-      isActive: true,
-      createdAt: new Date('2023-01-01T10:00:00Z'),
+      estimated_duration: 1800,
+      scheduled_days: ['monday', 'wednesday', 'friday'],
+      is_active: true,
+      created_at: new Date('2023-01-01T10:00:00Z').toISOString(),
       // Sync metadata
-      ownerId: null,
-      updatedAt: '2023-01-01T10:00:00.000Z',
+      owner_id: null,
+      updated_at: '2023-01-01T10:00:00.000Z',
       deleted: false,
       version: 1,
       dirty: 0,
@@ -138,12 +168,12 @@ describe('StorageService - Workout Management', () => {
 
       expect(mockDb.workouts.put).toHaveBeenCalledWith({
         ...mockWorkout,
-        createdAt: '2023-01-01T10:00:00.000Z',
-        updatedAt: expect.any(String),
+        created_at: '2023-01-01T10:00:00.000Z',
+        updated_at: expect.any(String),
         deleted: false,
         dirty: 1,
         op: 'upsert',
-        ownerId: null,
+        owner_id: null,
         version: 2 // Version increments from 1 to 2
       })
     })
@@ -151,8 +181,8 @@ describe('StorageService - Workout Management', () => {
     it('should get all workouts', async () => {
       const storedWorkout = {
         ...mockWorkout,
-        createdAt: '2023-01-01T10:00:00.000Z',
-        updatedAt: '2023-01-01T10:00:00.000Z'
+        created_at: '2023-01-01T10:00:00.000Z',
+        updated_at: '2023-01-01T10:00:00.000Z'
       }
       mockDb.workouts.orderBy.mockReturnValue({
         reverse: vi.fn().mockReturnValue({
@@ -167,15 +197,15 @@ describe('StorageService - Workout Management', () => {
       expect(workouts[0]).toEqual({
         ...mockWorkout,
         createdAt: new Date('2023-01-01T10:00:00.000Z'),
-        updatedAt: '2023-01-01T10:00:00.000Z'
+        updated_at: '2023-01-01T10:00:00.000Z'
       })
     })
 
     it('should get workout by ID', async () => {
       const storedWorkout = {
         ...mockWorkout,
-        createdAt: '2023-01-01T10:00:00.000Z',
-        updatedAt: '2023-01-01T10:00:00.000Z'
+        created_at: '2023-01-01T10:00:00.000Z',
+        updated_at: '2023-01-01T10:00:00.000Z'
       }
       mockDb.workouts.get.mockResolvedValue(storedWorkout)
 
@@ -185,7 +215,7 @@ describe('StorageService - Workout Management', () => {
       expect(workout).toEqual({
         ...mockWorkout,
         createdAt: new Date('2023-01-01T10:00:00.000Z'),
-        updatedAt: '2023-01-01T10:00:00.000Z'
+        updated_at: '2023-01-01T10:00:00.000Z'
       })
       expect(mockDb.workouts.get).toHaveBeenCalledWith('workout-1')
     })
@@ -218,7 +248,7 @@ describe('StorageService - Workout Management', () => {
         dirty: 1,
         op: 'delete',
         version: 2,
-        updatedAt: expect.any(String)
+        updated_at: expect.any(String)
       })
     })
 
@@ -235,17 +265,18 @@ describe('StorageService - Workout Management', () => {
   describe('Workout Session Operations', () => {
     const mockWorkoutSession: WorkoutSession = {
       id: 'session-1',
-      workoutId: 'workout-1',
-      workoutName: 'Upper Body Workout',
-      startTime: new Date('2023-01-01T10:00:00Z'),
-      endTime: new Date('2023-01-01T10:30:00Z'),
+      workout_id: 'workout-1',
+      workout_name: 'Upper Body Workout',
+      start_time: new Date('2023-01-01T10:00:00Z').toISOString(),
+      end_time: new Date('2023-01-01T10:30:00Z').toISOString(),
       exercises: [],
-      isCompleted: true,
-      completionPercentage: 100,
-      totalDuration: 1800,
+      is_completed: true,
+      completion_percentage: 100,
+      total_duration: 1800,
       // Sync metadata
-      ownerId: null,
-      updatedAt: '2023-01-01T10:00:00.000Z',
+      created_at: new Date('2023-01-01T10:00:00Z').toISOString(),
+      owner_id: null,
+      updated_at: '2023-01-01T10:00:00.000Z',
       deleted: false,
       version: 1,
       dirty: 0,
@@ -259,22 +290,22 @@ describe('StorageService - Workout Management', () => {
 
       expect(mockDb.workoutSessions.put).toHaveBeenCalledWith({
         ...mockWorkoutSession,
-        startTime: '2023-01-01T10:00:00.000Z',
-        endTime: '2023-01-01T10:30:00.000Z',
+        start_time: '2023-01-01T10:00:00.000Z',
+        end_time: '2023-01-01T10:30:00.000Z',
         deleted: false,
         dirty: 1,
         op: 'upsert',
-        ownerId: null,
+        owner_id: null,
         version: 2, // Version increments from 1 to 2
-        updatedAt: expect.any(String)
+        updated_at: expect.any(String)
       })
     })
 
     it('should get workout sessions with filtering', async () => {
       const storedSession = {
         ...mockWorkoutSession,
-        startTime: '2023-01-01T10:00:00.000Z',
-        endTime: '2023-01-01T10:30:00.000Z'
+        start_time: '2023-01-01T10:00:00.000Z',
+        end_time: '2023-01-01T10:30:00.000Z'
       }
       
       // Create a simple mock that returns the expected result
@@ -302,7 +333,7 @@ describe('StorageService - Workout Management', () => {
       // Mock getting the session first (for soft delete)
       mockDb.workoutSessions.get.mockResolvedValue({
         id: 'session-1',
-        workoutId: 'workout-1',
+        workout_id: 'workout-1',
         deleted: false,
         version: 1
       })
@@ -311,12 +342,12 @@ describe('StorageService - Workout Management', () => {
 
       expect(mockDb.workoutSessions.put).toHaveBeenCalledWith({
         id: 'session-1',
-        workoutId: 'workout-1',
+        workout_id: 'workout-1',
         deleted: true,
         dirty: 1,
         op: 'delete',
         version: 2,
-        updatedAt: expect.any(String)
+        updated_at: expect.any(String)
       })
     })
   })
@@ -329,12 +360,12 @@ describe('StorageService - Workout Management', () => {
         id: 'workout-1',
         name: 'Test Workout',
         exercises: [],
-        scheduledDays: [],
-        isActive: true,
-        createdAt: new Date(),
+        scheduled_days: [],
+        is_active: true,
+        created_at: new Date().toISOString(),
         // Sync metadata
-        ownerId: null,
-        updatedAt: new Date().toISOString(),
+        owner_id: null,
+        updated_at: new Date().toISOString(),
         deleted: false,
         version: 1,
         dirty: 0,

@@ -7,7 +7,7 @@ import { ConsentService } from '../services/consentService';
 
 export interface VideoErrorRecord {
   ts: string;              // ISO timestamp
-  exerciseId: string;      // exercise id attempted
+  exercise_id: string;      // exercise id attempted
   url: string;             // video URL (same-origin only)
   status?: number;         // optional HTTP status from HEAD probe
   ct?: string;             // content-type if probed
@@ -31,10 +31,10 @@ function saveRecords(records: VideoErrorRecord[]) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records.slice(0, MAX_RECORDS))); } catch { /* ignore quota */ }
 }
 
-export async function recordVideoLoadError(opts: { exerciseId: string; url: string; reason?: string }) {
+export async function recordVideoLoadError(opts: { exercise_id: string; url: string; reason?: string }) {
   const consent = ConsentService.getInstance();
   if (!consent.hasAnalyticsConsent()) return; // Respect analytics consent
-  const { url, exerciseId, reason } = opts;
+  const { url, exercise_id, reason } = opts;
   // Allow only same-origin /videos/ paths (defense-in-depth)
   if (!url.startsWith('/videos/')) return;
   let status: number | undefined;
@@ -47,7 +47,7 @@ export async function recordVideoLoadError(opts: { exerciseId: string; url: stri
   } catch {
     // network/HEAD failure silently ignored (still log base record)
   }
-  const rec: VideoErrorRecord = { ts: new Date().toISOString(), exerciseId, url, status, ct, reason };
+  const rec: VideoErrorRecord = { ts: new Date().toISOString(), exercise_id, url, status, ct, reason };
   const records = loadRecords();
   records.unshift(rec);
   saveRecords(records);

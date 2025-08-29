@@ -263,14 +263,20 @@ try {
         removeFromFavorites: 'Remove from favorites',
         addToFavorites: 'Add to favorites',
         addToFavoritesAria: 'Add {{name}} to favorites',
-        timeBased: 'Time-based',
-        repBased: 'Rep-based',
+        timeBased: {
+          name: 'Time-based'
+        },
+        repBased: {
+          name: 'Rep-based'
+        },
         defaultDuration: 'Default: {{duration}}',
         defaultSetsReps: 'Default: {{sets}} sets × {{reps}} reps',
         showFewerTags: 'Show fewer tags',
         showMoreTags_one: 'Show {{count}} more tag',
         showMoreTags_other: 'Show {{count}} more tags',
-        showLess: 'Show less'
+        showLess: 'Show less',
+        previewVideo: 'Preview video',
+        previewUnavailable: 'Video is not available at this time'
   }
   };
   // Reinitialize i18n for tests with in-memory resources to avoid async backend

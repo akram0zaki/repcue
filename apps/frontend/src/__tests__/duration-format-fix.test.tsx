@@ -28,9 +28,9 @@ describe('Duration Format Fix', () => {
     name: 'Test Exercise',
     description: 'A test exercise',
     category: ExerciseCategory.CORE,
-    exerciseType: 'time-based',
-    defaultDuration: 30,
-    isFavorite: false,
+    exercise_type: 'time_based',
+    default_duration: 30,
+    is_favorite: false,
     tags: ['test']
   });
 
@@ -43,26 +43,26 @@ describe('Duration Format Fix', () => {
     const mockLogs: ActivityLog[] = [
       createMockActivityLog({
         id: 'log-1',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 32.900999999999984, // This should be formatted as "33s"
-        timestamp: new Date('2024-01-01T10:00:00Z'),
+        timestamp: '2024-01-01T10:00:00Z',
         notes: 'Test log 1'
       }),
       createMockActivityLog({
         id: 'log-2',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 65.15999999999999, // This should be formatted as "1m 5s"
-        timestamp: new Date('2024-01-01T11:00:00Z'),
+        timestamp: '2024-01-01T11:00:00Z',
         notes: 'Test log 2'
       }),
       createMockActivityLog({
         id: 'log-3',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 120.99999999999999, // This should be formatted as "2m 1s"
-        timestamp: new Date('2024-01-01T12:00:00Z'),
+        timestamp: '2024-01-01T12:00:00Z',
         notes: 'Test log 3'
       })
     ];
@@ -88,18 +88,18 @@ describe('Duration Format Fix', () => {
     const mockLogs: ActivityLog[] = [
       createMockActivityLog({
         id: 'log-1',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 30, // Exact whole number
-        timestamp: new Date('2024-01-01T10:00:00Z'),
+        timestamp: '2024-01-01T10:00:00Z',
         notes: 'Test log'
       }),
       createMockActivityLog({
         id: 'log-2',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 60, // Exact minute
-        timestamp: new Date('2024-01-01T11:00:00Z'),
+        timestamp: '2024-01-01T11:00:00Z',
         notes: 'Test log'
       })
     ];
@@ -122,18 +122,18 @@ describe('Duration Format Fix', () => {
     const mockLogs: ActivityLog[] = [
       createMockActivityLog({
         id: 'log-1',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 0.9, // Should round to 1s
-        timestamp: new Date('2024-01-01T10:00:00Z'),
+        timestamp: '2024-01-01T10:00:00Z',
         notes: 'Very short exercise'
       }),
       createMockActivityLog({
         id: 'log-2',
-        exerciseId: 'exercise-1',
-        exerciseName: 'Test Exercise',
+        exercise_id: 'exercise-1',
+        exercise_name: 'Test Exercise',
         duration: 59.6, // Should round to 60s -> 1m
-        timestamp: new Date('2024-01-01T11:00:00Z'),
+        timestamp: '2024-01-01T11:00:00Z',
         notes: 'Almost a minute'
       })
     ];

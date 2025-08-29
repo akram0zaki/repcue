@@ -27,13 +27,9 @@ type StoredAppSettings = AppSettings;
 type StoredExercise = Exercise;
 
 // Workout-related data interfaces  
-interface StoredWorkout extends Workout {
-  // All fields already use snake_case and ISO strings
-}
+type StoredWorkout = Workout;
 
-interface StoredWorkoutSession extends WorkoutSession {
-  // All fields already use snake_case and ISO strings
-}
+type StoredWorkoutSession = WorkoutSession;
 
 
 
@@ -334,9 +330,9 @@ class RepCueDatabase extends Dexie {
       
       for (const tableName of tables) {
         try {
-          const count = await (this as any).table(tableName).count();
+          const count = await this.table(tableName).count();
           tableStats[tableName] = count;
-        } catch (error) {
+        } catch {
           tableStats[tableName] = 0;
         }
       }
@@ -419,7 +415,7 @@ export class StorageService {
   /**
    * Export all data for backup purposes
    */
-  async exportAllData(): Promise<Record<string, unknown[]>> {
+  async exportAllData(): Promise<Record<string, unknown[] | object>> {
     try {
       const status = await this.getMigrationStatus();
       const data: Record<string, unknown[]> = {};
@@ -536,7 +532,7 @@ export class StorageService {
     const logWithSync = prepareUpsert(log, logId);
     const storedLog: StoredActivityLog = {
       ...logWithSync,
-      timestamp: typeof log.timestamp === 'string' ? log.timestamp : log.timestamp.toISOString()
+      timestamp: log.timestamp
     };
 
     try {
@@ -681,42 +677,6 @@ export class StorageService {
     }
   }
 
-  /**
-   * Export all user data for GDPR compliance
-   */
-  public async exportAllData(): Promise<{
-    exercises: Exercise[];
-    activityLogs: ActivityLog[];
-    userPreferences: UserPreferences | null;
-    appSettings: AppSettings | null;
-    exportDate: string;
-    version: string;
-  }> {
-    if (!this.canStoreData()) {
-      throw new Error('Cannot export data without user consent');
-    }
-
-    try {
-      const [exercises, logs, preferences, settings] = await Promise.all([
-        this.getExercises(),
-        this.getActivityLogs(),
-        this.getUserPreferences(),
-        this.getAppSettings()
-      ]);
-
-      return {
-        exercises,
-        activityLogs: logs,
-        userPreferences: preferences,
-        appSettings: settings,
-        exportDate: new Date().toISOString(),
-        version: '1.0'
-      };
-    } catch (error) {
-      console.error('Failed to export data:', error);
-      throw error;
-    }
-  }
 
   /**
    * Clear all user data for GDPR compliance
@@ -893,8 +853,8 @@ export class StorageService {
     const sessionWithSync = prepareUpsert(session, sessionId);
     const storedSession: StoredWorkoutSession = {
       ...sessionWithSync,
-      start_time: typeof session.start_time === 'string' ? session.start_time : session.start_time.toISOString(),
-      end_time: session.end_time ? (typeof session.end_time === 'string' ? session.end_time : session.end_time.toISOString()) : undefined
+      start_time: session.start_time,
+      end_time: session.end_time
     };
 
     try {
@@ -943,7 +903,7 @@ export class StorageService {
         }
       });
       return sessions
-        .sort((a, b) => b.start_time.getTime() - a.start_time.getTime())
+        .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
         .slice(0, limit);
     }
   }

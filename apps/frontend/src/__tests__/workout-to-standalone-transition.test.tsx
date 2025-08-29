@@ -18,22 +18,22 @@ describe('Workout to Standalone Exercise Transition', () => {
     name: 'Plank',
     description: 'Core strengthening exercise',
     category: 'core',
-    exerciseType: 'time-based',
-    defaultDuration: 60,
-    isFavorite: false,
+    exercise_type: 'time_based',
+    default_duration: 60,
+    is_favorite: false,
     tags: ['core']
   });
 
   const mockAppSettings: AppSettings = createMockAppSettings({
-    intervalDuration: 30,
-    soundEnabled: false,
-    vibrationEnabled: false,
-    beepVolume: 0.5,
-    darkMode: false,
-    autoSave: true,
-    repSpeedFactor: 1.0,
-    preTimerCountdown: 0,
-    defaultRestTime: 30
+    interval_duration: 30,
+    sound_enabled: false,
+    vibration_enabled: false,
+    beep_volume: 0.5,
+    dark_mode: false,
+    auto_save: true,
+    rep_speed_factor: 1.0,
+    pre_timer_countdown: 0,
+    default_rest_time: 30
   });
 
   const standaloneTimerState: TimerState = {
@@ -58,10 +58,10 @@ describe('Workout to Standalone Exercise Transition', () => {
       workoutName: 'Upper Body Workout',
       exercises: [{
         id: 'we1',
-        exerciseId: 'exercise-1',
+        exercise_id: 'exercise-1',
         order: 0,
-        customSets: 3,
-        customReps: 10
+        custom_sets: 3,
+        custom_reps: 10
       }],
       currentExerciseIndex: 1, // Past the last exercise (completed)
       currentSet: 0,

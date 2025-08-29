@@ -57,7 +57,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
   const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && appSettings.showExerciseVideos && !prefersReducedMotion;
+  const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && appSettings.show_exercise_videos && !prefersReducedMotion;
 
   useEffect(() => {
     if (!videoFeatureEnabled) return;
@@ -73,8 +73,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const actuallyResting = workoutMode?.isResting || isResting;
   
   // Countdown progress (reverse of normal progress)
-  const countdownProgress = isCountdown && appSettings.preTimerCountdown > 0 
-    ? ((appSettings.preTimerCountdown - countdownTime) / appSettings.preTimerCountdown) * 100 
+  const countdownProgress = isCountdown && appSettings.pre_timer_countdown > 0 
+    ? ((appSettings.pre_timer_countdown - countdownTime) / appSettings.pre_timer_countdown) * 100 
     : 0;
   
   // Rest time calculations
@@ -269,7 +269,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {isWorkoutMode && (
           <div className="bg-blue-600 text-white rounded-lg p-4 mb-4">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">{workoutMode.workout_name}</h2>
+              <h2 className="text-lg font-semibold">{workoutMode.workoutName}</h2>
               <span className="text-sm bg-blue-500 px-2 py-1 rounded">
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
@@ -745,7 +745,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
             <div>
               <div className="text-gray-500 dark:text-gray-400">{t('timer.beepInterval')}</div>
               <div className="font-medium text-gray-900 dark:text-gray-100">
-                {appSettings.intervalDuration}s
+                {appSettings.interval_duration}s
               </div>
             </div>
             <div>

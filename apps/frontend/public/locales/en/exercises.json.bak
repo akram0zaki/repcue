@@ -143,10 +143,6 @@
     "name": "Forward Fold",
     "description": "Stand and bend forward, reaching toward toes"
   },
-  "timeBased": {
-    "name": "Time-based"
-  },
-  "repBased": {
-    "name": "Rep-based"
-  }
+  "timeBased": "Time-based",
+  "repBased": "Rep-based"
 }

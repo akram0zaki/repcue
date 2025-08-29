@@ -169,11 +169,11 @@ describe('Rep-based Exercise Fixes', () => {
     name: 'Cat-Cow Stretch',
     category: 'flexibility',
     description: 'Test rep-based exercise',
-    exerciseType: 'repetition-based' as const,
-    defaultDuration: 0,
-    defaultReps: 8,
-    defaultSets: 2,
-    isFavorite: false,
+    exercise_type: 'repetition_based' as const,
+    default_duration: 0,
+    default_reps: 8,
+    default_sets: 2,
+    is_favorite: false,
     tags: ['test']
   } as const;
 

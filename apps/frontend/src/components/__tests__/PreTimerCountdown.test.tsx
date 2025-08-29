@@ -33,9 +33,9 @@ const mockExercise: Exercise = createMockExercise({
   name: 'Test Exercise',
   description: 'Test description for countdown',
   category: 'core',
-  exerciseType: ExerciseType.TIME_BASED,
-  defaultDuration: 30,
-  isFavorite: false,
+  exercise_type: ExerciseType.TIME_BASED,
+  default_duration: 30,
+  is_favorite: false,
   tags: ['test']
 });
 
@@ -46,7 +46,7 @@ describe('Pre-Timer Countdown Feature', () => {
 
   describe('Settings Page Integration', () => {
     it('should display countdown settings in settings page', () => {
-      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 3 };
+      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 3 };
       const mockOnUpdateSettings = vi.fn();
 
       render(
@@ -67,7 +67,7 @@ describe('Pre-Timer Countdown Feature', () => {
     });
 
     it('should handle countdown value changes correctly', () => {
-      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 3 };
+      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 3 };
       const mockOnUpdateSettings = vi.fn();
 
       render(
@@ -81,11 +81,11 @@ describe('Pre-Timer Countdown Feature', () => {
       const countdownSlider = screen.getByLabelText('Pre-Timer Countdown');
       fireEvent.change(countdownSlider, { target: { value: '5' } });
 
-      expect(mockOnUpdateSettings).toHaveBeenCalledWith({ preTimerCountdown: 5 });
+      expect(mockOnUpdateSettings).toHaveBeenCalledWith({ pre_timer_countdown: 5 });
     });
 
     it('should show "Off" when countdown is set to 0', () => {
-      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 0 };
+      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 0 };
       const mockOnUpdateSettings = vi.fn();
 
       render(
@@ -104,7 +104,7 @@ describe('Pre-Timer Countdown Feature', () => {
     });
 
     it('should show countdown duration in seconds when > 0', () => {
-      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 7 };
+      const mockAppSettings: AppSettings = { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 7 };
       const mockOnUpdateSettings = vi.fn();
 
       render(
@@ -121,7 +121,7 @@ describe('Pre-Timer Countdown Feature', () => {
   describe('Timer Page Integration', () => {
     const defaultTimerProps = {
       exercises: [mockExercise],
-      appSettings: { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 5 },
+      appSettings: { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 5 },
       timerState: {
         isRunning: false,
         currentTime: 0,
@@ -155,7 +155,7 @@ describe('Pre-Timer Countdown Feature', () => {
     it('shows "Start" button when countdown is disabled', () => {
       const propsWithoutCountdown = {
         ...defaultTimerProps,
-        appSettings: { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 0 }
+        appSettings: { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 0 }
       };
       
       render(<TimerPage {...propsWithoutCountdown} />);

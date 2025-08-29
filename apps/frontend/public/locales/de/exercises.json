@@ -62,5 +62,11 @@
   "calf-raises": { "name": "Wadenheben", "description": "Auf die Zehenspitzen heben, kurz halten und wieder absenken" },
   "russian-twists": { "name": "Russische Drehungen", "description": "Sitz, Füße angehoben, Oberkörper nach rechts und links rotieren" },
   "bear-crawl": { "name": "Bärenlauf", "description": "Auf Händen und Füßen vorwärts krabbeln, Knie vom Boden abgehoben" },
-  "forward-fold": { "name": "Vorbeuge", "description": "Im Stand nach vorn beugen und zu den Zehen greifen" }
+  "forward-fold": { "name": "Vorbeuge", "description": "Im Stand nach vorn beugen und zu den Zehen greifen" },
+  "timeBased": {
+    "name": "Zeitbasiert"
+  },
+  "repBased": {
+    "name": "Wiederholungsbasiert"
+  }
 }

@@ -662,7 +662,7 @@ const CreateWorkoutPage: React.FC = () => {
                           {localizeExercise(exercise, t).name}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises.timeBased') : t('exercises.repBased')}
+                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises.timeBased.name') : t('exercises.repBased.name')}
                           {exercise.exercise_type === 'time_based' 
                             ? ` • ${exercise.default_duration}s` 
                             : ` • ${exercise.default_sets}×${exercise.default_reps}`}

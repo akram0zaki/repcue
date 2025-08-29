@@ -201,23 +201,23 @@ const EditWorkoutPage: React.FC = () => {
     setShowExercisePicker(false);
   };
 
-  const handleRemoveExercise = (exerciseId: string) => {
-    setSelectedExercises(prev => prev.filter(e => e.id !== exerciseId));
+  const handleRemoveExercise = (exercise_id: string) => {
+    setSelectedExercises(prev => prev.filter(e => e.id !== exercise_id));
   };
 
-  const handleUpdateExercise = (exerciseId: string, updates: Partial<SelectedExercise>) => {
+  const handleUpdateExercise = (exercise_id: string, updates: Partial<SelectedExercise>) => {
     setSelectedExercises(prev => 
       prev.map(exercise => 
-        exercise.id === exerciseId 
+        exercise.id === exercise_id 
           ? { ...exercise, ...updates }
           : exercise
       )
     );
   };
 
-  const handleMoveExercise = (exerciseId: string, direction: 'up' | 'down') => {
+  const handleMoveExercise = (exercise_id: string, direction: 'up' | 'down') => {
     setSelectedExercises(prev => {
-      const currentIndex = prev.findIndex(e => e.id === exerciseId);
+      const currentIndex = prev.findIndex(e => e.id === exercise_id);
       if (currentIndex === -1) return prev;
       
       const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;

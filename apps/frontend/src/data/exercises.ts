@@ -364,6 +364,6 @@ export const searchExercises = (exercises: Exercise[], query: string): Exercise[
   );
 };
 
-export const getExerciseById = (exerciseId: string): Exercise | undefined => {
-  return INITIAL_EXERCISES.find(exercise => exercise.id === exerciseId);
+export const getExerciseById = (exercise_id: string): Exercise | undefined => {
+  return INITIAL_EXERCISES.find(exercise => exercise.id === exercise_id);
 }; 
