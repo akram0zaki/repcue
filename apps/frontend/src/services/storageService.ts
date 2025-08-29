@@ -94,6 +94,16 @@ class RepCueDatabase extends Dexie {
       // Migration function to convert from camelCase to snake_case
       return this.migrateToUnifiedSchema(trans);
     });
+
+    // Version 7: Drop legacy camelCase stores so fresh DBs do not keep duplicates
+    // Dexie applies versions sequentially on first open; v3 created camelCase stores.
+    // We explicitly drop them here to ensure only snake_case tables remain.
+    this.version(7).stores({
+      activityLogs: null,
+      userPreferences: null,
+      appSettings: null,
+      workoutSessions: null,
+    });
   }
 
   /**

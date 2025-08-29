@@ -10,6 +10,17 @@
 ### Notes
 - Related files: `apps/frontend/src/services/authService.ts`, `apps/frontend/src/services/syncService.ts`, `apps/frontend/src/components/AppShell.tsx`.
 
+## 2025-08-30 (10) - IndexedDB schema cleanup (Dexie v7)
+
+### Fixed
+- Fresh installs after deleting the database were still creating legacy camelCase tables (activityLogs, userPreferences, appSettings, workoutSessions). Added Dexie version 7 migration to drop these legacy stores so only snake_case tables are present going forward.
+
+### Added
+- Unit test `storage-legacy-drop.test.ts` to assert legacy stores are absent and snake_case stores exist on a fresh DB.
+
+### Notes
+- Related files: `apps/frontend/src/services/storageService.ts`, `apps/frontend/src/__tests__/storage-legacy-drop.test.ts`.
+
 ## 2025-08-29 (8) - Translation System & Performance Fixes 🔧
 
 ### Fixed
