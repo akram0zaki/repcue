@@ -1365,20 +1365,18 @@ function App() {
   const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
     if (!hasConsent) return;
 
-    // Update state first using functional update to avoid depending on current appSettings
-    let updatedSettings: AppSettings;
-    setAppSettings(current => {
-      updatedSettings = { ...current, ...newSettings };
-      return updatedSettings;
-    });
-    
-    // Save to storage asynchronously, outside of setState to avoid race conditions
+    // Compute next settings deterministically from current state to avoid relying on
+    // a variable mutated inside the state updater (which can be deferred in some modes).
+    const nextSettings: AppSettings = { ...appSettings, ...newSettings };
+    setAppSettings(nextSettings);
+
+    // Persist the same object we set in state
     try {
-      await storageService.saveAppSettings(updatedSettings!);
+      await storageService.saveAppSettings(nextSettings);
     } catch (error) {
       console.error('Failed to save app settings:', error);
     }
-  }, [hasConsent]);
+  }, [hasConsent, appSettings]);
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
     setSelectedExercise(exercise);
