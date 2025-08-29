@@ -54,7 +54,8 @@
       "Bash(pnpm vitest run:*)",
       "Bash(for file in apps/frontend/public/locales/*/exercises.json)",
       "Bash(do echo \"Checking $file:\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pnpm --filter @repcue/frontend vitest run:*)"
     ],
     "deny": [],
     "ask": []

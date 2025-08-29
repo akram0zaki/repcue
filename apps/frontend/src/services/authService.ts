@@ -352,16 +352,30 @@ export class AuthService {
    */
   public async signOut(): Promise<{ success: boolean; error?: string }> {
     try {
+      // Supabase may return 401/403/404 when token is already invalid/expired.
+      // Treat these as non-fatal and still clear local session to ensure a reliable sign-out UX.
       const { error } = await supabase.auth.signOut();
 
-      if (error) {
-        return { success: false, error: error.message };
+      // Always clear local auth state regardless of remote revoke outcome
+      await this.handleSignOut();
+
+      // Proactively clear any sync errors so banners disappear immediately after sign-out
+      try {
+        const { SyncService } = await import('./syncService');
+        SyncService.getInstance().clearErrors();
+      } catch (e) {
+        // Non-fatal: sync service may not be initialized in some environments
       }
 
-      await this.handleSignOut();
+      if (error && !/401|403|404/.test(String((error as { status?: number; message?: string }).status ?? ''))) {
+        return { success: false, error: (error as { message?: string }).message || 'Failed to sign out' };
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Sign out error:', error);
+      // Best-effort local sign-out
+      await this.handleSignOut();
       return { success: false, error: 'An unexpected error occurred' };
     }
   }

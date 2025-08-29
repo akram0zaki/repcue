@@ -760,29 +760,52 @@ export class SyncService {
     const requestBody = JSON.stringify(syncRequest);
     console.log('🔍 Direct fetch request body size:', requestBody.length);
     
-    try {
-      const response = await fetch(functionUrl, {
+    const attempt = async (token: string) => {
+      return fetch(functionUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
           'X-Client-Info': 'repcue-frontend@1.0.0'
         },
         body: requestBody
       });
-      
+    };
+
+    try {
+      let response = await attempt(accessToken);
+
       console.log('🔍 Direct fetch response status:', response.status);
       console.log('🔍 Direct fetch response headers:', Object.fromEntries(response.headers.entries()));
-      
+
+      // If token invalid/expired, try a one-time refresh then retry
+      if (response.status === 401) {
+        try {
+          // Attempt our service refresh; ignore result
+          await this.authService.refreshSession();
+        } catch {}
+
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          const refreshedToken = sessionData?.session?.access_token;
+          if (refreshedToken) {
+            console.log('🔁 Retrying sync after token refresh');
+            response = await attempt(refreshedToken);
+            console.log('🔍 Direct fetch (retry) status:', response.status);
+          }
+        } catch (e) {
+          console.warn('Token refresh check failed:', e);
+        }
+      }
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🔴 Direct fetch error response:', errorText);
         throw new Error(`Direct fetch error: ${response.status} ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log('🔍 Direct fetch success, data received');
-      
       return data;
     } catch (error) {
       console.error('🔴 Direct fetch failed:', error);

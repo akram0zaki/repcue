@@ -1,3 +1,15 @@
+## 2025-08-29 (9) - Auth sign-out hardening, skip-link UX, sync 401 retry
+
+### Fixed
+- Sign-out reliability: local auth/session state now clears even if server sign-out returns 401/403/404. Prevents users from getting “stuck” when the token is already invalid. Also clears any sync error banners post sign-out.
+- Sync 401 handling: when the sync endpoint responds with 401 (Invalid/expired token), the client refreshes the session and retries once with the new access token before surfacing an error.
+
+### Changed
+- Accessibility skip link: “Skip to main content” is now hidden by default and only becomes visible after the first Tab keypress to reduce visual noise for pointer users. It remains visible in test environments for a11y assertions.
+
+### Notes
+- Related files: `apps/frontend/src/services/authService.ts`, `apps/frontend/src/services/syncService.ts`, `apps/frontend/src/components/AppShell.tsx`.
+
 ## 2025-08-29 (8) - Translation System & Performance Fixes 🔧
 
 ### Fixed
