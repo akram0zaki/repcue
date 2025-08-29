@@ -1401,7 +1401,7 @@ function App() {
     }
   }, [updateAppSettings]);
 
-  // Initialize app data after consent
+  // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
     const initializeApp = async () => {
       if (hasConsent) {
@@ -1507,15 +1507,21 @@ function App() {
           }
           setAppSettings(settingsToSet);
 
-          // Set last selected exercise
+          // Set last selected exercise without invoking settings update callback to avoid effect churn
           if (settingsToSet.last_selected_exercise_id) {
             const lastExercise = allExercises.find(
               (ex: Exercise) => ex.id === settingsToSet.last_selected_exercise_id
             );
             if (lastExercise) {
-              handleSetSelectedExercise(lastExercise, settingsToSet);
+              setSelectedExercise(lastExercise);
+              // Compute initial duration if rep-based
+              if (lastExercise.exercise_type === 'repetition_based') {
+                const baseRep = lastExercise.rep_duration_seconds || BASE_REP_TIME;
+                const repDuration = Math.round(baseRep * settingsToSet.rep_speed_factor) as TimerPreset;
+                setSelectedDuration(repDuration);
+              }
             }
-                  }
+          }
       } catch (error) {
         console.error('Failed to initialize app data:', error);
         // Fallback to initial exercises
@@ -1526,7 +1532,7 @@ function App() {
   };
 
   initializeApp();
-}, [hasConsent, handleSetSelectedExercise]);
+}, [hasConsent]);
 
 // Cleanup sync triggers on unmount
 useEffect(() => {
