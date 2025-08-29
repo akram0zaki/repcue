@@ -1,3 +1,38 @@
+## 2025-08-29 (8) - Translation System & Performance Fixes 🔧
+
+### Fixed
+- **🌐 Exercise Type Translation Display**: Fixed exercise type tags showing raw i18n keys
+  - Updated translation calls from `t('exercises.timeBased.name')` to `t('exercises:timeBased.name')` using namespace prefix syntax
+  - Enhanced test setup to include `exercises` namespace with proper translation resources
+  - Exercise type tags now correctly display "Time-based" and "Rep-based" instead of raw keys
+  
+- **⚡ Performance - Eliminated Infinite Logging Loop**: Fixed endless console logging causing performance issues
+  - **Root Cause**: Circular dependency in React useCallback hooks and useEffect dependencies
+  - **Solution**: Refactored `updateAppSettings` and `handleSetSelectedExercise` to use functional state updates
+  - **Impact**: Eliminated infinite re-render loop that was causing excessive initialization logging
+  - App now initializes once cleanly instead of continuous re-initialization cycles
+
+- **🔧 Build System**: Resolved TypeScript import conflicts
+  - Fixed import declaration conflict with `consentService` in storage service tests
+  - Removed conflicting direct import in favor of mocked version
+
+### Tests
+- All tests passing: 65 test files passed, 594 tests passed, 3 skipped ✅
+- Build successful with no TypeScript errors ✅
+
+## 2025-08-29 (7) - Sync pull visibility + conflict resolution fixes
+
+### Fixed
+- Server-to-client sync now refreshes UI immediately:
+  - Added global `sync:applied` event dispatch on successful pull in `syncService`.
+  - `WorkoutsPage` and `ActivityLogPage` subscribe and re-fetch their data after sync.
+- Conflict resolver now compares `updated_at` consistently (snake_case) to prevent stale merges.
+- Mark-clean metadata uses `synced_at` (snake_case) for consistency with schema.
+
+### Tests
+- Updated workout storage tests to match snake_case API and mocked Dexie chains for `workout_sessions`.
+- CI: 65 files passed, 594 tests passed, 3 skipped.
+
 ## 2025-08-29 - Major Test Suite Stabilization 🧪
 
 ### Test Suite Excellence ✅

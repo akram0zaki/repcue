@@ -1365,17 +1365,20 @@ function App() {
   const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
     if (!hasConsent) return;
 
-    // Update state first
-    const updatedSettings = { ...appSettings, ...newSettings };
-    setAppSettings(updatedSettings);
+    // Update state first using functional update to avoid depending on current appSettings
+    let updatedSettings: AppSettings;
+    setAppSettings(current => {
+      updatedSettings = { ...current, ...newSettings };
+      return updatedSettings;
+    });
     
     // Save to storage asynchronously, outside of setState to avoid race conditions
     try {
-      await storageService.saveAppSettings(updatedSettings);
+      await storageService.saveAppSettings(updatedSettings!);
     } catch (error) {
       console.error('Failed to save app settings:', error);
     }
-  }, [hasConsent, appSettings]);
+  }, [hasConsent]);
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
     setSelectedExercise(exercise);
@@ -1383,12 +1386,22 @@ function App() {
     
     // Set appropriate duration for rep-based exercises
     if (exercise?.exercise_type === 'repetition_based') {
-      const currentSettings = settings || appSettings;
-      const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
-      const repDuration = Math.round(baseRep * currentSettings.rep_speed_factor);
-      setSelectedDuration(repDuration as TimerPreset);
+      if (settings) {
+        // Use provided settings
+        const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+        const repDuration = Math.round(baseRep * settings.rep_speed_factor);
+        setSelectedDuration(repDuration as TimerPreset);
+      } else {
+        // Use current settings from state
+        setAppSettings(current => {
+          const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+          const repDuration = Math.round(baseRep * current.rep_speed_factor);
+          setSelectedDuration(repDuration as TimerPreset);
+          return current; // Don't change settings, just read them
+        });
+      }
     }
-  }, [appSettings, updateAppSettings]);
+  }, [updateAppSettings]);
 
   // Initialize app data after consent
   useEffect(() => {
@@ -1515,7 +1528,7 @@ function App() {
   };
 
   initializeApp();
-}, [hasConsent]);
+}, [hasConsent, handleSetSelectedExercise]);
 
 // Cleanup sync triggers on unmount
 useEffect(() => {
@@ -1592,6 +1605,14 @@ useEffect(() => {
           const updatedSettings = await storageService.getAppSettings();
           if (updatedSettings) {
             setAppSettings(updatedSettings);
+          }
+
+          // Also broadcast for pages not yet mounted to refresh their own data (workouts, activity logs)
+          try {
+            // No app-level state for workouts/activity logs; just dispatch event for any listeners
+            window.dispatchEvent(new CustomEvent('sync:applied', { detail: { result } }));
+          } catch (e) {
+            console.debug('Workouts refresh dispatch failed (non-fatal):', e);
           }
           
           console.log('✅ App state refreshed after sync');

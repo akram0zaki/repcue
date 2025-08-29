@@ -283,9 +283,15 @@ try {
   await i18n.init({
     lng: 'en',
     fallbackLng: 'en',
-    // Provide both flattened keys and nested compatibility under common.common
-    resources: { en: { common: { ...enBundle, common: enBundle } } },
-    ns: ['common'],
+    // Provide both flattened keys and nested compatibility under common.common, plus exercises namespace
+    resources: { en: { 
+      common: { ...enBundle, common: enBundle },
+      exercises: {
+        timeBased: { name: 'Time-based' },
+        repBased: { name: 'Rep-based' }
+      }
+    } },
+    ns: ['common', 'exercises'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },
     react: { useSuspense: false },

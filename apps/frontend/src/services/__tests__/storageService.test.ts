@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { StorageService } from '../storageService'
-import { consentService } from '../consentService'
 import type { Exercise, ActivityLog, UserPreferences, AppSettings } from '../../types'
 import { ExerciseType } from '../../types'
 import { createMockExercise, createMockActivityLog, createMockUserPreferences, createMockAppSettings } from '../../test/testUtils'
@@ -56,6 +55,8 @@ vi.mock('../consentService', () => ({
     hasConsent: vi.fn()
   }
 }))
+
+const { consentService } = await import('../consentService')
 
 describe('StorageService', () => {
   let storageService: StorageService
