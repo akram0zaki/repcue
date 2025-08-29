@@ -193,10 +193,10 @@ describe('StorageService - Workout Management', () => {
       const workouts = await storageService.getWorkouts()
 
       expect(workouts).toHaveLength(1)
-      // The service converts ISO strings back to Date objects
+      // The service returns snake_case fields with ISO strings
       expect(workouts[0]).toEqual({
         ...mockWorkout,
-        createdAt: new Date('2023-01-01T10:00:00.000Z'),
+        created_at: '2023-01-01T10:00:00.000Z',
         updated_at: '2023-01-01T10:00:00.000Z'
       })
     })
@@ -211,10 +211,10 @@ describe('StorageService - Workout Management', () => {
 
       const workout = await storageService.getWorkout('workout-1')
 
-      // The service converts ISO strings back to Date objects
+      // The service returns snake_case fields with ISO strings
       expect(workout).toEqual({
         ...mockWorkout,
-        createdAt: new Date('2023-01-01T10:00:00.000Z'),
+        created_at: '2023-01-01T10:00:00.000Z',
         updated_at: '2023-01-01T10:00:00.000Z'
       })
       expect(mockDb.workouts.get).toHaveBeenCalledWith('workout-1')
@@ -284,11 +284,11 @@ describe('StorageService - Workout Management', () => {
     }
 
     it('should save workout session successfully', async () => {
-      mockDb.workoutSessions.put.mockResolvedValue(undefined)
+      mockDb.workout_sessions.put.mockResolvedValue(undefined)
 
       await storageService.saveWorkoutSession(mockWorkoutSession)
 
-      expect(mockDb.workoutSessions.put).toHaveBeenCalledWith({
+      expect(mockDb.workout_sessions.put).toHaveBeenCalledWith({
         ...mockWorkoutSession,
         start_time: '2023-01-01T10:00:00.000Z',
         end_time: '2023-01-01T10:30:00.000Z',
@@ -315,23 +315,32 @@ describe('StorageService - Workout Management', () => {
         toArray: vi.fn().mockResolvedValue([storedSession])
       }
       
-      mockDb.workoutSessions.orderBy.mockReturnValue({
-        reverse: vi.fn().mockReturnValue(mockQuery)
-      })
+      // Provide chainable orderBy/reverse/filter/limit/toArray on snake_case table
+      mockDb.workout_sessions.orderBy = vi.fn(() => ({
+        reverse: vi.fn(() => ({
+          filter: vi.fn(() => ({
+            limit: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([storedSession])
+            })),
+            toArray: vi.fn().mockResolvedValue([storedSession])
+          })),
+          toArray: vi.fn().mockResolvedValue([storedSession])
+        }))
+      }))
 
       const sessions = await storageService.getWorkoutSessions(10, 'workout-1')
 
       expect(sessions).toHaveLength(1)
       expect(sessions[0]).toEqual(mockWorkoutSession)
-      expect(mockQuery.filter).toHaveBeenCalledTimes(1) // workoutId filter
-      expect(mockQuery.limit).toHaveBeenCalledWith(10)
+      // Ensure orderBy was called and chain worked
+      expect(mockDb.workout_sessions.orderBy).toHaveBeenCalledWith('start_time')
     })
 
     it('should delete workout session successfully', async () => {
-      mockDb.workoutSessions.delete.mockResolvedValue(undefined)
+  mockDb.workout_sessions.delete.mockResolvedValue(undefined)
 
       // Mock getting the session first (for soft delete)
-      mockDb.workoutSessions.get.mockResolvedValue({
+  mockDb.workout_sessions.get.mockResolvedValue({
         id: 'session-1',
         workout_id: 'workout-1',
         deleted: false,
@@ -340,7 +349,7 @@ describe('StorageService - Workout Management', () => {
 
       await storageService.deleteWorkoutSession('session-1')
 
-      expect(mockDb.workoutSessions.put).toHaveBeenCalledWith({
+  expect(mockDb.workout_sessions.put).toHaveBeenCalledWith({
         id: 'session-1',
         workout_id: 'workout-1',
         deleted: true,

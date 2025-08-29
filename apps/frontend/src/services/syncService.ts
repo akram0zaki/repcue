@@ -416,6 +416,15 @@ export class SyncService {
       if (result.success) {
         this.lastSuccessfulSync = Date.now();
         console.log(`✅ Sync completed: ${result.tablesProcessed} tables, ${result.recordsPushed} pushed, ${result.recordsPulled} pulled`);
+        // Broadcast a sync completion event so UI can refresh dependent views (workouts, activity logs, etc.)
+        if (typeof window !== 'undefined' && result.recordsPulled > 0) {
+          try {
+            window.dispatchEvent(new CustomEvent('sync:applied', { detail: { result } }));
+          } catch (e) {
+            // Non-fatal
+            console.debug('sync:applied event dispatch failed (ignored):', e);
+          }
+        }
       } else {
         console.warn(`⚠️ Sync completed with errors:`, result.errors);
         this.syncErrors = result.errors;
@@ -869,7 +878,7 @@ export class SyncService {
         }).where('dirty').equals(1).modify({
           dirty: 0,
           op: undefined,
-          syncedAt: new Date().toISOString()
+          synced_at: new Date().toISOString()
         });
       } catch (error) {
         console.error(`Error marking records as clean for ${tableName}:`, error);
@@ -970,8 +979,9 @@ export class SyncService {
     localRecord: Record<string, unknown>, 
     serverRecord: Record<string, unknown>
   ): Promise<Record<string, unknown>> {
-    const localUpdatedAt = new Date(localRecord.updatedAt as string || 0);
-    const serverUpdatedAt = new Date(serverRecord.updatedAt as string || 0);
+  // Use snake_case updated_at consistently across records
+  const localUpdatedAt = new Date((localRecord.updated_at as string) || 0);
+  const serverUpdatedAt = new Date((serverRecord.updated_at as string) || 0);
     
     // Enhanced conflict resolution rules
     if (localRecord.dirty) {

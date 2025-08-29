@@ -118,6 +118,21 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     };
 
     loadActivityLogs();
+
+    // Refresh logs after a successful sync pull
+    const handleSyncApplied = async () => {
+      try {
+        const logs = await storageService.getActivityLogs();
+        setActivityLogs(logs);
+      } catch (e) {
+        console.warn('Failed to refresh activity logs after sync:', e);
+      }
+    };
+    window.addEventListener('sync:applied', handleSyncApplied as EventListener);
+
+    return () => {
+      window.removeEventListener('sync:applied', handleSyncApplied as EventListener);
+    };
   }, []);
 
   // Recalculate stats when logs, exercises, or language change (no loading spinner)

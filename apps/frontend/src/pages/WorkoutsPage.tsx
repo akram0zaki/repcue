@@ -32,6 +32,23 @@ const WorkoutsPage: React.FC = () => {
     };
 
     checkConsentAndLoadWorkouts();
+    
+    // Refresh workouts after a successful sync pull
+    const handleSyncApplied = async () => {
+      try {
+        if (consentService.hasConsent()) {
+          const allWorkouts = await storageService.getWorkouts();
+          setWorkouts(allWorkouts);
+        }
+      } catch (e) {
+        console.warn('Failed to refresh workouts after sync:', e);
+      }
+    };
+    window.addEventListener('sync:applied', handleSyncApplied as EventListener);
+
+    return () => {
+      window.removeEventListener('sync:applied', handleSyncApplied as EventListener);
+    };
   }, []);
 
   const handleCreateWorkout = () => {
