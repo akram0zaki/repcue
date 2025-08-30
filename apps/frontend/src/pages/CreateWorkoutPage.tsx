@@ -39,6 +39,8 @@ const CreateWorkoutPage: React.FC = () => {
 
       if (consentStatus) {
         try {
+          // Ensure catalog is seeded on fresh DBs
+          await storageService.ensureExercisesSeeded();
           const exercises = await storageService.getExercises();
           setAvailableExercises(exercises);
         } catch (error) {
@@ -670,7 +672,23 @@ const CreateWorkoutPage: React.FC = () => {
                       </button>
                     ))}
                 </div>
-                {availableExercises.filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id)).length === 0 && (
+                {availableExercises.length === 0 ? (
+                  <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                    <p className="mb-2">{t('workouts.loadExercisesError')}</p>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await storageService.ensureExercisesSeeded();
+                          const refreshed = await storageService.getExercises();
+                          setAvailableExercises(refreshed);
+                        } catch {}
+                      }}
+                      className="inline-flex items-center px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      {t('common.retry')}
+                    </button>
+                  </div>
+                ) : availableExercises.filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id)).length === 0 && (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-8">
                     {t('workouts.allExercisesAdded')}
                   </p>

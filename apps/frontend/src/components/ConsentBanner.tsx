@@ -108,6 +108,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
               onClick={handleAcceptAll}
               className="btn-primary w-full touch-target"
               autoFocus
+              data-testid="consent-accept-all"
             >
               Accept All & Continue
             </button>
@@ -115,6 +116,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
             <button
               onClick={handleAcceptEssential}
               className="btn-secondary w-full touch-target"
+              data-testid="consent-accept-essential"
             >
               Essential Only
             </button>

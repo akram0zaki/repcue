@@ -501,6 +501,31 @@ export class StorageService {
   }
 
   /**
+   * Ensure the exercise catalog exists. If empty, seed with INITIAL_EXERCISES.
+   * Returns the number of exercises after seeding.
+   */
+  public async ensureExercisesSeeded(): Promise<number> {
+    if (!this.canStoreData()) {
+      return 0;
+    }
+
+    try {
+      const existingCount = await this.db.exercises.count();
+      if (existingCount > 0) return existingCount;
+
+      // Lazy import to avoid upfront bundle cost and circular deps
+      const { INITIAL_EXERCISES } = await import('../data/exercises');
+      for (const exercise of INITIAL_EXERCISES) {
+        await this.saveExercise(exercise);
+      }
+      return await this.db.exercises.count();
+    } catch (error) {
+      console.warn('Failed to seed exercises catalog:', error);
+      return 0;
+    }
+  }
+
+  /**
    * Update exercise favorite status
    */
   public async toggleExerciseFavorite(exerciseId: string): Promise<void> {
@@ -539,7 +564,29 @@ export class StorageService {
     }
 
     const logId = log.id || crypto.randomUUID();
-    const logWithSync = prepareUpsert(log, logId);
+    // Defensive: ensure exercise_name is present before persisting
+    let ensuredName = log.exercise_name;
+    try {
+      if (!ensuredName || typeof ensuredName !== 'string') {
+        if (log.is_workout && log.workout_id) {
+          // Try to derive from workout
+          const workout = await this.db.workouts.get(log.workout_id);
+          ensuredName = (workout as unknown as { workout_name?: string; name?: string } | undefined)?.workout_name
+            || (workout as unknown as { name?: string } | undefined)?.name
+            || 'Workout';
+        } else if (log.exercise_id) {
+          const ex = await this.db.exercises.get(log.exercise_id);
+          ensuredName = (ex as unknown as { name?: string } | undefined)?.name || 'Unknown Exercise';
+        } else {
+          ensuredName = 'Unknown Exercise';
+        }
+      }
+    } catch {
+      // On any error deriving the name, fall back to generic labels
+      ensuredName = log.is_workout ? 'Workout' : (ensuredName || 'Unknown Exercise');
+    }
+
+    const logWithSync = prepareUpsert({ ...log, exercise_name: ensuredName }, logId);
     const storedLog: StoredActivityLog = {
       ...logWithSync,
       timestamp: log.timestamp
@@ -581,7 +628,45 @@ export class StorageService {
       }
 
       const storedLogs = await query.toArray();
-      return storedLogs.map(this.convertStoredActivityLog);
+
+      // Hygiene: backfill missing exercise_name for legacy/bad records and persist
+      const repairedLogs: StoredActivityLog[] = [];
+      const repairPromises: Promise<unknown>[] = [];
+      for (const log of storedLogs) {
+        if (!log.exercise_name || typeof log.exercise_name !== 'string' || log.exercise_name.trim() === '') {
+          let newName: string;
+          try {
+            if (log.is_workout && log.workout_id) {
+              const workout = await this.db.workouts.get(log.workout_id);
+              newName = (workout as Record<string, unknown> | undefined)?.workout_name as string
+                || (workout as Record<string, unknown> | undefined)?.name as string
+                || 'Workout';
+            } else if (log.exercise_id) {
+              const ex = await this.db.exercises.get(log.exercise_id);
+              newName = (ex as Record<string, unknown> | undefined)?.name as string || 'Unknown Exercise';
+            } else {
+              newName = 'Unknown Exercise';
+            }
+          } catch {
+            newName = log.is_workout ? 'Workout' : 'Unknown Exercise';
+          }
+          const repaired: StoredActivityLog = {
+            ...log,
+            exercise_name: newName,
+            dirty: 1,
+            updated_at: new Date().toISOString()
+          };
+          repairPromises.push(this.db.activity_logs.put(repaired));
+          repairedLogs.push(repaired);
+        } else {
+          repairedLogs.push(log);
+        }
+      }
+      if (repairPromises.length) {
+        try { await Promise.all(repairPromises); } catch (e) { console.warn('Activity log repair failed:', e); }
+      }
+
+      return repairedLogs.map(this.convertStoredActivityLog);
     } catch (error) {
       console.warn('Failed to load activity logs from IndexedDB:', error);
       // Try fallback storage

@@ -21,6 +21,27 @@
 ### Notes
 - Related files: `apps/frontend/src/services/storageService.ts`, `apps/frontend/src/__tests__/storage-legacy-drop.test.ts`.
 
+## 2025-08-30 (11) - Activity Log name backfill + Create Workout seeding
+
+### Fixed
+- Activity Log entries missing `exercise_name` are now backfilled at save-time, read-time hygiene, and pre-sync validation. UI no longer shows "undefined" and prefers the actual workout name for workout entries.
+- After a fresh DB reset, the Create Workout page could claim "All exercises have been added" due to an empty catalog. We now auto-seed the exercise catalog on first load and show a clearer empty-state with a Retry.
+
+### Added
+- `storageService.ensureExercisesSeeded()` helper to populate the catalog when empty.
+- Unit test `CreateWorkoutPage.seed.test.tsx` validating the picker lists seeded exercises.
+
+### Notes
+- Related files: `apps/frontend/src/services/storageService.ts`, `apps/frontend/src/pages/CreateWorkoutPage.tsx`, `apps/frontend/src/pages/__tests__/CreateWorkoutPage.seed.test.tsx`, `apps/frontend/src/pages/ActivityLogPage.tsx`.
+
+## 2025-08-30 (12) - Testing Guide Documentation
+
+### Added
+- New comprehensive testing guide at `docs/testing/README.md` covering setup, when to write unit vs integration vs E2E, state/auth/sync/storage considerations, and exact pnpm commands for Windows and CI.
+
+### Notes
+- References existing configs: `apps/frontend/vitest.config.ts`, `apps/frontend/vitest.stable.config.ts`, `apps/frontend/playwright.config.ts`, and `apps/frontend/src/test/setup.ts`.
+
 ## 2025-08-29 (8) - Translation System & Performance Fixes 🔧
 
 ### Fixed

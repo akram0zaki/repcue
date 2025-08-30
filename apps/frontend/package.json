@@ -21,6 +21,9 @@
     "test:e2e": "start-server-and-test dev http://localhost:5173 \"cypress run --config-file ../../tests/e2e/cypress.config.mjs\"",
     "test:a11y": "start-server-and-test dev http://localhost:5173 \"cypress run --config-file ../../tests/e2e/cypress.config.mjs --spec cypress/e2e/axe.cy.ts\"",
     "test:all": "pnpm test:unit && pnpm test:e2e",
+    "pw:install": "npx playwright install --with-deps",
+    "pw:test": "playwright test -c playwright.config.ts",
+    "pw:ui": "playwright test -c playwright.config.ts --ui",
     "i18n:scan": "node scripts/i18n-scan.mjs",
     "i18n:report": "node scripts/i18n-scan.mjs || exit 0",
     "generate-favicons": "node scripts/generate-favicons.js",
@@ -47,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
+    "@playwright/test": "^1.55.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",

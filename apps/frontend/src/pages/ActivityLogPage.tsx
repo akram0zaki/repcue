@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: certain fallback strings localized via t(); remaining literals are icons/units */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Exercise, ActivityLog } from '../types';
+import type { Exercise, ActivityLog, Workout } from '../types';
 import { storageService } from '../services/storageService';
 import { ExerciseCategory } from '../types';
 
@@ -35,6 +35,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     currentStreak: 0,
     thisWeekWorkouts: 0
   });
+  const [workoutNameMap, setWorkoutNameMap] = useState<Record<string, string>>({});
 
   // Calculate user statistics
   const calculateStats = useCallback((logs: ActivityLog[]) => {
@@ -109,6 +110,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       try {
         setIsLoading(true);
         const logs = await storageService.getActivityLogs();
+        // Also load workouts to resolve workout names for display
+        try {
+          const workouts: Workout[] = await storageService.getWorkouts();
+          const map: Record<string, string> = {};
+          for (const w of workouts) map[w.id] = w.name;
+          setWorkoutNameMap(map);
+        } catch (e) {
+          // Non-fatal; UI will fall back to log.exercise_name
+          console.debug('Workout name map load failed (non-fatal):', e);
+        }
         setActivityLogs(logs);
       } catch (error) {
         console.error('Failed to load activity logs:', error);
@@ -122,8 +133,14 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     // Refresh logs after a successful sync pull
     const handleSyncApplied = async () => {
       try {
-        const logs = await storageService.getActivityLogs();
+        const [logs, workouts] = await Promise.all([
+          storageService.getActivityLogs(),
+          storageService.getWorkouts()
+        ]);
         setActivityLogs(logs);
+        const map: Record<string, string> = {};
+        for (const w of workouts) map[w.id] = w.name;
+        setWorkoutNameMap(map);
       } catch (e) {
         console.warn('Failed to refresh activity logs after sync:', e);
       }
@@ -426,11 +443,20 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
                                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                                       {(() => {
+                                        // Prefer the known workout name if available
+                                        const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
+                                        if (nameFromMap) {
+                                          return `${nameFromMap} (Workout)`;
+                                        }
+                                        // Fallback to exercise lookup (legacy) or stored log name
                                         const ex = exercises.find(e => e.id === log.exercise_id);
-                                        if (!ex) return `${log.exercise_name} (Workout)`;
-                                        const base = `${ex.id}`;
-                                        const name = t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
-                                        return `${name} (Workout)`;
+                                        if (ex) {
+                                          const base = `${ex.id}`;
+                                          const name = t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                          return `${name} (Workout)`;
+                                        }
+                                        const fallback = log.exercise_name && typeof log.exercise_name === 'string' ? log.exercise_name : t('activity.workoutBadge');
+                                        return `${fallback} (Workout)`;
                                       })()}
                                     </h4>
                                     <svg 
@@ -520,7 +546,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                                       {(() => {
                                         const ex = exercises.find(e => e.id === log.exercise_id);
-                                        if (!ex) return log.exercise_name;
+                                        if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
                                         const base = `${ex.id}`;
                                         return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
                                       })()}

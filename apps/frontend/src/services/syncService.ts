@@ -625,6 +625,23 @@ export class SyncService {
           if (record.op === 'delete' || record.deleted) {
             deletes.push(record.id as string);
           } else {
+          // Activity log hygiene: backfill missing exercise_name defensively
+          if (tableName === 'activity_logs' && (!record.exercise_name || typeof record.exercise_name !== 'string')) {
+            try {
+              if (record.is_workout && record.workout_id) {
+                const workout = await (db.workouts as unknown as { get: (id: string) => Promise<Record<string, unknown> | undefined> }).get(record.workout_id as string);
+                record.exercise_name = (workout?.workout_name as string) || (workout?.name as string) || 'Workout';
+              } else if (record.exercise_id) {
+                const ex = await (db.exercises as unknown as { get: (id: string) => Promise<Record<string, unknown> | undefined> }).get(record.exercise_id as string);
+                record.exercise_name = (ex?.name as string) || 'Unknown Exercise';
+              } else {
+                record.exercise_name = 'Unknown Exercise';
+              }
+            } catch {
+              record.exercise_name = record.is_workout ? 'Workout' : 'Unknown Exercise';
+            }
+          }
+
           // Remove local-only sync metadata before sending
           // With Phase 2 complete, no field mapping needed - direct assignment
           const { dirty: _dirty, op: _op, synced_at: _synced_at, ...cleanRecord } = record as Record<string, unknown>;
