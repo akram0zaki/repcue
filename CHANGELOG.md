@@ -1,3 +1,27 @@
+## 2025-08-30 (13) - Phase 2 complete (duration alignment) + Phase 3 diagnostics/resilience
+
+### Fixed
+- Duration semantics unified: workout_session.total_duration now always matches the summed per‑exercise duration used in the workout activity log. Eliminates mismatches caused by divergent calculations.
+
+### Added
+- Shared duration utility: `apps/frontend/src/utils/workoutDuration.ts` exposes `computeExerciseDuration` and `computeWorkoutDurations` used by `App.tsx` for both session logging and activity logs (single source of truth).
+- Diagnostics and resilience for sync:
+  - Feature flag `SYNC_USE_INVOKE` (default false) to toggle between Supabase `functions.invoke` and direct `fetch` to `/functions/v1/sync`.
+  - Enhanced invoke diagnostics and automatic fallback to direct fetch on failures.
+  - Debounced `scheduleSync` to coalesce rapid triggers and reduce "already in progress" noise.
+  - Visibility trigger: a `visibilitychange` listener schedules a sync when the app becomes foregrounded.
+- Tests: `apps/frontend/src/utils/__tests__/workoutDuration.test.ts` validates duration computations and totals.
+
+### Changed
+- `App.tsx` now uses `computeWorkoutDurations(...)` to build the workout session and the per‑exercise activity log entries, ensuring consistent totals and making the logic easier to reason about.
+- `syncService`: central `callSyncEndpoint` chooses invoke vs direct fetch via the new feature flag; retains 401 refresh+retry path and emits `sync:applied` on success. Added debounce + visibility foreground scheduling.
+
+### Ops / CI
+- Test toggle available: existing SKIP_UNIT_TESTS env is respected in Vitest configs and scripts to temporarily bypass unit tests during manual QA.
+
+### Notes
+- Related files: `apps/frontend/src/App.tsx`, `apps/frontend/src/services/syncService.ts`, `apps/frontend/src/utils/workoutDuration.ts`, `apps/frontend/src/utils/__tests__/workoutDuration.test.ts`, `apps/frontend/src/config/features.ts`.
+
 ## 2025-08-29 (9) - Auth sign-out hardening, skip-link UX, sync 401 retry
 
 ### Fixed
