@@ -2,7 +2,7 @@ import { StorageService } from './storageService';
 import { ConsentService } from './consentService';
 import { AuthService } from './authService';
 import { supabase } from '../config/supabase';
-import { SYNC_ENABLED } from '../config/features';
+import { SYNC_ENABLED, SYNC_USE_INVOKE } from '../config/features';
 
 export interface SyncResult {
   success: boolean;
@@ -218,6 +218,15 @@ export class SyncService {
     // Listen for online/offline events
     window.addEventListener('online', this.handleOnline.bind(this));
     window.addEventListener('offline', this.handleOffline.bind(this));
+    document.addEventListener('visibilitychange', () => {
+      try {
+        if (document.visibilityState === 'visible' && this.authService?.getAuthState()?.isAuthenticated) {
+          this.scheduleSync();
+        }
+      } catch (e) {
+        // Non-fatal
+      }
+    });
 
     // Load last sync cursor from localStorage
     this.loadSyncCursor();
@@ -266,9 +275,7 @@ export class SyncService {
 
     // Trigger sync when network comes back if authenticated
     if (this.authService?.getAuthState()?.isAuthenticated) {
-      this.sync().catch(error => {
-        console.error('Auto-sync on network restore failed:', error);
-      });
+      this.scheduleSync();
     }
   }
 
@@ -279,6 +286,20 @@ export class SyncService {
     console.log('📵 Network disconnected');
     this.isOnline = false;
     this.notifyListeners();
+  }
+
+  /**
+   * Debounced sync scheduler to coalesce rapid triggers (online/visibility/etc.)
+   */
+  private debounceTimer: number | null = null;
+  private scheduleWindowMs = 500;
+  private scheduleSync(): void {
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
+    }
+    this.debounceTimer = window.setTimeout(() => {
+      this.sync().catch(err => console.warn('Scheduled sync failed:', err));
+    }, this.scheduleWindowMs);
   }
 
   /**
@@ -718,9 +739,43 @@ export class SyncService {
       }
     });
 
-  // Known issue: supabase.functions.invoke sometimes returns 400 while direct fetch succeeds in dev.
-  // Prefer direct fetch first for reliability; keep invoke path commented for potential future use.
-  return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
+    // Choose path based on feature flag. Prefer direct fetch by default for reliability.
+    if (SYNC_USE_INVOKE) {
+      try {
+        return await this.callSyncEndpointInvoke(syncRequest, accessToken);
+      } catch (e) {
+        console.warn('Invoke path failed, falling back to direct fetch:', e);
+        return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
+      }
+    }
+    return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
+  }
+
+  /**
+   * Call sync endpoint using supabase.functions.invoke with enhanced diagnostics
+   */
+  private async callSyncEndpointInvoke(syncRequest: SyncRequest, _accessToken: string): Promise<SyncResponse> {
+    try {
+      const { data, error } = await supabase.functions.invoke('sync', {
+        body: syncRequest
+      });
+      if (error) {
+        console.error('🟥 Invoke error:', {
+          name: (error as any).name,
+          message: error.message,
+          status: (error as any).status,
+          cause: (error as any).cause
+        });
+        throw error;
+      }
+      if (!data || typeof data !== 'object' || !('changes' in data)) {
+        throw new Error('Invalid response from invoke: missing changes');
+      }
+      return data as SyncResponse;
+    } catch (err) {
+      console.error('🔴 callSyncEndpointInvoke failed:', err);
+      throw err;
+    }
   }
 
   /**

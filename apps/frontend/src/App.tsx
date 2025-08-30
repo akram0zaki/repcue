@@ -14,6 +14,7 @@ import { registerServiceWorker } from './utils/serviceWorker';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
+import { computeWorkoutDurations } from './utils/workoutDuration';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -568,25 +569,9 @@ function App() {
       });
       
       if (hasConsent && hasSessionId) {
-        console.log('✅ Creating workout session for logging...');
-        // Compute total workout duration consistent with Activity Log aggregation
-        const workoutExerciseDetails = workoutMode.exercises.map((workoutExercise) => {
-          const exercise = exercises.find(ex => ex.id === workoutExercise.exercise_id);
-          if (!exercise) return null;
-          let exerciseDuration: number;
-          if (exercise.exercise_type === 'time_based') {
-            exerciseDuration = workoutExercise.custom_duration || exercise.default_duration || 30;
-          } else {
-            const sets = workoutExercise.custom_sets || exercise.default_sets || 1;
-            const reps = workoutExercise.custom_reps || exercise.default_reps || 10;
-            const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
-            const repTime = Math.round(baseRep * appSettings.rep_speed_factor);
-            const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
-            exerciseDuration = (sets * reps * repTime) + restTime;
-          }
-          return exerciseDuration;
-        }).filter((d): d is number => typeof d === 'number');
-        const totalWorkoutDuration = Math.round(workoutExerciseDetails.reduce((a, b) => a + b, 0));
+  console.log('✅ Creating workout session for logging...');
+  // Compute total workout duration consistent with Activity Log aggregation
+  const { total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
 
         const workoutSession: WorkoutSession = {
           id: workoutMode.sessionId!,
@@ -612,35 +597,8 @@ function App() {
           
           // Create a single workout activity log entry for the activity log page
           console.log('📝 Creating workout activity log entry...');
-          const workoutExerciseDetailsDetailed = workoutMode.exercises.map((workoutExercise) => {
-            const exercise = exercises.find(ex => ex.id === workoutExercise.exercise_id);
-            if (!exercise) return null;
-            
-            let exerciseDuration: number;
-            let sets: number | undefined;
-            let reps: number | undefined;
-            
-            if (exercise.exercise_type === 'time_based') {
-              exerciseDuration = workoutExercise.custom_duration || exercise.default_duration || 30;
-            } else {
-              sets = workoutExercise.custom_sets || exercise.default_sets || 1;
-              reps = workoutExercise.custom_reps || exercise.default_reps || 10;
-              const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
-              const repTime = Math.round(baseRep * appSettings.rep_speed_factor);
-              const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
-              exerciseDuration = (sets * reps * repTime) + restTime;
-            }
-            
-            return {
-              exercise_id: exercise.id,
-              exercise_name: exercise.name,
-              duration: exerciseDuration,
-              sets,
-              reps
-            };
-          }).filter(Boolean);
-          
-          const totalWorkoutDuration = Math.round(workoutExerciseDetailsDetailed.reduce((total, ex) => total + (ex?.duration || 0), 0));
+          const { perExercise, total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
+          const exerciseNameById = new Map(exercises.map(ex => [ex.id, ex.name]));
           
           const workoutActivityLog: ActivityLog = {
             id: `workout-${workoutMode.sessionId}`,
@@ -651,13 +609,13 @@ function App() {
             notes: `Workout completed with ${workoutMode.exercises.length} exercises`,
             workout_id: workoutMode.workoutId,
             is_workout: true,
-            exercises: workoutExerciseDetailsDetailed as {
-              exercise_id: string;
-              exercise_name: string;
-              duration: number;
-              sets?: number;
-              reps?: number;
-            }[],
+            exercises: perExercise.map(d => ({
+              exercise_id: d.exercise_id,
+              exercise_name: exerciseNameById.get(d.exercise_id) || 'Unknown Exercise',
+              duration: d.duration,
+              ...(d.sets ? { sets: d.sets } : {}),
+              ...(d.reps ? { reps: d.reps } : {})
+            })),
             updated_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
             deleted: false,

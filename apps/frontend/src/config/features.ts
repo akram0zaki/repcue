@@ -7,3 +7,5 @@ export const VIDEO_DEMOS_ENABLED = !globalOverride; // Global kill switch for vi
 
 // Sync feature flag - enable now that Edge Functions are implemented
 export const SYNC_ENABLED = true;
+// Use Supabase functions.invoke for sync (dev reliability favors direct fetch). Default false.
+export const SYNC_USE_INVOKE = false;
