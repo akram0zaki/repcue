@@ -78,6 +78,8 @@ export class SyncService {
   private lastSyncCursor?: string;
   private syncErrors: SyncError[] = [];
   private listeners: ((status: SyncStatus) => void)[] = [];
+  // Internal: multi-pass hydration guard
+  private maxHydrationPasses = 3;
 
   /**
    * Create a structured sync error
@@ -298,7 +300,9 @@ export class SyncService {
       clearTimeout(this.debounceTimer);
     }
     this.debounceTimer = window.setTimeout(() => {
-      this.sync().catch(err => console.warn('Scheduled sync failed:', err));
+  // Avoid piling up if already syncing
+  if (this.isSyncing) return;
+  this.sync().catch(err => console.warn('Scheduled sync failed:', err));
     }, this.scheduleWindowMs);
   }
 
@@ -493,9 +497,16 @@ export class SyncService {
     };
 
     try {
+      // Detect initial hydration scenario: brand-new device (no cursor) and no local user data
+      const initialHydration = await this.isInitialHydration();
+      if (initialHydration) {
+        console.log('🆕 Initial hydration detected: forcing a full pull');
+      }
+
       // Step 1: Gather dirty records from all tables
       const syncRequest: SyncRequest = {
-        ...(this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
+        // For initial hydration, omit since cursor to request full server state
+        ...(!initialHydration && this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
         tables: {},
         clientInfo: {
           appVersion: '1.0.0', // TODO: get from package.json
@@ -534,7 +545,7 @@ export class SyncService {
       // Only skip sync if we have no local changes AND we're certain we don't need server data
       // We should always sync on first login (when lastSuccessfulSync is undefined)
       // or when force sync is requested
-      const shouldSkipSync = !hasChanges && 
+  const shouldSkipSync = !initialHydration && !hasChanges && 
                            this.lastSyncCursor && 
                            this.lastSuccessfulSync && 
                            !force &&
@@ -555,7 +566,7 @@ export class SyncService {
       console.log('🔄 Proceeding with sync - hasChanges:', hasChanges, 'lastSuccessfulSync:', this.lastSuccessfulSync, 'force:', force);
 
       // Step 2: Call sync endpoint
-      const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
+  const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
 
       // Step 3: Apply server changes locally
       for (const tableName of SYNCABLE_TABLES) {
@@ -584,6 +595,63 @@ export class SyncService {
 
       // Step 5: Update sync cursor
       this.saveSyncCursor(syncResponse.cursor);
+
+      // Optional multi-pass hydration: if initial hydration or server returned changes
+      // and there are still dirty records to push (batch-limited) or we just pulled data,
+      // run a few more passes to finish hydration.
+      let passes = 0;
+      while (passes < this.maxHydrationPasses) {
+        passes++;
+        const stillDirty = await this.hasChangesToSync();
+        // Only continue if we still have dirty records to push;
+        // we'll also continue if this pass pulls new records from server.
+        if (!stillDirty && this.lastSyncCursor) {
+          // Probe once more only if we had no cursor before (first pass handled above)
+          // If nothing dirty and we already have a cursor, break.
+          break;
+        }
+
+        const followUpReq: SyncRequest = {
+          ...(this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
+          tables: {},
+          clientInfo: {
+            appVersion: '1.0.0',
+            deviceId: this.getDeviceId()
+          }
+        };
+        // Re-gather dirty (next batch)
+        for (const tableName of SYNCABLE_TABLES) {
+          try {
+            const dirty = await this.getDirtyRecords(tableName);
+            followUpReq.tables[tableName] = dirty;
+            if (dirty.upserts.length > 0 || dirty.deletes.length > 0) {
+              result.recordsPushed += dirty.upserts.length + dirty.deletes.length;
+            }
+          } catch (e) {
+            // continue
+          }
+        }
+
+        const followResp = await this.callSyncEndpoint(followUpReq, accessToken);
+        let pulledThisPass = 0;
+        for (const tableName of SYNCABLE_TABLES) {
+          const changes = followResp.changes[tableName];
+          if (changes) {
+            await this.applyServerChanges(tableName, changes);
+            const pulled = changes.upserts.length + changes.deletes.length;
+            result.recordsPulled += pulled;
+            pulledThisPass += pulled;
+          }
+          result.tablesProcessed++;
+        }
+        await this.markRecordsAsClean();
+        this.saveSyncCursor(followResp.cursor);
+        // If we didn't pull anything and have no more dirty records, stop early
+        if (pulledThisPass === 0) {
+          const anyDirty = await this.hasChangesToSync();
+          if (!anyDirty) break;
+        }
+      }
 
       if (result.errors.length > 0) {
         result.success = false;
@@ -967,6 +1035,31 @@ export class SyncService {
       conflicts: 0,
       errors
     };
+  }
+
+  /**
+   * Determine if this device likely needs an initial full hydration from server.
+   * Criteria: no existing cursor AND key user tables empty (ignoring seeded exercises).
+   */
+  private async isInitialHydration(): Promise<boolean> {
+    if (this.lastSyncCursor) return false;
+    try {
+      const db = this.storageService.getDatabase();
+      const getCount = async (name: string): Promise<number> => {
+        const table = (db as unknown as Record<string, unknown>)[name];
+        if (!table || typeof table !== 'object') return 0;
+        return await (table as { count: () => Promise<number> }).count();
+      };
+      // Workouts, activity logs, and sessions indicate meaningful user data
+      const [w, a, s] = await Promise.all([
+        getCount('workouts'),
+        getCount('activity_logs'),
+        getCount('workout_sessions')
+      ]);
+      return (w + a + s) === 0;
+    } catch {
+      return false;
+    }
   }
 
   /**
