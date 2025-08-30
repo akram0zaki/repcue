@@ -140,18 +140,18 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
 
         {/* Sign-in prompt - only show if not authenticated */}
         {!isAuthenticated && (
-          <div className="text-center mb-6">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('home.signInMessage', { 
-                defaultValue: 'You can ' 
-              })}
+          <div className="text-center mb-6 text-sm text-gray-600 dark:text-gray-400">
+            <div>
+              <span>
+                {t('home.signInMessage', { defaultValue: 'You can ' })}
+              </span>
               <SignInButton variant="minimal" size="sm" className="inline p-0 h-auto font-normal underline hover:no-underline">
                 {t('home.signInLink', { defaultValue: 'sign-in' })}
               </SignInButton>
-              {t('home.signInSuffix', { 
-                defaultValue: ' to track your progress from different devices.' 
-              })}
-            </p>
+              <span>
+                {t('home.signInSuffix', { defaultValue: ' to track your progress from different devices.' })}
+              </span>
+            </div>
           </div>
         )}
 

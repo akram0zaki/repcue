@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
@@ -76,7 +77,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 overflow-y-auto"
       aria-labelledby="auth-modal-title"
@@ -116,7 +117,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    // Render at document.body to avoid invalid nesting inside inline/paragraph containers
+    document.body
   );
 };
 
