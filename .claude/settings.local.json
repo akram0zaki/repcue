@@ -55,7 +55,9 @@
       "Bash(for file in apps/frontend/public/locales/*/exercises.json)",
       "Bash(do echo \"Checking $file:\")",
       "Bash(done)",
-      "Bash(pnpm --filter @repcue/frontend vitest run:*)"
+      "Bash(pnpm --filter @repcue/frontend vitest run:*)",
+      "Bash(pnpm --filter @repcue/frontend test src/pages/__tests__/SettingsPage.test.tsx)",
+      "Bash(for file in apps/frontend/public/locales/*/common.json)"
     ],
     "deny": [],
     "ask": []

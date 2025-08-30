@@ -435,13 +435,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         {isAuthenticated && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mt-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-              Security & Privacy
+              {t('settings.securityPrivacy')}
             </h2>
             
             {/* Data Export */}
             <div className="mb-4">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Export Your Data
+                {t('settings.exportYourData')}
               </h3>
               <DataExportButton className="w-full" />
             </div>
@@ -449,16 +449,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             {/* Account Deletion */}
             <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Delete Account
+                {t('settings.deleteAccount')}
               </h3>
               <button
                 onClick={() => setShowDeleteAccountModal(true)}
                 className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
               >
-                Delete My Account
+                {t('settings.deleteMyAccount')}
               </button>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Permanently delete your account and all associated data. This action has a 30-day grace period.
+                {t('settings.deleteAccountHelp')}
               </p>
             </div>
           </div>

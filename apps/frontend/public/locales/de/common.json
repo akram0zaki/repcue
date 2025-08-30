@@ -62,7 +62,12 @@
     "clearAllDataAndReset": "Alle Daten löschen & App zurücksetzen",
     "clearAllDataHelp": "Alle Daten dauerhaft löschen, Einwilligung zurücksetzen und zum Startbildschirm zurückkehren",
     "clearAllDataMessage": "Sind Sie sicher, dass Sie alle Daten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Sie werden zum Startbildschirm weitergeleitet und erneut um Einwilligung gebeten.",
-    "clearAllData": "Alle Daten löschen"
+    "clearAllData": "Alle Daten löschen",
+    "securityPrivacy": "🔒 Sicherheit & Datenschutz",
+    "exportYourData": "Ihre Daten exportieren",
+    "deleteAccount": "Konto löschen",
+    "deleteMyAccount": "Mein Konto löschen",
+    "deleteAccountHelp": "Ihr Konto und alle zugehörigen Daten dauerhaft löschen. Diese Aktion hat eine 30-tägige Karenzzeit."
   },
   "timer": {
     "restNext": "Ruhepause (Nächste: {{next}})",

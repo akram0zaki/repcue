@@ -64,7 +64,12 @@
     "clearAllDataAndReset": "Clear All Data & Reset App",
     "clearAllDataHelp": "Permanently delete all data, reset consent, and return to home screen",
     "clearAllDataMessage": "Are you sure you want to clear all data? This action cannot be undone. You will be redirected to the home screen and asked for consent again.",
-    "clearAllData": "Clear All Data"
+    "clearAllData": "Clear All Data",
+    "securityPrivacy": "🔒 Security & Privacy",
+    "exportYourData": "Export Your Data",
+    "deleteAccount": "Delete Account",
+    "deleteMyAccount": "Delete My Account",
+    "deleteAccountHelp": "Permanently delete your account and all associated data. This action has a 30-day grace period."
   },
   "timer": {
     "restNext": "Rest Period (Next: {{next}})",

@@ -64,7 +64,12 @@
     "clearAllDataAndReset": "Borrar todos los datos y reiniciar la app",
     "clearAllDataHelp": "Eliminar permanentemente todos los datos, reiniciar consentimiento y volver a la pantalla de inicio",
     "clearAllDataMessage": "¿Estás seguro de que quieres borrar todos los datos? Esta acción no se puede deshacer. Serás redirigido a la pantalla de inicio y se te pedirá consentimiento nuevamente.",
-    "clearAllData": "Borrar todos los datos"
+    "clearAllData": "Borrar todos los datos",
+    "securityPrivacy": "🔒 Seguridad y privacidad",
+    "exportYourData": "Exportar tus datos",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteMyAccount": "Eliminar mi cuenta",
+    "deleteAccountHelp": "Eliminar permanentemente tu cuenta y todos los datos asociados. Esta acción tiene un período de gracia de 30 días."
   },
   "timer": {
     "restNext": "Período de descanso (Siguiente: {{next}})",

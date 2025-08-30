@@ -62,7 +62,12 @@
     "clearAllDataAndReset": "Alle Gegevens Wissen & App Resetten",
     "clearAllDataHelp": "Verwijder alle gegevens permanent, reset toestemming, en keer terug naar startscherm",
     "clearAllDataMessage": "Weet u zeker dat u alle gegevens wilt wissen? Deze actie kan niet ongedaan worden gemaakt. U wordt doorgestuurd naar het startscherm en gevraagd om opnieuw toestemming te geven.",
-    "clearAllData": "Alle Gegevens Wissen"
+    "clearAllData": "Alle Gegevens Wissen",
+    "securityPrivacy": "🔒 Beveiliging & Privacy",
+    "exportYourData": "Uw gegevens exporteren",
+    "deleteAccount": "Account verwijderen",
+    "deleteMyAccount": "Mijn account verwijderen",
+    "deleteAccountHelp": "Uw account en alle bijbehorende gegevens permanent verwijderen. Deze actie heeft een graceperiode van 30 dagen."
   },
   "timer": {
     "restNext": "Rustperiode (Volgende: {{next}})",
