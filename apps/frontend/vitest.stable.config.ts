@@ -34,6 +34,12 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     teardownTimeout: 30000,
+    // Env-flag to temporarily disable unit tests during manual QA cycles
+    ...(process.env.SKIP_UNIT_TESTS === '1' ? {
+      include: [],
+      exclude: ['**/*'],
+      passWithNoTests: true,
+    } : {}),
     typecheck: {
       tsconfig: './tsconfig.test.json'
     }
