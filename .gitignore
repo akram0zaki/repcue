@@ -52,3 +52,5 @@ playwright/.cache/
 .mcp.json
 console.log
 next.md
+docs/findings
+docs/testing/findings

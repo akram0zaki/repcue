@@ -84,6 +84,17 @@ export class AuthService {
         refreshToken: session.refresh_token
       };
 
+      // Privacy: strip auth hash fragments from URL after successful sign-in
+      try {
+        const hash = window.location.hash || '';
+        if (hash.includes('access_token') || hash.includes('refresh_token')) {
+          const url = new URL(window.location.href);
+          // Clear hash fragment; keep path and query intact
+          url.hash = '';
+          window.history.replaceState({}, document.title, url.toString());
+        }
+      } catch {}
+
       // Claim ownership of anonymous data on first sign-in
       await this.claimAnonymousData();
 

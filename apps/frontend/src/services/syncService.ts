@@ -626,7 +626,8 @@ export class SyncService {
             deletes.push(record.id as string);
           } else {
           // Activity log hygiene: backfill missing exercise_name defensively
-          if (tableName === 'activity_logs' && (!record.exercise_name || typeof record.exercise_name !== 'string')) {
+          const shouldReplaceGenericName = (name?: unknown) => !name || typeof name !== 'string' || name.trim() === '' || name === 'Unknown Exercise' || name === 'Workout';
+          if (tableName === 'activity_logs' && shouldReplaceGenericName(record.exercise_name)) {
             try {
               if (record.is_workout && record.workout_id) {
                 const workout = await (db.workouts as unknown as { get: (id: string) => Promise<Record<string, unknown> | undefined> }).get(record.workout_id as string);
@@ -717,52 +718,9 @@ export class SyncService {
       }
     });
 
-    try {
-      // Try using supabase.functions.invoke first
-      console.log('🔄 Making sync request via supabase.functions.invoke...');
-      const { data, error } = await supabase.functions.invoke('sync', {
-        body: syncRequest,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      console.log('🔍 Supabase invoke response:', { data: !!data, error: !!error });
-      
-      if (error) {
-        const networkError = this.createSyncError(
-          'network',
-          `Supabase invoke failed: ${error.message || 'Unknown error'}`,
-          undefined,
-          undefined,
-          { error, fallbackUsed: true }
-        );
-        console.error('🔴 Supabase invoke error:', networkError);
-        
-        // Always fall back to direct fetch on any invoke error
-        // This resolves the "Edge Function returned a non-2xx status code" issue
-        console.log('🔄 Supabase invoke failed, falling back to direct fetch...');
-        return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
-      }
-
-      if (data) {
-        console.log('🔍 Sync response received via supabase.functions.invoke:', {
-          hasCursor: !!data.cursor,
-          tablesInResponse: Object.keys(data.changes || {}),
-          changesCounts: Object.entries(data.changes || {}).map(([table, changes]) => {
-            const typedChanges = changes as { upserts?: unknown[]; deletes?: unknown[] };
-            return `${table}: ${typedChanges.upserts?.length || 0} upserts, ${typedChanges.deletes?.length || 0} deletes`;
-          })
-        });
-      }
-
-      return data as SyncResponse;
-    } catch (invokeError) {
-      console.error('🔴 Exception during supabase.functions.invoke:', invokeError);
-      console.log('🔄 Exception caught, falling back to direct fetch...');
-      return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
-    }
+  // Known issue: supabase.functions.invoke sometimes returns 400 while direct fetch succeeds in dev.
+  // Prefer direct fetch first for reliability; keep invoke path commented for potential future use.
+  return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
   }
 
   /**

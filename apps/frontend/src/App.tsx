@@ -151,7 +151,8 @@ function App() {
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   
   // Authentication state
-  const { isAuthenticated } = useAuth();
+  // Auth state consumed indirectly via sync:applied listener
+  useAuth();
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -568,16 +569,36 @@ function App() {
       
       if (hasConsent && hasSessionId) {
         console.log('✅ Creating workout session for logging...');
+        // Compute total workout duration consistent with Activity Log aggregation
+        const workoutExerciseDetails = workoutMode.exercises.map((workoutExercise) => {
+          const exercise = exercises.find(ex => ex.id === workoutExercise.exercise_id);
+          if (!exercise) return null;
+          let exerciseDuration: number;
+          if (exercise.exercise_type === 'time_based') {
+            exerciseDuration = workoutExercise.custom_duration || exercise.default_duration || 30;
+          } else {
+            const sets = workoutExercise.custom_sets || exercise.default_sets || 1;
+            const reps = workoutExercise.custom_reps || exercise.default_reps || 10;
+            const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+            const repTime = Math.round(baseRep * appSettings.rep_speed_factor);
+            const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
+            exerciseDuration = (sets * reps * repTime) + restTime;
+          }
+          return exerciseDuration;
+        }).filter((d): d is number => typeof d === 'number');
+        const totalWorkoutDuration = Math.round(workoutExerciseDetails.reduce((a, b) => a + b, 0));
+
         const workoutSession: WorkoutSession = {
           id: workoutMode.sessionId!,
           workout_id: workoutMode.workoutId,
           workout_name: workoutMode.workoutName,
-          start_time: new Date(Date.now() - (Math.round(timerState.currentTime) * 1000)).toISOString(), // Approximate start time
+          // Best-effort start time based on aggregated duration
+          start_time: new Date(Date.now() - (totalWorkoutDuration * 1000)).toISOString(),
           end_time: new Date().toISOString(),
           exercises: [], // TODO: Track individual exercise completion in Phase 5
           is_completed: true,
           completion_percentage: 100,
-          total_duration: Math.round(timerState.currentTime),
+          total_duration: totalWorkoutDuration,
           updated_at: new Date().toISOString(),
           created_at: new Date().toISOString(),
           deleted: false,
@@ -591,7 +612,7 @@ function App() {
           
           // Create a single workout activity log entry for the activity log page
           console.log('📝 Creating workout activity log entry...');
-          const workoutExerciseDetails = workoutMode.exercises.map((workoutExercise) => {
+          const workoutExerciseDetailsDetailed = workoutMode.exercises.map((workoutExercise) => {
             const exercise = exercises.find(ex => ex.id === workoutExercise.exercise_id);
             if (!exercise) return null;
             
@@ -619,7 +640,7 @@ function App() {
             };
           }).filter(Boolean);
           
-          const totalWorkoutDuration = Math.round(workoutExerciseDetails.reduce((total, ex) => total + (ex?.duration || 0), 0));
+          const totalWorkoutDuration = Math.round(workoutExerciseDetailsDetailed.reduce((total, ex) => total + (ex?.duration || 0), 0));
           
           const workoutActivityLog: ActivityLog = {
             id: `workout-${workoutMode.sessionId}`,
@@ -630,7 +651,7 @@ function App() {
             notes: `Workout completed with ${workoutMode.exercises.length} exercises`,
             workout_id: workoutMode.workoutId,
             is_workout: true,
-            exercises: workoutExerciseDetails as {
+            exercises: workoutExerciseDetailsDetailed as {
               exercise_id: string;
               exercise_name: string;
               duration: number;
@@ -1591,41 +1612,20 @@ useEffect(() => {
 
   
 
-  // Trigger sync when authentication state changes and refresh app state after sync
+  // Refresh local state when sync applies server changes
   useEffect(() => {
-    if (isAuthenticated && hasConsent) {
-      console.log('🔐 User authenticated - triggering sync');
-      syncService.sync().then(async (result) => {
-        if (result.success && result.recordsPulled > 0) {
-          console.log('🔄 Sync pulled data from server, refreshing app state...');
-          
-          // Refresh exercises
-          const updatedExercises = await storageService.getExercises();
-          if (updatedExercises.length > 0) {
-            setExercises(updatedExercises);
-          }
-          
-          // Refresh app settings
-          const updatedSettings = await storageService.getAppSettings();
-          if (updatedSettings) {
-            setAppSettings(updatedSettings);
-          }
-
-          // Also broadcast for pages not yet mounted to refresh their own data (workouts, activity logs)
-          try {
-            // No app-level state for workouts/activity logs; just dispatch event for any listeners
-            window.dispatchEvent(new CustomEvent('sync:applied', { detail: { result } }));
-          } catch (e) {
-            console.debug('Workouts refresh dispatch failed (non-fatal):', e);
-          }
-          
-          console.log('✅ App state refreshed after sync');
-        }
-      }).catch(error => {
-        console.error('Auth sync failed:', error);
-      });
-    }
-  }, [isAuthenticated, hasConsent]);
+    const handler = async () => {
+      // Refresh exercises and settings after server changes are applied
+      const [updatedExercises, updatedSettings] = await Promise.all([
+        storageService.getExercises(),
+        storageService.getAppSettings()
+      ]);
+      if (updatedExercises.length > 0) setExercises(updatedExercises);
+      if (updatedSettings) setAppSettings(updatedSettings);
+    };
+    window.addEventListener('sync:applied', handler as EventListener);
+    return () => window.removeEventListener('sync:applied', handler as EventListener);
+  }, []);
 
   // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {

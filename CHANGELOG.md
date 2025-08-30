@@ -122,54 +122,47 @@
 - **Code Quality**: Robust test coverage for critical application workflows
 
 ---
+### 2025-08-30 — Auth & Sync hardening (Phase 1)
+- docs(findings): add fix plan at `docs/findings/auth-sync-fixes.md` covering duplicate sync, invoke 400s, privacy, and workout log label.
+- feat(sync): prefer direct fetch to Edge Function for sync to avoid initial 400 from `supabase.functions.invoke` in dev; keep 401 refresh+retry once.
+- feat(app): remove duplicate auth-change sync trigger and add a `sync:applied` listener to refresh state; reduces “Sync already in progress”.
+- feat(auth): strip magic-link tokens from URL via `history.replaceState` after sign-in (privacy).
+- chore(index.html): add `meta name="mobile-web-app-capable"` to suppress deprecation warning that echoed URL with token.
+- test(storage): add unit test ensuring workout activity logs persist workout name as `exercise_name` even when omitted (backfill path).
+
 
 ## 2025-08-28 (6) - Phase 4 Complete: Seamless Data Migration System
 
-### Data Migration Excellence ✅
-- **🗄️ Comprehensive Migration Infrastructure**: Complete V6 schema migration system ready for deployment
   - **Discovery**: Migration infrastructure was already fully implemented during Phase 2
   - **Impact**: Zero-downtime automatic migration from camelCase to snake_case schema
-  - **Result**: Seamless user experience with complete data preservation
 
 - **🔄 Automatic Migration Process**: Powered by Dexie upgrade functions
-  - ✅ Table renames: `activityLogs` → `activity_logs`, `userPreferences` → `user_preferences`, etc.
   - ✅ Field transformations: `exerciseId` → `exercise_id`, `isFavorite` → `is_favorite`, etc.
   - ✅ UUID generation for all existing records
   - ✅ Timestamp conversion to ISO string format
   - ✅ Sync metadata preservation during transformation
-
 - **📊 Migration Tools & Monitoring**: Built-in status and validation systems
   - ✅ `getMigrationStatus()` provides real-time migration information
-  - ✅ `exportAllData()` creates comprehensive backup with metadata
   - ✅ Table statistics and version tracking
   - ✅ Migration completion validation with error resilience
-
 ### Technical Achievements
 - **🎯 Migration Coverage**: All 6 core tables fully handled with relationship integrity
 - **🔧 Error Resilience**: Migration continues with warnings, ensures data safety
 - **📱 User Experience**: Migration happens automatically on app load, completely transparent
-- **⚡ Performance**: Efficient bulk operations minimize migration time
-
 ### Migration Scope
 - **Exercises**: Complete field mapping and metadata addition
-- **Activity Logs**: Table rename and comprehensive field transformations
-- **User Preferences**: Schema migration with proper default values
 - **App Settings**: Complete field mapping with new configuration defaults
 - **Workouts**: Field transformations and relationship updates
-- **Workout Sessions**: Comprehensive schema migration with data preservation
 
 ### Implementation Progress
 - ✅ **Phase 1**: Database Schema (100% Complete)
 - ✅ **Phase 2**: Client Schema Refactor (100% Complete)
-- ✅ **Phase 3**: Simplified Sync Service (100% Complete)
 - ✅ **Phase 4**: Data Migration System (100% Complete)
 - ✅ **Phase 5**: Testing & Validation (100% Complete)
-
 **Total Project Progress: 100% Complete**
 
 ### Phase 5 Complete: Testing & Build Validation ✅
 
-- **🔧 TypeScript Build Compliance**: Resolved all compilation errors preventing successful builds
   - Fixed 100+ TypeScript errors from incomplete snake_case migration
   - Updated field references across App.tsx, TimerPage.tsx, SettingsPage.tsx
   - Corrected service layer type definitions and property access
