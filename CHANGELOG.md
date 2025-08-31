@@ -1,3 +1,41 @@
+## 2025-08-31
+
+- Hybrid favorites sync (Phase 1):
+  - Store favorites in `user_preferences.favorite_exercises` (TEXT[] of built-in exercise IDs/slugs).
+  - Stop syncing `exercises` table for built-in catalog; favorites toggle updates preferences and reflects locally without marking exercises dirty.
+  - Added Dexie logic to merge favorites into `getExercises()` so UI reflects cross-device state after sync.
+  - Migration: `supabase/migrations/20250831_alter_user_preferences_favorites_to_text_array.sql` changes column type to TEXT[] with safe default.
+  - Next phases will seed canonical UUIDs for built-ins and migrate to a normalized `user_favorites` join.
+
+### Firefox settings sync hardening + code hygiene
+
+#### Fixed
+- Server-to-browser settings sync now reliably applies on Firefox and other browsers without requiring reload:
+  - Immediate theme application during pull and on `sync:applied` events (no flash, respects reduced motion).
+  - Beep volume, sound/vibration toggles, pre‑timer countdown, show exercise demo videos, and data auto‑save now reflect server values cross‑device.
+  - Forced full pull when critical tables (`user_preferences`, `app_settings`) are missing locally, even if a cursor exists.
+  - Singleton deduplication on pull ensures exactly one row for `user_preferences` and `app_settings`.
+  - Conflict resolution: server wins by `updated_at` with special rule preferring server when it has `owner_id` and local does not.
+
+#### Changed
+- Lint/type hygiene: removed unused variables and eliminated `any` in core services (`storageService`, `syncService`, `authService`) and tests; ESLint passes clean.
+- Build validated after changes; unit tests were intentionally skipped for this QA pass per instruction.
+
+#### Notes
+- UX: Settings changes propagate within seconds via visibility-triggered sync and debounced scheduling.
+- Security: No secrets added; follows OWASP guidance. All network paths use HTTPS; no third‑party calls.
+
+## 2025-08-30 (14) - Dexie v8 migration: index workout_id + normalization hardening
+
+### Fixed
+- SchemaError during pre-sync normalization caused by missing `activity_logs.workout_id` index. Added Dexie v8 migration to index `workout_id` and refactored normalization to use scan/filter fallbacks, preventing crashes on existing installs before v8 applies.
+
+### Added
+- Test `src/__tests__/storage-indexes.test.ts` to assert `where('workout_id')` works without throwing when IndexedDB is available.
+
+### Notes
+- Existing users will be upgraded automatically on next app load. The fallback logic ensures pre-v8 databases won’t crash normalization.
+
 ## 2025-08-30 (13) - Phase 2 complete (duration alignment) + Phase 3 diagnostics/resilience
 
 ### Fixed

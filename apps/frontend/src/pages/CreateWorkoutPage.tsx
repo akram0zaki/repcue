@@ -177,9 +177,9 @@ const CreateWorkoutPage: React.FC = () => {
     setError(null);
 
     try {
-      // Create workout exercises
-      const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise, index) => ({
-        id: `we_${Date.now()}_${index}`,
+      // Create workout exercises (use UUIDs)
+      const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => ({
+        id: crypto.randomUUID(),
         exercise_id: exercise.id,
         order: exercise.order,
         custom_duration: exercise.custom_duration,
@@ -188,9 +188,9 @@ const CreateWorkoutPage: React.FC = () => {
         custom_rest_time: exercise.custom_rest_time
       }));
 
-      // Create new workout
+      // Create new workout (use UUID)
       const newWorkout: Workout = {
-        id: `workout_${Date.now()}`,
+        id: crypto.randomUUID(),
         name: workoutName.trim(),
         description: workoutDescription.trim() || undefined,
         exercises: workoutExercises,

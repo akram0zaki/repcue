@@ -371,10 +371,10 @@ export class AuthService {
       await this.handleSignOut();
 
       // Proactively clear any sync errors so banners disappear immediately after sign-out
-      try {
+  try {
         const { SyncService } = await import('./syncService');
         SyncService.getInstance().clearErrors();
-      } catch (e) {
+  } catch {
         // Non-fatal: sync service may not be initialized in some environments
       }
 

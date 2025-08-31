@@ -125,9 +125,10 @@ const EditWorkoutPage: React.FC = () => {
     setError(null);
 
     try {
-      // Create workout exercises
-      const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise, index) => ({
-        id: `we_${Date.now()}_${index}`,
+      // Create workout exercises; use stable UUIDs for new items
+      const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => ({
+        // If the current workout already had a matching workout-exercise entry, preserve its id when possible
+        id: (workout?.exercises?.find(we => we.exercise_id === exercise.id && we.order === exercise.order)?.id) || crypto.randomUUID(),
         exercise_id: exercise.id,
         order: exercise.order,
         custom_duration: exercise.custom_duration,

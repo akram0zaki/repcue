@@ -225,7 +225,7 @@ export class SyncService {
         if (document.visibilityState === 'visible' && this.authService?.getAuthState()?.isAuthenticated) {
           this.scheduleSync();
         }
-      } catch (e) {
+  } catch {
         // Non-fatal
       }
     });
@@ -496,17 +496,32 @@ export class SyncService {
         errors: []
     };
 
+    // Normalize legacy IDs locally to align with server UUID schema before pushing
+    try {
+      const norm = await this.storageService.normalizeIdsForSync();
+      if (norm.normalized_activity_logs || norm.normalized_workout_sessions || norm.normalized_workouts || norm.cleared_workout_id_refs) {
+        console.log('🧹 ID normalization before sync:', norm);
+      }
+    } catch (e) {
+      console.warn('ID normalization failed, proceeding anyway:', e);
+    }
+
     try {
       // Detect initial hydration scenario: brand-new device (no cursor) and no local user data
       const initialHydration = await this.isInitialHydration();
+      // Also force a full pull if critical user tables are missing locally (e.g., user_preferences)
+      const missingCriticalData = await this.needsCriticalDataHydration();
+      const forceFullPull = initialHydration || missingCriticalData;
       if (initialHydration) {
         console.log('🆕 Initial hydration detected: forcing a full pull');
+      } else if (missingCriticalData) {
+        console.log('🧩 Critical data missing locally (e.g., user_preferences) - forcing a full pull');
       }
 
       // Step 1: Gather dirty records from all tables
       const syncRequest: SyncRequest = {
-        // For initial hydration, omit since cursor to request full server state
-        ...(!initialHydration && this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
+  // For initial hydration or when critical data is missing, omit since cursor to request full server state
+  ...(!forceFullPull && this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
         tables: {},
         clientInfo: {
           appVersion: '1.0.0', // TODO: get from package.json
@@ -545,11 +560,11 @@ export class SyncService {
       // Only skip sync if we have no local changes AND we're certain we don't need server data
       // We should always sync on first login (when lastSuccessfulSync is undefined)
       // or when force sync is requested
-  const shouldSkipSync = !initialHydration && !hasChanges && 
-                           this.lastSyncCursor && 
-                           this.lastSuccessfulSync && 
-                           !force &&
-                           (Date.now() - this.lastSuccessfulSync) < 30000; // Only skip if synced within last 30 seconds
+  const shouldSkipSync = !forceFullPull && !hasChanges && 
+           this.lastSyncCursor && 
+           this.lastSuccessfulSync && 
+           !force &&
+           (Date.now() - this.lastSuccessfulSync) < 3000; // Only skip if synced within last 3 seconds
                            
       if (shouldSkipSync) {
         console.log('📋 No local changes to sync and recent successful sync exists, skipping sync call');
@@ -627,7 +642,7 @@ export class SyncService {
             if (dirty.upserts.length > 0 || dirty.deletes.length > 0) {
               result.recordsPushed += dirty.upserts.length + dirty.deletes.length;
             }
-          } catch (e) {
+          } catch {
             // continue
           }
         }
@@ -829,10 +844,10 @@ export class SyncService {
       });
       if (error) {
         console.error('🟥 Invoke error:', {
-          name: (error as any).name,
-          message: error.message,
-          status: (error as any).status,
-          cause: (error as any).cause
+          name: (error as unknown as { name?: string }).name,
+          message: (error as { message?: string }).message,
+          status: (error as unknown as { status?: number }).status,
+          cause: (error as unknown as { cause?: unknown }).cause
         });
         throw error;
       }
@@ -958,6 +973,63 @@ export class SyncService {
               synced_at: new Date().toISOString()
             });
           }
+
+          // Special handling: user_preferences should exist as a single row. Deduplicate and reflect favorites.
+          if (tableName === 'user_preferences') {
+            try {
+              const prefsTable = (db as unknown as { user_preferences?: { toArray: () => Promise<Array<Record<string, unknown>>>; delete: (id: string) => Promise<void> } }).user_preferences;
+              if (prefsTable && typeof prefsTable.toArray === 'function') {
+                const allPrefs = await prefsTable.toArray();
+                // Delete any other rows with different id to avoid ambiguity
+                const others = allPrefs.filter((p) => (p.id as string) !== (serverRecord.id as string));
+                for (const other of others) {
+                  try { await prefsTable.delete(other.id as string); } catch {}
+                }
+
+                // Best-effort immediate UX: update exercises.is_favorite flags per preferences (no dirty)
+                const favRaw = (serverRecord as Record<string, unknown>)['favorite_exercises'];
+                const favorites = Array.isArray(favRaw) ? (favRaw.filter((v): v is string => typeof v === 'string')) : [];
+                const exTable = (db as unknown as { exercises?: { toArray: () => Promise<Array<{ id: string; is_favorite?: boolean }>>; update: (id: string, changes: Record<string, unknown>) => Promise<number> } }).exercises;
+                if (exTable && typeof exTable.toArray === 'function') {
+                  try {
+                    const allEx = await exTable.toArray();
+                    const favSet = new Set(favorites);
+                    const nowIso = new Date().toISOString();
+                    for (const ex of allEx) {
+                      const newVal = favSet.has(ex.id);
+                      if (ex.is_favorite !== newVal) {
+                        await exTable.update(ex.id, { is_favorite: newVal, updated_at: nowIso });
+                      }
+                    }
+                  } catch {}
+                }
+              }
+            } catch {
+              // Ignore non-fatal issues
+            }
+          }
+
+          // Special handling: app_settings should exist as a single row. Deduplicate.
+          if (tableName === 'app_settings') {
+            try {
+              const settingsTable = (db as unknown as { app_settings?: { toArray: () => Promise<Array<Record<string, unknown>>>; delete: (id: string) => Promise<void> } }).app_settings;
+              if (settingsTable && typeof settingsTable.toArray === 'function') {
+                const all = await settingsTable.toArray();
+                const others = all.filter((s) => (s.id as string) !== (serverRecord.id as string));
+                for (const other of others) {
+                  try { await settingsTable.delete(other.id as string); } catch {}
+                }
+                // Apply theme immediately when settings change
+                const dm = (serverRecord as Record<string, unknown>)['dark_mode'];
+                if (typeof dm === 'boolean') {
+                  if (dm) document.documentElement.classList.add('dark');
+                  else document.documentElement.classList.remove('dark');
+                }
+              }
+            } catch {
+              // ignore
+            }
+          }
         } catch (error) {
           console.error(`Error applying upsert for ${tableName}:${serverRecord.id}:`, error);
           // Continue with other records
@@ -987,6 +1059,8 @@ export class SyncService {
     
     for (const tableName of SYNCABLE_TABLES) {
       try {
+  // Phase 1 hybrid: skip exercises (catalog) to avoid unnecessary sync churn
+  if (tableName === 'exercises') continue;
         const table = (db as unknown as Record<string, unknown>)[tableName];
         if (!table || typeof table !== 'object') continue;
 
@@ -1063,6 +1137,29 @@ export class SyncService {
   }
 
   /**
+   * Determine if we are missing critical user-scoped data locally and should force a pull.
+   * Specifically, if user_preferences has no rows but we do have a sync cursor (implying a prior sync),
+   * then another device might have created preferences that we must pull for UX (favorites/locale/dark mode).
+   */
+  private async needsCriticalDataHydration(): Promise<boolean> {
+    try {
+      const db = this.storageService.getDatabase();
+      const prefsTable = (db as unknown as Record<string, unknown>)['user_preferences'];
+      const settingsTable = (db as unknown as Record<string, unknown>)['app_settings'];
+      const counts = await Promise.all([
+        prefsTable && typeof prefsTable === 'object' ? (prefsTable as { count: () => Promise<number> }).count() : Promise.resolve(0),
+        settingsTable && typeof settingsTable === 'object' ? (settingsTable as { count: () => Promise<number> }).count() : Promise.resolve(0)
+      ]);
+      const [prefsCount, settingsCount] = counts;
+      // If we already have a cursor but are missing either preferences or settings locally,
+      // force a full pull to hydrate cross-device personalization.
+      return !!this.lastSyncCursor && (prefsCount === 0 || settingsCount === 0);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Check if there are changes to sync
    */
   async hasChangesToSync(): Promise<boolean> {
@@ -1125,6 +1222,15 @@ export class SyncService {
     localRecord: Record<string, unknown>, 
     serverRecord: Record<string, unknown>
   ): Promise<Record<string, unknown>> {
+  // If local record is anonymous but server has an owner, prefer server for user-scoped tables
+  if ((tableName === 'user_preferences' || tableName === 'app_settings')) {
+    const localOwner = (localRecord as Record<string, unknown>)['owner_id'];
+    const serverOwner = (serverRecord as Record<string, unknown>)['owner_id'];
+  if ((!localOwner || localOwner === null) && serverOwner) {
+      console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (server has owner_id, local is anonymous)`);
+      return serverRecord;
+    }
+  }
   // Use snake_case updated_at consistently across records
   const localUpdatedAt = new Date((localRecord.updated_at as string) || 0);
   const serverUpdatedAt = new Date((serverRecord.updated_at as string) || 0);

@@ -104,6 +104,18 @@ class RepCueDatabase extends Dexie {
       appSettings: null,
       workoutSessions: null,
     });
+
+    // Version 8: Add missing index on activity_logs.workout_id to support queries and normalization
+    // This aligns our IndexedDB indexes with server-side access patterns and prevents Dexie SchemaError
+    this.version(8).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      // Added workout_id to indexed fields
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
   }
 
   /**
@@ -412,6 +424,174 @@ export class StorageService {
     return StorageService.instance;
   }
 
+  // Utility: simple UUID v4 check
+  private isUuid(id: unknown): id is string {
+    if (typeof id !== 'string') return false;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
+  }
+
+  /**
+   * Normalize legacy IDs before syncing so server UUID columns accept inserts.
+   * - Ensures activity_logs.id and workout_sessions.id are UUIDs (renames records when needed).
+   * - Sets workout_id to null for records where it's not a valid UUID.
+   * - Backfills workout activity log names when possible.
+   */
+  public async normalizeIdsForSync(): Promise<{
+    normalized_activity_logs: number;
+    normalized_workout_sessions: number;
+    normalized_workouts: number;
+    cleared_workout_id_refs: number;
+  }> {
+    const now = new Date().toISOString();
+    let normalizedActivityLogs = 0;
+    let normalizedWorkoutSessions = 0;
+    let normalizedWorkouts = 0;
+    let clearedWorkoutRefs = 0;
+
+    await this.db.transaction('rw', this.db.activity_logs, this.db.workout_sessions, this.db.workouts, async () => {
+      // 0) Normalize workouts primary keys and cascade references
+      const allWorkouts = await this.db.workouts.toArray();
+      for (const wk of allWorkouts) {
+        if (!this.isUuid(wk.id)) {
+          const oldId = wk.id as unknown as string;
+          const newId = crypto.randomUUID();
+          const newWorkout: StoredWorkout = {
+            ...wk,
+            id: newId,
+            updated_at: now,
+            deleted: false,
+            version: wk.version || 1,
+            dirty: 1
+          };
+          await this.db.workouts.add(newWorkout);
+          await this.db.workouts.delete(oldId);
+          normalizedWorkouts++;
+          // Update fallback cache
+          try { const fb = this.fallbackStorage.get(`workout_${oldId}`); if (fb) { this.fallbackStorage.delete(`workout_${oldId}`); this.fallbackStorage.set(`workout_${newId}`, newWorkout); } } catch {}
+
+          // Cascade update workout_id references in sessions (fallback scan to avoid index requirement)
+          const allSessions = await this.db.workout_sessions.toArray();
+          const sessionsWithOld = allSessions.filter((s: StoredWorkoutSession) => s.workout_id === oldId);
+          for (const s of sessionsWithOld) {
+            const updated: StoredWorkoutSession = { ...s, workout_id: newId, updated_at: now, dirty: 1 };
+            await this.db.workout_sessions.put(updated);
+          }
+          // Cascade update in activity logs (fallback scan to avoid index requirement)
+          const allLogs = await this.db.activity_logs.toArray();
+          const logsWithOld = allLogs.filter((l: StoredActivityLog) => l.workout_id === oldId);
+          for (const l of logsWithOld) {
+            const updated: StoredActivityLog = { ...l, workout_id: newId, updated_at: now, dirty: 1 };
+            await this.db.activity_logs.put(updated);
+          }
+        }
+      }
+
+      // 1) Normalize workout_sessions primary keys and workout_id
+      const sessions = await this.db.workout_sessions.toArray();
+      for (const session of sessions) {
+        let changed = false;
+
+        // Null invalid workout_id (server column is uuid nullable)
+        if (session.workout_id && !this.isUuid(session.workout_id)) {
+          session.workout_id = undefined;
+          changed = true;
+          clearedWorkoutRefs++;
+        }
+
+        // Ensure UUID id
+        if (!this.isUuid(session.id)) {
+          const oldId = session.id as unknown as string;
+          const newId = crypto.randomUUID();
+          // Delete old, reinsert with new id
+          const newSession: StoredWorkoutSession = {
+            ...session,
+            id: newId,
+            updated_at: now,
+            deleted: false,
+            version: session.version || 1,
+            dirty: 1
+          };
+          await this.db.workout_sessions.add(newSession);
+          await this.db.workout_sessions.delete(oldId);
+          normalizedWorkoutSessions++;
+          // Also update fallback cache key for session if present
+          try { this.fallbackStorage.delete(`session_${oldId}`); } catch {}
+          this.fallbackStorage.set(`session_${newId}`, newSession);
+          continue; // handled via reinsert
+        }
+
+        if (changed) {
+          const updated: StoredWorkoutSession = { ...session, updated_at: now, dirty: 1 };
+          await this.db.workout_sessions.put(updated);
+        }
+      }
+
+      // 2) Normalize activity_logs primary keys and workout_id; backfill workout log names when feasible
+      const logs = await this.db.activity_logs.toArray();
+      for (const log of logs as (StoredActivityLog & { is_workout?: boolean; workout_id?: string | null })[]) {
+        let changed = false;
+
+        // Null invalid workout_id (server column is uuid nullable)
+        if (log.workout_id && !this.isUuid(log.workout_id)) {
+          log.workout_id = undefined;
+          changed = true;
+          clearedWorkoutRefs++;
+        }
+
+        // Ensure exercise_name for workout logs
+        if (log.is_workout) {
+          if (!log.exercise_name || log.exercise_name === 'Unknown Exercise') {
+            if (log.workout_id) {
+              // Try resolve name from workouts table
+              const workout = await this.db.workouts.get(log.workout_id);
+              if (workout?.name) {
+                log.exercise_name = workout.name;
+                changed = true;
+              }
+            }
+            if (!log.exercise_name) {
+              log.exercise_name = 'Workout';
+              changed = true;
+            }
+          }
+        }
+
+        // Ensure UUID id
+        if (!this.isUuid(log.id)) {
+          const oldId = log.id as unknown as string;
+          const newId = crypto.randomUUID();
+          const newLog: StoredActivityLog = {
+            ...log,
+            id: newId,
+            updated_at: now,
+            deleted: false,
+            version: log.version || 1,
+            dirty: 1
+          };
+          await this.db.activity_logs.add(newLog);
+          await this.db.activity_logs.delete(oldId);
+          normalizedActivityLogs++;
+          // Update fallback cache for log if present
+          try { this.fallbackStorage.delete(`log_${oldId}`); } catch {}
+          this.fallbackStorage.set(`log_${newId}`, newLog);
+          continue;
+        }
+
+        if (changed) {
+          const updated: StoredActivityLog = { ...log, updated_at: now, dirty: 1 };
+          await this.db.activity_logs.put(updated);
+        }
+      }
+    });
+
+    return {
+      normalized_activity_logs: normalizedActivityLogs,
+      normalized_workout_sessions: normalizedWorkoutSessions,
+  normalized_workouts: normalizedWorkouts,
+      cleared_workout_id_refs: clearedWorkoutRefs
+    };
+  }
+
   /**
    * Initialize database and handle errors gracefully
    */
@@ -515,8 +695,18 @@ export class StorageService {
     }
 
     try {
-      const storedExercises = await this.db.exercises.toArray();
-      const allExercises = storedExercises.map(this.convertStoredExercise);
+      const [storedExercises, prefs] = await Promise.all([
+        this.db.exercises.toArray(),
+        this.getUserPreferences().catch(() => null)
+      ]);
+      const favorites = prefs?.favorite_exercises || [];
+      const allExercises = storedExercises
+        .map(this.convertStoredExercise)
+        .map(ex => ({
+          ...ex,
+          // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
+          is_favorite: favorites.includes(ex.id)
+        }));
       return filterActiveRecords(allExercises);
     } catch (error) {
       console.warn('Failed to load exercises from IndexedDB:', error);
@@ -527,7 +717,15 @@ export class StorageService {
           exercises.push(this.convertStoredExercise(value as StoredExercise));
         }
       });
-      return filterActiveRecords(exercises);
+      // Merge favorites from preferences fallback if present
+      try {
+        const prefs = await this.getUserPreferences();
+        const favorites = prefs?.favorite_exercises || [];
+        const merged = exercises.map(ex => ({ ...ex, is_favorite: favorites.includes(ex.id) }));
+        return filterActiveRecords(merged);
+      } catch {
+        return filterActiveRecords(exercises);
+      }
     }
   }
 
@@ -546,8 +744,14 @@ export class StorageService {
 
       // Lazy import to avoid upfront bundle cost and circular deps
       const { INITIAL_EXERCISES } = await import('../data/exercises');
+      // Insert catalog entries as-is to keep dirty=0 and avoid syncing to server
       for (const exercise of INITIAL_EXERCISES) {
-        await this.saveExercise(exercise);
+        try {
+          await this.db.exercises.put(exercise as unknown as StoredExercise);
+        } catch (error) {
+          console.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
+          this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
+        }
       }
       return await this.db.exercises.count();
     } catch (error) {
@@ -565,13 +769,28 @@ export class StorageService {
     }
 
     try {
+      // Update preferences source of truth (store slug/id in array)
+      const prefs = await this.ensureUserPreferences();
+      const current = new Set(prefs.favorite_exercises || []);
+      if (current.has(exerciseId)) current.delete(exerciseId); else current.add(exerciseId);
+      await this.updateUserPreferences({ favorite_exercises: Array.from(current) });
+
+      // Best-effort UI reflection: flip local exercise flag WITHOUT marking record dirty
+      const now = new Date().toISOString();
       const exercise = await this.db.exercises.get(exerciseId);
       if (exercise) {
-        const updatedExercise = prepareUpsert({
-          ...exercise,
-          is_favorite: !exercise.is_favorite
-        }, exerciseId);
-        await this.db.exercises.put(updatedExercise);
+        const newVal = !exercise.is_favorite;
+        // Direct update only the necessary fields; do not touch dirty/version/op
+        await this.db.exercises.update(exerciseId, { is_favorite: newVal, updated_at: now } as Partial<StoredExercise>);
+      } else {
+        // Fallback cache path for environments without IndexedDB
+        const key = `exercise_${exerciseId}`;
+        const fallback = this.fallbackStorage.get(key) as StoredExercise | undefined;
+        if (fallback) {
+          fallback.is_favorite = !fallback.is_favorite;
+          fallback.updated_at = now;
+          this.fallbackStorage.set(key, fallback);
+        }
       }
     } catch (error) {
       console.warn('Failed to update exercise favorite:', error);
@@ -579,9 +798,18 @@ export class StorageService {
       const key = `exercise_${exerciseId}`;
       const exercise = this.fallbackStorage.get(key) as StoredExercise | undefined;
       if (exercise) {
+        const now = new Date().toISOString();
         exercise.is_favorite = !exercise.is_favorite;
-        exercise.updated_at = new Date().toISOString();
+        exercise.updated_at = now;
         this.fallbackStorage.set(key, exercise);
+        // Mirror to preferences fallback
+        const prefs = (this.fallbackStorage.get('user_preferences') as UserPreferences | undefined) || await this.ensureUserPreferences();
+        const set = new Set(prefs.favorite_exercises || []);
+        if (set.has(exerciseId)) set.delete(exerciseId); else set.add(exerciseId);
+        prefs.favorite_exercises = Array.from(set);
+        prefs.updated_at = now;
+        prefs.dirty = 1;
+        this.fallbackStorage.set('user_preferences', prefs);
       }
     }
   }
@@ -755,6 +983,70 @@ export class StorageService {
   }
 
   /**
+   * Ensure there is a user_preferences record. If missing, create one with sensible defaults.
+   * Returns the latest preferences (from DB if possible).
+   */
+  public async ensureUserPreferences(overrides: Partial<UserPreferences> = {}): Promise<UserPreferences> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    // Try fetch existing
+    const existing = await this.getUserPreferences();
+    if (existing) {
+      return existing;
+    }
+
+    const now = new Date().toISOString();
+    const base: UserPreferences = {
+      id: crypto.randomUUID(),
+      owner_id: null,
+      updated_at: now,
+      created_at: now,
+      deleted: false,
+      version: 1,
+      // Defaults
+      sound_enabled: true,
+      vibration_enabled: true,
+      default_interval_duration: 30,
+      dark_mode: false,
+      favorite_exercises: [],
+      locale: 'en',
+      units: 'metric',
+      cues: {},
+      rep_speed_factor: 1.0,
+      dirty: 1,
+      op: 'upsert'
+    };
+
+    const merged = { ...base, ...overrides } as UserPreferences;
+    await this.saveUserPreferences(merged);
+    return merged;
+  }
+
+  /**
+   * Patch user preferences with a partial update, creating the record if needed.
+   */
+  public async updateUserPreferences(patch: Partial<UserPreferences>): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    const existing = await this.getUserPreferences();
+    if (existing) {
+      const updated: UserPreferences = prepareUpsert(
+        { ...existing, ...patch } as UserPreferences,
+        existing.id
+      );
+      await this.saveUserPreferences(updated);
+    } else {
+      const created = await this.ensureUserPreferences(patch);
+      // ensureUserPreferences already saved it
+      void created; // no-op
+    }
+  }
+
+  /**
    * Get user preferences
    */
   public async getUserPreferences(): Promise<UserPreferences | null> {
@@ -786,7 +1078,8 @@ export class StorageService {
       throw new Error('Cannot store data without user consent');
     }
 
-    const settingsId = settings.id || crypto.randomUUID();
+  // Ensure UUID id so server accepts row
+  const settingsId = this.isUuid(settings.id) ? settings.id! : crypto.randomUUID();
     const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId);
 
     try {
@@ -1152,8 +1445,7 @@ export class StorageService {
     }
 
     try {
-      const [exercises, activityLogs, userPreferences, appSettings, workouts, workoutSessions] = await Promise.all([
-        this.db.exercises.where('dirty').equals(1).toArray(),
+      const [activityLogs, userPreferences, appSettings, workouts, workoutSessions] = await Promise.all([
         this.db.activity_logs.where('dirty').equals(1).toArray(),
         this.db.user_preferences.where('dirty').equals(1).toArray(),
         this.db.app_settings.where('dirty').equals(1).toArray(),
@@ -1162,7 +1454,9 @@ export class StorageService {
       ]);
 
       return {
-        exercises: exercises.map(this.convertStoredExercise),
+        // Do not sync exercises for the quick favorites-by-preferences path.
+        // Favorites are the only mutable field for built-ins; syncing them as rows causes server rejects.
+        exercises: [],
         activityLogs: activityLogs.map(this.convertStoredActivityLog),
         userPreferences: userPreferences.map(this.convertStoredUserPreferences),
         appSettings: appSettings.map(this.convertStoredAppSettings),
@@ -1259,25 +1553,17 @@ export class StorageService {
       const results = await Promise.all(
         tablesToClaim.map(async ({ table, name }) => {
           try {
-            // Claim records with null, undefined, or empty ownerId
-            // Handle empty string case
-            const emptyStringCount = await table.where('owner_id').equals('').modify(claimData);
-            
-            // Handle null/undefined cases by finding all records and filtering
-            const allRecords = await table.toArray();
-            const nullOrUndefinedRecords = allRecords.filter(record => 
-              record.owner_id == null || record.owner_id === undefined
-            );
-            
-            // Update null/undefined records
-            let nullUndefinedCount = 0;
-            for (const record of nullOrUndefinedRecords) {
-              await table.update(record.id, claimData);
-              nullUndefinedCount++;
+            // Enumerate and update records with empty/null/undefined owner_id
+            const allRecords = await table.toArray() as Array<{ id: string; owner_id?: string | null }>;
+            const targets = allRecords.filter(r => r.owner_id === '' || r.owner_id == null);
+            let modified = 0;
+            for (const rec of targets) {
+              // Use a minimally-typed update signature to avoid any-casts
+              const updater = table as unknown as { update: (id: string, changes: Record<string, unknown>) => Promise<number> };
+              await updater.update(rec.id, claimData as Record<string, unknown>);
+              modified++;
             }
-            
-            const modifiedCount = emptyStringCount + nullUndefinedCount;
-            return { name, count: modifiedCount };
+            return { name, count: modified };
           } catch (error) {
             console.warn(`Failed to claim ${name}:`, error);
             return { name, count: 0 };

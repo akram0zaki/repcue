@@ -175,7 +175,7 @@ export interface UserPreferences extends SyncMetadata {
   vibration_enabled: boolean;
   default_interval_duration: number; // in seconds
   dark_mode: boolean;
-  favorite_exercises: string[]; // exercise UUIDs
+  favorite_exercises: string[]; // Phase 1: built-in exercise IDs/slugs (server column is TEXT[])
   locale: string;
   units: string; // 'metric' | 'imperial'
   cues: Record<string, unknown>; // JSONB object

@@ -1,4 +1,4 @@
-import { test, expect, chromium, BrowserContext } from '@playwright/test';
+import { test, expect, BrowserContext } from '@playwright/test';
 
 async function preClean(context: BrowserContext) {
   const page = await context.newPage();
@@ -20,10 +20,10 @@ async function preClean(context: BrowserContext) {
     localStorage.clear();
     sessionStorage.clear();
     // Clear IndexedDB
-    const dbs = await (indexedDB as any).databases?.();
+    const dbs = await (indexedDB as unknown as { databases?: () => Promise<Array<{ name: string }>> }).databases?.();
     if (dbs?.length) {
       await Promise.all(
-        dbs.map((db: any) => new Promise<void>((resolve) => {
+        dbs.map((db) => new Promise<void>((resolve) => {
           const req = indexedDB.deleteDatabase(db.name);
           req.onsuccess = () => resolve();
           req.onerror = () => resolve();

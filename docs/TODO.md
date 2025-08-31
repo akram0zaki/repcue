@@ -93,4 +93,4 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 ---
 
-Icons: ☐ ✅ ❌ 🔄 ⏳⌛👉
+Icons: ☐ ✅ ❌ 🔄 ⏳⌛👉 🚫

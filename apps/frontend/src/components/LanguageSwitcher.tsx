@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: language names shown in their native forms */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { storageService } from '../services/storageService';
+import { syncService } from '../services/syncService';
 
 interface LanguageSwitcherProps {
   compact?: boolean;
@@ -28,6 +30,15 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   const handleLanguageChange = async (languageCode: string) => {
     try {
       await i18n.changeLanguage(languageCode);
+      // Persist preference for cross-device sync (best-effort)
+      try {
+        await storageService.updateUserPreferences({ locale: languageCode });
+        // Promptly push the change so other devices pick it up
+        void syncService.sync();
+      } catch (e) {
+        // Non-fatal: UI language has already switched via i18n
+        console.debug('Locale persistence skipped:', e);
+      }
     } catch (error) {
       console.error('Failed to change language:', error);
     }

@@ -354,24 +354,18 @@ describe('StorageService', () => {
 
   describe('toggleExerciseFavorite', () => {
     it('should toggle exercise favorite status', async () => {
-      mockDb.exercises.get.mockResolvedValue({
-        ...mockExercise,
-        is_favorite: false
-      })
+  // Seed prefs and exercise
+  await storageService.ensureUserPreferences({ favorite_exercises: [] })
+  await storageService.saveExercise(mockExercise)
+  mockDb.exercises.get.mockResolvedValue({ ...mockExercise, is_favorite: false })
       
       await storageService.toggleExerciseFavorite(mockExercise.id)
       
-      expect(mockDb.exercises.put).toHaveBeenCalledWith({
-        ...mockExercise,
-        is_favorite: true,
-        updated_at: expect.any(String),
-        created_at: expect.any(String),
-        deleted: false,
-        dirty: 1,
-        op: 'upsert',
-        owner_id: null,
-        version: 1
-      })
+  // Preferences updated
+  const prefs = await storageService.getUserPreferences()
+  expect(prefs?.favorite_exercises).toContain(mockExercise.id)
+  // Local exercise flag updated via update()
+  expect(mockDb.exercises.update).toHaveBeenCalledWith(mockExercise.id, expect.objectContaining({ is_favorite: true }))
     })
 
     it('should handle missing exercise gracefully', async () => {

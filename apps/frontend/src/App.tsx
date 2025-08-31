@@ -15,6 +15,7 @@ import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, W
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 import { computeWorkoutDurations } from './utils/workoutDuration';
+import i18n from './i18n';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -394,7 +395,7 @@ function App() {
     const { currentTime, currentExercise, isRunning } = timerState;
     if (!isCompletion && isRunning && currentExercise && currentTime > 0) {
       const activityLog: ActivityLog = {
-        id: `log-${Date.now()}`,
+        id: crypto.randomUUID(),
         exercise_id: currentExercise.id,
         exercise_name: currentExercise.name,
         duration: Math.round(currentTime), // Round to avoid floating-point precision issues
@@ -477,7 +478,7 @@ function App() {
     }
 
     // Create a new workout session for logging
-    const sessionId = `session-${Date.now()}`;
+  const sessionId = crypto.randomUUID();
     
     // Initialize workout mode state
     setTimerState(prev => ({
@@ -601,8 +602,8 @@ function App() {
           const exerciseNameById = new Map(exercises.map(ex => [ex.id, ex.name]));
           
           const workoutActivityLog: ActivityLog = {
-            id: `workout-${workoutMode.sessionId}`,
-            exercise_id: 'workout', // Special identifier for workout entries
+            id: crypto.randomUUID(),
+            exercise_id: crypto.randomUUID(),
             exercise_name: workoutMode.workoutName,
             duration: totalWorkoutDuration,
             timestamp: new Date().toISOString(),
@@ -1160,7 +1161,7 @@ function App() {
                 // Log the activity
                 if (currentExercise) {
                   const activityLog: ActivityLog = {
-                    id: `log-${Date.now()}`,
+                    id: crypto.randomUUID(),
                     exercise_id: currentExercise.id,
                     exercise_name: currentExercise.name,
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
@@ -1278,7 +1279,7 @@ function App() {
             // Log the activity
             if (currentExercise) {
               const activityLog: ActivityLog = {
-                id: `log-${Date.now()}`,
+                id: crypto.randomUUID(),
                 exercise_id: currentExercise.id,
                 exercise_name: currentExercise.name,
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
@@ -1302,7 +1303,7 @@ function App() {
           // Time-based exercise or rep-based without proper tracking
           if (currentExercise) {
             const activityLog: ActivityLog = {
-              id: `log-${Date.now()}`,
+              id: crypto.randomUUID(),
               exercise_id: currentExercise.id,
               exercise_name: currentExercise.name,
               duration: targetTime,
@@ -1346,12 +1347,22 @@ function App() {
 
     // Compute next settings deterministically from current state to avoid relying on
     // a variable mutated inside the state updater (which can be deferred in some modes).
-    const nextSettings: AppSettings = { ...appSettings, ...newSettings };
+    const nextSettings: AppSettings = {
+      ...appSettings,
+      ...newSettings,
+      // Always bump version and mark dirty so sync pushes reliably
+      version: (appSettings.version || 1) + 1,
+      updated_at: new Date().toISOString(),
+      dirty: 1,
+      op: 'upsert'
+    };
     setAppSettings(nextSettings);
 
     // Persist the same object we set in state
     try {
-      await storageService.saveAppSettings(nextSettings);
+  await storageService.saveAppSettings(nextSettings);
+  // Nudge sync so app_settings exist on server for other devices
+  void syncService.sync();
     } catch (error) {
       console.error('Failed to save app settings:', error);
     }
@@ -1486,6 +1497,15 @@ function App() {
           }
           setAppSettings(settingsToSet);
 
+          // Load and apply user preferences (locale) for cross-device sync
+          try {
+            const prefs = await storageService.getUserPreferences();
+            const preferredLocale = prefs?.locale;
+            if (preferredLocale && (i18n.resolvedLanguage || i18n.language) !== preferredLocale) {
+              await i18n.changeLanguage(preferredLocale);
+            }
+          } catch {}
+
           // Set last selected exercise without invoking settings update callback to avoid effect churn
           if (settingsToSet.last_selected_exercise_id) {
             const lastExercise = allExercises.find(
@@ -1518,6 +1538,14 @@ useEffect(() => {
   const cleanup = setupSyncTriggers();
   return cleanup;
 }, []);
+
+  // Proactively nudge a sync on first mount after initialization so cross-device
+  // preferences (favorites/locale/theme) are pulled promptly.
+  useEffect(() => {
+    if (hasConsent) {
+      void syncService.sync();
+    }
+  }, [hasConsent]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1556,6 +1584,8 @@ useEffect(() => {
 
     try {
       await storageService.toggleExerciseFavorite(exercise_id);
+  // Promptly sync so favorites show up on other devices
+  void syncService.sync();
       setExercises(prev => 
         prev.map(exercise => 
           exercise.id === exercise_id 
@@ -1574,12 +1604,28 @@ useEffect(() => {
   useEffect(() => {
     const handler = async () => {
       // Refresh exercises and settings after server changes are applied
-      const [updatedExercises, updatedSettings] = await Promise.all([
+      const [updatedExercises, updatedSettings, updatedPrefs] = await Promise.all([
         storageService.getExercises(),
-        storageService.getAppSettings()
+        storageService.getAppSettings(),
+        storageService.getUserPreferences()
       ]);
       if (updatedExercises.length > 0) setExercises(updatedExercises);
-      if (updatedSettings) setAppSettings(updatedSettings);
+      if (updatedSettings) {
+        setAppSettings(prev => ({ ...prev, ...updatedSettings }));
+        // Apply theme immediately after settings change
+        if (updatedSettings.dark_mode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+      // Apply locale if it changed on another device
+      try {
+        const preferredLocale = updatedPrefs?.locale;
+        if (preferredLocale && (i18n.resolvedLanguage || i18n.language) !== preferredLocale) {
+          await i18n.changeLanguage(preferredLocale);
+        }
+      } catch {}
     };
     window.addEventListener('sync:applied', handler as EventListener);
     return () => window.removeEventListener('sync:applied', handler as EventListener);
