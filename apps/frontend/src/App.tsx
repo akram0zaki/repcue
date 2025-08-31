@@ -61,12 +61,19 @@ const TimerPageWrapper: React.FC<{
     const state = location.state as { 
       selectedExercise?: Exercise; 
       selectedDuration?: number;
-      workoutMode?: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] };
+      // Accept both naming styles for compatibility
+      workoutMode?: { workoutId?: string; workoutName?: string; workout_id?: string; workout_name?: string; exercises: WorkoutExercise[] };
     } | null;
     
     // Handle workout mode navigation
     if (state?.workoutMode && !timerState.isRunning && !timerState.workoutMode) {
-      onStartWorkoutMode(state.workoutMode);
+      const wm = state.workoutMode;
+      const normalized = {
+        workoutId: wm.workoutId ?? wm.workout_id!,
+        workoutName: wm.workoutName ?? wm.workout_name!,
+        exercises: wm.exercises
+      };
+      onStartWorkoutMode(normalized);
       return;
     }
     
@@ -186,6 +193,11 @@ function App() {
 
   // Timer refs for interval management
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const mountedRef = useRef<boolean>(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
   const lastBeepIntervalRef = useRef<number>(0);
 
   // Wake lock for keeping screen active
@@ -201,7 +213,8 @@ function App() {
         ? (Date.now() - startTime) / 1000  // Use decimal seconds for smooth progress
         : Math.floor((Date.now() - startTime) / 1000); // Use whole seconds for time-based
       
-      setTimerState(prev => {
+  if (!mountedRef.current) return; // do not update after unmount
+  setTimerState(prev => {
         // Don't update if timer is not running or target time is not set
         if (!prev.isRunning || !prev.targetTime) {
           return prev;
@@ -225,7 +238,7 @@ function App() {
       });
 
       // Interval beeping: beep every intervalDuration seconds (only for whole seconds)
-      const wholeSecondsElapsed = Math.floor(elapsed);
+  const wholeSecondsElapsed = Math.floor(elapsed);
       if (wholeSecondsElapsed > 0 && wholeSecondsElapsed % appSettings.interval_duration === 0) {
         if (wholeSecondsElapsed !== lastBeepIntervalRef.current) {
           if (appSettings.sound_enabled || appSettings.vibration_enabled) {

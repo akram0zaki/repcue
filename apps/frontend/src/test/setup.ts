@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom'
+// Provide a working IndexedDB implementation for Dexie in tests
+import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
@@ -336,11 +338,7 @@ Object.defineProperty(navigator, 'vibrate', {
 
 // (localStorageMock already defined above)
 
-// Mock IndexedDB
-global.indexedDB = {
-  open: vi.fn(),
-  deleteDatabase: vi.fn(),
-} as any 
+// fake-indexeddb provides a global indexedDB; no manual mock needed
 
 // Make global.navigator writable to support tests that override it
 try {

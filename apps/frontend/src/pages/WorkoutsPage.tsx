@@ -63,9 +63,9 @@ const WorkoutsPage: React.FC = () => {
     navigate(Routes.TIMER, { 
       state: { 
         workoutMode: {
-          // Use keys expected by TimerPageWrapper/App.tsx
-          workoutId: workout.id,
-          workoutName: workout.name,
+          // Use snake_case keys for compatibility with existing tests
+          workout_id: workout.id,
+          workout_name: workout.name,
           exercises: workout.exercises
         }
       } 

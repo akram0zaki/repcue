@@ -2,6 +2,7 @@ import React from 'react';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { useNetworkSync } from '../hooks/useNetworkSync';
 import { useAuth } from '../hooks/useAuth';
+import { DEBUG } from '../config/features';
 
 /**
  * SyncStatusBanner component shows connectivity and sync status
@@ -24,7 +25,7 @@ const SyncStatusBanner: React.FC = () => {
   };
 
   // Show sync error state (highest priority)
-  if (isAuthenticated && syncState.errors.length > 0) {
+  if (DEBUG && isAuthenticated && syncState.errors.length > 0) {
     return (
       <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4" role="alert" data-testid="sync-status-banner">
         <div className="flex items-center justify-between">
@@ -65,7 +66,7 @@ const SyncStatusBanner: React.FC = () => {
   }
 
   // Show sync in progress (for authenticated users)
-  if (isAuthenticated && syncState.isSyncing) {
+  if (DEBUG && isAuthenticated && syncState.isSyncing) {
     return (
       <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 mb-4" role="status" data-testid="sync-status-banner">
         <div className="flex items-center">
@@ -98,8 +99,8 @@ const SyncStatusBanner: React.FC = () => {
               You're offline
             </p>
             <p className="text-xs mt-1">
-              {isAuthenticated 
-                ? "All features work normally. Data will sync when reconnected."
+              {isAuthenticated
+                ? "All features work normally. You'll reconnect automatically."
                 : "All features work normally. Your data is saved locally."
               }
             </p>
@@ -123,14 +124,14 @@ const SyncStatusBanner: React.FC = () => {
                 Connection restored
               </p>
               <p className="text-xs mt-1">
-                {isAuthenticated 
-                  ? "Back online! Data will sync automatically."
+                {isAuthenticated
+                  ? (DEBUG ? "Back online! Data will sync automatically." : "Back online! All features available.")
                   : "Back online! All features available."
                 }
               </p>
             </div>
           </div>
-          {isAuthenticated && syncState.hasChangesToSync && (
+          {DEBUG && isAuthenticated && syncState.hasChangesToSync && (
             <button
               onClick={syncActions.triggerSync}
               className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors ml-3"
@@ -145,7 +146,7 @@ const SyncStatusBanner: React.FC = () => {
   }
 
   // Show pending changes indicator (for authenticated users only)
-  if (isAuthenticated && isOnline && syncState.hasChangesToSync && !syncState.isSyncing) {
+  if (DEBUG && isAuthenticated && isOnline && syncState.hasChangesToSync && !syncState.isSyncing) {
     const lastSyncText = formatTimeAgo(syncState.lastSuccessfulSync);
     
     return (
