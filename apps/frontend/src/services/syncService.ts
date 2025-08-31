@@ -1,8 +1,13 @@
+/**
+ * SyncService — orchestrates client↔server synchronization.
+ * Maintainer docs: see docs/sync/READM.md for architecture, flows, and how to add new entities.
+ */
 import { StorageService } from './storageService';
 import { ConsentService } from './consentService';
 import { AuthService } from './authService';
 import { supabase } from '../config/supabase';
 import { SYNC_ENABLED, SYNC_USE_INVOKE } from '../config/features';
+import logger from '../utils/logger';
 
 export interface SyncResult {
   success: boolean;
@@ -251,7 +256,7 @@ export class SyncService {
         this.lastSyncCursor = stored;
       }
     } catch (error) {
-      console.warn('Failed to load sync cursor:', error);
+  logger.warn('Failed to load sync cursor:', error);
     }
   }
 
@@ -263,7 +268,7 @@ export class SyncService {
       localStorage.setItem('repcue_last_sync_cursor', cursor);
       this.lastSyncCursor = cursor;
     } catch (error) {
-      console.warn('Failed to save sync cursor:', error);
+  logger.warn('Failed to save sync cursor:', error);
     }
   }
 
@@ -271,7 +276,7 @@ export class SyncService {
    * Handle network coming back online
    */
   private handleOnline(): void {
-    console.log('📶 Network connected - scheduling sync');
+  logger.log('📶 Network connected - scheduling sync');
     this.isOnline = true;
     this.notifyListeners();
 
@@ -285,7 +290,7 @@ export class SyncService {
    * Handle network going offline
    */
   private handleOffline(): void {
-    console.log('📵 Network disconnected');
+  logger.log('📵 Network disconnected');
     this.isOnline = false;
     this.notifyListeners();
   }
@@ -302,7 +307,7 @@ export class SyncService {
     this.debounceTimer = window.setTimeout(() => {
   // Avoid piling up if already syncing
   if (this.isSyncing) return;
-  this.sync().catch(err => console.warn('Scheduled sync failed:', err));
+  this.sync().catch(err => logger.warn('Scheduled sync failed:', err));
     }, this.scheduleWindowMs);
   }
 
@@ -348,7 +353,7 @@ export class SyncService {
     try {
       hasChangesToSync = await this.hasChangesToSync();
     } catch (error) {
-      console.error('Error getting sync status with changes:', error);
+  logger.error('Error getting sync status with changes:', error);
       hasChangesToSync = false;
     }
     
@@ -368,18 +373,18 @@ export class SyncService {
         try {
           listener(status);
         } catch (error) {
-          console.error('Error in sync status listener:', error);
+          logger.error('Error in sync status listener:', error);
         }
       });
     }).catch(error => {
-      console.error('Error getting sync status with changes:', error);
+  logger.error('Error getting sync status with changes:', error);
       // Fallback to basic status
       const status = this.getSyncStatus();
       this.listeners.forEach(listener => {
         try {
           listener(status);
         } catch (error) {
-          console.error('Error in sync status listener:', error);
+          logger.error('Error in sync status listener:', error);
         }
       });
     });
@@ -391,32 +396,32 @@ export class SyncService {
   async sync(force: boolean = false): Promise<SyncResult> {
     // Check if sync is enabled
     if (!SYNC_ENABLED) {
-      console.log('🚫 Sync skipped: feature disabled');
+  logger.log('🚫 Sync skipped: feature disabled');
       return this.createEmptyResult();
     }
 
     // Check consent
     if (!this.consentService.hasConsent()) {
-      console.log('🚫 Sync skipped: no storage consent');
+  logger.log('🚫 Sync skipped: no storage consent');
       return this.createEmptyResult();
     }
 
     // Check authentication
     const authState = this.authService.getAuthState();
     if (!authState.isAuthenticated || !authState.accessToken) {
-      console.log('🚫 Sync skipped: not authenticated');
+  logger.log('🚫 Sync skipped: not authenticated');
       return this.createEmptyResult();
     }
 
     // Prevent concurrent syncs
     if (this.isSyncing && !force) {
-      console.log('🔄 Sync already in progress');
+  logger.log('🔄 Sync already in progress');
       return this.syncInProgress || this.createEmptyResult();
     }
 
     // Check network
     if (!this.isOnline) {
-      console.log('📴 Sync skipped: device offline');
+  logger.log('📴 Sync skipped: device offline');
       return {
         success: true,
         tablesProcessed: 0,
@@ -440,18 +445,18 @@ export class SyncService {
       
       if (result.success) {
         this.lastSuccessfulSync = Date.now();
-        console.log(`✅ Sync completed: ${result.tablesProcessed} tables, ${result.recordsPushed} pushed, ${result.recordsPulled} pulled`);
+  logger.log(`✅ Sync completed: ${result.tablesProcessed} tables, ${result.recordsPushed} pushed, ${result.recordsPulled} pulled`);
         // Broadcast a sync completion event so UI can refresh dependent views (workouts, activity logs, etc.)
         if (typeof window !== 'undefined' && result.recordsPulled > 0) {
           try {
             window.dispatchEvent(new CustomEvent('sync:applied', { detail: { result } }));
           } catch (e) {
             // Non-fatal
-            console.debug('sync:applied event dispatch failed (ignored):', e);
+            logger.debug('sync:applied event dispatch failed (ignored):', e);
           }
         }
       } else {
-        console.warn(`⚠️ Sync completed with errors:`, result.errors);
+  logger.warn(`⚠️ Sync completed with errors:`, result.errors);
         this.syncErrors = result.errors;
       }
 
@@ -465,7 +470,7 @@ export class SyncService {
         { originalError: error }
       );
       
-      console.error('❌ Sync failed:', syncError);
+  logger.error('❌ Sync failed:', syncError);
       this.syncErrors = [syncError];
       
       return {
@@ -500,10 +505,10 @@ export class SyncService {
     try {
       const norm = await this.storageService.normalizeIdsForSync();
       if (norm.normalized_activity_logs || norm.normalized_workout_sessions || norm.normalized_workouts || norm.cleared_workout_id_refs) {
-        console.log('🧹 ID normalization before sync:', norm);
+  logger.log('🧹 ID normalization before sync:', norm);
       }
     } catch (e) {
-      console.warn('ID normalization failed, proceeding anyway:', e);
+  logger.warn('ID normalization failed, proceeding anyway:', e);
     }
 
     try {
@@ -513,7 +518,7 @@ export class SyncService {
       const missingCriticalData = await this.needsCriticalDataHydration();
       const forceFullPull = initialHydration || missingCriticalData;
       if (initialHydration) {
-        console.log('🆕 Initial hydration detected: forcing a full pull');
+  logger.log('🆕 Initial hydration detected: forcing a full pull');
       } else if (missingCriticalData) {
         console.log('🧩 Critical data missing locally (e.g., user_preferences) - forcing a full pull');
       }

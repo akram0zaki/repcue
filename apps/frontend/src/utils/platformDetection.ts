@@ -1,3 +1,4 @@
+import logger from './logger'
 /**
  * Simple Platform Detection Test
  * Simplified version to isolate the import issue
@@ -178,9 +179,10 @@ export const usePlatform = (): PlatformInfo => {
 export const logPlatformInfo = (): void => {
   const info = getPlatformInfo();
   console.group('🔍 Platform Detection');
-  console.log('Platform Info:', info);
-  console.log('User Agent:', navigator.userAgent);
-  console.log('Platform:', navigator.platform);
+  // Debug output gated by global flag
+  logger.log('Platform Info:', info)
+  logger.log('User Agent:', navigator.userAgent)
+  logger.log('Platform:', navigator.platform)
   console.log('Install Instructions:', getInstallInstructions());
   console.groupEnd();
 };
