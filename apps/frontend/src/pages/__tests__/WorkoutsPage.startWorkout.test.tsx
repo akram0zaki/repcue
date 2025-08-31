@@ -29,34 +29,36 @@ const mockWorkout: Workout = {
   exercises: [
     {
       id: 'ex-1',
-      exerciseId: 'exercise-1',
+      exercise_id: 'exercise-1',
       order: 1,
-      customSets: 3,
-      customReps: 10,
-      customDuration: 30,
-      customRestTime: 60
+      custom_sets: 3,
+      custom_reps: 10,
+      custom_duration: 30,
+      custom_rest_time: 60
     },
     {
       id: 'ex-2',
-      exerciseId: 'exercise-2',
+      exercise_id: 'exercise-2',
       order: 2,
-      customSets: 3,
-      customReps: 15,
-      customDuration: 45,
-      customRestTime: 90
+      custom_sets: 3,
+      custom_reps: 15,
+      custom_duration: 45,
+      custom_rest_time: 90
     }
   ],
-  isActive: true,
-  scheduledDays: ['monday', 'wednesday', 'friday'],
-  createdAt: new Date('2024-01-01T00:00:00.000Z'),
-  updatedAt: new Date('2024-01-01T00:00:00.000Z')
+  is_active: true,
+  scheduled_days: ['monday', 'wednesday', 'friday'],
+  created_at: new Date('2024-01-01T00:00:00.000Z').toISOString(),
+  updated_at: new Date('2024-01-01T00:00:00.000Z').toISOString(),
+  deleted: false,
+  version: 1
 };
 
 const mockPausedWorkout: Workout = {
   ...mockWorkout,
   id: 'workout-2',
   name: 'Paused Workout',
-  isActive: false
+  is_active: false
 };
 
 describe('WorkoutsPage - Start Workout Feature', () => {
@@ -122,8 +124,8 @@ describe('WorkoutsPage - Start Workout Feature', () => {
     expect(mockNavigate).toHaveBeenCalledWith(Routes.TIMER, {
       state: {
         workoutMode: {
-          workoutId: mockWorkout.id,
-          workoutName: mockWorkout.name,
+          workout_id: mockWorkout.id,
+          workout_name: mockWorkout.name,
           exercises: mockWorkout.exercises
         }
       }

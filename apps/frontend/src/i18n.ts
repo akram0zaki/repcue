@@ -19,7 +19,7 @@ i18n
       'default': ['en']
     },
     supportedLngs: Array.from(supportedLngs),
-  ns: ['common', 'titles', 'a11y', 'exercises'],
+  ns: ['common', 'titles', 'a11y', 'exercises', 'auth'],
   defaultNS: 'common',
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',

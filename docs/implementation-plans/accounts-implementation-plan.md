@@ -19,8 +19,8 @@
 ### Recommended baseline
 
 -   **Frontend**: your current TS/React app with **Dexie** (IndexedDB).
--   **Auth**: **Passkeys (WebAuthn)** first; fallback **email magic
-    link**. (No passwords; great UX.)
+-   **Auth**: ⚠️ **Passkeys (WebAuthn)** first *(NOT IMPLEMENTED)*; ✅ fallback **email magic
+    link** *(IMPLEMENTED)*. ✅ Password auth also available.
 -   **Backend**: **Supabase** (managed Postgres + Row Level Security +
     Auth + Realtime) or **PocketBase** (self‑host, single binary,
     built‑in auth, realtime).
@@ -136,8 +136,8 @@ Row Level Security (if using Postgres/Supabase):
 
 ### 2) Sign up / Sign in
 
--   Offer **"Sign in with Passkey"** (primary), plus **"Continue with
-    Email"** (magic link) and optional OAuth (Apple/Google).
+-   ⚠️ Offer **"Sign in with Passkey"** (primary) *(NOT IMPLEMENTED)*, plus ✅ **"Continue with
+    Email"** (magic link) *(IMPLEMENTED)* and ✅ optional OAuth (Apple/Google/GitHub) *(IMPLEMENTED)*.
 -   On first successful auth:
     1.  **Attach/claim local data**: client sets `owner_id=user.id` on
         all local rows and pushes to server.
@@ -159,44 +159,55 @@ Row Level Security (if using Postgres/Supabase):
 
 ## Step‑by‑step implementation plan
 
-### Phase 0 --- Prep (types & Dexie schema)
+### ✅ Phase 0 --- Prep (types & Dexie schema) [COMPLETED]
 
--   Introduce metadata columns (`id`, `ownerId`, `updatedAt`, `deleted`,
+-   ✅ Introduce metadata columns (`id`, `ownerId`, `updatedAt`, `deleted`,
     `dirty`, `op`, `syncedAt`).
--   Wrap all writes in helpers (set `updatedAt`, mark dirty, tombstones
+-   ✅ Wrap all writes in helpers (set `updatedAt`, mark dirty, tombstones
     on delete).
--   Backfill existing data.
+-   ✅ Backfill existing data.
 
-### Phase 1 --- Auth
+### ✅ Phase 1 --- Auth [COMPLETED]
 
--   Pick provider (Supabase or PocketBase).
--   Add Auth Store + UI.
--   Persist tokens securely.
+-   ✅ Pick provider (Supabase or PocketBase).
+-   ✅ Add Auth Store + UI.
+-   ✅ Persist tokens securely.
+-   ✅ Email/password authentication
+-   ✅ Magic link authentication  
+-   ✅ OAuth providers (Google, Apple, GitHub)
+-   ⚠️  **MISSING: Passkey/WebAuthn authentication** (recommended primary method)
 
-### Phase 2 --- Sync API
+### ✅ Phase 2 --- Sync API [COMPLETED]
 
--   Implement `/sync` endpoint (validate JWT, accept/push rows, build
+-   ✅ Implement `/sync` endpoint (validate JWT, accept/push rows, build
     response).
--   Client SyncService: push dirty → pull → mark clean → update cursor.
--   Trigger on login, foreground, network regain, periodic.
--   Add sync indicator.
+-   ✅ Client SyncService: push dirty → pull → mark clean → update cursor.
+-   ✅ Trigger on login, foreground, network regain, periodic.
+-   ✅ Add sync indicator.
 
-### Phase 3 --- Migration: Signup without losing data
+### ✅ Phase 3 --- Migration: Signup without losing data [COMPLETED]
 
--   On first login: claim local data → push → resolve conflicts →
+-   ✅ On first login: claim local data → push → resolve conflicts →
     banner.
 
-### Phase 4 --- Security & Privacy
+### ✅ Phase 4 --- Security & Privacy [COMPLETED]
 
--   RLS policies.
--   Minimize PII.
--   Delete account flow.
--   Audit logging + rate limiting.
+-   ✅ Enhanced RLS policies with account lockout protection.
+-   ✅ Comprehensive audit logging system.
+-   ✅ Rate limiting for all endpoints.
+-   ✅ GDPR-compliant data export functionality.
+-   ✅ Secure account deletion with grace period.
+-   ✅ Automated data retention and cleanup.
+-   ✅ PII minimization principles.
+-   ✅ Security monitoring and threat detection.
 
-### Phase 5 --- Social foundations
+### 🔄 Phase 5 --- Social foundations [NOT STARTED]
 
--   Add friendship, streak, team tables.
--   Gate features by auth/flags.
+-   ❌ Add friendship tables and relationships.
+-   ❌ Add streak tracking and gamification.
+-   ❌ Add team/group functionality.
+-   ❌ Add achievements and goals system.
+-   ❌ Gate features by auth/flags.
 
 ------------------------------------------------------------------------
 

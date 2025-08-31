@@ -19,33 +19,75 @@ vi.mock('../services/storageService', () => {
     }
   ];
 
+  const mockStorageInstance = {
+    getExercises: vi.fn().mockResolvedValue(INITIAL_EXERCISES),
+    getAppSettings: vi.fn().mockResolvedValue({
+      ...DEFAULT_APP_SETTINGS,
+      lastSelectedExerciseId: 'bicycle-crunches',
+      repSpeedFactor: 1.0
+    }),
+    saveAppSettings: vi.fn().mockResolvedValue(undefined),
+    saveExercise: vi.fn().mockResolvedValue(undefined),
+    saveExercises: vi.fn().mockResolvedValue(undefined),
+    getWorkouts: vi.fn().mockResolvedValue([]),
+    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
+    getDatabase: vi.fn(() => ({})),
+    claimOwnership: vi.fn().mockResolvedValue(true)
+  };
+
   return {
-    storageService: {
-      getExercises: vi.fn().mockResolvedValue(INITIAL_EXERCISES),
-      getAppSettings: vi.fn().mockResolvedValue({
-        ...DEFAULT_APP_SETTINGS,
-        lastSelectedExerciseId: 'bicycle-crunches',
-        repSpeedFactor: 1.0
-      }),
-      saveAppSettings: vi.fn().mockResolvedValue(undefined),
-  saveExercise: vi.fn().mockResolvedValue(undefined),
-      saveExercises: vi.fn().mockResolvedValue(undefined),
-      getWorkouts: vi.fn().mockResolvedValue([]),
-      toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined)
-    }
+    StorageService: {
+      getInstance: vi.fn(() => mockStorageInstance)
+    },
+    storageService: mockStorageInstance
   };
 });
 
-vi.mock('../services/consentService', () => ({
-  consentService: {
+
+
+vi.mock('../services/consentService', () => {
+  const mockConsentInstance = {
     hasConsent: vi.fn().mockReturnValue(true),
     getConsentData: vi.fn().mockReturnValue({
       hasConsented: true,
       version: 2,
       isLatestVersion: true
     })
-  }
-}));
+  };
+
+  return {
+    ConsentService: {
+      getInstance: vi.fn(() => mockConsentInstance)
+    },
+    consentService: mockConsentInstance
+  };
+});
+
+
+
+vi.mock('../services/authService', () => {
+  const mockAuthInstance = {
+    getAuthState: vi.fn().mockReturnValue({
+      isAuthenticated: false,
+      user: undefined,
+      accessToken: undefined,
+      refreshToken: undefined
+    }),
+    onAuthStateChange: vi.fn(() => () => {}),
+    getCurrentSession: vi.fn().mockReturnValue(null),
+    signInWithPassword: vi.fn(),
+    signInWithMagicLink: vi.fn(),
+    signInWithOAuth: vi.fn(),
+    signOut: vi.fn()
+  };
+
+  return {
+    AuthService: {
+      getInstance: vi.fn(() => mockAuthInstance)
+    },
+    authService: mockAuthInstance
+  };
+});
 
 vi.mock('../services/audioService', () => ({
   audioService: {

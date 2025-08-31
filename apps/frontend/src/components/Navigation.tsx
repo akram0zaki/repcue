@@ -108,13 +108,14 @@ const Navigation: React.FC = () => {
 
           {/* Dropdown menu */}
           {showMoreMenu && (
-            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[120px]">
+            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] max-w-[250px]">
+              {/* Settings */}
               <button
                 onClick={() => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 data-testid="nav-settings"
               >
                 {t('navigation.settings')}

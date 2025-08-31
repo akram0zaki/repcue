@@ -9,8 +9,10 @@ vi.mock('../utils/serviceWorker', () => ({
   registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false })
 }));
 
-vi.mock('../services/storageService', () => ({
-  storageService: {
+
+
+vi.mock('../services/storageService', () => {
+  const mockStorageInstance = {
     getExercises: vi.fn().mockResolvedValue([
       {
         id: 'ex1',
@@ -39,12 +41,23 @@ vi.mock('../services/storageService', () => ({
     saveExercise: vi.fn().mockResolvedValue(undefined),
     saveAppSettings: vi.fn().mockResolvedValue(undefined),
     toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
-    getWorkouts: vi.fn().mockResolvedValue([])
-  }
-}));
+    getWorkouts: vi.fn().mockResolvedValue([]),
+    getDatabase: vi.fn(() => ({})),
+    claimOwnership: vi.fn().mockResolvedValue(true)
+  };
+  
+  return {
+    StorageService: {
+      getInstance: vi.fn(() => mockStorageInstance)
+    },
+    storageService: mockStorageInstance
+  };
+});
 
-vi.mock('../services/consentService', () => ({
-  consentService: {
+
+
+vi.mock('../services/consentService', () => {
+  const mockConsentInstance = {
     hasConsent: vi.fn().mockReturnValue(true),
     getConsentData: vi.fn().mockReturnValue({
       hasConsented: true,
@@ -52,8 +65,41 @@ vi.mock('../services/consentService', () => ({
       cookiesAccepted: true,
       analyticsAccepted: false
     })
-  }
-}));
+  };
+
+  return {
+    ConsentService: {
+      getInstance: vi.fn(() => mockConsentInstance)
+    },
+    consentService: mockConsentInstance
+  };
+});
+
+
+
+vi.mock('../services/authService', () => {
+  const mockAuthInstance = {
+    getAuthState: vi.fn().mockReturnValue({
+      isAuthenticated: false,
+      user: undefined,
+      accessToken: undefined,
+      refreshToken: undefined
+    }),
+    onAuthStateChange: vi.fn(() => () => {}),
+    getCurrentSession: vi.fn().mockReturnValue(null),
+    signInWithPassword: vi.fn(),
+    signInWithMagicLink: vi.fn(),
+    signInWithOAuth: vi.fn(),
+    signOut: vi.fn()
+  };
+
+  return {
+    AuthService: {
+      getInstance: vi.fn(() => mockAuthInstance)
+    },
+    authService: mockAuthInstance
+  };
+});
 
 vi.mock('../services/audioService', () => ({
   audioService: {

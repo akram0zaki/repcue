@@ -37,6 +37,11 @@ coverage
 # nyc test coverage
 .nyc_output
 
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
 # TypeScript build info
 *.tsbuildinfo
 
@@ -44,3 +49,8 @@ coverage
 
 # Other
 .local/*
+.mcp.json
+console.log
+next.md
+docs/findings
+docs/testing/findings

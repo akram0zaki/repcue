@@ -16,21 +16,63 @@ vi.mock('../services/storageService', () => {
     getWorkoutSessions: vi.fn().mockResolvedValue([]),
     getActivityLogs: vi.fn().mockResolvedValue([]),
     getAppSettings: vi.fn(),
-  saveExercise: vi.fn().mockResolvedValue(undefined),
-  saveExercises: vi.fn().mockResolvedValue(undefined),
+    saveExercise: vi.fn().mockResolvedValue(undefined),
+    saveExercises: vi.fn().mockResolvedValue(undefined),
     saveActivityLog: vi.fn(),
     saveAppSettings: vi.fn().mockResolvedValue(undefined),
-    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined)
+    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
+    getDatabase: vi.fn(() => ({})),
+    claimOwnership: vi.fn().mockResolvedValue(true)
   };
-  return { storageService: api };
+  return { 
+    StorageService: {
+      getInstance: vi.fn(() => api)
+    },
+    storageService: api 
+  };
 });
 
-vi.mock('../services/consentService', () => ({
-  consentService: {
+
+
+vi.mock('../services/consentService', () => {
+  const mockConsentInstance = {
     hasConsent: vi.fn().mockReturnValue(true),
     getConsentData: vi.fn().mockReturnValue({ hasConsented: true })
-  }
-}));
+  };
+
+  return {
+    ConsentService: {
+      getInstance: vi.fn(() => mockConsentInstance)
+    },
+    consentService: mockConsentInstance
+  };
+});
+
+
+
+vi.mock('../services/authService', () => {
+  const mockAuthInstance = {
+    getAuthState: vi.fn().mockReturnValue({
+      isAuthenticated: false,
+      user: undefined,
+      accessToken: undefined,
+      refreshToken: undefined
+    }),
+    onAuthStateChange: vi.fn(() => () => {}),
+    getCurrentSession: vi.fn().mockReturnValue(null),
+    signInWithPassword: vi.fn(),
+    signInWithMagicLink: vi.fn(),
+    signInWithOAuth: vi.fn(),
+    signOut: vi.fn()
+  };
+
+  return {
+    AuthService: {
+      getInstance: vi.fn(() => mockAuthInstance)
+    },
+    authService: mockAuthInstance
+  };
+});
 
 vi.mock('../services/audioService', () => ({
   audioService: {
@@ -119,38 +161,19 @@ if (!navigator.vibrate) {
 
 describe('Rep-based Exercise Fixes', () => {
   async function ensureTimerPageVisible(user: ReturnType<typeof userEvent.setup>) {
-    try {
-      await screen.findByTestId('timer-page', {}, { timeout: 1500 });
-    } catch {
-      // If timer page not visible, try navigation
-      try {
-        const navTimer = await screen.findByTestId('nav-timer');
-        await user.click(navTimer);
-        await screen.findByTestId('timer-page', {}, { timeout: 5000 });
-      } catch {
-        // Fallback: try clicking Start Timer button from home page
-        try {
-          const startTimerBtn = await screen.findByRole('button', { name: /start timer/i });
-          await user.click(startTimerBtn);
-          await screen.findByTestId('timer-page', {}, { timeout: 5000 });
-        } catch (error) {
-          console.error('Failed to navigate to timer page. Current page content:');
-          console.error(document.body.innerHTML);
-          throw error;
-        }
-      }
-    }
+    // Since we start directly on the timer page, just wait for it to load
+    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
   }
   const mockRepExercise = {
     id: 'test-rep-exercise',
     name: 'Cat-Cow Stretch',
     category: 'flexibility',
     description: 'Test rep-based exercise',
-    exerciseType: 'repetition-based' as const,
-    defaultDuration: 0,
-    defaultReps: 8,
-    defaultSets: 2,
-    isFavorite: false,
+    exercise_type: 'repetition_based' as const,
+    default_duration: 0,
+    default_reps: 8,
+    default_sets: 2,
+    is_favorite: false,
     tags: ['test']
   } as const;
 
@@ -166,7 +189,7 @@ describe('Rep-based Exercise Fixes', () => {
       preTimerCountdown: 0 // start immediately so rep/set UI renders without waiting
     });
 
-    // Navigate to the Timer route so App routes correctly
+    // Navigate directly to timer page to avoid home navigation issues
     window.history.replaceState({}, '', '/timer');
     
     // Dispatch a popstate event to ensure the router responds to the URL change

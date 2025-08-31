@@ -42,7 +42,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
   // Resolve metadata & choose initial variant (square -> portrait -> landscape)
   useEffect(() => {
-    if (!exercise || !mediaIndex || !exercise.hasVideo) {
+    if (!exercise || !mediaIndex || !exercise.has_video) {
       setMedia(null);
       setVideoUrl(null);
       setReady(false);
@@ -130,7 +130,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
       setError(new Error('video-load-failed'));
       // Phase 4 telemetry: consent-aware bounded local log
       if (exercise && videoUrl) {
-        recordVideoLoadError({ exerciseId: exercise.id, url: videoUrl, reason: 'element-error' });
+        recordVideoLoadError({ exercise_id: exercise.id, url: videoUrl, reason: 'element-error' });
       }
     };
     v.addEventListener('loadeddata', loaded);

@@ -5,6 +5,7 @@ import SettingsPage from '../SettingsPage';
 import { consentService } from '../../services/consentService';
 import { storageService } from '../../services/storageService';
 import type { AppSettings, Exercise } from '../../types';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Mock the services
 vi.mock('../../services/consentService', () => ({
@@ -29,43 +30,43 @@ vi.mock('../../services/storageService', () => ({
 // Mock the dynamic import for exercises data
 vi.mock('../../data/exercises', () => ({
   INITIAL_EXERCISES: [
-    {
+    createMockExercise({
       id: '1',
       name: 'Test Exercise 1',
       description: 'Test description 1',
-      exerciseType: 'repetition-based',
-      defaultSets: 3,
-      defaultReps: 12,
+      exercise_type: 'repetition_based',
+      default_sets: 3,
+      default_reps: 12,
       category: 'strength',
       tags: [],
-      isFavorite: false
-    },
-    {
+      is_favorite: false
+    }),
+    createMockExercise({
       id: '2', 
       name: 'Test Exercise 2',
       description: 'Test description 2',
-      exerciseType: 'time-based',
-      defaultSets: 1,
-      defaultDuration: 60,
+      exercise_type: 'time_based',
+      default_sets: 1,
+      default_duration: 60,
       category: 'cardio',
       tags: [],
-      isFavorite: false
-    }
+      is_favorite: false
+    })
   ]
 }));
 
-const mockAppSettings: AppSettings = {
-  intervalDuration: 30,
-  soundEnabled: true,
-  vibrationEnabled: true,
-  beepVolume: 0.5,
-  darkMode: false,
-  autoSave: true,
-  lastSelectedExerciseId: null,
-  preTimerCountdown: 3,
-  defaultRestTime: 60,
-  repSpeedFactor: 1.0
-};
+const mockAppSettings: AppSettings = createMockAppSettings({
+  interval_duration: 30,
+  sound_enabled: true,
+  vibration_enabled: true,
+  beep_volume: 0.5,
+  dark_mode: false,
+  auto_save: true,
+  last_selected_exercise_id: null,
+  pre_timer_countdown: 3,
+  default_rest_time: 60,
+  rep_speed_factor: 1.0
+});
 
 const mockOnUpdateSettings = vi.fn();
 
@@ -155,7 +156,7 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        intervalDuration: 60
+        interval_duration: 60
       });
     });
   });
@@ -168,7 +169,7 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        soundEnabled: false
+        sound_enabled: false
       });
     });
   });
@@ -181,7 +182,7 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        vibrationEnabled: false
+        vibration_enabled: false
       });
     });
   });
@@ -194,7 +195,7 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        beepVolume: 0.75
+        beep_volume: 0.75
       });
     });
   });
@@ -207,7 +208,7 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        darkMode: true
+        dark_mode: true
       });
     });
   });
@@ -220,7 +221,7 @@ describe('SettingsPage', () => {
 
     await waitFor(() => {
       expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        autoSave: false
+        auto_save: false
       });
     });
   });
@@ -229,10 +230,10 @@ describe('SettingsPage', () => {
     const mockExportData = {
       exercises: [],
       activityLogs: [],
-      userPreferences: null,
+      user_preferences: {},
       appSettings: mockAppSettings,
-      exportDate: new Date().toISOString(),
-      version: '1.0'
+      export_date: [new Date().toISOString()],
+      version: ['1.0']
     };
 
     vi.mocked(storageService.exportAllData).mockResolvedValue(mockExportData);
@@ -298,28 +299,28 @@ describe('SettingsPage', () => {
   it('refreshes exercises when refresh button is clicked', async () => {
     // Mock current exercises with some having favorites
     const currentExercises: Exercise[] = [
-      {
+      createMockExercise({
         id: '1',
         name: 'Old Exercise 1',
         description: 'Old description',
         category: 'strength' as const,
-        exerciseType: 'repetition-based' as const,
-        isFavorite: true,
-        defaultSets: 2,
-        defaultReps: 10,
+        exercise_type: 'repetition_based' as const,
+        is_favorite: true,
+        default_sets: 2,
+        default_reps: 10,
         tags: []
-      },
-      {
+      }),
+      createMockExercise({
         id: '2',
         name: 'Old Exercise 2',
         description: 'Old description 2', 
         category: 'cardio' as const,
-        exerciseType: 'time-based' as const,
-        isFavorite: false,
-        defaultSets: 1,
-        defaultDuration: 30,
+        exercise_type: 'time_based' as const,
+        is_favorite: false,
+        default_sets: 1,
+        default_duration: 30,
         tags: []
-      }
+      })
     ];
 
     vi.mocked(storageService.getExercises).mockResolvedValue(currentExercises);
@@ -347,14 +348,14 @@ describe('SettingsPage', () => {
       expect.objectContaining({
         id: '1',
         name: 'Test Exercise 1',
-        isFavorite: false // Should reset favorite status for force refresh
+        is_favorite: false // Should reset favorite status for force refresh
       })
     );
     expect(storageService.saveExercise).toHaveBeenCalledWith(
       expect.objectContaining({
         id: '2',
         name: 'Test Exercise 2', 
-        isFavorite: false // Should reset favorite status for force refresh
+        is_favorite: false // Should reset favorite status for force refresh
       })
     );
   });
@@ -419,10 +420,10 @@ describe('SettingsPage', () => {
     const mockExportData = {
       exercises: [],
       activityLogs: [],
-      userPreferences: null,
-      appSettings: null,
-      exportDate: '2025-01-01',
-      version: '1.0.0'
+      user_preferences: {},
+      app_settings: {},
+      export_date: ['2025-01-01'],
+      version: ['1.0.0']
     };
     vi.mocked(storageService.exportAllData).mockResolvedValue(mockExportData);
     
@@ -509,7 +510,7 @@ describe('SettingsPage', () => {
     const autoSaveToggle = screen.getByLabelText(/auto save/i);
     fireEvent.click(autoSaveToggle);
     
-    expect(mockOnUpdateSettings).toHaveBeenCalledWith({ autoSave: false });
+    expect(mockOnUpdateSettings).toHaveBeenCalledWith({ auto_save: false });
   });
 
   it('shows data section properly formatted', () => {
@@ -519,7 +520,7 @@ describe('SettingsPage', () => {
   });
 
   it('displays correct interval duration in select', () => {
-    const settingsWithLongInterval = { ...mockAppSettings, intervalDuration: 60 };
+    const settingsWithLongInterval = createMockAppSettings({ ...mockAppSettings, interval_duration: 60 });
     renderSettingsPage({ appSettings: settingsWithLongInterval });
     
     const select = screen.getByLabelText(/beep interval/i);

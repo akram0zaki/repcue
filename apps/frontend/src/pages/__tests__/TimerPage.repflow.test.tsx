@@ -4,24 +4,25 @@ import { describe, it, expect, vi } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 describe('TimerPage - Rep Flow', () => {
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'ex1',
     name: 'Push-ups',
     description: 'Classic push-up exercise',
     category: 'strength',
-    exerciseType: 'repetition-based',
-    defaultSets: 3,
-    defaultReps: 8,
-    isFavorite: false,
+    exercise_type: 'repetition_based',
+    default_sets: 3,
+    default_reps: 8,
+    is_favorite: false,
     tags: []
-  };
+  });
 
-  const mockAppSettings: AppSettings = {
+  const mockAppSettings: AppSettings = createMockAppSettings({
     ...DEFAULT_APP_SETTINGS,
-    repSpeedFactor: 1.0
-  };
+    rep_speed_factor: 1.0
+  });
 
   const defaultProps = {
     exercises: [mockExercise],
@@ -52,11 +53,11 @@ describe('TimerPage - Rep Flow', () => {
         workoutName: 'Upper Body',
         exercises: [{
           id: 'we1',
-          exerciseId: 'ex1',
+          exercise_id: 'ex1',
           order: 0,
-          customSets: 3,
-          customReps: 8,
-          customRestTime: 60
+          custom_sets: 3,
+          custom_reps: 8,
+          custom_rest_time: 60
         }],
         currentExerciseIndex: 0,
         currentSet: 0, // Starts at 0
@@ -95,11 +96,11 @@ describe('TimerPage - Rep Flow', () => {
         workoutName: 'Upper Body',
         exercises: [{
           id: 'we1',
-          exerciseId: 'ex1',
+          exercise_id: 'ex1',
           order: 0,
-          customSets: 3,
-          customReps: 8,
-          customRestTime: 60
+          custom_sets: 3,
+          custom_reps: 8,
+          custom_rest_time: 60
         }],
         currentExerciseIndex: 0,
         currentSet: 0,
@@ -147,11 +148,11 @@ describe('TimerPage - Rep Flow', () => {
         workoutName: 'Upper Body',
         exercises: [{
           id: 'we1',
-          exerciseId: 'ex1',
+          exercise_id: 'ex1',
           order: 0,
-          customSets: 3,
-          customReps: 8,
-          customRestTime: 60
+          custom_sets: 3,
+          custom_reps: 8,
+          custom_rest_time: 60
         }],
         currentExerciseIndex: 0,
         currentSet: 0, // Still first set

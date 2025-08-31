@@ -7,30 +7,31 @@ import ExercisePage from '../ExercisePage';
 import { INITIAL_EXERCISES } from '../../data/exercises';
 import type { Exercise } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
+import { createMockExercise } from '../../test/testUtils';
 
 // Mock exercise with many tags for testing expandable functionality
-const mockExerciseWithManyTags: Exercise = {
+const mockExerciseWithManyTags: Exercise = createMockExercise({
   id: 'test-exercise',
   name: 'Test Exercise',
   description: 'A test exercise with many tags',
   category: ExerciseCategory.CORE,
-  exerciseType: ExerciseType.TIME_BASED,
-  defaultDuration: 30,
-  isFavorite: false,
+  exercise_type: ExerciseType.TIME_BASED,
+  default_duration: 30,
+  is_favorite: false,
   tags: ['tag1', 'tag2', 'tag3', 'tag4', 'tag5']
-};
+});
 
 // Mock exercise with few tags
-const mockExerciseWithFewTags: Exercise = {
+const mockExerciseWithFewTags: Exercise = createMockExercise({
   id: 'test-exercise-few',
   name: 'Test Exercise Few',
   description: 'A test exercise with few tags',
   category: ExerciseCategory.CARDIO,
-  exerciseType: ExerciseType.TIME_BASED,
-  defaultDuration: 60,
-  isFavorite: true,
+  exercise_type: ExerciseType.TIME_BASED,
+  default_duration: 60,
+  is_favorite: true,
   tags: ['tag1', 'tag2']
-};
+});
 
 describe('ExercisePage', () => {
   const mockOnToggleFavorite = vi.fn();

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consent Debug</title>
+</head>
+<body>
+    <h1>RepCue Consent Debug</h1>
+    <button onclick="checkConsent()">Check Consent</button>
+    <button onclick="grantConsent()">Grant Consent</button>
+    <button onclick="setDarkMode()">Set Dark Mode</button>
+    <button onclick="checkTheme()">Check Theme</button>
+    <button onclick="clearAll()">Clear All</button>
+    <pre id="output"></pre>
+
+    <script>
+        function log(message) {
+            document.getElementById('output').textContent += message + '\n';
+        }
+
+        function checkConsent() {
+            log('=== Checking Consent ===');
+            const consent = localStorage.getItem('repcue_consent');
+            log('Consent in localStorage: ' + consent);
+            
+            if (consent) {
+                try {
+                    const parsed = JSON.parse(consent);
+                    log('Parsed consent: ' + JSON.stringify(parsed, null, 2));
+                } catch (e) {
+                    log('Failed to parse consent: ' + e.message);
+                }
+            }
+        }
+
+        function grantConsent() {
+            log('=== Granting Consent ===');
+            const consentData = {
+                version: 2,
+                timestamp: new Date().toISOString(),
+                hasConsented: true,
+                cookiesAccepted: true,
+                analyticsAccepted: false,
+                marketingAccepted: false,
+                dataRetentionDays: 365
+            };
+            localStorage.setItem('repcue_consent', JSON.stringify(consentData));
+            log('Consent granted and stored');
+        }
+
+        function setDarkMode() {
+            log('=== Setting Dark Mode ===');
+            localStorage.setItem('repcue-theme', 'dark');
+            
+            // Mock app settings
+            const appSettings = {
+                darkMode: true,
+                soundEnabled: true,
+                vibrationEnabled: true,
+                autoSave: true,
+                repSpeedFactor: 1,
+                updatedAt: new Date().toISOString()
+            };
+            
+            // This would normally go through the storage service
+            // For now, let's see if we can directly access IndexedDB
+            log('Theme set to dark, appSettings would be: ' + JSON.stringify(appSettings, null, 2));
+        }
+
+        function checkTheme() {
+            log('=== Checking Theme ===');
+            const theme = localStorage.getItem('repcue-theme');
+            log('Theme in localStorage: ' + theme);
+        }
+
+        function clearAll() {
+            log('=== Clearing All ===');
+            localStorage.clear();
+            log('localStorage cleared');
+        }
+
+        // Initial check on load
+        window.onload = function() {
+            log('Page loaded, checking initial state...');
+            checkConsent();
+            checkTheme();
+        };
+    </script>
+</body>
+</html>

@@ -76,22 +76,31 @@ function loadLocaleMaps() {
 }
 
 function hasKeyWithAliases(key, map) {
-  // direct
-  if (map[key]) return true
-  // i18next pluralization
-  if (map[`${key}_one`] || map[`${key}_other`]) return true
-  // Aliases: common.<key> when key is bare
-  if (!key.includes('.') && (map[`common.${key}`] || map[`common.${key}_one`] || map[`common.${key}_other`])) return true
-  // Namespace alias: allow referencing namespace.key while stored as key in its own namespace file
-  if (key.includes('.')) {
+  // Support i18next namespace prefix (ns:key.path)
+  let keyNoNs = key.includes(':') ? key.split(':', 2)[1] : key
+  // Also support pseudo-namespace with dot (ns.key.path) used in some files
+  if (!key.includes(':') && key.includes('.')) {
     const idx = key.indexOf('.')
-    const rest = key.slice(idx + 1)
-    if (map[rest] || map[`${rest}_one`] || map[`${rest}_other`]) return true
+    keyNoNs = key.slice(idx + 1)
   }
+
+  // Direct match (with or without namespace)
+  if (map[keyNoNs] || map[key]) return true
+
+  // i18next pluralization forms
+  if (map[`${keyNoNs}_one`] || map[`${keyNoNs}_other`] || map[`${key}_one`] || map[`${key}_other`]) return true
+
+  // Allow bare keys to resolve under common.* (project convention)
+  if (!keyNoNs.includes('.') && (map[`common.${keyNoNs}`] || map[`common.${keyNoNs}_one`] || map[`common.${keyNoNs}_other`])) return true
+
   return false
 }
 
 function main() {
+  const args = process.argv.slice(2)
+  const listFlag = args.includes('--list') || process.env.I18N_LIST === '1'
+  const onlyArg = args.find(a => a.startsWith('--only='))
+  const onlyLocale = onlyArg ? onlyArg.split('=')[1] : undefined
   const files = walkFiles(SRC_DIR, ['.ts', '.tsx'])
   const allKeys = new Set()
   for (const f of files) {
@@ -110,6 +119,22 @@ function main() {
       if (!hasKeyWithAliases(key, map)) missingForLng.push(key)
     }
     if (missingForLng.length) missing[lng] = missingForLng.sort()
+  }
+
+  if (listFlag) {
+    const entries = Object.entries(missing)
+      .filter(([lng]) => !onlyLocale || lng === onlyLocale)
+    if (!entries.length) {
+      console.log('[i18n] No missing keys' + (onlyLocale ? ` for ${onlyLocale}` : ''))
+    } else {
+      console.log('[i18n] Missing keys detail:')
+      for (const [lng, list] of entries) {
+        console.log(`  ${lng}: ${list.length} missing`)
+        for (const k of list) console.log(`   - ${k}`)
+      }
+    }
+    // Do not fail in list mode
+    return
   }
 
   if (Object.keys(missing).length) {

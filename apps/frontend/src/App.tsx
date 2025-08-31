@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { consentService } from './services/consentService';
-import { storageService } from './services/storageService';
+import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
+import { syncService } from './services/syncService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
+import { useAuth } from './hooks/useAuth';
 import ConsentBanner from './components/ConsentBanner';
+import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import { registerServiceWorker } from './utils/serviceWorker';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
+import { computeWorkoutDurations } from './utils/workoutDuration';
+import i18n from './i18n';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -23,6 +28,7 @@ import {
   WorkoutsPage,
   CreateWorkoutPage,
   EditWorkoutPage,
+  AuthCallbackPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -55,12 +61,19 @@ const TimerPageWrapper: React.FC<{
     const state = location.state as { 
       selectedExercise?: Exercise; 
       selectedDuration?: number;
-      workoutMode?: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] };
+      // Accept both naming styles for compatibility
+      workoutMode?: { workoutId?: string; workoutName?: string; workout_id?: string; workout_name?: string; exercises: WorkoutExercise[] };
     } | null;
     
     // Handle workout mode navigation
     if (state?.workoutMode && !timerState.isRunning && !timerState.workoutMode) {
-      onStartWorkoutMode(state.workoutMode);
+      const wm = state.workoutMode;
+      const normalized = {
+        workoutId: wm.workoutId ?? wm.workout_id!,
+        workoutName: wm.workoutName ?? wm.workout_name!,
+        exercises: wm.exercises
+      };
+      onStartWorkoutMode(normalized);
       return;
     }
     
@@ -97,12 +110,58 @@ const TimerPageWrapper: React.FC<{
   return <TimerPage {...props} onResetTimer={handleResetTimer} />;
 };
 
+// Setup sync triggers for various app lifecycle events
+const setupSyncTriggers = () => {
+  // Trigger sync on page visibility change (app foreground)
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      console.log('📱 App came to foreground - triggering sync');
+      syncService.sync().catch(error => {
+        console.warn('Foreground sync failed:', error);
+      });
+    }
+  };
+
+  // Setup periodic sync (every 5 minutes when active)
+  let syncInterval: NodeJS.Timeout | null = null;
+  const setupPeriodicSync = () => {
+    if (syncInterval) {
+      clearInterval(syncInterval);
+    }
+    
+    syncInterval = setInterval(() => {
+      if (!document.hidden) {
+        console.log('⏰ Periodic sync triggered');
+        syncService.sync().catch(error => {
+          console.warn('Periodic sync failed:', error);
+        });
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  };
+
+  // Setup event listeners
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  setupPeriodicSync();
+
+  // Cleanup function
+  return () => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    if (syncInterval) {
+      clearInterval(syncInterval);
+    }
+  };
+};
+
 function App() {
   const autoConsent = typeof window !== 'undefined' && (window as Window & { __AUTO_CONSENT__?: boolean }).__AUTO_CONSENT__ === true;
   const [hasConsent, setHasConsent] = useState<boolean>(autoConsent ? true : consentService.hasConsent());
   const [isLoading, setIsLoading] = useState(true);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
+  
+  // Authentication state
+  // Auth state consumed indirectly via sync:applied listener
+  useAuth();
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -123,17 +182,22 @@ function App() {
 
   // Effect to ensure correct duration for rep-based exercises
   useEffect(() => {
-    if (selectedExercise?.exerciseType === 'repetition-based' && appSettings.repSpeedFactor) {
-    const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
-    const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
+    if (selectedExercise?.exercise_type === 'repetition_based' && appSettings.rep_speed_factor) {
+    const baseRep = selectedExercise.rep_duration_seconds || BASE_REP_TIME;
+    const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
       if (selectedDuration !== repDuration) {
         setSelectedDuration(repDuration as TimerPreset);
       }
     }
-  }, [selectedExercise, appSettings.repSpeedFactor, selectedDuration]);
+  }, [selectedExercise, appSettings.rep_speed_factor, selectedDuration]);
 
   // Timer refs for interval management
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const mountedRef = useRef<boolean>(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
   const lastBeepIntervalRef = useRef<number>(0);
 
   // Wake lock for keeping screen active
@@ -149,7 +213,8 @@ function App() {
         ? (Date.now() - startTime) / 1000  // Use decimal seconds for smooth progress
         : Math.floor((Date.now() - startTime) / 1000); // Use whole seconds for time-based
       
-      setTimerState(prev => {
+  if (!mountedRef.current) return; // do not update after unmount
+  setTimerState(prev => {
         // Don't update if timer is not running or target time is not set
         if (!prev.isRunning || !prev.targetTime) {
           return prev;
@@ -173,17 +238,17 @@ function App() {
       });
 
       // Interval beeping: beep every intervalDuration seconds (only for whole seconds)
-      const wholeSecondsElapsed = Math.floor(elapsed);
-      if (wholeSecondsElapsed > 0 && wholeSecondsElapsed % appSettings.intervalDuration === 0) {
+  const wholeSecondsElapsed = Math.floor(elapsed);
+      if (wholeSecondsElapsed > 0 && wholeSecondsElapsed % appSettings.interval_duration === 0) {
         if (wholeSecondsElapsed !== lastBeepIntervalRef.current) {
-          if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-            audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+          if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+            audioService.playIntervalFeedback(appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume);
           }
           lastBeepIntervalRef.current = wholeSecondsElapsed;
         }
       }
     }, intervalDuration);
-  }, [appSettings.intervalDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume]);
+  }, [appSettings.interval_duration, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume]);
 
   // Separate function for the actual timer logic
   const startActualTimer = useCallback(() => {
@@ -194,12 +259,12 @@ function App() {
     }
 
     // Play start sound and vibration
-    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-      audioService.playStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+    if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+      audioService.playStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
     }
 
     // Announce timer start
-    if (appSettings.soundEnabled) {
+    if (appSettings.sound_enabled) {
       const actualTargetTime = timerState.targetTime || selectedDuration;
       audioService.announceText(`Timer started! ${actualTargetTime} seconds`);
     }
@@ -208,13 +273,13 @@ function App() {
     lastBeepIntervalRef.current = 0; // Reset interval counter
 
     // Check if this is a standalone rep-based exercise (not in workout mode)
-    const isStandaloneRepBased = selectedExercise?.exerciseType === 'repetition-based' && !timerState.workoutMode;
+    const isStandaloneRepBased = selectedExercise?.exercise_type === 'repetition_based' && !timerState.workoutMode;
     
     // For standalone rep-based exercises, set up rep/set tracking
     let repSetState = {};
     if (isStandaloneRepBased) {
-      const defaultSets = selectedExercise.defaultSets || 3;
-      const defaultReps = selectedExercise.defaultReps || 8;
+      const defaultSets = selectedExercise.default_sets || 3;
+      const defaultReps = selectedExercise.default_reps || 8;
       repSetState = {
         currentSet: 0,
         totalSets: defaultSets,
@@ -255,13 +320,13 @@ function App() {
     let isRepBasedExercise = false;
     if (timerState.workoutMode) {
       const currentWorkoutExercise = timerState.workoutMode.exercises[timerState.workoutMode.currentExerciseIndex];
-      const currentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
-      isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+      const currentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
+      isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
     } else {
-      isRepBasedExercise = selectedExercise?.exerciseType === 'repetition-based';
+      isRepBasedExercise = selectedExercise?.exercise_type === 'repetition_based';
     }
     intervalRef.current = createTimerInterval(startTime, isRepBasedExercise);
-  }, [selectedExercise, selectedDuration, appSettings.soundEnabled, appSettings.vibrationEnabled, timerState.workoutMode, createTimerInterval, timerState.targetTime, exercises]);
+  }, [selectedExercise, selectedDuration, appSettings.sound_enabled, appSettings.vibration_enabled, timerState.workoutMode, createTimerInterval, timerState.targetTime, exercises]);
 
   // Timer Functions
   const startTimer = useCallback(async () => {
@@ -276,13 +341,13 @@ function App() {
     }
 
     // If pre-timer countdown is enabled, start countdown phase
-    if (appSettings.preTimerCountdown > 0) {
+    if (appSettings.pre_timer_countdown > 0) {
       // Start countdown phase
       setTimerState(prev => ({
         ...prev,
         isRunning: true,
         isCountdown: true,
-        countdownTime: appSettings.preTimerCountdown,
+        countdownTime: appSettings.pre_timer_countdown,
         currentTime: 0,
         targetTime: selectedDuration,
         currentExercise: selectedExercise || undefined,
@@ -294,8 +359,8 @@ function App() {
       }));
 
       // Announce countdown start
-      if (appSettings.soundEnabled) {
-        audioService.announceText(`Get ready for ${selectedExercise.name}. Starting in ${appSettings.preTimerCountdown} seconds`);
+      if (appSettings.sound_enabled) {
+        audioService.announceText(`Get ready for ${selectedExercise.name}. Starting in ${appSettings.pre_timer_countdown} seconds`);
       }
 
       const countdownStartTime = Date.now();
@@ -303,7 +368,7 @@ function App() {
       // Countdown interval
       intervalRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - countdownStartTime) / 1000);
-        const remaining = appSettings.preTimerCountdown - elapsed;
+        const remaining = appSettings.pre_timer_countdown - elapsed;
 
         if (remaining <= 0) {
           // Countdown finished, start actual timer
@@ -317,11 +382,11 @@ function App() {
           }));
 
           // Beep on each countdown second
-          if (remaining <= 3 && elapsed > appSettings.preTimerCountdown - remaining - 1) {
-            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-              audioService.playIntervalFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume);
+          if (remaining <= 3 && elapsed > appSettings.pre_timer_countdown - remaining - 1) {
+            if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+              audioService.playIntervalFeedback(appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume);
             }
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(remaining.toString());
             }
           }
@@ -331,7 +396,7 @@ function App() {
       // No countdown, start timer immediately
       startActualTimer();
     }
-  }, [selectedExercise, selectedDuration, appSettings.preTimerCountdown, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.beepVolume, wakeLockSupported, requestWakeLock, startActualTimer]);
+  }, [selectedExercise, selectedDuration, appSettings.pre_timer_countdown, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.beep_volume, wakeLockSupported, requestWakeLock, startActualTimer]);
 
   const stopTimer = useCallback(async (isCompletion: boolean = false) => {
     if (intervalRef.current) {
@@ -343,12 +408,16 @@ function App() {
     const { currentTime, currentExercise, isRunning } = timerState;
     if (!isCompletion && isRunning && currentExercise && currentTime > 0) {
       const activityLog: ActivityLog = {
-        id: `log-${Date.now()}`,
-        exerciseId: currentExercise.id,
-        exerciseName: currentExercise.name,
+        id: crypto.randomUUID(),
+        exercise_id: currentExercise.id,
+        exercise_name: currentExercise.name,
         duration: Math.round(currentTime), // Round to avoid floating-point precision issues
-        timestamp: new Date(),
-        notes: `Stopped after ${Math.round(currentTime)}s`
+        timestamp: new Date().toISOString(),
+        notes: `Stopped after ${Math.round(currentTime)}s`,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        deleted: false,
+        version: 1
       };
 
       if (consentService.hasConsent()) {
@@ -357,8 +426,8 @@ function App() {
     }
 
     // Play stop sound and vibration
-    if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-      await audioService.playStopFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+    if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+      await audioService.playStopFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
     }
 
     // Release wake lock when timer stops
@@ -367,7 +436,7 @@ function App() {
     }
 
     setTimerState(prev => ({ ...prev, isRunning: false, isCountdown: false, countdownTime: 0 }));
-  }, [appSettings.soundEnabled, appSettings.vibrationEnabled, wakeLockActive, releaseWakeLock, timerState]);
+  }, [appSettings.sound_enabled, appSettings.vibration_enabled, wakeLockActive, releaseWakeLock, timerState]);
 
   const resetTimer = useCallback(async () => {
     if (intervalRef.current) {
@@ -404,15 +473,15 @@ function App() {
 
     // Reset duration to default for the current exercise
     if (selectedExercise) {
-      if (selectedExercise.exerciseType === 'time-based') {
-        setSelectedDuration(selectedExercise.defaultDuration as TimerPreset);
-      } else if (selectedExercise.exerciseType === 'repetition-based') {
-  const baseRep = selectedExercise.repDurationSeconds || BASE_REP_TIME;
-  const repDuration = Math.round(baseRep * appSettings.repSpeedFactor);
+      if (selectedExercise.exercise_type === 'time_based') {
+        setSelectedDuration(selectedExercise.default_duration as TimerPreset);
+      } else if (selectedExercise.exercise_type === 'repetition_based') {
+  const baseRep = selectedExercise.rep_duration_seconds || BASE_REP_TIME;
+  const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
         setSelectedDuration(repDuration as TimerPreset);
       }
     }
-  }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.repSpeedFactor]);
+  }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.rep_speed_factor]);
 
   // Start workout-guided timer mode
   const startWorkoutMode = useCallback(async (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => {
@@ -422,7 +491,7 @@ function App() {
     }
 
     // Create a new workout session for logging
-    const sessionId = `session-${Date.now()}`;
+  const sessionId = crypto.randomUUID();
     
     // Initialize workout mode state
     setTimerState(prev => ({
@@ -444,21 +513,21 @@ function App() {
 
     // Find the first exercise and load it
     const firstWorkoutExercise = workoutData.exercises[0];
-    const firstExercise = exercises.find(ex => ex.id === firstWorkoutExercise.exerciseId);
+    const firstExercise = exercises.find(ex => ex.id === firstWorkoutExercise.exercise_id);
     
     if (firstExercise) {
       setSelectedExercise(firstExercise);
       
       // Set duration/reps based on exercise type and custom values
-      if (firstExercise.exerciseType === 'time-based') {
-        const duration = firstWorkoutExercise.customDuration || firstExercise.defaultDuration || 30;
+      if (firstExercise.exercise_type === 'time_based') {
+        const duration = firstWorkoutExercise.custom_duration || firstExercise.default_duration || 30;
         setSelectedDuration(duration as TimerPreset);
-      } else if (firstExercise.exerciseType === 'repetition-based') {
+      } else if (firstExercise.exercise_type === 'repetition_based') {
         // For rep-based exercises, we'll use a timer for each repetition
-        const sets = firstWorkoutExercise.customSets || firstExercise.defaultSets || 1;
-        const reps = firstWorkoutExercise.customReps || firstExercise.defaultReps || 10;
-        const repBase = firstExercise.repDurationSeconds || BASE_REP_TIME;
-        const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+        const sets = firstWorkoutExercise.custom_sets || firstExercise.default_sets || 1;
+        const reps = firstWorkoutExercise.custom_reps || firstExercise.default_reps || 10;
+        const repBase = firstExercise.rep_duration_seconds || BASE_REP_TIME;
+        const repDuration = Math.round(repBase * appSettings.rep_speed_factor);
 
         setTimerState(prev => ({
           ...prev,
@@ -476,10 +545,10 @@ function App() {
     }
 
     // Announce workout start
-    if (appSettings.soundEnabled) {
+    if (appSettings.sound_enabled) {
       audioService.announceText(`Starting workout: ${workoutData.workoutName}. ${workoutData.exercises.length} exercises planned.`);
     }
-  }, [exercises, appSettings.soundEnabled, appSettings.repSpeedFactor]);
+  }, [exercises, appSettings.sound_enabled, appSettings.rep_speed_factor]);
 
   // Advance workout to next exercise or complete workout
   const advanceWorkout = useCallback(async () => {
@@ -500,7 +569,7 @@ function App() {
       // Workout completed
       console.log('🎉 Workout completed! Logging workout session...');
       console.log('🔍 About to check consent and session for workout logging...');
-      if (appSettings.soundEnabled) {
+      if (appSettings.sound_enabled) {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
 
@@ -514,17 +583,25 @@ function App() {
       });
       
       if (hasConsent && hasSessionId) {
-        console.log('✅ Creating workout session for logging...');
+  console.log('✅ Creating workout session for logging...');
+  // Compute total workout duration consistent with Activity Log aggregation
+  const { total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
+
         const workoutSession: WorkoutSession = {
           id: workoutMode.sessionId!,
-          workoutId: workoutMode.workoutId,
-          workoutName: workoutMode.workoutName,
-          startTime: new Date(Date.now() - (Math.round(timerState.currentTime) * 1000)), // Approximate start time
-          endTime: new Date(),
+          workout_id: workoutMode.workoutId,
+          workout_name: workoutMode.workoutName,
+          // Best-effort start time based on aggregated duration
+          start_time: new Date(Date.now() - (totalWorkoutDuration * 1000)).toISOString(),
+          end_time: new Date().toISOString(),
           exercises: [], // TODO: Track individual exercise completion in Phase 5
-          isCompleted: true,
-          completionPercentage: 100,
-          totalDuration: Math.round(timerState.currentTime)
+          is_completed: true,
+          completion_percentage: 100,
+          total_duration: totalWorkoutDuration,
+          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          deleted: false,
+          version: 1
         };
         
         try {
@@ -534,52 +611,29 @@ function App() {
           
           // Create a single workout activity log entry for the activity log page
           console.log('📝 Creating workout activity log entry...');
-          const workoutExerciseDetails = workoutMode.exercises.map((workoutExercise) => {
-            const exercise = exercises.find(ex => ex.id === workoutExercise.exerciseId);
-            if (!exercise) return null;
-            
-            let exerciseDuration: number;
-            let sets: number | undefined;
-            let reps: number | undefined;
-            
-            if (exercise.exerciseType === 'time-based') {
-              exerciseDuration = workoutExercise.customDuration || exercise.defaultDuration || 30;
-            } else {
-              sets = workoutExercise.customSets || exercise.defaultSets || 1;
-              reps = workoutExercise.customReps || exercise.defaultReps || 10;
-              const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
-              const repTime = Math.round(baseRep * appSettings.repSpeedFactor);
-              const restTime = sets > 1 ? (sets - 1) * REST_TIME_BETWEEN_SETS : 0;
-              exerciseDuration = (sets * reps * repTime) + restTime;
-            }
-            
-            return {
-              exerciseId: exercise.id,
-              exerciseName: exercise.name,
-              duration: exerciseDuration,
-              sets,
-              reps
-            };
-          }).filter(Boolean);
-          
-          const totalWorkoutDuration = Math.round(workoutExerciseDetails.reduce((total, ex) => total + (ex?.duration || 0), 0));
+          const { perExercise, total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
+          const exerciseNameById = new Map(exercises.map(ex => [ex.id, ex.name]));
           
           const workoutActivityLog: ActivityLog = {
-            id: `workout-${workoutMode.sessionId}`,
-            exerciseId: 'workout', // Special identifier for workout entries
-            exerciseName: workoutMode.workoutName,
+            id: crypto.randomUUID(),
+            exercise_id: crypto.randomUUID(),
+            exercise_name: workoutMode.workoutName,
             duration: totalWorkoutDuration,
-            timestamp: new Date(),
+            timestamp: new Date().toISOString(),
             notes: `Workout completed with ${workoutMode.exercises.length} exercises`,
-            workoutId: workoutMode.workoutId,
-            isWorkout: true,
-            exercises: workoutExerciseDetails as {
-              exerciseId: string;
-              exerciseName: string;
-              duration: number;
-              sets?: number;
-              reps?: number;
-            }[]
+            workout_id: workoutMode.workoutId,
+            is_workout: true,
+            exercises: perExercise.map(d => ({
+              exercise_id: d.exercise_id,
+              exercise_name: exerciseNameById.get(d.exercise_id) || 'Unknown Exercise',
+              duration: d.duration,
+              ...(d.sets ? { sets: d.sets } : {}),
+              ...(d.reps ? { reps: d.reps } : {})
+            })),
+            updated_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            deleted: false,
+            version: 1
           };
           
           console.log(`📝 Saving workout activity log:`, workoutActivityLog);
@@ -615,12 +669,12 @@ function App() {
       // Move to next exercise
       const nextExerciseIndex = currentIndex + 1;
       const nextWorkoutExercise = workoutMode.exercises[nextExerciseIndex];
-      const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exerciseId);
+      const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exercise_id);
 
       if (nextExercise) {
         // Check if we need a rest period
         const currentWorkoutExercise = workoutMode.exercises[currentIndex];
-        const restTime = currentWorkoutExercise.customRestTime || 30; // Default 30s rest
+        const restTime = currentWorkoutExercise.custom_rest_time || 30; // Default 30s rest
 
         if (restTime > 0) {
           // Start rest period
@@ -642,7 +696,7 @@ function App() {
             countdownTime: 0
           }));
 
-          if (appSettings.soundEnabled) {
+          if (appSettings.sound_enabled) {
             audioService.announceText(`Rest time: ${restTime} seconds. Next exercise: ${nextExercise.name}`);
           }
 
@@ -698,14 +752,14 @@ function App() {
           }));
 
           // Set duration/reps for next exercise
-          if (nextExercise.exerciseType === 'time-based') {
-            const duration = nextWorkoutExercise.customDuration || nextExercise.defaultDuration || 30;
+          if (nextExercise.exercise_type === 'time_based') {
+            const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
             setSelectedDuration(duration as TimerPreset);
-          } else if (nextExercise.exerciseType === 'repetition-based') {
-            const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
-            const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
-            const repBase = nextExercise.repDurationSeconds || BASE_REP_TIME;
-            const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+          } else if (nextExercise.exercise_type === 'repetition_based') {
+            const sets = nextWorkoutExercise.custom_sets || nextExercise.default_sets || 1;
+            const reps = nextWorkoutExercise.custom_reps || nextExercise.default_reps || 10;
+            const repBase = nextExercise.rep_duration_seconds || BASE_REP_TIME;
+            const repDuration = Math.round(repBase * appSettings.rep_speed_factor);
             
             setTimerState(prev => ({
               ...prev,
@@ -721,13 +775,13 @@ function App() {
             setSelectedDuration(repDuration as TimerPreset);
           }
 
-          if (appSettings.soundEnabled) {
+          if (appSettings.sound_enabled) {
             audioService.announceText(`Next exercise: ${nextExercise.name}`);
           }
         }
       }
     }
-  }, [timerState, selectedExercise?.name, exercises, appSettings.soundEnabled, appSettings.repSpeedFactor, resetTimer]);
+  }, [timerState, selectedExercise?.name, exercises, appSettings.sound_enabled, appSettings.rep_speed_factor, resetTimer]);
 
   // Handle timer completion
   useEffect(() => {
@@ -746,7 +800,7 @@ function App() {
       if (workoutMode) {
         // Get the actual current exercise from workout mode for accurate logging
         const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
-        const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
+        const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
         console.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
         console.log('Workout state:', {
           currentExerciseIndex: workoutMode.currentExerciseIndex,
@@ -769,18 +823,18 @@ function App() {
           }
           
           const nextWorkoutExercise = workoutMode.exercises[nextExerciseIndex];
-          const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exerciseId);
+          const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exercise_id);
           
           if (nextExercise) {
             console.log('Rest completed, changing selectedExercise from', selectedExercise?.name, 'to', nextExercise.name);
             setSelectedExercise(nextExercise);
 
             // Set duration/reps for next exercise
-            if (nextExercise.exerciseType === 'time-based') {
-              const duration = nextWorkoutExercise.customDuration || nextExercise.defaultDuration || 30;
+            if (nextExercise.exercise_type === 'time_based') {
+              const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
               console.log('Setting duration for', nextExercise.name, ':', {
-                customDuration: nextWorkoutExercise.customDuration,
-                defaultDuration: nextExercise.defaultDuration,
+                custom_duration: nextWorkoutExercise.custom_duration,
+                default_duration: nextExercise.default_duration,
                 finalDuration: duration
               });
               setSelectedDuration(duration as TimerPreset);
@@ -801,11 +855,11 @@ function App() {
                 isCountdown: false,
                 countdownTime: 0
               }));
-            } else if (nextExercise.exerciseType === 'repetition-based') {
-              const sets = nextWorkoutExercise.customSets || nextExercise.defaultSets || 1;
-              const reps = nextWorkoutExercise.customReps || nextExercise.defaultReps || 10;
-              const repBase = nextExercise.repDurationSeconds || BASE_REP_TIME;
-              const repDuration = Math.round(repBase * appSettings.repSpeedFactor);
+            } else if (nextExercise.exercise_type === 'repetition_based') {
+              const sets = nextWorkoutExercise.custom_sets || nextExercise.default_sets || 1;
+              const reps = nextWorkoutExercise.custom_reps || nextExercise.default_reps || 10;
+              const repBase = nextExercise.rep_duration_seconds || BASE_REP_TIME;
+              const repDuration = Math.round(repBase * appSettings.rep_speed_factor);
               
               setSelectedDuration(repDuration as TimerPreset);
               
@@ -830,7 +884,7 @@ function App() {
               }));
             }
 
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(`Rest complete. Starting ${nextExercise.name}`);
             }
 
@@ -845,14 +899,14 @@ function App() {
           // Exercise completed (not in rest period)
           // Use the actual current exercise from workout mode for accurate processing
           const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
-          const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exerciseId);
+          const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
           
           console.log('Processing exercise completion for:', actualCurrentExercise?.name);
-          console.log('Exercise type:', actualCurrentExercise?.exerciseType);
+          console.log('Exercise type:', actualCurrentExercise?.exercise_type);
           console.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
           
           // Check if this is a repetition-based exercise that needs rep/set advancement
-          if (actualCurrentExercise?.exerciseType === 'repetition-based' && workoutMode.totalReps && workoutMode.totalSets) {
+          if (actualCurrentExercise?.exercise_type === 'repetition_based' && workoutMode.totalReps && workoutMode.totalSets) {
             console.log('Processing rep-based exercise completion...');
             const currentRep = workoutMode.currentRep || 0;
             const currentSet = workoutMode.currentSet || 0;
@@ -876,7 +930,7 @@ function App() {
               }));
               
               // More reps to go, announce next rep
-              if (appSettings.soundEnabled) {
+              if (appSettings.sound_enabled) {
                 audioService.announceText(`Rep ${nextRep + 1} of ${totalReps}`);
               }
               
@@ -916,13 +970,13 @@ function App() {
                   targetTime: REST_TIME_BETWEEN_SETS
                 }));
                 
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
                 }
                 
                 // Play rest start feedback
-                if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                  audioService.playRestStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                  audioService.playRestStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                 }
                 
                 // Start rest timer
@@ -942,13 +996,13 @@ function App() {
 
                     if (remaining <= 0) {
                       // Rest completed, transition to next set
-                      if (appSettings.soundEnabled) {
+                      if (appSettings.sound_enabled) {
                         audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
                       }
                       
                       // Play rest end feedback
-                      if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                        audioService.playRestEndFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                      if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                        audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                       }
                       
                       // Clear rest interval to prevent double triggers
@@ -957,8 +1011,8 @@ function App() {
                       // Start new timer for next set immediately
                       const nextSetStartTime = Date.now();
                       // Use helper function - check if current exercise is rep-based
-                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
-                      const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exercise_id);
+                      const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
                       intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                       
                       return {
@@ -984,7 +1038,7 @@ function App() {
                 }, 1000);
               } else {
                 // All sets completed for this exercise, advance to next exercise
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText('Exercise completed!');
                 }
                 
@@ -1003,7 +1057,7 @@ function App() {
         // Standard timer completion (non-workout mode)
         
         // Check if this is a standalone repetition-based exercise
-        if (currentExercise?.exerciseType === 'repetition-based' && timerState.totalReps && timerState.totalSets) {
+        if (currentExercise?.exercise_type === 'repetition_based' && timerState.totalReps && timerState.totalSets) {
           const currentRep = timerState.currentRep || 0;
           const currentSet = timerState.currentSet || 0;
           const totalReps = timerState.totalReps;
@@ -1023,7 +1077,7 @@ function App() {
             
             if (nextRep < totalReps) {
               // More reps to go, announce next rep
-              if (appSettings.soundEnabled) {
+              if (appSettings.sound_enabled) {
                 audioService.announceText(`Rep ${nextRep + 1} of ${totalReps}`);
               }
               
@@ -1048,13 +1102,13 @@ function App() {
                   targetTime: REST_TIME_BETWEEN_SETS
                 }));
                 
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
                 }
                 
                 // Play rest start feedback
-                if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                  audioService.playRestStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                  audioService.playRestStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                 }
                 
                 // Start rest timer
@@ -1074,13 +1128,13 @@ function App() {
 
                     if (remaining <= 0) {
                       // Rest completed, transition to next set
-                      if (appSettings.soundEnabled) {
+                      if (appSettings.sound_enabled) {
                         audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
                       }
                       
                       // Play rest end feedback
-                      if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                        audioService.playRestEndFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                      if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                        audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                       }
                       
                       // Clear rest interval to prevent double triggers
@@ -1089,8 +1143,8 @@ function App() {
                       // Start new timer for next set immediately
                       const nextSetStartTime = Date.now();
                       // Use helper function - check if current exercise is rep-based
-                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
-                      const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                      const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exercise_id);
+                      const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
                       intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                       
                       return {
@@ -1113,19 +1167,23 @@ function App() {
                 }, 1000);
               } else {
                 // All reps and sets completed
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(`Exercise completed! Great job on ${currentExercise.name}`);
                 }
                 
                 // Log the activity
                 if (currentExercise) {
                   const activityLog: ActivityLog = {
-                    id: `log-${Date.now()}`,
-                    exerciseId: currentExercise.id,
-                    exerciseName: currentExercise.name,
+                    id: crypto.randomUUID(),
+                    exercise_id: currentExercise.id,
+                    exercise_name: currentExercise.name,
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
-                    timestamp: new Date(),
-                    notes: `Completed ${totalSets} sets of ${totalReps} reps`
+                    timestamp: new Date().toISOString(),
+                    notes: `Completed ${totalSets} sets of ${totalReps} reps`,
+                    updated_at: new Date().toISOString(),
+                    created_at: new Date().toISOString(),
+                    deleted: false,
+                    version: 1
                   };
 
                   if (consentService.hasConsent()) {
@@ -1150,13 +1208,13 @@ function App() {
               targetTime: REST_TIME_BETWEEN_SETS
             }));
             
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(`Set completed! Rest for ${REST_TIME_BETWEEN_SETS} seconds`);
             }
             
             // Play rest start feedback
-            if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-              audioService.playRestStartFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+            if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+              audioService.playRestStartFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
             }
             
             // Start rest timer
@@ -1176,13 +1234,13 @@ function App() {
 
                 if (remaining <= 0) {
                   // Rest completed, transition to next set
-                  if (appSettings.soundEnabled) {
+                  if (appSettings.sound_enabled) {
                     audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
                   }
                   
                   // Play rest end feedback
-                  if (appSettings.soundEnabled || appSettings.vibrationEnabled) {
-                    audioService.playRestEndFeedback(appSettings.soundEnabled, appSettings.vibrationEnabled);
+                  if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+                    audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
                   }
                   
                   // Clear rest interval to prevent double triggers
@@ -1194,8 +1252,8 @@ function App() {
                   // Start new timer for next set immediately
                   const nextSetStartTime = Date.now();
                   // Use helper function - check if current exercise is rep-based
-                  const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exerciseId);
-                  const isRepBasedExercise = currentExercise?.exerciseType === 'repetition-based';
+                  const currentExercise = exercises.find(ex => ex.id === prev.workoutMode?.exercises[prev.workoutMode.currentExerciseIndex]?.exercise_id);
+                  const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
                   intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
                   
                   return { 
@@ -1218,7 +1276,7 @@ function App() {
 
               // Beep at 3, 2, 1 seconds remaining during rest
               if (remaining <= 3 && remaining > 0) {
-                if (appSettings.soundEnabled) {
+                if (appSettings.sound_enabled) {
                   audioService.announceText(remaining.toString());
                 }
               }
@@ -1227,19 +1285,23 @@ function App() {
             return;
           } else {
             // All reps and sets completed
-            if (appSettings.soundEnabled) {
+            if (appSettings.sound_enabled) {
               audioService.announceText(`Exercise completed! Great job on ${currentExercise.name}`);
             }
             
             // Log the activity
             if (currentExercise) {
               const activityLog: ActivityLog = {
-                id: `log-${Date.now()}`,
-                exerciseId: currentExercise.id,
-                exerciseName: currentExercise.name,
+                id: crypto.randomUUID(),
+                exercise_id: currentExercise.id,
+                exercise_name: currentExercise.name,
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
-                timestamp: new Date(),
-                notes: `Completed ${totalSets} sets of ${totalReps} reps`
+                timestamp: new Date().toISOString(),
+                notes: `Completed ${totalSets} sets of ${totalReps} reps`,
+                updated_at: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                deleted: false,
+                version: 1
               };
 
               if (consentService.hasConsent()) {
@@ -1254,12 +1316,16 @@ function App() {
           // Time-based exercise or rep-based without proper tracking
           if (currentExercise) {
             const activityLog: ActivityLog = {
-              id: `log-${Date.now()}`,
-              exerciseId: currentExercise.id,
-              exerciseName: currentExercise.name,
+              id: crypto.randomUUID(),
+              exercise_id: currentExercise.id,
+              exercise_name: currentExercise.name,
               duration: targetTime,
-              timestamp: new Date(),
-              notes: `Completed ${targetTime}s interval timer`
+              timestamp: new Date().toISOString(),
+              notes: `Completed ${targetTime}s interval timer`,
+              updated_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
+              deleted: false,
+              version: 1
             };
 
             if (consentService.hasConsent()) {
@@ -1271,13 +1337,13 @@ function App() {
           stopTimer(true);
 
           // Announce completion
-          if (appSettings.soundEnabled) {
+          if (appSettings.sound_enabled) {
             audioService.announceText(`Timer completed! Great job on ${currentExercise?.name}`);
           }
         }
       }
     }
-  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.soundEnabled, appSettings.vibrationEnabled, appSettings.repSpeedFactor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
+  }, [timerState, stopTimer, advanceWorkout, exercises, appSettings.sound_enabled, appSettings.vibration_enabled, appSettings.rep_speed_factor, selectedExercise?.name, selectedDuration, startActualTimer, createTimerInterval]);
 
   // Cleanup timer interval on unmount
   useEffect(() => {
@@ -1292,11 +1358,24 @@ function App() {
   const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
     if (!hasConsent) return;
 
-    const updatedSettings = { ...appSettings, ...newSettings };
-    setAppSettings(updatedSettings);
+    // Compute next settings deterministically from current state to avoid relying on
+    // a variable mutated inside the state updater (which can be deferred in some modes).
+    const nextSettings: AppSettings = {
+      ...appSettings,
+      ...newSettings,
+      // Always bump version and mark dirty so sync pushes reliably
+      version: (appSettings.version || 1) + 1,
+      updated_at: new Date().toISOString(),
+      dirty: 1,
+      op: 'upsert'
+    };
+    setAppSettings(nextSettings);
 
+    // Persist the same object we set in state
     try {
-      await storageService.saveAppSettings(updatedSettings);
+  await storageService.saveAppSettings(nextSettings);
+  // Nudge sync so app_settings exist on server for other devices
+  void syncService.sync();
     } catch (error) {
       console.error('Failed to save app settings:', error);
     }
@@ -1304,22 +1383,43 @@ function App() {
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
     setSelectedExercise(exercise);
-    updateAppSettings({ lastSelectedExerciseId: exercise ? exercise.id : null });
+    updateAppSettings({ last_selected_exercise_id: exercise ? exercise.id : null });
     
     // Set appropriate duration for rep-based exercises
-    if (exercise?.exerciseType === 'repetition-based') {
-      const currentSettings = settings || appSettings;
-      const baseRep = exercise.repDurationSeconds || BASE_REP_TIME;
-      const repDuration = Math.round(baseRep * currentSettings.repSpeedFactor);
-      setSelectedDuration(repDuration as TimerPreset);
+    if (exercise?.exercise_type === 'repetition_based') {
+      if (settings) {
+        // Use provided settings
+        const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+        const repDuration = Math.round(baseRep * settings.rep_speed_factor);
+        setSelectedDuration(repDuration as TimerPreset);
+      } else {
+        // Use current settings from state
+        setAppSettings(current => {
+          const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+          const repDuration = Math.round(baseRep * current.rep_speed_factor);
+          setSelectedDuration(repDuration as TimerPreset);
+          return current; // Don't change settings, just read them
+        });
+      }
     }
-  }, [appSettings, updateAppSettings]);
+  }, [updateAppSettings]);
 
-  // Initialize app data after consent
+  // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
     const initializeApp = async () => {
       if (hasConsent) {
         try {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('🚀 Initializing app with consent granted');
+            
+            // Add storage service to window for debugging
+            if (typeof window !== 'undefined') {
+              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
+              console.log('🔧 Debug helpers: window.storageService, window.resetDB()');
+            }
+          }
+
           // Register service worker for offline functionality
           console.log('🚀 Initializing PWA capabilities...');
           const maybePromise = registerServiceWorker();
@@ -1364,7 +1464,7 @@ function App() {
                 // Use latest exercise data but preserve user's favorite status (automatic refresh)
                 return {
                   ...latestExercise,
-                  isFavorite: storedExercise.isFavorite
+                  is_favorite: storedExercise.is_favorite
                 };
               }
               return storedExercise; // Keep old exercise if not found in latest data
@@ -1388,11 +1488,19 @@ function App() {
           // Load app settings
           const storedSettings = await storageService.getAppSettings();
           
+          if (process.env.NODE_ENV === 'development') {
+            console.log('⚙️ Loaded stored settings:', storedSettings);
+          }
+          
           // Merge with defaults to handle new settings properties
           const settingsToSet = storedSettings ? {
             ...DEFAULT_APP_SETTINGS,
             ...storedSettings
           } : DEFAULT_APP_SETTINGS;
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('⚙️ Final settings to set:', settingsToSet);
+          }
           
           if (!storedSettings) {
             await storageService.saveAppSettings(DEFAULT_APP_SETTINGS);
@@ -1402,26 +1510,55 @@ function App() {
           }
           setAppSettings(settingsToSet);
 
-          // Set last selected exercise
-          if (settingsToSet.lastSelectedExerciseId) {
+          // Load and apply user preferences (locale) for cross-device sync
+          try {
+            const prefs = await storageService.getUserPreferences();
+            const preferredLocale = prefs?.locale;
+            if (preferredLocale && (i18n.resolvedLanguage || i18n.language) !== preferredLocale) {
+              await i18n.changeLanguage(preferredLocale);
+            }
+          } catch {}
+
+          // Set last selected exercise without invoking settings update callback to avoid effect churn
+          if (settingsToSet.last_selected_exercise_id) {
             const lastExercise = allExercises.find(
-              (ex: Exercise) => ex.id === settingsToSet.lastSelectedExerciseId
+              (ex: Exercise) => ex.id === settingsToSet.last_selected_exercise_id
             );
             if (lastExercise) {
-              handleSetSelectedExercise(lastExercise, settingsToSet);
+              setSelectedExercise(lastExercise);
+              // Compute initial duration if rep-based
+              if (lastExercise.exercise_type === 'repetition_based') {
+                const baseRep = lastExercise.rep_duration_seconds || BASE_REP_TIME;
+                const repDuration = Math.round(baseRep * settingsToSet.rep_speed_factor) as TimerPreset;
+                setSelectedDuration(repDuration);
+              }
             }
           }
-        } catch (error) {
-          console.error('Failed to initialize app data:', error);
-          // Fallback to initial exercises
-          setExercises(INITIAL_EXERCISES);
-        }
+      } catch (error) {
+        console.error('Failed to initialize app data:', error);
+        // Fallback to initial exercises
+        setExercises(INITIAL_EXERCISES);
       }
-      setIsLoading(false);
-    };
+    }
+    setIsLoading(false);
+  };
 
-    initializeApp();
-  }, [hasConsent, handleSetSelectedExercise]);
+  initializeApp();
+}, [hasConsent]);
+
+// Cleanup sync triggers on unmount
+useEffect(() => {
+  const cleanup = setupSyncTriggers();
+  return cleanup;
+}, []);
+
+  // Proactively nudge a sync on first mount after initialization so cross-device
+  // preferences (favorites/locale/theme) are pulled promptly.
+  useEffect(() => {
+    if (hasConsent) {
+      void syncService.sync();
+    }
+  }, [hasConsent]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1455,15 +1592,17 @@ function App() {
   
 
   // Update exercise favorite status
-  const toggleExerciseFavorite = async (exerciseId: string) => {
+  const toggleExerciseFavorite = async (exercise_id: string) => {
     if (!hasConsent) return;
 
     try {
-      await storageService.toggleExerciseFavorite(exerciseId);
+      await storageService.toggleExerciseFavorite(exercise_id);
+  // Promptly sync so favorites show up on other devices
+  void syncService.sync();
       setExercises(prev => 
         prev.map(exercise => 
-          exercise.id === exerciseId 
-            ? { ...exercise, isFavorite: !exercise.isFavorite }
+          exercise.id === exercise_id 
+            ? { ...exercise, is_favorite: !exercise.is_favorite }
             : exercise
         )
       );
@@ -1474,14 +1613,64 @@ function App() {
 
   
 
-  // Apply dark mode to document
+  // Refresh local state when sync applies server changes
   useEffect(() => {
-    if (appSettings.darkMode) {
+    const handler = async () => {
+      // Refresh exercises and settings after server changes are applied
+      const [updatedExercises, updatedSettings, updatedPrefs] = await Promise.all([
+        storageService.getExercises(),
+        storageService.getAppSettings(),
+        storageService.getUserPreferences()
+      ]);
+      if (updatedExercises.length > 0) setExercises(updatedExercises);
+      if (updatedSettings) {
+        setAppSettings(prev => ({ ...prev, ...updatedSettings }));
+        // Apply theme immediately after settings change
+        if (updatedSettings.dark_mode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+      // Apply locale if it changed on another device
+      try {
+        const preferredLocale = updatedPrefs?.locale;
+        if (preferredLocale && (i18n.resolvedLanguage || i18n.language) !== preferredLocale) {
+          await i18n.changeLanguage(preferredLocale);
+        }
+      } catch {}
+    };
+    window.addEventListener('sync:applied', handler as EventListener);
+    return () => window.removeEventListener('sync:applied', handler as EventListener);
+  }, []);
+
+  // Early theme detection to prevent flash - use system preference as fallback
+  useEffect(() => {
+    // Check system preference for initial theme
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (prefersDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [appSettings.darkMode]);
+  }, []);
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (appSettings.dark_mode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Debug logging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🎨 Theme applied:', appSettings.dark_mode ? 'dark' : 'light', {
+        hasConsent,
+        dark_mode: appSettings.dark_mode
+      });
+    }
+  }, [appSettings.dark_mode, hasConsent]);
 
   // Show consent banner if no consent
   if (!hasConsent) {
@@ -1507,6 +1696,7 @@ function App() {
     canUseBrowserRouter ? (
       <Router>
       <ChunkErrorBoundary>
+        <MigrationSuccessBanner />
         <AppShell>
           <Suspense fallback={createRouteLoader('page')}>
             <Routes>
@@ -1597,6 +1787,14 @@ function App() {
                       appSettings={appSettings}
                       onUpdateSettings={updateAppSettings}
                     />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.AUTH_CALLBACK} 
+                element={
+                  <Suspense fallback={createRouteLoader('Auth Callback')}>
+                    <AuthCallbackPage />
                   </Suspense>
                 } 
               />

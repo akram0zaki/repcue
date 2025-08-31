@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ExercisePage from '../ExercisePage';
@@ -41,13 +41,13 @@ describe('ExercisePage - video preview', () => {
     name: 'Bicycle Crunches',
     description: 'Alternate elbow to knee',
     category: 'core',
-    exerciseType: 'time-based',
-    defaultDuration: 30,
-    defaultSets: 1,
-    defaultReps: 0,
+    exercise_type: 'time_based',
+    default_duration: 30,
+    default_sets: 1,
+    default_reps: 0,
     tags: ['core'],
-    hasVideo: true,
-    isFavorite: false,
+    has_video: true,
+    is_favorite: false,
   } as any;
 
   const renderPage = () =>

@@ -5,19 +5,20 @@ import * as telemetry from '../../telemetry/videoTelemetry';
 import { ConsentService } from '../../services/consentService';
 import type { Exercise } from '../../types';
 import type { ExerciseMediaIndex } from '../../types/media';
+import { createMockExercise } from '../../test/testUtils';
 
-const exercise: Exercise = {
+const exercise: Exercise = createMockExercise({
   id: 'jumping-jacks',
   name: 'Jumping Jacks',
   description: 'A basic warmup move',
   category: 'cardio',
-  exerciseType: 'repetition-based',
-  defaultSets: 1,
-  defaultReps: 10,
-  isFavorite: false,
+  exercise_type: 'repetition_based',
+  default_sets: 1,
+  default_reps: 10,
+  is_favorite: false,
   tags: [],
-  hasVideo: true
-};
+  has_video: true
+});
 
 const mediaIndex: ExerciseMediaIndex = {
   'jumping-jacks': { id: 'jumping-jacks', repsPerLoop: 1, fps: 30, video: { square: '/videos/jumping-jacks-square.mp4' } }
@@ -41,7 +42,7 @@ beforeEach(() => {
 
 describe('useExerciseVideo', () => {
   it('returns null video when exercise.hasVideo is false', () => {
-    const { result } = renderHook(() => useExerciseVideo({ exercise: { ...exercise, hasVideo: false }, mediaIndex, enabled: true, isRunning: false, isActiveMovement: false, isPaused: false }));
+    const { result } = renderHook(() => useExerciseVideo({ exercise: { ...exercise, has_video: false }, mediaIndex, enabled: true, isRunning: false, isActiveMovement: false, isPaused: false }));
     expect(result.current.media).toBeNull();
     expect(result.current.videoUrl).toBeNull();
   });

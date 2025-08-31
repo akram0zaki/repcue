@@ -1,3 +1,4 @@
+import logger from '../utils/logger'
 /**
  * Audio and haptic feedback service for exercise intervals
  * Handles beeps, vibrations, and accessibility announcements
@@ -44,7 +45,7 @@ export class AudioService {
     try {
       this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     } catch (error) {
-      console.warn('Web Audio API not supported:', error);
+  logger.warn('Web Audio API not supported:', error);
     }
   }
 
@@ -144,7 +145,7 @@ export class AudioService {
       try {
         navigator.vibrate(pattern);
       } catch (error) {
-        console.warn('Vibration not supported or failed:', error);
+  logger.warn('Vibration not supported or failed:', error);
       }
     }
   }

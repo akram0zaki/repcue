@@ -8,6 +8,11 @@ import { consentService } from '../services/consentService';
 import { SpeakerIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useAuth } from '../hooks/useAuth';
+import { syncService } from '../services/syncService';
+import DataExportButton from '../components/security/DataExportButton';
+import DeleteAccountModal from '../components/security/DeleteAccountModal';
+import { ProfileSection } from '../components/ProfileSection';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -17,20 +22,23 @@ interface SettingsPageProps {
 const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettings }) => {
   const { t } = useTranslation(['common']);
   const [showClearDataToast, setShowClearDataToast] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
-    onUpdateSettings({ beepVolume: volume });
+    onUpdateSettings({ beep_volume: volume });
     
     // Play a test beep at the new volume
-    if (appSettings.soundEnabled) {
+    if (appSettings.sound_enabled) {
       await audioService.playIntervalBeep(volume);
     }
   };
 
   const handleIntervalChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const duration = parseInt(event.target.value);
-    onUpdateSettings({ intervalDuration: duration });
+    onUpdateSettings({ interval_duration: duration });
   };
 
   const handleExportData = async () => {
@@ -60,6 +68,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     setShowClearDataToast(true);
   };
 
+  const handleSyncNow = async () => {
+    try {
+      setIsManualSyncing(true);
+      await syncService.sync(true);
+    } catch (err) {
+      console.error('Manual sync failed:', err);
+    } finally {
+      setIsManualSyncing(false);
+    }
+  };
+
   const confirmClearData = async () => {
     try {
       // Clear all application data
@@ -87,7 +106,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       // This gives users a clean slate with the latest exercise definitions
       const refreshedExercises = INITIAL_EXERCISES.map(exercise => ({
         ...exercise,
-        isFavorite: false // Reset all favorites for a complete refresh
+        is_favorite: false // Reset all favorites for a complete refresh
       }));
       
       // Save all refreshed exercises (this will overwrite existing ones)
@@ -105,13 +124,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const hasConsent = consentService.hasConsent();
   const consentStatus = consentService.getConsentStatus();
 
-  // Debug logging for production troubleshooting
-  console.log('SettingsPage - Consent Status:', consentStatus);
-  console.log('SettingsPage - hasConsent:', hasConsent);
-
   return (
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4 max-w-md">
+        {/* Profile Section */}
+        <ProfileSection 
+          onViewProfile={() => {
+            // TODO: Open profile settings modal
+            console.log('View profile clicked');
+          }}
+        />
+
         {/* Audio Settings */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
@@ -126,16 +149,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </label>
             <button
               id="sound-enabled"
-              onClick={() => onUpdateSettings({ soundEnabled: !appSettings.soundEnabled })}
+              onClick={() => onUpdateSettings({ sound_enabled: !appSettings.sound_enabled })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.soundEnabled 
+                appSettings.sound_enabled 
                   ? 'bg-blue-600' 
                   : 'bg-gray-200 dark:bg-gray-600'
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.soundEnabled 
+                  appSettings.sound_enabled 
                     ? 'translate-x-6 toggle-switch-on' 
                     : 'translate-x-1 toggle-switch-off'
                 }`}
@@ -150,7 +173,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 {t('settings.beepVolume')}
               </label>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {Math.round(appSettings.beepVolume * 100)}%
+                {Math.round(appSettings.beep_volume * 100)}%
               </span>
             </div>
             <input
@@ -159,9 +182,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               min="0.1"
               max="1.0"
               step="0.1"
-              value={appSettings.beepVolume}
+              value={appSettings.beep_volume}
               onChange={handleVolumeChange}
-              disabled={!appSettings.soundEnabled}
+              disabled={!appSettings.sound_enabled}
               className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
             />
             <div className="grid grid-cols-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -178,16 +201,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </label>
             <button
               id="vibration-enabled"
-              onClick={() => onUpdateSettings({ vibrationEnabled: !appSettings.vibrationEnabled })}
+              onClick={() => onUpdateSettings({ vibration_enabled: !appSettings.vibration_enabled })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.vibrationEnabled 
+                appSettings.vibration_enabled 
                   ? 'bg-blue-600' 
                   : 'bg-gray-200 dark:bg-gray-600'
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.vibrationEnabled 
+                  appSettings.vibration_enabled 
                     ? 'translate-x-6 toggle-switch-on' 
                     : 'translate-x-1 toggle-switch-off'
                 }`}
@@ -209,7 +232,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 {t('settings.preTimerCountdown')}
               </label>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {appSettings.preTimerCountdown === 0 ? t('common.off') : `${appSettings.preTimerCountdown}${t('common.secondsShortSuffix')}`}
+                {appSettings.pre_timer_countdown === 0 ? t('common.off') : `${appSettings.pre_timer_countdown}${t('common.secondsShortSuffix')}`}
               </span>
             </div>
             <input
@@ -218,8 +241,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               min="0"
               max="10"
               step="1"
-              value={appSettings.preTimerCountdown}
-              onChange={(e) => onUpdateSettings({ preTimerCountdown: parseInt(e.target.value) })}
+              value={appSettings.pre_timer_countdown}
+              onChange={(e) => onUpdateSettings({ pre_timer_countdown: parseInt(e.target.value) })}
               className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
             />
             <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -239,7 +262,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </label>
             <select
               id="interval-duration"
-              value={appSettings.intervalDuration}
+              value={appSettings.interval_duration}
               onChange={handleIntervalChange}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -267,16 +290,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </label>
             <button
               id="dark-mode"
-              onClick={() => onUpdateSettings({ darkMode: !appSettings.darkMode })}
+              onClick={() => onUpdateSettings({ dark_mode: !appSettings.dark_mode })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.darkMode 
+                appSettings.dark_mode 
                   ? 'bg-blue-600' 
                   : 'bg-gray-200 dark:bg-gray-600'
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.darkMode 
+                  appSettings.dark_mode 
                     ? 'translate-x-6 toggle-switch-on' 
                     : 'translate-x-1 toggle-switch-off'
                 }`}
@@ -290,15 +313,15 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </label>
             <button
               id="exercise-videos"
-              onClick={() => onUpdateSettings({ showExerciseVideos: !appSettings.showExerciseVideos })}
+              onClick={() => onUpdateSettings({ show_exercise_videos: !appSettings.show_exercise_videos })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.showExerciseVideos ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
+                appSettings.show_exercise_videos ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
               }`}
         data-testid="toggle-exercise-videos"
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.showExerciseVideos 
+                  appSettings.show_exercise_videos 
                     ? 'translate-x-6 toggle-switch-on' 
                     : 'translate-x-1 toggle-switch-off'
                 }`}
@@ -334,16 +357,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </label>
             <button
               id="auto-save"
-              onClick={() => onUpdateSettings({ autoSave: !appSettings.autoSave })}
+              onClick={() => onUpdateSettings({ auto_save: !appSettings.auto_save })}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.autoSave 
+                appSettings.auto_save 
                   ? 'bg-blue-600' 
                   : 'bg-gray-200 dark:bg-gray-600'
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.autoSave 
+                  appSettings.auto_save 
                     ? 'translate-x-6 toggle-switch-on' 
                     : 'translate-x-1 toggle-switch-off'
                 }`}
@@ -392,6 +415,21 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </p>
           </div>
 
+          {/* Sync Now Button */}
+          <div className="mb-3">
+            <button
+              onClick={handleSyncNow}
+              disabled={!hasConsent || !isAuthenticated || isManualSyncing}
+              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              data-testid="btn-sync-now"
+            >
+              {isManualSyncing ? t('settings.syncInProgress') : t('settings.syncNow')}
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {t('settings.syncNowHelp')}
+            </p>
+          </div>
+
           {/* Refresh Exercises Button */}
           <div className="mb-3">
             <button
@@ -420,6 +458,39 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </p>
           </div>
         </div>
+
+        {/* Security & Privacy Settings */}
+        {isAuthenticated && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mt-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              {t('settings.securityPrivacy')}
+            </h2>
+            
+            {/* Data Export */}
+            <div className="mb-4">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('settings.exportYourData')}
+              </h3>
+              <DataExportButton className="w-full" />
+            </div>
+
+            {/* Account Deletion */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('settings.deleteAccount')}
+              </h3>
+              <button
+                onClick={() => setShowDeleteAccountModal(true)}
+                className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+              >
+                {t('settings.deleteMyAccount')}
+              </button>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t('settings.deleteAccountHelp')}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Clear Data Confirmation Toast */}
@@ -431,7 +502,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         title={t('settings.clearAllDataAndReset')}
         message={t('settings.clearAllDataMessage')}
         confirmText={t('settings.clearAllData')}
-        cancelText={t('cancel')}
+        cancelText={t('common.cancel')}
+      />
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteAccountModal}
+        onClose={() => setShowDeleteAccountModal(false)}
+        onSuccess={() => {
+          setShowDeleteAccountModal(false);
+          // User will be signed out automatically
+        }}
       />
     </div>
   );

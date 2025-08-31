@@ -5,6 +5,7 @@ import React from 'react';
 import TimerPage from '../TimerPage';
 import type { Exercise, TimerState, AppSettings } from '../../types';
 import { DEFAULT_APP_SETTINGS, type TimerPreset } from '../../constants';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Mock the audio service
 vi.mock('../../services/audioService', () => ({
@@ -25,23 +26,23 @@ vi.mock('../../hooks/useWakeLock', () => ({
 }));
 
 // Mock data exercise
-const mockRepBasedExercise: Exercise = {
+const mockRepBasedExercise: Exercise = createMockExercise({
   id: 'pushups',
   name: 'Push-ups',
   description: 'Classic push-up exercise',
   category: 'strength',
-  exerciseType: 'repetition-based',
-  defaultDuration: 30,
-  defaultSets: 3,
-  defaultReps: 8,
-  isFavorite: false,
+  exercise_type: 'repetition_based',
+  default_duration: 30,
+  default_sets: 3,
+  default_reps: 8,
+  is_favorite: false,
   tags: [],
-};
+});
 
-const mockAppSettings: AppSettings = {
+const mockAppSettings: AppSettings = createMockAppSettings({
   ...DEFAULT_APP_SETTINGS,
-  repSpeedFactor: 1.0,
-};
+  rep_speed_factor: 1.0,
+});
 
 describe('TimerPage - Standalone Rep-Based Exercise', () => {
   const mockFunctions = {

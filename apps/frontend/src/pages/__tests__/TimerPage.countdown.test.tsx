@@ -4,22 +4,23 @@ import TimerPage from '../TimerPage';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
 import type { Exercise, TimerState } from '../../types';
 import { ExerciseType } from '../../types';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
-const mockExercise: Exercise = {
+const mockExercise: Exercise = createMockExercise({
   id: 'test-exercise',
   name: 'Test Exercise',
   description: 'Test description for countdown',
   category: 'core',
-  exerciseType: ExerciseType.TIME_BASED,
-  defaultDuration: 30,
-  isFavorite: false,
+  exercise_type: ExerciseType.TIME_BASED,
+  default_duration: 30,
+  is_favorite: false,
   tags: ['test']
-};
+});
 
 describe('TimerPage - Pre-Timer Countdown Feature', () => {
   const defaultProps = {
     exercises: [mockExercise],
-    appSettings: { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 5 },
+    appSettings: createMockAppSettings({ ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 5 }),
     timerState: {
       isRunning: false,
       currentTime: 0,
@@ -57,7 +58,7 @@ describe('TimerPage - Pre-Timer Countdown Feature', () => {
   it('shows "Start" button when countdown is disabled', () => {
     const propsWithoutCountdown = {
       ...defaultProps,
-      appSettings: { ...DEFAULT_APP_SETTINGS, preTimerCountdown: 0 }
+      appSettings: createMockAppSettings({ ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 0 })
     };
     
     render(<TimerPage {...propsWithoutCountdown} />);

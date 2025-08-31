@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom'
+// Provide a working IndexedDB implementation for Dexie in tests
+import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
@@ -263,23 +265,35 @@ try {
         removeFromFavorites: 'Remove from favorites',
         addToFavorites: 'Add to favorites',
         addToFavoritesAria: 'Add {{name}} to favorites',
-        timeBased: 'Time-based',
-        repBased: 'Rep-based',
+        timeBased: {
+          name: 'Time-based'
+        },
+        repBased: {
+          name: 'Rep-based'
+        },
         defaultDuration: 'Default: {{duration}}',
         defaultSetsReps: 'Default: {{sets}} sets × {{reps}} reps',
         showFewerTags: 'Show fewer tags',
         showMoreTags_one: 'Show {{count}} more tag',
         showMoreTags_other: 'Show {{count}} more tags',
-        showLess: 'Show less'
+        showLess: 'Show less',
+        previewVideo: 'Preview video',
+        previewUnavailable: 'Video is not available at this time'
   }
   };
   // Reinitialize i18n for tests with in-memory resources to avoid async backend
   await i18n.init({
     lng: 'en',
     fallbackLng: 'en',
-    // Provide both flattened keys and nested compatibility under common.common
-    resources: { en: { common: { ...enBundle, common: enBundle } } },
-    ns: ['common'],
+    // Provide both flattened keys and nested compatibility under common.common, plus exercises namespace
+    resources: { en: { 
+      common: { ...enBundle, common: enBundle },
+      exercises: {
+        timeBased: { name: 'Time-based' },
+        repBased: { name: 'Rep-based' }
+      }
+    } },
+    ns: ['common', 'exercises'],
     defaultNS: 'common',
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
@@ -324,11 +338,7 @@ Object.defineProperty(navigator, 'vibrate', {
 
 // (localStorageMock already defined above)
 
-// Mock IndexedDB
-global.indexedDB = {
-  open: vi.fn(),
-  deleteDatabase: vi.fn(),
-} as any 
+// fake-indexeddb provides a global indexedDB; no manual mock needed
 
 // Make global.navigator writable to support tests that override it
 try {

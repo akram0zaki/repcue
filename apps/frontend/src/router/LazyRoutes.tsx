@@ -180,6 +180,12 @@ export const EditWorkoutPage = lazy(() =>
   }))
 );
 
+export const AuthCallbackPage = lazy(() => 
+  import('../pages/AuthCallbackPage').catch(() => ({
+    default: () => <div>Error loading Auth Callback page</div>
+  }))
+);
+
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule
 // See: src/router/routeUtils.tsx

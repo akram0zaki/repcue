@@ -1,49 +1,132 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { SyncService, type SyncResult, type SyncStatus } from '../syncService';
-import { QueueService } from '../queueService';
-import { StorageService } from '../storageService';
-import { ConsentService } from '../consentService';
 
 // Mock dependencies
-vi.mock('../queueService');
-vi.mock('../storageService');
-vi.mock('../consentService');
+vi.mock('../storageService', () => ({
+  StorageService: {
+    getInstance: vi.fn()
+  }
+}));
+
+vi.mock('../consentService', () => ({
+  ConsentService: {
+    getInstance: vi.fn()
+  }
+}));
+
+vi.mock('../authService', () => ({
+  AuthService: {
+    getInstance: vi.fn()
+  }
+}));
+
+const mockSupabaseResponse = {
+  data: {
+    changes: {
+      exercises: { upserts: [], deletes: [] },
+      activity_logs: { upserts: [], deletes: [] },
+      user_preferences: { upserts: [], deletes: [] },
+      app_settings: { upserts: [], deletes: [] },
+      workouts: { upserts: [], deletes: [] },
+      workout_sessions: { upserts: [], deletes: [] }
+    },
+    cursor: new Date().toISOString()
+  },
+  error: null
+};
+
+vi.mock('../config/supabase', () => ({
+  supabase: {
+    functions: {
+      invoke: vi.fn().mockResolvedValue(mockSupabaseResponse)
+    }
+  }
+}));
 
 describe('SyncService', () => {
   let syncService: SyncService;
-  let mockQueueService: any;
   let mockStorageService: any;
   let mockConsentService: any;
+  let mockAuthService: any;
+  let mockDatabase: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     
     // Reset singleton instances
     (SyncService as any).instance = undefined;
+
+    // Reset other singleton instances too
+    const StorageServiceClass = (await import('../storageService')).StorageService;
+    const ConsentServiceClass = (await import('../consentService')).ConsentService;
+    const AuthServiceClass = (await import('../authService')).AuthService;
     
-    // Mock QueueService
-    mockQueueService = {
-      enqueue: vi.fn().mockResolvedValue(1),
-      getNextOperations: vi.fn().mockResolvedValue([]),
-      markSuccess: vi.fn().mockResolvedValue(undefined),
-      markFailure: vi.fn().mockResolvedValue(undefined),
-      getStats: vi.fn().mockResolvedValue({
-        totalOperations: 0,
-        pendingOperations: 0,
-        failedOperations: 0,
-        successfulOperations: 0
-      }),
-      clear: vi.fn().mockResolvedValue(undefined),
-      getNextRetryTime: vi.fn().mockResolvedValue(null)
-    };
+    // Clear any existing singleton instances
+    (StorageServiceClass as any).instance = undefined;
+    (ConsentServiceClass as any).instance = undefined;
+    (AuthServiceClass as any).instance = undefined;
 
     // Mock StorageService
+    mockDatabase = {
+        exercises: {
+          where: vi.fn(() => ({
+            equals: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([]),
+              count: vi.fn().mockResolvedValue(0),
+              modify: vi.fn().mockResolvedValue(undefined)
+            }))
+          }))
+        },
+        activity_logs: {
+          where: vi.fn(() => ({
+            equals: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([]),
+              count: vi.fn().mockResolvedValue(0),
+              modify: vi.fn().mockResolvedValue(undefined)
+            }))
+          }))
+        },
+        user_preferences: {
+          where: vi.fn(() => ({
+            equals: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([]),
+              count: vi.fn().mockResolvedValue(0),
+              modify: vi.fn().mockResolvedValue(undefined)
+            }))
+          }))
+        },
+        app_settings: {
+          where: vi.fn(() => ({
+            equals: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([]),
+              count: vi.fn().mockResolvedValue(0),
+              modify: vi.fn().mockResolvedValue(undefined)
+            }))
+          }))
+        },
+        workouts: {
+          where: vi.fn(() => ({
+            equals: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([]),
+              count: vi.fn().mockResolvedValue(0),
+              modify: vi.fn().mockResolvedValue(undefined)
+            }))
+          }))
+        },
+        workout_sessions: {
+          where: vi.fn(() => ({
+            equals: vi.fn(() => ({
+              toArray: vi.fn().mockResolvedValue([]),
+              count: vi.fn().mockResolvedValue(0),
+              modify: vi.fn().mockResolvedValue(undefined)
+            }))
+          }))
+        }
+    };
+
     mockStorageService = {
-      saveExercise: vi.fn().mockResolvedValue(undefined),
-      saveActivityLog: vi.fn().mockResolvedValue(undefined),
-      saveAppSettings: vi.fn().mockResolvedValue(undefined),
-      deleteExercise: vi.fn().mockResolvedValue(undefined),
-      deleteActivityLog: vi.fn().mockResolvedValue(undefined)
+      getDatabase: vi.fn().mockReturnValue(mockDatabase),
+      claimOwnership: vi.fn().mockResolvedValue(true)
     };
 
     // Mock ConsentService
@@ -51,71 +134,39 @@ describe('SyncService', () => {
       hasConsent: vi.fn().mockReturnValue(true)
     };
 
-    // Mock getInstance methods
-    vi.mocked(QueueService.getInstance).mockReturnValue(mockQueueService);
+    // Mock AuthService
+    mockAuthService = {
+      getAuthState: vi.fn().mockReturnValue({
+        isAuthenticated: false,
+        user: undefined,
+        accessToken: undefined,
+        refreshToken: undefined
+      }),
+      onAuthStateChange: vi.fn(() => () => {})
+    };
+
+    // Setup the mocked getInstance methods
+    const { StorageService } = await import('../storageService');
+    const { ConsentService } = await import('../consentService');
+    const { AuthService } = await import('../authService');
+    
     vi.mocked(StorageService.getInstance).mockReturnValue(mockStorageService);
     vi.mocked(ConsentService.getInstance).mockReturnValue(mockConsentService);
+    vi.mocked(AuthService.getInstance).mockReturnValue(mockAuthService);
 
-    // Mock global objects
-    Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
-    
-    global.window = {
-      addEventListener: vi.fn(),
-      ServiceWorkerRegistration: {
-        prototype: { sync: {} }
-      }
-    } as any;
-
-    global.navigator = {
-      ...global.navigator,
-      onLine: true,
-      serviceWorker: {
-        ready: Promise.resolve({
-          sync: {
-            register: vi.fn().mockResolvedValue(undefined)
-          }
-        })
-      }
-    } as any;
+    // Ensure the mocks are properly set before creating the service
+    expect(StorageService.getInstance()).toBe(mockStorageService);
+    expect(ConsentService.getInstance()).toBe(mockConsentService);
+    expect(AuthService.getInstance()).toBe(mockAuthService);
 
     syncService = SyncService.getInstance();
   });
 
-  describe('Singleton Pattern', () => {
-    it('should return the same instance', () => {
+  describe('getInstance', () => {
+    it('should return singleton instance', () => {
       const instance1 = SyncService.getInstance();
       const instance2 = SyncService.getInstance();
       expect(instance1).toBe(instance2);
-    });
-  });
-
-  describe('queueOperation', () => {
-    it('should queue operation successfully', async () => {
-      const operationId = await syncService.queueOperation(
-        'POST',
-        '/api/exercises',
-        { name: 'Test Exercise' },
-        { priority: 'high', metadata: { entityType: 'exercise', operation: 'create' } }
-      );
-
-      expect(operationId).toBe(1);
-      expect(mockQueueService.enqueue).toHaveBeenCalledWith({
-        type: 'POST',
-        endpoint: '/api/exercises',
-        data: { name: 'Test Exercise' },
-        priority: 'high',
-        metadata: { entityType: 'exercise', operation: 'create' }
-      });
-    });
-
-    it('should use default priority when not specified', async () => {
-      await syncService.queueOperation('PUT', '/api/exercises/1', { name: 'Updated' });
-
-      expect(mockQueueService.enqueue).toHaveBeenCalledWith(
-        expect.objectContaining({
-          priority: 'medium'
-        })
-      );
     });
   });
 
@@ -127,129 +178,79 @@ describe('SyncService', () => {
 
       expect(result).toEqual({
         success: true,
-        processedOperations: 0,
-        failedOperations: 0,
+        tablesProcessed: 0,
+        recordsPushed: 0,
+        recordsPulled: 0,
+        conflicts: 0,
         errors: []
       });
-      expect(mockQueueService.getNextOperations).not.toHaveBeenCalled();
+    });
+
+    it('should skip sync when not authenticated', async () => {
+      mockConsentService.hasConsent.mockReturnValue(true);
+      mockAuthService.getAuthState.mockReturnValue({
+        isAuthenticated: false,
+        user: undefined,
+        accessToken: undefined,
+        refreshToken: undefined
+      });
+
+      const result = await syncService.sync();
+
+      expect(result.success).toBe(true);
+      expect(result.tablesProcessed).toBe(0);
     });
 
     it('should skip sync when offline', async () => {
-      Object.defineProperty(navigator, 'onLine', { value: false });
-      (syncService as any).isOnline = false;
+      // Store original navigator.onLine value
+      const originalOnline = navigator.onLine;
+      
+      try {
+        // Mock navigator.onLine to be false BEFORE creating the SyncService instance
+        Object.defineProperty(navigator, 'onLine', {
+          writable: true,
+          value: false
+        });
 
-      const result = await syncService.sync();
+        // Reset singleton to force new instance creation with false onLine value
+        (SyncService as any).instance = undefined;
+        
+        // Create a new SyncService instance that will read the false onLine value
+        syncService = SyncService.getInstance();
 
-      expect(result.success).toBe(false);
-      expect(result.errors).toContain('Device is offline');
-      expect(mockQueueService.getNextOperations).not.toHaveBeenCalled();
+        mockConsentService.hasConsent.mockReturnValue(true);
+        mockAuthService.getAuthState.mockReturnValue({
+          isAuthenticated: true,
+          user: { id: 'user1' },
+          accessToken: 'token123',
+          refreshToken: 'refresh123'
+        });
+        
+        // Trigger the offline event to update the sync service's internal state
+        const offlineEvent = new Event('offline');
+        window.dispatchEvent(offlineEvent);
+
+        // Wait for the event to be processed
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        const result = await syncService.sync();
+
+        expect(result.success).toBe(true);
+        expect(result.errors).toEqual(expect.arrayContaining([
+          expect.objectContaining({
+            type: 'network'
+          })
+        ]));
+      } finally {
+        // Restore original navigator.onLine value
+        Object.defineProperty(navigator, 'onLine', {
+          writable: true,
+          value: originalOnline
+        });
+      }
     });
 
-    it('should process operations successfully', async () => {
-      const mockOperations = [
-        {
-          id: 1,
-          type: 'POST',
-          endpoint: '/api/exercises',
-          data: { name: 'Test Exercise' },
-          metadata: { entityType: 'exercise', operation: 'create' }
-        }
-      ];
-
-      mockQueueService.getNextOperations.mockResolvedValue(mockOperations);
-
-      const result = await syncService.sync();
-
-      expect(result.success).toBe(true);
-      expect(result.processedOperations).toBe(1);
-      expect(result.failedOperations).toBe(0);
-      expect(mockStorageService.saveExercise).toHaveBeenCalledWith({ name: 'Test Exercise' });
-      expect(mockQueueService.markSuccess).toHaveBeenCalledWith(1);
-    });
-
-    it('should handle operation failures', async () => {
-      const mockOperations = [
-        {
-          id: 1,
-          type: 'POST',
-          endpoint: '/api/exercises',
-          data: { name: 'Test Exercise' },
-          metadata: { entityType: 'exercise', operation: 'create' }
-        }
-      ];
-
-      mockQueueService.getNextOperations.mockResolvedValue(mockOperations);
-      mockStorageService.saveExercise.mockRejectedValue(new Error('Storage error'));
-
-      const result = await syncService.sync();
-
-      expect(result.success).toBe(false);
-      expect(result.processedOperations).toBe(0);
-      expect(result.failedOperations).toBe(1);
-      expect(result.errors).toHaveLength(1);
-      expect(mockQueueService.markFailure).toHaveBeenCalledWith(1, 'Storage error');
-    });
-  });
-
-  describe('operation processing', () => {
-    it('should handle POST exercise operation', async () => {
-      const operation = {
-        id: 1,
-        type: 'POST' as const,
-        endpoint: '/api/exercises',
-        data: { name: 'Test Exercise' },
-        metadata: { entityType: 'exercise' as const, operation: 'create' }
-      };
-
-      const result = await (syncService as any).processOperation(operation);
-
-      expect(result.success).toBe(true);
-      expect(mockStorageService.saveExercise).toHaveBeenCalledWith({ name: 'Test Exercise' });
-    });
-
-    it('should handle PUT activity log operation', async () => {
-      const operation = {
-        id: 1,
-        type: 'PUT' as const,
-        endpoint: '/api/activity-logs/1',
-        data: { exerciseId: '1', duration: 30 },
-        metadata: { entityType: 'activityLog' as const, operation: 'update' }
-      };
-
-      const result = await (syncService as any).processOperation(operation);
-
-      expect(result.success).toBe(true);
-      expect(mockStorageService.saveActivityLog).toHaveBeenCalledWith({ exerciseId: '1', duration: 30 });
-    });
-
-    it('should handle DELETE exercise operation', async () => {
-      const operation = {
-        id: 1,
-        type: 'DELETE' as const,
-        endpoint: '/api/exercises/exercise-1',
-        metadata: { entityType: 'exercise' as const, entityId: 'exercise-1', operation: 'delete' }
-      };
-
-      const result = await (syncService as any).processOperation(operation);
-
-      expect(result.success).toBe(true);
-      expect(mockStorageService.deleteExercise).toHaveBeenCalledWith('exercise-1');
-    });
-
-    it('should handle unknown operation type', async () => {
-      const operation = {
-        id: 1,
-        type: 'PATCH' as any,
-        endpoint: '/api/exercises/1',
-        data: {},
-        metadata: { entityType: 'exercise' as const, operation: 'patch' }
-      };
-
-      const result = await (syncService as any).processOperation(operation);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toBe('Unknown operation type: PATCH');
-    });
+    // Note: Full sync integration tests moved to syncService.integration.test.ts
   });
 
   describe('status management', () => {
@@ -257,53 +258,69 @@ describe('SyncService', () => {
       const status = syncService.getSyncStatus();
 
       expect(status).toEqual({
-        isOnline: true,
+        isOnline: expect.any(Boolean),
         isSyncing: false,
         lastSyncAttempt: undefined,
         lastSuccessfulSync: undefined,
-        pendingOperations: 0,
+        hasChangesToSync: false,
         errors: []
       });
     });
 
-    it('should add and remove status listeners', async () => {
+    it('should add and remove status listeners', () => {
       const listener = vi.fn();
-      
-      const unsubscribe = syncService.addStatusListener(listener);
-      
+
+      const unsubscribe = syncService.onSyncStatusChange(listener);
+
       // Should call listener immediately
-      await new Promise(resolve => setTimeout(resolve, 0));
-      expect(listener).toHaveBeenCalled();
+      expect(listener).toHaveBeenCalledWith(expect.objectContaining({
+        isOnline: expect.any(Boolean),
+        isSyncing: false
+      }));
 
+      // Should allow unsubscribe
       unsubscribe();
+      expect(typeof unsubscribe).toBe('function');
+    });
+  });
+
+  describe('hasChangesToSync', () => {
+    it('should return false when no consent', async () => {
+      mockConsentService.hasConsent.mockReturnValue(false);
+
+      const hasChanges = await syncService.hasChangesToSync();
+
+      expect(hasChanges).toBe(false);
+    });
+
+    it('should return false when no dirty records', async () => {
+      mockConsentService.hasConsent.mockReturnValue(true);
+
+      const hasChanges = await syncService.hasChangesToSync();
+
+      expect(hasChanges).toBe(false);
+    });
+
+    it('should return true when there are dirty records', async () => {
+      mockConsentService.hasConsent.mockReturnValue(true);
       
-      // Verify listener is removed
-      const listenerCount = (syncService as any).listeners.length;
-      expect(listenerCount).toBe(0);
+      // Mock one table to have dirty records
+      // Set up the full chain: where('dirty').equals(true).count()
+      const mockCount = vi.fn().mockResolvedValue(1);
+      const mockEquals = vi.fn().mockReturnValue({ count: mockCount, toArray: vi.fn(), modify: vi.fn() });
+      const mockWhere = vi.fn().mockReturnValue({ equals: mockEquals });
+      
+      mockDatabase.exercises.where = mockWhere;
+
+      const hasChanges = await syncService.hasChangesToSync();
+
+      // Verify the call chain was used correctly
+      expect(mockWhere).toHaveBeenCalledWith('dirty');
+      expect(mockEquals).toHaveBeenCalledWith(1);
+      expect(mockCount).toHaveBeenCalled();
+      expect(hasChanges).toBe(true);
     });
   });
 
-  describe('utility methods', () => {
-    it('should clear sync data', async () => {
-      await syncService.clearSyncData();
-
-      expect(mockQueueService.clear).toHaveBeenCalled();
-    });
-
-    it('should force sync', async () => {
-      const result = await syncService.forcSync();
-
-      expect(result).toBeDefined();
-      expect(result.success).toBe(true);
-    });
-
-    it('should get next retry time', async () => {
-      mockQueueService.getNextRetryTime.mockResolvedValue(Date.now() + 5000);
-
-      const nextRetry = await syncService.getNextRetryTime();
-
-      expect(nextRetry).toBeDefined();
-      expect(mockQueueService.getNextRetryTime).toHaveBeenCalled();
-    });
-  });
+  // Note: forcSync integration tests moved to syncService.integration.test.ts
 });

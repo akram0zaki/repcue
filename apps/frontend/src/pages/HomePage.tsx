@@ -10,16 +10,19 @@ import { consentService } from '../services/consentService';
 import { StarFilledIcon } from '../components/icons/NavigationIcons';
 import { localizeExercise } from '../utils/localizeExercise';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { SignInButton } from '../components/auth';
+import { useAuth } from '../hooks/useAuth';
 
 interface HomePageProps {
   exercises: Exercise[];
   appSettings: AppSettings;
-  onToggleFavorite: (exerciseId: string) => void;
+  onToggleFavorite: (exercise_id: string) => void;
 }
 
 const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['common']);
+  const { isAuthenticated } = useAuth();
   const [upcomingWorkout, setUpcomingWorkout] = useState<{
     workout: Workout;
     weekday: string;
@@ -35,7 +38,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       if (consentStatus) {
         try {
           const workouts = await storageService.getWorkouts();
-          const activeWorkouts = workouts.filter(workout => workout.isActive);
+          const activeWorkouts = workouts.filter(workout => workout.is_active);
           
           if (activeWorkouts.length > 0) {
             const today = new Date();
@@ -43,7 +46,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             
             // Find today's workout or next upcoming workout
             let targetWorkout = activeWorkouts.find(workout => 
-              workout.scheduledDays.includes(currentWeekday)
+              workout.scheduled_days.includes(currentWeekday)
             );
             let targetWeekday = currentWeekday;
             
@@ -56,7 +59,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 const nextIndex = (currentIndex + i) % 7;
                 const nextWeekday = weekdayOrder[nextIndex] as Weekday;
                 targetWorkout = activeWorkouts.find(workout => 
-                  workout.scheduledDays.includes(nextWeekday)
+                  workout.scheduled_days.includes(nextWeekday)
                 );
                 if (targetWorkout) {
                   targetWeekday = nextWeekday;
@@ -78,7 +81,21 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               
               // Calculate the date for the workout
               const workoutDate = new Date();
-              const daysUntilWorkout = (Object.values(Weekday).indexOf(targetWeekday) - today.getDay() + 7) % 7;
+              
+              // Convert JavaScript's getDay() (0=Sunday) to our Weekday enum index (0=Monday)
+              const jsWeekdayToWeekdayIndex = (jsDay: number): number => {
+                return (jsDay + 6) % 7; // Sunday(0) -> 6, Monday(1) -> 0, Tuesday(2) -> 1, etc.
+              };
+              
+              const currentWeekdayIndex = jsWeekdayToWeekdayIndex(today.getDay());
+              const targetWeekdayIndex = Object.values(Weekday).indexOf(targetWeekday);
+              
+              let daysUntilWorkout = (targetWeekdayIndex - currentWeekdayIndex + 7) % 7;
+              // If it's 0 (same day), and we're looking for next occurrence, make it 7
+              if (daysUntilWorkout === 0 && targetWeekday !== currentWeekday) {
+                daysUntilWorkout = 7;
+              }
+              
               workoutDate.setDate(today.getDate() + daysUntilWorkout);
               
               setUpcomingWorkout({
@@ -102,7 +119,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       navigate(Routes.TIMER, { 
         state: { 
           selectedExercise: exercise,
-          selectedDuration: exercise.defaultDuration || 30
+          selectedDuration: exercise.default_duration || 30
         }
       });
     } else {
@@ -120,6 +137,23 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
+
+        {/* Sign-in prompt - only show if not authenticated */}
+        {!isAuthenticated && (
+          <div className="text-center mb-6 text-sm text-gray-600 dark:text-gray-400">
+            <div>
+              <span>
+                {t('home.signInMessage', { defaultValue: 'You can ' })}
+              </span>
+              <SignInButton variant="minimal" size="sm" className="inline p-0 h-auto font-normal underline hover:no-underline">
+                {t('home.signInLink', { defaultValue: 'sign-in' })}
+              </SignInButton>
+              <span>
+                {t('home.signInSuffix', { defaultValue: ' to track your progress from different devices.' })}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Upcoming Workout Section */}
         {hasConsent && (
@@ -156,8 +190,8 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                       navigate(Routes.TIMER, {
                         state: {
                           workoutMode: {
-                            workoutId: upcomingWorkout.workout.id,
-                            workoutName: upcomingWorkout.workout.name,
+                            workout_id: upcomingWorkout.workout.id,
+                            workout_name: upcomingWorkout.workout.name,
                             exercises: upcomingWorkout.workout.exercises
                           }
                         }
@@ -213,10 +247,10 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
               {t('home.favoriteExercises')}
             </h2>
-            {exercises.filter(ex => ex.isFavorite).length > 0 ? (
+            {exercises.filter(ex => ex.is_favorite).length > 0 ? (
               <div className="space-y-2">
                 {exercises
-                  .filter(exercise => exercise.isFavorite)
+                  .filter(exercise => exercise.is_favorite)
                   .slice(0, 3)
                   .map(exercise => (
                     <div key={exercise.id} className="exercise-card w-full p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">

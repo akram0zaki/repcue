@@ -10,19 +10,19 @@ const makeExercise = (overrides: Partial<any> = {}) => ({
   name: 'Plank',
   description: 'Core stability hold',
   category: ExerciseCategory.CORE,
-  exerciseType: 'time-based',
-  defaultDuration: 30,
-  defaultSets: 1,
-  defaultReps: 1,
-  isFavorite: false,
+  exercise_type: 'time_based',
+  default_duration: 30,
+  default_sets: 1,
+  default_reps: 1,
+  is_favorite: false,
   tags: ['core'],
-  hasVideo: false,
+  has_video: false,
   ...overrides,
 })
 
 describe('ExercisePage exercise type labels', () => {
   it('renders localized Time-based label for time-based exercises', () => {
-    const exercises = [makeExercise({ exerciseType: 'time-based' })]
+    const exercises = [makeExercise({ exercise_type: 'time_based' })]
     render(
       <MemoryRouter initialEntries={['/exercises']}>
         <SnackbarProvider>
@@ -37,7 +37,7 @@ describe('ExercisePage exercise type labels', () => {
   })
 
   it('renders localized Rep-based label for repetition-based exercises', () => {
-    const exercises = [makeExercise({ id: 'ex-2', name: 'Push Ups', exerciseType: 'repetition-based' })]
+    const exercises = [makeExercise({ id: 'ex-2', name: 'Push Ups', exercise_type: 'repetition_based' })]
     render(
       <MemoryRouter initialEntries={['/exercises']}>
         <SnackbarProvider>

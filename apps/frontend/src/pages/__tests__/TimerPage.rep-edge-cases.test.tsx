@@ -4,23 +4,24 @@ import { describe, it, expect, vi } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise } from '../../test/testUtils';
 
 describe('TimerPage - Rep Logic Edge Cases', () => {
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'ex1',
     name: 'Cat-Cow Stretch',
     description: 'Alternate arching and rounding spine on hands and knees',
     category: 'flexibility',
-    exerciseType: 'repetition-based',
-    defaultSets: 2,
-    defaultReps: 8,
-    isFavorite: false,
+    exercise_type: 'repetition_based',
+    default_sets: 2,
+    default_reps: 8,
+    is_favorite: false,
     tags: []
-  };
+  });
 
   const mockAppSettings: AppSettings = {
     ...DEFAULT_APP_SETTINGS,
-    repSpeedFactor: 1.0
+    rep_speed_factor: 1.0
   };
 
   const defaultProps = {

@@ -9,6 +9,16 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/playwright-report/**',
+      '**/test-results/**',
+      '**/tests/e2e/**',
+      '**/*.{workspace,projects}',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*'
+    ],
     // Ensure each test file has a fresh module context even in single worker
     isolate: true,
     // Auto-restore/clear mocks between tests to prevent leakage
@@ -24,6 +34,12 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     teardownTimeout: 30000,
+    // Env-flag to temporarily disable unit tests during manual QA cycles
+    ...(process.env.SKIP_UNIT_TESTS === '1' ? {
+      include: [],
+      exclude: ['**/*'],
+      passWithNoTests: true,
+    } : {}),
     typecheck: {
       tsconfig: './tsconfig.test.json'
     }

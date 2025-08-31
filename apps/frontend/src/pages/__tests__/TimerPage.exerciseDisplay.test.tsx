@@ -5,18 +5,19 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import TimerPage from '../TimerPage';
 import type { Exercise, AppSettings, TimerState } from '../../types';
 import { DEFAULT_APP_SETTINGS } from '../../constants';
+import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
-const mockExercise: Exercise = {
+const mockExercise: Exercise = createMockExercise({
   id: 'exercise-1',
   name: 'Push-ups',
   description: 'Classic upper body exercise',
   category: 'strength',
-  exerciseType: 'repetition-based',
-  defaultSets: 3,
-  defaultReps: 10,
-  isFavorite: false,
+  exercise_type: 'repetition_based',
+  default_sets: 3,
+  default_reps: 10,
+  is_favorite: false,
   tags: ['upper-body', 'bodyweight']
-};
+});
 
 const mockWorkoutMode = {
   workoutId: 'workout-1',
@@ -24,10 +25,10 @@ const mockWorkoutMode = {
   exercises: [
     {
       id: 'ex-1',
-      exerciseId: 'exercise-1',
+      exercise_id: 'exercise-1',
       order: 1,
-      customSets: 3,
-      customReps: 10
+      custom_sets: 3,
+      custom_reps: 10
     }
   ],
   currentExerciseIndex: 0,
@@ -126,10 +127,10 @@ describe('TimerPage - Exercise Display Improvements', () => {
   });
 
   it('should handle exercise without description gracefully', () => {
-    const exerciseWithoutDescription: Exercise = {
+    const exerciseWithoutDescription: Exercise = createMockExercise({
       ...mockExercise,
       description: undefined as any
-    };
+    });
 
     renderTimerPage({
       workoutMode: mockWorkoutMode
@@ -160,7 +161,7 @@ describe('TimerPage - Exercise Display Improvements', () => {
       exercises: [
         {
           id: 'ex-1',
-          exerciseId: 'missing-exercise-id', // This ID doesn't exist in the exercises array
+          exercise_id: 'missing-exercise-id', // This ID doesn't exist in the exercises array
           order: 1,
           customSets: 3,
           customReps: 10

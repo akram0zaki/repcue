@@ -41,10 +41,10 @@ describe('ExercisePage preview error handling', () => {
       description: 'Core',
       category: 'core',
       tags: [],
-      exerciseType: 'time-based',
-      defaultDuration: 30,
-      hasVideo: true,
-      isFavorite: false
+      exercise_type: 'time_based',
+      default_duration: 30,
+      has_video: true,
+      is_favorite: false
     } as any
   ];
 

@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { StorageService } from '../storageService'
-import { consentService } from '../consentService'
 import type { Exercise, ActivityLog, UserPreferences, AppSettings } from '../../types'
 import { ExerciseType } from '../../types'
+import { createMockExercise, createMockActivityLog, createMockUserPreferences, createMockAppSettings } from '../../test/testUtils'
 
 // Mock Dexie
 vi.mock('dexie', () => {
@@ -11,6 +11,8 @@ vi.mock('dexie', () => {
     add: vi.fn(),
     get: vi.fn(),
     update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn().mockResolvedValue(0),
     toArray: vi.fn().mockResolvedValue([]),
     orderBy: vi.fn(() => ({
       reverse: vi.fn(() => ({
@@ -20,20 +22,29 @@ vi.mock('dexie', () => {
         limit: vi.fn().mockResolvedValue([])
       }))
     })),
+    filter: vi.fn(() => ({
+      first: vi.fn().mockResolvedValue(null),
+      toArray: vi.fn().mockResolvedValue([])
+    })),
     clear: vi.fn()
   }))
 
   return {
     default: vi.fn(() => ({
       version: vi.fn(() => ({
-        stores: vi.fn()
+        stores: vi.fn(() => ({
+          upgrade: vi.fn()
+        }))
       })),
       open: vi.fn().mockResolvedValue(undefined),
       close: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
       exercises: new MockTable(),
-      activityLogs: new MockTable(),
-      userPreferences: new MockTable(),
-      appSettings: new MockTable()
+      activity_logs: new MockTable(),
+      user_preferences: new MockTable(),
+      app_settings: new MockTable(),
+      workouts: new MockTable(),
+      workout_sessions: new MockTable()
     }))
   }
 })
@@ -45,49 +56,55 @@ vi.mock('../consentService', () => ({
   }
 }))
 
+const { consentService } = await import('../consentService')
+
 describe('StorageService', () => {
   let storageService: StorageService
   let mockDb: any
+  let exerciseStorage: Map<string, any>
+  let activityLogStorage: any[]
+  let userPreferencesStorage: any[]
+  let appSettingsStorage: any[]
 
-  const mockExercise: Exercise = {
+  const mockExercise: Exercise = createMockExercise({
     id: 'test-exercise-1',
     name: 'Push-ups',
     category: 'strength',
-    exerciseType: ExerciseType.REPETITION_BASED,
+    exercise_type: ExerciseType.REPETITION_BASED,
     description: 'Basic push-up exercise',
-    defaultDuration: 30,
-    isFavorite: false,
+    default_duration: 30,
+    is_favorite: false,
     tags: ['bodyweight', 'upper-body']
-  }
+  })
 
-  const mockActivityLog: ActivityLog = {
+  const mockActivityLog: ActivityLog = createMockActivityLog({
     id: 'log-1',
-    exerciseId: 'test-exercise-1',
-    exerciseName: 'Push-ups',
-    timestamp: new Date('2024-01-01T12:00:00Z'),
+    exercise_id: 'test-exercise-1',
+    exercise_name: 'Push-ups',
+    timestamp: new Date('2024-01-01T12:00:00Z').toISOString(),
     duration: 30,
     notes: 'Good workout'
-  }
+  })
 
-  const mockUserPreferences: UserPreferences = {
-    soundEnabled: true,
-    vibrationEnabled: true,
-    defaultIntervalDuration: 30,
-    darkMode: false,
-    favoriteExercises: ['test-exercise-1']
-  }
+  const mockUserPreferences: UserPreferences = createMockUserPreferences({
+    sound_enabled: true,
+    vibration_enabled: true,
+    default_interval_duration: 30,
+    dark_mode: false,
+    favorite_exercises: ['test-exercise-1']
+  })
 
-  const mockAppSettings: AppSettings = {
-    intervalDuration: 30,
-    soundEnabled: true,
-    vibrationEnabled: true,
-    beepVolume: 0.5,
-    darkMode: false,
-    autoSave: true,
-    preTimerCountdown: 3,
-    defaultRestTime: 60,
-    repSpeedFactor: 1.0
-  }
+  const mockAppSettings: AppSettings = createMockAppSettings({
+    interval_duration: 30,
+    sound_enabled: true,
+    vibration_enabled: true,
+    beep_volume: 0.5,
+    dark_mode: false,
+    auto_save: true,
+    pre_timer_countdown: 3,
+    default_rest_time: 60,
+    rep_speed_factor: 1.0
+  })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -102,10 +119,10 @@ describe('StorageService', () => {
     storageService = StorageService.getInstance()
     
     // Create fresh storage for our mocks
-    const exerciseStorage = new Map()
-    const activityLogStorage: ActivityLog[] = []
-    const userPreferencesStorage: UserPreferences[] = []
-    const appSettingsStorage: AppSettings[] = []
+    exerciseStorage = new Map()
+    activityLogStorage = []
+    userPreferencesStorage = []
+    appSettingsStorage = []
     
     // Get reference to the mocked database and override it with fresh mocks
     // @ts-expect-error - accessing private property for testing
@@ -136,7 +153,11 @@ describe('StorageService', () => {
           return Promise.resolve(exerciseStorage.size)
         })
       } as any,
-      activityLogs: {
+      activity_logs: {
+        put: vi.fn().mockImplementation((log) => {
+          activityLogStorage.push(log)
+          return Promise.resolve(undefined)
+        }),
         add: vi.fn().mockImplementation((log) => {
           activityLogStorage.push(log)
           return Promise.resolve(undefined)
@@ -147,22 +168,14 @@ describe('StorageService', () => {
         orderBy: vi.fn().mockImplementation(() => {
           const createQueryObject = () => ({
             filter: vi.fn().mockImplementation(() => createQueryObject()),
-            limit: vi.fn().mockImplementation((limit) => ({
-              toArray: vi.fn().mockImplementation(() => {
-                return Promise.resolve(activityLogStorage.slice(0, limit))
-              })
-            })),
+            limit: vi.fn().mockImplementation((limit) => createQueryObject()),
+            reverse: vi.fn().mockImplementation(() => createQueryObject()),
             toArray: vi.fn().mockImplementation(() => {
               return Promise.resolve([...activityLogStorage])
             })
           })
           
-          return {
-            reverse: vi.fn().mockImplementation(() => createQueryObject()),
-            toArray: vi.fn().mockImplementation(() => {
-              return Promise.resolve([...activityLogStorage])
-            })
-          }
+          return createQueryObject()
         }),
         clear: vi.fn().mockImplementation(() => {
           activityLogStorage.length = 0
@@ -172,8 +185,11 @@ describe('StorageService', () => {
           return Promise.resolve(activityLogStorage.length)
         })
       } as any,
-      userPreferences: {
-        put: vi.fn().mockResolvedValue(undefined),
+      user_preferences: {
+        put: vi.fn().mockImplementation((preferences) => {
+          userPreferencesStorage.push(preferences)
+          return Promise.resolve(undefined)
+        }),
         add: vi.fn().mockImplementation((preferences) => {
           userPreferencesStorage.push(preferences)
           return Promise.resolve(undefined)
@@ -183,7 +199,7 @@ describe('StorageService', () => {
         }),
         orderBy: vi.fn().mockImplementation(() => ({
           last: vi.fn(() => {
-            return Promise.resolve(userPreferencesStorage[userPreferencesStorage.length - 1])
+            return Promise.resolve(userPreferencesStorage.length > 0 ? userPreferencesStorage[userPreferencesStorage.length - 1] : null)
           }),
           limit: vi.fn(() => ({
             first: vi.fn().mockResolvedValue(userPreferencesStorage[0])
@@ -192,10 +208,16 @@ describe('StorageService', () => {
         clear: vi.fn().mockImplementation(() => {
           userPreferencesStorage.length = 0
           return Promise.resolve(undefined)
+        }),
+        count: vi.fn().mockImplementation(() => {
+          return Promise.resolve(userPreferencesStorage.length)
         })
       } as any,
-      appSettings: {
-        put: vi.fn().mockResolvedValue(undefined),
+      app_settings: {
+        put: vi.fn().mockImplementation((settings) => {
+          appSettingsStorage.push(settings)
+          return Promise.resolve(undefined)
+        }),
         add: vi.fn().mockImplementation((settings) => {
           appSettingsStorage.push(settings)
           return Promise.resolve(undefined)
@@ -205,7 +227,7 @@ describe('StorageService', () => {
         }),
         orderBy: vi.fn().mockImplementation(() => ({
           last: vi.fn(() => {
-            return Promise.resolve(appSettingsStorage[appSettingsStorage.length - 1])
+            return Promise.resolve(appSettingsStorage.length > 0 ? appSettingsStorage[appSettingsStorage.length - 1] : null)
           }),
           limit: vi.fn(() => ({
             first: vi.fn().mockResolvedValue(appSettingsStorage[0])
@@ -214,9 +236,39 @@ describe('StorageService', () => {
         clear: vi.fn().mockImplementation(() => {
           appSettingsStorage.length = 0
           return Promise.resolve(undefined)
+        }),
+        count: vi.fn().mockImplementation(() => {
+          return Promise.resolve(appSettingsStorage.length)
         })
       } as any,
-      close: vi.fn().mockResolvedValue(undefined)
+      workouts: {
+        toArray: vi.fn().mockResolvedValue([]),
+        clear: vi.fn().mockResolvedValue(undefined),
+        count: vi.fn().mockResolvedValue(0)
+      } as any,
+      workout_sessions: {
+        toArray: vi.fn().mockResolvedValue([]),
+        clear: vi.fn().mockResolvedValue(undefined),
+        count: vi.fn().mockResolvedValue(0)
+      } as any,
+      close: vi.fn().mockResolvedValue(undefined),
+      table: vi.fn().mockImplementation((tableName: string) => {
+        switch (tableName) {
+          case 'exercises':
+            return { toArray: vi.fn().mockImplementation(() => Promise.resolve(Array.from(exerciseStorage.values()))) };
+          case 'activity_logs':
+            return { toArray: vi.fn().mockImplementation(() => Promise.resolve([...activityLogStorage])) };
+          case 'user_preferences':
+            return { toArray: vi.fn().mockImplementation(() => Promise.resolve([...userPreferencesStorage])) };
+          case 'app_settings':
+            return { toArray: vi.fn().mockImplementation(() => Promise.resolve([...appSettingsStorage])) };
+          case 'workouts':
+          case 'workout_sessions':
+            return { toArray: vi.fn().mockResolvedValue([]) };
+          default:
+            return { toArray: vi.fn().mockResolvedValue([]) };
+        }
+      })
     } as any
   })
 
@@ -254,7 +306,13 @@ describe('StorageService', () => {
       
       expect(mockDb.exercises.put).toHaveBeenCalledWith({
         ...mockExercise,
-        updatedAt: expect.any(String)
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
+        deleted: false,
+        dirty: 1,
+        op: 'upsert',
+        owner_id: null,
+        version: 1
       })
     })
 
@@ -279,7 +337,10 @@ describe('StorageService', () => {
       const exercises = await storageService.getExercises()
       
       expect(exercises).toHaveLength(1)
-      expect(exercises[0]).toMatchObject(mockExercise)
+      expect(exercises[0]).toMatchObject({
+        ...mockExercise,
+        updatedAt: '2024-01-01T12:00:00Z'
+      })
     })
 
     it('should handle IndexedDB errors gracefully', async () => {
@@ -293,17 +354,18 @@ describe('StorageService', () => {
 
   describe('toggleExerciseFavorite', () => {
     it('should toggle exercise favorite status', async () => {
-      mockDb.exercises.get.mockResolvedValue({
-        ...mockExercise,
-        isFavorite: false
-      })
+  // Seed prefs and exercise
+  await storageService.ensureUserPreferences({ favorite_exercises: [] })
+  await storageService.saveExercise(mockExercise)
+  mockDb.exercises.get.mockResolvedValue({ ...mockExercise, is_favorite: false })
       
       await storageService.toggleExerciseFavorite(mockExercise.id)
       
-      expect(mockDb.exercises.update).toHaveBeenCalledWith(mockExercise.id, {
-        isFavorite: true,
-        updatedAt: expect.any(String)
-      })
+  // Preferences updated
+  const prefs = await storageService.getUserPreferences()
+  expect(prefs?.favorite_exercises).toContain(mockExercise.id)
+  // Local exercise flag updated via update()
+  expect(mockDb.exercises.update).toHaveBeenCalledWith(mockExercise.id, expect.objectContaining({ is_favorite: true }))
     })
 
     it('should handle missing exercise gracefully', async () => {
@@ -318,36 +380,57 @@ describe('StorageService', () => {
     it('should save activity log to IndexedDB', async () => {
       await storageService.saveActivityLog(mockActivityLog)
       
-      expect(mockDb.activityLogs.add).toHaveBeenCalledWith({
+      expect(mockDb.activity_logs.put).toHaveBeenCalledWith({
         ...mockActivityLog,
-        timestamp: mockActivityLog.timestamp.toISOString()
+        id: expect.any(String),
+        timestamp: mockActivityLog.timestamp,
+        created_at: expect.any(String),
+        deleted: false,
+        dirty: 1,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: expect.any(String)
       })
     })
 
     it('should use fallback storage when IndexedDB fails', async () => {
-      mockDb.activityLogs.add.mockRejectedValue(new Error('IndexedDB error'))
+      mockDb.activity_logs.put.mockRejectedValue(new Error('IndexedDB error'))
       
       await storageService.saveActivityLog(mockActivityLog)
       
       // Should not throw, fallback should handle it
-      expect(mockDb.activityLogs.add).toHaveBeenCalled()
+      expect(mockDb.activity_logs.put).toHaveBeenCalled()
     })
   })
 
   describe('getActivityLogs', () => {
     it('should retrieve activity logs from IndexedDB', async () => {
-      // First add the log to our mock storage
-      await storageService.saveActivityLog(mockActivityLog)
+      const mockStoredLog = {
+        ...mockActivityLog,
+        id: 'log-1',
+        timestamp: mockActivityLog.timestamp,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      // Add the log to the mock storage
+      activityLogStorage.push(mockStoredLog)
       
       const logs = await storageService.getActivityLogs(10)
       
       expect(logs).toHaveLength(1)
-      expect(logs[0].timestamp).toBeInstanceOf(Date)
+      // Timestamp should be an ISO string, not a Date object
+      expect(typeof logs[0].timestamp).toBe('string')
     })
 
     it('should handle IndexedDB errors gracefully', async () => {
       // Force the mock to throw an error
-      mockDb.activityLogs.orderBy.mockImplementation(() => {
+      mockDb.activity_logs.orderBy.mockImplementation(() => {
         throw new Error('IndexedDB error')
       })
       
@@ -361,9 +444,16 @@ describe('StorageService', () => {
     it('should save user preferences to IndexedDB', async () => {
       await storageService.saveUserPreferences(mockUserPreferences)
       
-      expect(mockDb.userPreferences.add).toHaveBeenCalledWith({
+      expect(mockDb.user_preferences.put).toHaveBeenCalledWith({
         ...mockUserPreferences,
-        updatedAt: expect.any(String)
+        id: expect.any(String),
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
+        deleted: false,
+        dirty: 1,
+        op: 'upsert',
+        owner_id: null,
+        version: 1
       })
     })
   })
@@ -375,7 +465,15 @@ describe('StorageService', () => {
       
       const preferences = await storageService.getUserPreferences()
       
-      expect(preferences).toMatchObject(mockUserPreferences)
+      expect(preferences).toMatchObject({
+        sound_enabled: mockUserPreferences.sound_enabled,
+        vibration_enabled: mockUserPreferences.vibration_enabled,
+        default_interval_duration: mockUserPreferences.default_interval_duration,
+        dark_mode: mockUserPreferences.dark_mode,
+        id: expect.any(String),
+        created_at: expect.any(String),
+        updated_at: expect.any(String)
+      })
     })
 
     it('should return null when no preferences exist', async () => {
@@ -389,9 +487,16 @@ describe('StorageService', () => {
     it('should save app settings to IndexedDB', async () => {
       await storageService.saveAppSettings(mockAppSettings)
       
-      expect(mockDb.appSettings.add).toHaveBeenCalledWith({
+      expect(mockDb.app_settings.put).toHaveBeenCalledWith({
         ...mockAppSettings,
-        updatedAt: expect.any(String)
+        id: expect.any(String),
+        created_at: expect.any(String),
+        updated_at: expect.any(String),
+        deleted: false,
+        dirty: 1,
+        op: 'upsert',
+        owner_id: null,
+        version: 1
       })
     })
   })
@@ -403,7 +508,17 @@ describe('StorageService', () => {
       
       const settings = await storageService.getAppSettings()
       
-      expect(settings).toMatchObject(mockAppSettings)
+      expect(settings).toMatchObject({
+        interval_duration: mockAppSettings.interval_duration,
+        sound_enabled: mockAppSettings.sound_enabled,
+        vibration_enabled: mockAppSettings.vibration_enabled,
+        beep_volume: mockAppSettings.beep_volume,
+        dark_mode: mockAppSettings.dark_mode,
+        auto_save: mockAppSettings.auto_save,
+        id: expect.any(String),
+        created_at: expect.any(String),
+        updated_at: expect.any(String)
+      })
     })
 
     it('should return null when no settings exist', async () => {
@@ -415,21 +530,90 @@ describe('StorageService', () => {
 
   describe('exportAllData', () => {
     it('should export all user data', async () => {
-      // Add data to our mock storage through the service
-      await storageService.saveExercise(mockExercise)
-      await storageService.saveActivityLog(mockActivityLog)
-      await storageService.saveUserPreferences(mockUserPreferences)
-      await storageService.saveAppSettings(mockAppSettings)
+      const mockStoredExercise = {
+        ...mockExercise,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      const mockStoredLog = {
+        ...mockActivityLog,
+        id: 'log-1',
+        timestamp: mockActivityLog.timestamp,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      const mockStoredPreferences = {
+        ...mockUserPreferences,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      const mockStoredSettings = {
+        ...mockAppSettings,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      // Add data to the mock storage arrays
+      exerciseStorage.set(mockStoredExercise.id, mockStoredExercise)
+      activityLogStorage.push(mockStoredLog)
+      userPreferencesStorage.push(mockStoredPreferences)
+      appSettingsStorage.push(mockStoredSettings)
+      
+      // Mock getMigrationStatus
+      mockDb.getMigrationStatus = vi.fn().mockReturnValue({ 
+        currentVersion: 6, 
+        isV6Schema: true, 
+        tableStats: { exercises: 1, activity_logs: 1, user_preferences: 1, app_settings: 1 } 
+      })
       
       const exportData = await storageService.exportAllData()
       
       expect(exportData).toMatchObject({
+        metadata: {
+          exportTimestamp: expect.any(String),
+          databaseVersion: expect.any(Number),
+          isV6Schema: expect.any(Boolean),
+          tableStats: expect.any(Object)
+        },
         exercises: [expect.objectContaining({ id: mockExercise.id })],
-        activityLogs: [expect.objectContaining({ id: mockActivityLog.id })],
-        userPreferences: mockUserPreferences,
-        appSettings: mockAppSettings,
-        exportDate: expect.any(String),
-        version: expect.any(String)
+        activity_logs: [expect.objectContaining({ id: mockActivityLog.id })],
+        user_preferences: [expect.objectContaining({
+          sound_enabled: mockUserPreferences.sound_enabled,
+          vibration_enabled: mockUserPreferences.vibration_enabled,
+          default_interval_duration: mockUserPreferences.default_interval_duration,
+          dark_mode: mockUserPreferences.dark_mode,
+          version: 1
+        })],
+        app_settings: [expect.objectContaining({
+          interval_duration: mockAppSettings.interval_duration,
+          sound_enabled: mockAppSettings.sound_enabled,
+          vibration_enabled: mockAppSettings.vibration_enabled,
+          beep_volume: mockAppSettings.beep_volume,
+          dark_mode: mockAppSettings.dark_mode,
+          auto_save: mockAppSettings.auto_save,
+          version: 1
+        })],
+        workouts: expect.any(Array),
+        workout_sessions: expect.any(Array)
       })
     })
   })
@@ -439,19 +623,63 @@ describe('StorageService', () => {
       await storageService.clearAllData()
       
       expect(mockDb.exercises.clear).toHaveBeenCalled()
-      expect(mockDb.activityLogs.clear).toHaveBeenCalled()
-      expect(mockDb.userPreferences.clear).toHaveBeenCalled()
-      expect(mockDb.appSettings.clear).toHaveBeenCalled()
+      expect(mockDb.activity_logs.clear).toHaveBeenCalled()
+      expect(mockDb.user_preferences.clear).toHaveBeenCalled()
+      expect(mockDb.app_settings.clear).toHaveBeenCalled()
+      expect(mockDb.workouts.clear).toHaveBeenCalled()
+      expect(mockDb.workout_sessions.clear).toHaveBeenCalled()
     })
   })
 
   describe('getStorageStats', () => {
     it('should return storage statistics', async () => {
-      // Add data to our mock storage through the service
-      await storageService.saveExercise(mockExercise)
-      await storageService.saveActivityLog(mockActivityLog)
-      await storageService.saveUserPreferences(mockUserPreferences)
-      await storageService.saveAppSettings(mockAppSettings)
+      const mockStoredExercise = {
+        ...mockExercise,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      const mockStoredLog = {
+        ...mockActivityLog,
+        id: 'log-1',
+        timestamp: mockActivityLog.timestamp,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      const mockStoredPreferences = {
+        ...mockUserPreferences,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      const mockStoredSettings = {
+        ...mockAppSettings,
+        deleted: false,
+        dirty: false,
+        op: 'upsert',
+        owner_id: null,
+        version: 1,
+        updated_at: new Date().toISOString()
+      }
+      
+      // Add data to the mock storage arrays
+      exerciseStorage.set(mockStoredExercise.id, mockStoredExercise)
+      activityLogStorage.push(mockStoredLog)
+      userPreferencesStorage.push(mockStoredPreferences)
+      appSettingsStorage.push(mockStoredSettings)
       
       const stats = await storageService.getStorageStats()
       
