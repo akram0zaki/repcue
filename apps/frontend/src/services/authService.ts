@@ -23,6 +23,16 @@ export class AuthService {
     this.initializeAuth();
   }
 
+  // Compute current origin safely (browser only)
+  private getRedirectBase(): string {
+    try {
+      if (typeof window !== 'undefined' && window.location?.origin) {
+        return window.location.origin;
+      }
+    } catch {}
+    return '';
+  }
+
   public static getInstance(): AuthService {
     if (!AuthService.instance) {
       AuthService.instance = new AuthService();
@@ -238,6 +248,8 @@ export class AuthService {
         email,
         password,
         options: {
+          // Ensure email confirmations redirect back to the current app origin (dev/prod)
+          emailRedirectTo: `${this.getRedirectBase()}/auth/callback`,
           data: {
             display_name: displayName || email.split('@')[0]
           }
@@ -268,6 +280,8 @@ export class AuthService {
         email,
         options: {
           shouldCreateUser: true,
+          // Redirect magic-link back to the current app origin (dev/prod)
+          emailRedirectTo: `${this.getRedirectBase()}/auth/callback`,
           data: {
             display_name: email.split('@')[0]
           }
