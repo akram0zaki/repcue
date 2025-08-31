@@ -1,5 +1,18 @@
 ## 2025-08-31
 
+### Fixed
+- Mobile dropdowns (Settings → Beep Interval and Language) flashing closed on Safari/Edge mobile.
+  - Root cause: focus was being moved to the PWA install banner after its animation, which blurs native pickers on touch devices; and an outside-click handler could also react to native picker taps.
+  - Changes:
+    - InstallPrompt: safe focus management — do not steal focus on touch devices or while a form control is focused.
+    - Navigation dropdown: switch outside-close listener from mousedown → click and ignore events originating from form controls (select/input/textarea/combobox).
+  - Result: Native select pickers remain open and usable on mobile.
+
+### Tests
+- Added regression unit test ensuring InstallPrompt does not steal focus on touch or when a select is active (`InstallPrompt.focus.test.tsx`). Test execution intentionally skipped per request during this pass.
+
+## 2025-08-31
+
 - docs(sync): Added comprehensive sync architecture and developer guide at docs/sync/READM.md and linked from README.
 
 ## 2025-08-31

@@ -178,8 +178,25 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
     hideAnimationTimeoutRef.current = setTimeout(() => {
       setIsVisible(false);
       setIsAnimating(false);
-      setShowIOSInstructions(false);
-      setCurrentStep(0);
+      // Focus the install button for accessibility (desktop/keyboard users only)
+      // Avoid stealing focus on mobile/touch or while a form control (e.g., select) is active,
+      // which can cause native pickers to close immediately on iOS/Edge mobile.
+      try {
+        const isTouch =
+          (typeof navigator !== 'undefined' && (navigator as unknown as { maxTouchPoints?: number }).maxTouchPoints && (navigator as unknown as { maxTouchPoints: number }).maxTouchPoints > 0) ||
+          (typeof window !== 'undefined' && 'ontouchstart' in window);
+
+        const active = typeof document !== 'undefined' ? (document.activeElement as HTMLElement | null) : null;
+        const activeTag = active?.tagName?.toLowerCase();
+        const isFormControlActive = activeTag === 'select' || activeTag === 'input' || activeTag === 'textarea' || active?.isContentEditable === true;
+
+        // Only move focus if not touch and no form control currently focused
+        if (!isTouch && !isFormControlActive) {
+          installButtonRef.current?.focus();
+        }
+      } catch {
+        // no-op: focus management is best-effort
+      }
     }, animationDuration);
 
     // Clear auto-hide timer
@@ -203,8 +220,29 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
     
     animationTimeoutRef.current = setTimeout(() => {
       setIsAnimating(false);
-      // Focus the install button for accessibility
-      installButtonRef.current?.focus();
+      // Accessibility: only auto-focus on non-touch/desktop and when not stealing focus from form controls.
+      // This avoids closing native <select> pickers on iOS/Edge mobile where focus changes dismiss the sheet.
+      const isTouchDevice = (() => {
+        try {
+          return window.matchMedia?.('(pointer: coarse)').matches || isIOS() || isAndroid();
+        } catch {
+          return false;
+        }
+      })();
+
+      const activeEl = document.activeElement as HTMLElement | null;
+      const activeTag = activeEl?.tagName?.toLowerCase();
+      const isFormControlFocused = !!activeEl && (
+        activeTag === 'select' ||
+        activeTag === 'input' ||
+        activeTag === 'textarea' ||
+        activeEl.getAttribute('role') === 'combobox' ||
+        activeEl.isContentEditable === true
+      );
+
+      if (!isTouchDevice && !isFormControlFocused) {
+        installButtonRef.current?.focus();
+      }
     }, animationDuration);
 
     // Set auto-hide timer if specified

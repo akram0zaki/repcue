@@ -24,13 +24,20 @@ const Navigation: React.FC = () => {
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+      const target = event.target as HTMLElement | null;
+      // Ignore interactions originating from form controls (native pickers on mobile)
+      if (target && target.closest('select, option, input, textarea, [role="combobox"]')) {
+        return;
+      }
+
+      if (moreMenuRef.current && !moreMenuRef.current.contains(target as Node)) {
         setShowMoreMenu(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    // Use 'click' instead of 'mousedown' to avoid interfering with touch-based native controls on mobile
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const mainNavItems = [
