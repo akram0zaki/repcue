@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter @repcue/frontend dev",
     "dev:be": "pnpm --filter @repcue/backend dev",
-    "build": "pnpm --filter @repcue/frontend build",
+  "build": "pnpm --filter @repcue/frontend build",
     "preview": "pnpm --filter @repcue/frontend preview",
     "start": "pnpm --filter @repcue/backend start",
     "build:serve": "pnpm --filter @repcue/frontend build && pnpm --filter @repcue/backend start",
