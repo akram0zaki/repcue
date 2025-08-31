@@ -1,7 +1,9 @@
 module.exports = {
   apps: [{
     name: "repcue",
-    script: "server.js",
+  // Ensure PM2 runs from the backend folder so script paths resolve correctly on deploy hosts
+  cwd: __dirname,
+  script: "./server.js",
     instances: 1, // Single instance for Pi 5
     autorestart: true,
     watch: false,
