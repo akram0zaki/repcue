@@ -564,7 +564,7 @@ export class SyncService {
            this.lastSyncCursor && 
            this.lastSuccessfulSync && 
            !force &&
-           (Date.now() - this.lastSuccessfulSync) < 3000; // Only skip if synced within last 3 seconds
+           (Date.now() - this.lastSuccessfulSync) < 30000; // Skip if synced within last 30 seconds
                            
       if (shouldSkipSync) {
         console.log('📋 No local changes to sync and recent successful sync exists, skipping sync call');

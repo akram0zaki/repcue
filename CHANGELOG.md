@@ -20,6 +20,8 @@
 #### Changed
 - Lint/type hygiene: removed unused variables and eliminated `any` in core services (`storageService`, `syncService`, `authService`) and tests; ESLint passes clean.
 - Build validated after changes; unit tests were intentionally skipped for this QA pass per instruction.
+ - Settings page: added a "Sync now" button under Data section to trigger bidirectional sync on demand (useful for testing/troubleshooting).
+ - Sync scheduler: reverted skip window back to 30 seconds (from 3 seconds) to limit unnecessary traffic and respect user data plans.
 
 #### Notes
 - UX: Settings changes propagate within seconds via visibility-triggered sync and debounced scheduling.

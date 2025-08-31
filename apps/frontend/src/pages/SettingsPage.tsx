@@ -9,6 +9,7 @@ import { SpeakerIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
+import { syncService } from '../services/syncService';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
 import { ProfileSection } from '../components/ProfileSection';
@@ -23,6 +24,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const { isAuthenticated } = useAuth();
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -64,6 +66,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
   const handleClearData = async () => {
     setShowClearDataToast(true);
+  };
+
+  const handleSyncNow = async () => {
+    try {
+      setIsManualSyncing(true);
+      await syncService.sync(true);
+    } catch (err) {
+      console.error('Manual sync failed:', err);
+    } finally {
+      setIsManualSyncing(false);
+    }
   };
 
   const confirmClearData = async () => {
@@ -399,6 +412,21 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t('settings.exportDataHelp')}
+            </p>
+          </div>
+
+          {/* Sync Now Button */}
+          <div className="mb-3">
+            <button
+              onClick={handleSyncNow}
+              disabled={!hasConsent || !isAuthenticated || isManualSyncing}
+              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              data-testid="btn-sync-now"
+            >
+              {isManualSyncing ? t('settings.syncInProgress') : t('settings.syncNow')}
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {t('settings.syncNowHelp')}
             </p>
           </div>
 
