@@ -1,5 +1,9 @@
 ## 2025-08-31
 
+- docs(sync): Added comprehensive sync architecture and developer guide at docs/sync/READM.md and linked from README.
+
+## 2025-08-31
+
 - Hybrid favorites sync (Phase 1):
   - Store favorites in `user_preferences.favorite_exercises` (TEXT[] of built-in exercise IDs/slugs).
   - Stop syncing `exercises` table for built-in catalog; favorites toggle updates preferences and reflects locally without marking exercises dirty.

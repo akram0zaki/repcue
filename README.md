@@ -757,6 +757,12 @@ pnpm cypress:run
 
 8) CI (GitHub Actions): switch to workspace install (`pnpm install --frozen-lockfile` or cache), run `pnpm lint && pnpm test && pnpm build` from root.
 
+### Sync architecture
+
+For a deep dive into how data sync works (high‑level and inner workings), plus steps to add new entities to the sync scope, see:
+
+- [docs/sync/READM.md](docs/sync/READM.md)
+
 ### Adding New Features
 
 #### New Exercise
