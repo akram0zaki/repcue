@@ -10,6 +10,7 @@ import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import { useExerciseVideo } from '../hooks/useExerciseVideo';
+import getVideoSources from '../utils/videoSources';
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -57,7 +58,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
   const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && appSettings.show_exercise_videos && !prefersReducedMotion;
+  const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && (appSettings.show_exercise_videos ?? true) && !prefersReducedMotion;
 
   useEffect(() => {
     if (!videoFeatureEnabled) return;
@@ -182,6 +183,14 @@ const TimerPage: React.FC<TimerPageProps> = ({
     return () => window.removeEventListener('resize', update);
   }, [exerciseVideo.media]);
 
+  // Force reload when URL changes so new <source> children are considered by the media element
+  useEffect(() => {
+    const v = exerciseVideo.videoRef.current;
+    if (v) {
+      try { v.load(); } catch {}
+    }
+  }, [videoUrl]);
+
   useEffect(() => {
     if (!exerciseVideo || !isRepBased) return;
     exerciseVideo.onLoop(() => {
@@ -193,9 +202,11 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
   // Phase 3 debug aid: log reasons when an exercise marked has_video does not actually render
   useEffect(() => {
-    if (!exerciseForVideo || !videoFeatureEnabled) return;
+  if (!exerciseForVideo || !videoFeatureEnabled) return;
     if (showVideoInsideCircle) return; // already visible
     const reasons: string[] = [];
+  if (appSettings.show_exercise_videos === false) reasons.push('user setting off');
+  if (!VIDEO_DEMOS_ENABLED) reasons.push('feature flag disabled');
     if (!exerciseVideo.media) reasons.push('missing media metadata');
     if (!videoUrl) reasons.push('no variant chosen');
     if (isCountdown) reasons.push('during countdown');
@@ -476,29 +487,34 @@ const TimerPage: React.FC<TimerPageProps> = ({
           >
             {showVideoInsideCircle && (
               // Inset the video slightly so progress ring(s) wrap AROUND, not over, the media
-        <div className="absolute inset-2 sm:inset-3 rounded-full overflow-hidden z-0" data-testid="exercise-video-wrapper">
+  <div className="absolute inset-2 sm:inset-3 rounded-full overflow-hidden z-[1]" data-testid="exercise-video-wrapper">
                 <video
                   ref={exerciseVideo.videoRef}
-                  src={videoUrl || undefined}
+                  autoPlay
                   muted
                   loop
                   playsInline
                   preload="metadata"
                   className="h-full w-full object-cover"
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
-          data-testid="exercise-video"
+                  data-testid="exercise-video"
+                  style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
                   onLoadedData={() => {
                     // Safety: ensure play attempt if hook's effect missed due to timing
                     if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
                       exerciseVideo.videoRef.current.play().catch(() => {});
                     }
                   }}
-                />
+                >
+                  {getVideoSources(videoUrl).map(s => (
+                    <source key={s.src} src={s.src} type={s.type} />
+                  ))}
+                </video>
                 {/* Subtle overlay to maintain ring contrast */}
                 <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />
               </div>
             )}
-            <svg className="transform -rotate-90 w-40 h-40">
+            <svg className="transform -rotate-90 w-40 h-40 pointer-events-none relative z-0">
               {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
               {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets ? (
                 <>

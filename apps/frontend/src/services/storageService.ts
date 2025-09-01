@@ -271,7 +271,8 @@ class RepCueDatabase extends Dexie {
           pre_timer_countdown: 3,
           default_rest_time: 60,
           rep_speed_factor: 1.0,
-          show_exercise_videos: false,
+          // Align with DEFAULT_APP_SETTINGS (true). Prior value 'false' caused videos hidden on migrated installs.
+          show_exercise_videos: true,
           reduce_motion: false,
           auto_start_next: false,
           // Remove old camelCase fields  

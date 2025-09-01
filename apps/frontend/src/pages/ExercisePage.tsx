@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
+import getVideoSources from '../utils/videoSources';
 import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
@@ -445,7 +446,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
             <div className="p-3 sm:p-4">
               {previewUrl ? (
                 <video
-                  src={previewUrl}
                   className="w-full h-auto rounded-md bg-black"
                   controls
                   autoPlay
@@ -454,7 +454,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                   playsInline
                   onError={handleVideoError}
                   ref={videoRef}
-                />
+                  style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
+                >
+                  {getVideoSources(previewUrl).map(s => (
+                    <source key={s.src} src={s.src} type={s.type} />
+                  ))}
+                </video>
               ) : (
                 <div className="w-full h-40 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" data-testid="preview-loading" />
               )}
