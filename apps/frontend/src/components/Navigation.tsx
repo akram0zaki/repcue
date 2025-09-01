@@ -48,12 +48,6 @@ const Navigation: React.FC = () => {
   testId: 'nav-home'
     },
     {
-      path: Routes.WORKOUTS, // Changed from SCHEDULE
-      label: t('navigation.workouts'), // Changed from 'Schedule'
-      icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
-  testId: 'nav-workouts'
-    },
-    {
       path: Routes.EXERCISES,
       label: t('navigation.exercises'),
       icon: ExercisesIcon,
@@ -64,6 +58,12 @@ const Navigation: React.FC = () => {
       label: t('navigation.timer'),
       icon: TimerIcon,
   testId: 'nav-timer'
+    },
+    {
+      path: Routes.WORKOUTS, // Changed from SCHEDULE
+      label: t('navigation.workouts'), // Changed from 'Schedule'
+      icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
+  testId: 'nav-workouts'
     },
     {
       path: Routes.ACTIVITY_LOG,

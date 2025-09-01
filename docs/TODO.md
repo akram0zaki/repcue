@@ -48,7 +48,7 @@
     - ✅ On Mon 25-Aug I created a Workout for Tue and Fri and the Home screen workout panel said next exercise Tue 25-Aug, Start now. The correct date is Tue 26-Aug.
     - ✅ I created a workout of Plank, Burpees, then Finger Rolls. The videos were not displayed for Plank or Burpees in the workout mode although both exercises have videos, and the "Show Exercise Demo Videos" toggle was enabled. The videos were displayed when the same exercises were run in standalone mode before I ran the workout. After completing the Workout the same exercises did not play the videos again in standalone mode, and there was a very thin small green line on the timer component, which may suggest some UI problem was there.
     - ✅ A "cancel" label is not translated in the Arabic locale files.
-    - Sign-up with biometrics fails with error "Failed to send a request to the Edge Function"
+    - 🔄 Sign-up with biometrics fails with error "Failed to send a request to the Edge Function"
     - ✅ This text is repeated on the console in an endless loop: "🚀 Initializing app with consent granted
 App.tsx:1391 🚀 Initializing PWA capabilities...
 serviceWorker.ts:28 🔧 Service worker not registered in development mode
@@ -59,11 +59,11 @@ App.tsx:1391 🚀 Initializing PWA capabilities...
 serviceWorker.ts:28 🔧 Service worker not registered in development mode
 App.tsx:1459 ⚙️ Loaded stored settings: {id: 'default-app-settings', intervalDuration: 30, soundEnabled: true, vibrationEnabled: true, beepVolume: 0.5, …}
 App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', intervalDuration: 30, soundEnabled: true, vibrationEnabled: true, beepVolume: 0.5, …}"
-    - I signed up on Firefox after entering email, screen name, and password. I tried to sign in from Edge with the email and password yet I get message "Invalid login credentials", while I entered the email address and password correctly.
+    - 🔄 I signed up on Firefox after entering email, screen name, and password. I tried to sign in from Edge with the email and password yet I get message "Invalid login credentials", while I entered the email address and password correctly.
     - ✅ I signed in with magic link on Firefox, received the login link, then pasted it in a new tab in Firefox. I got a message in a green overlay saying "Welcome! Your Data is Safe Successfully migrated 27 records from your local storage Migrated: 26 exercises and 1 settings" but at the same time I got a Red toast on top of the screen wwith error "Sync failed Sync endpoint error: Edge Function returned a non-2xx status code • Last attempt: 2m ago", while the console in the developer tools is continuously printing text like it's in an endless loop.
     - ✅ In this message "Welcome! Your Data is Safe Successfully migrated 27 records from your local storage Migrated: 26 exercises and 1 settings" I expect a lot more data to be synced. 26 exercises is the global exercise catalog. What I expect to be synced is also my own Workouts with their own settings, the activity log, and all the settings I set.
     - ✅ There is no option to sign-out after I have signed-in. There should be a Profile part at the top of the settings page where users can view their profile or sign out, or sign-in/up.
-    - The sync failed error is not translated in non-English locales.
+    - ✅ The sync failed error is not translated in non-English locales.
     - ✅ I want a Profile section at the top of the Settings page, not on top of the Settings menu. The Profile section on the settings page should give the user options to view profile, sign-in or sign out depending on their login status.
     - ✅ When the user is logged on, a section appears on top of the Settings menu item displaying the user's email address. Since we added a profile section to the Settings page I find this redundant. Remove the profile info on top of the Settings menu in navigation for logged on users.
     - ✅ Review all non-English translation files and translate any English strings there to the file's corresponding language. Note that ar-EG is the slang Egyptian Arabic.
@@ -79,6 +79,13 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ This application is still under development and has no real users yet. I don't mind deleting the entire supabase database and starting over with a clean and clear design to solve this sync issue once and for all. I would like you to be critical and if you think this is a good idea then you need to create a detailed implementation plan with phases and tasks how you would do this step by step  and write it to docs/implementation-plans/sync-resolution.md. Such plan must be thorough and include an analysis of existing indexeddb entities and relations and application functionality to make sure everything is addressed.
 
+- UX improvements:
+    - ✅ In the main navigation menu, change the order of pages to be: Home, Exercises, Timer, Workouts, Log, and Settings
+    - On the Home page there is a message with key home.availableExercises under the number of exercises. The number of exercises should be a link that takes the user to the Exercises page, and move this section up to replace the "Browse Exercises" button.
+    - On the Exercises page, replace the categories dropdown menu in the filter with tags similar to how it is rendered in the Activity Log. This would allow the user to choose combinations of categories at a time, rather than just one.
+    - Bug: When the server is down, the PWA app continues to run in the browser however all strings are displayed as keys (e.g. home.availableExercises) rather than localized text. 
+    - Review all icons in the app and make sure descriptive SVG icons are in place, and replace any emojis with appropriate SVG icons.
+    
 
 - Gamification:
     - Add motivational feedback.

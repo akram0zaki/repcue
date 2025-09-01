@@ -1,3 +1,7 @@
+## 2025-09-01 (2)
+
+- UX: Reordered bottom navigation to Home, Exercises, Timer, Workouts, Activity Log; Settings remains under More.
+
 ## 2025-09-01 — iOS Timer video playback fixes
 
 ### Fixed
@@ -752,7 +756,6 @@
 
 ### Package Manager Migration
 - Migrated from npm to pnpm for improved performance and disk usage
-- Created `pnpm-workspace.yaml` to replace npm workspaces configuration  
 - Updated all workspace scripts to use `pnpm --filter` syntax
 - Added `packageManager` field to root `package.json` (pnpm@10.15.0)
 - Updated GitHub Actions CI to use pnpm with action-setup and frozen lockfile
