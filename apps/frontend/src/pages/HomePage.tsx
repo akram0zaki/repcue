@@ -232,13 +232,22 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               >
                 {t('home.startTimer')}
               </button>
-              <button 
-                className="btn-secondary w-full"
-                data-testid="browse-exercises"
-                onClick={() => navigate(Routes.EXERCISES)}
-              >
-                {t('home.browseExercises')}
-              </button>
+              
+              {/* Exercises Count Section - moved up from Stats */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md">
+                <button 
+                  className="w-full text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg p-2"
+                  onClick={() => navigate(Routes.EXERCISES)}
+                  data-testid="exercises-count-link"
+                >
+                  <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                    {exercises.length}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {t('home.availableExercises')}
+                  </div>
+                </button>
+              </div>
             </div>
           </section>
 
@@ -289,19 +298,6 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             )}
           </section>
 
-          {/* Stats Section */}
-          <section>
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md">
-              <div className="text-center">
-                <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                  {exercises.length}
-                </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('home.availableExercises')}
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* Language Selection Footer */}
           <footer className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">

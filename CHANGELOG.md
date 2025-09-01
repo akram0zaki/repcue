@@ -1,3 +1,8 @@
+## 2025-09-01 (3)
+
+- UX: Home page exercises count is now a clickable link that navigates to Exercises page, moved up to replace Browse Exercises button for better discoverability and reduced UI redundancy.
+- docs: Created comprehensive CLAUDE.md file with monorepo-aware architecture guide, essential commands, and development context for AI coding assistants.
+
 ## 2025-09-01 (2)
 
 - UX: Reordered bottom navigation to Home, Exercises, Timer, Workouts, Activity Log; Settings remains under More.
