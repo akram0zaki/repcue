@@ -1,3 +1,27 @@
+## 2025-09-01 — iOS Timer video playback fixes
+
+### Fixed
+- Exercise demo videos not rendering on iOS Safari in Timer (standalone and workout) while preview worked:
+  - Multi-source fallback: render a <video> with multiple <source> entries (MP4 preferred on iOS, WebM as fallback) instead of a single `src`.
+  - Layering: ensure the video sits above the SVG progress ring (z-index fix) and set the ring to `pointer-events: none` to avoid intercepting taps.
+  - Gating: default `show_exercise_videos` to “on” when undefined and remove duplicate checks so gating is: feature flag + user setting + reduced motion.
+  - Reload: call `video.load()` when the resolved video URL changes so iOS re-evaluates the `<source>` list.
+  - Diagnostics: compact console log for reasons a Timer video is hidden, to aid on-device verification.
+
+### Changed
+- Exercise preview modal now also uses the same multi-source pattern for parity and future-proofing.
+
+### Notes
+- Only WebM assets are currently shipped; the utility will prefer MP4 on iOS when/if MP4 variants are added, while keeping WebM as a fallback.
+- Security/privacy: media remains same-origin; no third-party calls. Respects reduced-motion.
+
+### Build
+- Frontend build successful after changes (`pnpm -C apps/frontend build`).
+
+### Related files
+- Updated: `apps/frontend/src/pages/TimerPage.tsx`, `apps/frontend/src/pages/ExercisePage.tsx`
+- Added: `apps/frontend/src/utils/videoSources.ts`
+
 ## 2025-08-31
 
 ### Fixed
