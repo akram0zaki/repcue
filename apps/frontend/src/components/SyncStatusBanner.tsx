@@ -24,8 +24,8 @@ const SyncStatusBanner: React.FC = () => {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
-  // Show sync error state (highest priority)
-  if (DEBUG && isAuthenticated && syncState.errors.length > 0) {
+  // Show sync error state (highest priority) - always show errors regardless of DEBUG flag
+  if (isAuthenticated && syncState.errors.length > 0) {
     return (
       <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4" role="alert" data-testid="sync-status-banner">
         <div className="flex items-center justify-between">

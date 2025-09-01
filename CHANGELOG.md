@@ -1,3 +1,21 @@
+## 2025-09-01 (6)
+
+- UX: Hide sync success messages in production mode - sync success messages (e.g., "Welcome! Your Data is Safe - Successfully migrated X records") are now only shown when DEBUG is enabled in config/features.ts. Users take sync for granted, so only sync errors are displayed in normal operation while successful syncs happen silently in the background.
+
+  When DEBUG = false (Production Mode):
+  - ✅ Sync errors: Always displayed when they occur
+  - ❌ Sync success messages: Hidden ("Welcome! Your Data is Safe...")
+  - ❌ Sync progress indicators: Hidden
+  - ❌ Pending changes notifications: Hidden
+
+  When DEBUG = true (Development Mode):
+  - ✅ All sync messages: Success, errors, progress, pending changes
+  - ✅ Full sync visibility: For debugging and development purposes
+
+  This creates a clean production experience where users only see sync messages when there's     
+  actually a problem that needs their attention, while developers can still see full sync        
+  details when debugging is enabled.
+
 ## 2025-09-01 (5)
 
 - UX: Timer page optimized for better video visibility and mobile experience - enlarged timer rings from 160px to 280px (75% larger), increased text sizes from 3xl to 4xl-5xl, thicker ring strokes for better visibility, reduced padding and margins throughout, minimized section spacing, and removed redundant exercise display card in workout mode. Timer now displays in full without vertical scrolling on mobile devices.

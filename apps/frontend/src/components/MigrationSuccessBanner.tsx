@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { DEBUG } from '../config/features';
 
 interface MigrationSuccessDetail {
   recordsClaimed: number;
@@ -28,6 +29,12 @@ const MigrationSuccessBanner: React.FC<MigrationSuccessBannerProps> = ({ onDismi
 
   useEffect(() => {
     const handleMigrationSuccess = (event: CustomEvent<MigrationSuccessDetail>) => {
+      // Only show success message when debugging is enabled
+      // Users take sync for granted - only show errors in production
+      if (!DEBUG) {
+        return;
+      }
+      
       setMigrationData(event.detail);
       setIsVisible(true);
       
