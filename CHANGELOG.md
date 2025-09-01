@@ -2,7 +2,7 @@
 
 ### Fixed
 - Exercise demo videos not rendering on iOS Safari in Timer (standalone and workout) while preview worked:
-  - Multi-source fallback: render a <video> with multiple <source> entries (MP4 preferred on iOS, WebM as fallback) instead of a single `src`.
+  - Switched to <video> with <source> children (ready for multi-codec fallback). Current assets are WebM-only; the utility emits a single <source> for the chosen URL and will prefer MP4 on iOS when MP4 variants are added.
   - Layering: ensure the video sits above the SVG progress ring (z-index fix) and set the ring to `pointer-events: none` to avoid intercepting taps.
   - Gating: default `show_exercise_videos` to “on” when undefined and remove duplicate checks so gating is: feature flag + user setting + reduced motion.
   - Reload: call `video.load()` when the resolved video URL changes so iOS re-evaluates the `<source>` list.
