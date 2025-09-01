@@ -117,16 +117,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const currentWorkoutExercise = workoutMode ? workoutMode.exercises[workoutMode.currentExerciseIndex] : null;
   const workoutCurrentExercise = currentWorkoutExercise ? exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id) : null;
   
-  // During rest periods, we want to show the previous exercise as "completed" and the next exercise as "coming up"
-  const previousWorkoutExercise = workoutMode && workoutMode.currentExerciseIndex > 0 
-    ? workoutMode.exercises[workoutMode.currentExerciseIndex - 1] 
-    : null;
-  const previousExercise = previousWorkoutExercise ? exercises.find(ex => ex.id === previousWorkoutExercise.exercise_id) : null;
   
-  // Choose which exercise to display based on rest state
-  const displayExercise = isWorkoutMode 
-    ? (actuallyResting ? previousExercise || workoutCurrentExercise : workoutCurrentExercise || selectedExercise)
-    : selectedExercise;
   
   // Define exerciseForVideo with proper workout mode support
   const exerciseForVideo = isWorkoutMode 
@@ -273,81 +264,47 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const favoriteExercises = exercises.filter(ex => ex.is_favorite).slice(0, 6);
 
   return (
-  <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900" data-testid="timer-page">
-      <div className="container mx-auto px-4 py-2 max-w-md">
+  <div id="main-content" className="min-h-screen pt-safe pb-16 bg-gray-50 dark:bg-gray-900" data-testid="timer-page">
+      <div className="container mx-auto px-3 py-1 max-w-md">
         
-        {/* Workout Mode Header */}
+        {/* Compact Workout Mode Header */}
         {isWorkoutMode && (
-          <div className="bg-blue-600 text-white rounded-lg p-4 mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-semibold">{workoutMode.workoutName}</h2>
-              <span className="text-sm bg-blue-500 px-2 py-1 rounded">
+          <div className="bg-blue-600 text-white rounded-lg p-3 mb-2">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-base font-semibold truncate">{workoutMode.workoutName}</h2>
+              <span className="text-xs bg-blue-500 px-2 py-0.5 rounded">
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
                   const totalExercises = workoutMode.exercises.length;
                   
                   if (currentIndex >= totalExercises) {
-                    // Workout completed
-                    return `${totalExercises} / ${totalExercises}`;
+                    return `${totalExercises}/${totalExercises}`;
                   }
                   
                   if (workoutMode.isResting) {
-                    // During rest: show completed exercises
-                    return `${currentIndex} / ${totalExercises}`;
+                    return `${currentIndex}/${totalExercises}`;
                   } else {
-                    // During exercise: show current exercise
-                    return `${currentIndex + 1} / ${totalExercises}`;
+                    return `${currentIndex + 1}/${totalExercises}`;
                   }
                 })()}
               </span>
             </div>
             
-            {/* Workout Progress Bar */}
-            <div className="w-full bg-blue-500 rounded-full h-2 mb-2">
+            {/* Compact Workout Progress Bar */}
+            <div className="w-full bg-blue-500 rounded-full h-1.5">
               <div 
-                className="bg-white h-2 rounded-full transition-all duration-300"
+                className="bg-white h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${workoutProgress}%` }}
               />
             </div>
-            
-            <div className="text-sm opacity-90">
-              {actuallyResting 
-                ? t('timer.restNext', { next: workoutCurrentExercise?.name || t('common.loading') })
-                : t('timer.exerciseWithName', { index: workoutMode.currentExerciseIndex + 1, name: displayExercise?.name || t('common.loading') })
-              }
-            </div>
           </div>
         )}
 
-        {/* Current Exercise Display - More prominent in workout mode */}
-        {isWorkoutMode && displayExercise && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4 text-center">
-            <div className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-              {actuallyResting ? t('timer.restPeriod') : localizeExercise(displayExercise, t).name}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              {actuallyResting 
-                ? t('timer.nextWithCategory', { next: workoutCurrentExercise ? localizeExercise(workoutCurrentExercise, t).name : undefined, category: workoutCurrentExercise?.category })
-                : t('timer.currentWithCategory', { category: displayExercise.category })
-              }
-            </div>
-      {localizeExercise(displayExercise, t).description && !actuallyResting && (
-              <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
-        {localizeExercise(displayExercise, t).description}
-              </div>
-            )}
-            {actuallyResting && (
-              <div className="text-xs text-gray-500 dark:text-gray-500 mt-2 italic">
-                {t('timer.restHint')}
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Exercise Selection - Hidden in workout mode */}
+        {/* Compact Exercise Selection - Hidden in workout mode */}
         {!isWorkoutMode && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.exerciseLabel')}</span>
               <button
                 onClick={() => onSetShowExerciseSelector(true)}
@@ -393,9 +350,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
         )}
 
-        {/* Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
+        {/* Compact Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
         {!isWorkoutMode && selectedExercise?.exercise_type !== 'repetition_based' && (
-        <div className="mb-4">
+        <div className="mb-2">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.duration')}</p>
           <div className="grid grid-cols-3 gap-2">
             {TIMER_PRESETS.map(duration => (
@@ -415,9 +372,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
         )}
 
-        {/* Rep Duration Display - Shown for repetition-based exercises in standalone mode */}
+        {/* Compact Rep Duration Display - Shown for repetition-based exercises in standalone mode */}
         {!isWorkoutMode && selectedExercise?.exercise_type === 'repetition_based' && (
-        <div className="mb-4">
+        <div className="mb-2">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.repDuration')}</p>
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-3">
             <div className="text-center">
@@ -432,10 +389,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
         )}
 
-        {/* Rep/Set Progress - Shown for repetition-based exercises (both workout mode and standalone) */}
+        {/* Compact Rep/Set Progress - Shown for repetition-based exercises (both workout mode and standalone) */}
         {selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
-            <div className="mb-3">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-2">
+            <div className="mb-2">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
                 <span>{t('timer.setProgress')}</span>
                 <span>{
@@ -471,7 +428,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
         {/* Countdown Banner */}
         {isCountdown && (
-          <div className="bg-orange-100 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-3 mb-4 text-center">
+          <div className="bg-orange-100 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-2 mb-2 text-center">
             <div className="text-orange-800 dark:text-orange-300 font-medium text-sm flex items-center justify-center gap-2">
               <ReadyIcon size={16} />
               {t('timer.getReadyStartsIn', { count: countdownTime })}
@@ -479,15 +436,17 @@ const TimerPage: React.FC<TimerPageProps> = ({
           </div>
         )}
 
-        {/* Timer Display */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-4">
-          {/* Circular Progress */}
-      <div className={`relative w-40 h-40 mx-auto mb-4 ${repPulse ? 'transition-transform' : ''}`}
+        {/* Enhanced Timer Display */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
+          {/* Larger Circular Progress for Better Video Visibility */}
+      <div 
+        className={`relative mx-auto mb-3 ${repPulse ? 'transition-transform' : ''}`}
+        style={{ width: '280px', height: '280px' }}
             aria-live="off"
           >
             {showVideoInsideCircle && (
               // Inset the video slightly so progress ring(s) wrap AROUND, not over, the media
-  <div className="absolute inset-2 sm:inset-3 rounded-full overflow-hidden z-[1]" data-testid="exercise-video-wrapper">
+  <div className="absolute inset-4 sm:inset-6 rounded-full overflow-hidden z-[1]" data-testid="exercise-video-wrapper">
                 <video
                   ref={exerciseVideo.videoRef}
                   autoPlay
@@ -514,52 +473,56 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />
               </div>
             )}
-            <svg className="transform -rotate-90 w-40 h-40 pointer-events-none relative z-0">
+            <svg 
+              className="transform -rotate-90 pointer-events-none relative z-0" 
+              style={{ width: '280px', height: '280px' }}
+              viewBox="0 0 280 280"
+            >
               {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
               {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets ? (
                 <>
                   {/* Outer circle for set progress (reps within current set) */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="75"
+                    cx="140"
+                    cy="140"
+                    r="125"
                     stroke="currentColor"
-                    strokeWidth="6"
+                    strokeWidth="8"
                     fill="none"
                     className="text-gray-200 dark:text-gray-700"
                   />
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="75"
+                    cx="140"
+                    cy="140"
+                    r="125"
                     stroke="currentColor"
-                    strokeWidth="6"
+                    strokeWidth="8"
                     fill="none"
-                    strokeDasharray={`${2 * Math.PI * 75}`}
-                    strokeDashoffset={`${2 * Math.PI * 75 * (1 - repProgressInSet / 100)}`}
+                    strokeDasharray={`${2 * Math.PI * 125}`}
+                    strokeDashoffset={`${2 * Math.PI * 125 * (1 - repProgressInSet / 100)}`}
                     className={`text-green-500 transition-all duration-300 ${repPulse ? 'animate-pulse' : ''}`}
                     strokeLinecap="round"
                   />
                   
                   {/* Inner circle for individual rep progress */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="60"
+                    cx="140"
+                    cy="140"
+                    r="105"
                     stroke="currentColor"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="none"
                     className="text-gray-200 dark:text-gray-700"
                   />
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="60"
+                    cx="140"
+                    cy="140"
+                    r="105"
                     stroke="currentColor"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="none"
-                    strokeDasharray={`${2 * Math.PI * 60}`}
-                    strokeDashoffset={`${2 * Math.PI * 60 * (1 - finalDisplayProgress / 100)}`}
+                    strokeDasharray={`${2 * Math.PI * 105}`}
+                    strokeDashoffset={`${2 * Math.PI * 105 * (1 - finalDisplayProgress / 100)}`}
                     className={`transition-all duration-300 ${
                       isCountdown 
                         ? 'text-orange-500' 
@@ -577,23 +540,23 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   
                   {/* Inner circle for timer progress */}
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
+                    cx="140"
+                    cy="140"
+                    r="115"
                     stroke="currentColor"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="none"
                     className="text-gray-200 dark:text-gray-700"
                   />
                   <circle
-                    cx="80"
-                    cy="80"
-                    r="70"
+                    cx="140"
+                    cy="140"
+                    r="115"
                     stroke="currentColor"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     fill="none"
-                    strokeDasharray={`${2 * Math.PI * 70}`}
-                    strokeDashoffset={`${2 * Math.PI * 70 * (1 - finalDisplayProgress / 100)}`}
+                    strokeDasharray={`${2 * Math.PI * 115}`}
+                    strokeDashoffset={`${2 * Math.PI * 115 * (1 - finalDisplayProgress / 100)}`}
                     className={`transition-all duration-300 ${
                       isCountdown 
                         ? 'text-orange-500' 
@@ -612,10 +575,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <div className="text-center">
                 {isCountdown ? (
                   <>
-                    <div className="text-4xl font-bold text-orange-500 dark:text-orange-400">
+                    <div className="text-5xl font-bold text-orange-500 dark:text-orange-400">
                       {countdownTime}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {t('timer.getReadyEllipsis')}
                     </div>
                   </>
@@ -623,16 +586,16 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   // Rep-based exercise display: show rep progress instead of time countdown
                   // Only show when not all reps are completed
                   <>
-                    <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-sm">
+                    <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-sm">
                       Rep {(currentRep || 0) + 1}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className={`text-3xl font-bold drop-shadow-sm ${
+                    <div className={`text-4xl font-bold drop-shadow-sm ${
                       isCountdown && displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
                         : actuallyResting
@@ -641,7 +604,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     }`}>
                       {formatTime(displayTime)}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {actuallyResting 
                         ? t('timer.restPeriod')
                         : isWorkoutMode 
@@ -663,7 +626,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
           </div>
 
           {/* Timer Controls */}
-          <div className="flex justify-center space-x-3">
+          <div className="flex justify-center space-x-3 mt-2">
             {!isRunning ? (
               <button
                 onClick={onStartTimer}
@@ -693,10 +656,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
           </div>
         </div>
 
-        {/* Exercise Controls - Shown for workout mode or standalone rep-based exercises */}
+        {/* Compact Exercise Controls - Shown for workout mode or standalone rep-based exercises */}
         {(isWorkoutMode || (selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps)) && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
-            <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 mb-2">
+            <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
               {isWorkoutMode ? t('timer.workoutControls') : t('timer.exerciseControls')}
             </h3>
             
