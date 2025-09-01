@@ -81,11 +81,13 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - UX improvements:
     - ✅ In the main navigation menu, change the order of pages to be: Home, Exercises, Timer, Workouts, Log, and Settings
-    - On the Home page there is a message with key home.availableExercises under the number of exercises. The number of exercises should be a link that takes the user to the Exercises page, and move this section up to replace the "Browse Exercises" button.
-    - On the Exercises page, replace the categories dropdown menu in the filter with tags similar to how it is rendered in the Activity Log. This would allow the user to choose combinations of categories at a time, rather than just one.
-    - Bug: When the server is down, the PWA app continues to run in the browser however all strings are displayed as keys (e.g. home.availableExercises) rather than localized text. 
-    - Review all icons in the app and make sure descriptive SVG icons are in place, and replace any emojis with appropriate SVG icons.
+    - ✅ On the Home page there is a message with key home.availableExercises under the number of exercises. The number of exercises should be a link that takes the user to the Exercises page, and move this section up to replace the "Browse Exercises" button.
+    - ✅ On the Exercises page, replace the categories dropdown menu in the filter with tags similar to how it is rendered in the Activity Log. This would allow the user to choose combinations of categories at a time, rather than just one.
+    - ✅ On the Timer page, the timer itself is the main feature and if an exercise has a video the video gets rendered inside the timer's rings. I would like to give the timer rings more space on the page to improve the video visibility (for exercises which have videos), by minimizing the size of other elements on the page and avoiding vertical scrolling. The timer should be rendered in full without the need to scroll vertically on mobile devices.
+    - ✅ When browser page becomes visible, sync is initiated and I get a sync result message like this one "Welcome! Your Data is Safe \n Successfully migrated 11 records from your local storage \n Migrated: 5 activity_logs, 3 workout_sessions, 1 user_preferences, and 2 other items". The user takes sync for granted, the successful message should be displayed only if debugging is toggled on in config/features.ts. Otherwise successful sync shouldn't trigger a message and a message should be rendered only if there is a problem.
+    - ✅ Bug: When the server is down, the PWA app continues to run in the browser however all strings are displayed as keys (e.g. home.availableExercises) rather than localized text. 
     
+- Review all icons in the app and make sure descriptive SVG icons are in place, and replace any emojis with appropriate SVG icons.
 
 - Gamification:
     - Add motivational feedback.

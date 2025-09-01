@@ -1,3 +1,19 @@
+## 2025-09-01 (7)
+
+- Bug: Fixed i18n strings displaying as keys when server is down - added locale JSON files to PWA service worker cache to ensure i18n resources are available offline. Previously, when the server was unreachable, localized strings would display as their translation keys (e.g., "home.availableExercises") instead of the translated text. The fix includes both static precaching of all locale files and runtime caching strategy to ensure i18n works reliably in offline scenarios.
+
+  🔧 Technical Implementation:
+  - Added `locales/**/*.json` to Workbox globPatterns for static precaching
+  - Added runtime caching rule for `/locales/*.json` with StaleWhileRevalidate strategy
+  - 7-day cache expiration with up to 50 locale file entries
+  - Ensures all supported locales (en, ar, ar-EG, de, es, fr, nl) work offline
+
+  🎯 Benefits:
+  - ✅ i18n works reliably when server is down
+  - ✅ Faster locale file loading from cache
+  - ✅ Better offline PWA experience
+  - ✅ Consistent localized text display regardless of connectivity
+
 ## 2025-09-01 (6)
 
 - UX: Hide sync success messages in production mode - sync success messages (e.g., "Welcome! Your Data is Safe - Successfully migrated X records") are now only shown when DEBUG is enabled in config/features.ts. Users take sync for granted, so only sync errors are displayed in normal operation while successful syncs happen silently in the background.

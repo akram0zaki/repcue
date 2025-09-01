@@ -57,7 +57,16 @@
       "Bash(done)",
       "Bash(pnpm --filter @repcue/frontend vitest run:*)",
       "Bash(pnpm --filter @repcue/frontend test src/pages/__tests__/SettingsPage.test.tsx)",
-      "Bash(for file in apps/frontend/public/locales/*/common.json)"
+      "Bash(for file in apps/frontend/public/locales/*/common.json)",
+      "Bash(pnpm i18n:scan:*)",
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(pnpm --filter @repcue/frontend lint \"src/pages/TimerPage.tsx\")",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)"
     ],
     "deny": [],
     "ask": []
