@@ -35,7 +35,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises']);
   const { showSnackbar } = useSnackbar();
-  const [selectedCategory, setSelectedCategory] = useState<ExerciseCategory | 'all'>('all');
+  const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   // Video preview state
@@ -188,7 +188,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     return exercises.filter(exercise => {
-      const matchesCategory = selectedCategory === 'all' || exercise.category === selectedCategory;
+      const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(exercise.category);
       // Use localized name/description for search while preserving canonical tags
       const loc = localizeExercise(exercise, t);
       const matchesSearch = term.length === 0
@@ -198,7 +198,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
       return matchesCategory && matchesSearch && matchesFavorites;
     });
-  }, [exercises, selectedCategory, searchTerm, showFavoritesOnly, t]);
+  }, [exercises, selectedCategories, searchTerm, showFavoritesOnly, t]);
 
   // Group exercises by category for better organization
   const exercisesByCategory = useMemo(() => {
@@ -302,24 +302,43 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
             </div>
           </div>
 
-          {/* Filter Controls */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
-            {/* Category Filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as ExerciseCategory | 'all')}
-              className="flex-1 sm:flex-none px-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">{t('exercises.allCategories')}</option>
-              <option value={Categories.CORE}>{t('exercises.category.core')}</option>
-              <option value={Categories.STRENGTH}>{t('exercises.category.strength')}</option>
-              <option value={Categories.CARDIO}>{t('exercises.category.cardio')}</option>
-              <option value={Categories.FLEXIBILITY}>{t('exercises.category.flexibility')}</option>
-              <option value={Categories.BALANCE}>{t('exercises.category.balance')}</option>
-              <option value={Categories.HAND_WARMUP}>{t('exercises.category.handWarmup')}</option>
-            </select>
+          {/* Category Filter Tags */}
+          <div className="mb-3 sm:mb-4">
+            <div className="flex flex-wrap gap-2">
+              {Object.values(Categories).map(category => (
+                <button
+                  key={category}
+                  onClick={() => {
+                    const newSelected = new Set(selectedCategories);
+                    if (newSelected.has(category)) {
+                      newSelected.delete(category);
+                    } else {
+                      newSelected.add(category);
+                    }
+                    setSelectedCategories(newSelected);
+                  }}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedCategories.has(category)
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {t(`exercises.category.${category.replace('-', '')}` as const, { defaultValue: category.replace('-', ' ') })}
+                </button>
+              ))}
+              {selectedCategories.size > 0 && (
+                <button
+                  onClick={() => setSelectedCategories(new Set())}
+                  className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  {t('exercises.clearFilters')}
+                </button>
+              )}
+            </div>
+          </div>
 
-            {/* Favorites Toggle */}
+          {/* Favorites Toggle */}
+          <div className="flex justify-start">
             <button
               onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
               className={`flex items-center justify-center gap-2 px-3 py-2.5 sm:py-2 rounded-md transition-colors min-h-[44px] ${
@@ -340,7 +359,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         </div>
 
         {/* Exercise Grid */}
-        {selectedCategory === 'all' ? (
+        {selectedCategories.size === 0 ? (
           // Show by category when viewing all
           <div className="space-y-6 sm:space-y-8">
             {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
@@ -402,7 +421,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
             <button
               onClick={() => {
                 setSearchTerm('');
-                setSelectedCategory('all');
+                setSelectedCategories(new Set());
                 setShowFavoritesOnly(false);
               }}
               className="px-4 py-2.5 bg-blue-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px]"

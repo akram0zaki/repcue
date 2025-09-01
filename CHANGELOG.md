@@ -1,3 +1,7 @@
+## 2025-09-01 (4)
+
+- UX: Exercises page now uses multi-select category tags instead of dropdown, allowing users to filter by multiple categories simultaneously. Layout matches Activity Log for consistency.
+
 ## 2025-09-01 (3)
 
 - UX: Home page exercises count is now a clickable link that navigates to Exercises page, moved up to replace Browse Exercises button for better discoverability and reduced UI redundancy.
