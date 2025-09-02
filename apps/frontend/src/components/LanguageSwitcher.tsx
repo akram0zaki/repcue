@@ -13,6 +13,7 @@ interface LanguageSwitcherProps {
 const supportedLanguages = [
   { code: 'en', label: 'English', nativeLabel: 'English' },
   { code: 'nl', label: 'Dutch', nativeLabel: 'Nederlands' },
+  { code: 'fy', label: 'Frisian', nativeLabel: 'Frysk' },
   { code: 'ar', label: 'Arabic (Standard)', nativeLabel: 'العربية (فصحى)' },
   { code: 'ar-EG', label: 'Arabic (Egyptian)', nativeLabel: 'عربي مصري' },
   { code: 'de', label: 'German', nativeLabel: 'Deutsch' },

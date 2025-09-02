@@ -7,7 +7,7 @@ import HttpBackend from 'i18next-http-backend';
 // Security: Backend constrained to same-origin /locales path.
 
 // Supported languages (expand locales progressively; fallback ensures safety)
-const supportedLngs = ['en', 'nl', 'ar', 'ar-EG', 'de', 'es', 'fr'] as const;
+const supportedLngs = ['en', 'nl', 'fy', 'ar', 'ar-EG', 'de', 'es', 'fr'] as const;
 
 i18n
   .use(HttpBackend)

@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "_note": "Keys below are exercise IDs. 'variable' is a UI label for variable duration."
+  },
+  "variable": "Fariabel",
+  "tags": {
+    "isometric": "Isometrysk",
+    "dynamic": "Dynamysk",
+    "core": "Rûch",
+    "stability": "Stabiliteit",
+    "obliques": "Skeanspieren",
+    "cardio": "Kardio",
+    "upper-body": "Boppelijf",
+    "chest": "Boarst",
+    "arms": "Earms",
+    "lower-body": "Ûnderlijf",
+    "glutes": "Bilspieren",
+    "legs": "Skonken",
+    "balance": "Lykwicht",
+    "quads": "Quadriceps",
+    "full-body": "Folslein lijf",
+    "explosive": "Eksplozyf",
+    "hamstrings": "Hamstrings",
+    "yoga": "Yoga",
+    "stretch": "Rekke",
+    "relaxation": "Ûntspanning",
+    "back": "Rêch",
+    "spine": "Rêchbonke",
+    "mobility": "Mobiliteit",
+    "posterior-chain": "Achterste keatling",
+    "hands": "Hannen",
+    "fingers": "Fingers",
+    "warmup": "Opwurming",
+    "dexterity": "Behendigens",
+    "triceps": "Triceps",
+    "bodyweight": "Lijfswicht",
+    "calves": "Kalveren",
+    "coordination": "Koördinaasje",
+    "rotation": "Rotaasje",
+    "proprioception": "Propriosepsje"
+  },
+  "plank": {
+    "name": "Plank",
+    "description": "Hâld jo lijf yn in rjochte line, stipe troch ûnderearms en tean"
+  },
+  "side-plank": {
+    "name": "Side Plank",
+    "description": "Hâld jo lijf op 'e kant, stipe troch ien ûnderarm"
+  },
+  "mountain-climbers": {
+    "name": "Mountain Climbers",
+    "description": "Wikselje tusken it bringen fan knibbens nei boarst yn plankposysje"
+  },
+  "bicycle-crunches": {
+    "name": "Bicycle Crunches",
+    "description": "Wikselje elleboog nei oars knibbe yn fytsbeweging"
+  },
+  "push-ups": {
+    "name": "Push-ups",
+    "description": "Ûnderlizze en opheffe fan lijf mei earms yn liggjende posysje"
+  },
+  "squats": {
+    "name": "Squats",
+    "description": "Ûnderlijf ûnderlizze troch knibbens te bûgjen, dan werom nei steande posysje"
+  },
+  "lunges": {
+    "name": "Lunges",
+    "description": "Stap nei foaren en ûnderlizze lijf, wikselende skonken"
+  },
+  "wall-sit": {
+    "name": "Wall Sit",
+    "description": "Glije omleech tsjin muorre oant dijen parallel binne, posysje hâlde"
+  },
+  "burpees": {
+    "name": "Burpees",
+    "description": "Squat, springe werom nei plank, push-up, fuotten werom springe, omheech springe"
+  },
+  "jumping-jacks": {
+    "name": "Jumping Jacks",
+    "description": "Fuotten út elkoar springe wylst earms opheffe, dan werom byinoar springe"
+  },
+  "high-knees": {
+    "name": "High Knees",
+    "description": "Op plak rinne mei knibbens omheech nei boarstnivo"
+  },
+  "butt-kicks": {
+    "name": "Butt Kicks",
+    "description": "Op plak rinne mei hakken nei bilspieren sparke"
+  },
+  "downward-dog": {
+    "name": "Downward Dog",
+    "description": "Meitsje in omkearde V-foarm mei hannen en fuotten op grûn"
+  },
+  "child-pose": {
+    "name": "Child's Pose",
+    "description": "Knije en sit werom op hakken, earms nei foaren útstrekke op grûn"
+  },
+  "cat-cow": {
+    "name": "Cat-Cow Stretch",
+    "description": "Wikselje tusken bôgjen en rûnje fan rêchbonke op hannen en knibbens"
+  },
+  "single-leg-stand": {
+    "name": "Single Leg Stand",
+    "description": "Stean op ien skonk, hâld foar tiid, dan wikselje"
+  },
+  "tree-pose": {
+    "name": "Tree Pose",
+    "description": "Stean op ien skonk mei oare foet op binnenkant dij"
+  },
+  "warrior-3": {
+    "name": "Warrior III",
+    "description": "Lykwicht op ien skonk mei oare skonk nei efter útstrutsen"
+  },
+  "dead-bug": {
+    "name": "Dead Bug",
+    "description": "Lizze op rêch, wikselje tusken útstrekken fan oarske earm en skonk"
+  },
+  "glute-bridges": {
+    "name": "Glute Bridges",
+    "description": "Lizze op rêch, heupen opheffe troch bilspieren oan te spannen"
+  },
+  "finger-roll": {
+    "name": "Finger Roll",
+    "description": "Rol fingers fan fûst nei folsleine útstrekking, wurkje elke finger yndividueel"
+  },
+  "tricep-dips": {
+    "name": "Tricep Dips",
+    "description": "Ûnderlizze en opheffe fan lijf mei earmkrêft wylst sitte op râne"
+  },
+  "calf-raises": {
+    "name": "Calf Raises",
+    "description": "Kom omheech op tean, hâld koart, dan werom omleech"
+  },
+  "russian-twists": {
+    "name": "Russian Twists",
+    "description": "Sit mei fuotten omheech, rotearje torso fan kant nei kant"
+  },
+  "bear-crawl": {
+    "name": "Bear Crawl",
+    "description": "Krûp nei foaren op hannen en fuotten, knibbens fan grûn ôf hâlde"
+  },
+  "forward-fold": {
+    "name": "Forward Fold",
+    "description": "Stean en bûgje nei foaren, nei tean reitsje"
+  },
+  "timeBased": {
+    "name": "Tiidbasearre"
+  },
+  "repBased": {
+    "name": "Rep-basearre"
+  }
+}

@@ -1,3 +1,26 @@
+## 2025-09-02 (1)
+
+- feat: Add Frisian language support - added complete Frisian (fy) translation files and language selector integration. Users can now select "Frysk" from the language selector on Home and Settings pages. All UI text, exercise descriptions, authentication forms, and accessibility labels are fully translated into West Frisian.
+
+  🌐 Translation Coverage:
+  - ✅ Complete common.json with all UI elements, navigation, settings, timer controls
+  - ✅ Complete exercises.json with all exercise names, descriptions, and category tags  
+  - ✅ Complete auth.json with authentication forms, errors, and profile management
+  - ✅ Complete titles.json with page titles and app branding
+  - ✅ Complete a11y.json with accessibility labels and screen reader content
+
+  🔧 Technical Implementation:
+  - Added Frisian locale files in `/locales/fy/` directory
+  - Updated LanguageSwitcher.tsx to include { code: 'fy', label: 'Frisian', nativeLabel: 'Frysk' }
+  - Updated i18n.ts supportedLngs array to include 'fy'
+  - Validated all translation keys with i18n:scan - no missing translations
+
+  🎯 Benefits:
+  - ✅ Full native Frisian language experience for West Frisian speakers
+  - ✅ Consistent terminology across fitness app features
+  - ✅ Accessible to ~470,000 native Frisian speakers
+  - ✅ Maintains app's multilingual accessibility commitment
+
 ## 2025-09-01 (7)
 
 - Bug: Fixed i18n strings displaying as keys when server is down - added locale JSON files to PWA service worker cache to ensure i18n resources are available offline. Previously, when the server was unreachable, localized strings would display as their translation keys (e.g., "home.availableExercises") instead of the translated text. The fix includes both static precaching of all locale files and runtime caching strategy to ensure i18n works reliably in offline scenarios.
