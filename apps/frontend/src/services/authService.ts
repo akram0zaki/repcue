@@ -3,6 +3,7 @@ import { supabase } from '../config/supabase';
 import type { AuthState, AuthUserProfile } from '../types';
 import { storageService } from './storageService';
 import { webauthnService, type PasskeyRegistrationResult, type PasskeyAuthenticationResult } from './webauthnService';
+import { getMagicLinkRedirectUrl } from '../utils/pwaDetection';
 
 /**
  * Authentication service using Supabase
@@ -276,12 +277,14 @@ export class AuthService {
    */
   public async signInWithMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
     try {
+      // Use PWA-aware redirect URL
+      const redirectUrl = getMagicLinkRedirectUrl(this.getRedirectBase());
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true,
-          // Redirect magic-link back to the current app origin (dev/prod)
-          emailRedirectTo: `${this.getRedirectBase()}/auth/callback`,
+          emailRedirectTo: redirectUrl,
           data: {
             display_name: email.split('@')[0]
           }

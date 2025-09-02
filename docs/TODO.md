@@ -86,7 +86,11 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - ✅ On the Timer page, the timer itself is the main feature and if an exercise has a video the video gets rendered inside the timer's rings. I would like to give the timer rings more space on the page to improve the video visibility (for exercises which have videos), by minimizing the size of other elements on the page and avoiding vertical scrolling. The timer should be rendered in full without the need to scroll vertically on mobile devices.
     - ✅ When browser page becomes visible, sync is initiated and I get a sync result message like this one "Welcome! Your Data is Safe \n Successfully migrated 11 records from your local storage \n Migrated: 5 activity_logs, 3 workout_sessions, 1 user_preferences, and 2 other items". The user takes sync for granted, the successful message should be displayed only if debugging is toggled on in config/features.ts. Otherwise successful sync shouldn't trigger a message and a message should be rendered only if there is a problem.
     - ✅ Bug: When the server is down, the PWA app continues to run in the browser however all strings are displayed as keys (e.g. home.availableExercises) rather than localized text. 
-    
+
+- Provide a mechanism to force the PWA applications to refresh pages from server.
+
+- ✅ After I install the app as PWA on my iphone's home screen and try to login via magic link, when I click the link in my inbox it opens the web browser and doesn't go to my installed pwa app. How can I resolve this?
+
 - Review all icons in the app and make sure descriptive SVG icons are in place, and replace any emojis with appropriate SVG icons.
 
 - Gamification:

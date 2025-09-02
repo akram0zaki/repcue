@@ -6,6 +6,17 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
+  "protocol_handlers": [
+    {
+      "protocol": "web+repcue",
+      "url": "/auth/callback?token=%s"
+    }
+  ],
+  "url_handlers": [
+    {
+      "origin": "*"
+    }
+  ],
   "theme_color": "#2563eb",
   "background_color": "#f8fafc",
   "categories": ["health", "fitness", "sports"],

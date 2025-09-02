@@ -11,6 +11,7 @@ import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import { registerServiceWorker } from './utils/serviceWorker';
+import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
@@ -1422,6 +1423,10 @@ function App() {
 
           // Register service worker for offline functionality
           console.log('🚀 Initializing PWA capabilities...');
+          
+          // Register PWA link handlers for magic link routing
+          registerPWALinkHandlers();
+          
           const maybePromise = registerServiceWorker();
           const isPromiseLike = <T,>(val: unknown): val is PromiseLike<T> => (
             typeof val === 'object' && val !== null && 'then' in (val as Record<string, unknown>) &&
