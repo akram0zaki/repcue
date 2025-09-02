@@ -13,6 +13,11 @@ import { syncService } from '../services/syncService';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
 import { ProfileSection } from '../components/ProfileSection';
+import { 
+  forceRefreshFromServer, 
+  clearPWACaches, 
+  forceUpdateServiceWorker 
+} from '../utils/serviceWorker';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -23,8 +28,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const { t } = useTranslation(['common']);
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
   const { isAuthenticated } = useAuth();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -118,6 +125,41 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       window.location.reload();
     } catch (error) {
       console.error('Failed to refresh exercises:', error);
+    }
+  };
+
+  const handleForceRefresh = () => {
+    setShowForceRefreshToast(true);
+  };
+
+  const confirmForceRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await forceRefreshFromServer();
+    } catch (error) {
+      console.error('Force refresh failed:', error);
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleClearCaches = async () => {
+    try {
+      setIsRefreshing(true);
+      await clearPWACaches();
+      setIsRefreshing(false);
+    } catch (error) {
+      console.error('Clear caches failed:', error);
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleUpdateServiceWorker = async () => {
+    try {
+      setIsRefreshing(true);
+      await forceUpdateServiceWorker();
+    } catch (error) {
+      console.error('Service worker update failed:', error);
+      setIsRefreshing(false);
     }
   };
 
@@ -444,6 +486,41 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </p>
           </div>
 
+          {/* Force Refresh Buttons */}
+          <div className="mb-3 space-y-2">
+            <button
+              onClick={handleForceRefresh}
+              disabled={isRefreshing}
+              className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            >
+              {isRefreshing ? t('common.loading') : t('settings.forceRefreshApp')}
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('settings.forceRefreshAppHelp')}
+            </p>
+            
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <button
+                onClick={handleClearCaches}
+                disabled={isRefreshing}
+                className="py-2 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                {t('settings.clearCachesOnly')}
+              </button>
+              <button
+                onClick={handleUpdateServiceWorker}
+                disabled={isRefreshing}
+                className="py-2 px-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                {t('settings.updateServiceWorker')}
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <p>{t('settings.clearCachesOnlyHelp')}</p>
+              <p>{t('settings.updateServiceWorkerHelp')}</p>
+            </div>
+          </div>
+
           {/* Clear Data Button */}
           <div>
             <button
@@ -502,6 +579,18 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         title={t('settings.clearAllDataAndReset')}
         message={t('settings.clearAllDataMessage')}
         confirmText={t('settings.clearAllData')}
+        cancelText={t('common.cancel')}
+      />
+
+      {/* Force Refresh Confirmation Toast */}
+      <Toast
+        isOpen={showForceRefreshToast}
+        onClose={() => setShowForceRefreshToast(false)}
+        onConfirm={confirmForceRefresh}
+        type="warning"
+        title={t('settings.forceRefreshApp')}
+        message={t('settings.forceRefreshConfirm')}
+        confirmText={t('settings.forceRefreshApp')}
         cancelText={t('common.cancel')}
       />
 

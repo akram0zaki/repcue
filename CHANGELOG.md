@@ -1,3 +1,46 @@
+## 2025-09-02 (3)
+
+- docs: Add comprehensive PWA implementation guide - created detailed documentation at docs/pwa.md covering PWA functionality, installation guides, and developer implementation details. The guide serves as both user manual and developer reference for RepCue's Progressive Web Application features.
+
+  📚 Documentation Coverage:
+  - ✅ User installation guides for iOS, Android, Desktop platforms
+  - ✅ PWA functionality overview including offline mode, shortcuts, update management
+  - ✅ Developer implementation details with code examples and configuration
+  - ✅ Technical architecture documentation for service workers and caching
+  - ✅ Troubleshooting guide and best practices for PWA development
+  - ✅ Platform-specific optimizations and testing recommendations
+
+  🎯 Guide Highlights:
+  - ✅ Complete feature documentation from user and developer perspectives  
+  - ✅ Step-by-step installation instructions with platform detection
+  - ✅ Advanced PWA features including Wake Lock, Vibration API, Web Share
+  - ✅ Privacy-first architecture and GDPR compliance details
+  - ✅ Performance monitoring and debugging techniques
+  - ✅ Cache management strategies and update deployment workflows
+
+## 2025-09-02 (2)
+
+- feat: Add force PWA refresh functionality - implemented comprehensive mechanism to force refresh PWA applications from server when cached content becomes outdated or app behaves unexpectedly. Users can now force refresh through Settings page with three different approaches.
+
+  🔄 Force Refresh Options:
+  - ✅ Force Refresh App - Complete cache clearing, service worker unregistration, hard reload
+  - ✅ Clear Caches Only - Selective PWA cache clearing without app reload
+  - ✅ Check for Updates - Force service worker update check and immediate application
+
+  🔧 Technical Implementation:
+  - Added forceRefreshFromServer(), clearPWACaches(), forceUpdateServiceWorker() utilities
+  - Enhanced serviceWorker.ts with comprehensive cache management functions
+  - Added force refresh UI in Settings page with confirmation dialogs
+  - Integrated loading states and error handling for all refresh operations
+  - Added translation keys for force refresh functionality in all 8 supported languages
+
+  🎯 Benefits:
+  - ✅ Users can resolve outdated PWA content issues independently
+  - ✅ Multiple refresh strategies for different use cases and preferences
+  - ✅ Professional UI with confirmation dialogs and loading indicators
+  - ✅ Comprehensive error handling and graceful fallbacks
+  - ✅ Multi-language support including newly added Frisian translations
+
 ## 2025-09-02 (1)
 
 - feat: Add Frisian language support - added complete Frisian (fy) translation files and language selector integration. Users can now select "Frysk" from the language selector on Home and Settings pages. All UI text, exercise descriptions, authentication forms, and accessibility labels are fully translated into West Frisian.

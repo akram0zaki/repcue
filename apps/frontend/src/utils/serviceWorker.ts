@@ -123,6 +123,102 @@ export const isStandalone = (): boolean => {
 };
 
 /**
+ * Force refresh the PWA by clearing all caches and reloading from server
+ * This bypasses all service worker caches and forces fresh content
+ */
+export const forceRefreshFromServer = async (): Promise<void> => {
+  try {
+    logger.log('🔄 Force refreshing PWA from server...');
+
+    // Method 1: Clear all caches
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      logger.log(`🗑️ Clearing ${cacheNames.length} cache(s):`, cacheNames);
+      
+      await Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      );
+      logger.log('✅ All caches cleared');
+    }
+
+    // Method 2: Unregister service worker if present
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        logger.log('🚫 Unregistering service worker:', registration.scope);
+        await registration.unregister();
+      }
+    }
+
+    // Method 3: Hard reload from server
+    logger.log('🔃 Performing hard reload from server...');
+    window.location.reload();
+    
+  } catch (error) {
+    logger.error('❌ Force refresh failed:', error);
+    // Fallback: regular hard reload
+    window.location.reload();
+  }
+};
+
+/**
+ * Clear only PWA caches while keeping service worker active
+ * Less disruptive than full force refresh
+ */
+export const clearPWACaches = async (): Promise<void> => {
+  try {
+    if ('caches' in window) {
+      const cacheNames = await caches.keys();
+      logger.log(`🧹 Clearing ${cacheNames.length} PWA cache(s)...`);
+      
+      await Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      );
+      
+      logger.log('✅ PWA caches cleared successfully');
+    }
+  } catch (error) {
+    logger.error('❌ Cache clearing failed:', error);
+    throw error;
+  }
+};
+
+/**
+ * Check for and apply service worker updates immediately
+ */
+export const forceUpdateServiceWorker = async (): Promise<void> => {
+  try {
+    if (!('serviceWorker' in navigator)) {
+      throw new Error('Service worker not supported');
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+    
+    logger.log('🔍 Checking for service worker updates...');
+    await registration.update();
+    
+    if (registration.waiting) {
+      logger.log('🚀 Activating waiting service worker...');
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      
+      // Wait for controller change
+      return new Promise((resolve) => {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          logger.log('✅ Service worker updated and activated');
+          window.location.reload();
+          resolve();
+        });
+      });
+    } else {
+      logger.log('ℹ️ No service worker updates available');
+    }
+  } catch (error) {
+    logger.error('❌ Service worker update failed:', error);
+    throw error;
+  }
+};
+
+/**
  * Show install prompt for PWA
  */
 export const setupInstallPrompt = (): Promise<boolean> => {
