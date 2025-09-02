@@ -276,10 +276,22 @@ export class AuthService {
    */
   public async signInWithMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Always use the current origin for magic link redirects to ensure
-      // the user is redirected back to the same domain they initiated the request from
-      const currentOrigin = this.getRedirectBase();
-      const redirectUrl = `${currentOrigin}/auth/callback`;
+      // Use hybrid redirect URL approach:
+      // - In PWA mode: use custom protocol for deep linking back to PWA
+      // - In browser mode: use current origin for same-domain redirects
+      let redirectUrl: string;
+      
+      // Check if we're in PWA mode (standalone display)
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                    (window.navigator as any).standalone === true;
+      
+      if (isPWA) {
+        // For PWA: use custom protocol to ensure magic links open in the PWA
+        redirectUrl = `web+repcue://auth/callback`;
+      } else {
+        // For browser: use current origin for domain-specific redirects
+        redirectUrl = `${this.getRedirectBase()}/auth/callback`;
+      }
 
       const { error } = await supabase.auth.signInWithOtp({
         email,

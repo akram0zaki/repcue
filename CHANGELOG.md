@@ -1,3 +1,25 @@
+## 2025-09-02 (5)
+
+- fix: Enhanced iOS PWA magic link deep linking with hybrid redirect approach - Improved magic link authentication for iOS PWA users by implementing smart context detection. When users request magic links from installed PWA apps, the system now generates custom protocol URLs (web+repcue://) that can redirect back to the PWA instead of always opening in Safari. Browser users continue to get regular domain-specific URLs for consistent cross-domain functionality.
+
+  🔧 Technical Implementation:
+  - Added PWA context detection in signInWithMagicLink() using display-mode and navigator.standalone checks
+  - Enhanced handleDeepLink() to properly preserve auth parameters in custom protocol URLs
+  - Restored protocol handler registration with improved documentation for user consent
+  - Maintained backward compatibility with browser-based authentication flows
+
+  📱 iOS PWA Benefits:
+  - ✅ Magic links from PWA context use web+repcue:// protocol for deep linking
+  - ✅ Magic links from browser context use regular URLs for domain consistency
+  - ✅ Protocol handler registration allows magic links to open in installed PWA
+  - ✅ Graceful fallback to Safari with session sharing when PWA unavailable
+  - ✅ Enhanced deep link parameter preservation for reliable authentication
+
+  🎯 User Experience:
+  - PWA users: Magic links can open directly in installed app (with protocol handler consent)
+  - Browser users: Magic links redirect to correct domain (repcue.me vs repcue.azprojects.net)
+  - Clear documentation provided for protocol handler popup explanation
+
 ## 2025-09-02 (4)
 
 - fix: Magic links now redirect to the correct domain where the login was initiated - Fixed magic links always redirecting to repcue.azprojects.net instead of dynamically using the origin where the login was requested. All authentication methods (magic links, OAuth, password reset, sign-up) now use the current domain for redirects, ensuring users are sent back to the same domain they started from (e.g., repcue.me → repcue.me, repcue.azprojects.net → repcue.azprojects.net).

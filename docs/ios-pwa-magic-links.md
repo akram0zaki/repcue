@@ -1,5 +1,22 @@
 # iOS PWA Magic Link Setup Guide
 
+## Browser Protocol Handler Popup
+
+### What It Means
+When you first visit RepCue and give consent, you may see a browser popup asking:
+> "www.repcue.me wants to Open web+repcue links instead of localhost"
+
+### Why It Appears
+This popup enables **iOS PWA deep linking** for magic link authentication. When you install RepCue as a PWA and request magic links, they can redirect back to your installed app instead of always opening in Safari.
+
+### Recommendation: Click "Allow"
+- **Allows**: Magic links to open in your installed PWA app
+- **Improves**: Authentication experience for PWA users  
+- **Enables**: Seamless login flow without Safari redirects
+- **Safe**: Only handles RepCue authentication URLs, no security risk
+
+If you click "Block", magic links will still work but will always open in Safari instead of your PWA.
+
 ## Problem
 When you install RepCue as a PWA on your iPhone home screen and try to sign in via magic link, clicking the email link opens Safari instead of your installed PWA app.
 

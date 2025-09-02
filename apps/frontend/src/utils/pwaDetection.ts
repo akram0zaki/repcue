@@ -46,6 +46,26 @@ export function handleDeepLink(url: string): boolean {
     // Handle custom protocol links
     if (url.startsWith('web+repcue://')) {
       const path = url.replace('web+repcue://', '/');
+      
+      // For auth callbacks, preserve any query parameters and hash fragments
+      if (path.startsWith('/auth/callback')) {
+        // Extract any additional parameters from the original URL
+        const authUrl = new URL(window.location.origin + path);
+        
+        // If there are query parameters in the custom protocol URL, preserve them
+        const protocolUrl = new URL(url.replace('web+repcue://', 'https://example.com/'));
+        if (protocolUrl.search) {
+          authUrl.search = protocolUrl.search;
+        }
+        if (protocolUrl.hash) {
+          authUrl.hash = protocolUrl.hash;
+        }
+        
+        window.location.href = authUrl.toString();
+        return true;
+      }
+      
+      // For other paths, simple replacement
       window.location.href = path;
       return true;
     }
@@ -71,7 +91,8 @@ export function handleDeepLink(url: string): boolean {
  * Register PWA link handlers
  */
 export function registerPWALinkHandlers(): void {
-  // Handle protocol handler registration
+  // Register protocol handler for iOS PWA deep linking support
+  // This allows magic links to potentially redirect to the installed PWA
   if ('serviceWorker' in navigator && 'registerProtocolHandler' in navigator) {
     try {
       navigator.registerProtocolHandler(
