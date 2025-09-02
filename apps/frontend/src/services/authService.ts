@@ -3,7 +3,6 @@ import { supabase } from '../config/supabase';
 import type { AuthState, AuthUserProfile } from '../types';
 import { storageService } from './storageService';
 import { webauthnService, type PasskeyRegistrationResult, type PasskeyAuthenticationResult } from './webauthnService';
-import { getMagicLinkRedirectUrl } from '../utils/pwaDetection';
 
 /**
  * Authentication service using Supabase
@@ -249,7 +248,7 @@ export class AuthService {
         email,
         password,
         options: {
-          // Ensure email confirmations redirect back to the current app origin (dev/prod)
+          // Ensure email confirmations redirect back to the current app origin
           emailRedirectTo: `${this.getRedirectBase()}/auth/callback`,
           data: {
             display_name: displayName || email.split('@')[0]
@@ -277,8 +276,10 @@ export class AuthService {
    */
   public async signInWithMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Use PWA-aware redirect URL
-      const redirectUrl = getMagicLinkRedirectUrl(this.getRedirectBase());
+      // Always use the current origin for magic link redirects to ensure
+      // the user is redirected back to the same domain they initiated the request from
+      const currentOrigin = this.getRedirectBase();
+      const redirectUrl = `${currentOrigin}/auth/callback`;
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
@@ -310,7 +311,7 @@ export class AuthService {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${this.getRedirectBase()}/auth/callback`
         }
       });
 
@@ -414,7 +415,7 @@ export class AuthService {
   public async resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`
+        redirectTo: `${this.getRedirectBase()}/auth/reset-password`
       });
 
       if (error) {

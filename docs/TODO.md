@@ -75,7 +75,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - ✅ It seems like the sync is working in one direction from client to server but not from server to client, which defeats the purpose of one profile across devices.
     - ✅ All Edge function calls fail with error ( Supabase invoke error: FunctionsHttpError: Edge Function returned a non-2xx status code) and the application falls back to direct fetch. This needs investigation.
 
-- Remove the successful sync message "Welcome! Your Data is Safe \n Successfully migrated 35 records from your local storage" if the Debug flag is off. If the sync is not successful then an error should be displayed in a toast indicating that the app is unable to sync with the server.
+- ✅ Remove the successful sync message "Welcome! Your Data is Safe \n Successfully migrated 35 records from your local storage" if the Debug flag is off. If the sync is not successful then an error should be displayed in a toast indicating that the app is unable to sync with the server.
 
 - ✅ This application is still under development and has no real users yet. I don't mind deleting the entire supabase database and starting over with a clean and clear design to solve this sync issue once and for all. I would like you to be critical and if you think this is a good idea then you need to create a detailed implementation plan with phases and tasks how you would do this step by step  and write it to docs/implementation-plans/sync-resolution.md. Such plan must be thorough and include an analysis of existing indexeddb entities and relations and application functionality to make sure everything is addressed.
 
@@ -87,7 +87,9 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - ✅ When browser page becomes visible, sync is initiated and I get a sync result message like this one "Welcome! Your Data is Safe \n Successfully migrated 11 records from your local storage \n Migrated: 5 activity_logs, 3 workout_sessions, 1 user_preferences, and 2 other items". The user takes sync for granted, the successful message should be displayed only if debugging is toggled on in config/features.ts. Otherwise successful sync shouldn't trigger a message and a message should be rendered only if there is a problem.
     - ✅ Bug: When the server is down, the PWA app continues to run in the browser however all strings are displayed as keys (e.g. home.availableExercises) rather than localized text. 
 
-- Provide a mechanism to force the PWA applications to refresh pages from server.
+- ✅ Provide a mechanism to force the PWA applications to refresh pages from server.
+
+- Introduce a feature allowing users create individual exercises or workouts (one or more exercises grouped together) and share them with other users.
 
 - ✅ After I install the app as PWA on my iphone's home screen and try to login via magic link, when I click the link in my inbox it opens the web browser and doesn't go to my installed pwa app. How can I resolve this?
 

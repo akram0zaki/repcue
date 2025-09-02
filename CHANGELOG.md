@@ -1,3 +1,19 @@
+## 2025-09-02 (4)
+
+- fix: Magic links now redirect to the correct domain where the login was initiated - Fixed magic links always redirecting to repcue.azprojects.net instead of dynamically using the origin where the login was requested. All authentication methods (magic links, OAuth, password reset, sign-up) now use the current domain for redirects, ensuring users are sent back to the same domain they started from (e.g., repcue.me → repcue.me, repcue.azprojects.net → repcue.azprojects.net).
+
+  🔧 Technical Implementation:
+  - Modified signInWithMagicLink() to use getRedirectBase() instead of PWA-specific protocol URLs
+  - Updated all authentication methods for consistency: signUpWithPassword(), signInWithOAuth(), resetPassword()
+  - Removed dependency on getMagicLinkRedirectUrl() PWA detection utility
+  - All redirect URLs now dynamically determined based on current origin where request is initiated
+
+  🎯 Benefits:
+  - ✅ Magic links work correctly across multiple deployment domains
+  - ✅ Consistent authentication experience regardless of domain used
+  - ✅ No hardcoded URLs - fully dynamic based on request origin
+  - ✅ Simplified authentication flow without PWA-specific complications
+
 ## 2025-09-02 (3)
 
 - docs: Add comprehensive PWA implementation guide - created detailed documentation at docs/pwa.md covering PWA functionality, installation guides, and developer implementation details. The guide serves as both user manual and developer reference for RepCue's Progressive Web Application features.
