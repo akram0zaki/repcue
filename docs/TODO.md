@@ -38,9 +38,7 @@
 
 - Create user agreement and privacy policy
 
-- Add accounts module, sign-up/sign-in, profile, etc
-
-- I signed up on Firefox where I had Planks, Burpees, and Finger rolls marked as favorites, then I logged on from Edge where I had Burpees and Planks marked as favorites.
+- ✅ Add accounts module, sign-up/sign-in, profile, etc
 
 - Fix issues 2025-08-25:
     - ✅ When I switch to Dark Mode and add a couple of exercises to favorites then reload the page (refresh), the dark mode is gone and the favorites are gone. This was supposedly fixed earlier (and verified).
@@ -89,11 +87,11 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ Provide a mechanism to force the PWA applications to refresh pages from server.
 
-- Introduce a feature allowing users create individual exercises or workouts (one or more exercises grouped together) and share them with other users.
-
 - ✅ After I install the app as PWA on my iphone's home screen and try to login via magic link, when I click the link in my inbox it opens the web browser and doesn't go to my installed pwa app. How can I resolve this?
 
-- Review all icons in the app and make sure descriptive SVG icons are in place, and replace any emojis with appropriate SVG icons.
+- I want to add a feature allowing authenticated users to create their own exercises and also share them with other users. How does this impact the application and the database, and what's the best way to go about it? Don't implement anything until we agree on the implementation plan.
+
+- Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
 
 - Gamification:
     - Add motivational feedback.
@@ -102,9 +100,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - Feature to introduce competitions or streaks where two or more users try to achieve some goals (time spent on exercises, frequency of workouts, etc).
     - Share achievements via Share button
 
-- Add support to create tailored exercises.
-
-- Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
+- Review all icons in the app and make sure descriptive SVG icons are in place, and replace any emojis with appropriate SVG icons.
 
 - Smart onboarding: Use GenAI to have a chat with the user at the first run with the purpose of creating a workout schedule for them. During this onboarding chat, the AI assistant would ask questions about the user's patterns, goals, injuries, preferences, etc then suggest a workout tailored for them. For example it doesn't make sense to suggest Planks to someone who has a shoulder injury.
 
