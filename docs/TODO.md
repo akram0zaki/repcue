@@ -89,7 +89,13 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ After I install the app as PWA on my iphone's home screen and try to login via magic link, when I click the link in my inbox it opens the web browser and doesn't go to my installed pwa app. How can I resolve this?
 
-- I want to add a feature allowing authenticated users to create their own exercises and also share them with other users. How does this impact the application and the database, and what's the best way to go about it? Don't implement anything until we agree on the implementation plan.
+- 👉 🔄 I want to add a feature allowing authenticated users to create their own exercises and also share them with other users. How does this impact the application and the database, and what's the best way to go about it? Don't implement anything until we agree on the implementation plan. -> docs\implementation-plans\user-created-exercises-implementation-plan.md
+    - Implement [Phase 1: Database Schema Extensions] and update progress in the plan
+    - Implement any remaining tasks in phase 1 then implement [Phase 2: Backend API Extensions] and update progress in the plan
+    - Implement any remaining tasks in phase 2 then implement [Phase 3: Frontend UI Implementation] and update progress in the plan
+    - Implement any remaining tasks in phase 3 then implement [Phase 4: Discovery, Sharing & Rating Features] and update progress in the plan
+    - Implement any remaining tasks in phase 4 then implement [Phase 5: Storage & Sync Updates] and update progress in the plan
+    - Implement any remaining tasks in phase 5 then implement [Phase 6: Testing & Polish] and update progress in the plan
 
 - Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
 
