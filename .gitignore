@@ -46,6 +46,10 @@ playwright/.cache/
 *.tsbuildinfo
 
 .env
+.env.local
+.env.development
+.env.production
+.env.*.local
 
 # Other
 .local/*
@@ -54,3 +58,6 @@ console.log
 next.md
 docs/findings
 docs/testing/findings
+
+# Supabase
+supabase/.temp/

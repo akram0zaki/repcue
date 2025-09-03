@@ -870,7 +870,7 @@ export class SyncService {
    * Fallback sync endpoint call using direct fetch
    */
   private async callSyncEndpointDirectFetch(syncRequest: SyncRequest, accessToken: string): Promise<SyncResponse> {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://zumzzuvfsuzvvymhpymk.supabase.co';
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync`;
     
     console.log('🔄 Using direct fetch to:', functionUrl);

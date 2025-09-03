@@ -1,3 +1,34 @@
+## 2025-09-03 — Separate Development Environment Setup
+
+- feat: Created separate Supabase development environment for safe feature development - Established complete environment isolation between development and production to prevent breaking changes from affecting production users during user-created exercises feature development.
+
+  🏗️ **Environment Separation**:
+  - ✅ **Production**: `RepCue` (zumzzuvfsuzvvymhpymk.supabase.co) - Protected from development changes
+  - ✅ **Development**: `repcue-dev` (xwzrsfkzqxdybjrkkkvh.supabase.co) - Safe testing environment
+  - ✅ **Removed hardcoded credentials** from codebase - now requires environment variables
+  - ✅ **Environment-specific builds** with `pnpm dev` (development) and `pnpm build:prod` (production)
+
+  🔧 **Technical Implementation**:
+  - Created environment files: `.env.local`, `.env.development`, `.env.production`
+  - Updated package.json scripts for environment-based development workflow
+  - Removed fallback credentials from `src/config/supabase.ts` and `src/services/syncService.ts`
+  - Deployed all Edge Functions (sync, webauthn-register, webauthn-authenticate) to development project
+  - Fixed development database schema to match production for seamless sync compatibility
+
+  🛡️ **Production Safety Benefits**:
+  - ✅ **Zero risk of production data corruption** during feature development
+  - ✅ **Safe database schema changes** - test in development first
+  - ✅ **Isolated user accounts** for testing without affecting real users
+  - ✅ **Complete development freedom** without production consequences
+
+  📋 **Developer Workflow**:
+  - Development: `pnpm dev` automatically uses development database
+  - Production testing: `pnpm dev:prod` uses production database when needed  
+  - Production builds: `pnpm build:prod` for Raspberry Pi deployment
+  - Schema changes: Apply to development → test → migrate to production
+
+  🎯 **Prepared for User-Created Exercises**: Development environment ready for implementing user-created content platform with database changes, new tables, and feature testing without any risk to production users.
+
 ## 2025-09-02 (5)
 
 - fix: Enhanced iOS PWA magic link deep linking with hybrid redirect approach - Improved magic link authentication for iOS PWA users by implementing smart context detection. When users request magic links from installed PWA apps, the system now generates custom protocol URLs (web+repcue://) that can redirect back to the PWA instead of always opening in Safari. Browser users continue to get regular domain-specific URLs for consistent cross-domain functionality.
