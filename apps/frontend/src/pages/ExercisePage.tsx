@@ -15,9 +15,11 @@ import {
   RunnerIcon,
   StarIcon,
   StarFilledIcon,
-  PlayIcon
+  PlayIcon,
+  PlusIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
+import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
@@ -35,6 +37,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises']);
   const { showSnackbar } = useSnackbar();
+  const { flags } = useFeatureFlags();
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -273,6 +276,17 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               <WorkoutIcon size={24} className="text-blue-600 dark:text-blue-400" />
               {t('exercises.title')}
             </h1>
+            {flags.canCreateExercises && (
+              <button
+                onClick={() => navigate('/exercises/create')}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
+                aria-label={t('exercises.createNew', 'Create New Exercise')}
+              >
+                <PlusIcon size={20} />
+                <span className="hidden sm:inline">{t('exercises.createNew', 'Create New Exercise')}</span>
+                <span className="sm:hidden">{t('common.create', 'Create')}</span>
+              </button>
+            )}
           </div>
           
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">

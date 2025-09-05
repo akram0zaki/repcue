@@ -1,0 +1,17 @@
+{
+  "clickToUpload": "[fy] Click to upload video",
+  "currentVideo": "Current Fideo",
+  "exerciseVideo": "Oefening Fideo",
+  "fileTooLarge": "[fy] File is too large",
+  "invalidFileType": "[fy] Invalid file type",
+  "loadError": "[fy] Failed to load video",
+  "maxFileSize": "[fy] Maximum file size",
+  "removeVideo": "Remove Fideo",
+  "supportedFormats": "[fy] Supported formats",
+  "uploadFailed": "Oplade failed",
+  "uploadHint": "Oplade a video demonstration",
+  "uploaded": "Fideo uploaded",
+  "uploadsNotAvailable": "Fideo uploads are not available",
+  "urlPlaceholder": "[fy] Enter video URL",
+  "urlPlaceholderHelper": "[fy] YouTube, Vimeo, or direct video URL"
+}

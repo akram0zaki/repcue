@@ -8,24 +8,40 @@ import type { AppSettings, Exercise } from '../../types';
 import { createMockExercise, createMockAppSettings } from '../../test/testUtils';
 
 // Mock the services
-vi.mock('../../services/consentService', () => ({
-  consentService: {
+vi.mock('../../services/consentService', () => {
+  const mockConsentService = {
     hasConsent: vi.fn(),
     setConsent: vi.fn(),
     getConsentData: vi.fn(),
     getConsentStatus: vi.fn(),
     resetConsent: vi.fn()
-  }
-}));
+  };
+  
+  const MockConsentService = vi.fn().mockImplementation(() => mockConsentService);
+  MockConsentService.getInstance = vi.fn(() => mockConsentService);
+  
+  return {
+    ConsentService: MockConsentService,
+    consentService: mockConsentService
+  };
+});
 
-vi.mock('../../services/storageService', () => ({
-  storageService: {
+vi.mock('../../services/storageService', () => {
+  const mockStorageService = {
     exportAllData: vi.fn(),
     clearAllData: vi.fn(),
     getExercises: vi.fn(),
     saveExercise: vi.fn()
-  }
-}));
+  };
+  
+  const MockStorageService = vi.fn().mockImplementation(() => mockStorageService);
+  MockStorageService.getInstance = vi.fn(() => mockStorageService);
+  
+  return {
+    StorageService: MockStorageService,
+    storageService: mockStorageService
+  };
+});
 
 // Mock the dynamic import for exercises data
 vi.mock('../../data/exercises', () => ({

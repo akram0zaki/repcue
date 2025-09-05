@@ -67,7 +67,19 @@
       "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
       "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
       "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(pnpm exec tsc:*)",
+      "Bash(pnpm --filter @repcue/frontend exec tsc --noEmit)",
+      "Bash(pnpm --filter @repcue/frontend test --run)",
+      "mcp__supabase__get_project_url",
+      "Bash(find:*)",
+      "Bash(for lang in ar ar-EG de es fy)",
+      "Bash(do)",
+      "Bash(sed:*)",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Bash(pnpm --filter @repcue/frontend lint \"src/components/ExerciseForm.tsx\")",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
+      "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)"
     ],
     "deny": [],
     "ask": []

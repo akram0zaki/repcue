@@ -1,0 +1,17 @@
+{
+  "clickToUpload": "[fr] Click to upload video",
+  "currentVideo": "Current Vidéo",
+  "exerciseVideo": "Exercice Vidéo",
+  "fileTooLarge": "[fr] File is too large",
+  "invalidFileType": "[fr] Invalid file type",
+  "loadError": "[fr] Failed to load video",
+  "maxFileSize": "[fr] Maximum file size",
+  "removeVideo": "Remove Vidéo",
+  "supportedFormats": "[fr] Supported formats",
+  "uploadFailed": "Télécharger failed",
+  "uploadHint": "Télécharger a video demonstration",
+  "uploaded": "Vidéo uploaded",
+  "uploadsNotAvailable": "Vidéo uploads are not available",
+  "urlPlaceholder": "[fr] Enter video URL",
+  "urlPlaceholderHelper": "[fr] YouTube, Vimeo, or direct video URL"
+}

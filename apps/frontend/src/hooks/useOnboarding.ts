@@ -92,14 +92,29 @@ export function useOnboarding(): UseOnboardingReturn {
       const firstLaunchStored = localStorage.getItem(FIRST_LAUNCH_STORAGE_KEY);
       
       if (stored) {
-        const parsed = JSON.parse(stored);
-        return {
-          ...parsed,
-          startedAt: parsed.startedAt ? new Date(parsed.startedAt) : undefined,
-          completedAt: parsed.completedAt ? new Date(parsed.completedAt) : undefined,
-          isFirstTime: firstLaunchStored === null, // First time if no record exists
-          totalSteps: steps.length
-        };
+        try {
+          const parsed = JSON.parse(stored);
+          return {
+            ...parsed,
+            startedAt: parsed.startedAt ? new Date(parsed.startedAt) : undefined,
+            completedAt: parsed.completedAt ? new Date(parsed.completedAt) : undefined,
+            isFirstTime: firstLaunchStored === null, // First time if no record exists
+            totalSteps: steps.length
+          };
+        } catch (parseError) {
+          console.warn('Failed to parse onboarding data, clearing invalid data:', parseError);
+          // Clear invalid data and fall through to default state
+          localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+          // When invalid data is found, treat as first time
+          return {
+            isFirstTime: true,
+            isOnboardingActive: false,
+            currentStep: 0,
+            totalSteps: steps.length,
+            hasCompletedOnboarding: false,
+            isSkipped: false
+          };
+        }
       }
       
       // Default state for new users

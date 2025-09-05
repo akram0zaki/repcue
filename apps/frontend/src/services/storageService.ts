@@ -608,6 +608,25 @@ export class StorageService {
         console.warn('⚠️ Database health check failed but could not be repaired:', healthCheck.error);
       }
     } catch (error) {
+      // Check if this is a schema migration error that we can fix
+      const errorObj = error as Error;
+      if (errorObj.name === 'UpgradeError' || errorObj.message?.includes('changing primary key')) {
+        console.warn('💾 IndexedDB schema migration failed, clearing database and starting fresh...', error);
+        try {
+          // Close the current database instance
+          this.db.close();
+          
+          // Delete the entire database to clear schema conflicts
+          await this.db.delete();
+          
+          // Recreate the database with the current schema
+          await this.db.open();
+          console.log('✅ IndexedDB cleared and recreated successfully');
+          return;
+        } catch (resetError) {
+          console.error('❌ Failed to reset IndexedDB:', resetError);
+        }
+      }
       console.warn('IndexedDB not available, falling back to memory storage:', error);
     }
   }
@@ -1722,6 +1741,9 @@ export class StorageService {
   }> {
     try {
       // Try a simple operation to test database health
+      if (!this.db) {
+        throw new Error('Database not initialized');
+      }
       await this.db.exercises.count();
       await this.db.user_preferences.count();
       await this.db.app_settings.count();
@@ -1742,6 +1764,242 @@ export class StorageService {
           error: errorMsg 
         };
       }
+    }
+  }
+
+  // ===============================
+  // Custom Exercise Methods
+  // ===============================
+
+  /**
+   * Create a custom exercise
+   */
+  public async createCustomExercise(exerciseData: Omit<Exercise, 'id' | 'created_at' | 'updated_at' | 'version' | 'synced_at' | 'is_dirty'>): Promise<Exercise> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to create custom exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to create custom exercises');
+      }
+
+      const exercise = prepareUpsert({
+        ...exerciseData,
+        id: crypto.randomUUID(),
+        owner_id: userId,
+        is_public: (exerciseData as any).is_public || false,
+        is_verified: false, // User-created exercises require admin verification
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted: false,
+        version: 1,
+        dirty: 1 // Mark for sync
+      } as Exercise);
+
+      await this.db.exercises.add(exercise);
+      console.log('Custom exercise created:', exercise.name);
+      return exercise;
+    } catch (error) {
+      console.error('Failed to create custom exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a custom exercise (only for owned exercises)
+   */
+  public async updateCustomExercise(exerciseId: string, updates: Partial<Exercise>): Promise<Exercise> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to update exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to update exercises');
+      }
+
+      const existing = await this.db.exercises.get(exerciseId);
+      if (!existing) {
+        throw new Error('Exercise not found');
+      }
+
+      if (existing.owner_id !== userId) {
+        throw new Error('Can only update exercises you created');
+      }
+
+      const updatedExercise = prepareUpsert({
+        ...existing,
+        ...updates,
+        updated_at: new Date().toISOString(),
+        dirty: 1 // Mark for sync
+      });
+
+      await this.db.exercises.put(updatedExercise);
+      console.log('Custom exercise updated:', updatedExercise.name);
+      return updatedExercise;
+    } catch (error) {
+      console.error('Failed to update custom exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get exercises shared with current user (synced from server)
+   */
+  public async getSharedExercises(): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) return [];
+
+      // Get exercises where owner_id is not current user (i.e., shared or public)
+      const sharedExercises = await this.db.exercises
+        .where('owner_id')
+        .notEqual(userId)
+        .and(exercise => !exercise.deleted && (exercise.is_public || false))
+        .toArray();
+
+      return filterActiveRecords(sharedExercises);
+    } catch (error) {
+      console.error('Failed to get shared exercises:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get exercises created by current user
+   */
+  public async getUserCreatedExercises(): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) return [];
+
+      const userExercises = await this.db.exercises
+        .where('owner_id')
+        .equals(userId)
+        .and(exercise => !exercise.deleted)
+        .toArray();
+
+      return filterActiveRecords(userExercises);
+    } catch (error) {
+      console.error('Failed to get user-created exercises:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Copy an exercise to user's library
+   */
+  public async copyExercise(sourceExercise: Exercise): Promise<Exercise> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to copy exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to copy exercises');
+      }
+
+      const copyName = sourceExercise.name.includes('(Copy)') 
+        ? sourceExercise.name 
+        : `${sourceExercise.name} (Copy)`;
+
+      const copiedExercise = prepareUpsert({
+        ...sourceExercise,
+        id: crypto.randomUUID(),
+        name: copyName,
+        owner_id: userId,
+        is_public: false, // Copies are private by default
+        is_verified: false,
+        // Remove community stats from copy
+        rating_average: undefined,
+        rating_count: undefined,
+        copy_count: undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        version: 1,
+        dirty: 1 // Mark for sync
+      } as Exercise);
+
+      await this.db.exercises.add(copiedExercise);
+      console.log('Exercise copied:', copiedExercise.name);
+      return copiedExercise;
+    } catch (error) {
+      console.error('Failed to copy exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a custom exercise (soft delete for owned exercises only)
+   */
+  public async deleteCustomExercise(exerciseId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to delete exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to delete exercises');
+      }
+
+      const exercise = await this.db.exercises.get(exerciseId);
+      if (!exercise) {
+        throw new Error('Exercise not found');
+      }
+
+      if (exercise.owner_id !== userId) {
+        throw new Error('Can only delete exercises you created');
+      }
+
+      const deletedExercise = prepareSoftDelete(exercise);
+      await this.db.exercises.put(deletedExercise);
+      console.log('Custom exercise deleted:', exercise.name);
+    } catch (error) {
+      console.error('Failed to delete custom exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get current user ID from authentication context
+   */
+  private getCurrentUserId(): string | null {
+    // This would typically come from an auth service
+    // For now, return null to indicate no authentication
+    return null;
+  }
+
+  /**
+   * Get all exercises (builtin + user-created + shared)
+   */
+  public async getAllExercises(): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const allExercises = await this.db.exercises
+        .where('deleted')
+        .equals(0) // Only get non-deleted exercises
+        .toArray();
+
+      return filterActiveRecords(allExercises);
+    } catch (error) {
+      console.error('Failed to get all exercises:', error);
+      return [];
     }
   }
 }

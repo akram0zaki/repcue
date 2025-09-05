@@ -150,7 +150,10 @@ export class SecurityService {
       }
 
       return {
-        logs: data || []
+        logs: (data || []).map(log => ({
+          ...log,
+          ip_address: log.ip_address as string | null
+        }))
       };
 
     } catch (error) {

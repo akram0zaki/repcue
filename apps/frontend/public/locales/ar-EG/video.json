@@ -1,0 +1,17 @@
+{
+  "clickToUpload": "[ar-EG] Click to upload video",
+  "currentVideo": "Current فيديو",
+  "exerciseVideo": "تمرين فيديو",
+  "fileTooLarge": "[ar-EG] File is too large",
+  "invalidFileType": "[ar-EG] Invalid file type",
+  "loadError": "[ar-EG] Failed to load video",
+  "maxFileSize": "[ar-EG] Maximum file size",
+  "removeVideo": "Remove فيديو",
+  "supportedFormats": "[ar-EG] Supported formats",
+  "uploadFailed": "رفع failed",
+  "uploadHint": "رفع a video demonstration",
+  "uploaded": "فيديو uploaded",
+  "uploadsNotAvailable": "فيديو uploads are not available",
+  "urlPlaceholder": "[ar-EG] Enter video URL",
+  "urlPlaceholderHelper": "[ar-EG] YouTube, Vimeo, or direct video URL"
+}

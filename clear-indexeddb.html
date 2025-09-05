@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear RepCue IndexedDB</title>
+</head>
+<body>
+    <h1>Clear RepCue IndexedDB</h1>
+    <p>This will clear the local IndexedDB database to fix schema conflicts.</p>
+    <button id="clearBtn">Clear IndexedDB</button>
+    <div id="status"></div>
+
+    <script>
+        document.getElementById('clearBtn').addEventListener('click', async () => {
+            const statusDiv = document.getElementById('status');
+            try {
+                // Clear the RepCueDB database
+                if ('indexedDB' in window) {
+                    const deleteReq = indexedDB.deleteDatabase('RepCueDB');
+                    deleteReq.onsuccess = () => {
+                        statusDiv.innerHTML = '<p style="color: green;">✅ IndexedDB cleared successfully! You can now refresh the app.</p>';
+                    };
+                    deleteReq.onerror = () => {
+                        statusDiv.innerHTML = '<p style="color: red;">❌ Failed to clear IndexedDB.</p>';
+                    };
+                } else {
+                    statusDiv.innerHTML = '<p style="color: red;">IndexedDB not supported in this browser.</p>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

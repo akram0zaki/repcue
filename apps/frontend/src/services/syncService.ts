@@ -729,7 +729,23 @@ export class SyncService {
       const upserts: Record<string, unknown>[] = [];
       const deletes: string[] = [];
 
-      for (const record of dirtyRecords) {
+      // Filter out shared exercises for the exercises table - only sync owned exercises
+      let filteredRecords = dirtyRecords;
+      if (tableName === 'exercises') {
+        const userId = this.authService.getAuthState().user?.id;
+        if (userId) {
+          filteredRecords = dirtyRecords.filter(record => {
+            // Only sync exercises owned by current user
+            return (record as Record<string, unknown>).owner_id === userId;
+          });
+          
+          if (filteredRecords.length !== dirtyRecords.length) {
+            console.log(`🔒 Filtered ${dirtyRecords.length - filteredRecords.length} non-owned exercises from sync`);
+          }
+        }
+      }
+
+      for (const record of filteredRecords) {
         try {
           if (record.op === 'delete' || record.deleted) {
             deletes.push(record.id as string);
@@ -1011,6 +1027,43 @@ export class SyncService {
               }
             } catch {
               // Ignore non-fatal issues
+            }
+          }
+
+          // Special handling: exercises - ensure proper ownership handling
+          if (tableName === 'exercises') {
+            try {
+              const userId = this.authService.getAuthState().user?.id;
+              const exerciseRecord = serverRecord as Record<string, unknown>;
+              
+              // Mark exercises as not owned by current user if they're shared/public
+              if (userId && exerciseRecord.owner_id !== userId) {
+                // This is a shared or public exercise - ensure it's read-only locally
+                await typedTable.put({
+                  ...exerciseRecord,
+                  dirty: 0, // Never mark shared exercises as dirty
+                  op: undefined,
+                  synced_at: new Date().toISOString()
+                });
+              } else if (userId && exerciseRecord.owner_id === userId) {
+                // This is user's own exercise - handle normally with potential dirty state
+                const isLocallyModified = localRecord && (localRecord as Record<string, unknown>).dirty === 1;
+                await typedTable.put({
+                  ...exerciseRecord,
+                  dirty: isLocallyModified ? 1 : 0, // Preserve local dirty state for user's exercises
+                  op: isLocallyModified ? (localRecord as Record<string, unknown>).op : undefined,
+                  synced_at: new Date().toISOString()
+                });
+              }
+            } catch (error) {
+              console.warn('Exercise sync handling failed:', error);
+              // Fallback to standard handling
+              await typedTable.put({
+                ...serverRecord,
+                dirty: 0,
+                op: undefined,
+                synced_at: new Date().toISOString()
+              });
             }
           }
 

@@ -1,0 +1,17 @@
+{
+  "clickToUpload": "[nl] Click to upload video",
+  "currentVideo": "[nl] Current Video",
+  "exerciseVideo": "Oefening Video",
+  "fileTooLarge": "[nl] File is too large",
+  "invalidFileType": "[nl] Invalid file type",
+  "loadError": "[nl] Failed to load video",
+  "maxFileSize": "[nl] Maximum file size",
+  "removeVideo": "[nl] Remove Video",
+  "supportedFormats": "[nl] Supported formats",
+  "uploadFailed": "Uploaden failed",
+  "uploadHint": "Uploaden a video demonstration",
+  "uploaded": "[nl] Video uploaded",
+  "uploadsNotAvailable": "[nl] Video uploads are not available",
+  "urlPlaceholder": "[nl] Enter video URL",
+  "urlPlaceholderHelper": "[nl] YouTube, Vimeo, or direct video URL"
+}

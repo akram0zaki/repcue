@@ -37,36 +37,173 @@
     "rotation": "لفّ",
     "proprioception": "الإحساس الوضعي"
   },
-  "plank": { "name": "بلانك", "description": "خلّي جسمك خط مستقيم، ساند على الساعدين وصوابِع رجلك" },
-  "side-plank": { "name": "بلانك جانبي", "description": "نفس الفكرة بس على جنب واحد" },
-  "mountain-climbers": { "name": "متسلّقين الجبل", "description": "من وضع البلانك، طلّع ركبة لصدرك وبعدين بدّل" },
-  "bicycle-crunches": { "name": "كرَنش العجلة", "description": "المس الكوع للركبة التانية وبَدّل" },
-  "push-ups": { "name": "ضغط", "description": "انزل بصدرك واطلع تاني بإيديك" },
-  "squats": { "name": "سكوات", "description": "انزل بقعدة واطلع واقف تاني" },
-  "lunges": { "name": "لانجز", "description": "خطوة لقدّام وانزل وبعدين بدّل الرجلين" },
-  "wall-sit": { "name": "قعدة الحيطة", "description": "انزل لحد ما فخادك تبقى موازية للأرض وخليك ثابت" },
-  "burpees": { "name": "بيربيز", "description": "سكوات → بلانك/بوش أب → نطّة لفوق" },
-  "jumping-jacks": { "name": "فتح وضم", "description": "افتح رجلك وارفع إيدك وبعدين اقفلهم" },
-  "high-knees": { "name": "رُكَب عالية", "description": "اجري مكانك وارفع الركب لمستوى الحوض" },
-  "butt-kicks": { "name": "كعب للورا", "description": "اجري مكانك وخبّط بكعوبك في المؤخرة" },
-  "downward-dog": { "name": "الكلب لتحت", "description": "شكل V مقلوبة بإيديك ورجليك على الأرض" },
-  "child-pose": { "name": "وضع الطفل", "description": "اقعد على ركَبك ومد إيديك لقدّام وارتاح" },
-  "cat-cow": { "name": "قطة وبقرة", "description": "قرّب ضهرك لفوق وبعدين لتحت بالتبادل" },
-  "single-leg-stand": { "name": "وقفة على رجل واحدة", "description": "اقف على رجل واحدة شوية وبعدين بدّل" },
-  "tree-pose": { "name": "وضع الشجرة", "description": "اقف على رجل وحُط التانية على فخذك من جوّه" },
-  "warrior-3": { "name": "محارب 3", "description": "اتوازن على رجل ومدّ التانية وضمرك لقدّام" },
-  "dead-bug": { "name": "ديد بَج", "description": "على ضهرك؛ مدّ دراع ورجل عكس بعض بالتبادل" },
-  "glute-bridges": { "name": "جسر المؤخرة", "description": "ارفع الحوض وإنت نايم على ضهرك بضغط المؤخرة" },
-  "finger-roll": { "name": "لفّ الصوابع", "description": "لفّ الصوابع من قبضة لتمديد، واحدة واحدة" },
-  "tricep-dips": { "name": "ديبس ترايسبس", "description": "انزل واطلع مستخدم مسند بإيديك ورا" },
-  "calf-raises": { "name": "رفع سمانة", "description": "اطلع على أطراف صوابعك وارجع انزل" },
-  "russian-twists": { "name": "تويست روسي", "description": "اقعد وارفع رجليك ولف الجزع يمين وشمال" },
-  "bear-crawl": { "name": "زحف الدب", "description": "امشي على إيدك ورجلك وركبك مش لامسة الأرض" },
-  "forward-fold": { "name": "انحناءة لقدّام", "description": "من الوقوف انحني لقدّام ولمّس رجليك" },
+  "plank": {
+    "name": "بلانك",
+    "description": "خلّي جسمك خط مستقيم، ساند على الساعدين وصوابِع رجلك"
+  },
+  "side-plank": {
+    "name": "بلانك جانبي",
+    "description": "نفس الفكرة بس على جنب واحد"
+  },
+  "mountain-climbers": {
+    "name": "متسلّقين الجبل",
+    "description": "من وضع البلانك، طلّع ركبة لصدرك وبعدين بدّل"
+  },
+  "bicycle-crunches": {
+    "name": "كرَنش العجلة",
+    "description": "المس الكوع للركبة التانية وبَدّل"
+  },
+  "push-ups": {
+    "name": "ضغط",
+    "description": "انزل بصدرك واطلع تاني بإيديك"
+  },
+  "squats": {
+    "name": "سكوات",
+    "description": "انزل بقعدة واطلع واقف تاني"
+  },
+  "lunges": {
+    "name": "لانجز",
+    "description": "خطوة لقدّام وانزل وبعدين بدّل الرجلين"
+  },
+  "wall-sit": {
+    "name": "قعدة الحيطة",
+    "description": "انزل لحد ما فخادك تبقى موازية للأرض وخليك ثابت"
+  },
+  "burpees": {
+    "name": "بيربيز",
+    "description": "سكوات → بلانك/بوش أب → نطّة لفوق"
+  },
+  "jumping-jacks": {
+    "name": "فتح وضم",
+    "description": "افتح رجلك وارفع إيدك وبعدين اقفلهم"
+  },
+  "high-knees": {
+    "name": "رُكَب عالية",
+    "description": "اجري مكانك وارفع الركب لمستوى الحوض"
+  },
+  "butt-kicks": {
+    "name": "كعب للورا",
+    "description": "اجري مكانك وخبّط بكعوبك في المؤخرة"
+  },
+  "downward-dog": {
+    "name": "الكلب لتحت",
+    "description": "شكل V مقلوبة بإيديك ورجليك على الأرض"
+  },
+  "child-pose": {
+    "name": "وضع الطفل",
+    "description": "اقعد على ركَبك ومد إيديك لقدّام وارتاح"
+  },
+  "cat-cow": {
+    "name": "قطة وبقرة",
+    "description": "قرّب ضهرك لفوق وبعدين لتحت بالتبادل"
+  },
+  "single-leg-stand": {
+    "name": "وقفة على رجل واحدة",
+    "description": "اقف على رجل واحدة شوية وبعدين بدّل"
+  },
+  "tree-pose": {
+    "name": "وضع الشجرة",
+    "description": "اقف على رجل وحُط التانية على فخذك من جوّه"
+  },
+  "warrior-3": {
+    "name": "محارب 3",
+    "description": "اتوازن على رجل ومدّ التانية وضمرك لقدّام"
+  },
+  "dead-bug": {
+    "name": "ديد بَج",
+    "description": "على ضهرك؛ مدّ دراع ورجل عكس بعض بالتبادل"
+  },
+  "glute-bridges": {
+    "name": "جسر المؤخرة",
+    "description": "ارفع الحوض وإنت نايم على ضهرك بضغط المؤخرة"
+  },
+  "finger-roll": {
+    "name": "لفّ الصوابع",
+    "description": "لفّ الصوابع من قبضة لتمديد، واحدة واحدة"
+  },
+  "tricep-dips": {
+    "name": "ديبس ترايسبس",
+    "description": "انزل واطلع مستخدم مسند بإيديك ورا"
+  },
+  "calf-raises": {
+    "name": "رفع سمانة",
+    "description": "اطلع على أطراف صوابعك وارجع انزل"
+  },
+  "russian-twists": {
+    "name": "تويست روسي",
+    "description": "اقعد وارفع رجليك ولف الجزع يمين وشمال"
+  },
+  "bear-crawl": {
+    "name": "زحف الدب",
+    "description": "امشي على إيدك ورجلك وركبك مش لامسة الأرض"
+  },
+  "forward-fold": {
+    "name": "انحناءة لقدّام",
+    "description": "من الوقوف انحني لقدّام ولمّس رجليك"
+  },
   "timeBased": {
     "name": "مبني على الوقت"
   },
   "repBased": {
     "name": "مبني على التكرارات"
-  }
+  },
+  "difficulties": {
+    "beginner": "مبتدئ",
+    "intermediate": "متوسط",
+    "advanced": "متقدم"
+  },
+  "difficulty": "صعوبة",
+  "emailRequired": "[ar-EG] Email address is required",
+  "equipment": "معدات",
+  "equipmentPlaceholder": "[ar-EG] e.g., Dumbbells, Resistance band",
+  "makePublic": "[ar-EG] Make public",
+  "muscleGroupPlaceholder": "[ar-EG] e.g., Chest, Arms, Legs",
+  "muscleGroups": "[ar-EG] Muscle Groups",
+  "name": "اسم",
+  "namePlaceholder": "[ar-EG] Enter exercise name",
+  "permissionLevel": "[ar-EG] Permission Level",
+  "publicHelp": "عام exercises can be discovered by other users",
+  "shareDescription": "مشاركة this exercise with others",
+  "shareError": "[ar-EG] Failed to share exercise",
+  "shareExercise": "مشاركة تمرين",
+  "sharePublic": "مشاركة عامly",
+  "sharePublicDesc": "[ar-EG] Anyone can find and copy this exercise",
+  "shareWithUser": "مشاركة with User",
+  "shareWithUserDesc": "مشاركة with a specific user by email",
+  "sharedPublicly": "مشاركةd publicly",
+  "sharedWithUser": "مشاركةd with user",
+  "sharing": "[ar-EG] Sharing",
+  "stepDuration": "Step مدة",
+  "tagPlaceholder": "[ar-EG] e.g., Core, Cardio, Strength",
+  "type": "نوع",
+  "viewOnlyDesc": "[ar-EG] User can view but not edit",
+  "addStep": "[ar-EG] Add Step",
+  "basicInfo": "[ar-EG] Basic Information",
+  "canCopy": "Can نسخ",
+  "canCopyDesc": "[ar-EG] User can copy this exercise to their library",
+  "categories": {
+    "balance": "[ar-EG] Balance",
+    "cardio": "[ar-EG] Cardio",
+    "core": "[ar-EG] Core",
+    "flexibility": "[ar-EG] Flexibility",
+    "strength": "[ar-EG] Strength"
+  },
+  "category": "فئة",
+  "createDescription": "إنشاء a new exercise for your workouts",
+  "createError": "مقدرتش أعمل التمرين. جرب تاني.",
+  "createExercise": "إنشاء تمرين",
+  "createNotEnabled": "تمرين creation is not available",
+  "createSuccess": "تمرين created successfully",
+  "defaultReps": "[ar-EG] Default Reps",
+  "defaultSets": "[ar-EG] Default Sets",
+  "description": "وصف",
+  "descriptionPlaceholder": "[ar-EG] Describe the exercise",
+  "instructionPlaceholder": "[ar-EG] Enter step instructions",
+  "instructions": "تعليمات",
+  "repDuration": "Rep مدة",
+  "types": {
+    "repetition_based": "[ar-EG] Repetition Based",
+    "time_based": "[ar-EG] Time Based"
+  },
+  "viewOnly": "[ar-EG] View Only"
 }

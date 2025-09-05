@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: developer toasts not user-localized */
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-type SnackbarType = 'info' | 'warning' | 'danger';
+type SnackbarType = 'info' | 'warning' | 'danger' | 'success' | 'error';
 
 interface SnackbarItem {
   id: number;
@@ -82,9 +82,13 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
   const typeClasses = (type: SnackbarType) => {
     switch (type) {
       case 'danger':
+      case 'error':
         return 'bg-red-600 text-white';
       case 'info':
         return 'bg-blue-600 text-white';
+      case 'success':
+        return 'bg-green-600 text-white';
+      case 'warning':
       default:
         return 'bg-yellow-500 text-black';
     }

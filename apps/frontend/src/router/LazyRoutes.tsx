@@ -144,6 +144,12 @@ export const ExercisePage = lazy(() =>
   }))
 );
 
+export const CreateExercisePage = lazy(() => 
+  import('../pages/CreateExercisePage').catch(() => ({
+    default: () => <div>Error loading Create Exercise page</div>
+  }))
+);
+
 export const TimerPage = lazy(() => 
   import('../pages/TimerPage').catch(() => ({
     default: () => <div>Error loading Timer page</div>
@@ -183,6 +189,18 @@ export const EditWorkoutPage = lazy(() =>
 export const AuthCallbackPage = lazy(() => 
   import('../pages/AuthCallbackPage').catch(() => ({
     default: () => <div>Error loading Auth Callback page</div>
+  }))
+);
+
+export const CommunityPage = lazy(() => 
+  import('../pages/CommunityPage').catch(() => ({
+    default: () => <div>Error loading Community page</div>
+  }))
+);
+
+export const ExerciseDetailPage = lazy(() => 
+  import('../pages/ExerciseDetailPage').catch(() => ({
+    default: () => <div>Error loading Exercise Detail page</div>
   }))
 );
 

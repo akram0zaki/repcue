@@ -23,12 +23,15 @@ import { Suspense } from 'react';
 import { 
   HomePage, 
   ExercisePage, 
+  CreateExercisePage,
+  ExerciseDetailPage,
   TimerPage, 
   ActivityLogPage, 
   SettingsPage,
   WorkoutsPage,
   CreateWorkoutPage,
   EditWorkoutPage,
+  CommunityPage,
   AuthCallbackPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
@@ -1448,7 +1451,7 @@ function App() {
           const storedExercises = await storageService.getExercises();
           let allExercises: Exercise[];
           
-          if (storedExercises.length === 0) {
+          if (!storedExercises || storedExercises.length === 0) {
             // No stored exercises, use all initial exercises
             for (const exercise of INITIAL_EXERCISES) {
               await storageService.saveExercise(exercise);
@@ -1729,6 +1732,22 @@ useEffect(() => {
                 } 
               />
               <Route 
+                path={AppRoutes.CREATE_EXERCISE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Create Exercise')}>
+                    <CreateExercisePage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.EXERCISE_DETAIL} 
+                element={
+                  <Suspense fallback={createRouteLoader('Exercise Detail')}>
+                    <ExerciseDetailPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
                 path={AppRoutes.WORKOUTS} 
                 element={
                   <Suspense fallback={createRouteLoader('Workouts')}>
@@ -1792,6 +1811,14 @@ useEffect(() => {
                       appSettings={appSettings}
                       onUpdateSettings={updateAppSettings}
                     />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.COMMUNITY} 
+                element={
+                  <Suspense fallback={createRouteLoader('Community')}>
+                    <CommunityPage />
                   </Suspense>
                 } 
               />
