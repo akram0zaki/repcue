@@ -83,7 +83,8 @@
       "Bash(pnpm --filter @repcue/frontend lint \"src/pages/CreateExercisePage.tsx\")",
       "Bash(pnpm list:*)",
       "Bash(pnpm --filter @repcue/frontend list start-server-and-test)",
-      "Bash(pnpm:*)"
+      "Bash(pnpm:*)",
+      "Bash(npx cypress:*)"
     ],
     "deny": [],
     "ask": []
