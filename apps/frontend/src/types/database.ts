@@ -20,11 +20,26 @@ export type ExerciseInsert = Omit<Exercise, 'instructions' | 'tags' | 'muscle_gr
  * Helper function to transform Exercise data for Supabase insert
  */
 export const prepareExerciseForInsert = (exercise: Partial<Exercise>): ExerciseInsert => {
+  // Ensure required fields have defaults
+  const baseExercise = {
+    id: exercise.id ?? crypto.randomUUID(),
+    name: exercise.name ?? '',
+    category: exercise.category ?? 'core' as const,
+    exercise_type: exercise.exercise_type ?? 'repetition_based' as const,
+    is_favorite: exercise.is_favorite ?? false,
+    tags: exercise.tags ?? [],
+    created_at: exercise.created_at ?? new Date().toISOString(),
+    updated_at: exercise.updated_at ?? new Date().toISOString(),
+    deleted: exercise.deleted ?? false,
+    version: exercise.version ?? 1,
+  };
+
   return {
     ...exercise,
+    ...baseExercise,
     // Cast arrays and objects to 'any' for JSONB compatibility
     instructions: exercise.instructions as any,
-    tags: exercise.tags as any,
+    tags: baseExercise.tags as any,
     muscle_groups: exercise.muscle_groups as any,
     equipment_needed: exercise.equipment_needed as any,
   };
