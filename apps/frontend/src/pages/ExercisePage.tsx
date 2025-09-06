@@ -17,7 +17,8 @@ import {
   StarFilledIcon,
   PlayIcon,
   PlusIcon,
-  EditIcon
+  EditIcon,
+  DeleteIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -34,9 +35,10 @@ import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 interface ExercisePageProps {
   exercises: Exercise[];
   onToggleFavorite: (exercise_id: string) => void;
+  onDeleteExercise?: (exercise_id: string) => Promise<void>;
 }
 
-const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite }) => {
+const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises']);
   const { showSnackbar } = useSnackbar();
@@ -286,6 +288,32 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     navigate(`/exercises/edit/${exercise.id}`);
   };
 
+  const handleDeleteExercise = async (exerciseId: string) => {
+    if (onDeleteExercise) {
+      // Find the exercise name for the confirmation dialog
+      const exercise = exercises.find(ex => ex.id === exerciseId);
+      const exerciseName = exercise ? localizeExercise(exercise, t).name : 'this exercise';
+      
+      // Show confirmation dialog
+      const confirmed = window.confirm(
+        t('exercises.deleteConfirm', { 
+          name: exerciseName,
+          defaultValue: `Are you sure you want to delete "${exerciseName}"? This action cannot be undone.`
+        })
+      );
+      
+      if (!confirmed) return;
+      
+      try {
+        await onDeleteExercise(exerciseId);
+        showSnackbar(t('exercises.deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), 'success');
+      } catch (error) {
+        console.error('Failed to delete exercise:', error);
+        showSnackbar(t('exercises.deleteError', { defaultValue: 'Failed to delete exercise' }), 'error');
+      }
+    }
+  };
+
   return (
     <>
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
@@ -420,6 +448,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         formatDuration={formatDuration}
                         onPreview={openPreview}
                         onEdit={handleEditExercise}
+                        onDelete={handleDeleteExercise}
                         currentUser={user}
                       />
                     ))}
@@ -441,6 +470,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 formatDuration={formatDuration}
                 onPreview={openPreview}
                 onEdit={handleEditExercise}
+                onDelete={handleDeleteExercise}
                 currentUser={user}
               />
             ))}
@@ -539,6 +569,7 @@ interface ExerciseCardProps {
   formatDuration: (seconds?: number) => string;
   onPreview?: (exercise: Exercise) => void;
   onEdit?: (exercise: Exercise) => void;
+  onDelete?: (exercise_id: string) => Promise<void>;
   currentUser?: AuthUserProfile; // User from auth hook
 }
 
@@ -550,6 +581,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   formatDuration,
   onPreview,
   onEdit,
+  onDelete,
   currentUser
 }) => {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
@@ -597,6 +629,16 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 aria-label={t('exercises.editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
               >
                 <EditIcon size={20} />
+              </button>
+            )}
+            {isUserCreated && onDelete && (
+              <button
+                onClick={() => onDelete(exercise.id)}
+                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                title={t('exercises.deleteExercise', { defaultValue: 'Delete exercise' })}
+                aria-label={t('exercises.deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
+              >
+                <DeleteIcon size={20} />
               </button>
             )}
             <button

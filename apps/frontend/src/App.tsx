@@ -1626,6 +1626,26 @@ useEffect(() => {
     }
   };
 
+  // Delete a user-created exercise
+  const deleteExercise = async (exercise_id: string) => {
+    if (!hasConsent) return;
+
+    try {
+      await storageService.deleteCustomExercise(exercise_id);
+      // Promptly sync so deletion reflects on other devices
+      void syncService.sync();
+      
+      // Remove the exercise from the local state
+      setExercises(prev => prev.filter(exercise => exercise.id !== exercise_id));
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('exercise-deleted', { detail: exercise_id }));
+    } catch (error) {
+      console.error('Failed to delete exercise:', error);
+      throw error; // Re-throw to let ExercisePage handle the error display
+    }
+  };
+
   
 
   // Function to refresh exercises from storage
@@ -1758,6 +1778,7 @@ useEffect(() => {
                     <ExercisePage 
                       exercises={exercises}
                       onToggleFavorite={toggleExerciseFavorite}
+                      onDeleteExercise={deleteExercise}
                     />
                   </Suspense>
                 } 
