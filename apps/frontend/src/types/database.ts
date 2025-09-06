@@ -10,10 +10,10 @@ import type { Exercise, ExerciseInstruction } from './index';
  * Converts complex types to Json for JSONB columns
  */
 export type ExerciseInsert = Omit<Exercise, 'instructions' | 'tags' | 'muscle_groups' | 'equipment_needed'> & {
-  instructions?: any; // ExerciseInstruction[] cast to Json
-  tags?: any; // string[] cast to Json  
-  muscle_groups?: any; // string[] cast to Json
-  equipment_needed?: any; // string[] cast to Json
+  instructions?: ExerciseInstruction[]; // ExerciseInstruction[] for JSONB
+  tags?: string[]; // string[] for JSONB  
+  muscle_groups?: string[]; // string[] for JSONB
+  equipment_needed?: string[]; // string[] for JSONB
 };
 
 /**
@@ -37,18 +37,18 @@ export const prepareExerciseForInsert = (exercise: Partial<Exercise>): ExerciseI
   return {
     ...exercise,
     ...baseExercise,
-    // Cast arrays and objects to 'any' for JSONB compatibility
-    instructions: exercise.instructions as any,
-    tags: baseExercise.tags as any,
-    muscle_groups: exercise.muscle_groups as any,
-    equipment_needed: exercise.equipment_needed as any,
+    // Ensure arrays are properly typed for JSONB compatibility
+    instructions: exercise.instructions,
+    tags: baseExercise.tags,
+    muscle_groups: exercise.muscle_groups,
+    equipment_needed: exercise.equipment_needed,
   };
 };
 
 /**
  * Helper function to transform database result back to Exercise type
  */
-export const parseExerciseFromDatabase = (dbExercise: any): Exercise => {
+export const parseExerciseFromDatabase = (dbExercise: Record<string, unknown>): Exercise => {
   return {
     ...dbExercise,
     // Parse JSONB fields back to their TypeScript types

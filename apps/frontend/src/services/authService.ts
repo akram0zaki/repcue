@@ -283,7 +283,7 @@ export class AuthService {
       
       // Check if we're in PWA mode (standalone display)
       const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                    (window.navigator as any).standalone === true;
+                    ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
       
       if (isPWA) {
         // For PWA: use custom protocol to ensure magic links open in the PWA

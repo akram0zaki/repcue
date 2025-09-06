@@ -22,6 +22,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useAuth } from '../hooks/useAuth';
+import type { AuthUserProfile } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
@@ -538,7 +539,7 @@ interface ExerciseCardProps {
   formatDuration: (seconds?: number) => string;
   onPreview?: (exercise: Exercise) => void;
   onEdit?: (exercise: Exercise) => void;
-  currentUser?: any; // User from auth hook
+  currentUser?: AuthUserProfile; // User from auth hook
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({

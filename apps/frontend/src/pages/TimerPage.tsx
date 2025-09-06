@@ -180,7 +180,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     if (v) {
       try { v.load(); } catch {}
     }
-  }, [videoUrl]);
+  }, [videoUrl, exerciseVideo.videoRef]);
 
   useEffect(() => {
     if (!exerciseVideo || !isRepBased) return;
@@ -207,7 +207,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
       // One concise debug line (no PII) to assist diagnosing missing video rendering
       console.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
     }
-  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error]);
+  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error, appSettings.show_exercise_videos]);
   
   // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
   

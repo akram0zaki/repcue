@@ -1789,7 +1789,7 @@ export class StorageService {
         ...exerciseData,
         id: crypto.randomUUID(),
         owner_id: userId,
-        is_public: (exerciseData as any).is_public || false,
+        is_public: (exerciseData as Partial<Exercise>).is_public || false,
         is_verified: false, // User-created exercises require admin verification
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),

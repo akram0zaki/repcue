@@ -125,6 +125,8 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - The video couldn't be uploaded at the time of creating an exercise because supabase mandated having the exercise uuid in order to be able to write the record to database. Changing the behavior of create/edit exercise to be offline-first, would I be able to upload the video at the same time I am creating the exercise?
 
+- The exercise card on ExercisesPage is missing a delete button for user-owned exercises.
+
  - On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI, give me suggestions to improve this.
 
 - Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile.
