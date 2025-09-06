@@ -34,6 +34,7 @@
     "saveChanges": "Wijzigingen Opslaan",
     "saving": "Opslaan...",
     "sharing": "Delen",
+    "videoUploadAfterSave": "Video uploaden wordt beschikbaar na het opslaan van de oefening.",
     "minutes": "minuten"
   },
   "navigation": {
@@ -266,7 +267,7 @@
     "searchLabel": "Oefeningen zoeken",
     "searchPlaceholder": "Zoek op naam, beschrijving of tag...",
     "allCategories": "Alle categorieën",
-    "category": {
+    "categories": {
       "core": "Core",
       "strength": "Kracht",
       "cardio": "Cardio",
@@ -296,6 +297,12 @@
     "createNew": "Nieuwe Oefening Maken",
     "createExercise": "Oefening Maken",
     "createDescription": "Maak een aangepaste oefening die je kunt gebruiken in je trainingen",
+    "createError": "Fout bij het maken van oefening. Probeer het opnieuw.",
+    "createNotEnabled": "Het maken van oefeningen is momenteel niet ingeschakeld",
+    "createSuccess": "Oefening succesvol aangemaakt!",
+    "confirmClearForm": "Weet je zeker dat je het formulier wilt wissen? Dit zal je concept verwijderen.",
+    "keepDraft": "Je formulierconcept bewaren voor de volgende keer?",
+    "clearDraft": "Concept Wissen",
     "addStep": "Stap Toevoegen",
     "basicInfo": "Basisinformatie",
     "name": "Oefening Naam",
@@ -313,21 +320,12 @@
     "defaultReps": "Standaard Herhalingen",
     "tags": "Tags",
     "tagPlaceholder": "Voeg tags toe gescheiden door komma's...",
+    "durationSeconds": "Duur (seconden)",
     "instructions": "Instructies",
     "instructionPlaceholder": "Stap instructies...",
     "canCopy": "Kan Kopiëren",
     "canCopyDesc": "Gebruiker kan deze oefening naar hun bibliotheek kopiëren",
-    "categories": {
-      "balance": "Balans",
-      "cardio": "Cardio",
-      "core": "Core",
-      "flexibility": "Flexibiliteit",
-      "strength": "Kracht"
-    },
     "category": "Categorie",
-    "createError": "Kon oefening niet maken. Probeer het opnieuw.",
-    "createNotEnabled": "Het maken van oefeningen is momenteel niet ingeschakeld",
-    "createSuccess": "Oefening succesvol aangemaakt!",
     "difficulties": {
       "advanced": "Gevorderd",
       "beginner": "Beginner",

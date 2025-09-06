@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Exercise, ExerciseCategory, ExerciseType, ExerciseInstruction } from '../types';
 import { ExerciseCategory as Categories, ExerciseType as Types } from '../types';
@@ -136,6 +136,115 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   const [newMuscleGroup, setNewMuscleGroup] = useState('');
   const [newTag, setNewTag] = useState('');
 
+  // Form persistence key - use 'create' or exercise ID for editing
+  const persistenceKey = `exercise-form-${isEditing && exercise?.id ? exercise.id : 'create'}`;
+
+  // Save form state to localStorage whenever it changes
+  useEffect(() => {
+    const formState = {
+      name,
+      description,
+      category,
+      exerciseType,
+      defaultDuration,
+      defaultSets,
+      defaultReps,
+      repDurationSeconds,
+      difficultyLevel,
+      equipmentNeeded,
+      muscleGroups,
+      tags,
+      instructions,
+      isPublic,
+      customVideoUrl,
+      newEquipment,
+      newMuscleGroup,
+      newTag,
+    };
+
+    // Only save if form has content (avoid saving empty states)
+    if (name.trim() || description.trim() || instructions.some(i => i.text.trim())) {
+      localStorage.setItem(persistenceKey, JSON.stringify(formState));
+    }
+  }, [
+    name, description, category, exerciseType, defaultDuration, defaultSets, 
+    defaultReps, repDurationSeconds, difficultyLevel, equipmentNeeded, 
+    muscleGroups, tags, instructions, isPublic, customVideoUrl,
+    newEquipment, newMuscleGroup, newTag, persistenceKey
+  ]);
+
+  // Restore form state on component mount
+  useEffect(() => {
+    const savedState = localStorage.getItem(persistenceKey);
+    if (savedState && !isEditing) { // Only restore for new exercises, not when editing existing ones
+      try {
+        const parsedState = JSON.parse(savedState);
+        setName(parsedState.name || '');
+        setDescription(parsedState.description || '');
+        setCategory(parsedState.category || Categories.CORE);
+        setExerciseType(parsedState.exerciseType || Types.TIME_BASED);
+        setDefaultDuration(parsedState.defaultDuration || '');
+        setDefaultSets(parsedState.defaultSets || '');
+        setDefaultReps(parsedState.defaultReps || '');
+        setRepDurationSeconds(parsedState.repDurationSeconds || '');
+        setDifficultyLevel(parsedState.difficultyLevel || 'beginner');
+        setEquipmentNeeded(parsedState.equipmentNeeded || []);
+        setMuscleGroups(parsedState.muscleGroups || []);
+        setTags(parsedState.tags || []);
+        setInstructions(parsedState.instructions || [{ step: 1, text: '' }]);
+        setIsPublic(parsedState.isPublic || false);
+        setCustomVideoUrl(parsedState.customVideoUrl || '');
+        setNewEquipment(parsedState.newEquipment || '');
+        setNewMuscleGroup(parsedState.newMuscleGroup || '');
+        setNewTag(parsedState.newTag || '');
+      } catch (error) {
+        console.warn('Failed to restore form state:', error);
+      }
+    }
+  }, [persistenceKey, isEditing]);
+
+  // Clear saved form state when form is successfully submitted
+  const clearFormState = () => {
+    localStorage.removeItem(persistenceKey);
+  };
+
+  // Clear form and reset to initial state
+  const handleClearForm = () => {
+    if (confirm(t('exercises.confirmClearForm', 'Are you sure you want to clear the form? This will delete your draft.'))) {
+      clearFormState();
+      setName('');
+      setDescription('');
+      setCategory(Categories.CORE);
+      setExerciseType(Types.TIME_BASED);
+      setDefaultDuration('');
+      setDefaultSets('');
+      setDefaultReps('');
+      setRepDurationSeconds('');
+      setDifficultyLevel('beginner');
+      setEquipmentNeeded([]);
+      setMuscleGroups([]);
+      setTags([]);
+      setInstructions([{ step: 1, text: '' }]);
+      setIsPublic(false);
+      setCustomVideoUrl('');
+      setNewEquipment('');
+      setNewMuscleGroup('');
+      setNewTag('');
+    }
+  };
+
+  // Handle cancel with option to keep draft
+  const handleCancel = () => {
+    const hasContent = name.trim() || description.trim() || instructions.some(i => i.text.trim());
+    if (hasContent) {
+      const keepDraft = confirm(t('exercises.keepDraft', 'Keep your form draft for next time?'));
+      if (!keepDraft) {
+        clearFormState();
+      }
+    }
+    onCancel();
+  };
+
   const handleAddInstruction = () => {
     const newStep = instructions.length + 1;
     setInstructions([...instructions, { step: newStep, text: '' }]);
@@ -259,6 +368,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       exerciseData.custom_video_url = customVideoUrl.trim();
     }
 
+    // Clear saved form state on successful submission
+    clearFormState();
     onSubmit(exerciseData);
   };
 
@@ -617,11 +728,19 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           {/* Video Upload */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Exercise Video</h3>
-            <VideoUploadWidget
-              exerciseId={exercise?.id || 'new'}
-              currentVideoUrl={customVideoUrl}
-              onVideoUploaded={setCustomVideoUrl}
-            />
+            {exercise?.id ? (
+              <VideoUploadWidget
+                exerciseId={exercise.id}
+                currentVideoUrl={customVideoUrl}
+                onVideoUploaded={setCustomVideoUrl}
+              />
+            ) : (
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {t('common.videoUploadAfterSave', 'Video upload will be available after saving the exercise.')}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Sharing Options */}
@@ -648,28 +767,42 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={loading}
-            >
-              {t('common.cancel', 'Cancel')}
-            </button>
+          <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div>
+              {!isEditing && (
+                <button
+                  type="button"
+                  onClick={handleClearForm}
+                  className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-none"
+                  disabled={loading}
+                >
+                  {t('exercises.clearDraft', 'Clear Draft')}
+                </button>
+              )}
+            </div>
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
+              >
+                {t('common.cancel', 'Cancel')}
+              </button>
             
-            <button
-              type="submit"
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading || !name.trim()}
-            >
-              {loading 
-                ? t('common.saving', 'Saving...') 
-                : isEditing 
-                  ? t('common.saveChanges', 'Save Changes')
-                  : t('exercises.createExercise', 'Create Exercise')
-              }
-            </button>
+              <button
+                type="submit"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !name.trim()}
+              >
+                {loading 
+                  ? t('common.saving', 'Saving...') 
+                  : isEditing 
+                    ? t('common.saveChanges', 'Save Changes')
+                    : t('exercises.createExercise', 'Create Exercise')
+                }
+              </button>
+            </div>
           </div>
         </form>
       </div>

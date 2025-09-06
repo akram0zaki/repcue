@@ -34,6 +34,7 @@
     "saveChanges": "حفظ التغييرات",
     "saving": "حفظ...",
     "sharing": "مشاركة",
+    "videoUploadAfterSave": "رفع الفيديو هيكون متاح بعد ما نحفظ التمرين.",
     "minutes": "دقايق"
   },
   "navigation": {
@@ -308,6 +309,12 @@
     "createNew": "اعمل تمرين جديد",
     "createExercise": "اعمل تمرين",
     "createDescription": "اعمل تمرين مخصوص تقدر تستعمله في تدريباتك",
+    "createError": "فشل في عمل التمرين. جرب تاني.",
+    "createNotEnabled": "عمل التمارين مش شغال دلوقتي",
+    "createSuccess": "اتعمل التمرين بنجاح!",
+    "confirmClearForm": "انت متأكد انك عايز تمسح الفورم؟ ده هيمسح المسودة بتاعتك.",
+    "keepDraft": "تحتفظ بمسودة الفورم للمرة الجاية؟",
+    "clearDraft": "امسح المسودة",
     "addStep": "ضيف خطوة",
     "basicInfo": "المعلومات الأساسية",
     "name": "اسم التمرين",
@@ -325,6 +332,7 @@
     "defaultReps": "العدات الأساسية",
     "tags": "التاجز",
     "tagPlaceholder": "ضيف تاجز مقسومة بفواصل...",
+    "durationSeconds": "المدة (بالثواني)",
     "instructions": "التعليمات",
     "instructionPlaceholder": "تعليمات الخطوة..."
   },

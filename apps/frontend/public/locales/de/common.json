@@ -34,6 +34,7 @@
     "saveChanges": "Änderungen Speichern",
     "saving": "Speichere...",
     "sharing": "Teilen",
+    "videoUploadAfterSave": "Video-Upload wird nach dem Speichern der Übung verfügbar sein.",
     "minutes": "Minuten"
   },
   "navigation": {
@@ -296,6 +297,12 @@
     "createNew": "Neue Übung Erstellen",
     "createExercise": "Übung Erstellen",
     "createDescription": "Erstellen Sie eine benutzerdefinierte Übung für Ihre Workouts",
+    "createError": "Fehler beim Erstellen der Übung. Bitte versuchen Sie es erneut.",
+    "createNotEnabled": "Das Erstellen von Übungen ist derzeit nicht aktiviert",
+    "createSuccess": "Übung erfolgreich erstellt!",
+    "confirmClearForm": "Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht.",
+    "keepDraft": "Ihren Formularentwurf für das nächste Mal behalten?",
+    "clearDraft": "Entwurf Löschen",
     "addStep": "Schritt Hinzufügen",
     "basicInfo": "Grundinformationen",
     "name": "Übungsname",
@@ -313,6 +320,7 @@
     "defaultReps": "Standard-Wiederholungen",
     "tags": "Tags",
     "tagPlaceholder": "Tags durch Kommas getrennt hinzufügen...",
+    "durationSeconds": "Dauer (Sekunden)",
     "instructions": "Anweisungen",
     "instructionPlaceholder": "Schritt-Anweisungen..."
   },

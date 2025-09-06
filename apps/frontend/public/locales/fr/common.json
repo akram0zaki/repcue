@@ -34,6 +34,7 @@
     "saveChanges": "Enregistrer les Modifications",
     "saving": "Enregistrement...",
     "sharing": "Partage",
+    "videoUploadAfterSave": "Le téléchargement de vidéo sera disponible après avoir sauvegardé l'exercice.",
     "minutes": "minutes"
   },
   "navigation": {
@@ -328,6 +329,9 @@
     "createError": "Échec de la création de l'exercice. Veuillez réessayer.",
     "createNotEnabled": "La création d'exercices n'est pas activée actuellement",
     "createSuccess": "Exercice créé avec succès !",
+    "confirmClearForm": "Êtes-vous sûr de vouloir effacer le formulaire ? Cela supprimera votre brouillon.",
+    "keepDraft": "Conserver votre brouillon de formulaire pour la prochaine fois ?",
+    "clearDraft": "Effacer le Brouillon",
     "difficulties": {
       "advanced": "Avancé",
       "beginner": "Débutant",
@@ -351,6 +355,7 @@
     "sharedPublicly": "Partagé publiquement",
     "sharedWithUser": "Partagé avec l'utilisateur",
     "stepDuration": "Durée de l'Étape (secondes)",
+    "durationSeconds": "Durée (secondes)",
     "types": {
       "repetition_based": "Basé sur les Répétitions",
       "time_based": "Basé sur le Temps"

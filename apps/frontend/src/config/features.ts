@@ -12,4 +12,4 @@ export const SYNC_USE_INVOKE = false;
 
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = false;
+export const DEBUG = true;

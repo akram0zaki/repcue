@@ -34,6 +34,7 @@
     "saveChanges": "Guardar Cambios",
     "saving": "Guardando...",
     "sharing": "Compartir",
+    "videoUploadAfterSave": "La carga de video estará disponible después de guardar el ejercicio.",
     "minutes": "minutos"
   },
   "navigation": {
@@ -296,6 +297,12 @@
     "createNew": "Crear Nuevo Ejercicio",
     "createExercise": "Crear Ejercicio",
     "createDescription": "Crea un ejercicio personalizado que puedas usar en tus entrenamientos",
+    "createError": "Error al crear el ejercicio. Por favor, inténtalo de nuevo.",
+    "createNotEnabled": "La creación de ejercicios no está habilitada actualmente",
+    "createSuccess": "¡Ejercicio creado con éxito!",
+    "confirmClearForm": "¿Estás seguro de que quieres borrar el formulario? Esto eliminará tu borrador.",
+    "keepDraft": "¿Mantener tu borrador del formulario para la próxima vez?",
+    "clearDraft": "Borrar Borrador",
     "addStep": "Agregar Paso",
     "basicInfo": "Información Básica",
     "name": "Nombre del Ejercicio",
@@ -313,6 +320,7 @@
     "defaultReps": "Repeticiones Predeterminadas",
     "tags": "Etiquetas",
     "tagPlaceholder": "Agregar etiquetas separadas por comas...",
+    "durationSeconds": "Duración (segundos)",
     "instructions": "Instrucciones",
     "instructionPlaceholder": "Instrucciones del paso..."
   },

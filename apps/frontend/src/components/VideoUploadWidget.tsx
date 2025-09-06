@@ -72,19 +72,20 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
           // Save video metadata to database
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            await supabase.from('exercise_videos').upsert({
-              id: crypto.randomUUID(),
+            const { error: dbError } = await supabase.from('exercise_videos').insert({
               exercise_id: exerciseId,
               uploader_id: user.id,
               video_url: urlData.publicUrl,
               file_size: file.size,
               duration_seconds: null, // Could be extracted from video metadata
-              is_approved: false, // Requires admin approval
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              deleted: false,
-              version: 1
+              is_approved: false // Requires admin approval
+              // Let database handle: id, created_at, updated_at, deleted, version
             });
+            
+            if (dbError) {
+              console.error('Database error saving video metadata:', dbError);
+              throw dbError;
+            }
           }
 
           onVideoUploaded(urlData.publicUrl);

@@ -58,6 +58,7 @@ console.log
 next.md
 docs/findings
 docs/testing/findings
+.temp/
 
 # Supabase
 supabase/.temp/

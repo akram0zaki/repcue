@@ -34,6 +34,7 @@
     "saveChanges": "حفظ التغييرات",
     "saving": "حفظ...",
     "sharing": "مشاركة",
+    "videoUploadAfterSave": "سيكون رفع الفيديو متاحًا بعد حفظ التمرين.",
     "minutes": "دقائق"
   },
   "navigation": {
@@ -308,6 +309,12 @@
     "createNew": "إنشاء تمرين جديد",
     "createExercise": "إنشاء تمرين",
     "createDescription": "أنشئ تمريناً مخصصاً يمكنك استخدامه في تدريباتك",
+    "createError": "فشل في إنشاء التمرين. يرجى المحاولة مرة أخرى.",
+    "createNotEnabled": "إنشاء التمارين غير مفعّل حالياً",
+    "createSuccess": "تم إنشاء التمرين بنجاح!",
+    "confirmClearForm": "هل أنت متأكد من أنك تريد مسح النموذج؟ سيؤدي هذا إلى حذف مسودتك.",
+    "keepDraft": "الاحتفاظ بمسودة النموذج للمرة القادمة؟",
+    "clearDraft": "مسح المسودة",
     "addStep": "إضافة خطوة",
     "basicInfo": "المعلومات الأساسية",
     "name": "اسم التمرين",
@@ -325,6 +332,7 @@
     "defaultReps": "التكرارات الافتراضية",
     "tags": "العلامات",
     "tagPlaceholder": "أضف علامات مفصولة بفاصلات...",
+    "durationSeconds": "المدة (بالثواني)",
     "instructions": "التعليمات",
     "instructionPlaceholder": "تعليمات الخطوة..."
   },

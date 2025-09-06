@@ -34,6 +34,7 @@
     "saveChanges": "Wizigingen Bewarje",
     "saving": "Bewarje...",
     "sharing": "Diele",
+    "videoUploadAfterSave": "Fideo oplade sil beskikber wêze nei it bewarjen fan de oefening.",
     "minutes": "minuten"
   },
   "navigation": {
@@ -296,6 +297,12 @@
     "createNew": "Nije Oefening Meitsje",
     "createExercise": "Oefening Meitsje",
     "createDescription": "Meitsje in oanpaste oefening dy't jo brûke kinne yn jo trainings",
+    "createError": "Flater by it meitsjen fan oefening. Besykje it opnij.",
+    "createNotEnabled": "It meitsjen fan oefeningen is op dit stuit net ynskeakele",
+    "createSuccess": "Oefening mei sukses makke!",
+    "confirmClearForm": "Binne jo wis dat jo it formulier wiskje wolle? Dit sil jo konsept fuortsmite.",
+    "keepDraft": "Jo formulier konsept bewarje foar de folgjende kear?",
+    "clearDraft": "Konsept Wiskje",
     "addStep": "Stap Taheakje",
     "basicInfo": "Basis Ynformaasje",
     "name": "Oefening Namme",
@@ -313,6 +320,7 @@
     "defaultReps": "Standert Werhalingen",
     "tags": "Labels",
     "tagPlaceholder": "Foegje labels ta skieden troch komma's...",
+    "durationSeconds": "Doer (sekonden)",
     "instructions": "Ynstruksjes",
     "instructionPlaceholder": "Stap ynstruksjes..."
   },

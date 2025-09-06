@@ -34,7 +34,8 @@
     "remove": "Remove",
     "saveChanges": "Save Changes",
     "saving": "Saving...",
-    "sharing": "Sharing"
+    "sharing": "Sharing",
+    "videoUploadAfterSave": "Video upload will be available after saving the exercise."
   },
   "navigation": {
     "home": "Home",
@@ -313,6 +314,9 @@
     "createNotEnabled": "Exercise creation is not enabled currently",
     "createError": "Failed to create exercise. Please try again.",
     "createSuccess": "Exercise created successfully!",
+    "confirmClearForm": "Are you sure you want to clear the form? This will delete your draft.",
+    "keepDraft": "Keep your form draft for next time?",
+    "clearDraft": "Clear Draft",
     "addStep": "Add Step",
     "basicInfo": "Basic Information",
     "name": "Exercise Name",
@@ -334,6 +338,7 @@
     "muscleGroupPlaceholder": "e.g., Chest, Arms, Legs",
     "repDuration": "Rep Duration (seconds)",
     "stepDuration": "Step Duration (seconds)",
+    "durationSeconds": "Duration (seconds)",
     "emailRequired": "Email address is required",
     "makePublic": "Make public",
     "permissionLevel": "Permission Level",
@@ -347,16 +352,12 @@
     "shareWithUserDesc": "Share with a specific user by email",
     "sharedPublicly": "Shared publicly",
     "sharedWithUser": "Shared with user",
+    "videoUploadAfterSave": "Video upload will be available after saving the exercise.",
     "publicHelp": "When enabled, this exercise will be visible to all users in the community",
     "viewOnly": "View Only",
     "viewOnlyDesc": "User can view but not edit",
     "canCopy": "Can Copy",
-    "canCopyDesc": "User can copy this exercise to their library",
-    "difficulty": {
-      "advanced": "Advanced",
-      "beginner": "Beginner", 
-      "intermediate": "Intermediate"
-    }
+    "canCopyDesc": "User can copy this exercise to their library"
   },
   "community": {
     "title": "Community",

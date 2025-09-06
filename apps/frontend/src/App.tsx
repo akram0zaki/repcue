@@ -1464,19 +1464,25 @@ function App() {
             const storedIds = new Set(storedExercises.map(ex => ex.id));
             const newExercises = INITIAL_EXERCISES.filter(ex => !storedIds.has(ex.id));
             
-            // Update existing exercises with latest data from INITIAL_EXERCISES while preserving favorites
-            // Note: This differs from manual refresh which resets ALL data including favorites
-            const updatedStoredExercises = storedExercises.map(storedExercise => {
+            // Separate built-in exercises from user-created exercises
+            const builtInExercises: Exercise[] = [];
+            const userCreatedExercises: Exercise[] = [];
+            
+            storedExercises.forEach(storedExercise => {
               const latestExercise = INITIAL_EXERCISES.find(ex => ex.id === storedExercise.id);
               if (latestExercise) {
-                // Use latest exercise data but preserve user's favorite status (automatic refresh)
-                return {
+                // This is a built-in exercise - update with latest data but preserve user's favorite status
+                builtInExercises.push({
                   ...latestExercise,
                   is_favorite: storedExercise.is_favorite
-                };
+                });
+              } else {
+                // This is a user-created exercise - keep as-is
+                userCreatedExercises.push(storedExercise);
               }
-              return storedExercise; // Keep old exercise if not found in latest data
             });
+            
+            const updatedStoredExercises = [...builtInExercises, ...userCreatedExercises];
             
             // Save updated exercises back to storage
             for (const exercise of updatedStoredExercises) {
