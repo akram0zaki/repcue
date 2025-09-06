@@ -71,6 +71,7 @@
     "consentMigrationWarning": "⚠️ Toestemmingsgegevens worden gemigreerd naar de nieuwste versie bij volgende app start.",
     "exportData": "Gegevens Exporteren",
     "exportDataHelp": "Download uw trainingsgegevens als een JSON-bestand",
+    "exportRateLimit": "U kunt tot 3 exports per dag aanvragen",
     "exportNow": "Nu exporteren",
     "exportNowHelp": "Exporteer direct uw meest recente gegevens naar een JSON-bestand.",
     "syncNow": "Nu synchroniseren",
@@ -136,6 +137,10 @@
     "completeExercise": "Oefening Voltooien",
     "exitWorkout": "Training Verlaten",
     "beepInterval": "Piep Interval",
+    "beepInterval15": "Elke 15 seconden",
+    "beepInterval30": "Elke 30 seconden",
+    "beepInterval45": "Elke 45 seconden",
+    "beepInterval60": "Elke 60 seconden",
     "wakeLock": "Wake Lock",
     "selectExercise": "Selecteer Oefening"
   },

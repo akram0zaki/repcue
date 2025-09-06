@@ -71,6 +71,7 @@
     "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
     "exportData": "Daten exportieren",
     "exportDataHelp": "Laden Sie Ihre Trainingsdaten als JSON-Datei herunter",
+    "exportRateLimit": "Sie können bis zu 3 Exporte pro Tag anfordern",
     "exportNow": "Jetzt exportieren",
     "exportNowHelp": "Ihre neuesten Daten sofort als JSON-Datei exportieren.",
     "syncNow": "Jetzt synchronisieren",
@@ -136,6 +137,10 @@
     "completeExercise": "Übung abschließen",
     "exitWorkout": "Workout beenden",
     "beepInterval": "Piep-Intervall",
+    "beepInterval15": "Alle 15 Sekunden",
+    "beepInterval30": "Alle 30 Sekunden",
+    "beepInterval45": "Alle 45 Sekunden",
+    "beepInterval60": "Alle 60 Sekunden",
     "wakeLock": "Bildschirm aktiv halten",
     "selectExercise": "Übung auswählen"
   },

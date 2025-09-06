@@ -139,6 +139,10 @@
     "completeExercise": "Terminer l'exercice",
     "exitWorkout": "Quitter l'entraînement",
     "beepInterval": "Intervalle de bip",
+    "beepInterval15": "Toutes les 15 secondes",
+    "beepInterval30": "Toutes les 30 secondes",
+    "beepInterval45": "Toutes les 45 secondes", 
+    "beepInterval60": "Toutes les 60 secondes",
     "wakeLock": "Maintenir l'écran allumé",
     "selectExercise": "Sélectionner un exercice"
   },

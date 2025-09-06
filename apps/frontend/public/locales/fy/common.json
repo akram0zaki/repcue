@@ -71,6 +71,7 @@
     "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
     "exportData": "Gegevens eksportearje",
     "exportDataHelp": "Laad jo traininggegevens yn as JSON-bestân",
+    "exportRateLimit": "Jo kinne oant 3 eksporten per dei oanfreegje",
     "exportNow": "No eksportearje",
     "exportNowHelp": "Eksportearje daliks jo nijste gegevens nei in JSON-bestân.",
     "syncNow": "No syngronisearje",
@@ -136,6 +137,10 @@
     "completeExercise": "Oefening foltôgje",
     "exitWorkout": "Training ferlitte",
     "beepInterval": "Piip-ynterfal",
+    "beepInterval15": "Elke 15 sekonden",
+    "beepInterval30": "Elke 30 sekonden",
+    "beepInterval45": "Elke 45 sekonden",
+    "beepInterval60": "Elke 60 sekonden",
     "wakeLock": "Wekkerslot",
     "selectExercise": "Oefening selektearje"
   },

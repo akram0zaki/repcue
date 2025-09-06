@@ -308,10 +308,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               onChange={handleIntervalChange}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value={15}>Every 15 seconds</option>
-              <option value={30}>Every 30 seconds</option>
-              <option value={45}>Every 45 seconds</option>
-              <option value={60}>Every 60 seconds</option>
+              <option value={15}>{t('timer.beepInterval15')}</option>
+              <option value={30}>{t('timer.beepInterval30')}</option>
+              <option value={45}>{t('timer.beepInterval45')}</option>
+              <option value={60}>{t('timer.beepInterval60')}</option>
             </select>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {t('settings.beepIntervalHelp')}

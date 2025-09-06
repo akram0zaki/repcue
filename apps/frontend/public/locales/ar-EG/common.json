@@ -71,6 +71,7 @@
     "consentMigrationWarning": "⚠️ بيانات الموافقة هتتنقل للإصدار الجديد في تحميل البرنامج الجاي.",
     "exportData": "صدّر البيانات",
     "exportDataHelp": "نزّل بيانات التمرين بتاعتك كملف JSON",
+    "exportRateLimit": "تقدر تطلب لحدّ 3 تصديرات في اليوم",
     "exportNow": "صدّر دلوقتي",
     "exportNowHelp": "صدّر أحدث بياناتك فوراً لملف JSON.",
     "syncNow": "زامِن دلوقتي",
@@ -136,6 +137,10 @@
     "completeExercise": "خلّص التمرين",
     "exitWorkout": "اطلع من التمرين",
     "beepInterval": "فترة البيب",
+    "beepInterval15": "كل 15 ثانية",
+    "beepInterval30": "كل 30 ثانية",
+    "beepInterval45": "كل 45 ثانية",
+    "beepInterval60": "كل 60 ثانية",
     "wakeLock": "قفل الشاشة",
     "selectExercise": "اختار التمرين"
   },

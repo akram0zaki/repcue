@@ -71,6 +71,7 @@
     "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
     "exportData": "تصدير البيانات",
     "exportDataHelp": "تحميل بيانات التمرين كملف JSON",
+    "exportRateLimit": "يمكنك طلب حتى 3 عمليات تصدير يومياً",
     "exportNow": "تصدير الآن",
     "exportNowHelp": "تصدير أحدث بياناتك فوراً إلى ملف JSON.",
     "syncNow": "مزامنة الآن",
@@ -136,6 +137,10 @@
     "completeExercise": "إكمال التمرين",
     "exitWorkout": "الخروج من التمرين",
     "beepInterval": "فترة الصوت",
+    "beepInterval15": "كل 15 ثانية",
+    "beepInterval30": "كل 30 ثانية",
+    "beepInterval45": "كل 45 ثانية",
+    "beepInterval60": "كل 60 ثانية",
     "wakeLock": "قفل الشاشة",
     "selectExercise": "اختر التمرين"
   },
