@@ -54,6 +54,7 @@ playwright/.cache/
 # Other
 .local/*
 .mcp.json
+.vscode/mcp.json
 console.log
 next.md
 docs/findings

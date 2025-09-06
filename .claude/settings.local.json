@@ -80,7 +80,10 @@
       "Bash(pnpm --filter @repcue/frontend lint \"src/components/ExerciseForm.tsx\")",
       "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
       "Read(c:\\Users\\akram\\OneDrive\\Pictures\\Screenshots 1/**)",
-      "Bash(pnpm --filter @repcue/frontend lint \"src/pages/CreateExercisePage.tsx\")"
+      "Bash(pnpm --filter @repcue/frontend lint \"src/pages/CreateExercisePage.tsx\")",
+      "Bash(pnpm list:*)",
+      "Bash(pnpm --filter @repcue/frontend list start-server-and-test)",
+      "Bash(pnpm:*)"
     ],
     "deny": [],
     "ask": []
