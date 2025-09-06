@@ -127,7 +127,7 @@ export function enhanceInstallPrompt(): void {
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault();
-    deferredPrompt = e;
+    deferredPrompt = e as BeforeInstallPromptEvent;
     
     // Show custom install button if needed
     const installButton = document.getElementById('pwa-install-button');

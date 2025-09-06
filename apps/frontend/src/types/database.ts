@@ -56,5 +56,5 @@ export const parseExerciseFromDatabase = (dbExercise: Record<string, unknown>): 
     tags: dbExercise.tags as string[],
     muscle_groups: dbExercise.muscle_groups as string[],
     equipment_needed: dbExercise.equipment_needed as string[],
-  };
+  } as Exercise;
 };
