@@ -24,6 +24,7 @@ import {
   HomePage, 
   ExercisePage, 
   CreateExercisePage,
+  EditExercisePage,
   ExerciseDetailPage,
   TimerPage, 
   ActivityLogPage, 
@@ -1627,6 +1628,16 @@ useEffect(() => {
 
   
 
+  // Function to refresh exercises from storage
+  const refreshExercises = useCallback(async () => {
+    try {
+      const updatedExercises = await storageService.getExercises();
+      if (updatedExercises.length > 0) setExercises(updatedExercises);
+    } catch (error) {
+      console.warn('Failed to refresh exercises:', error);
+    }
+  }, []);
+
   // Refresh local state when sync applies server changes
   useEffect(() => {
     const handler = async () => {
@@ -1657,6 +1668,20 @@ useEffect(() => {
     window.addEventListener('sync:applied', handler as EventListener);
     return () => window.removeEventListener('sync:applied', handler as EventListener);
   }, []);
+
+  // Listen for local exercise updates
+  useEffect(() => {
+    const handler = () => {
+      // Refresh exercises when they're updated locally
+      refreshExercises();
+    };
+    window.addEventListener('exercise-updated', handler);
+    window.addEventListener('exercise-created', handler);
+    return () => {
+      window.removeEventListener('exercise-updated', handler);
+      window.removeEventListener('exercise-created', handler);
+    };
+  }, [refreshExercises]);
 
   // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {
@@ -1742,6 +1767,14 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('Create Exercise')}>
                     <CreateExercisePage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.EDIT_EXERCISE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Edit Exercise')}>
+                    <EditExercisePage />
                   </Suspense>
                 } 
               />

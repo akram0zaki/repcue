@@ -84,7 +84,11 @@
       "Bash(pnpm list:*)",
       "Bash(pnpm --filter @repcue/frontend list start-server-and-test)",
       "Bash(pnpm:*)",
-      "Bash(npx cypress:*)"
+      "Bash(npx cypress:*)",
+      "mcp__supabase-dev__list_tables",
+      "mcp__supabase-dev__execute_sql",
+      "mcp__supabase-dev__list_edge_functions",
+      "mcp__supabase-dev__deploy_edge_function"
     ],
     "deny": [],
     "ask": []

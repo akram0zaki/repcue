@@ -318,6 +318,7 @@ export const Routes = {
   HOME: '/',
   EXERCISES: '/exercises',
   CREATE_EXERCISE: '/exercises/create',
+  EDIT_EXERCISE: '/exercises/edit/:id',
   EXERCISE_DETAIL: '/exercises/:id',
   TIMER: '/timer',
   ACTIVITY_LOG: '/activity',

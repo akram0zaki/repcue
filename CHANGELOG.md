@@ -1,3 +1,30 @@
+## 2025-09-06 — User-Created Exercise Platform Fixes and Infrastructure Improvements
+
+- fix: Resolved critical issues with Edit Exercise page functionality - Fixed equipment, muscle groups, and tags not being saved during exercise creation and editing due to form logic sending `undefined` instead of actual arrays.
+
+  🔧 **Exercise Form Fixes**:
+  - ✅ **Array Field Handling**: Fixed form submission logic to properly send array values instead of `undefined`
+  - ✅ **Offline-First Architecture**: Converted Create/Edit pages from direct Supabase calls to proper IndexedDB → sync pattern
+  - ✅ **Immediate UI Updates**: Added custom event system for real-time exercise list updates after create/edit operations
+  - ✅ **Data Integrity**: Fixed caching issues where changes weren't reflected immediately in the UI
+  - ✅ **Ownership Validation**: Enhanced user authorization checks for exercise editing
+
+- fix: Cleaned up database orphaned records and display issues - Resolved visibility problems with exercises showing wrong owner_id and duration display bugs.
+
+  🗄️ **Database Cleanup**:
+  - ✅ **Orphaned Records**: Removed exercises with null owner_id that weren't marked as public
+  - ✅ **Duration Display**: Fixed time-based exercises showing "exercises.variable" instead of actual duration
+  - ✅ **Missing Migrations**: Applied duration_minutes column migration to production database
+  - ✅ **Default Values**: Set proper default duration of 30 seconds for exercises missing duration data
+
+- feat: Enhanced PWA offline-first architecture compliance - Ensured all user-created content operations follow proper offline-first patterns for better reliability and performance.
+
+  📱 **PWA Architecture**:
+  - ✅ **Storage Service Integration**: All exercise operations now use `storageService.saveExercise()` pattern
+  - ✅ **Sync Queue**: Changes are properly queued for background synchronization with server
+  - ✅ **Event-Driven Updates**: Implemented custom event system for component communication
+  - ✅ **Local Data Priority**: UI always shows latest local data while sync happens in background
+
 ## 2025-09-06 — Form Persistence, Database Fixes, Security Planning, and Accessibility Testing
 
 - feat: Complete accessibility testing infrastructure and WCAG 2.1 AA compliance - Fixed all accessibility test dependencies, resolved consent screen blocking issue, and achieved 100% test success rate (14/14 tests passing).

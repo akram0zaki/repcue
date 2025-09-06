@@ -4,19 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { ExerciseForm } from '../components/ExerciseForm';
 import { FeatureGuard } from '../hooks/useFeatureFlags';
 import { useSnackbar } from '../components/SnackbarProvider';
-import { supabase } from '../config/supabase';
+import { storageService } from '../services/storageService';
+import { useAuth } from '../hooks/useAuth';
 import type { Exercise } from '../types';
-import { prepareExerciseForInsert } from '../types/database';
 import { DEBUG } from '../config/features';
 
 export const CreateExercisePage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises']);
   const { showSnackbar } = useSnackbar();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (exerciseData: Partial<Exercise>) => {
-    if (!supabase) {
+    if (!user) {
       showSnackbar(t('errors.notAuthenticated', 'Please log in to create exercises'), {
         type: 'error'
       });
@@ -26,48 +27,40 @@ export const CreateExercisePage: React.FC = () => {
     setLoading(true);
 
     try {
-      // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        showSnackbar(t('errors.notAuthenticated', 'Please log in to create exercises'), {
-          type: 'error'
-        });
-        return;
-      }
-      // Create exercise via direct database insert
-      // The sync function will handle server-side processing
-      const exercisePayload = {
-        // Ensure required fields are present
+      // Create exercise via IndexedDB storage service (offline-first)
+      // The sync service will handle pushing to server later
+      const exercisePayload: Exercise = {
+        // Generate unique ID
+        id: crypto.randomUUID(),
+        // Set owner and required fields
         owner_id: user.id,
-        category: exerciseData.category || 'strength',
         name: exerciseData.name || '',
+        category: exerciseData.category || 'core',
         exercise_type: exerciseData.exercise_type || 'repetition_based',
-        // Transform complex fields - send as objects/arrays for JSONB fields
+        // Optional fields with defaults
+        description: exerciseData.description,
         instructions: exerciseData.instructions || [],
         tags: exerciseData.tags || [],
-        // Spread the rest of the data (excluding problematic fields)
-        description: exerciseData.description,
         muscle_groups: exerciseData.muscle_groups || [],
         equipment_needed: exerciseData.equipment_needed || [],
-        difficulty_level: exerciseData.difficulty_level,
+        difficulty_level: exerciseData.difficulty_level || 'beginner',
         default_duration: exerciseData.default_duration,
         default_sets: exerciseData.default_sets,
         default_reps: exerciseData.default_reps,
         rep_duration_seconds: exerciseData.rep_duration_seconds,
-        has_video: exerciseData.has_video,
+        has_video: exerciseData.has_video || false,
         custom_video_url: exerciseData.custom_video_url,
-        // Override with system-generated fields
-        id: crypto.randomUUID(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        deleted: false,
-        version: 1,
+        is_public: exerciseData.is_public || false,
+        // System fields
         is_favorite: false,
+        is_verified: false,
         rating_average: 0,
         rating_count: 0,
         copy_count: 0,
-        is_verified: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted: false,
+        version: 1
       };
       
       if (DEBUG) {
@@ -81,25 +74,14 @@ export const CreateExercisePage: React.FC = () => {
         console.log('===============================');
       }
       
-      // Transform the payload to match Supabase's expected types
-      const supabasePayload = prepareExerciseForInsert(exercisePayload);
+      // Save to IndexedDB (this will mark it as dirty for sync)
+      await storageService.saveExercise(exercisePayload);
 
-      const { data, error } = await supabase
-        .from('exercises')
-        .insert(supabasePayload)
-        .select()
-        .single();
-
-      if (DEBUG) {
-        console.log('Supabase response - data:', data, 'error:', error);
-      }
-
-      if (error) {
-        throw error;
-      }
-
-      if (!data) {
-        throw new Error('No data returned from exercise creation');
+      // Notify App.tsx to refresh exercises
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('exercise-created', { 
+          detail: { exerciseId: exercisePayload.id } 
+        }));
       }
 
       showSnackbar(t('exercises.createSuccess', 'Exercise created successfully!'), {

@@ -340,9 +340,9 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       exercise_type: exerciseType,
       instructions: validInstructions.length > 0 ? validInstructions : undefined,
       difficulty_level: difficultyLevel,
-      equipment_needed: equipmentNeeded.length > 0 ? equipmentNeeded : undefined,
-      muscle_groups: muscleGroups.length > 0 ? muscleGroups : undefined,
-      tags: tags.length > 0 ? tags : undefined,
+      equipment_needed: equipmentNeeded,
+      muscle_groups: muscleGroups,
+      tags: tags,
       is_public: isPublic,
     };
 

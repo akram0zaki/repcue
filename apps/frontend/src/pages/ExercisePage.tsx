@@ -16,10 +16,12 @@ import {
   StarIcon,
   StarFilledIcon,
   PlayIcon,
-  PlusIcon
+  PlusIcon,
+  EditIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { useAuth } from '../hooks/useAuth';
 import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
@@ -38,6 +40,18 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const { t } = useTranslation(['common', 'exercises']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
+  const { user } = useAuth();
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('🔍 ExercisePage Debug Info:', {
+      totalExercises: exercises.length,
+      currentUser: user,
+      userCreatedExercises: exercises.filter(ex => ex.owner_id && ex.owner_id !== null),
+      userOwnedExercises: exercises.filter(ex => ex.owner_id === user?.id),
+      sampleExerciseOwnerIds: exercises.slice(0, 5).map(ex => ({ id: ex.id, name: ex.name, owner_id: ex.owner_id }))
+    });
+  }, [exercises, user]);
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -265,6 +279,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     });
   };
 
+  const handleEditExercise = (exercise: Exercise) => {
+    console.log('🔧 Edit button clicked for exercise:', exercise.name, 'ID:', exercise.id);
+    console.log('🔧 Navigating to:', `/exercises/edit/${exercise.id}`);
+    navigate(`/exercises/edit/${exercise.id}`);
+  };
+
   return (
     <>
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
@@ -398,6 +418,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         getCategoryColor={getCategoryColor}
                         formatDuration={formatDuration}
                         onPreview={openPreview}
+                        onEdit={handleEditExercise}
+                        currentUser={user}
                       />
                     ))}
                   </div>
@@ -417,6 +439,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 getCategoryColor={getCategoryColor}
                 formatDuration={formatDuration}
                 onPreview={openPreview}
+                onEdit={handleEditExercise}
+                currentUser={user}
               />
             ))}
           </div>
@@ -513,6 +537,8 @@ interface ExerciseCardProps {
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
   onPreview?: (exercise: Exercise) => void;
+  onEdit?: (exercise: Exercise) => void;
+  currentUser?: any; // User from auth hook
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -521,7 +547,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onStartTimer,
   getCategoryColor,
   formatDuration,
-  onPreview
+  onPreview,
+  onEdit,
+  currentUser
 }) => {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const { t } = useTranslation(['common', 'exercises']);
@@ -530,6 +558,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const visibleTags = isTagsExpanded ? exercise.tags : exercise.tags.slice(0, 2);
   const additionalTagsCount = exercise.tags.length - 2;
   const hasMoreTags = exercise.tags.length > 2;
+  
+  // Check if the exercise is user-created and belongs to the current user
+  const isUserCreated = exercise.owner_id && currentUser && exercise.owner_id === currentUser.id;
 
   const handleTagExpansionToggle = () => {
     setIsTagsExpanded(!isTagsExpanded);
@@ -555,6 +586,16 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 aria-label={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
               >
                 <PlayIcon size={20} />
+              </button>
+            )}
+            {isUserCreated && onEdit && (
+              <button
+                onClick={() => onEdit(exercise)}
+                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                title={t('exercises.editExercise', { defaultValue: 'Edit exercise' })}
+                aria-label={t('exercises.editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
+              >
+                <EditIcon size={20} />
               </button>
             )}
             <button

@@ -111,6 +111,22 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ While on the create exercise page, if I fill in some fields then change visibility (e.g. change tabs or change windows), the page resets and the entered fields disappear.
 
+- 👉 🔄 The Edit Exercise page works now however I found a number of other issues:
+    - While creating the exercise I entered some details like equipment, muscle groups, and tags. On the edit page these were all empty which suggests they were not saved.
+    - I changed the sets/reps from 2x8 to 2x9 then clicked Save which took me back to the Exercises page and it was still showing 2x8 for the exercise I just edited. After refreshing the page the correct number was displayed 2x9.
+    - I created a number of other exercises earlier but there was a problem in the owner id so I cannot edit them now. However when creating these exercises I never marked them as Public, so if my owner id is not the same then I shouldn't see them at all because I don't own them and they're not public. Those exercises are: Pelvix (time-based), Pelvix (time-based), Ya 7amada (rep-based).
+    - The listing of time-based user-created exercises seem to have a problem where the duration is not displayed on the card. Instead it says: "Default: exercises.variable".
+    - There is a migration that's not applied to production yet, the column storing exercise duration is missing from the exercises table on production supabase project.
+    - Rep duration should allow decimal point.
+
+- What is the sequence of events when changing any data in the application? I assumed that all changes always go to IndexedDB first and the record is marked dirty then the sync service would push the changes to server. If that's the case, then when I edit an exercise then it should be saved to IndexedDB first and even if the sync hasn't taken place, the Exercises page should render up to date data. This application is meant to work completely offline (PWA).
+
+- Being a PWA application with optional sign-up/sign-in, means that it shouldn't be an issue if exercises exist without an owner id. Maybe the owner id will be added if the user signs in?
+
+- The video couldn't be uploaded at the time of creating an exercise because supabase mandated having the exercise uuid in order to be able to write the record to database. Changing the behavior of create/edit exercise to be offline-first, would I be able to upload the video at the same time I am creating the exercise?
+
+ - On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI, give me suggestions to improve this.
+
 - Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile.
 
 - Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
@@ -128,4 +144,4 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 ---
 
-Icons: ☐ ✅ ❌ 🔄 ⏳⌛👉 🚫
+Icons: ☐ ✅ ❌ 👉 🔄 ⏳⌛🚫

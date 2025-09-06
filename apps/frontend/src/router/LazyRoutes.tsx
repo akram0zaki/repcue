@@ -150,6 +150,12 @@ export const CreateExercisePage = lazy(() =>
   }))
 );
 
+export const EditExercisePage = lazy(() => 
+  import('../pages/EditExercisePage').catch(() => ({
+    default: () => <div>Error loading Edit Exercise page</div>
+  }))
+);
+
 export const TimerPage = lazy(() => 
   import('../pages/TimerPage').catch(() => ({
     default: () => <div>Error loading Timer page</div>

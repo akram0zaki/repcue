@@ -314,6 +314,10 @@
     "createNotEnabled": "Exercise creation is not enabled currently",
     "createError": "Failed to create exercise. Please try again.",
     "createSuccess": "Exercise created successfully!",
+    "editExercise": "Edit exercise",
+    "editExerciseAria": "Edit {{name}}",
+    "editExerciseSubtitle": "Update your custom exercise details",
+    "updateSuccess": "Exercise updated successfully!",
     "confirmClearForm": "Are you sure you want to clear the form? This will delete your draft.",
     "keepDraft": "Keep your form draft for next time?",
     "clearDraft": "Clear Draft",
@@ -454,6 +458,10 @@
   },
   "errors": {
     "featureNotAvailable": "This feature is not available",
-    "notAuthenticated": "Please log in to access this feature"
+    "notAuthenticated": "Please log in to access this feature",
+    "exerciseNotFound": "Exercise not found",
+    "unauthorized": "You can only edit your own exercises",
+    "loadFailed": "Failed to load exercise",
+    "updateFailed": "Failed to update exercise"
   }
 }
