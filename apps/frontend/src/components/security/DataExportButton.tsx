@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../config/supabase';
 
@@ -11,6 +12,7 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
   className = '', 
   variant = 'secondary' 
 }) => {
+  const { t } = useTranslation(['common']);
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -71,9 +73,9 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
         onClick={handleExportData}
         disabled={isExporting}
         className={`px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${baseClasses} ${className}`}
-        aria-label="Export your data"
+        aria-label={t('settings.exportData')}
       >
-        {isExporting ? 'Exporting...' : 'Export My Data'}
+        {isExporting ? t('settings.exportInProgress') : t('settings.exportData')}
       </button>
 
       {error && (
@@ -84,13 +86,13 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
 
       {success && (
         <div className="text-sm text-green-600 bg-green-50 border border-green-200 rounded-md p-2" role="status">
-          Your data has been exported successfully!
+          {t('settings.exportSuccess')}
         </div>
       )}
 
       <div className="text-xs text-gray-500">
-        <p>Export includes your workouts, exercises, settings, and activity logs.</p>
-        <p>You can request up to 3 exports per day.</p>
+        <p>{t('settings.exportDataHelp')}</p>
+        <p>{t('settings.exportRateLimit')}</p>
       </div>
     </div>
   );
