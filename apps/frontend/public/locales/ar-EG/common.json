@@ -384,5 +384,31 @@
     "viewWorkout": "شوف التدريب",
     "workouts": "التدريبات",
     "workoutsOnly": "التدريبات بس"
+  },
+  "profile": {
+    "title": "البروفايل",
+    "myProfile": "بروفايلي",
+    "profile": "البروفايل",
+    "viewProfile": "شوف البروفايل",
+    "editProfile": "عدل البروفايل",
+    "signInRequired": "لازم تسجل دخول",
+    "signInToViewProfile": "سجل دخول عشان تشوف بروفايلك",
+    "notSignedIn": "مسجلتش دخول",
+    "signInToSync": "سجل دخول عشان تزامن بياناتك على كل الأجهزة",
+    "notFound": "البروفايل مش موجود",
+    "profileNotFoundMessage": "البروفايل اللي بدور عليه مش موجود",
+    "anonymous": "يوزر مجهول",
+    "connections": "الكونكشنز",
+    "connectionsCount": "{{count}} كونكشن",
+    "connectionsCount_plural": "{{count}} كونكشن",
+    "stats": "الستاتس",
+    "totalWorkouts": "كل التدريبات",
+    "currentStreak": "السلسلة دلوقتي",
+    "exercisesCreated": "التمارين اللي اتعملت",
+    "workoutsCreated": "التدريبات اللي اتعملت",
+    "memberSince": "عضو من {{date}}",
+    "unknownUser": "يوزر مش معروف",
+    "connectedSince": "متصل من {{date}}",
+    "pending": "مستنى"
   }
 }

@@ -414,5 +414,31 @@
     "loginRequired": "Connectez-vous pour copier",
     "tooltip": "Copier {{name}} dans votre bibliothèque",
     "genericError": "Échec de la copie de l'exercice"
+  },
+  "profile": {
+    "title": "Profil",
+    "myProfile": "Mon Profil",
+    "profile": "Profil",
+    "viewProfile": "Voir le Profil",
+    "editProfile": "Modifier le Profil",
+    "signInRequired": "Connexion Requise",
+    "signInToViewProfile": "Veuillez vous connecter pour voir votre profil",
+    "notSignedIn": "Vous n'êtes pas connecté",
+    "signInToSync": "Connectez-vous pour synchroniser vos données entre appareils",
+    "notFound": "Profil Non Trouvé",
+    "profileNotFoundMessage": "Le profil que vous recherchez n'a pas pu être trouvé",
+    "anonymous": "Utilisateur Anonyme",
+    "connections": "Connexions",
+    "connectionsCount": "{{count}} connexion",
+    "connectionsCount_plural": "{{count}} connexions",
+    "stats": "Statistiques",
+    "totalWorkouts": "Total des Entraînements",
+    "currentStreak": "Série Actuelle",
+    "exercisesCreated": "Exercices Créés",
+    "workoutsCreated": "Entraînements Créés",
+    "memberSince": "Membre depuis {{date}}",
+    "unknownUser": "Utilisateur Inconnu",
+    "connectedSince": "Connecté depuis {{date}}",
+    "pending": "En attente"
   }
 }

@@ -397,5 +397,31 @@
     "viewWorkout": "Training Bekijken",
     "workouts": "Trainingen",
     "workoutsOnly": "Alleen Trainingen"
+  },
+  "profile": {
+    "title": "Profiel",
+    "myProfile": "Mijn Profiel",
+    "profile": "Profiel",
+    "viewProfile": "Profiel Bekijken",
+    "editProfile": "Profiel Bewerken",
+    "signInRequired": "Inloggen Vereist",
+    "signInToViewProfile": "Log in om je profiel te bekijken",
+    "notSignedIn": "Je bent niet ingelogd",
+    "signInToSync": "Log in om je gegevens tussen apparaten te synchroniseren",
+    "notFound": "Profiel Niet Gevonden",
+    "profileNotFoundMessage": "Het profiel dat je zoekt kon niet worden gevonden",
+    "anonymous": "Anonieme Gebruiker",
+    "connections": "Verbindingen",
+    "connectionsCount": "{{count}} verbinding",
+    "connectionsCount_plural": "{{count}} verbindingen",
+    "stats": "Statistieken",
+    "totalWorkouts": "Totale Trainingen",
+    "currentStreak": "Huidige Streak",
+    "exercisesCreated": "Oefeningen Gemaakt",
+    "workoutsCreated": "Trainingen Gemaakt",
+    "memberSince": "Lid sinds {{date}}",
+    "unknownUser": "Onbekende Gebruiker",
+    "connectedSince": "Verbonden sinds {{date}}",
+    "pending": "In behandeling"
   }
 }

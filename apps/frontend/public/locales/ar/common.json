@@ -384,5 +384,31 @@
     "viewWorkout": "عرض التدريب",
     "workouts": "التدريبات",
     "workoutsOnly": "التدريبات فقط"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "myProfile": "ملفي الشخصي",
+    "profile": "الملف الشخصي",
+    "viewProfile": "عرض الملف الشخصي",
+    "editProfile": "تحرير الملف الشخصي",
+    "signInRequired": "تسجيل الدخول مطلوب",
+    "signInToViewProfile": "يرجى تسجيل الدخول لعرض ملفك الشخصي",
+    "notSignedIn": "لم تسجل الدخول",
+    "signInToSync": "سجل الدخول لمزامنة بياناتك عبر الأجهزة",
+    "notFound": "الملف الشخصي غير موجود",
+    "profileNotFoundMessage": "لا يمكن العثور على الملف الشخصي المطلوب",
+    "anonymous": "مستخدم مجهول",
+    "connections": "الاتصالات",
+    "connectionsCount": "{{count}} اتصال",
+    "connectionsCount_plural": "{{count}} اتصال",
+    "stats": "الإحصائيات",
+    "totalWorkouts": "إجمالي التدريبات",
+    "currentStreak": "السلسلة الحالية",
+    "exercisesCreated": "التمارين المُنشأة",
+    "workoutsCreated": "التدريبات المُنشأة",
+    "memberSince": "عضو منذ {{date}}",
+    "unknownUser": "مستخدم غير معروف",
+    "connectedSince": "متصل منذ {{date}}",
+    "pending": "معلق"
   }
 }

@@ -372,5 +372,31 @@
     "viewWorkout": "Training Besjen",
     "workouts": "Trainings",
     "workoutsOnly": "Allinne Trainings"
+  },
+  "profile": {
+    "title": "Profyl",
+    "myProfile": "Myn Profyl",
+    "profile": "Profyl",
+    "viewProfile": "Profyl Besjen",
+    "editProfile": "Profyl Bewurkje",
+    "signInRequired": "Ynloggen Fereaske",
+    "signInToViewProfile": "Logje yn om jo profyl te besjen",
+    "notSignedIn": "Jo binne net ynlogge",
+    "signInToSync": "Logje yn om jo gegevens tusken apparaten te syngronisearjen",
+    "notFound": "Profyl Net Fûn",
+    "profileNotFoundMessage": "It profyl dat jo sykje koe net fûn wurde",
+    "anonymous": "Anonieme Brûker",
+    "connections": "Ferbinings",
+    "connectionsCount": "{{count}} ferbining",
+    "connectionsCount_plural": "{{count}} ferbinings",
+    "stats": "Statistiken",
+    "totalWorkouts": "Totale Trainings",
+    "currentStreak": "Hjoeddeiske Reeks",
+    "exercisesCreated": "Oefeningen Makke",
+    "workoutsCreated": "Trainings Makke",
+    "memberSince": "Lid sûnt {{date}}",
+    "unknownUser": "Unbekende Brûker",
+    "connectedSince": "Ferbûn sûnt {{date}}",
+    "pending": "Yn behanneling"
   }
 }

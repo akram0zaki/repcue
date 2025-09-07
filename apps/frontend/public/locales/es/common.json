@@ -372,5 +372,31 @@
     "viewWorkout": "Ver Entrenamiento",
     "workouts": "Entrenamientos",
     "workoutsOnly": "Solo Entrenamientos"
+  },
+  "profile": {
+    "title": "Perfil",
+    "myProfile": "Mi Perfil",
+    "profile": "Perfil",
+    "viewProfile": "Ver Perfil",
+    "editProfile": "Editar Perfil",
+    "signInRequired": "Inicio de Sesión Requerido",
+    "signInToViewProfile": "Por favor inicia sesión para ver tu perfil",
+    "notSignedIn": "No has iniciado sesión",
+    "signInToSync": "Inicia sesión para sincronizar tus datos entre dispositivos",
+    "notFound": "Perfil No Encontrado",
+    "profileNotFoundMessage": "El perfil que buscas no pudo ser encontrado",
+    "anonymous": "Usuario Anónimo",
+    "connections": "Conexiones",
+    "connectionsCount": "{{count}} conexión",
+    "connectionsCount_plural": "{{count}} conexiones",
+    "stats": "Estadísticas",
+    "totalWorkouts": "Entrenamientos Totales",
+    "currentStreak": "Racha Actual",
+    "exercisesCreated": "Ejercicios Creados",
+    "workoutsCreated": "Entrenamientos Creados",
+    "memberSince": "Miembro desde {{date}}",
+    "unknownUser": "Usuario Desconocido",
+    "connectedSince": "Conectado desde {{date}}",
+    "pending": "Pendiente"
   }
 }

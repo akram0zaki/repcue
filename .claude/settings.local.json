@@ -89,7 +89,9 @@
       "mcp__supabase-dev__execute_sql",
       "mcp__supabase-dev__list_edge_functions",
       "mcp__supabase-dev__deploy_edge_function",
-      "Read(//c/Users/akram/OneDrive/Pictures/Screenshots 1/**)"
+      "Read(//c/Users/akram/OneDrive/Pictures/Screenshots 1/**)",
+      "Bash(for lang in de es nl ar ar-EG fy)",
+      "Bash(do echo \"Adding profile translations to $lang\")"
     ],
     "deny": [],
     "ask": []

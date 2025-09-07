@@ -119,7 +119,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
     - There is a migration that's not applied to production yet, the column storing exercise duration is missing from the exercises table on production supabase project.
     - Rep duration should allow decimal point.
 
-- What is the sequence of events when changing any data in the application? I assumed that all changes always go to IndexedDB first and the record is marked dirty then the sync service would push the changes to server. If that's the case, then when I edit an exercise then it should be saved to IndexedDB first and even if the sync hasn't taken place, the Exercises page should render up to date data. This application is meant to work completely offline (PWA).
+- 👉 🔄 What is the sequence of events when changing any data in the application? I assumed that all changes always go to IndexedDB first and the record is marked dirty then the sync service would push the changes to server. If that's the case, then when I edit an exercise then it should be saved to IndexedDB first and even if the sync hasn't taken place, the Exercises page should render up to date data. This application is meant to work completely offline (PWA).
 
 - Being a PWA application with optional sign-up/sign-in, means that it shouldn't be an issue if exercises exist without an owner id. Maybe the owner id will be added if the user signs in?
 
@@ -129,7 +129,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
  - On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI, give me suggestions to improve this.
 
-- Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile.
+- 🔄 Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile.
 
 - Add feature to allow users to give rating and feedback on the app.
 

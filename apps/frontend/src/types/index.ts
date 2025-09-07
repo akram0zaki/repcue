@@ -324,6 +324,9 @@ export const Routes = {
   ACTIVITY_LOG: '/activity',
   SETTINGS: '/settings',
   PRIVACY: '/privacy',
+  PROFILE: '/profile',
+  PROFILE_VIEW: '/profile/:userId',
+  CONNECTIONS: '/connections',
   WORKOUTS: '/workouts', // Changed from SCHEDULE
   CREATE_WORKOUT: '/workout/create',
   EDIT_WORKOUT: '/workout/edit',
@@ -371,6 +374,69 @@ export interface AuthUserProfile {
   email?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Profile and connection types
+export interface UserProfile extends SyncMetadata {
+  user_id: string; // Auth user ID
+  display_name?: string; // How they like to be called
+  bio?: string;
+  location?: string;
+  website?: string;
+  privacy_settings: UserPrivacySettings;
+  stats?: UserStats;
+  badges?: UserBadge[];
+  join_date: string; // ISO timestamp
+  last_active?: string; // ISO timestamp
+}
+
+export interface UserPrivacySettings {
+  profile_visibility: 'public' | 'connections' | 'private';
+  show_stats: boolean;
+  show_activity: boolean;
+  allow_connection_requests: boolean;
+}
+
+export interface UserStats {
+  total_workouts: number;
+  total_exercises_created: number;
+  total_workouts_created: number;
+  streak_days: number;
+  longest_streak: number;
+  favorite_category?: ExerciseCategory;
+}
+
+export interface UserBadge {
+  id: string;
+  name: string;
+  description: string;
+  icon_url?: string;
+  earned_at: string; // ISO timestamp
+}
+
+export interface Connection extends SyncMetadata {
+  user_id: string; // The user who owns this connection
+  connected_user_id: string; // The user they're connected to
+  status: ConnectionStatus;
+  requested_at: string; // ISO timestamp
+  accepted_at?: string; // ISO timestamp
+  nickname?: string; // Custom name for this connection
+}
+
+export const ConnectionStatus = {
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  BLOCKED: 'blocked'
+} as const;
+
+export type ConnectionStatus = typeof ConnectionStatus[keyof typeof ConnectionStatus];
+
+export interface ConnectionRequest extends SyncMetadata {
+  from_user_id: string;
+  to_user_id: string;
+  message?: string;
+  requested_at: string; // ISO timestamp
+  status: 'pending' | 'accepted' | 'rejected';
 }
 
 export interface AuthState {

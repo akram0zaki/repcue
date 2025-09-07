@@ -34,6 +34,7 @@ import {
   EditWorkoutPage,
   CommunityPage,
   AuthCallbackPage,
+  ProfilePage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -1887,6 +1888,22 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('Auth Callback')}>
                     <AuthCallbackPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.PROFILE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Profile')}>
+                    <ProfilePage isOwnProfile={true} />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.PROFILE_VIEW} 
+                element={
+                  <Suspense fallback={createRouteLoader('Profile')}>
+                    <ProfilePage isOwnProfile={false} />
                   </Suspense>
                 } 
               />

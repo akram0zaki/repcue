@@ -364,5 +364,31 @@
     "viewWorkout": "Workout Ansehen",
     "workouts": "Workouts",
     "workoutsOnly": "Nur Workouts"
+  },
+  "profile": {
+    "title": "Profil",
+    "myProfile": "Mein Profil",
+    "profile": "Profil",
+    "viewProfile": "Profil Anzeigen",
+    "editProfile": "Profil Bearbeiten",
+    "signInRequired": "Anmeldung Erforderlich",
+    "signInToViewProfile": "Bitte melden Sie sich an, um Ihr Profil zu sehen",
+    "notSignedIn": "Sie sind nicht angemeldet",
+    "signInToSync": "Melden Sie sich an, um Ihre Daten geräteübergreifend zu synchronisieren",
+    "notFound": "Profil Nicht Gefunden",
+    "profileNotFoundMessage": "Das gesuchte Profil konnte nicht gefunden werden",
+    "anonymous": "Anonymer Benutzer",
+    "connections": "Verbindungen",
+    "connectionsCount": "{{count}} Verbindung",
+    "connectionsCount_plural": "{{count}} Verbindungen",
+    "stats": "Statistiken",
+    "totalWorkouts": "Gesamte Workouts",
+    "currentStreak": "Aktuelle Serie",
+    "exercisesCreated": "Übungen Erstellt",
+    "workoutsCreated": "Workouts Erstellt",
+    "memberSince": "Mitglied seit {{date}}",
+    "unknownUser": "Unbekannter Benutzer",
+    "connectedSince": "Verbunden seit {{date}}",
+    "pending": "Ausstehend"
   }
 }

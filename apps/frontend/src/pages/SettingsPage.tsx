@@ -172,8 +172,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         {/* Profile Section */}
         <ProfileSection 
           onViewProfile={() => {
-            // TODO: Open profile settings modal
-            console.log('View profile clicked');
+            window.location.href = '/profile';
           }}
         />
 
