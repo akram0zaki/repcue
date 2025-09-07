@@ -1,6 +1,7 @@
 import { supabase } from '../config/supabase';
 import type { FeatureFlag } from '../types';
 import { authService } from './authService';
+import logger from '../utils/logger';
 
 /**
  * Feature Flag Service
@@ -46,11 +47,11 @@ export class FeatureFlagService {
         .order('flag_name');
 
       if (error) {
-        console.error('Failed to load feature flags:', error);
+        logger.error('Failed to load feature flags:', error);
         
         // Fallback: Enable user-created exercises when API fails
         // This ensures the feature works even when feature_flags table is missing
-        console.log('Using fallback feature flags due to API error');
+        logger.log('Using fallback feature flags due to API error');
         const fallbackFlags: FeatureFlag[] = [
           {
             id: 'fallback-1',
@@ -86,7 +87,7 @@ export class FeatureFlagService {
           this.flags.set(flag.flag_name, flag);
         });
         this.loaded = true;
-        console.log(`Loaded ${this.flags.size} fallback feature flags`);
+        logger.log(`Loaded ${this.flags.size} fallback feature flags`);
         return;
       }
 
@@ -105,9 +106,9 @@ export class FeatureFlagService {
       });
 
       this.loaded = true;
-      console.log(`Loaded ${this.flags.size} feature flags`);
+      logger.log(`Loaded ${this.flags.size} feature flags`);
     } catch (error) {
-      console.error('Error loading feature flags:', error);
+      logger.error('Error loading feature flags:', error);
     }
   }
 
@@ -119,7 +120,7 @@ export class FeatureFlagService {
     
     const flag = this.flags.get(flagName);
     if (!flag) {
-      console.warn(`Feature flag '${flagName}' not found`);
+      logger.warn(`Feature flag '${flagName}' not found`);
       return false;
     }
 

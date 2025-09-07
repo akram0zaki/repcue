@@ -15,6 +15,7 @@ import {
   prepareSoftDelete, 
   filterActiveRecords 
 } from './syncHelpers';
+import logger from '../utils/logger';
 
 // Database schema interfaces with sync metadata
 interface StoredActivityLog extends Omit<ActivityLog, 'timestamp'> {
@@ -331,7 +332,7 @@ class RepCueDatabase extends Dexie {
       }
 
     } catch (error) {
-      console.error('Migration to unified schema failed:', error);
+      logger.error('Migration to unified schema failed:', error);
       // Don't throw - let the migration continue with warnings
     }
   }
@@ -368,7 +369,7 @@ class RepCueDatabase extends Dexie {
         migrationComplete: isV6Schema && Object.values(tableStats).some(count => count > 0)
       };
     } catch (error) {
-      console.error('Error getting migration status:', error);
+      logger.error('Error getting migration status:', error);
       return {
         currentVersion: 0,
         isV6Schema: false,
@@ -604,15 +605,15 @@ export class StorageService {
       // Check database health after opening
       const healthCheck = await this.checkAndRepairDatabase();
       if (healthCheck.repaired) {
-        console.log('🔧 Database was automatically repaired during initialization');
+        logger.log('🔧 Database was automatically repaired during initialization');
       } else if (!healthCheck.healthy) {
-        console.warn('⚠️ Database health check failed but could not be repaired:', healthCheck.error);
+        logger.warn('⚠️ Database health check failed but could not be repaired:', healthCheck.error);
       }
     } catch (error) {
       // Check if this is a schema migration error that we can fix
       const errorObj = error as Error;
       if (errorObj.name === 'UpgradeError' || errorObj.message?.includes('changing primary key')) {
-        console.warn('💾 IndexedDB schema migration failed, clearing database and starting fresh...', error);
+        logger.warn('💾 IndexedDB schema migration failed, clearing database and starting fresh...', error);
         try {
           // Close the current database instance
           this.db.close();
@@ -622,13 +623,13 @@ export class StorageService {
           
           // Recreate the database with the current schema
           await this.db.open();
-          console.log('✅ IndexedDB cleared and recreated successfully');
+          logger.log('✅ IndexedDB cleared and recreated successfully');
           return;
         } catch (resetError) {
-          console.error('❌ Failed to reset IndexedDB:', resetError);
+          logger.error('❌ Failed to reset IndexedDB:', resetError);
         }
       }
-      console.warn('IndexedDB not available, falling back to memory storage:', error);
+      logger.warn('IndexedDB not available, falling back to memory storage:', error);
     }
   }
 
@@ -667,7 +668,7 @@ export class StorageService {
         try {
           data[tableName] = await this.db.table(tableName).toArray();
         } catch (error) {
-          console.error(`Error exporting ${tableName}:`, error);
+          logger.error(`Error exporting ${tableName}:`, error);
           data[tableName] = [];
         }
       }
@@ -682,7 +683,7 @@ export class StorageService {
         ...data
       };
     } catch (error) {
-      console.error('Error exporting data:', error);
+      logger.error('Error exporting data:', error);
       throw error;
     }
   }
@@ -701,7 +702,7 @@ export class StorageService {
     try {
   await this.db.exercises.put(storedExercise);
     } catch (error) {
-      console.warn('Failed to save exercise to IndexedDB:', error);
+      logger.warn('Failed to save exercise to IndexedDB:', error);
   // Use the resolved exerciseId to avoid undefined keys when caller didn't provide one
   this.fallbackStorage.set(`exercise_${exerciseId}`, storedExercise);
     }
@@ -730,7 +731,7 @@ export class StorageService {
         }));
       return filterActiveRecords(allExercises);
     } catch (error) {
-      console.warn('Failed to load exercises from IndexedDB:', error);
+      logger.warn('Failed to load exercises from IndexedDB:', error);
       // Try fallback storage
       const exercises: Exercise[] = [];
       this.fallbackStorage.forEach((value, key) => {
@@ -783,7 +784,7 @@ export class StorageService {
           
           await this.db.exercises.put(cleanExercise);
         } catch (error) {
-          console.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
+          logger.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
           this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
         }
       }
@@ -792,7 +793,7 @@ export class StorageService {
       
       return await this.db.exercises.count();
     } catch (error) {
-      console.warn('Failed to seed exercises catalog:', error);
+      logger.warn('Failed to seed exercises catalog:', error);
       return 0;
     }
   }
@@ -840,7 +841,7 @@ export class StorageService {
           }
         } else {
           // This built-in exercise was removed from catalog - delete it
-          console.log(`🗑️ Removing obsolete built-in exercise: ${exercise.name} (${exercise.id})`);
+          logger.log(`🗑️ Removing obsolete built-in exercise: ${exercise.name} (${exercise.id})`);
           await this.db.exercises.delete(exercise.id);
         }
       }
@@ -849,7 +850,7 @@ export class StorageService {
       const existingIds = new Set(existingBuiltInExercises.map(ex => ex.id));
       for (const exercise of INITIAL_EXERCISES) {
         if (!existingIds.has(exercise.id)) {
-          console.log(`➕ Adding new built-in exercise: ${exercise.name} (${exercise.id})`);
+          logger.log(`➕ Adding new built-in exercise: ${exercise.name} (${exercise.id})`);
           const cleanExercise: StoredExercise = {
             ...exercise,
             dirty: 0,
@@ -865,7 +866,7 @@ export class StorageService {
         }
       }
     } catch (error) {
-      console.warn('Failed to clean built-in exercises:', error);
+      logger.warn('Failed to clean built-in exercises:', error);
     }
   }
 
@@ -902,7 +903,7 @@ export class StorageService {
         }
       }
     } catch (error) {
-      console.warn('Failed to update exercise favorite:', error);
+      logger.warn('Failed to update exercise favorite:', error);
       // Try fallback storage
       const key = `exercise_${exerciseId}`;
       const exercise = this.fallbackStorage.get(key) as StoredExercise | undefined;
@@ -976,7 +977,7 @@ export class StorageService {
     try {
       await this.db.activity_logs.put(storedLog);
     } catch (error) {
-      console.warn('Failed to save activity log to IndexedDB:', error);
+      logger.warn('Failed to save activity log to IndexedDB:', error);
       // Use generated logId to ensure consistent fallback key
       this.fallbackStorage.set(`log_${logId}`, storedLog);
     }
@@ -1042,12 +1043,12 @@ export class StorageService {
         }
       }
       if (repairPromises.length) {
-        try { await Promise.all(repairPromises); } catch (e) { console.warn('Activity log repair failed:', e); }
+        try { await Promise.all(repairPromises); } catch (e) { logger.warn('Activity log repair failed:', e); }
       }
 
       return repairedLogs.map(this.convertStoredActivityLog);
     } catch (error) {
-      console.warn('Failed to load activity logs from IndexedDB:', error);
+      logger.warn('Failed to load activity logs from IndexedDB:', error);
       // Try fallback storage and ensure names are backfilled
       const logs: ActivityLog[] = [];
       const shouldReplaceGenericName = (name?: string) => !name || typeof name !== 'string' || name.trim() === '' || name === 'Unknown Exercise' || name === 'Workout';
@@ -1086,7 +1087,7 @@ export class StorageService {
       // Use put() to handle both insert and update operations
       await this.db.user_preferences.put(storedPreferences);
     } catch (error) {
-      console.warn('Failed to save user preferences to IndexedDB:', error);
+      logger.warn('Failed to save user preferences to IndexedDB:', error);
       this.fallbackStorage.set('user_preferences', storedPreferences);
     }
   }
@@ -1170,7 +1171,7 @@ export class StorageService {
       }
       return null;
     } catch (error) {
-      console.warn('Failed to load user preferences from IndexedDB:', error);
+      logger.warn('Failed to load user preferences from IndexedDB:', error);
       const fallback = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
       if (fallback) {
         return fallback;
@@ -1195,7 +1196,7 @@ export class StorageService {
       // Use put() to handle both insert and update operations
       await this.db.app_settings.put(storedSettings);
     } catch (error) {
-      console.warn('Failed to save app settings to IndexedDB:', error);
+      logger.warn('Failed to save app settings to IndexedDB:', error);
       this.fallbackStorage.set('app_settings', storedSettings);
     }
   }
@@ -1219,7 +1220,7 @@ export class StorageService {
       }
       return null;
     } catch (error) {
-      console.warn('Failed to load app settings from IndexedDB:', error);
+      logger.warn('Failed to load app settings from IndexedDB:', error);
       const fallback = this.fallbackStorage.get('app_settings') as AppSettings | undefined;
       if (fallback) {
         return fallback;
@@ -1246,7 +1247,7 @@ export class StorageService {
       // Clear fallback storage
       this.fallbackStorage.clear();
     } catch (error) {
-      console.error('Failed to clear all data:', error);
+      logger.error('Failed to clear all data:', error);
       throw error;
     }
   }
@@ -1284,7 +1285,7 @@ export class StorageService {
         hasSettings: settings !== null
       };
     } catch (error) {
-      console.warn('Failed to get storage stats:', error);
+      logger.warn('Failed to get storage stats:', error);
       return {
         exerciseCount: 0,
         logCount: 0,
@@ -1321,7 +1322,7 @@ export class StorageService {
     try {
       await this.db.workouts.put(storedWorkout);
     } catch (error) {
-      console.warn('Failed to save workout to IndexedDB:', error);
+      logger.warn('Failed to save workout to IndexedDB:', error);
       // Use the resolved workoutId so downstream lookups (e.g., resolveWorkoutName) find it
       this.fallbackStorage.set(`workout_${workoutId}`, storedWorkout);
     }
@@ -1339,7 +1340,7 @@ export class StorageService {
       const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
       return storedWorkouts.map(this.convertStoredWorkout);
     } catch (error) {
-      console.warn('Failed to load workouts from IndexedDB:', error);
+      logger.warn('Failed to load workouts from IndexedDB:', error);
       const workouts: Workout[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('workout_')) {
@@ -1362,7 +1363,7 @@ export class StorageService {
       const storedWorkout = await this.db.workouts.get(workoutId);
       return storedWorkout ? this.convertStoredWorkout(storedWorkout) : null;
     } catch (error) {
-      console.warn('Failed to get workout from IndexedDB:', error);
+      logger.warn('Failed to get workout from IndexedDB:', error);
       const fallback = this.fallbackStorage.get(`workout_${workoutId}`);
       return fallback ? this.convertStoredWorkout(fallback as StoredWorkout) : null;
     }
@@ -1381,10 +1382,10 @@ export class StorageService {
       if (workout) {
         const deletedWorkout = prepareSoftDelete(workout);
         await this.db.workouts.put(deletedWorkout);
-        console.log(`Workout ${workoutId} soft deleted successfully`);
+        logger.log(`Workout ${workoutId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete workout from IndexedDB:', error);
+      logger.error('Failed to soft delete workout from IndexedDB:', error);
       // For fallback storage, we can still use hard delete since it's temporary
       this.fallbackStorage.delete(`workout_${workoutId}`);
     }
@@ -1413,7 +1414,7 @@ export class StorageService {
     try {
       await this.db.workout_sessions.put(storedSession);
     } catch (error) {
-      console.warn('Failed to save workout session to IndexedDB:', error);
+      logger.warn('Failed to save workout session to IndexedDB:', error);
       // Use generated sessionId to ensure consistent fallback key
       this.fallbackStorage.set(`session_${sessionId}`, storedSession);
     }
@@ -1449,7 +1450,7 @@ export class StorageService {
       const storedSessions = await query.toArray();
       return storedSessions.map(this.convertStoredWorkoutSession);
     } catch (error) {
-      console.warn('Failed to load workout sessions from IndexedDB:', error);
+      logger.warn('Failed to load workout sessions from IndexedDB:', error);
       const sessions: WorkoutSession[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('session_')) {
@@ -1475,10 +1476,10 @@ export class StorageService {
       if (session) {
         const deletedSession = prepareSoftDelete(session);
         await this.db.workout_sessions.put(deletedSession);
-        console.log(`Workout session ${sessionId} soft deleted successfully`);
+        logger.log(`Workout session ${sessionId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete workout session from IndexedDB:', error);
+      logger.error('Failed to soft delete workout session from IndexedDB:', error);
       this.fallbackStorage.delete(`session_${sessionId}`);
     }
   }
@@ -1496,10 +1497,10 @@ export class StorageService {
       if (exercise) {
         const deletedExercise = prepareSoftDelete(exercise);
         await this.db.exercises.put(deletedExercise);
-        console.log(`Exercise ${exerciseId} soft deleted successfully`);
+        logger.log(`Exercise ${exerciseId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete exercise from IndexedDB:', error);
+      logger.error('Failed to soft delete exercise from IndexedDB:', error);
       // Remove from fallback storage
       this.fallbackStorage.delete(`exercise_${exerciseId}`);
     }
@@ -1518,10 +1519,10 @@ export class StorageService {
       if (log) {
         const deletedLog = prepareSoftDelete(log);
         await this.db.activity_logs.put(deletedLog);
-        console.log(`Activity log ${activityLogId} soft deleted successfully`);
+        logger.log(`Activity log ${activityLogId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete activity log from IndexedDB:', error);
+      logger.error('Failed to soft delete activity log from IndexedDB:', error);
       // Remove from fallback storage (align with 'log_' prefix used for fallback saves)
       this.fallbackStorage.delete(`log_${activityLogId}`);
     }
@@ -1573,7 +1574,7 @@ export class StorageService {
         workoutSessions: workoutSessions.map(this.convertStoredWorkoutSession)
       };
     } catch (error) {
-      console.warn('Failed to get dirty records:', error);
+      logger.warn('Failed to get dirty records:', error);
       return {
         exercises: [],
         activityLogs: [],
@@ -1618,7 +1619,7 @@ export class StorageService {
           break;
       }
     } catch (error) {
-      console.warn(`Failed to mark ${table} records as synced:`, error);
+      logger.warn(`Failed to mark ${table} records as synced:`, error);
     }
   }
 
@@ -1674,7 +1675,7 @@ export class StorageService {
             }
             return { name, count: modified };
           } catch (error) {
-            console.warn(`Failed to claim ${name}:`, error);
+            logger.warn(`Failed to claim ${name}:`, error);
             return { name, count: 0 };
           }
         })
@@ -1688,7 +1689,7 @@ export class StorageService {
         totalClaimed += count;
       });
 
-      console.log(`✅ Successfully claimed ${totalClaimed} anonymous records for user ${ownerId}:`, tableStats);
+      logger.log(`✅ Successfully claimed ${totalClaimed} anonymous records for user ${ownerId}:`, tableStats);
 
       return {
         success: true,
@@ -1696,7 +1697,7 @@ export class StorageService {
         tableStats,
       };
     } catch (error) {
-      console.error('Failed to claim ownership of records:', error);
+      logger.error('Failed to claim ownership of records:', error);
       return {
         success: false,
         recordsClaimed: 0,
@@ -1773,7 +1774,7 @@ export class StorageService {
    */
   public async resetDatabase(): Promise<void> {
     try {
-      console.warn('🔄 Resetting RepCue database...');
+      logger.warn('🔄 Resetting RepCue database...');
       
       // Close the current connection
       await this.db.close();
@@ -1784,7 +1785,7 @@ export class StorageService {
       } catch (hardDeleteError) {
         // In test/JSDOM or constrained environments, delete() may not work because
         // indexedDB.deleteDatabase returns an incomplete mock/request. Fall back to a soft reset.
-        console.warn('⚠️ Hard delete failed, performing soft reset instead:', hardDeleteError);
+        logger.warn('⚠️ Hard delete failed, performing soft reset instead:', hardDeleteError);
         try {
           // Best-effort: attempt to clear all known tables if the DB can be accessed
           await Promise.allSettled([
@@ -1797,7 +1798,7 @@ export class StorageService {
           ]);
         } catch (softError) {
           // Ignore – we'll recreate a fresh instance anyway
-          console.warn('Soft clear during reset encountered issues (safe to ignore in tests):', softError);
+          logger.warn('Soft clear during reset encountered issues (safe to ignore in tests):', softError);
         }
       }
 
@@ -1807,15 +1808,15 @@ export class StorageService {
         await this.db.open();
       } catch (openErr) {
         // In environments without IndexedDB, open may fail; we still consider reset successful
-        console.warn('DB open after reset failed (likely no IndexedDB in test env). Continuing with in-memory fallback.', openErr);
+        logger.warn('DB open after reset failed (likely no IndexedDB in test env). Continuing with in-memory fallback.', openErr);
       }
       
       // Clear fallback storage as well
       this.fallbackStorage.clear();
       
-      console.log('✅ Database reset successfully');
+      logger.log('✅ Database reset successfully');
     } catch (error) {
-      console.error('❌ Failed to reset database:', error);
+      logger.error('❌ Failed to reset database:', error);
       throw new Error('Database reset failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }
@@ -1839,14 +1840,14 @@ export class StorageService {
       
       return { healthy: true, repaired: false };
     } catch (error) {
-      console.warn('🔧 Database health check failed, attempting repair:', error);
+      logger.warn('🔧 Database health check failed, attempting repair:', error);
       
       try {
         await this.resetDatabase();
         return { healthy: true, repaired: true };
       } catch (repairError) {
         const errorMsg = repairError instanceof Error ? repairError.message : 'Unknown repair error';
-        console.error('❌ Database repair failed:', repairError);
+        logger.error('❌ Database repair failed:', repairError);
         return { 
           healthy: false, 
           repaired: false, 
@@ -1888,10 +1889,10 @@ export class StorageService {
       } as Exercise);
 
       await this.db.exercises.add(exercise);
-      console.log('Custom exercise created:', exercise.name);
+      logger.log('Custom exercise created:', exercise.name);
       return exercise;
     } catch (error) {
-      console.error('Failed to create custom exercise:', error);
+      logger.error('Failed to create custom exercise:', error);
       throw error;
     }
   }
@@ -1927,10 +1928,10 @@ export class StorageService {
       });
 
       await this.db.exercises.put(updatedExercise);
-      console.log('Custom exercise updated:', updatedExercise.name);
+      logger.log('Custom exercise updated:', updatedExercise.name);
       return updatedExercise;
     } catch (error) {
-      console.error('Failed to update custom exercise:', error);
+      logger.error('Failed to update custom exercise:', error);
       throw error;
     }
   }
@@ -1956,7 +1957,7 @@ export class StorageService {
 
       return filterActiveRecords(sharedExercises);
     } catch (error) {
-      console.error('Failed to get shared exercises:', error);
+      logger.error('Failed to get shared exercises:', error);
       return [];
     }
   }
@@ -1981,7 +1982,7 @@ export class StorageService {
 
       return filterActiveRecords(userExercises);
     } catch (error) {
-      console.error('Failed to get user-created exercises:', error);
+      logger.error('Failed to get user-created exercises:', error);
       return [];
     }
   }
@@ -2022,10 +2023,10 @@ export class StorageService {
       } as Exercise);
 
       await this.db.exercises.add(copiedExercise);
-      console.log('Exercise copied:', copiedExercise.name);
+      logger.log('Exercise copied:', copiedExercise.name);
       return copiedExercise;
     } catch (error) {
-      console.error('Failed to copy exercise:', error);
+      logger.error('Failed to copy exercise:', error);
       throw error;
     }
   }
@@ -2055,9 +2056,9 @@ export class StorageService {
 
       const deletedExercise = prepareSoftDelete(exercise);
       await this.db.exercises.put(deletedExercise);
-      console.log('Custom exercise deleted:', exercise.name);
+      logger.log('Custom exercise deleted:', exercise.name);
     } catch (error) {
-      console.error('Failed to delete custom exercise:', error);
+      logger.error('Failed to delete custom exercise:', error);
       throw error;
     }
   }
@@ -2086,7 +2087,7 @@ export class StorageService {
 
       return filterActiveRecords(allExercises);
     } catch (error) {
-      console.error('Failed to get all exercises:', error);
+      logger.error('Failed to get all exercises:', error);
       return [];
     }
   }

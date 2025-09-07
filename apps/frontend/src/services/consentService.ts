@@ -6,6 +6,7 @@ import type {
   ConsentData
 } from '../types/consent';
 import { CURRENT_CONSENT_VERSION } from '../types/consent';
+import logger from '../utils/logger';
 
 const CONSENT_STORAGE_KEY = 'repcue_consent';
 
@@ -71,15 +72,15 @@ export class ConsentService {
         
         // Save migrated data if version changed
         if (migratedData.version !== consentData.version) {
-          console.log(`Consent migrated from v${consentData.version} to v${migratedData.version}`);
+          logger.log(`Consent migrated from v${consentData.version} to v${migratedData.version}`);
           this.saveConsentData();
         }
       } else {
-        console.warn('Invalid consent data after migration, resetting');
+        logger.warn('Invalid consent data after migration, resetting');
         this.resetConsent();
       }
     } catch (error) {
-      console.error('Consent migration failed:', error);
+      logger.error('Consent migration failed:', error);
       this.resetConsent(); // Reset on migration failure
     }
   }
@@ -93,11 +94,11 @@ export class ConsentService {
     while (currentData.version < CURRENT_CONSENT_VERSION) {
       const migration = this.migrations.find(m => m.from === currentData.version);
       if (!migration) {
-        console.warn(`No migration found from version ${currentData.version} to ${CURRENT_CONSENT_VERSION}`);
+        logger.warn(`No migration found from version ${currentData.version} to ${CURRENT_CONSENT_VERSION}`);
         break;
       }
       
-      console.log(`Applying migration from v${migration.from} to v${migration.to}`);
+      logger.log(`Applying migration from v${migration.from} to v${migration.to}`);
       currentData = migration.migrate(currentData);
     }
 
@@ -266,7 +267,7 @@ export class ConsentService {
   public resetConsent(): void {
     this.consentData = null;
     localStorage.removeItem(CONSENT_STORAGE_KEY);
-    console.log('Consent data has been reset');
+    logger.log('Consent data has been reset');
   }
 
   /**
@@ -299,7 +300,7 @@ export class ConsentService {
         localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(this.consentData));
       }
     } catch (error) {
-      console.error('Failed to save consent data:', error);
+      logger.error('Failed to save consent data:', error);
     }
   }
 
@@ -321,7 +322,7 @@ export class ConsentService {
         indexedDB.deleteDatabase('RepCueDB');
       }
     } catch (error) {
-      console.error('Failed to clear application data:', error);
+      logger.error('Failed to clear application data:', error);
     }
   }
 }

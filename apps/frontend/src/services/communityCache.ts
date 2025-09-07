@@ -3,6 +3,7 @@
  * Provides local caching for community exercises and workouts to improve performance
  */
 import type { Exercise, Workout } from '../types';
+import logger from '../utils/logger';
 
 interface CacheEntry<T> {
   data: T;
@@ -227,7 +228,7 @@ export class CommunityCacheService {
       this.exerciseListCache.delete(key);
     }
     
-    console.log(`Cache invalidated for exercise ${exerciseId}`);
+    logger.log(`Cache invalidated for exercise ${exerciseId}`);
   }
 
   /**
@@ -241,7 +242,7 @@ export class CommunityCacheService {
       this.workoutListCache.delete(key);
     }
     
-    console.log(`Cache invalidated for workout ${workoutId}`);
+    logger.log(`Cache invalidated for workout ${workoutId}`);
   }
 
   /**
@@ -253,7 +254,7 @@ export class CommunityCacheService {
     this.exerciseListCache.clear();
     this.workoutListCache.clear();
     
-    console.log('All community caches invalidated');
+    logger.log('All community caches invalidated');
   }
 
   /**
@@ -316,7 +317,7 @@ export class CommunityCacheService {
     }
 
     if (cleanupCount > 0) {
-      console.log(`🧹 Cleaned up ${cleanupCount} expired cache entries`);
+      logger.log(`🧹 Cleaned up ${cleanupCount} expired cache entries`);
     }
   }
 
@@ -346,13 +347,13 @@ export class CommunityCacheService {
   public async preloadPopularContent(): Promise<void> {
     try {
       // This would typically make API calls to load popular exercises/workouts
-      console.log('📦 Preloading popular community content...');
+      logger.log('📦 Preloading popular community content...');
       
       // For now, just log that preloading is available
       // In a real implementation, this would fetch popular content from the server
-      console.log('✅ Community content preloading ready');
+      logger.log('✅ Community content preloading ready');
     } catch (error) {
-      console.error('Failed to preload community content:', error);
+      logger.error('Failed to preload community content:', error);
     }
   }
 }

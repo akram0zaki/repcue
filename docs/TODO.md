@@ -153,7 +153,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 - ✅ CreateExercise issues:
     - ✅ I created exercise "Ya 7amada 4" which is time-based and I was able to view it in IndexedDB and could also see the edit/delete links on the exercise card on ExercisesPage. A few minutes later after sync was done I was also able to see it in the exercises table in supabase-dev project, but then the edit/delete buttons disappeared on the UI. I think due to a sync bug I lost ownership of the exercise.
 
-- Create a helper/utility class to log to console. The helper method which writes to console should only do so if the DEBUG flag in apps\frontend\src\config\features.ts is set to true. Scan the entire codebase to replace direct console.log() with a call to this new helper method. Also describe this console logging feature in AI instruction files so AI agents don't directly use console.log: \AGENTS.md, .claude\CLAUDE.md, .cursor\rules\workspace.mdc, .github\copilot-instructions.md, and .github\instructions\project.instructions.md
+- Scan the entire codebase to replace direct console.log() with logger.log().
 
 - Add feature to allow users to give rating and feedback on the app.
 

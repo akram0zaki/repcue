@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import logger from '../utils/logger';
 
 // Queue operation types
 export interface QueueOperation {
@@ -110,10 +111,10 @@ export class QueueService {
       } else {
         id = (await this.db.operations.add(queueOperation)) as unknown as number;
       }
-      console.log(`📤 Queued operation ${operation.type} ${operation.endpoint}`, { id, operation: queueOperation });
+      logger.log(`📤 Queued operation ${operation.type} ${operation.endpoint}`, { id, operation: queueOperation });
       return id as number;
     } catch (error) {
-      console.error('Failed to enqueue operation:', error);
+      logger.error('Failed to enqueue operation:', error);
       throw error;
     }
   }
@@ -146,7 +147,7 @@ export class QueueService {
         })
         .slice(0, limit);
     } catch (error) {
-      console.error('Failed to get next operations:', error);
+      logger.error('Failed to get next operations:', error);
       return [];
     }
   }
@@ -162,9 +163,9 @@ export class QueueService {
       } else {
         await this.db.operations.delete(operationId);
       }
-      console.log(`✅ Operation ${operationId} completed successfully`);
+      logger.log(`✅ Operation ${operationId} completed successfully`);
     } catch (error) {
-      console.error(`Failed to mark operation ${operationId} as successful:`, error);
+      logger.error(`Failed to mark operation ${operationId} as successful:`, error);
     }
   }
 
@@ -177,7 +178,7 @@ export class QueueService {
       const mockTable = this.getMockTable();
       const operation = mockOps ? mockOps.get(operationId) : await this.db.operations.get(operationId);
       if (!operation) {
-        console.warn(`Operation ${operationId} not found for failure marking`);
+        logger.warn(`Operation ${operationId} not found for failure marking`);
         return;
       }
 
@@ -190,7 +191,7 @@ export class QueueService {
         } else {
           await this.db.operations.delete(operationId);
         }
-        console.error(`❌ Operation ${operationId} failed permanently after ${newRetryCount} attempts`, error);
+        logger.error(`❌ Operation ${operationId} failed permanently after ${newRetryCount} attempts`, error);
         return;
       }
 
@@ -207,9 +208,9 @@ export class QueueService {
         });
       }
 
-      console.warn(`⚠️ Operation ${operationId} failed (attempt ${newRetryCount}/${operation.maxRetries}). Next retry at ${new Date(nextRetryAt).toLocaleTimeString()}`, error);
+      logger.warn(`⚠️ Operation ${operationId} failed (attempt ${newRetryCount}/${operation.maxRetries}). Next retry at ${new Date(nextRetryAt).toLocaleTimeString()}`, error);
     } catch (updateError) {
-      console.error(`Failed to mark operation ${operationId} as failed:`, updateError);
+      logger.error(`Failed to mark operation ${operationId} as failed:`, updateError);
     }
   }
 
@@ -245,7 +246,7 @@ export class QueueService {
         nextRetryAt: nextRetryAt || undefined
       };
     } catch (error) {
-      console.error('Failed to get queue stats:', error);
+      logger.error('Failed to get queue stats:', error);
       return {
         totalOperations: 0,
         pendingOperations: 0,
@@ -266,9 +267,9 @@ export class QueueService {
       } else {
         await this.db.operations.clear();
       }
-      console.log('🧹 Queue cleared');
+      logger.log('🧹 Queue cleared');
     } catch (error) {
-      console.error('Failed to clear queue:', error);
+      logger.error('Failed to clear queue:', error);
     }
   }
 
@@ -293,7 +294,7 @@ export class QueueService {
           }
         }
         if (failedCount > 0 || oldCount > 0) {
-          console.log(`🧹 Cleaned up ${failedCount} failed operations and ${oldCount} old operations`);
+          logger.log(`🧹 Cleaned up ${failedCount} failed operations and ${oldCount} old operations`);
         }
       } else {
         const now = Date.now();
@@ -313,11 +314,11 @@ export class QueueService {
           .delete();
 
         if (failedCount > 0 || oldCount > 0) {
-          console.log(`🧹 Cleaned up ${failedCount} failed operations and ${oldCount} old operations`);
+          logger.log(`🧹 Cleaned up ${failedCount} failed operations and ${oldCount} old operations`);
         }
       }
     } catch (error) {
-      console.error('Failed to cleanup queue:', error);
+      logger.error('Failed to cleanup queue:', error);
     }
   }
 
@@ -354,7 +355,7 @@ export class QueueService {
         return await query.toArray();
       }
     } catch (error) {
-      console.error('Failed to get operations:', error);
+      logger.error('Failed to get operations:', error);
       return [];
     }
   }
@@ -367,7 +368,7 @@ export class QueueService {
       const stats = await this.getStats();
       return stats.pendingOperations > 0;
     } catch (error) {
-      console.error('Failed to check pending operations:', error);
+      logger.error('Failed to check pending operations:', error);
       return false;
     }
   }
@@ -380,7 +381,7 @@ export class QueueService {
       const stats = await this.getStats();
       return stats.nextRetryAt || null;
     } catch (error) {
-      console.error('Failed to get next retry time:', error);
+      logger.error('Failed to get next retry time:', error);
       return null;
     }
   }

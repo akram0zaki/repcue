@@ -520,7 +520,7 @@ export class SyncService {
       if (initialHydration) {
   logger.log('🆕 Initial hydration detected: forcing a full pull');
       } else if (missingCriticalData) {
-        console.log('🧩 Critical data missing locally (e.g., user_preferences) - forcing a full pull');
+        logger.log('🧩 Critical data missing locally (e.g., user_preferences) - forcing a full pull');
       }
 
       // Step 1: Gather dirty records from all tables
@@ -550,7 +550,7 @@ export class SyncService {
             undefined,
             { originalError: error }
           );
-          console.error(`Error gathering dirty records for ${tableName}:`, syncError);
+          logger.error(`Error gathering dirty records for ${tableName}:`, syncError);
           result.errors.push(syncError);
         }
       }
@@ -560,7 +560,7 @@ export class SyncService {
         table.upserts.length > 0 || table.deletes.length > 0
       );
       
-      console.log('🔍 Sync request has changes:', hasChanges);
+      logger.log('🔍 Sync request has changes:', hasChanges);
       
       // Only skip sync if we have no local changes AND we're certain we don't need server data
       // We should always sync on first login (when lastSuccessfulSync is undefined)
@@ -572,7 +572,7 @@ export class SyncService {
            (Date.now() - this.lastSuccessfulSync) < 30000; // Skip if synced within last 30 seconds
                            
       if (shouldSkipSync) {
-        console.log('📋 No local changes to sync and recent successful sync exists, skipping sync call');
+        logger.log('📋 No local changes to sync and recent successful sync exists, skipping sync call');
         return {
           success: true,
           tablesProcessed: SYNCABLE_TABLES.length,
@@ -583,7 +583,7 @@ export class SyncService {
         };
       }
       
-      console.log('🔄 Proceeding with sync - hasChanges:', hasChanges, 'lastSuccessfulSync:', this.lastSuccessfulSync, 'force:', force);
+      logger.log('🔄 Proceeding with sync - hasChanges:', hasChanges, 'lastSuccessfulSync:', this.lastSuccessfulSync, 'force:', force);
 
       // Step 2: Call sync endpoint
   const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
@@ -605,7 +605,7 @@ export class SyncService {
             undefined,
             { originalError: error }
           );
-          console.error(`Error applying server changes for ${tableName}:`, syncError);
+          logger.error(`Error applying server changes for ${tableName}:`, syncError);
           result.errors.push(syncError);
         }
       }
@@ -688,7 +688,7 @@ export class SyncService {
 
       return result;
     } catch (error) {
-      console.error('Sync operation failed:', error);
+      logger.error('Sync operation failed:', error);
       result.success = false;
       result.errors.push(this.createSyncError(
         'unknown',
@@ -749,7 +749,7 @@ export class SyncService {
           });
           
           if (filteredRecords.length !== dirtyRecords.length) {
-            console.log(`🔒 Filtered ${dirtyRecords.length - filteredRecords.length} non-owned exercises from sync`);
+            logger.log(`🔒 Filtered ${dirtyRecords.length - filteredRecords.length} non-owned exercises from sync`);
           }
         }
       }
@@ -784,7 +784,7 @@ export class SyncService {
           // Validate record before adding to sync
           const validationError = this.validateRecord(cleanRecord, tableName);
           if (validationError) {
-            console.error(`Validation failed for record ${cleanRecord.id}:`, validationError);
+            logger.error(`Validation failed for record ${cleanRecord.id}:`, validationError);
             // Skip invalid records to prevent sync failures
             continue;
           }
@@ -792,14 +792,14 @@ export class SyncService {
           upserts.push(cleanRecord);
         }
         } catch (recordError) {
-          console.error(`Error processing record ${record.id} for table ${tableName}:`, recordError);
+          logger.error(`Error processing record ${record.id} for table ${tableName}:`, recordError);
           // Skip this problematic record and continue with others
         }
       }
 
       return { upserts, deletes };
     } catch (error) {
-      console.error(`Error getting dirty records for ${tableName}:`, error);
+      logger.error(`Error getting dirty records for ${tableName}:`, error);
       return { upserts: [], deletes: [] };
     }
   }
@@ -809,7 +809,7 @@ export class SyncService {
    */
   private async callSyncEndpoint(syncRequest: SyncRequest, accessToken: string): Promise<SyncResponse> {
     // Debug logging to see what's being sent
-    console.log('🔄 Sync request being sent:', {
+    logger.log('🔄 Sync request being sent:', {
       tables: Object.keys(syncRequest.tables),
       recordCounts: Object.entries(syncRequest.tables).map(([table, data]) => 
         `${table}: ${data.upserts.length} upserts, ${data.deletes.length} deletes`
@@ -820,25 +820,25 @@ export class SyncService {
     
     // Log the full request body to debug empty body issue
     const requestBodyString = JSON.stringify(syncRequest);
-    console.log('🔍 Sync request body size (bytes):', requestBodyString.length);
-    console.log('🔍 Full sync request body:', requestBodyString.substring(0, 1000) + (requestBodyString.length > 1000 ? '...[truncated]' : ''));
+    logger.log('🔍 Sync request body size (bytes):', requestBodyString.length);
+    logger.log('🔍 Full sync request body:', requestBodyString.substring(0, 1000) + (requestBodyString.length > 1000 ? '...[truncated]' : ''));
     
     // Verify the request is not empty
     const hasContent = Object.values(syncRequest.tables).some(table => 
       table.upserts.length > 0 || table.deletes.length > 0
     );
-    console.log('🔍 Has content to sync:', hasContent);
+    logger.log('🔍 Has content to sync:', hasContent);
     
     // Add extra validation to ensure we never send truly empty requests
     if (!syncRequest.tables || Object.keys(syncRequest.tables).length === 0) {
-      console.error('🚨 Attempting to send sync request with empty tables object!');
+      logger.error('🚨 Attempting to send sync request with empty tables object!');
       throw new Error('Invalid sync request: empty tables object');
     }
     
     // Log detailed structure of non-empty tables
     Object.entries(syncRequest.tables).forEach(([tableName, tableData]) => {
       if (tableData.upserts.length > 0 || tableData.deletes.length > 0) {
-        console.log(`🔍 ${tableName} details:`, {
+        logger.log(`🔍 ${tableName} details:`, {
           upsertsCount: tableData.upserts.length,
           deletesCount: tableData.deletes.length,
           firstUpsert: tableData.upserts[0] || null,
@@ -847,7 +847,7 @@ export class SyncService {
         
         // Log first few records in detail
         if (tableData.upserts.length > 0) {
-          console.log(`🔍 ${tableName} first record:`, JSON.stringify(tableData.upserts[0], null, 2));
+          logger.log(`🔍 ${tableName} first record:`, JSON.stringify(tableData.upserts[0], null, 2));
         }
       }
     });
@@ -857,7 +857,7 @@ export class SyncService {
       try {
         return await this.callSyncEndpointInvoke(syncRequest, accessToken);
       } catch (e) {
-        console.warn('Invoke path failed, falling back to direct fetch:', e);
+        logger.warn('Invoke path failed, falling back to direct fetch:', e);
         return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
       }
     }
@@ -873,7 +873,7 @@ export class SyncService {
         body: syncRequest
       });
       if (error) {
-        console.error('🟥 Invoke error:', {
+        logger.error('🟥 Invoke error:', {
           name: (error as unknown as { name?: string }).name,
           message: (error as { message?: string }).message,
           status: (error as unknown as { status?: number }).status,
@@ -886,7 +886,7 @@ export class SyncService {
       }
       return data as SyncResponse;
     } catch (err) {
-      console.error('🔴 callSyncEndpointInvoke failed:', err);
+      logger.error('🔴 callSyncEndpointInvoke failed:', err);
       throw err;
     }
   }
@@ -898,10 +898,10 @@ export class SyncService {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync`;
     
-    console.log('🔄 Using direct fetch to:', functionUrl);
+    logger.log('🔄 Using direct fetch to:', functionUrl);
     
     const requestBody = JSON.stringify(syncRequest);
-    console.log('🔍 Direct fetch request body size:', requestBody.length);
+    logger.log('🔍 Direct fetch request body size:', requestBody.length);
     
     const attempt = async (token: string) => {
       return fetch(functionUrl, {
@@ -918,8 +918,8 @@ export class SyncService {
     try {
       let response = await attempt(accessToken);
 
-      console.log('🔍 Direct fetch response status:', response.status);
-      console.log('🔍 Direct fetch response headers:', Object.fromEntries(response.headers.entries()));
+      logger.log('🔍 Direct fetch response status:', response.status);
+      logger.log('🔍 Direct fetch response headers:', Object.fromEntries(response.headers.entries()));
 
       // If token invalid/expired, try a one-time refresh then retry
       if (response.status === 401) {
@@ -932,26 +932,26 @@ export class SyncService {
           const { data: sessionData } = await supabase.auth.getSession();
           const refreshedToken = sessionData?.session?.access_token;
           if (refreshedToken) {
-            console.log('🔁 Retrying sync after token refresh');
+            logger.log('🔁 Retrying sync after token refresh');
             response = await attempt(refreshedToken);
-            console.log('🔍 Direct fetch (retry) status:', response.status);
+            logger.log('🔍 Direct fetch (retry) status:', response.status);
           }
         } catch (e) {
-          console.warn('Token refresh check failed:', e);
+          logger.warn('Token refresh check failed:', e);
         }
       }
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('🔴 Direct fetch error response:', errorText);
+        logger.error('🔴 Direct fetch error response:', errorText);
         throw new Error(`Direct fetch error: ${response.status} ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('🔍 Direct fetch success, data received');
+      logger.log('🔍 Direct fetch success, data received');
       return data;
     } catch (error) {
-      console.error('🔴 Direct fetch failed:', error);
+      logger.error('🔴 Direct fetch failed:', error);
       throw error;
     }
   }
@@ -1047,7 +1047,7 @@ export class SyncService {
               
               // Debug logging for ownership issues
               if (exerciseRecord.name && typeof exerciseRecord.name === 'string' && exerciseRecord.name.includes('7amada')) {
-                console.log('🔍 Sync Debug - Processing 7amada exercise:', {
+                logger.log('🔍 Sync Debug - Processing 7amada exercise:', {
                   exerciseId: exerciseRecord.id,
                   exerciseName: exerciseRecord.name,
                   currentUserId: userId,
@@ -1077,7 +1077,7 @@ export class SyncService {
                 });
               } else {
                 // Handle case where userId is null or undefined - this might be the bug!
-                console.warn('🚨 Sync Bug - Missing userId or owner_id mismatch:', {
+                logger.warn('🚨 Sync Bug - Missing userId or owner_id mismatch:', {
                   userId,
                   exerciseRecord: { id: exerciseRecord.id, name: exerciseRecord.name, owner_id: exerciseRecord.owner_id },
                   authState: this.authService.getAuthState()
@@ -1092,7 +1092,7 @@ export class SyncService {
                 });
               }
             } catch (error) {
-              console.warn('Exercise sync handling failed:', error);
+              logger.warn('Exercise sync handling failed:', error);
               // Fallback to standard handling
               await typedTable.put({
                 ...serverRecord,
@@ -1125,7 +1125,7 @@ export class SyncService {
             }
           }
         } catch (error) {
-          console.error(`Error applying upsert for ${tableName}:${serverRecord.id}:`, error);
+          logger.error(`Error applying upsert for ${tableName}:${serverRecord.id}:`, error);
           // Continue with other records
         }
       }
@@ -1140,7 +1140,7 @@ export class SyncService {
         });
       }
     } catch (error) {
-      console.error(`Error applying server changes for ${tableName}:`, error);
+      logger.error(`Error applying server changes for ${tableName}:`, error);
       throw error;
     }
   }
@@ -1170,7 +1170,7 @@ export class SyncService {
           synced_at: new Date().toISOString()
         });
       } catch (error) {
-        console.error(`Error marking records as clean for ${tableName}:`, error);
+        logger.error(`Error marking records as clean for ${tableName}:`, error);
       }
     }
   }
@@ -1286,7 +1286,7 @@ export class SyncService {
           return true;
         }
       } catch (error) {
-        console.error(`Error checking dirty records for ${tableName}:`, error);
+        logger.error(`Error checking dirty records for ${tableName}:`, error);
       }
     }
 
@@ -1321,7 +1321,7 @@ export class SyncService {
     const localOwner = (localRecord as Record<string, unknown>)['owner_id'];
     const serverOwner = (serverRecord as Record<string, unknown>)['owner_id'];
   if ((!localOwner || localOwner === null) && serverOwner) {
-      console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (server has owner_id, local is anonymous)`);
+      logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (server has owner_id, local is anonymous)`);
       return serverRecord;
     }
   }
@@ -1333,11 +1333,11 @@ export class SyncService {
     if (localRecord.dirty) {
       if (serverUpdatedAt > localUpdatedAt) {
         // Server is newer - accept server version
-        console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (newer timestamp)`);
+        logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (newer timestamp)`);
         return serverRecord;
       } else if (localUpdatedAt > serverUpdatedAt) {
         // Local is newer - keep local changes (will be pushed to server in next sync)
-        console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - local wins (newer timestamp)`);
+        logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - local wins (newer timestamp)`);
         return localRecord;
       } else {
         // Same timestamp - handle special cases
@@ -1345,7 +1345,7 @@ export class SyncService {
       }
     } else {
       // Local record is clean - accept server version
-      console.log(`📥 Updating clean local record ${tableName}:${serverRecord.id} with server version`);
+      logger.log(`📥 Updating clean local record ${tableName}:${serverRecord.id} with server version`);
       return serverRecord;
     }
   }
@@ -1364,12 +1364,12 @@ export class SyncService {
         { ...serverRecord, deleted: true } : 
         serverRecord;
       
-      console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - preferring delete operation`);
+      logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - preferring delete operation`);
       return result;
     }
 
     // For other conflicts with equal timestamps, prefer server version
-    console.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (timestamp tie)`);
+    logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (timestamp tie)`);
     return serverRecord;
   }
 }

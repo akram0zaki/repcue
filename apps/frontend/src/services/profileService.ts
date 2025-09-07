@@ -5,6 +5,7 @@ import type {
   UserStats,
   UserPrivacySettings
 } from '../types';
+import logger from '../utils/logger';
 
 // Simple UUID generator
 const generateUUID = (): string => {
@@ -48,7 +49,7 @@ class ProfileService {
       };
       return defaultProfile;
     } catch (error) {
-      console.error('Failed to get user profile:', error);
+      logger.error('Failed to get user profile:', error);
       return null;
     }
   }
@@ -59,10 +60,10 @@ class ProfileService {
   async saveUserProfile(profile: Partial<UserProfile> & { user_id: string }): Promise<boolean> {
     try {
       // Mock implementation - always return success
-      console.log('Saving user profile:', profile);
+      logger.log('Saving user profile:', profile);
       return true;
     } catch (error) {
-      console.error('Failed to save user profile:', error);
+      logger.error('Failed to save user profile:', error);
       return false;
     }
   }
@@ -105,7 +106,7 @@ class ProfileService {
       ];
       return mockConnections;
     } catch (error) {
-      console.error('Failed to get user connections:', error);
+      logger.error('Failed to get user connections:', error);
       return [];
     }
   }
@@ -118,7 +119,7 @@ class ProfileService {
       // Mock implementation
       return [];
     } catch (error) {
-      console.error('Failed to get connection requests:', error);
+      logger.error('Failed to get connection requests:', error);
       return [];
     }
   }
@@ -129,10 +130,10 @@ class ProfileService {
   async sendConnectionRequest(fromUserId: string, toUserId: string, message?: string): Promise<boolean> {
     try {
       // Mock implementation
-      console.log('Sending connection request from', fromUserId, 'to', toUserId, 'with message:', message);
+      logger.log('Sending connection request from', fromUserId, 'to', toUserId, 'with message:', message);
       return true;
     } catch (error) {
-      console.error('Failed to send connection request:', error);
+      logger.error('Failed to send connection request:', error);
       return false;
     }
   }
@@ -143,10 +144,10 @@ class ProfileService {
   async acceptConnectionRequest(requestId: string): Promise<boolean> {
     try {
       // Mock implementation
-      console.log('Accepting connection request:', requestId);
+      logger.log('Accepting connection request:', requestId);
       return true;
     } catch (error) {
-      console.error('Failed to accept connection request:', error);
+      logger.error('Failed to accept connection request:', error);
       return false;
     }
   }
@@ -157,10 +158,10 @@ class ProfileService {
   async rejectConnectionRequest(requestId: string): Promise<boolean> {
     try {
       // Mock implementation
-      console.log('Rejecting connection request:', requestId);
+      logger.log('Rejecting connection request:', requestId);
       return true;
     } catch (error) {
-      console.error('Failed to reject connection request:', error);
+      logger.error('Failed to reject connection request:', error);
       return false;
     }
   }
@@ -171,10 +172,10 @@ class ProfileService {
   async removeConnection(connectionId: string): Promise<boolean> {
     try {
       // Mock implementation
-      console.log('Removing connection:', connectionId);
+      logger.log('Removing connection:', connectionId);
       return true;
     } catch (error) {
-      console.error('Failed to remove connection:', error);
+      logger.error('Failed to remove connection:', error);
       return false;
     }
   }
@@ -187,7 +188,7 @@ class ProfileService {
       // Mock implementation
       return null;
     } catch (error) {
-      console.error('Failed to get connection between users:', error);
+      logger.error('Failed to get connection between users:', error);
       return null;
     }
   }
@@ -198,10 +199,10 @@ class ProfileService {
   async updateUserStats(userId: string, stats: Partial<UserStats>): Promise<boolean> {
     try {
       // Mock implementation
-      console.log('Updating user stats for', userId, ':', stats);
+      logger.log('Updating user stats for', userId, ':', stats);
       return true;
     } catch (error) {
-      console.error('Failed to update user stats:', error);
+      logger.error('Failed to update user stats:', error);
       return false;
     }
   }
@@ -214,7 +215,7 @@ class ProfileService {
       // Mock implementation
       return [];
     } catch (error) {
-      console.error('Failed to search profiles:', error);
+      logger.error('Failed to search profiles:', error);
       return [];
     }
   }

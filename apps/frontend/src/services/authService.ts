@@ -3,6 +3,7 @@ import { supabase } from '../config/supabase';
 import type { AuthState, AuthUserProfile } from '../types';
 import { storageService } from './storageService';
 import { webauthnService, type PasskeyRegistrationResult, type PasskeyAuthenticationResult } from './webauthnService';
+import logger from '../utils/logger';
 
 /**
  * Authentication service using Supabase
@@ -49,14 +50,14 @@ export class AuthService {
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error) {
-        console.warn('Error getting initial session:', error.message);
+        logger.warn('Error getting initial session:', error.message);
       } else if (session) {
         await this.handleSessionChange(session);
       }
 
       // Listen for auth changes
       supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id || 'no user');
+        logger.log('Auth state changed:', event, session?.user?.id || 'no user');
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           await this.handleSessionChange(session);
@@ -65,7 +66,7 @@ export class AuthService {
         }
       });
     } catch (error) {
-      console.error('Failed to initialize auth:', error);
+      logger.error('Failed to initialize auth:', error);
     }
   }
 
@@ -143,21 +144,21 @@ export class AuthService {
     if (!this.authState.user?.id) return;
 
     try {
-      console.log('🔄 Starting anonymous data migration...');
+      logger.log('🔄 Starting anonymous data migration...');
       const migrationResult = await storageService.claimOwnership(this.authState.user.id);
       
       if (migrationResult.success && migrationResult.recordsClaimed > 0) {
-        console.log(`✅ Migration successful! Claimed ${migrationResult.recordsClaimed} records:`, migrationResult.tableStats);
+        logger.log(`✅ Migration successful! Claimed ${migrationResult.recordsClaimed} records:`, migrationResult.tableStats);
         
         // Show migration success notification
         this.showMigrationSuccess(migrationResult);
       } else if (migrationResult.recordsClaimed === 0) {
-        console.log('ℹ️ No anonymous data found to migrate (new user or already migrated)');
+        logger.log('ℹ️ No anonymous data found to migrate (new user or already migrated)');
       } else {
-        console.warn('⚠️ Migration encountered issues:', migrationResult.error);
+        logger.warn('⚠️ Migration encountered issues:', migrationResult.error);
       }
     } catch (error) {
-      console.error('❌ Failed to claim ownership of anonymous data:', error);
+      logger.error('❌ Failed to claim ownership of anonymous data:', error);
     }
   }
 
@@ -186,31 +187,31 @@ export class AuthService {
       setTimeout(() => {
         // Verify we still have a valid auth state before syncing
         if (!this.authState.isAuthenticated || !this.authState.accessToken) {
-          console.log('⚠️ Skipping post-auth sync: user no longer authenticated');
+          logger.log('⚠️ Skipping post-auth sync: user no longer authenticated');
           return;
         }
 
         // Dynamically import and trigger sync to avoid circular dependencies
         import('./syncService').then(({ syncService }) => {
-          console.log('🔄 Starting post-authentication sync...');
+          logger.log('🔄 Starting post-authentication sync...');
           syncService.sync().then(result => {
             if (result.success) {
-              console.log('✅ Post-authentication sync completed successfully');
+              logger.log('✅ Post-authentication sync completed successfully');
             } else {
-              console.warn('⚠️ Post-authentication sync completed with errors:', result.errors);
+              logger.warn('⚠️ Post-authentication sync completed with errors:', result.errors);
               // Don't show error toasts for initial sync issues to avoid overwhelming users
               // who just successfully signed in and saw migration success
             }
           }).catch(error => {
-            console.warn('❌ Post-authentication sync failed:', error);
+            logger.warn('❌ Post-authentication sync failed:', error);
             // Silent failure - don't show error toast to avoid conflicting with migration success
           });
         }).catch(error => {
-          console.warn('Failed to load sync service:', error);
+          logger.warn('Failed to load sync service:', error);
         });
       }, 1000); // 1 second delay to ensure auth state is settled
     } catch (error) {
-      console.warn('Failed to trigger delayed sync:', error);
+      logger.warn('Failed to trigger delayed sync:', error);
     }
   }
 
@@ -234,7 +235,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Sign in error:', error);
+      logger.error('Sign in error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -266,7 +267,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Sign up error:', error);
+      logger.error('Sign up error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -310,7 +311,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Magic link error:', error);
+      logger.error('Magic link error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -333,7 +334,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('OAuth error:', error);
+      logger.error('OAuth error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -414,7 +415,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Sign out error:', error);
+      logger.error('Sign out error:', error);
       // Best-effort local sign-out
       await this.handleSignOut();
       return { success: false, error: 'An unexpected error occurred' };
@@ -436,7 +437,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Reset password error:', error);
+      logger.error('Reset password error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -456,7 +457,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Update password error:', error);
+      logger.error('Update password error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -479,7 +480,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Update profile error:', error);
+      logger.error('Update profile error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }
@@ -535,7 +536,7 @@ export class AuthService {
       try {
         callback(this.authState);
       } catch (error) {
-        console.error('Error in auth state listener:', error);
+        logger.error('Error in auth state listener:', error);
       }
     });
   }
@@ -557,7 +558,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Refresh session error:', error);
+      logger.error('Refresh session error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
   }

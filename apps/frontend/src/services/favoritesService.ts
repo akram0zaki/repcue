@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase';
 import type { UserFavorite } from '../types';
+import logger from '../utils/logger';
 
 /**
  * Service for managing unified favorites system
@@ -48,7 +49,7 @@ export class FavoritesService {
 
       return !error && !!data;
     } catch (error) {
-      console.error('Error checking favorite status:', error);
+      logger.error('Error checking favorite status:', error);
       return false;
     }
   }
@@ -111,7 +112,7 @@ export class FavoritesService {
         return true;
       }
     } catch (error) {
-      console.error('Error toggling favorite:', error);
+      logger.error('Error toggling favorite:', error);
       throw error;
     }
   }
@@ -157,7 +158,7 @@ export class FavoritesService {
         version: fav.version || 1
       }));
     } catch (error) {
-      console.error('Error getting favorites:', error);
+      logger.error('Error getting favorites:', error);
       return [];
     }
   }
@@ -203,7 +204,7 @@ export class FavoritesService {
         [id]: favoriteIds.has(id) 
       }), {});
     } catch (error) {
-      console.error('Error bulk checking favorites:', error);
+      logger.error('Error bulk checking favorites:', error);
       return itemIds.reduce((acc, id) => ({ ...acc, [id]: false }), {});
     }
   }
