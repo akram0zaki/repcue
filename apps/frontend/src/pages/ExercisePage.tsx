@@ -627,7 +627,23 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const hasMoreTags = exercise.tags.length > 2;
   
   // Check if the exercise is user-created and belongs to the current user
+  // Be defensive against temporary auth state issues during sync
   const isUserCreated = exercise.owner_id && currentUser && exercise.owner_id === currentUser.id;
+  
+  // Debug logging for ownership issues
+  React.useEffect(() => {
+    if (exercise.name.includes('7amada')) {
+      console.log('🔍 ExerciseCard Debug - 7amada exercise ownership check:', {
+        exerciseName: exercise.name,
+        exerciseOwnerId: exercise.owner_id,
+        currentUserId: currentUser?.id,
+        isUserCreated,
+        hasCurrentUser: !!currentUser,
+        hasOwnerId: !!exercise.owner_id,
+        idsMatch: exercise.owner_id === currentUser?.id
+      });
+    }
+  }, [exercise, currentUser, isUserCreated]);
 
   const handleTagExpansionToggle = () => {
     setIsTagsExpanded(!isTagsExpanded);
