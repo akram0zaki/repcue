@@ -410,7 +410,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     // Handle video URL when feature is enabled
     if (canUploadVideos) {
       // Always set the video URL (even if empty to clear existing ones)
-      exerciseData.custom_video_url = customVideoUrl.trim() || null;
+      exerciseData.custom_video_url = customVideoUrl.trim() || undefined;
     }
 
     // Clear saved form state on successful submission
