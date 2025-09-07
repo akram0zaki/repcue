@@ -1045,6 +1045,18 @@ export class SyncService {
               const userId = this.authService.getAuthState().user?.id;
               const exerciseRecord = serverRecord as Record<string, unknown>;
               
+              // Debug logging for ownership issues
+              if (exerciseRecord.name && typeof exerciseRecord.name === 'string' && exerciseRecord.name.includes('7amada')) {
+                console.log('🔍 Sync Debug - Processing 7amada exercise:', {
+                  exerciseId: exerciseRecord.id,
+                  exerciseName: exerciseRecord.name,
+                  currentUserId: userId,
+                  exerciseOwnerId: exerciseRecord.owner_id,
+                  ownershipMatch: userId === exerciseRecord.owner_id,
+                  localRecord: localRecord ? { id: localRecord.id, dirty: localRecord.dirty, owner_id: (localRecord as any).owner_id } : null
+                });
+              }
+              
               // Mark exercises as not owned by current user if they're shared/public
               if (userId && exerciseRecord.owner_id !== userId) {
                 // This is a shared or public exercise - ensure it's read-only locally
@@ -1061,6 +1073,21 @@ export class SyncService {
                   ...exerciseRecord,
                   dirty: isLocallyModified ? 1 : 0, // Preserve local dirty state for user's exercises
                   op: isLocallyModified ? (localRecord as Record<string, unknown>).op : undefined,
+                  synced_at: new Date().toISOString()
+                });
+              } else {
+                // Handle case where userId is null or undefined - this might be the bug!
+                console.warn('🚨 Sync Bug - Missing userId or owner_id mismatch:', {
+                  userId,
+                  exerciseRecord: { id: exerciseRecord.id, name: exerciseRecord.name, owner_id: exerciseRecord.owner_id },
+                  authState: this.authService.getAuthState()
+                });
+                
+                // Fallback: preserve owner_id and ensure proper handling
+                await typedTable.put({
+                  ...exerciseRecord,
+                  dirty: 0,
+                  op: undefined,
                   synced_at: new Date().toISOString()
                 });
               }

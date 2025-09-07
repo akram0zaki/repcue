@@ -48,11 +48,20 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
   // Debug logging
   React.useEffect(() => {
+    const hamadaExercises = exercises.filter(ex => ex.name.includes('7amada'));
     console.log('🔍 ExercisePage Debug Info:', {
       totalExercises: exercises.length,
       currentUser: user,
+      currentUserId: user?.id,
       userCreatedExercises: exercises.filter(ex => ex.owner_id && ex.owner_id !== null),
       userOwnedExercises: exercises.filter(ex => ex.owner_id === user?.id),
+      hamadaExercises: hamadaExercises.map(ex => ({ 
+        id: ex.id, 
+        name: ex.name, 
+        owner_id: ex.owner_id,
+        isUserOwned: ex.owner_id === user?.id,
+        hasOwner: !!ex.owner_id
+      })),
       sampleExerciseOwnerIds: exercises.slice(0, 5).map(ex => ({ id: ex.id, name: ex.name, owner_id: ex.owner_id }))
     });
   }, [exercises, user]);
