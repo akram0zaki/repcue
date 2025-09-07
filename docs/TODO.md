@@ -129,7 +129,27 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
  - On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI, give me suggestions to improve this.
 
-- 🔄 Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile.
+- 🔄 Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile:
+  1. ProfileService StorageService Integration ✅
+    - Replaced non-existent getTable() and saveToTable() methods with mock
+  implementation
+    - Simplified service to return mock data until proper database integration is        
+  implemented
+    - Removed unused ConnectionStatus import
+  2. ProfilePage Component Issues ✅
+    - Fixed missing icon imports (MoreHorizontalIcon, UsersIcon, SettingsIcon)
+    - Replaced UsersIcon with inline SVG for connections section
+    - Removed unused UserStats import and isOwnProfile prop usage
+  3. ExercisePage Snackbar Type Errors ✅
+    - Fixed showSnackbar calls to use proper options object format
+    - Changed from showSnackbar(message, 'success') to showSnackbar(message, { type:     
+  'success' })
+    - Both success and error snackbar calls now use correct TypeScript signature
+  4. Unused Parameters and Variables ✅
+    - Added underscore prefix to intentionally unused parameters in ProfileService       
+  methods
+    - All TypeScript compilation warnings resolved
+
 
 - Add feature to allow users to give rating and feedback on the app.
 

@@ -28,6 +28,7 @@ import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import getVideoSources from '../utils/videoSources';
+import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
@@ -64,6 +65,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  
+  // Delete confirmation modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
 
   // Lazy-load media index only when needed
   const ensureMediaIndex = async (): Promise<ExerciseMediaIndex | null> => {
@@ -289,27 +294,21 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   const handleDeleteExercise = async (exerciseId: string) => {
-    if (onDeleteExercise) {
-      // Find the exercise name for the confirmation dialog
-      const exercise = exercises.find(ex => ex.id === exerciseId);
-      const exerciseName = exercise ? localizeExercise(exercise, t).name : 'this exercise';
-      
-      // Show confirmation dialog
-      const confirmed = window.confirm(
-        t('exercises.deleteConfirm', { 
-          name: exerciseName,
-          defaultValue: `Are you sure you want to delete "${exerciseName}"? This action cannot be undone.`
-        })
-      );
-      
-      if (!confirmed) return;
-      
+    // Store the exercise ID and show the confirmation modal
+    setExerciseToDelete(exerciseId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (exerciseToDelete && onDeleteExercise) {
       try {
-        await onDeleteExercise(exerciseId);
+        await onDeleteExercise(exerciseToDelete);
         showSnackbar(t('exercises.deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), { type: 'success' });
       } catch (error) {
         console.error('Failed to delete exercise:', error);
         showSnackbar(t('exercises.deleteError', { defaultValue: 'Failed to delete exercise' }), { type: 'error' });
+      } finally {
+        setExerciseToDelete(null);
       }
     }
   };
@@ -556,6 +555,32 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         </div>
       </div>
     )}
+
+    {/* Delete confirmation modal */}
+    <ConfirmationModal
+      isOpen={deleteModalOpen}
+      onClose={() => {
+        setDeleteModalOpen(false);
+        setExerciseToDelete(null);
+      }}
+      onConfirm={handleConfirmDelete}
+      title={t('exercises.deleteExerciseTitle', { defaultValue: 'Delete Exercise' })}
+      message={
+        exerciseToDelete 
+          ? t('exercises.deleteConfirm', { 
+              name: exercises.find(ex => ex.id === exerciseToDelete) 
+                ? localizeExercise(exercises.find(ex => ex.id === exerciseToDelete)!, t).name 
+                : 'this exercise',
+              defaultValue: `Are you sure you want to delete "${exercises.find(ex => ex.id === exerciseToDelete) 
+                ? localizeExercise(exercises.find(ex => ex.id === exerciseToDelete)!, t).name 
+                : 'this exercise'}"? This action cannot be undone.`
+            })
+          : ''
+      }
+      confirmText={t('common.delete', { defaultValue: 'Delete' })}
+      cancelText={t('common.cancel')}
+      variant="danger"
+    />
     </>
   );
 };

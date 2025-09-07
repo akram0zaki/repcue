@@ -9,6 +9,7 @@ import type {
   WorkoutSession
 } from '../types';
 import { consentService } from './consentService';
+import { authService } from './authService';
 import { 
   prepareUpsert, 
   prepareSoftDelete, 
@@ -764,19 +765,107 @@ export class StorageService {
 
       // Lazy import to avoid upfront bundle cost and circular deps
       const { INITIAL_EXERCISES } = await import('../data/exercises');
-      // Insert catalog entries as-is to keep dirty=0 and avoid syncing to server
+      // Insert catalog entries with explicit clean sync metadata to avoid syncing to server
       for (const exercise of INITIAL_EXERCISES) {
         try {
-          await this.db.exercises.put(exercise as unknown as StoredExercise);
+          // Built-in exercises should never be dirty or owned by users
+          const cleanExercise: StoredExercise = {
+            ...exercise,
+            // Explicit clean sync metadata for built-in exercises
+            dirty: 0,
+            version: 1,
+            created_at: '2025-01-01T00:00:00.000Z', // Static date for built-ins
+            updated_at: '2025-01-01T00:00:00.000Z',
+            deleted: false,
+            owner_id: null, // Built-in exercises have no owner
+            op: 'seed' // Special operation type for seeded data
+          } as StoredExercise;
+          
+          await this.db.exercises.put(cleanExercise);
         } catch (error) {
           console.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
           this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
         }
       }
+      // Also clean up any existing built-in exercises that might be dirty
+      await this.cleanBuiltInExercises();
+      
       return await this.db.exercises.count();
     } catch (error) {
       console.warn('Failed to seed exercises catalog:', error);
       return 0;
+    }
+  }
+
+  /**
+   * Public method to trigger cleanup of built-in exercises
+   */
+  public async cleanupBuiltInExercises(): Promise<void> {
+    await this.cleanBuiltInExercises();
+  }
+
+  /**
+   * Sync built-in exercises with the current INITIAL_EXERCISES catalog
+   */
+  private async cleanBuiltInExercises(): Promise<void> {
+    try {
+      const { INITIAL_EXERCISES } = await import('../data/exercises');
+      const currentBuiltInIds = new Set(INITIAL_EXERCISES.map(ex => ex.id));
+      
+      // Get all existing built-in exercises (those with slug IDs, not UUIDs)
+      const existingBuiltInExercises = await this.db.exercises
+        .filter(exercise => 
+          // Built-in exercises have slug IDs (no hyphens in UUID format)
+          !!exercise.id && !exercise.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+        )
+        .toArray();
+
+      // 1. Clean up existing built-in exercises that should remain
+      for (const exercise of existingBuiltInExercises) {
+        if (currentBuiltInIds.has(exercise.id)) {
+          // This built-in exercise should remain - ensure it's clean
+          if (exercise.dirty === 1 || exercise.owner_id !== null) {
+            const cleanedExercise: StoredExercise = {
+              ...exercise,
+              dirty: 0,
+              version: 1,
+              created_at: '2025-01-01T00:00:00.000Z',
+              updated_at: '2025-01-01T00:00:00.000Z',
+              deleted: false,
+              owner_id: null,
+              op: 'seed'
+            } as StoredExercise;
+            
+            await this.db.exercises.put(cleanedExercise);
+          }
+        } else {
+          // This built-in exercise was removed from catalog - delete it
+          console.log(`🗑️ Removing obsolete built-in exercise: ${exercise.name} (${exercise.id})`);
+          await this.db.exercises.delete(exercise.id);
+        }
+      }
+
+      // 2. Add any new built-in exercises that don't exist yet
+      const existingIds = new Set(existingBuiltInExercises.map(ex => ex.id));
+      for (const exercise of INITIAL_EXERCISES) {
+        if (!existingIds.has(exercise.id)) {
+          console.log(`➕ Adding new built-in exercise: ${exercise.name} (${exercise.id})`);
+          const cleanExercise: StoredExercise = {
+            ...exercise,
+            dirty: 0,
+            version: 1,
+            created_at: '2025-01-01T00:00:00.000Z',
+            updated_at: '2025-01-01T00:00:00.000Z',
+            deleted: false,
+            owner_id: null,
+            op: 'seed'
+          } as StoredExercise;
+          
+          await this.db.exercises.put(cleanExercise);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to clean built-in exercises:', error);
     }
   }
 
@@ -1977,9 +2066,8 @@ export class StorageService {
    * Get current user ID from authentication context
    */
   private getCurrentUserId(): string | null {
-    // This would typically come from an auth service
-    // For now, return null to indicate no authentication
-    return null;
+    const user = authService.getCurrentUser();
+    return user?.id || null;
   }
 
   /**

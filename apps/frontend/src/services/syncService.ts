@@ -613,8 +613,13 @@ export class SyncService {
       // Step 4: Mark local records as clean
       await this.markRecordsAsClean();
 
-      // Step 5: Update sync cursor
-      this.saveSyncCursor(syncResponse.cursor);
+      // Step 5: Update sync cursor with overlap buffer to prevent missed records due to timing differences
+      // Subtract 30 seconds from the server cursor to create an overlap buffer
+      // This ensures we don't miss records that fall in timing gaps between client/server
+      const serverCursor = new Date(syncResponse.cursor);
+      const bufferSize = 30 * 1000; // 30 seconds in milliseconds
+      const bufferedCursor = new Date(serverCursor.getTime() - bufferSize);
+      this.saveSyncCursor(bufferedCursor.toISOString());
 
       // Optional multi-pass hydration: if initial hydration or server returned changes
       // and there are still dirty records to push (batch-limited) or we just pulled data,
@@ -665,7 +670,11 @@ export class SyncService {
           result.tablesProcessed++;
         }
         await this.markRecordsAsClean();
-        this.saveSyncCursor(followResp.cursor);
+        // Apply same buffer logic for follow-up syncs
+        const followServerCursor = new Date(followResp.cursor);
+        const followBufferSize = 30 * 1000; // 30 seconds
+        const followBufferedCursor = new Date(followServerCursor.getTime() - followBufferSize);
+        this.saveSyncCursor(followBufferedCursor.toISOString());
         // If we didn't pull anything and have no more dirty records, stop early
         if (pulledThisPass === 0) {
           const anyDirty = await this.hasChangesToSync();
