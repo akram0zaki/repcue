@@ -4,6 +4,7 @@ import type { Exercise, ExerciseCategory, ExerciseType, ExerciseInstruction } fr
 import { ExerciseCategory as Categories, ExerciseType as Types } from '../types';
 import { PlusIcon, MinusIcon, MoveUpIcon, MoveDownIcon } from '../components/icons/NavigationIcons';
 import { VideoUploadWidget } from './VideoUploadWidget';
+import { ConfirmationModal } from './ui/ConfirmationModal';
 
 interface ExerciseFormProps {
   exercise?: Partial<Exercise>;
@@ -136,6 +137,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   const [newMuscleGroup, setNewMuscleGroup] = useState('');
   const [newTag, setNewTag] = useState('');
 
+  // Modal states
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [clearFormModalOpen, setClearFormModalOpen] = useState(false);
+
   // Form persistence key - use 'create' or exercise ID for editing
   const persistenceKey = `exercise-form-${isEditing && exercise?.id ? exercise.id : 'create'}`;
 
@@ -210,38 +215,47 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
   // Clear form and reset to initial state
   const handleClearForm = () => {
-    if (confirm(t('exercises.confirmClearForm', 'Are you sure you want to clear the form? This will delete your draft.'))) {
-      clearFormState();
-      setName('');
-      setDescription('');
-      setCategory(Categories.CORE);
-      setExerciseType(Types.TIME_BASED);
-      setDefaultDuration('');
-      setDefaultSets('');
-      setDefaultReps('');
-      setRepDurationSeconds('');
-      setDifficultyLevel('beginner');
-      setEquipmentNeeded([]);
-      setMuscleGroups([]);
-      setTags([]);
-      setInstructions([{ step: 1, text: '' }]);
-      setIsPublic(false);
-      setCustomVideoUrl('');
-      setNewEquipment('');
-      setNewMuscleGroup('');
-      setNewTag('');
-    }
+    setClearFormModalOpen(true);
+  };
+
+  const handleConfirmClearForm = () => {
+    clearFormState();
+    setName('');
+    setDescription('');
+    setCategory(Categories.CORE);
+    setExerciseType(Types.TIME_BASED);
+    setDefaultDuration('');
+    setDefaultSets('');
+    setDefaultReps('');
+    setRepDurationSeconds('');
+    setDifficultyLevel('beginner');
+    setEquipmentNeeded([]);
+    setMuscleGroups([]);
+    setTags([]);
+    setInstructions([{ step: 1, text: '' }]);
+    setIsPublic(false);
+    setCustomVideoUrl('');
+    setNewEquipment('');
+    setNewMuscleGroup('');
+    setNewTag('');
+    setClearFormModalOpen(false);
   };
 
   // Handle cancel with option to keep draft
   const handleCancel = () => {
     const hasContent = name.trim() || description.trim() || instructions.some(i => i.text.trim());
     if (hasContent) {
-      const keepDraft = confirm(t('exercises.keepDraft', 'Keep your form draft for next time?'));
-      if (!keepDraft) {
-        clearFormState();
-      }
+      setCancelModalOpen(true);
+    } else {
+      onCancel();
     }
+  };
+
+  const handleConfirmCancel = (keepDraft: boolean) => {
+    if (!keepDraft) {
+      clearFormState();
+    }
+    setCancelModalOpen(false);
     onCancel();
   };
 
@@ -806,6 +820,30 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Cancel confirmation modal */}
+      <ConfirmationModal
+        isOpen={cancelModalOpen}
+        onClose={() => handleConfirmCancel(true)} // Keep draft when closing
+        onConfirm={() => handleConfirmCancel(false)} // Discard changes when confirming
+        title={t('cancelTitle', 'Cancel Exercise Form')}
+        message={t('keepDraft', 'Keep your form draft for next time?')}
+        confirmText={t('discard', 'Discard Changes')}
+        cancelText={t('common.keepDraft', 'Keep Draft')}
+        variant="default"
+      />
+
+      {/* Clear form confirmation modal */}
+      <ConfirmationModal
+        isOpen={clearFormModalOpen}
+        onClose={() => setClearFormModalOpen(false)}
+        onConfirm={handleConfirmClearForm}
+        title={t('clearFormTitle', 'Clear Form')}
+        message={t('confirmClearForm', 'Are you sure you want to clear the form? This will delete your draft.')}
+        confirmText={t('clear', 'Clear Form')}
+        cancelText={t('common.cancel', 'Cancel')}
+        variant="danger"
+      />
     </div>
   );
 };

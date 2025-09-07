@@ -308,9 +308,34 @@ async function getExerciseChanges(
     ...(builtinResult.data || [])
   ];
 
-  // Deduplicate by ID
+  // Deduplicate by ID, prioritizing user-owned records over built-in ones
   const unique = new Map();
-  allRecords.forEach(record => unique.set(record.id, record));
+  allRecords.forEach(record => {
+    const existing = unique.get(record.id);
+    if (!existing) {
+      // No existing record, add this one
+      unique.set(record.id, record);
+    } else {
+      // Conflict: prioritize user-owned records over built-in ones
+      const currentIsUserOwned = record.owner_id === userId;
+      const existingIsUserOwned = existing.owner_id === userId;
+      
+      if (currentIsUserOwned && !existingIsUserOwned) {
+        // Current record is user-owned but existing is not, replace with current
+        unique.set(record.id, record);
+      } else if (!currentIsUserOwned && existingIsUserOwned) {
+        // Existing record is user-owned but current is not, keep existing
+        // Do nothing
+      } else {
+        // Both are user-owned or both are built-in, use the most recent
+        const currentUpdated = new Date(record.updated_at || 0).getTime();
+        const existingUpdated = new Date(existing.updated_at || 0).getTime();
+        if (currentUpdated > existingUpdated) {
+          unique.set(record.id, record);
+        }
+      }
+    }
+  });
   return Array.from(unique.values());
 }
 

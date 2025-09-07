@@ -27,6 +27,7 @@
     "completedAt": "Terminé à {{time}}",
     "workoutSummary": "{{exerciseCount}} exercices en {{duration}}",
     "create": "Créer",
+    "keepDraft": "Conserver le brouillon",
     "emailPlaceholder": "Adresse e-mail",
     "goBack": "Retour",
     "moveDown": "Déplacer Vers le Bas",
@@ -275,7 +276,7 @@
     "searchLabel": "Rechercher des exercices",
     "searchPlaceholder": "Rechercher par nom, description ou tag...",
     "allCategories": "Toutes les catégories",
-    "category": {
+    "categories": {
       "core": "Tronc",
       "strength": "Force",
       "cardio": "Cardio",
@@ -334,13 +335,6 @@
     "instructionPlaceholder": "Instructions d'étape...",
     "canCopy": "Peut Copier",
     "canCopyDesc": "L'utilisateur peut copier cet exercice dans sa bibliothèque",
-    "categories": {
-      "balance": "Équilibre",
-      "cardio": "Cardio",
-      "core": "Tronc",
-      "flexibility": "Flexibilité",
-      "strength": "Force"
-    },
     "category": "Catégorie",
     "createError": "Échec de la création de l'exercice. Veuillez réessayer.",
     "createNotEnabled": "La création d'exercices n'est pas activée actuellement",
@@ -348,6 +342,10 @@
     "confirmClearForm": "Êtes-vous sûr de vouloir effacer le formulaire ? Cela supprimera votre brouillon.",
     "keepDraft": "Conserver votre brouillon de formulaire pour la prochaine fois ?",
     "clearDraft": "Effacer le Brouillon",
+    "cancelTitle": "Annuler le Formulaire d'Exercice",
+    "clearFormTitle": "Effacer le Formulaire",
+    "discard": "Ignorer les Modifications",
+    "clear": "Effacer le Formulaire",
     "difficulties": {
       "advanced": "Avancé",
       "beginner": "Débutant",

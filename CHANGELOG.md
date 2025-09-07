@@ -1,3 +1,29 @@
+## 2025-09-07 — UX Improvements and Sync Bug Fixes
+
+- feat: Replace JavaScript alerts with elegant modal dialogs in exercise form and fix critical sync ownership bug
+
+  🎨 **User Experience Improvements**:
+  - ✅ **Modal Dialogs**: Replaced ugly JavaScript `alert()` and `confirm()` calls in ExerciseForm with beautiful ConfirmationModal components
+  - ✅ **Cancel Dialog**: Added "Keep Draft" vs "Discard Changes" options when canceling exercise edits
+  - ✅ **Clear Form Dialog**: Added confirmation modal before clearing exercise form drafts
+  - ✅ **Consistent Design**: Modal dialogs match the app's design system and support accessibility features
+
+  🐛 **Critical Sync Bug Fix**:
+  - ✅ **Ownership Preservation**: Fixed sync service bug where user-created exercises lost owner_id during sync operations
+  - ✅ **Database Cleanup**: Removed legacy built-in exercise records from Supabase that were causing ID conflicts
+  - ✅ **Deduplication Logic**: Implemented ownership-aware deduplication that prioritizes user-owned records over built-in ones
+  - ✅ **Edit/Delete Buttons**: Restored missing edit/delete buttons for user-created exercises after sync
+
+  🌐 **Internationalization**:
+  - ✅ **Translation Keys**: Added modal-related translation keys for all supported languages
+  - ✅ **Common Keys**: Extended common translation namespace with delete, discard, and keepDraft keys
+
+  🔧 **Technical Implementation**:
+  - Modified `ExerciseForm.tsx` to use ConfirmationModal instead of browser alerts
+  - Fixed sync-processor.ts deduplication logic in Supabase Edge Function
+  - Cleaned legacy built-in exercise data from production database
+  - Added proper modal state management with cancelModalOpen and clearFormModalOpen
+
 ## 2025-09-07 — Build and Code Quality Fixes
 
 - fix: Resolved TypeScript build errors and ESLint violations for improved code quality and maintainability
