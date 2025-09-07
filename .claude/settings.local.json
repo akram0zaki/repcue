@@ -91,7 +91,11 @@
       "mcp__supabase-dev__deploy_edge_function",
       "Read(//c/Users/akram/OneDrive/Pictures/Screenshots 1/**)",
       "Bash(for lang in de es nl ar ar-EG fy)",
-      "Bash(do echo \"Adding profile translations to $lang\")"
+      "Bash(do echo \"Adding profile translations to $lang\")",
+      "Bash(for lang in de es nl ar ar-EG fy fr)",
+      "Bash(do echo \"Adding confirm translation to $lang\")",
+      "Bash(do echo \"Adding deleteExerciseTitle to $lang\")",
+      "mcp__supabase-dev__apply_migration"
     ],
     "deny": [],
     "ask": []

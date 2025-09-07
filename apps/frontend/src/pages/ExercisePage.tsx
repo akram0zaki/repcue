@@ -32,6 +32,7 @@ import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
+import logger from '../utils/logger';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -49,7 +50,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Debug logging
   React.useEffect(() => {
     const hamadaExercises = exercises.filter(ex => ex.name.includes('7amada'));
-    console.log('🔍 ExercisePage Debug Info:', {
+    logger.log('🔍 ExercisePage Debug Info:', {
       totalExercises: exercises.length,
       currentUser: user,
       currentUserId: user?.id,
@@ -87,7 +88,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       setMediaIndex(idx);
       return idx;
     } catch (err) {
-      console.warn('[exercise-preview] failed to load media index', err);
+      logger.warn('[exercise-preview] failed to load media index', err);
       return null;
     }
   };
@@ -297,8 +298,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   const handleEditExercise = (exercise: Exercise) => {
-    console.log('🔧 Edit button clicked for exercise:', exercise.name, 'ID:', exercise.id);
-    console.log('🔧 Navigating to:', `/exercises/edit/${exercise.id}`);
+    logger.log('🔧 Edit button clicked for exercise:', exercise.name, 'ID:', exercise.id);
+    logger.log('🔧 Navigating to:', `/exercises/edit/${exercise.id}`);
     navigate(`/exercises/edit/${exercise.id}`);
   };
 
@@ -314,7 +315,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         await onDeleteExercise(exerciseToDelete);
         showSnackbar(t('exercises.deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), { type: 'success' });
       } catch (error) {
-        console.error('Failed to delete exercise:', error);
+        logger.error('Failed to delete exercise:', error);
         showSnackbar(t('exercises.deleteError', { defaultValue: 'Failed to delete exercise' }), { type: 'error' });
       } finally {
         setExerciseToDelete(null);
@@ -627,13 +628,21 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const hasMoreTags = exercise.tags.length > 2;
   
   // Check if the exercise is user-created and belongs to the current user
-  // Be defensive against temporary auth state issues during sync
-  const isUserCreated = exercise.owner_id && currentUser && exercise.owner_id === currentUser.id;
+  // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
+  const isUserCreatedExercise = (id: string): boolean => {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  };
+  
+  // Only show edit/delete for user-created exercises owned by current user
+  const isUserCreated = isUserCreatedExercise(exercise.id) && 
+                        exercise.owner_id && 
+                        currentUser && 
+                        exercise.owner_id === currentUser.id;
   
   // Debug logging for ownership issues
   React.useEffect(() => {
     if (exercise.name.includes('7amada')) {
-      console.log('🔍 ExerciseCard Debug - 7amada exercise ownership check:', {
+      logger.log('🔍 ExerciseCard Debug - 7amada exercise ownership check:', {
         exerciseName: exercise.name,
         exerciseOwnerId: exercise.owner_id,
         currentUserId: currentUser?.id,

@@ -1,3 +1,30 @@
+## 2025-09-07 — Logger Utility Implementation and Console Cleanup
+
+- feat: Implemented centralized logger utility with DEBUG flag control
+- refactor: Replaced direct console.log() usage with logger utility across codebase
+- docs: Updated AI instruction files with logger usage guidelines
+
+  🛠️ **Logger Utility Features**:
+  - ✅ **DEBUG-Controlled Logging**: `logger.log()`, `logger.info()`, `logger.debug()`, `logger.warn()` respect DEBUG feature flag
+  - ✅ **Production Safety**: `logger.error()` always outputs regardless of DEBUG flag for error tracking
+  - ✅ **Type Safety**: Full TypeScript support with proper argument typing
+  - ✅ **Feature Flag Integration**: Controlled by `DEBUG` constant in `src/config/features.ts`
+  - ✅ **Usage Pattern**: Simple import `import logger from '../utils/logger';` and use
+
+  🔄 **Console Usage Migration**:
+  - ✅ **App.tsx**: Replaced 43+ console calls with logger utility
+  - ✅ **ExercisePage.tsx**: Migrated 6 console calls to logger
+  - ✅ **EditExercisePage.tsx**: Converted all console usage to logger
+  - ✅ **Major Files**: Updated core application files with logger imports
+  - ✅ **Test Coverage**: Added comprehensive tests for logger functionality
+
+  📚 **Documentation Updates**:
+  - ✅ **AGENTS.md**: Added logger usage guidelines and migration patterns
+  - ✅ **CLAUDE.md**: Added debug logging instructions with feature flag info
+  - ✅ **Cursor Rules**: Updated workspace rules to prohibit direct console usage
+  - ✅ **GitHub Instructions**: Updated Copilot and project instructions with logger requirements
+  - ✅ **AI Agent Guidelines**: Comprehensive documentation for consistent logger usage across development tools
+
 ## 2025-09-07 — Exercise Form Enhancements and Critical Sync Fixes
 
 - feat: Comprehensive exercise form improvements with decimal durations, video features, and working sync system

@@ -8,6 +8,7 @@ import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import type { Exercise } from '../types';
 import { DEBUG } from '../config/features';
+import logger from '../utils/logger';
 
 export const EditExercisePage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,17 +23,17 @@ export const EditExercisePage: React.FC = () => {
   // Load the exercise data on component mount
   useEffect(() => {
     const loadExercise = async () => {
-      console.log('🔧 EditExercisePage: Loading exercise, exerciseId:', exerciseId);
-      console.log('🔧 EditExercisePage: User available:', !!user);
+      logger.log('🔧 EditExercisePage: Loading exercise, exerciseId:', exerciseId);
+      logger.log('🔧 EditExercisePage: User available:', !!user);
       
       if (!exerciseId) {
-        console.log('🔧 EditExercisePage: Missing exerciseId, redirecting to exercises');
+        logger.log('🔧 EditExercisePage: Missing exerciseId, redirecting to exercises');
         navigate('/exercises');
         return;
       }
 
       if (!user) {
-        console.log('🔧 EditExercisePage: User not authenticated, redirecting to exercises');
+        logger.log('🔧 EditExercisePage: User not authenticated, redirecting to exercises');
         showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
           type: 'error'
         });
@@ -41,14 +42,14 @@ export const EditExercisePage: React.FC = () => {
       }
 
       try {
-        console.log('🔧 EditExercisePage: Fetching exercise from local storage...');
+        logger.log('🔧 EditExercisePage: Fetching exercise from local storage...');
         const exercises = await storageService.getExercises();
         const foundExercise = exercises.find(ex => ex.id === exerciseId);
 
-        console.log('🔧 EditExercisePage: Found exercise:', foundExercise);
+        logger.log('🔧 EditExercisePage: Found exercise:', foundExercise);
 
         if (!foundExercise) {
-          console.error('🔧 EditExercisePage: Exercise not found in local storage');
+          logger.error('🔧 EditExercisePage: Exercise not found in local storage');
           showSnackbar(t('errors.exerciseNotFound', 'Exercise not found'), {
             type: 'error'
           });
@@ -57,10 +58,10 @@ export const EditExercisePage: React.FC = () => {
         }
 
         // Verify user ownership
-        console.log('🔧 EditExercisePage: Exercise owner_id:', foundExercise.owner_id, 'User id:', user.id);
+        logger.log('🔧 EditExercisePage: Exercise owner_id:', foundExercise.owner_id, 'User id:', user.id);
         
         if (foundExercise.owner_id !== user.id) {
-          console.log('🔧 EditExercisePage: User not authorized, redirecting to exercises');
+          logger.log('🔧 EditExercisePage: User not authorized, redirecting to exercises');
           showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
             type: 'error'
           });
@@ -68,16 +69,16 @@ export const EditExercisePage: React.FC = () => {
           return;
         }
 
-        console.log('🔧 EditExercisePage: Successfully loaded exercise, setting state');
+        logger.log('🔧 EditExercisePage: Successfully loaded exercise, setting state');
         setExercise(foundExercise);
       } catch (error) {
-        console.error('🔧 EditExercisePage: Error loading exercise:', error);
+        logger.error('🔧 EditExercisePage: Error loading exercise:', error);
         showSnackbar(t('errors.loadFailed', 'Failed to load exercise'), {
           type: 'error'
         });
         navigate('/exercises');
       } finally {
-        console.log('🔧 EditExercisePage: Setting initialLoading to false');
+        logger.log('🔧 EditExercisePage: Setting initialLoading to false');
         setInitialLoading(false);
       }
     };
@@ -140,11 +141,11 @@ export const EditExercisePage: React.FC = () => {
       };
       
       if (DEBUG) {
-        console.log('=== EXERCISE UPDATE DEBUG ===');
-        console.log('User:', user);
-        console.log('Original exercise:', exercise);
-        console.log('Updated exercise payload:', JSON.stringify(updatedExercise, null, 2));
-        console.log('==============================');
+        logger.log('=== EXERCISE UPDATE DEBUG ===');
+        logger.log('User:', user);
+        logger.log('Original exercise:', exercise);
+        logger.log('Updated exercise payload:', JSON.stringify(updatedExercise, null, 2));
+        logger.log('==============================');
       }
       
       // Save to IndexedDB (this will mark it as dirty for sync)
@@ -164,7 +165,7 @@ export const EditExercisePage: React.FC = () => {
       // Navigate back to exercises list
       navigate('/exercises');
     } catch (error) {
-      console.error('Error updating exercise:', error);
+      logger.error('Error updating exercise:', error);
       showSnackbar(t('errors.updateFailed', 'Failed to update exercise'), {
         type: 'error'
       });

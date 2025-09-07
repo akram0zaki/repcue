@@ -389,10 +389,44 @@ pnpm pm2:start          # Start with PM2 process manager
 
 ### 🐛 Debug Features
 - **Feature Flag**: `DEBUG: true` in `src/config/features.ts`
-- **Console Logging**: Conditional debug statements
+- **Logger Utility**: Conditional debug statements via `src/utils/logger.ts`
 - **React DevTools**: Component state inspection
 - **Network Tab**: API call monitoring
 - **Storage Inspector**: IndexedDB/LocalStorage examination
+
+### 📝 Logger Utility Usage
+RepCue includes a centralized logging utility that respects the DEBUG feature flag:
+
+```typescript
+import logger from '../utils/logger';
+
+// Basic logging (only shown when DEBUG=true)
+logger.log('User action:', userAction);
+logger.info('App initialized');
+logger.debug('Detailed debugging info');
+logger.warn('Potential issue detected');
+
+// Error logging (always shown, even when DEBUG=false)
+logger.error('Critical error:', error);
+```
+
+**Key Features:**
+- **DEBUG-Controlled**: `log()`, `info()`, `debug()`, `warn()` only output when `DEBUG=true`
+- **Always Error**: `error()` always outputs (production safety)
+- **Feature Flag**: Controlled by `DEBUG` constant in `src/config/features.ts`
+- **Type Safe**: Full TypeScript support with proper argument typing
+
+**Migration Pattern:**
+```typescript
+// ❌ OLD - Direct console usage
+console.log('Debug message');
+console.error('Error occurred:', error);
+
+// ✅ NEW - Logger utility
+import logger from '../utils/logger';
+logger.log('Debug message');
+logger.error('Error occurred:', error);
+```
 
 ### 📊 Development Tools
 - **ESLint**: Code quality enforcement
@@ -425,7 +459,8 @@ pnpm pm2:start          # Start with PM2 process manager
 5. **Accessibility**: Don't remove accessibility attributes or ignore reduced motion
 6. **i18n**: Never hardcode strings - always use translation keys
 7. **Types**: Don't use `any` type - maintain strict TypeScript typing
-8. **Console**: Don't leave debugging console.log in production code
+8. **Console Logging**: Never use `console.log()` directly - always use the logger utility
+9. **Debug Code**: Don't leave debugging code in production without DEBUG flag protection
 
 ### ✅ Always Do This
 1. **Read CLAUDE.md**: Check `.claude/CLAUDE.md` for latest project instructions
@@ -436,6 +471,7 @@ pnpm pm2:start          # Start with PM2 process manager
 6. **Update Documentation**: Keep CHANGELOG.md current with changes
 7. **Security First**: Follow security best practices for user data
 8. **Mobile First**: Test changes on mobile viewport sizes
+9. **Use Logger**: Always use `logger.log()`, `logger.warn()`, `logger.error()` instead of console methods
 
 ### 🎯 Timer Logic Validation Example
 ```typescript

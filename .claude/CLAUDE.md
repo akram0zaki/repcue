@@ -58,6 +58,12 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 ## Security & privacy defaults
 - Never hardcode secrets; use env vars in server paths. HTTPS for network calls. Parameterize any DB queries (Dexie used). Sanitize any HTML via DOMPurify before `dangerouslySetInnerHTML` (rare; prefer text).
 
+## Debug logging
+- **Never use `console.log()` directly** - use the logger utility from `src/utils/logger.ts`
+- Logger respects DEBUG feature flag: `logger.log()`, `logger.info()`, `logger.debug()`, `logger.warn()` only output when `DEBUG=true`
+- `logger.error()` always outputs for production error tracking
+- Import: `import logger from '../utils/logger';` (adjust path as needed)
+
 ## When in doubt
 - Check CHANGELOG.md for recent behavior changes (timer, workouts, i18n). Keep UX consistent and accessibility compliant.
 

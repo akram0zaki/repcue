@@ -17,6 +17,7 @@ import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 import { computeWorkoutDurations } from './utils/workoutDuration';
 import i18n from './i18n';
+import logger from './utils/logger';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -121,9 +122,9 @@ const setupSyncTriggers = () => {
   // Trigger sync on page visibility change (app foreground)
   const handleVisibilityChange = () => {
     if (!document.hidden) {
-      console.log('📱 App came to foreground - triggering sync');
+      logger.log('📱 App came to foreground - triggering sync');
       syncService.sync().catch(error => {
-        console.warn('Foreground sync failed:', error);
+        logger.warn('Foreground sync failed:', error);
       });
     }
   };
@@ -137,9 +138,9 @@ const setupSyncTriggers = () => {
     
     syncInterval = setInterval(() => {
       if (!document.hidden) {
-        console.log('⏰ Periodic sync triggered');
+        logger.log('⏰ Periodic sync triggered');
         syncService.sync().catch(error => {
-          console.warn('Periodic sync failed:', error);
+          logger.warn('Periodic sync failed:', error);
         });
       }
     }, 5 * 60 * 1000); // 5 minutes
@@ -298,7 +299,7 @@ function App() {
     setTimerState(prev => {
       // If targetTime is already set (e.g., from workout mode), use it; otherwise use selectedDuration
       const actualTargetTime = prev.targetTime || selectedDuration;
-      console.log('startActualTimer: Setting targetTime to:', actualTargetTime, 'from prev.targetTime:', prev.targetTime, 'selectedDuration:', selectedDuration);
+      logger.log('startActualTimer: Setting targetTime to:', actualTargetTime, 'from prev.targetTime:', prev.targetTime, 'selectedDuration:', selectedDuration);
       
       return {
         ...prev,
@@ -319,7 +320,7 @@ function App() {
     });
 
     // Start the main timer interval
-    console.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
+    logger.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
     
     // Use the helper function to create appropriate timer interval
     // In workout mode, check the current exercise in the workout; otherwise use selectedExercise
@@ -564,7 +565,7 @@ function App() {
     const currentIndex = workoutMode.currentExerciseIndex;
     const isLastExercise = currentIndex >= workoutMode.exercises.length - 1;
     
-    console.log('advanceWorkout called:', {
+    logger.log('advanceWorkout called:', {
       currentIndex,
       totalExercises: workoutMode.exercises.length,
       isLastExercise,
@@ -573,8 +574,8 @@ function App() {
 
     if (isLastExercise) {
       // Workout completed
-      console.log('🎉 Workout completed! Logging workout session...');
-      console.log('🔍 About to check consent and session for workout logging...');
+      logger.log('🎉 Workout completed! Logging workout session...');
+      logger.log('🔍 About to check consent and session for workout logging...');
       if (appSettings.sound_enabled) {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
@@ -582,14 +583,14 @@ function App() {
       // Save workout session completion
       const hasConsent = consentService.hasConsent();
       const hasSessionId = !!workoutMode.sessionId;
-      console.log('Workout completion - consent check:', {
+      logger.log('Workout completion - consent check:', {
         hasConsent,
         hasSessionId,
         sessionId: workoutMode.sessionId
       });
       
       if (hasConsent && hasSessionId) {
-  console.log('✅ Creating workout session for logging...');
+  logger.log('✅ Creating workout session for logging...');
   // Compute total workout duration consistent with Activity Log aggregation
   const { total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
 
@@ -611,12 +612,12 @@ function App() {
         };
         
         try {
-          console.log('💾 Saving workout session to storage...', workoutSession);
+          logger.log('💾 Saving workout session to storage...', workoutSession);
           await storageService.saveWorkoutSession(workoutSession);
-          console.log('✅ Workout session saved successfully');
+          logger.log('✅ Workout session saved successfully');
           
           // Create a single workout activity log entry for the activity log page
-          console.log('📝 Creating workout activity log entry...');
+          logger.log('📝 Creating workout activity log entry...');
           const { perExercise, total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
           const exerciseNameById = new Map(exercises.map(ex => [ex.id, ex.name]));
           
@@ -642,14 +643,14 @@ function App() {
             version: 1
           };
           
-          console.log(`📝 Saving workout activity log:`, workoutActivityLog);
+          logger.log(`📝 Saving workout activity log:`, workoutActivityLog);
           await storageService.saveActivityLog(workoutActivityLog);
-          console.log('✅ Workout activity log saved successfully');
+          logger.log('✅ Workout activity log saved successfully');
         } catch (error) {
-          console.error('❌ Failed to save workout session or activity logs:', error);
+          logger.error('❌ Failed to save workout session or activity logs:', error);
         }
       } else {
-        console.log('❌ Workout session not saved:', {
+        logger.log('❌ Workout session not saved:', {
           reason: !hasConsent ? 'No consent' : 'No session ID',
           hasConsent,
           hasSessionId
@@ -684,7 +685,7 @@ function App() {
 
         if (restTime > 0) {
           // Start rest period
-          console.log('Starting rest period, selectedExercise remains:', selectedExercise?.name);
+          logger.log('Starting rest period, selectedExercise remains:', selectedExercise?.name);
           setTimerState(prev => ({
             ...prev,
             workoutMode: prev.workoutMode ? {
@@ -801,14 +802,14 @@ function App() {
         intervalRef.current = null;
       }
       
-      console.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
+      logger.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
       
       if (workoutMode) {
         // Get the actual current exercise from workout mode for accurate logging
         const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
         const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
-        console.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
-        console.log('Workout state:', {
+        logger.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
+        logger.log('Workout state:', {
           currentExerciseIndex: workoutMode.currentExerciseIndex,
           totalExercises: workoutMode.exercises.length,
           isResting: workoutMode.isResting,
@@ -823,7 +824,7 @@ function App() {
           
           // Check if workout is complete
           if (nextExerciseIndex >= workoutMode.exercises.length) {
-            console.log('🎉 Workout completed after rest period!');
+            logger.log('🎉 Workout completed after rest period!');
             advanceWorkout();
             return;
           }
@@ -832,19 +833,19 @@ function App() {
           const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exercise_id);
           
           if (nextExercise) {
-            console.log('Rest completed, changing selectedExercise from', selectedExercise?.name, 'to', nextExercise.name);
+            logger.log('Rest completed, changing selectedExercise from', selectedExercise?.name, 'to', nextExercise.name);
             setSelectedExercise(nextExercise);
 
             // Set duration/reps for next exercise
             if (nextExercise.exercise_type === 'time_based') {
               const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
-              console.log('Setting duration for', nextExercise.name, ':', {
+              logger.log('Setting duration for', nextExercise.name, ':', {
                 custom_duration: nextWorkoutExercise.custom_duration,
                 default_duration: nextExercise.default_duration,
                 finalDuration: duration
               });
               setSelectedDuration(duration as TimerPreset);
-              console.log('After setSelectedDuration, selectedDuration should be:', duration);
+              logger.log('After setSelectedDuration, selectedDuration should be:', duration);
               
               setTimerState(prev => ({
                 ...prev,
@@ -896,8 +897,8 @@ function App() {
 
             // Auto-start the timer after a short delay to ensure state is updated
             setTimeout(() => {
-              console.log('Auto-starting timer with selectedDuration:', selectedDuration, 'for exercise:', nextExercise.name);
-              console.log('Calling startActualTimer directly since targetTime is already set correctly');
+              logger.log('Auto-starting timer with selectedDuration:', selectedDuration, 'for exercise:', nextExercise.name);
+              logger.log('Calling startActualTimer directly since targetTime is already set correctly');
               startActualTimer(); // Call startActualTimer directly instead of startTimer
             }, 100);
           }
@@ -907,13 +908,13 @@ function App() {
           const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
           const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
           
-          console.log('Processing exercise completion for:', actualCurrentExercise?.name);
-          console.log('Exercise type:', actualCurrentExercise?.exercise_type);
-          console.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
+          logger.log('Processing exercise completion for:', actualCurrentExercise?.name);
+          logger.log('Exercise type:', actualCurrentExercise?.exercise_type);
+          logger.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
           
           // Check if this is a repetition-based exercise that needs rep/set advancement
           if (actualCurrentExercise?.exercise_type === 'repetition_based' && workoutMode.totalReps && workoutMode.totalSets) {
-            console.log('Processing rep-based exercise completion...');
+            logger.log('Processing rep-based exercise completion...');
             const currentRep = workoutMode.currentRep || 0;
             const currentSet = workoutMode.currentSet || 0;
             const totalReps = workoutMode.totalReps;
@@ -1054,8 +1055,8 @@ function App() {
             }
           } else {
             // Time-based exercise completed, advance workout
-            console.log('Time-based exercise completed in workout mode:', actualCurrentExercise?.name);
-            console.log('Calling advanceWorkout to move to next exercise or complete workout...');
+            logger.log('Time-based exercise completed in workout mode:', actualCurrentExercise?.name);
+            logger.log('Calling advanceWorkout to move to next exercise or complete workout...');
             advanceWorkout();
           }
         }
@@ -1383,7 +1384,7 @@ function App() {
   // Nudge sync so app_settings exist on server for other devices
   void syncService.sync();
     } catch (error) {
-      console.error('Failed to save app settings:', error);
+      logger.error('Failed to save app settings:', error);
     }
   }, [hasConsent, appSettings]);
 
@@ -1416,19 +1417,19 @@ function App() {
       if (hasConsent) {
         try {
           if (process.env.NODE_ENV === 'development') {
-            console.log('🚀 Initializing app with consent granted');
+            logger.log('🚀 Initializing app with consent granted');
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
               (window as Window & { storageService?: StorageService; syncService?: SyncService; resetDB?: () => Promise<void> }).storageService = storageService;
               (window as Window & { storageService?: StorageService; syncService?: SyncService; resetDB?: () => Promise<void> }).syncService = syncService;
               (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
-              console.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
+              logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
             }
           }
 
           // Register service worker for offline functionality
-          console.log('🚀 Initializing PWA capabilities...');
+          logger.log('🚀 Initializing PWA capabilities...');
           
           // Register PWA link handlers for magic link routing
           registerPWALinkHandlers();
@@ -1442,11 +1443,11 @@ function App() {
             maybePromise
               .then((swInfo) => {
                 if (swInfo?.updateAvailable) {
-                  console.log('📦 App update available - refresh to update');
+                  logger.log('📦 App update available - refresh to update');
                 }
               })
               .catch((error) => {
-                console.error('❌ Service worker registration failed:', error);
+                logger.error('❌ Service worker registration failed:', error);
               });
           }
 
@@ -1506,7 +1507,7 @@ function App() {
           const storedSettings = await storageService.getAppSettings();
           
           if (process.env.NODE_ENV === 'development') {
-            console.log('⚙️ Loaded stored settings:', storedSettings);
+            logger.log('⚙️ Loaded stored settings:', storedSettings);
           }
           
           // Merge with defaults to handle new settings properties
@@ -1516,7 +1517,7 @@ function App() {
           } : DEFAULT_APP_SETTINGS;
           
           if (process.env.NODE_ENV === 'development') {
-            console.log('⚙️ Final settings to set:', settingsToSet);
+            logger.log('⚙️ Final settings to set:', settingsToSet);
           }
           
           if (!storedSettings) {
@@ -1552,7 +1553,7 @@ function App() {
             }
           }
       } catch (error) {
-        console.error('Failed to initialize app data:', error);
+        logger.error('Failed to initialize app data:', error);
         // Fallback to initial exercises
         setExercises(INITIAL_EXERCISES);
       }
@@ -1624,7 +1625,7 @@ useEffect(() => {
         )
       );
     } catch (error) {
-      console.error('Failed to toggle exercise favorite:', error);
+      logger.error('Failed to toggle exercise favorite:', error);
     }
   };
 
@@ -1643,7 +1644,7 @@ useEffect(() => {
       // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('exercise-deleted', { detail: exercise_id }));
     } catch (error) {
-      console.error('Failed to delete exercise:', error);
+      logger.error('Failed to delete exercise:', error);
       throw error; // Re-throw to let ExercisePage handle the error display
     }
   };
@@ -1656,7 +1657,7 @@ useEffect(() => {
       const updatedExercises = await storageService.getExercises();
       if (updatedExercises.length > 0) setExercises(updatedExercises);
     } catch (error) {
-      console.warn('Failed to refresh exercises:', error);
+      logger.warn('Failed to refresh exercises:', error);
     }
   }, []);
 
@@ -1726,7 +1727,7 @@ useEffect(() => {
 
     // Debug logging in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('🎨 Theme applied:', appSettings.dark_mode ? 'dark' : 'light', {
+      logger.log('🎨 Theme applied:', appSettings.dark_mode ? 'dark' : 'light', {
         hasConsent,
         dark_mode: appSettings.dark_mode
       });

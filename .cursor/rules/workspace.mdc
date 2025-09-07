@@ -39,3 +39,5 @@ You are an AI coding assistant, your role is to create software based on the pro
 - After successfully implementing a Module or a number of related tasks in the plan, and fully testing it successfully, update the progress for this module/tasks in the plan.
 
 - The project is multi-lingual with many locales. Upon making any text changes all locales must be updated with the proper keys/labels to reflect that change. Also must run (pnpm i18n:scan) and resolve any problems in the output.
+
+- Never use console.log() directly. Always use the logger utility from src/utils/logger.ts which respects the DEBUG feature flag. Import: `import logger from '../utils/logger';` then use `logger.log()`, `logger.warn()`, `logger.error()`, etc.
