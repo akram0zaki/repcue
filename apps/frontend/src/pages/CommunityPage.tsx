@@ -9,8 +9,6 @@ import { communityCacheService } from '../services/communityCache';
 import { FeatureGuard } from '../components/FeatureGuard';
 import { SearchIcon, FilterIcon, StarIcon } from '../components/icons/NavigationIcons';
 
-interface CommunityPageProps {}
-
 interface CommunityExercise extends Exercise {
   creator_name?: string;
   is_favorited?: boolean;
@@ -19,6 +17,28 @@ interface CommunityExercise extends Exercise {
 interface CommunityWorkout extends Workout {
   creator_name?: string;
   is_favorited?: boolean;
+}
+
+// Server response types for Supabase data
+interface ServerExerciseData extends Omit<Exercise, 'description' | 'tags' | 'muscle_groups' | 'equipment_needed' | 'difficulty_level'> {
+  description?: string | null;
+  tags?: string[] | null;
+  muscle_groups?: string[] | null;
+  equipment_needed?: string[] | null;
+  difficulty_level?: 'beginner' | 'intermediate' | 'advanced' | null;
+  profiles?: {
+    display_name?: string;
+  };
+}
+
+interface ServerWorkoutData extends Omit<Workout, 'description' | 'scheduled_days' | 'is_active' | 'exercises'> {
+  description?: string | null;
+  scheduled_days?: string[] | null;
+  is_active?: boolean | null;
+  exercises?: unknown[] | null;
+  profiles?: {
+    display_name?: string;
+  };
 }
 
 interface SearchFilters {
@@ -88,7 +108,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
         if (exerciseError) throw exerciseError;
         // Transform server data to match Exercise type
-        exerciseData = (serverExerciseData || []).map((exercise: any) => ({
+        exerciseData = (serverExerciseData || []).map((exercise: ServerExerciseData) => ({
           ...exercise,
           description: exercise.description || undefined,
           tags: exercise.tags || [],
@@ -115,7 +135,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
         if (workoutError) throw workoutError;
         // Transform server data to match Workout type
-        workoutData = (serverWorkoutData || []).map((workout: any) => ({
+        workoutData = (serverWorkoutData || []).map((workout: ServerWorkoutData) => ({
           ...workout,
           description: workout.description || undefined,
           scheduled_days: workout.scheduled_days || [],
@@ -138,14 +158,14 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       // Process exercises
       const processedExercises = (exerciseData || []).map(exercise => ({
         ...exercise,
-        creator_name: (exercise as any).profiles?.display_name || 'Anonymous',
+        creator_name: (exercise as ServerExerciseData).profiles?.display_name || 'Anonymous',
         is_favorited: favorites[exercise.id] || false
       }));
 
       // Process workouts
       const processedWorkouts = (workoutData || []).map(workout => ({
         ...workout,
-        creator_name: (workout as any).profiles?.display_name || 'Anonymous',
+        creator_name: (workout as ServerWorkoutData).profiles?.display_name || 'Anonymous',
         is_favorited: favorites[workout.id] || false
       }));
 

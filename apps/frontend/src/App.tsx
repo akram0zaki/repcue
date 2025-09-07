@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import { consentService } from './services/consentService';
 import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
-import { syncService } from './services/syncService';
+import { syncService, SyncService } from './services/syncService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
@@ -1420,9 +1420,10 @@ function App() {
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
-              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; syncService?: SyncService; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; syncService?: SyncService; resetDB?: () => Promise<void> }).syncService = syncService;
               (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
-              console.log('🔧 Debug helpers: window.storageService, window.resetDB()');
+              console.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
             }
           }
 

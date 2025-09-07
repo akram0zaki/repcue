@@ -20,9 +20,7 @@ import { ExerciseRating } from '../components/ExerciseRating';
 import { CopyExerciseButton } from '../components/CopyExerciseButton';
 import { favoritesService } from '../services/favoritesService';
 
-interface ExerciseDetailPageProps {}
-
-const ExerciseDetailPage: React.FC<ExerciseDetailPageProps> = () => {
+const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();

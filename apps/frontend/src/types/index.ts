@@ -8,7 +8,7 @@ export interface SyncMetadata {
   created_at: string; // ISO timestamp
   // Local-only fields (not synced to server)
   dirty?: number; // 1 if local changes need to be synced, 0 if not
-  op?: 'upsert' | 'delete'; // pending operation type
+  op?: 'upsert' | 'delete' | 'seed'; // pending operation type
   synced_at?: string; // ISO timestamp of last successful sync
 }
 
