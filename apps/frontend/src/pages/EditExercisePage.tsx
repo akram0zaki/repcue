@@ -83,7 +83,7 @@ export const EditExercisePage: React.FC = () => {
     };
 
     loadExercise();
-  }, [exerciseId, navigate, showSnackbar, t, user]);
+  }, [exerciseId, navigate, showSnackbar, t, user?.id]);
 
   const handleSubmit = async (exerciseData: Partial<Exercise>) => {
     if (!user || !exercise) {
@@ -125,7 +125,7 @@ export const EditExercisePage: React.FC = () => {
         default_reps: exerciseData.default_reps ?? exercise.default_reps,
         rep_duration_seconds: exerciseData.rep_duration_seconds ?? exercise.rep_duration_seconds,
         has_video: exerciseData.has_video ?? exercise.has_video,
-        custom_video_url: exerciseData.custom_video_url ?? exercise.custom_video_url,
+        custom_video_url: exerciseData.hasOwnProperty('custom_video_url') ? exerciseData.custom_video_url : exercise.custom_video_url,
         is_public: exerciseData.is_public ?? exercise.is_public,
         // Preserve system fields
         is_favorite: exercise.is_favorite,

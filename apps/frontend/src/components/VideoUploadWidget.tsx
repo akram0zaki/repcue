@@ -151,9 +151,6 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
 
   return (
     <div className={`video-upload-widget space-y-4 ${className}`}>
-      <h4 className="font-medium text-gray-900 dark:text-white">
-        {t('video.exerciseVideo')}
-      </h4>
       
       {error && (
         <div className="bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">

@@ -5,6 +5,7 @@ import { ExerciseCategory as Categories, ExerciseType as Types } from '../types'
 import { PlusIcon, MinusIcon, MoveUpIcon, MoveDownIcon } from '../components/icons/NavigationIcons';
 import { VideoUploadWidget } from './VideoUploadWidget';
 import { ConfirmationModal } from './ui/ConfirmationModal';
+import { useFeatureFlag } from '../hooks/useFeatureFlags';
 
 interface ExerciseFormProps {
   exercise?: Partial<Exercise>;
@@ -113,6 +114,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   loading = false,
 }) => {
   const { t } = useTranslation(['common', 'exercises']);
+  const [canUploadVideos] = useFeatureFlag('canUploadVideos');
 
   // Form state
   const [name, setName] = useState(exercise?.name || '');
@@ -161,7 +163,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       tags,
       instructions,
       isPublic,
-      customVideoUrl,
+      ...(canUploadVideos && { customVideoUrl }),
       newEquipment,
       newMuscleGroup,
       newTag,
@@ -175,7 +177,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     name, description, category, exerciseType, defaultDuration, defaultSets, 
     defaultReps, repDurationSeconds, difficultyLevel, equipmentNeeded, 
     muscleGroups, tags, instructions, isPublic, customVideoUrl,
-    newEquipment, newMuscleGroup, newTag, persistenceKey
+    newEquipment, newMuscleGroup, newTag, persistenceKey, canUploadVideos
   ]);
 
   // Restore form state on component mount
@@ -198,7 +200,9 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         setTags(parsedState.tags || []);
         setInstructions(parsedState.instructions || [{ step: 1, text: '' }]);
         setIsPublic(parsedState.isPublic || false);
-        setCustomVideoUrl(parsedState.customVideoUrl || '');
+        if (canUploadVideos) {
+          setCustomVideoUrl(parsedState.customVideoUrl || '');
+        }
         setNewEquipment(parsedState.newEquipment || '');
         setNewMuscleGroup(parsedState.newMuscleGroup || '');
         setNewTag(parsedState.newTag || '');
@@ -206,7 +210,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         console.warn('Failed to restore form state:', error);
       }
     }
-  }, [persistenceKey, isEditing]);
+  }, [persistenceKey, isEditing, canUploadVideos]);
 
   // Clear saved form state when form is successfully submitted
   const clearFormState = () => {
@@ -234,7 +238,9 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     setTags([]);
     setInstructions([{ step: 1, text: '' }]);
     setIsPublic(false);
-    setCustomVideoUrl('');
+    if (canUploadVideos) {
+      setCustomVideoUrl('');
+    }
     setNewEquipment('');
     setNewMuscleGroup('');
     setNewTag('');
@@ -294,26 +300,50 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   };
 
   const handleAddArrayItem = (type: 'equipment' | 'muscleGroups' | 'tags', value: string) => {
-    if (!value.trim()) return;
+    console.log('🔧 DEBUG: handleAddArrayItem called with:', { type, value, trimmed: value.trim() });
+    if (!value.trim()) {
+      console.log('🔧 DEBUG: handleAddArrayItem returning early - empty value');
+      return;
+    }
     
-    const trimmedValue = value.trim();
+    // Support comma-separated values - split by comma and process each item
+    const items = value.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    console.log('🔧 DEBUG: Split items:', items);
     
     switch (type) {
       case 'equipment':
-        if (!equipmentNeeded.includes(trimmedValue)) {
-          setEquipmentNeeded([...equipmentNeeded, trimmedValue]);
+        console.log('🔧 DEBUG: Adding equipment items, current array:', equipmentNeeded);
+        const newEquipmentItems = items.filter(item => !equipmentNeeded.includes(item));
+        if (newEquipmentItems.length > 0) {
+          const updatedEquipment = [...equipmentNeeded, ...newEquipmentItems];
+          setEquipmentNeeded(updatedEquipment);
+          console.log('🔧 DEBUG: Equipment added, new array:', updatedEquipment);
+        } else {
+          console.log('🔧 DEBUG: All equipment items already exist');
         }
         setNewEquipment('');
         break;
       case 'muscleGroups':
-        if (!muscleGroups.includes(trimmedValue)) {
-          setMuscleGroups([...muscleGroups, trimmedValue]);
+        console.log('🔧 DEBUG: Adding muscle group items, current array:', muscleGroups);
+        const newMuscleGroupItems = items.filter(item => !muscleGroups.includes(item));
+        if (newMuscleGroupItems.length > 0) {
+          const updatedMuscleGroups = [...muscleGroups, ...newMuscleGroupItems];
+          setMuscleGroups(updatedMuscleGroups);
+          console.log('🔧 DEBUG: Muscle groups added, new array:', updatedMuscleGroups);
+        } else {
+          console.log('🔧 DEBUG: All muscle group items already exist');
         }
         setNewMuscleGroup('');
         break;
       case 'tags':
-        if (!tags.includes(trimmedValue)) {
-          setTags([...tags, trimmedValue]);
+        console.log('🔧 DEBUG: Adding tag items, current array:', tags);
+        const newTagItems = items.filter(item => !tags.includes(item));
+        if (newTagItems.length > 0) {
+          const updatedTags = [...tags, ...newTagItems];
+          setTags(updatedTags);
+          console.log('🔧 DEBUG: Tags added, new array:', updatedTags);
+        } else {
+          console.log('🔧 DEBUG: All tag items already exist');
         }
         setNewTag('');
         break;
@@ -363,7 +393,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     // Add type-specific fields
     if (exerciseType === Types.TIME_BASED) {
       if (defaultDuration) {
-        exerciseData.default_duration = parseInt(defaultDuration, 10);
+        exerciseData.default_duration = parseFloat(defaultDuration);
       }
     } else {
       if (defaultSets) {
@@ -373,13 +403,14 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         exerciseData.default_reps = parseInt(defaultReps, 10);
       }
       if (repDurationSeconds) {
-        exerciseData.rep_duration_seconds = parseInt(repDurationSeconds, 10);
+        exerciseData.rep_duration_seconds = parseFloat(repDurationSeconds);
       }
     }
 
-    // Add video URL if provided
-    if (customVideoUrl.trim()) {
-      exerciseData.custom_video_url = customVideoUrl.trim();
+    // Handle video URL when feature is enabled
+    if (canUploadVideos) {
+      // Always set the video URL (even if empty to clear existing ones)
+      exerciseData.custom_video_url = customVideoUrl.trim() || null;
     }
 
     // Clear saved form state on successful submission
@@ -498,7 +529,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 <input
                   id="default-duration"
                   type="number"
-                  min="1"
+                  min="0.1"
+                  step="0.1"
                   value={defaultDuration}
                   onChange={(e) => setDefaultDuration(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -545,7 +577,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   <input
                     id="rep-duration"
                     type="number"
-                    min="1"
+                    min="0.1"
+                    step="0.1"
                     value={repDurationSeconds}
                     onChange={(e) => setRepDurationSeconds(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -600,11 +633,17 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   value={newEquipment}
                   onChange={(e) => setNewEquipment(e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={t('exercises.equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat')}
+                  placeholder={t('exercises.equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat (comma-separated)')}
                   disabled={loading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
+                      handleAddArrayItem('equipment', newEquipment);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Auto-capture when user tabs away from field
+                    if (newEquipment.trim()) {
                       handleAddArrayItem('equipment', newEquipment);
                     }
                   }}
@@ -650,11 +689,17 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   value={newMuscleGroup}
                   onChange={(e) => setNewMuscleGroup(e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={t('exercises.muscleGroupPlaceholder', 'e.g., Arms, Core, Legs')}
+                  placeholder={t('exercises.muscleGroupPlaceholder', 'e.g., Arms, Core, Legs (comma-separated)')}
                   disabled={loading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
+                      handleAddArrayItem('muscleGroups', newMuscleGroup);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Auto-capture when user tabs away from field
+                    if (newMuscleGroup.trim()) {
                       handleAddArrayItem('muscleGroups', newMuscleGroup);
                     }
                   }}
@@ -700,11 +745,17 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={t('exercises.tagPlaceholder', 'e.g., beginner, quick, home')}
+                  placeholder={t('exercises.tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
                   disabled={loading}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
+                      handleAddArrayItem('tags', newTag);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Auto-capture when user tabs away from field
+                    if (newTag.trim()) {
                       handleAddArrayItem('tags', newTag);
                     }
                   }}
@@ -739,23 +790,25 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             </div>
           </div>
 
-          {/* Video Upload */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Exercise Video</h3>
-            {exercise?.id ? (
-              <VideoUploadWidget
-                exerciseId={exercise.id}
-                currentVideoUrl={customVideoUrl}
-                onVideoUploaded={setCustomVideoUrl}
-              />
-            ) : (
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  {t('common.videoUploadAfterSave', 'Video upload will be available after saving the exercise.')}
-                </p>
-              </div>
-            )}
-          </div>
+          {/* Video Upload - Only show if feature is enabled */}
+          {canUploadVideos && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Exercise Video</h3>
+              {exercise?.id ? (
+                <VideoUploadWidget
+                  exerciseId={exercise.id}
+                  currentVideoUrl={customVideoUrl}
+                  onVideoUploaded={setCustomVideoUrl}
+                />
+              ) : (
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {t('common.videoUploadAfterSave', 'Video upload will be available after saving the exercise.')}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Sharing Options */}
           <div className="space-y-4">

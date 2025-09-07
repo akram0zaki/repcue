@@ -1,22 +1,33 @@
-## 2025-09-07 — UX Improvements and Sync Bug Fixes
+## 2025-09-07 — Exercise Form Enhancements and Critical Sync Fixes
 
-- feat: Replace JavaScript alerts with elegant modal dialogs in exercise form and fix critical sync ownership bug
+- feat: Comprehensive exercise form improvements with decimal durations, video features, and working sync system
 
-  🎨 **User Experience Improvements**:
-  - ✅ **Modal Dialogs**: Replaced ugly JavaScript `alert()` and `confirm()` calls in ExerciseForm with beautiful ConfirmationModal components
-  - ✅ **Cancel Dialog**: Added "Keep Draft" vs "Discard Changes" options when canceling exercise edits
-  - ✅ **Clear Form Dialog**: Added confirmation modal before clearing exercise form drafts
-  - ✅ **Consistent Design**: Modal dialogs match the app's design system and support accessibility features
+  🎨 **Exercise Form UX Improvements**:
+  - ✅ **Auto-capture Array Inputs**: Added automatic data capture when tabbing away from equipment, muscle groups, and tags fields
+  - ✅ **Comma-separated Input**: Support for comma-separated values in array fields (e.g., "dumbbells, yoga mat")
+  - ✅ **Form Stability**: Fixed form reset issue when switching browser tabs during editing
+  - ✅ **Decimal Durations**: Added support for decimal values in Duration and Rep Duration fields (e.g., 2.5 seconds)
+  - ✅ **Feature-gated Video Section**: Video upload section now properly hidden when feature flag is disabled
+  - ✅ **Video Removal**: Fixed video removal functionality to properly clear video data on save
+  - ✅ **Duplicate Header Fix**: Removed duplicate "Exercise Video" header from video upload widget
+  - ✅ **useEffect Warning Fix**: Resolved React useEffect dependency array size warning
 
-  🐛 **Critical Sync Bug Fix**:
-  - ✅ **Ownership Preservation**: Fixed sync service bug where user-created exercises lost owner_id during sync operations
-  - ✅ **Database Cleanup**: Removed legacy built-in exercise records from Supabase that were causing ID conflicts
-  - ✅ **Deduplication Logic**: Implemented ownership-aware deduplication that prioritizes user-owned records over built-in ones
-  - ✅ **Edit/Delete Buttons**: Restored missing edit/delete buttons for user-created exercises after sync
+  🗄️ **Database Schema Updates**:
+  - ✅ **Decimal Duration Support**: Migrated `default_duration` and `rep_duration_seconds` from integer to numeric(10,2)
+  - ✅ **Video Storage**: Created `exercise-videos` Supabase storage bucket with proper permissions
+  - ✅ **Feature Flags**: Enabled `custom_video_upload` feature flag for video upload functionality
 
-  🌐 **Internationalization**:
-  - ✅ **Translation Keys**: Added modal-related translation keys for all supported languages
-  - ✅ **Common Keys**: Extended common translation namespace with delete, discard, and keepDraft keys
+  🔄 **Critical Sync System Fixes**:
+  - ✅ **Sync Edge Function**: Fixed missing client upsert processing logic in sync edge function
+  - ✅ **IndexedDB → Database**: Client changes now properly sync from IndexedDB to Supabase database
+  - ✅ **Real-time Sync**: Exercise updates (including decimal durations) now sync within minutes
+  - ✅ **Multi-environment**: Fixed sync functionality deployed to both development and production
+
+  🛠️ **Technical Improvements**:
+  - ✅ **Form Processing**: Changed `parseInt()` to `parseFloat()` for duration fields to preserve decimals
+  - ✅ **Input Validation**: Updated form inputs with `step="0.1"` and `min="0.1"` for decimal support
+  - ✅ **Error Handling**: Enhanced sync error handling and logging for better debugging
+  - ✅ **Feature Flag Integration**: Added proper feature flag checking in ExerciseForm component
 
   🔧 **Technical Implementation**:
   - Modified `ExerciseForm.tsx` to use ConfirmationModal instead of browser alerts
