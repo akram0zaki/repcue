@@ -95,7 +95,8 @@
       "Bash(for lang in de es nl ar ar-EG fy fr)",
       "Bash(do echo \"Adding confirm translation to $lang\")",
       "Bash(do echo \"Adding deleteExerciseTitle to $lang\")",
-      "mcp__supabase-dev__apply_migration"
+      "mcp__supabase-dev__apply_migration",
+      "mcp__supabase__get_anon_key"
     ],
     "deny": [],
     "ask": []
