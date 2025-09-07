@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { Exercise, Workout } from '../types';
 import { ExerciseCategory } from '../types';
+import type { Json } from '../types/supabase';
 import { supabase } from '../config/supabase';
 import { favoritesService } from '../services/favoritesService';
 import { communityCacheService } from '../services/communityCache';
@@ -22,24 +23,18 @@ interface CommunityWorkout extends Workout {
 // Server response types for Supabase data
 interface ServerExerciseData extends Omit<Exercise, 'description' | 'tags' | 'muscle_groups' | 'equipment_needed' | 'difficulty_level'> {
   description?: string | null;
-  tags?: string[] | null;
-  muscle_groups?: string[] | null;
-  equipment_needed?: string[] | null;
+  tags?: Json | null;
+  muscle_groups?: Json | null;
+  equipment_needed?: Json | null;
   difficulty_level?: 'beginner' | 'intermediate' | 'advanced' | null;
   profiles?: {
     display_name?: string;
   };
 }
 
-interface ServerWorkoutData extends Omit<Workout, 'description' | 'scheduled_days' | 'is_active' | 'exercises'> {
-  description?: string | null;
-  scheduled_days?: string[] | null;
-  is_active?: boolean | null;
-  exercises?: unknown[] | null;
-  profiles?: {
-    display_name?: string;
-  };
-}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface CommunityPageProps {}
 
 interface SearchFilters {
   query: string;
@@ -108,14 +103,15 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
         if (exerciseError) throw exerciseError;
         // Transform server data to match Exercise type
-        exerciseData = (serverExerciseData || []).map((exercise: ServerExerciseData) => ({
+        exerciseData = (serverExerciseData || []).map((exercise) => ({
           ...exercise,
           description: exercise.description || undefined,
-          tags: exercise.tags || [],
-          muscle_groups: exercise.muscle_groups || [],
-          equipment_needed: exercise.equipment_needed || [],
-          difficulty_level: exercise.difficulty_level || 'beginner'
-        })) as Exercise[];
+          tags: Array.isArray(exercise.tags) ? exercise.tags as string[] : [],
+          muscle_groups: Array.isArray(exercise.muscle_groups) ? exercise.muscle_groups as string[] : [],
+          equipment_needed: Array.isArray(exercise.equipment_needed) ? exercise.equipment_needed as string[] : [],
+          difficulty_level: exercise.difficulty_level || 'beginner',
+          instructions: Array.isArray(exercise.instructions) ? exercise.instructions : undefined
+        })) as unknown as Exercise[];
         
         // Cache the results
         communityCacheService.cacheExerciseList(exerciseQueryKey, exerciseData);
@@ -135,13 +131,13 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
         if (workoutError) throw workoutError;
         // Transform server data to match Workout type
-        workoutData = (serverWorkoutData || []).map((workout: ServerWorkoutData) => ({
+        workoutData = (serverWorkoutData || []).map((workout) => ({
           ...workout,
           description: workout.description || undefined,
-          scheduled_days: workout.scheduled_days || [],
+          scheduled_days: Array.isArray(workout.scheduled_days) ? workout.scheduled_days as string[] : [],
           is_active: workout.is_active ?? true,
           exercises: Array.isArray(workout.exercises) ? workout.exercises : []
-        })) as Workout[];
+        })) as unknown as Workout[];
         
         // Cache the results
         communityCacheService.cacheWorkoutList(workoutQueryKey, workoutData);
@@ -165,7 +161,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       // Process workouts
       const processedWorkouts = (workoutData || []).map(workout => ({
         ...workout,
-        creator_name: (workout as ServerWorkoutData).profiles?.display_name || 'Anonymous',
+        creator_name: (workout as { profiles?: { display_name?: string } }).profiles?.display_name || 'Anonymous',
         is_favorited: favorites[workout.id] || false
       }));
 
@@ -181,7 +177,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
   useEffect(() => {
     loadCommunityContent();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filter and sort content
   const filteredContent = useMemo(() => {
