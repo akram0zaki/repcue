@@ -306,10 +306,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       
       try {
         await onDeleteExercise(exerciseId);
-        showSnackbar(t('exercises.deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), 'success');
+        showSnackbar(t('exercises.deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), { type: 'success' });
       } catch (error) {
         console.error('Failed to delete exercise:', error);
-        showSnackbar(t('exercises.deleteError', { defaultValue: 'Failed to delete exercise' }), 'error');
+        showSnackbar(t('exercises.deleteError', { defaultValue: 'Failed to delete exercise' }), { type: 'error' });
       }
     }
   };
