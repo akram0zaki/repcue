@@ -21,7 +21,8 @@ const logger: Logger = {
     if (DEBUG) console.debug(...args)
   },
   warn: (...args) => {
-    if (DEBUG) console.warn(...args)
+    // Always log warnings; they indicate recoverable issues that need attention
+    console.warn(...args)
   },
   error: (...args) => {
     // Always log errors; avoid sensitive data in production

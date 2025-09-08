@@ -1840,14 +1840,14 @@ export class StorageService {
       
       return { healthy: true, repaired: false };
     } catch (error) {
-      logger.warn('🔧 Database health check failed, attempting repair:', error);
+      logger.warn('Database health check failed, attempting repair:', error);
       
       try {
         await this.resetDatabase();
         return { healthy: true, repaired: true };
       } catch (repairError) {
         const errorMsg = repairError instanceof Error ? repairError.message : 'Unknown repair error';
-        logger.error('❌ Database repair failed:', repairError);
+        logger.error('Database repair failed:', repairError);
         return { 
           healthy: false, 
           repaired: false, 

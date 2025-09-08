@@ -276,7 +276,6 @@ export class SyncService {
    * Handle network coming back online
    */
   private handleOnline(): void {
-  logger.log('📶 Network connected - scheduling sync');
     this.isOnline = true;
     this.notifyListeners();
 
@@ -290,7 +289,6 @@ export class SyncService {
    * Handle network going offline
    */
   private handleOffline(): void {
-  logger.log('📵 Network disconnected');
     this.isOnline = false;
     this.notifyListeners();
   }
@@ -396,32 +394,27 @@ export class SyncService {
   async sync(force: boolean = false): Promise<SyncResult> {
     // Check if sync is enabled
     if (!SYNC_ENABLED) {
-  logger.log('🚫 Sync skipped: feature disabled');
       return this.createEmptyResult();
     }
 
     // Check consent
     if (!this.consentService.hasConsent()) {
-  logger.log('🚫 Sync skipped: no storage consent');
       return this.createEmptyResult();
     }
 
     // Check authentication
     const authState = this.authService.getAuthState();
     if (!authState.isAuthenticated || !authState.accessToken) {
-  logger.log('🚫 Sync skipped: not authenticated');
       return this.createEmptyResult();
     }
 
     // Prevent concurrent syncs
     if (this.isSyncing && !force) {
-  logger.log('🔄 Sync already in progress');
       return this.syncInProgress || this.createEmptyResult();
     }
 
     // Check network
     if (!this.isOnline) {
-  logger.log('📴 Sync skipped: device offline');
       return {
         success: true,
         tablesProcessed: 0,
@@ -445,7 +438,6 @@ export class SyncService {
       
       if (result.success) {
         this.lastSuccessfulSync = Date.now();
-  logger.log(`✅ Sync completed: ${result.tablesProcessed} tables, ${result.recordsPushed} pushed, ${result.recordsPulled} pulled`);
         // Broadcast a sync completion event so UI can refresh dependent views (workouts, activity logs, etc.)
         if (typeof window !== 'undefined' && result.recordsPulled > 0) {
           try {
@@ -503,10 +495,8 @@ export class SyncService {
 
     // Normalize legacy IDs locally to align with server UUID schema before pushing
     try {
-      const norm = await this.storageService.normalizeIdsForSync();
-      if (norm.normalized_activity_logs || norm.normalized_workout_sessions || norm.normalized_workouts || norm.cleared_workout_id_refs) {
-  logger.log('🧹 ID normalization before sync:', norm);
-      }
+      await this.storageService.normalizeIdsForSync();
+      // ID normalization completed
     } catch (e) {
   logger.warn('ID normalization failed, proceeding anyway:', e);
     }
@@ -518,9 +508,9 @@ export class SyncService {
       const missingCriticalData = await this.needsCriticalDataHydration();
       const forceFullPull = initialHydration || missingCriticalData;
       if (initialHydration) {
-  logger.log('🆕 Initial hydration detected: forcing a full pull');
+        // Initial hydration detected
       } else if (missingCriticalData) {
-        logger.log('🧩 Critical data missing locally (e.g., user_preferences) - forcing a full pull');
+        // Critical data missing locally
       }
 
       // Step 1: Gather dirty records from all tables
@@ -560,7 +550,6 @@ export class SyncService {
         table.upserts.length > 0 || table.deletes.length > 0
       );
       
-      logger.log('🔍 Sync request has changes:', hasChanges);
       
       // Only skip sync if we have no local changes AND we're certain we don't need server data
       // We should always sync on first login (when lastSuccessfulSync is undefined)
@@ -572,7 +561,6 @@ export class SyncService {
            (Date.now() - this.lastSuccessfulSync) < 30000; // Skip if synced within last 30 seconds
                            
       if (shouldSkipSync) {
-        logger.log('📋 No local changes to sync and recent successful sync exists, skipping sync call');
         return {
           success: true,
           tablesProcessed: SYNCABLE_TABLES.length,
@@ -583,7 +571,6 @@ export class SyncService {
         };
       }
       
-      logger.log('🔄 Proceeding with sync - hasChanges:', hasChanges, 'lastSuccessfulSync:', this.lastSuccessfulSync, 'force:', force);
 
       // Step 2: Call sync endpoint
   const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
@@ -809,25 +796,6 @@ export class SyncService {
    */
   private async callSyncEndpoint(syncRequest: SyncRequest, accessToken: string): Promise<SyncResponse> {
     // Debug logging to see what's being sent
-    logger.log('🔄 Sync request being sent:', {
-      tables: Object.keys(syncRequest.tables),
-      recordCounts: Object.entries(syncRequest.tables).map(([table, data]) => 
-        `${table}: ${data.upserts.length} upserts, ${data.deletes.length} deletes`
-      ),
-      since: syncRequest.since,
-      clientInfo: syncRequest.clientInfo
-    });
-    
-    // Log the full request body to debug empty body issue
-    const requestBodyString = JSON.stringify(syncRequest);
-    logger.log('🔍 Sync request body size (bytes):', requestBodyString.length);
-    logger.log('🔍 Full sync request body:', requestBodyString.substring(0, 1000) + (requestBodyString.length > 1000 ? '...[truncated]' : ''));
-    
-    // Verify the request is not empty
-    const hasContent = Object.values(syncRequest.tables).some(table => 
-      table.upserts.length > 0 || table.deletes.length > 0
-    );
-    logger.log('🔍 Has content to sync:', hasContent);
     
     // Add extra validation to ensure we never send truly empty requests
     if (!syncRequest.tables || Object.keys(syncRequest.tables).length === 0) {
@@ -835,22 +803,6 @@ export class SyncService {
       throw new Error('Invalid sync request: empty tables object');
     }
     
-    // Log detailed structure of non-empty tables
-    Object.entries(syncRequest.tables).forEach(([tableName, tableData]) => {
-      if (tableData.upserts.length > 0 || tableData.deletes.length > 0) {
-        logger.log(`🔍 ${tableName} details:`, {
-          upsertsCount: tableData.upserts.length,
-          deletesCount: tableData.deletes.length,
-          firstUpsert: tableData.upserts[0] || null,
-          firstUpsertKeys: tableData.upserts[0] ? Object.keys(tableData.upserts[0]) : []
-        });
-        
-        // Log first few records in detail
-        if (tableData.upserts.length > 0) {
-          logger.log(`🔍 ${tableName} first record:`, JSON.stringify(tableData.upserts[0], null, 2));
-        }
-      }
-    });
 
     // Choose path based on feature flag. Prefer direct fetch by default for reliability.
     if (SYNC_USE_INVOKE) {
@@ -898,10 +850,8 @@ export class SyncService {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync`;
     
-    logger.log('🔄 Using direct fetch to:', functionUrl);
     
     const requestBody = JSON.stringify(syncRequest);
-    logger.log('🔍 Direct fetch request body size:', requestBody.length);
     
     const attempt = async (token: string) => {
       return fetch(functionUrl, {
@@ -918,8 +868,6 @@ export class SyncService {
     try {
       let response = await attempt(accessToken);
 
-      logger.log('🔍 Direct fetch response status:', response.status);
-      logger.log('🔍 Direct fetch response headers:', Object.fromEntries(response.headers.entries()));
 
       // If token invalid/expired, try a one-time refresh then retry
       if (response.status === 401) {
@@ -932,9 +880,7 @@ export class SyncService {
           const { data: sessionData } = await supabase.auth.getSession();
           const refreshedToken = sessionData?.session?.access_token;
           if (refreshedToken) {
-            logger.log('🔁 Retrying sync after token refresh');
             response = await attempt(refreshedToken);
-            logger.log('🔍 Direct fetch (retry) status:', response.status);
           }
         } catch (e) {
           logger.warn('Token refresh check failed:', e);
@@ -948,7 +894,6 @@ export class SyncService {
       }
 
       const data = await response.json();
-      logger.log('🔍 Direct fetch success, data received');
       return data;
     } catch (error) {
       logger.error('🔴 Direct fetch failed:', error);
@@ -1045,17 +990,6 @@ export class SyncService {
               const userId = this.authService.getAuthState().user?.id;
               const exerciseRecord = serverRecord as Record<string, unknown>;
               
-              // Debug logging for ownership issues
-              if (exerciseRecord.name && typeof exerciseRecord.name === 'string' && exerciseRecord.name.includes('7amada')) {
-                logger.log('🔍 Sync Debug - Processing 7amada exercise:', {
-                  exerciseId: exerciseRecord.id,
-                  exerciseName: exerciseRecord.name,
-                  currentUserId: userId,
-                  exerciseOwnerId: exerciseRecord.owner_id,
-                  ownershipMatch: userId === exerciseRecord.owner_id,
-                  localRecord: localRecord ? { id: localRecord.id, dirty: localRecord.dirty, owner_id: (localRecord as Record<string, unknown>).owner_id } : null
-                });
-              }
               
               // Mark exercises as not owned by current user if they're shared/public
               if (userId && exerciseRecord.owner_id !== userId) {
@@ -1321,7 +1255,6 @@ export class SyncService {
     const localOwner = (localRecord as Record<string, unknown>)['owner_id'];
     const serverOwner = (serverRecord as Record<string, unknown>)['owner_id'];
   if ((!localOwner || localOwner === null) && serverOwner) {
-      logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (server has owner_id, local is anonymous)`);
       return serverRecord;
     }
   }
@@ -1333,11 +1266,9 @@ export class SyncService {
     if (localRecord.dirty) {
       if (serverUpdatedAt > localUpdatedAt) {
         // Server is newer - accept server version
-        logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (newer timestamp)`);
         return serverRecord;
       } else if (localUpdatedAt > serverUpdatedAt) {
         // Local is newer - keep local changes (will be pushed to server in next sync)
-        logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - local wins (newer timestamp)`);
         return localRecord;
       } else {
         // Same timestamp - handle special cases
@@ -1345,7 +1276,6 @@ export class SyncService {
       }
     } else {
       // Local record is clean - accept server version
-      logger.log(`📥 Updating clean local record ${tableName}:${serverRecord.id} with server version`);
       return serverRecord;
     }
   }
@@ -1364,12 +1294,10 @@ export class SyncService {
         { ...serverRecord, deleted: true } : 
         serverRecord;
       
-      logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - preferring delete operation`);
       return result;
     }
 
     // For other conflicts with equal timestamps, prefer server version
-    logger.log(`🔄 Conflict resolved for ${tableName}:${serverRecord.id} - server wins (timestamp tie)`);
     return serverRecord;
   }
 }
