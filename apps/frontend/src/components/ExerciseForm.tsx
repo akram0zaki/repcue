@@ -311,7 +311,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     console.log('🔧 DEBUG: Split items:', items);
     
     switch (type) {
-      case 'equipment':
+      case 'equipment': {
         console.log('🔧 DEBUG: Adding equipment items, current array:', equipmentNeeded);
         const newEquipmentItems = items.filter(item => !equipmentNeeded.includes(item));
         if (newEquipmentItems.length > 0) {
@@ -323,7 +323,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         }
         setNewEquipment('');
         break;
-      case 'muscleGroups':
+      }
+      case 'muscleGroups': {
         console.log('🔧 DEBUG: Adding muscle group items, current array:', muscleGroups);
         const newMuscleGroupItems = items.filter(item => !muscleGroups.includes(item));
         if (newMuscleGroupItems.length > 0) {
@@ -335,7 +336,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         }
         setNewMuscleGroup('');
         break;
-      case 'tags':
+      }
+      case 'tags': {
         console.log('🔧 DEBUG: Adding tag items, current array:', tags);
         const newTagItems = items.filter(item => !tags.includes(item));
         if (newTagItems.length > 0) {
@@ -347,6 +349,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         }
         setNewTag('');
         break;
+      }
     }
   };
 

@@ -1053,7 +1053,7 @@ export class SyncService {
                   currentUserId: userId,
                   exerciseOwnerId: exerciseRecord.owner_id,
                   ownershipMatch: userId === exerciseRecord.owner_id,
-                  localRecord: localRecord ? { id: localRecord.id, dirty: localRecord.dirty, owner_id: (localRecord as any).owner_id } : null
+                  localRecord: localRecord ? { id: localRecord.id, dirty: localRecord.dirty, owner_id: (localRecord as Record<string, unknown>).owner_id } : null
                 });
               }
               

@@ -126,7 +126,7 @@ export const EditExercisePage: React.FC = () => {
         default_reps: exerciseData.default_reps ?? exercise.default_reps,
         rep_duration_seconds: exerciseData.rep_duration_seconds ?? exercise.rep_duration_seconds,
         has_video: exerciseData.has_video ?? exercise.has_video,
-        custom_video_url: exerciseData.hasOwnProperty('custom_video_url') ? exerciseData.custom_video_url : exercise.custom_video_url,
+        custom_video_url: Object.prototype.hasOwnProperty.call(exerciseData, 'custom_video_url') ? exerciseData.custom_video_url : exercise.custom_video_url,
         is_public: exerciseData.is_public ?? exercise.is_public,
         // Preserve system fields
         is_favorite: exercise.is_favorite,
