@@ -4,6 +4,7 @@ import { consentService } from './services/consentService';
 import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService, SyncService } from './services/syncService';
+import { authService } from './services/authService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
@@ -1614,9 +1615,26 @@ useEffect(() => {
     if (!hasConsent) return;
 
     try {
-      await storageService.toggleExerciseFavorite(exercise_id);
-  // Promptly sync so favorites show up on other devices
-  void syncService.sync();
+      // Detect exercise type: UUID = user-created, slug = built-in
+      const isUserCreated = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise_id);
+      
+      if (isUserCreated) {
+        // User-created exercise: use StorageService and user_favorites table
+        const userId = authService.getAuthState().user?.id;
+        if (!userId) {
+          logger.error('Cannot toggle favorite: user not authenticated');
+          return;
+        }
+        await storageService.toggleUserCreatedExerciseFavorite(exercise_id, userId);
+      } else {
+        // Built-in exercise: use existing StorageService and user_preferences.favorite_exercises array
+        await storageService.toggleExerciseFavorite(exercise_id);
+      }
+      
+      // Promptly sync so favorites show up on other devices
+      void syncService.sync();
+      
+      // Update local UI state
       setExercises(prev => 
         prev.map(exercise => 
           exercise.id === exercise_id 

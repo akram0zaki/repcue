@@ -61,11 +61,13 @@ export interface SyncResponse {
 }
 
 // List of syncable tables in the order they should be processed
+// IMPORTANT: exercises must sync before user_favorites for foreign key integrity
 const SYNCABLE_TABLES = [
-  'user_preferences',
+  'user_preferences',    // Built-in exercise favorites (slug IDs)
   'app_settings', 
-  'exercises',
+  'exercises',           // Must sync BEFORE user_favorites
   'workouts',
+  'user_favorites',      // User-created exercise favorites (UUID IDs) 
   'activity_logs',
   'workout_sessions'
 ] as const;
@@ -765,18 +767,23 @@ export class SyncService {
           }
 
           // Remove local-only sync metadata before sending
-          // With Phase 2 complete, no field mapping needed - direct assignment
           const { dirty: _dirty, op: _op, synced_at: _synced_at, ...cleanRecord } = record as Record<string, unknown>;
           
+          // Apply field mapping for app_settings table
+          let mappedRecord = cleanRecord;
+          if (tableName === 'app_settings') {
+            mappedRecord = this.storageService.convertAppSettingsForSync(cleanRecord as any);
+          }
+          
           // Validate record before adding to sync
-          const validationError = this.validateRecord(cleanRecord, tableName);
+          const validationError = this.validateRecord(mappedRecord, tableName);
           if (validationError) {
-            logger.error(`Validation failed for record ${cleanRecord.id}:`, validationError);
+            logger.error(`Validation failed for record ${mappedRecord.id}:`, validationError);
             // Skip invalid records to prevent sync failures
             continue;
           }
           
-          upserts.push(cleanRecord);
+          upserts.push(mappedRecord);
         }
         } catch (recordError) {
           logger.error(`Error processing record ${record.id} for table ${tableName}:`, recordError);
@@ -922,15 +929,18 @@ export class SyncService {
       // Apply upserts with enhanced conflict resolution
       for (const serverRecord of changes.upserts) {
         try {
-          // With Phase 2 complete, no field mapping needed - direct assignment
-          // serverRecord is already defined by the for loop
+          // Apply field mapping for app_settings from server format to client format
+          let mappedServerRecord = serverRecord;
+          if (tableName === 'app_settings') {
+            mappedServerRecord = this.storageService.convertAppSettingsFromSync(serverRecord) as Record<string, unknown>;
+          }
           
           // Get local record to check for conflicts
-          const localRecord = await typedTable.get(serverRecord.id as string);
+          const localRecord = await typedTable.get(mappedServerRecord.id as string);
           
           if (localRecord) {
             // Handle conflict resolution
-            const resolvedRecord = await this.resolveConflict(tableName, localRecord, serverRecord);
+            const resolvedRecord = await this.resolveConflict(tableName, localRecord, mappedServerRecord);
             
             // Apply resolved record with sync metadata
             await typedTable.put({
@@ -942,7 +952,7 @@ export class SyncService {
           } else {
             // No local record - apply server record directly
             await typedTable.put({
-              ...serverRecord,
+              ...mappedServerRecord,
               dirty: 0,
               op: undefined,
               synced_at: new Date().toISOString()

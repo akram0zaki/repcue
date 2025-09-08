@@ -19,6 +19,8 @@ export class AuthService {
     refreshToken: undefined
   };
   private listeners: Array<(authState: AuthState) => void> = [];
+  private migrationInProgress = false;
+  private syncInProgress = false;
 
   private constructor() {
     this.initializeAuth();
@@ -142,7 +144,9 @@ export class AuthService {
    */
   private async claimAnonymousData(): Promise<void> {
     if (!this.authState.user?.id) return;
+    if (this.migrationInProgress) return;
 
+    this.migrationInProgress = true;
     try {
       logger.log('🔄 Starting anonymous data migration...');
       const migrationResult = await storageService.claimOwnership(this.authState.user.id);
@@ -159,6 +163,8 @@ export class AuthService {
       }
     } catch (error) {
       logger.error('❌ Failed to claim ownership of anonymous data:', error);
+    } finally {
+      this.migrationInProgress = false;
     }
   }
 
@@ -191,6 +197,14 @@ export class AuthService {
           return;
         }
 
+        // Prevent multiple concurrent sync operations
+        if (this.syncInProgress) {
+          logger.log('⚠️ Skipping post-auth sync: sync already in progress');
+          return;
+        }
+
+        this.syncInProgress = true;
+
         // Dynamically import and trigger sync to avoid circular dependencies
         import('./syncService').then(({ syncService }) => {
           logger.log('🔄 Starting post-authentication sync...');
@@ -205,6 +219,8 @@ export class AuthService {
           }).catch(error => {
             logger.warn('❌ Post-authentication sync failed:', error);
             // Silent failure - don't show error toast to avoid conflicting with migration success
+          }).finally(() => {
+            this.syncInProgress = false;
           });
         }).catch(error => {
           logger.warn('Failed to load sync service:', error);

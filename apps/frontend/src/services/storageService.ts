@@ -6,7 +6,8 @@ import type {
   UserPreferences, 
   AppSettings,
   Workout,
-  WorkoutSession
+  WorkoutSession,
+  UserFavorite
 } from '../types';
 import { consentService } from './consentService';
 import { authService } from './authService';
@@ -26,6 +27,8 @@ type StoredUserPreferences = UserPreferences;
 
 type StoredAppSettings = AppSettings;
 
+type StoredUserFavorite = UserFavorite;
+
 type StoredExercise = Exercise;
 
 // Workout-related data interfaces  
@@ -44,6 +47,7 @@ class RepCueDatabase extends Dexie {
   activity_logs!: Table<StoredActivityLog>;
   user_preferences!: Table<StoredUserPreferences>;
   app_settings!: Table<StoredAppSettings>;
+  user_favorites!: Table<StoredUserFavorite>;
   workouts!: Table<StoredWorkout>;
   workout_sessions!: Table<StoredWorkoutSession>;
 
@@ -115,6 +119,17 @@ class RepCueDatabase extends Dexie {
       activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
       user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
       app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 9: Add user_favorites table for user-created exercise favorites
+    this.version(9).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
     });
@@ -1540,6 +1555,7 @@ export class StorageService {
     activityLogs: ActivityLog[];
     userPreferences: UserPreferences[];
     appSettings: AppSettings[];
+    userFavorites: UserFavorite[];
     workouts: Workout[];
     workoutSessions: WorkoutSession[];
   }> {
@@ -1549,16 +1565,18 @@ export class StorageService {
         activityLogs: [],
         userPreferences: [],
         appSettings: [],
+        userFavorites: [],
         workouts: [],
         workoutSessions: []
       };
     }
 
     try {
-      const [activityLogs, userPreferences, appSettings, workouts, workoutSessions] = await Promise.all([
+      const [activityLogs, userPreferences, appSettings, userFavorites, workouts, workoutSessions] = await Promise.all([
         this.db.activity_logs.where('dirty').equals(1).toArray(),
         this.db.user_preferences.where('dirty').equals(1).toArray(),
         this.db.app_settings.where('dirty').equals(1).toArray(),
+        this.db.user_favorites.where('dirty').equals(1).toArray(),
         this.db.workouts.where('dirty').equals(1).toArray(),
         this.db.workout_sessions.where('dirty').equals(1).toArray()
       ]);
@@ -1570,6 +1588,7 @@ export class StorageService {
         activityLogs: activityLogs.map(this.convertStoredActivityLog),
         userPreferences: userPreferences.map(this.convertStoredUserPreferences),
         appSettings: appSettings.map(this.convertStoredAppSettings),
+        userFavorites: userFavorites.map(this.convertStoredUserFavorite),
         workouts: workouts.map(this.convertStoredWorkout),
         workoutSessions: workoutSessions.map(this.convertStoredWorkoutSession)
       };
@@ -1580,6 +1599,7 @@ export class StorageService {
         activityLogs: [],
         userPreferences: [],
         appSettings: [],
+        userFavorites: [],
         workouts: [],
         workoutSessions: []
       };
@@ -1744,10 +1764,140 @@ export class StorageService {
   }
 
   /**
+   * Convert stored user favorite to runtime format
+   */
+  private convertStoredUserFavorite(stored: StoredUserFavorite): UserFavorite {
+    return stored;
+  }
+
+  /**
+   * Toggle favorite status for a user-created exercise (UUID ID)
+   * Stores in user_favorites table for sync
+   */
+  public async toggleUserCreatedExerciseFavorite(exerciseId: string, userId: string): Promise<boolean> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    try {
+      // Check if already favorited
+      const existing = await this.db.user_favorites
+        .where('user_id').equals(userId)
+        .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
+        .first();
+
+      if (existing) {
+        // Remove from favorites (soft delete)
+        const updatedFavorite: StoredUserFavorite = prepareSoftDelete(existing, userId);
+        await this.db.user_favorites.put(updatedFavorite);
+        return false;
+      } else {
+        // Add to favorites
+        const newFavorite: StoredUserFavorite = prepareUpsert({
+          user_id: userId,
+          item_id: exerciseId,
+          item_type: 'exercise' as const,
+          exercise_type: 'user_created' as const
+        } as UserFavorite, undefined, userId);
+        await this.db.user_favorites.put(newFavorite);
+        return true;
+      }
+    } catch (error) {
+      logger.warn('Failed to toggle user favorite:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a user-created exercise is favorited
+   */
+  public async isUserCreatedExerciseFavorited(exerciseId: string, userId: string): Promise<boolean> {
+    if (!this.canStoreData()) {
+      return false;
+    }
+
+    try {
+      const existing = await this.db.user_favorites
+        .where('user_id').equals(userId)
+        .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
+        .first();
+      
+      return !!existing;
+    } catch (error) {
+      logger.warn('Failed to check favorite status:', error);
+      return false;
+    }
+  }
+
+  /**
    * Convert stored app settings to runtime format
    */
   private convertStoredAppSettings(stored: StoredAppSettings): AppSettings {
     return stored;
+  }
+
+  /**
+   * Convert client AppSettings to Supabase app_settings format
+   * Handles field name differences between client and server schemas
+   */
+  public convertAppSettingsForSync(settings: AppSettings): Record<string, unknown> {
+    return {
+      id: settings.id,
+      // Map client field names to Supabase field names
+      beep_interval_seconds: settings.interval_duration,
+      beep_sound_enabled: settings.sound_enabled,
+      beep_volume: settings.beep_volume,
+      vibration_enabled: settings.vibration_enabled,
+      dark_mode: settings.dark_mode,
+      reduce_motion: settings.reduce_motion,
+      auto_start_next: settings.auto_start_next,
+      pre_timer_countdown: settings.pre_timer_countdown,
+      show_exercise_videos: settings.show_exercise_videos,
+      data_auto_save: settings.auto_save,
+      default_rest_time: settings.default_rest_time,
+      // Include sync metadata
+      owner_id: settings.owner_id,
+      created_at: settings.created_at,
+      updated_at: settings.updated_at,
+      version: settings.version,
+      deleted: settings.deleted,
+      dirty: settings.dirty,
+      synced_at: settings.synced_at,
+      op: settings.op
+    };
+  }
+
+  /**
+   * Convert Supabase app_settings to client AppSettings format
+   * Handles field name differences between server and client schemas
+   */
+  public convertAppSettingsFromSync(serverData: Record<string, unknown>): AppSettings {
+    return {
+      id: serverData.id as string,
+      // Map Supabase field names to client field names
+      interval_duration: (serverData.beep_interval_seconds as number) || 30,
+      sound_enabled: (serverData.beep_sound_enabled as boolean) ?? true,
+      beep_volume: (serverData.beep_volume as number) || 0.5,
+      vibration_enabled: (serverData.vibration_enabled as boolean) ?? true,
+      dark_mode: (serverData.dark_mode as boolean) || false,
+      reduce_motion: (serverData.reduce_motion as boolean) || false,
+      auto_start_next: (serverData.auto_start_next as boolean) || false,
+      pre_timer_countdown: (serverData.pre_timer_countdown as number) || 3,
+      show_exercise_videos: (serverData.show_exercise_videos as boolean) ?? true,
+      auto_save: (serverData.data_auto_save as boolean) ?? true,
+      default_rest_time: (serverData.default_rest_time as number) || 60,
+      rep_speed_factor: 1.0, // This stays client-side only for now
+      last_selected_exercise_id: null, // This stays client-side only for now
+      // Include sync metadata
+      owner_id: serverData.owner_id as string | null,
+      created_at: serverData.created_at as string,
+      updated_at: serverData.updated_at as string,
+      version: (serverData.version as number) || 1,
+      deleted: (serverData.deleted as boolean) || false,
+      dirty: 0, // Mark as clean when coming from server
+      synced_at: serverData.synced_at as string | undefined,
+      op: 'upsert' as const
+    };
   }
 
   /**
