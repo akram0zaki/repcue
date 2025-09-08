@@ -49,7 +49,6 @@
       "Bash(tree:*)",
       "Bash(dir:*)",
       "Bash(pnpm --filter @repcue/frontend lint \"src/pages/TimerPage.tsx\")",
-
       "Bash(mkdir:*)",
       "Bash(pnpm exec tsc:*)",
       "Bash(pnpm --filter @repcue/frontend exec tsc --noEmit)",
@@ -77,7 +76,8 @@
       "Bash(do echo \"Adding deleteExerciseTitle to $lang\")",
       "mcp__supabase-dev__apply_migration",
       "mcp__supabase__get_anon_key",
-      "mcp__supabase-prod__deploy_edge_function"
+      "mcp__supabase-prod__deploy_edge_function",
+      "Bash(do echo \"Adding exercise filter translations to $lang\")"
     ],
     "deny": [],
     "ask": []

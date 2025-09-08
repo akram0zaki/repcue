@@ -48,27 +48,29 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const { user } = useAuth();
 
   // Debug logging
-  React.useEffect(() => {
-    const hamadaExercises = exercises.filter(ex => ex.name.includes('7amada'));
-    logger.log('🔍 ExercisePage Debug Info:', {
-      totalExercises: exercises.length,
-      currentUser: user,
-      currentUserId: user?.id,
-      userCreatedExercises: exercises.filter(ex => ex.owner_id && ex.owner_id !== null),
-      userOwnedExercises: exercises.filter(ex => ex.owner_id === user?.id),
-      hamadaExercises: hamadaExercises.map(ex => ({ 
-        id: ex.id, 
-        name: ex.name, 
-        owner_id: ex.owner_id,
-        isUserOwned: ex.owner_id === user?.id,
-        hasOwner: !!ex.owner_id
-      })),
-      sampleExerciseOwnerIds: exercises.slice(0, 5).map(ex => ({ id: ex.id, name: ex.name, owner_id: ex.owner_id }))
-    });
-  }, [exercises, user]);
+  // React.useEffect(() => {
+  //   const hamadaExercises = exercises.filter(ex => ex.name.includes('7amada'));
+  //   logger.log('🔍 ExercisePage Debug Info:', {
+  //     totalExercises: exercises.length,
+  //     currentUser: user,
+  //     currentUserId: user?.id,
+  //     userCreatedExercises: exercises.filter(ex => ex.owner_id && ex.owner_id !== null),
+  //     userOwnedExercises: exercises.filter(ex => ex.owner_id === user?.id),
+  //     hamadaExercises: hamadaExercises.map(ex => ({ 
+  //       id: ex.id, 
+  //       name: ex.name, 
+  //       owner_id: ex.owner_id,
+  //       isUserOwned: ex.owner_id === user?.id,
+  //       hasOwner: !!ex.owner_id
+  //     })),
+  //     sampleExerciseOwnerIds: exercises.slice(0, 5).map(ex => ({ id: ex.id, name: ex.name, owner_id: ex.owner_id }))
+  //   });
+  // }, [exercises, user]);
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom'>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>('name');
   // Video preview state
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -219,10 +221,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     return () => { v.removeEventListener('error', handleError); };
   }, [previewOpen, previewUrl, previewExercise, showSnackbar, t]);
 
+  // Helper function to check if exercise is user-created
+  const isUserCreatedExercise = (exercise: Exercise): boolean => {
+    const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
+    return isUUIDFormat && !!exercise.owner_id;
+  };
+
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    return exercises.filter(exercise => {
+    let filtered = exercises.filter(exercise => {
       const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(exercise.category);
       // Use localized name/description for search while preserving canonical tags
       const loc = localizeExercise(exercise, t);
@@ -231,9 +239,44 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         || (loc.description || '').toLowerCase().includes(term)
         || exercise.tags.some(tag => tag.toLowerCase().includes(term));
       const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
-      return matchesCategory && matchesSearch && matchesFavorites;
+      
+      // Apply exercise type filter
+      const matchesExerciseFilter = exerciseFilter === 'all' ||
+        (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise)) ||
+        (exerciseFilter === 'custom' && isUserCreatedExercise(exercise));
+      
+      return matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
     });
-  }, [exercises, selectedCategories, searchTerm, showFavoritesOnly, t]);
+    
+    // Apply sorting
+    filtered.sort((a, b) => {
+      const aLoc = localizeExercise(a, t);
+      const bLoc = localizeExercise(b, t);
+      
+      switch (sortBy) {
+        case 'name':
+          return aLoc.name.localeCompare(bLoc.name);
+        case 'type':
+          // Sort by exercise type, then by name
+          if (a.exercise_type !== b.exercise_type) {
+            return a.exercise_type.localeCompare(b.exercise_type);
+          }
+          return aLoc.name.localeCompare(bLoc.name);
+        case 'recently-added':
+          // Sort by created_at (newest first), fallback to name
+          const aDate = new Date(a.created_at).getTime();
+          const bDate = new Date(b.created_at).getTime();
+          if (aDate !== bDate) {
+            return bDate - aDate; // newest first
+          }
+          return aLoc.name.localeCompare(bLoc.name);
+        default:
+          return aLoc.name.localeCompare(bLoc.name);
+      }
+    });
+    
+    return filtered;
+  }, [exercises, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy, t]);
 
   // Group exercises by category for better organization
   const exercisesByCategory = useMemo(() => {
@@ -409,11 +452,63 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
             </div>
           </div>
 
-          {/* Favorites Toggle */}
-          <div className="flex justify-start">
+          {/* Filter and Sort Controls */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            {/* Exercise Type Filter */}
+            <div className="flex gap-1">
+              <button
+                onClick={() => setExerciseFilter('all')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                  exerciseFilter === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                {t('exercises.filterAll', { defaultValue: 'All' })}
+              </button>
+              <button
+                onClick={() => setExerciseFilter('built-in')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                  exerciseFilter === 'built-in'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                {t('exercises.filterBuiltIn', { defaultValue: 'Built-in' })}
+              </button>
+              <button
+                onClick={() => setExerciseFilter('custom')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                  exerciseFilter === 'custom'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                {t('exercises.filterCustom', { defaultValue: 'Custom' })}
+              </button>
+            </div>
+            
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <label htmlFor="sort-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('exercises.sortBy', { defaultValue: 'Sort by:' })}
+              </label>
+              <select
+                id="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[44px]"
+              >
+                <option value="name">{t('exercises.sortName', { defaultValue: 'Name' })}</option>
+                <option value="type">{t('exercises.sortType', { defaultValue: 'Type' })}</option>
+                <option value="recently-added">{t('exercises.sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
+              </select>
+            </div>
+            
+            {/* Favorites Toggle */}
             <button
               onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className={`flex items-center justify-center gap-2 px-3 py-2.5 sm:py-2 rounded-md transition-colors min-h-[44px] ${
+              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors min-h-[44px] ${
                 showFavoritesOnly 
                   ? 'bg-yellow-500 text-white' 
                   : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
@@ -501,6 +596,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 setSearchTerm('');
                 setSelectedCategories(new Set());
                 setShowFavoritesOnly(false);
+                setExerciseFilter('all');
+                setSortBy('name');
               }}
               className="px-4 py-2.5 bg-blue-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px]"
             >
@@ -640,35 +737,48 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         exercise.owner_id === currentUser.id;
   
   // Debug logging for ownership issues
-  React.useEffect(() => {
-    if (exercise.name.includes('7amada')) {
-      logger.log('🔍 ExerciseCard Debug - 7amada exercise ownership check:', {
-        exerciseName: exercise.name,
-        exerciseOwnerId: exercise.owner_id,
-        currentUserId: currentUser?.id,
-        isUserCreated,
-        hasCurrentUser: !!currentUser,
-        hasOwnerId: !!exercise.owner_id,
-        idsMatch: exercise.owner_id === currentUser?.id
-      });
-    }
-  }, [exercise, currentUser, isUserCreated]);
+  // React.useEffect(() => {
+  //   if (exercise.name.includes('7amada')) {
+  //     logger.log('🔍 ExerciseCard Debug - 7amada exercise ownership check:', {
+  //       exerciseName: exercise.name,
+  //       exerciseOwnerId: exercise.owner_id,
+  //       currentUserId: currentUser?.id,
+  //       isUserCreated,
+  //       hasCurrentUser: !!currentUser,
+  //       hasOwnerId: !!exercise.owner_id,
+  //       idsMatch: exercise.owner_id === currentUser?.id
+  //     });
+  //   }
+  // }, [exercise, currentUser, isUserCreated]);
 
   const handleTagExpansionToggle = () => {
     setIsTagsExpanded(!isTagsExpanded);
   };
 
   return (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation" data-testid="exercise-card">
+  <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+    isUserCreated 
+      ? 'border-2 border-blue-300 dark:border-blue-600' 
+      : 'border border-gray-200 dark:border-gray-700'
+  }`} data-testid="exercise-card">
       {/* Category Header */}
       <div className={`${getCategoryColor(exercise.category)} h-2`}></div>
       
       <div className="p-3 sm:p-4">
         {/* Exercise Header */}
         <div className="flex items-start justify-between mb-2 sm:mb-3">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight flex-1 mr-2">
-            {loc.name}
-          </h3>
+          <div className="flex-1 mr-2">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                {loc.name}
+              </h3>
+              {isUserCreated && (
+                <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full">
+                  {t('exercises.custom', { defaultValue: 'Custom' })}
+                </span>
+              )}
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             {exercise.has_video && (
               <button

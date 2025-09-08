@@ -127,7 +127,18 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ The exercise card on ExercisesPage is missing a delete button for user-owned exercises.
 
- - On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI, give me suggestions to improve this.
+ - ✅ On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI.
+ I want to follow a combo/balanced approach to improve this:
+    - ✅ Keep one listing, not split.
+    - ✅ Built-in cards keep current look.
+    - ✅ User-created cards:
+        + ✅ Show a “Custom” badge next to the title.
+        + ✅ Use a different border color (for example blue/green instead of red).
+        + ✅ Retain edit/delete icons.
+    - Improve Filter/Sort Options:
+        + ✅ Add toggle buttons: "All" | "Built-in" | "Custom"
+        + ✅ Sort options: "Name", "Type", "Recently Added"
+        + ✅ Search functionality that works across both types
 
 - 🔄 Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile:
   1. ProfileService StorageService Integration ✅
@@ -153,7 +164,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 - ✅ CreateExercise issues:
     - ✅ I created exercise "Ya 7amada 4" which is time-based and I was able to view it in IndexedDB and could also see the edit/delete links on the exercise card on ExercisesPage. A few minutes later after sync was done I was also able to see it in the exercises table in supabase-dev project, but then the edit/delete buttons disappeared on the UI. I think due to a sync bug I lost ownership of the exercise.
 
-- Scan the entire codebase to replace direct console.log() with logger.log().
+- ✅ Scan the entire codebase to replace direct console.log() with logger.log().
 
 - Add feature to allow users to give rating and feedback on the app.
 

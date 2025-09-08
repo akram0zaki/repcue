@@ -1272,7 +1272,7 @@ export class SyncService {
         return localRecord;
       } else {
         // Same timestamp - handle special cases
-        return this.resolveTimestampTie(tableName, localRecord, serverRecord);
+        return this.resolveTimestampTie(localRecord, serverRecord);
       }
     } else {
       // Local record is clean - accept server version
@@ -1284,7 +1284,6 @@ export class SyncService {
    * Handle cases where timestamps are equal
    */
   private resolveTimestampTie(
-    tableName: string,
     localRecord: Record<string, unknown>,
     serverRecord: Record<string, unknown>
   ): Record<string, unknown> {
