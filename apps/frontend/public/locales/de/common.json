@@ -349,7 +349,23 @@
     "tagPlaceholder": "Tags durch Kommas getrennt hinzufügen...",
     "durationSeconds": "Dauer (Sekunden)",
     "instructions": "Anweisungen",
-    "instructionPlaceholder": "Schritt-Anweisungen..."
+    "instructionPlaceholder": "Schritt-Anweisungen...",
+    "validation": {
+      "required": "Erforderlich",
+      "nameRequired": "Übungsname ist erforderlich",
+      "categoryRequired": "Kategorie ist erforderlich",
+      "typeRequired": "Übungstyp ist erforderlich",
+      "difficultyRequired": "Schwierigkeitsgrad ist erforderlich",
+      "durationRequired": "Dauer ist erforderlich",
+      "setsRequired": "Sätze sind erforderlich",
+      "repsRequired": "Wiederholungen sind erforderlich",
+      "stepRequired": "Schritt-Anweisungen sind erforderlich",
+      "durationPositive": "Dauer muss größer als 0 sein",
+      "setsPositive": "Sätze müssen größer als 0 sein",
+      "repsPositive": "Wiederholungen müssen größer als 0 sein",
+      "repDurationPositive": "Wiederholungsdauer muss größer als 0 sein",
+      "stepDurationPositive": "Schrittdauer muss größer als 0 sein"
+    }
   },
   "errors": {
     "featureNotAvailable": "Feature Nicht Verfügbar",

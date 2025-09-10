@@ -10,6 +10,10 @@ export const SYNC_ENABLED = true;
 // Use Supabase functions.invoke for sync (dev reliability favors direct fetch). Default false.
 export const SYNC_USE_INVOKE = false;
 
+// New sync engine (v2) feature flag. When set to 'v2', app loads CorrectSyncService instead of legacy SyncService.
+// Values: 'legacy' | 'v2'. Default now flipped to 'v2' post Phase 9 validation; override with VITE_SYNC_ENGINE=legacy if rollback needed.
+export const SYNC_ENGINE: 'legacy' | 'v2' = (import.meta.env.VITE_SYNC_ENGINE as 'legacy' | 'v2') || 'v2';
+
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
 export const DEBUG = true;

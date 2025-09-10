@@ -2,6 +2,8 @@
 
 RepCue is a modern, privacy-first fitness tracking Progressive Web App (PWA) designed for interval training and exercise logging. Built with React, TypeScript, and Tailwind CSS, it delivers a native-like app experience while being optimized for mobile devices and perfect for self-hosting on Raspberry Pi.
 
+> Want details on the offline-first data layer? See the new **[Sync Architecture (v2)](./docs/sync.md)** guide for per-table cursors, conflict resolution, batching, and feature-flag rollout.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -761,7 +763,7 @@ pnpm cypress:run
 
 For a deep dive into how data sync works (high‑level and inner workings), plus steps to add new entities to the sync scope, see:
 
-- [docs/sync/READM.md](docs/sync/READM.md)
+- [Sync Architecture (v2)](docs/sync.md)
 
 ### Adding New Features
 

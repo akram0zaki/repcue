@@ -390,7 +390,23 @@
     "viewOnly": "View Only",
     "viewOnlyDesc": "User can view but not edit",
     "canCopy": "Can Copy",
-    "canCopyDesc": "User can copy this exercise to their library"
+    "canCopyDesc": "User can copy this exercise to their library",
+    "validation": {
+      "required": "Required",
+      "nameRequired": "Exercise name is required",
+      "categoryRequired": "Category is required",
+      "typeRequired": "Exercise type is required",
+      "difficultyRequired": "Difficulty level is required",
+      "durationRequired": "Duration is required",
+      "setsRequired": "Sets are required",
+      "repsRequired": "Reps are required",
+      "stepRequired": "Step instructions are required",
+      "durationPositive": "Duration must be greater than 0",
+      "setsPositive": "Sets must be greater than 0",
+      "repsPositive": "Reps must be greater than 0",
+      "repDurationPositive": "Rep duration must be greater than 0",
+      "stepDurationPositive": "Step duration must be greater than 0"
+    }
   },
   "community": {
     "title": "Community",
@@ -466,7 +482,14 @@
     "loginRequired": "Sign in to copy",
     "tooltip": "Copy {{name}} to your library",
     "error": "Error: {{error}}",
-    "genericError": "Failed to copy exercise"
+    "genericError": "Failed to copy exercise",
+    "copyToLibrary": "Copy to Library",
+    "copyExercise": "Copy Exercise",
+    "copyComplete": "Copy Complete",
+    "copySuccess": "Exercise copied successfully!",
+    "copyError": "Failed to copy exercise",
+    "copyErrorNetwork": "Network error - please try again",
+    "copyErrorGeneric": "An error occurred while copying"
   },
   "video": {
     "exerciseVideo": "Exercise Video",

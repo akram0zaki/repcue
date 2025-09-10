@@ -133,6 +133,19 @@ class RepCueDatabase extends Dexie {
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
     });
+
+    // Version 10: Add sync_state table for per-user per-table cursor and metadata (v2 sync engine)
+    this.version(10).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      // sync_state: key = user_id (only one row per user) — store JSON blobs for cursors & metrics
+      sync_state: 'user_id'
+    });
   }
 
   /**
@@ -440,6 +453,41 @@ export class StorageService {
       StorageService.instance = new StorageService();
     }
     return StorageService.instance;
+  }
+
+  // === v2 sync_state helpers ===
+  public async getSyncState(userId: string): Promise<null | any> {
+    try {
+      // @ts-ignore Dexie dynamic table
+      const table = (this.db as any).sync_state;
+      if (!table) return null;
+      return await table.get(userId) || null;
+    } catch (e) {
+      logger.warn('sync_state get failed', e);
+      return null;
+    }
+  }
+
+  public async upsertSyncState(userId: string, data: Record<string, unknown>): Promise<void> {
+    try {
+      // @ts-ignore Dexie dynamic table
+      const table = (this.db as any).sync_state;
+      if (!table) return;
+      await table.put({ user_id: userId, ...data });
+    } catch (e) {
+      logger.warn('sync_state put failed', e);
+    }
+  }
+
+  public async resetSyncState(userId: string): Promise<void> {
+    try {
+      // @ts-ignore
+      const table = (this.db as any).sync_state;
+      if (!table) return;
+      await table.delete(userId);
+    } catch (e) {
+      logger.warn('sync_state delete failed', e);
+    }
   }
 
   // Utility: simple UUID v4 check

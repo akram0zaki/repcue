@@ -77,7 +77,9 @@
       "mcp__supabase-dev__apply_migration",
       "mcp__supabase__get_anon_key",
       "mcp__supabase-prod__deploy_edge_function",
-      "Bash(do echo \"Adding exercise filter translations to $lang\")"
+      "Bash(do echo \"Adding exercise filter translations to $lang\")",
+      "mcp__supabase-prod__list_edge_functions",
+      "mcp__supabase__get_edge_function"
     ],
     "deny": [],
     "ask": []

@@ -6,8 +6,10 @@ import { StorageService } from './storageService';
 import { ConsentService } from './consentService';
 import { AuthService } from './authService';
 import { supabase } from '../config/supabase';
-import { SYNC_ENABLED, SYNC_USE_INVOKE } from '../config/features';
+import { SYNC_ENABLED, SYNC_USE_INVOKE, SYNC_ENGINE } from '../config/features';
+import { correctSyncService } from './correctSyncService';
 import logger from '../utils/logger';
+import type { AppSettings } from '../types';
 
 export interface SyncResult {
   success: boolean;
@@ -772,7 +774,7 @@ export class SyncService {
           // Apply field mapping for app_settings table
           let mappedRecord = cleanRecord;
           if (tableName === 'app_settings') {
-            mappedRecord = this.storageService.convertAppSettingsForSync(cleanRecord as any);
+            mappedRecord = this.storageService.convertAppSettingsForSync(cleanRecord as unknown as AppSettings);
           }
           
           // Validate record before adding to sync
@@ -932,7 +934,7 @@ export class SyncService {
           // Apply field mapping for app_settings from server format to client format
           let mappedServerRecord = serverRecord;
           if (tableName === 'app_settings') {
-            mappedServerRecord = this.storageService.convertAppSettingsFromSync(serverRecord) as Record<string, unknown>;
+            mappedServerRecord = this.storageService.convertAppSettingsFromSync(serverRecord) as unknown as Record<string, unknown>;
           }
           
           // Get local record to check for conflicts
@@ -1312,4 +1314,5 @@ export class SyncService {
 }
 
 // Export singleton instance
-export const syncService = SyncService.getInstance();
+// Factory export honoring SYNC_ENGINE flag.
+export const syncService = SYNC_ENGINE === 'v2' ? correctSyncService : SyncService.getInstance();

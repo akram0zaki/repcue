@@ -349,7 +349,23 @@
     "tagPlaceholder": "Foegje labels ta skieden troch komma's...",
     "durationSeconds": "Doer (sekonden)",
     "instructions": "Ynstruksjes",
-    "instructionPlaceholder": "Stap ynstruksjes..."
+    "instructionPlaceholder": "Stap ynstruksjes...",
+    "validation": {
+      "required": "Ferplicht",
+      "nameRequired": "Oefening namme is ferplicht",
+      "categoryRequired": "Kategory is ferplicht",
+      "typeRequired": "Oefening type is ferplicht",
+      "difficultyRequired": "Swierrichheidsnivo is ferplicht",
+      "durationRequired": "Doer is ferplicht",
+      "setsRequired": "Sets binne ferplicht",
+      "repsRequired": "Werhellings binne ferplicht",
+      "stepRequired": "Stap ynstruksjes binne ferplicht",
+      "durationPositive": "Doer moat grutter wêze as 0",
+      "setsPositive": "Sets moatte grutter wêze as 0",
+      "repsPositive": "Werhellings moatte grutter wêze as 0",
+      "repDurationPositive": "Werhelling doer moat grutter wêze as 0",
+      "stepDurationPositive": "Stap doer moat grutter wêze as 0"
+    }
   },
   "emailPlaceholder": "E-mailadres ynfiere",
   "goBack": "Gean Werom",

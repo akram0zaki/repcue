@@ -10,6 +10,8 @@ import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
 import { syncService } from '../services/syncService';
+import { correctSyncService } from '../services/correctSyncService';
+import { SYNC_ENGINE } from '../config/features';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
 import { ProfileSection } from '../components/ProfileSection';
@@ -32,6 +34,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const { isAuthenticated } = useAuth();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isForceFullSyncing, setIsForceFullSyncing] = useState(false);
+  const [isResettingSyncState, setIsResettingSyncState] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -78,11 +82,44 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const handleSyncNow = async () => {
     try {
       setIsManualSyncing(true);
-      await syncService.sync(true);
+  // Legacy sync (and v2 wrapper) accept optional force flag; current typing expects no args
+  await syncService.sync();
     } catch (err) {
       console.error('Manual sync failed:', err);
     } finally {
       setIsManualSyncing(false);
+    }
+  };
+
+  // Force a FULL sync cycle using v2 engine if enabled, otherwise fall back to legacy manual sync
+  const handleForceFullSync = async () => {
+    if (!hasConsent || !isAuthenticated) return;
+    if (SYNC_ENGINE !== 'v2') {
+      // Legacy path: reuse manual sync (force flag already triggers push/pull best-effort)
+      return handleSyncNow();
+    }
+    try {
+      setIsForceFullSyncing(true);
+      await correctSyncService.sync('full');
+    } catch (err) {
+      console.error('Force full sync failed:', err);
+    } finally {
+      setIsForceFullSyncing(false);
+    }
+  };
+
+  // Reset local sync state (v2) then immediately request a full sync
+  const handleResetSyncState = async () => {
+    if (SYNC_ENGINE !== 'v2') return; // Only meaningful for v2
+    if (!hasConsent || !isAuthenticated) return;
+    try {
+      setIsResettingSyncState(true);
+      await correctSyncService.resetState();
+      await correctSyncService.sync('full');
+    } catch (err) {
+      console.error('Reset sync state failed:', err);
+    } finally {
+      setIsResettingSyncState(false);
     }
   };
 
@@ -470,6 +507,36 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               {t('settings.syncNowHelp')}
             </p>
           </div>
+
+          {/* Advanced Sync Controls (v2 only) */}
+          {SYNC_ENGINE === 'v2' && (
+            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" data-testid="advanced-sync-controls">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('settings.syncAdvanced')}
+              </h3>
+              <div className="space-y-2">
+                <button
+                  onClick={handleForceFullSync}
+                  disabled={!hasConsent || !isAuthenticated || isForceFullSyncing}
+                  className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  data-testid="btn-force-full-sync"
+                >
+                  {isForceFullSyncing ? t('settings.syncInProgress') : t('settings.forceFullSync')}
+                </button>
+                <button
+                  onClick={handleResetSyncState}
+                  disabled={!hasConsent || !isAuthenticated || isResettingSyncState}
+                  className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  data-testid="btn-reset-sync-state"
+                >
+                  {isResettingSyncState ? t('common.loading') : t('settings.resetSyncState')}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                {t('settings.syncAdvancedHelp')}
+              </p>
+            </div>
+          )}
 
           {/* Refresh Exercises Button */}
           <div className="mb-3">

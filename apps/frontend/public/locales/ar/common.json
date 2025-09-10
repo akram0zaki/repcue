@@ -362,7 +362,23 @@
     "tagPlaceholder": "أضف علامات مفصولة بفاصلات...",
     "durationSeconds": "المدة (بالثواني)",
     "instructions": "التعليمات",
-    "instructionPlaceholder": "تعليمات الخطوة..."
+    "instructionPlaceholder": "تعليمات الخطوة...",
+    "validation": {
+      "required": "مطلوب",
+      "nameRequired": "اسم التمرين مطلوب",
+      "categoryRequired": "الفئة مطلوبة",
+      "typeRequired": "نوع التمرين مطلوب",
+      "difficultyRequired": "مستوى الصعوبة مطلوب",
+      "durationRequired": "المدة مطلوبة",
+      "setsRequired": "المجموعات مطلوبة",
+      "repsRequired": "التكرارات مطلوبة",
+      "stepRequired": "تعليمات الخطوة مطلوبة",
+      "durationPositive": "يجب أن تكون المدة أكبر من 0",
+      "setsPositive": "يجب أن تكون المجموعات أكبر من 0",
+      "repsPositive": "يجب أن تكون التكرارات أكبر من 0",
+      "repDurationPositive": "يجب أن تكون مدة التكرار أكبر من 0",
+      "stepDurationPositive": "يجب أن تكون مدة الخطوة أكبر من 0"
+    }
   },
   "emailPlaceholder": "عنوان البريد الإلكتروني",
   "goBack": "العودة",

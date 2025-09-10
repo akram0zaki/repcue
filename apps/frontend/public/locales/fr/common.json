@@ -383,7 +383,23 @@
       "time_based": "Basé sur le Temps"
     },
     "viewOnly": "Vue Seulement",
-    "viewOnlyDesc": "L'utilisateur peut voir mais pas éditer"
+    "viewOnlyDesc": "L'utilisateur peut voir mais pas éditer",
+    "validation": {
+      "required": "Requis",
+      "nameRequired": "Le nom de l'exercice est requis",
+      "categoryRequired": "La catégorie est requise",
+      "typeRequired": "Le type d'exercice est requis",
+      "difficultyRequired": "Le niveau de difficulté est requis",
+      "durationRequired": "La durée est requise",
+      "setsRequired": "Les séries sont requises",
+      "repsRequired": "Les répétitions sont requises",
+      "stepRequired": "Les instructions d'étape sont requises",
+      "durationPositive": "La durée doit être supérieure à 0",
+      "setsPositive": "Les séries doivent être supérieures à 0",
+      "repsPositive": "Les répétitions doivent être supérieures à 0",
+      "repDurationPositive": "La durée de répétition doit être supérieure à 0",
+      "stepDurationPositive": "La durée d'étape doit être supérieure à 0"
+    }
   },
   "errors": {
     "featureNotAvailable": "Fonctionnalité Non Disponible",

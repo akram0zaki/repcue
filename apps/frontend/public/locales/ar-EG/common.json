@@ -361,7 +361,23 @@
     "tagPlaceholder": "ضيف تاجز مقسومة بفواصل...",
     "durationSeconds": "المدة (بالثواني)",
     "instructions": "التعليمات",
-    "instructionPlaceholder": "تعليمات الخطوة..."
+    "instructionPlaceholder": "تعليمات الخطوة...",
+    "validation": {
+      "required": "مطلوب",
+      "nameRequired": "اسم التمرين مطلوب",
+      "categoryRequired": "الفئة مطلوبة",
+      "typeRequired": "نوع التمرين مطلوب",
+      "difficultyRequired": "مستوى الصعوبة مطلوب",
+      "durationRequired": "المدة مطلوبة",
+      "setsRequired": "الجولات مطلوبة",
+      "repsRequired": "التكرارات مطلوبة",
+      "stepRequired": "تعليمات الخطوة مطلوبة",
+      "durationPositive": "لازم تكون المدة أكتر من صفر",
+      "setsPositive": "لازم تكون الجولات أكتر من صفر",
+      "repsPositive": "لازم تكون التكرارات أكتر من صفر",
+      "repDurationPositive": "لازم تكون مدة التكرار أكتر من صفر",
+      "stepDurationPositive": "لازم تكون مدة الخطوة أكتر من صفر"
+    }
   },
   "emailPlaceholder": "عنوان الإيميل",
   "goBack": "ارجع",

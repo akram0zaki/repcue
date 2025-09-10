@@ -349,7 +349,23 @@
     "tagPlaceholder": "Agregar etiquetas separadas por comas...",
     "durationSeconds": "Duración (segundos)",
     "instructions": "Instrucciones",
-    "instructionPlaceholder": "Instrucciones del paso..."
+    "instructionPlaceholder": "Instrucciones del paso...",
+    "validation": {
+      "required": "Obligatorio",
+      "nameRequired": "El nombre del ejercicio es obligatorio",
+      "categoryRequired": "La categoría es obligatoria",
+      "typeRequired": "El tipo de ejercicio es obligatorio",
+      "difficultyRequired": "El nivel de dificultad es obligatorio",
+      "durationRequired": "La duración es obligatoria",
+      "setsRequired": "Las series son obligatorias",
+      "repsRequired": "Las repeticiones son obligatorias",
+      "stepRequired": "Las instrucciones del paso son obligatorias",
+      "durationPositive": "La duración debe ser mayor que 0",
+      "setsPositive": "Las series deben ser mayor que 0",
+      "repsPositive": "Las repeticiones deben ser mayor que 0",
+      "repDurationPositive": "La duración de repetición debe ser mayor que 0",
+      "stepDurationPositive": "La duración del paso debe ser mayor que 0"
+    }
   },
   "emailPlaceholder": "Ingresa tu dirección de correo",
   "goBack": "Volver",

@@ -230,7 +230,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    let filtered = exercises.filter(exercise => {
+    const filtered = exercises.filter(exercise => {
       const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(exercise.category);
       // Use localized name/description for search while preserving canonical tags
       const loc = localizeExercise(exercise, t);
@@ -262,7 +262,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
             return a.exercise_type.localeCompare(b.exercise_type);
           }
           return aLoc.name.localeCompare(bLoc.name);
-        case 'recently-added':
+        case 'recently-added': {
           // Sort by created_at (newest first), fallback to name
           const aDate = new Date(a.created_at).getTime();
           const bDate = new Date(b.created_at).getTime();
@@ -270,6 +270,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
             return bDate - aDate; // newest first
           }
           return aLoc.name.localeCompare(bLoc.name);
+        }
         default:
           return aLoc.name.localeCompare(bLoc.name);
       }
