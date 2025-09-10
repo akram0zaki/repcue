@@ -1,3 +1,30 @@
+## Unreleased
+
+### Fixed
+- **Sync v2 field mapping issues**: Fixed app_settings sync failures where beep volume changes showed "pushed=1" but weren't reaching database
+  - Restored missing field mapping calls in `CorrectSyncService` for `app_settings` table
+  - Updated `sync_v2` edge function with comprehensive `MUTABLE_FIELD_ALLOWLIST` including all required fields
+  - Deployed edge function fixes to both development and production environments
+  - Resolved TypeScript build errors from non-existent field mapping method calls
+- **Build errors**: Fixed TypeScript compilation issues in `CorrectSyncService` by removing calls to non-existent field mapping methods and unused imports
+
+### Added
+- Updated Sync Implementation Plan (section T) with immediate execution focus tasks (edge function v2, pull logic, conflict resolution, advanced UI controls, test matrix).
+- Advanced Sync controls (v2 only): Force Full Sync & Reset Sync State added to `SettingsPage` guarded by `SYNC_ENGINE === 'v2'`.
+- Sync Engine v2 completion: `CorrectSyncService` + `sync_v2` Edge Function delivering per-table composite cursors, push batching (≤5), pull pagination (50/page, max 5 pages), light/full/priority modes, version-first conflict resolution with timestamp/id tiebreak, soft delete propagation & resurrection prevention, exponential backoff with jitter, priority push bypass, advanced Settings UI (Force Full Sync / Reset Sync State), structured correlation ID logging, and comprehensive test matrix coverage (batch splitting, backoff escalation/reset, conflict winner selection, soft delete propagation, multi-page & boundary pagination, cursor tie ordering, owner_id tamper prevention, priority push path, concurrency guard).  
+  - Security hardening: table allow‑list, payload size cap (32KB), field scrubbing (`owner_id`, `updated_at`, `deleted`), enforced ownership, minimal response payload.
+  - Documentation: `docs/sync.md` rewritten, README link added, implementation plan updated through Phase 9.
+
+### Changed
+- Refined implementation phases R4–R11 inside plan; marked current scaffold progress and new statuses.
+- Default sync engine flag flipped to v2 (`SYNC_ENGINE` now defaults to 'v2'; set VITE_SYNC_ENGINE=legacy to rollback during monitoring window).
+
+### Removed
+- Outdated technical note about edge function v2 not existing (engine implemented and feature-flagged).
+
+### Technical
+- Sync v2 feature flag remains (`SYNC_ENGINE`); legacy service retained for rollback until Phase 10 validation completes.
+
 ## 2025-09-08 — Exercise Page UX Enhancement & Filter Improvements
 
 - feat: Enhanced ExercisePage with visual distinction between built-in and user-created exercises
