@@ -456,12 +456,12 @@ export class StorageService {
   }
 
   // === v2 sync_state helpers ===
-  public async getSyncState(userId: string): Promise<null | any> {
+  public async getSyncState(userId: string): Promise<Record<string, unknown> | null> {
     try {
-      // @ts-ignore Dexie dynamic table
-      const table = (this.db as any).sync_state;
-      if (!table) return null;
-      return await table.get(userId) || null;
+  const maybeDb = this.db as unknown as { sync_state?: { get: (key: string) => Promise<unknown> } };
+  const table = maybeDb.sync_state;
+  if (!table) return null;
+  return (await table.get(userId)) as Record<string, unknown> | null;
     } catch (e) {
       logger.warn('sync_state get failed', e);
       return null;
@@ -470,10 +470,10 @@ export class StorageService {
 
   public async upsertSyncState(userId: string, data: Record<string, unknown>): Promise<void> {
     try {
-      // @ts-ignore Dexie dynamic table
-      const table = (this.db as any).sync_state;
-      if (!table) return;
-      await table.put({ user_id: userId, ...data });
+  const maybeDb = this.db as unknown as { sync_state?: { put: (value: Record<string, unknown>) => Promise<unknown> } };
+  const table = maybeDb.sync_state;
+  if (!table) return;
+  await table.put({ user_id: userId, ...data });
     } catch (e) {
       logger.warn('sync_state put failed', e);
     }
@@ -481,10 +481,10 @@ export class StorageService {
 
   public async resetSyncState(userId: string): Promise<void> {
     try {
-      // @ts-ignore
-      const table = (this.db as any).sync_state;
-      if (!table) return;
-      await table.delete(userId);
+  const maybeDb = this.db as unknown as { sync_state?: { delete: (key: string) => Promise<unknown> } };
+  const table = maybeDb.sync_state;
+  if (!table) return;
+  await table.delete(userId);
     } catch (e) {
       logger.warn('sync_state delete failed', e);
     }

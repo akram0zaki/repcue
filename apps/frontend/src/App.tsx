@@ -1422,8 +1422,8 @@ function App() {
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
-              (window as Window & { storageService?: StorageService; syncService?: any; resetDB?: () => Promise<void> }).storageService = storageService;
-              (window as Window & { storageService?: StorageService; syncService?: any; resetDB?: () => Promise<void> }).syncService = syncService;
+              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).syncService = syncService;
               (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
               logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
             }

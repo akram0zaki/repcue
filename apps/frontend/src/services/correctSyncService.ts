@@ -48,14 +48,14 @@ export interface CorrectSyncResult {
 interface EdgeSyncRequestV2 {
   mode: 'light' | 'full' | 'priority';
   since?: Record<string, TableCursor>; // per-table cursor
-  tables: Record<string, { upserts: any[]; deletes: string[] }>; // push payload
+  tables: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>; // push payload
   clientInfo: { deviceId: string; appVersion: string };
 }
 
 interface EdgeSyncResponseV2 {
   correlation_id?: string;
   server_time: string;
-  tables: Record<string, { upserts: any[]; deletes: string[]; nextCursor?: TableCursor; more?: boolean }>;
+  tables: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[]; nextCursor?: TableCursor; more?: boolean }>;
 }
 
 export class CorrectSyncService {
@@ -127,7 +127,7 @@ export class CorrectSyncService {
 
   // Trigger an immediate priority sync for a subset of tables (phase 6 requirement)
   async priorityPush(tables: string[]): Promise<CorrectSyncResult> {
-    this.priorityTables = new Set(tables.filter(t => SYNC_ORDER.includes(t as any)));
+  this.priorityTables = new Set(tables.filter(t => SYNC_ORDER.includes(t)));
     return this.sync('priority');
   }
 
@@ -217,19 +217,23 @@ export class CorrectSyncService {
     }
   }
 
-  private async collectDirtyBatch(tableName: string, limit: number, userId: string): Promise<{ upserts: any[]; deletes: string[] }> {
+  private async collectDirtyBatch(tableName: string, limit: number, userId: string): Promise<{ upserts: Array<Record<string, unknown>>; deletes: string[] }> {
     const db = this.storage.getDatabase();
-    const table: any = (db as any)[tableName];
+    const table = (db as unknown as Record<string, unknown>)[tableName] as {
+      where: (field: string) => {
+        equals: (value: number) => { limit: (n: number) => { toArray: () => Promise<Array<Record<string, unknown>>> } };
+      };
+    } | undefined;
     if (!table) return { upserts: [], deletes: [] };
     try {
       // Dexie where('dirty').equals(1).limit(limit)
-      const dirty: any[] = await table.where('dirty').equals(1).limit(limit).toArray();
-      const upserts: any[] = [];
+      const dirty: Array<Record<string, unknown>> = await table.where('dirty').equals(1).limit(limit).toArray();
+      const upserts: Array<Record<string, unknown>> = [];
       const deletes: string[] = [];
       for (const rec of dirty) {
-        if (rec.owner_id && rec.owner_id !== userId && tableName !== 'exercises') continue; // skip foreign-owned
-        if (rec.deleted || rec.op === 'delete') {
-          deletes.push(rec.id);
+        if ((rec as { owner_id?: string }).owner_id && (rec as { owner_id?: string }).owner_id !== userId && tableName !== 'exercises') continue; // skip foreign-owned
+        if ((rec as { deleted?: boolean; op?: string }).deleted || (rec as { op?: string }).op === 'delete') {
+          deletes.push(rec.id as string);
         } else {
           const { dirty: _d, op: _o, synced_at: _s, ...clean } = rec;
           // Apply field mapping for tables that need it
@@ -251,13 +255,18 @@ export class CorrectSyncService {
   // Fast dirty check across subset of tables for suppression logic
   private async hasAnyDirty(tables: string[], userId: string): Promise<boolean> {
     try {
-      const db = this.storage.getDatabase() as any;
+      const db = this.storage.getDatabase() as unknown as Record<string, unknown>;
       for (const t of tables) {
-        const coll = db[t];
+        const coll = db[t] as {
+          where: (field: string) => {
+            equals: (value: number) => { first: () => Promise<Record<string, unknown> | undefined> };
+          };
+        } | undefined;
         if (!coll) continue;
         const first = await coll.where('dirty').equals(1).first();
         if (first) {
-          if (first.owner_id && first.owner_id !== userId && t !== 'exercises') continue;
+          const ownerId = (first as { owner_id?: string }).owner_id;
+          if (ownerId && ownerId !== userId && t !== 'exercises') continue;
           return true;
         }
       }
@@ -267,15 +276,15 @@ export class CorrectSyncService {
     }
   }
 
-  private async markPushedClean(payload: Record<string, { upserts: any[]; deletes: string[] }>) {
+  private async markPushedClean(payload: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>) {
     const db = this.storage.getDatabase();
     const nowIso = new Date().toISOString();
     for (const [table, data] of Object.entries(payload)) {
-      const coll: any = (db as any)[table];
+      const coll = (db as unknown as Record<string, unknown>)[table] as { update: (id: string, changes: Record<string, unknown>) => Promise<number> } | undefined;
       if (!coll) continue;
       // Mark upserts
       for (const rec of data.upserts) {
-        try { await coll.update(rec.id, { dirty: 0, op: undefined, synced_at: nowIso }); } catch {}
+        try { await coll.update(rec.id as string, { dirty: 0, op: undefined, synced_at: nowIso }); } catch {}
       }
       // Mark deletes
       for (const id of data.deletes) {
@@ -316,20 +325,57 @@ export class CorrectSyncService {
     try {
       const existing = await this.storage.getSyncState(userId);
       if (existing) {
-        this.state = {
-          user_id: userId,
-            perTable: existing.perTable || {},
-            lastFullSyncAt: existing.lastFullSyncAt,
-            lastLightSyncAt: existing.lastLightSyncAt,
-            consecutiveFailures: existing.consecutiveFailures || 0,
-            backoffUntil: existing.backoffUntil,
-            lastErrorCode: existing.lastErrorCode,
-            lastErrorMessage: existing.lastErrorMessage
-        };
+        const parsed = this.parsePersistedState(existing);
+        this.state = { user_id: userId, ...parsed };
         return;
       }
     } catch (e) { logger.warn('[sync:v2] loadState failed', e); }
     this.state = { user_id: userId, perTable: {}, consecutiveFailures: 0 };
+  }
+
+  // Coerce untyped persisted JSON into LocalSyncState, with validation and safe defaults
+  private parsePersistedState(raw: Record<string, unknown>): Omit<LocalSyncState, 'user_id'> {
+    const perTable: Record<string, TableCursor> = {};
+    const rawPer = (raw as { perTable?: unknown }).perTable;
+    if (rawPer && typeof rawPer === 'object') {
+      for (const [k, v] of Object.entries(rawPer as Record<string, unknown>)) {
+        if (v && typeof v === 'object') {
+          const lastUpdatedAt = (v as { lastUpdatedAt?: unknown }).lastUpdatedAt;
+          const lastId = (v as { lastId?: unknown }).lastId;
+          if (typeof lastUpdatedAt === 'string' && typeof lastId === 'string') {
+            perTable[k] = { lastUpdatedAt, lastId };
+          }
+        }
+      }
+    }
+
+    const lastFullSyncAt = typeof (raw as { lastFullSyncAt?: unknown }).lastFullSyncAt === 'string'
+      ? (raw as { lastFullSyncAt?: string }).lastFullSyncAt
+      : undefined;
+    const lastLightSyncAt = typeof (raw as { lastLightSyncAt?: unknown }).lastLightSyncAt === 'string'
+      ? (raw as { lastLightSyncAt?: string }).lastLightSyncAt
+      : undefined;
+    const backoffUntil = typeof (raw as { backoffUntil?: unknown }).backoffUntil === 'string'
+      ? (raw as { backoffUntil?: string }).backoffUntil
+      : undefined;
+    const lastErrorCode = typeof (raw as { lastErrorCode?: unknown }).lastErrorCode === 'string'
+      ? (raw as { lastErrorCode?: string }).lastErrorCode
+      : undefined;
+    const lastErrorMessage = typeof (raw as { lastErrorMessage?: unknown }).lastErrorMessage === 'string'
+      ? (raw as { lastErrorMessage?: string }).lastErrorMessage
+      : undefined;
+  const cfRaw = (raw as { consecutiveFailures?: unknown }).consecutiveFailures;
+  const consecutiveFailures: number = typeof cfRaw === 'number' ? cfRaw : 0;
+
+    return {
+      perTable,
+      lastFullSyncAt,
+      lastLightSyncAt,
+      consecutiveFailures,
+      backoffUntil,
+      lastErrorCode,
+      lastErrorMessage
+    };
   }
 
   private setCursor(table: string, cursor: TableCursor, userId: string) {
@@ -338,9 +384,13 @@ export class CorrectSyncService {
     this.state.perTable[table] = cursor;
   }
 
-  private async applyServerTableChanges(table: string, upserts: any[], deletes: string[], userId: string) {
+  private async applyServerTableChanges(table: string, upserts: Array<Record<string, unknown>>, deletes: string[], userId: string) {
     const db = this.storage.getDatabase();
-    const coll: any = (db as any)[table];
+    const coll = (db as unknown as Record<string, unknown>)[table] as {
+      get: (id: string) => Promise<Record<string, unknown> | undefined>;
+      put: (row: Record<string, unknown>) => Promise<void>;
+      update: (id: string, changes: Record<string, unknown>) => Promise<number>;
+    } | undefined;
     if (!coll) return;
     // Apply deletions (soft delete locally)
     for (const id of deletes) {
@@ -357,17 +407,19 @@ export class CorrectSyncService {
     // Apply upserts with conflict resolution
     for (const row of upserts) {
       try {
-        const existing = await coll.get(row.id);
+        const existing = await coll.get(row.id as string);
         if (!existing) {
           await coll.put({ ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
           continue;
         }
         // If local dirty and local version > incoming, keep local (will push later)
-        if (existing.dirty === 1 && (existing.version ?? 0) > (row.version ?? 0)) continue;
+        if ((existing as { dirty?: number; version?: number }).dirty === 1 && ((existing as { version?: number }).version ?? 0) > ((row as { version?: number }).version ?? 0)) continue;
         // If local dirty and versions equal, prefer higher updated_at then version fallback; server is authoritative on tie
-        if (existing.dirty === 1 && (existing.version ?? 0) === (row.version ?? 0)) {
-          const localTime = new Date(existing.updated_at || 0).getTime();
-          const incomingTime = new Date(row.updated_at || 0).getTime();
+        if ((existing as { dirty?: number; version?: number }).dirty === 1 && ((existing as { version?: number }).version ?? 0) === ((row as { version?: number }).version ?? 0)) {
+          const localUpdated = (existing as { updated_at?: string | number }).updated_at ?? 0;
+          const incomingUpdated = (row as { updated_at?: string | number }).updated_at ?? 0;
+          const localTime = new Date(localUpdated as string | number).getTime();
+          const incomingTime = new Date(incomingUpdated as string | number).getTime();
           if (localTime > incomingTime) continue; // keep local newer timestamp
         }
         await coll.put({ ...existing, ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
