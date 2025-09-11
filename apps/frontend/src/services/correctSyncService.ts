@@ -465,6 +465,14 @@ export class CorrectSyncService {
   private async callEdge(reqBody: EdgeSyncRequestV2, accessToken: string): Promise<EdgeSyncResponseV2> {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync_v2`;
+    
+    // Debug logging for network requests
+    if (SYNC_DEBUG) {
+      logger.debug(`[sync:v2] callEdge URL: ${functionUrl}`);
+      logger.debug(`[sync:v2] callEdge payload:`, reqBody);
+      logger.debug(`[sync:v2] callEdge auth token: ${accessToken ? `${accessToken.substring(0, 20)}...` : 'MISSING'}`);
+    }
+    
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort('timeout'), EDGE_TIMEOUT_MS);
     let resp: Response;
@@ -477,6 +485,10 @@ export class CorrectSyncService {
       });
     } catch (e) {
       clearTimeout(t);
+      // Enhanced error logging
+      if (SYNC_DEBUG) {
+        logger.debug(`[sync:v2] callEdge fetch failed:`, e);
+      }
       // Normalize aborts into a friendly error
       if (e instanceof DOMException || (e as { name?: string }).name === 'AbortError') {
         throw new Error('edge request aborted (timeout)');
@@ -485,11 +497,27 @@ export class CorrectSyncService {
     } finally {
       clearTimeout(t);
     }
+    
+    // Debug response details
+    if (SYNC_DEBUG) {
+      logger.debug(`[sync:v2] callEdge response status: ${resp.status} ${resp.statusText}`);
+      logger.debug(`[sync:v2] callEdge response headers:`, Object.fromEntries(resp.headers.entries()));
+    }
+    
     if (!resp.ok) {
       const t = await resp.text();
+      if (SYNC_DEBUG) {
+        logger.debug(`[sync:v2] callEdge error response body:`, t);
+      }
       throw new Error(`edge error ${resp.status}: ${t}`);
     }
     const json = await resp.json();
+    
+    // Debug successful response
+    if (SYNC_DEBUG) {
+      logger.debug(`[sync:v2] callEdge success response:`, json);
+    }
+    
     // Shape coercion
     return json as EdgeSyncResponseV2;
   }
