@@ -3,6 +3,15 @@
 - Frontend: Added exercise seeding diagnostics (`[seed] exercises.count before/after`) and a safe reseed + fallback path in `App.tsx` to prevent empty Exercises page after hard reloads. This also reduces perceived init stalls by avoiding endless empty loads.
 - Frontend: Improved post‑init rehydrate with short retry/backoff when UI shows 0 exercises but IndexedDB has data, ensuring the Exercises page populates reliably even if the init watchdog forces early UI render.
 
+### 2025-09-11 — IndexedDB Schema Conflict Fix
+
+### Fixed
+- **IndexedDB creation failure**: Fixed database creation failing with "index already exists" error
+  - Removed duplicate `*owner_id` index declarations from database version 11 schema
+  - `owner_id` fields were already indexed since version 6, duplicate indexes caused ConstraintError
+  - Database now creates successfully after consent, allowing proper storage functionality
+  - Fixed issue where app would fall back to memory storage instead of persistent IndexedDB
+
 ### 2025-09-11 — Custom Exercise Identification & Sync Debugging
 
 ### Fixed

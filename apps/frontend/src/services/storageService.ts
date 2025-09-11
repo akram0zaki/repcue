@@ -148,15 +148,16 @@ class RepCueDatabase extends Dexie {
       sync_state: 'user_id'
     });
 
-    // Version 11: Add owner_id indexes for better claimOwnership query performance
+    // Version 11: owner_id indexes are already present from version 6 - no schema changes needed
+    // Just increment version for migration tracking purposes
     this.version(11).stores({
-      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
-      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
-      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty, *owner_id',
-      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty, *owner_id',
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
       user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
-      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
-      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       sync_state: 'user_id'
     });
   }
