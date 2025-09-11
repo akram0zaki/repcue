@@ -2066,16 +2066,35 @@ export class StorageService {
 
             // Strategy 1: Use indexed queries on owner_id for efficient lookups (available from v11+)
             if (coll.where) {
-              for (const val of [null, '']) {
-                let batch = await coll.where('owner_id').equals(val).limit(BATCH).toArray();
-                while (batch.length) {
-                  for (const rec of batch) {
-                    await coll.update(rec.id, claimData as Record<string, unknown>);
-                    modified++;
+              // Query for empty string owner_id values (Dexie can't query null with equals)
+              let batch = await coll.where('owner_id').equals('').limit(BATCH).toArray();
+              while (batch.length) {
+                for (const rec of batch) {
+                  await coll.update(rec.id, claimData as Record<string, unknown>);
+                  modified++;
+                }
+                // Yield to event loop to keep UI responsive
+                await new Promise(r => setTimeout(r, 0));
+                batch = await coll.where('owner_id').equals('').limit(BATCH).toArray();
+              }
+              
+              // Also need to scan for null values since Dexie can't query null with equals()
+              // Use toCollection scan to find null owner_id values
+              if (coll.toCollection) {
+                let offset = 0;
+                const MAX_PAGES = 200; // up to 10k rows in worst case
+                for (let page = 0; page < MAX_PAGES; page++) {
+                  const rows = await coll.toCollection().offset(offset).limit(BATCH).toArray();
+                  if (!rows.length) break;
+                  for (const rec of rows) {
+                    const owner = (rec as { owner_id?: string | null }).owner_id;
+                    if (owner == null) { // Only handle null, empty string was handled above
+                      await coll.update(rec.id, claimData as Record<string, unknown>);
+                      modified++;
+                    }
                   }
-                  // Yield to event loop to keep UI responsive
+                  offset += rows.length;
                   await new Promise(r => setTimeout(r, 0));
-                  batch = await coll.where('owner_id').equals(val).limit(BATCH).toArray();
                 }
               }
             } else if (coll.toCollection) {
