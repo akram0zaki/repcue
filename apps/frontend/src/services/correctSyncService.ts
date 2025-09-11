@@ -467,6 +467,10 @@ export class CorrectSyncService {
     const functionUrl = `${supabaseUrl}/functions/v1/sync_v2`;
     
     // Debug logging for network requests
+    console.log(`[SYNC DEBUG] callEdge URL: ${functionUrl}`);
+    console.log(`[SYNC DEBUG] callEdge payload:`, reqBody);
+    console.log(`[SYNC DEBUG] callEdge auth token: ${accessToken ? `${accessToken.substring(0, 20)}...` : 'MISSING'}`);
+    
     if (SYNC_DEBUG) {
       logger.debug(`[sync:v2] callEdge URL: ${functionUrl}`);
       logger.debug(`[sync:v2] callEdge payload:`, reqBody);
@@ -514,6 +518,8 @@ export class CorrectSyncService {
     const json = await resp.json();
     
     // Debug successful response
+    console.log(`[SYNC DEBUG] callEdge success response:`, json);
+    
     if (SYNC_DEBUG) {
       logger.debug(`[sync:v2] callEdge success response:`, json);
     }

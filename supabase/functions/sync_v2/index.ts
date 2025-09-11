@@ -2,8 +2,28 @@
 // @ts-nocheck // Edge function executed in Deno runtime; Deno types provided at runtime
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { corsHeaders } from '../_shared/cors.ts';
-import { validateJWT } from '../_shared/auth.ts';
+
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
+};
+
+// JWT validation function
+async function validateJWT(jwt: string): Promise<string | null> {
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const { data: { user }, error } = await supabase.auth.getUser(jwt);
+    if (error || !user) {
+      return null;
+    }
+    return user.id;
+  } catch {
+    return null;
+  }
+}
 
 interface TableCursor { lastUpdatedAt: string; lastId: string; }
 interface EdgeSyncRequestV2 {
@@ -33,12 +53,79 @@ const PUSH_BATCH_LIMIT = 5; // Max total records (upserts+deletes) per request
 const PULL_PAGE_SIZE = 50;  // Max rows per table per page
 const MAX_SERVER_ERRORS_LOGGED = 5; // Cap noisy logs per request
 
-// Basic allow‑list of mutable fields (shared across tables for now). Any other incoming fields are dropped.
-// This prevents clients from attempting to tamper with server managed columns or unexpected schema areas.
-const MUTABLE_FIELD_ALLOWLIST = new Set<string>([
-  'id', 'name', 'title', 'description', 'favorite_exercises', 'exercise_id', 'workout_id',
-  'settings', 'locale', 'units', 'rep_speed_factor', 'cues', 'data', 'metadata', 'payload',
-  'version', 'deleted'
+// Comprehensive allow‑list of mutable fields using database field names
+const MUTABLE_FIELD_ALLOWLIST = new Set([
+  'id',
+  'name',
+  'title',
+  'description',
+  'exercise_id',
+  'workout_id',
+  'settings',
+  'locale',
+  'units',
+  'rep_speed_factor',
+  'cues',
+  'data',
+  'metadata',
+  'payload',
+  'version',
+  'deleted',
+  // app_settings fields (using database field names)
+  'beep_volume',
+  'dark_mode',
+  'vibration_enabled',
+  'reduce_motion',
+  'auto_start_next',
+  'default_rest_time',
+  'pre_timer_countdown',
+  'show_exercise_videos',
+  'last_selected_exercise_id',
+  'beep_interval_seconds',
+  'beep_sound_enabled',
+  'data_auto_save',
+  // user_preferences fields
+  'favorite_exercises',
+  'daily_goal',
+  'weekly_goal',
+  'preferred_units',
+  'notification_preferences',
+  'privacy_settings',
+  // exercises fields
+  'instructions',
+  'muscle_groups',
+  'difficulty',
+  'equipment_needed',
+  'video_url',
+  'image_url',
+  'tags',
+  'category',
+  'duration_seconds',
+  // user_favorites fields
+  'favorited_at',
+  'notes',
+  // workouts fields
+  'exercises',
+  'total_duration',
+  'difficulty_level',
+  'tags_list',
+  'is_public',
+  'created_by',
+  'category_name',
+  // activity_logs fields
+  'exercise_name',
+  'duration',
+  'timestamp',
+  'notes',
+  'sets',
+  'reps',
+  // workout_sessions fields
+  'started_at',
+  'completed_at',
+  'total_time',
+  'exercises_completed',
+  'notes_session',
+  'performance_rating'
 ]);
 
 serve(async (req) => {
@@ -84,6 +171,7 @@ serve(async (req) => {
     // 1. Process pushes (upserts / deletes) respecting version precedence & resurrection rules
     for (const table of Object.keys(body.tables)) {
       const { upserts = [], deletes = [] } = body.tables[table];
+      console.log(`[DEBUG] Processing table ${table}: ${upserts.length} upserts, ${deletes.length} deletes`);
       // Upserts
       for (const record of upserts) {
         try {
@@ -96,16 +184,31 @@ serve(async (req) => {
             if (!existing) {
               // Insert new
               const insertRecord = scrubIncoming(record, userId, now, incomingVersion);
-              await supabase.from(table).insert(insertRecord);
+              console.log(`[DEBUG] Inserting new ${table}:${id}`, insertRecord);
+              const { error: insertError } = await supabase.from(table).insert(insertRecord);
+              if (insertError) console.log(`[DEBUG] Insert error:`, insertError);
+              else console.log(`[DEBUG] Insert successful`);
             } else {
               // Ownership check
-              if (existing.owner_id && existing.owner_id !== userId) continue; // skip foreign-owned row
+              if (existing.owner_id && existing.owner_id !== userId) {
+                console.log(`[DEBUG] Skipping ${table}:${id} - ownership mismatch`);
+                continue;
+              }
               // Resurrection prevention: if server row is deleted and client isn't explicitly deleting, skip
-              if (existing.deleted && !record.deleted) continue;
+              if (existing.deleted && !record.deleted) {
+                console.log(`[DEBUG] Skipping ${table}:${id} - resurrection prevention`);
+                continue;
+              }
               // If client version <= existing version, skip (server authoritative)
-              if ((existing.version ?? 0) >= incomingVersion) continue;
+              if ((existing.version ?? 0) >= incomingVersion) {
+                console.log(`[DEBUG] Skipping ${table}:${id} - version conflict (existing: ${existing.version}, incoming: ${incomingVersion})`);
+                continue;
+              }
               const updateRecord = scrubIncoming(record, userId, now, incomingVersion);
-              await supabase.from(table).update(updateRecord).eq('id', id);
+              console.log(`[DEBUG] Updating ${table}:${id}`, updateRecord);
+              const { error: updateError } = await supabase.from(table).update(updateRecord).eq('id', id);
+              if (updateError) console.log(`[DEBUG] Update error:`, updateError);
+              else console.log(`[DEBUG] Update successful`);
             }
         } catch (e) {
           if (pushErrors < MAX_SERVER_ERRORS_LOGGED) {
