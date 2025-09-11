@@ -123,28 +123,31 @@ const setupSyncTriggers = () => {
   // Trigger sync on page visibility change (app foreground)
   const handleVisibilityChange = () => {
     if (!document.hidden) {
-      logger.log('📱 App came to foreground - triggering sync');
-      syncService.sync().catch(error => {
-        logger.warn('Foreground sync failed:', error);
-      });
+      logger.log('📱 App came to foreground - sync disabled temporarily');
+      // Temporarily disabled due to timeout issues
+      // syncService.sync().catch(error => {
+      //   logger.warn('Foreground sync failed:', error);
+      // });
     }
   };
 
   // Setup periodic sync (every 5 minutes when active)
-  let syncInterval: NodeJS.Timeout | null = null;
+  const syncInterval: { current: NodeJS.Timeout | null } = { current: null };
   const setupPeriodicSync = () => {
-    if (syncInterval) {
-      clearInterval(syncInterval);
+    if (syncInterval.current) {
+      clearInterval(syncInterval.current);
     }
     
-    syncInterval = setInterval(() => {
-      if (!document.hidden) {
-        logger.log('⏰ Periodic sync triggered');
-        syncService.sync().catch(error => {
-          logger.warn('Periodic sync failed:', error);
-        });
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    // Temporarily disabled due to timeout issues
+    // syncInterval = setInterval(() => {
+    //   if (!document.hidden) {
+    //     logger.log('⏰ Periodic sync triggered');
+    //     syncService.sync().catch(error => {
+    //       logger.warn('Periodic sync failed:', error);
+    //     });
+    //   }
+    // }, 5 * 60 * 1000); // 5 minutes
+    logger.log('⏰ Periodic sync disabled temporarily');
   };
 
   // Setup event listeners
@@ -154,8 +157,8 @@ const setupSyncTriggers = () => {
   // Cleanup function
   return () => {
     document.removeEventListener('visibilitychange', handleVisibilityChange);
-    if (syncInterval) {
-      clearInterval(syncInterval);
+    if (syncInterval.current) {
+      clearInterval(syncInterval.current);
     }
   };
 };
@@ -187,6 +190,8 @@ function App() {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<TimerPreset>(30);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  // Prevent StrictMode dev double-run of initialization
+  const initStartedRef = useRef<boolean>(false);
 
   // Effect to ensure correct duration for rep-based exercises
   useEffect(() => {
@@ -1414,9 +1419,25 @@ function App() {
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
+    if (!hasConsent) return;
+    if (initStartedRef.current) {
+      // In React StrictMode (dev), effects run twice. Skip the duplicate init.
+      logger.log('[init] Skipping duplicate initialization (StrictMode dev)');
+      return;
+    }
+    initStartedRef.current = true;
+
     const initializeApp = async () => {
+      // Watchdog to avoid UI being stuck on splash if init takes too long
+      const initStart = Date.now();
+      const watchdog = setTimeout(() => {
+        logger.warn('[init] Initialization taking too long (>5s). Forcing UI ready.');
+        setIsLoading(false);
+      }, 5000);
+
       if (hasConsent) {
         try {
+          logger.log('[init] Starting initialization with consent');
           if (process.env.NODE_ENV === 'development') {
             logger.log('🚀 Initializing app with consent granted');
             
@@ -1452,60 +1473,78 @@ function App() {
               });
           }
 
-          // Load exercises from storage or use initial data
-          const storedExercises = await storageService.getExercises();
-          let allExercises: Exercise[];
+          const tSeedStart = Date.now();
+          const tReady = Date.now();
           
-          if (!storedExercises || storedExercises.length === 0) {
-            // No stored exercises, use all initial exercises
-            for (const exercise of INITIAL_EXERCISES) {
-              await storageService.saveExercise(exercise);
+          // Add timeout to storageService.ready() to fail fast if database is broken
+          const storageReadyTimeout = new Promise<void>((_, reject) => {
+            setTimeout(() => reject(new Error('Storage ready timeout')), 3000);
+          });
+          
+          try {
+            await Promise.race([storageService.ready(), storageReadyTimeout]);
+            const readyMs = Date.now() - tReady;
+            if (readyMs > 800) logger.warn(`[init] storageService.ready() took ${readyMs}ms`);
+          } catch (error) {
+            logger.error(`[init] storageService.ready() failed or timed out after 3s:`, error);
+            // Continue with fallback - try to load built-in exercises without storage
+            logger.warn('[init] Falling back to in-memory exercise catalog');
+            const { INITIAL_EXERCISES: builtInExercises } = await import('./data/exercises');
+            setExercises(builtInExercises);
+            setIsLoading(false);
+            clearTimeout(watchdog);
+            return; // Exit early with built-in exercises only
+          }
+          // Quick DB snapshot for diagnostics (counts only)
+          try {
+            const snap = await storageService.debugSnapshot();
+            logger.log('[init] DB snapshot:', snap);
+          } catch {}
+          logger.log('[init] Ensuring exercise catalog is seeded');
+          await storageService.ensureExercisesSeeded();
+          const seedMs = Date.now() - tSeedStart;
+          if (seedMs > 1000) logger.warn(`[init] seeding took ${seedMs}ms`); else logger.log(`[init] seeding took ${seedMs}ms`);
+
+          const tLoadStart = Date.now();
+          logger.log('[init] Loading exercises from storage');
+          let allExercises = await storageService.getExercises();
+          const loadMs = Date.now() - tLoadStart;
+          if (loadMs > 1000) logger.warn(`[init] getExercises took ${loadMs}ms (n=${allExercises.length})`); else logger.log(`[init] getExercises took ${loadMs}ms (n=${allExercises.length})`);
+          if (allExercises.length === 0) {
+            // Defensive: if the catalog is still empty, try one more seed then fall back to in-memory list
+            logger.warn('[init] Exercises list is empty after initial seed. Retrying seeding and reload…');
+            try {
+              const reseeded = await storageService.ensureExercisesSeeded();
+              logger.log(`[init] Reseed attempt completed. exercises.count=${reseeded}`);
+              const tReload = Date.now();
+              allExercises = await storageService.getExercises();
+              const reloadMs = Date.now() - tReload;
+              if (reloadMs > 1000) logger.warn(`[init] getExercises (retry) took ${reloadMs}ms (n=${allExercises.length})`);
+            } catch (e) {
+              logger.warn('[init] Reseed attempt failed:', e);
             }
-            allExercises = INITIAL_EXERCISES;
-          } else {
-            // Always use the latest exercise definitions from INITIAL_EXERCISES to ensure
-            // users get updated exercise types, defaults, and any new exercises
-            // This is an AUTOMATIC refresh that preserves user favorites
-            const storedIds = new Set(storedExercises.map(ex => ex.id));
-            const newExercises = INITIAL_EXERCISES.filter(ex => !storedIds.has(ex.id));
-            
-            // Separate built-in exercises from user-created exercises
-            const builtInExercises: Exercise[] = [];
-            const userCreatedExercises: Exercise[] = [];
-            
-            storedExercises.forEach(storedExercise => {
-              const latestExercise = INITIAL_EXERCISES.find(ex => ex.id === storedExercise.id);
-              if (latestExercise) {
-                // This is a built-in exercise - update with latest data but preserve user's favorite status
-                builtInExercises.push({
-                  ...latestExercise,
-                  is_favorite: storedExercise.is_favorite
-                });
+            if (allExercises.length === 0) {
+              // Try a fast path without preferences merge before giving up
+              const tFast = Date.now();
+              const fast = await storageService.getExercisesFast().catch(() => []);
+              const fastMs = Date.now() - tFast;
+              if (fast.length > 0) {
+                logger.warn(`[init] Fast path loaded ${fast.length} exercises in ${fastMs}ms; using fast list`);
+                allExercises = fast;
               } else {
-                // This is a user-created exercise - keep as-is
-                userCreatedExercises.push(storedExercise);
+                logger.warn('[init] Exercises still empty after reseed — using built-in catalog as temporary fallback');
+                allExercises = INITIAL_EXERCISES;
               }
-            });
-            
-            const updatedStoredExercises = [...builtInExercises, ...userCreatedExercises];
-            
-            // Save updated exercises back to storage
-            for (const exercise of updatedStoredExercises) {
-              await storageService.saveExercise(exercise);
             }
-            
-            // Save any new exercises to storage
-            for (const exercise of newExercises) {
-              await storageService.saveExercise(exercise);
-            }
-            
-            // Combine updated and new exercises
-            allExercises = [...updatedStoredExercises, ...newExercises];
           }
           setExercises(allExercises);
 
           // Load app settings
+          logger.log('[init] Loading app settings');
+          const tSettingsStart = Date.now();
           const storedSettings = await storageService.getAppSettings();
+          const settingsMs = Date.now() - tSettingsStart;
+          if (settingsMs > 800) logger.warn(`[init] getAppSettings took ${settingsMs}ms`);
           
           if (process.env.NODE_ENV === 'development') {
             logger.log('⚙️ Loaded stored settings:', storedSettings);
@@ -1530,8 +1569,12 @@ function App() {
           setAppSettings(settingsToSet);
 
           // Load and apply user preferences (locale) for cross-device sync
+          logger.log('[init] Loading user preferences');
           try {
+            const tPrefsStart = Date.now();
             const prefs = await storageService.getUserPreferences();
+            const prefsMs = Date.now() - tPrefsStart;
+            if (prefsMs > 800) logger.warn(`[init] getUserPreferences took ${prefsMs}ms`);
             const preferredLocale = prefs?.locale;
             if (preferredLocale && (i18n.resolvedLanguage || i18n.language) !== preferredLocale) {
               await i18n.changeLanguage(preferredLocale);
@@ -1553,17 +1596,29 @@ function App() {
               }
             }
           }
-      } catch (error) {
-        logger.error('Failed to initialize app data:', error);
-        // Fallback to initial exercises
-        setExercises(INITIAL_EXERCISES);
+          const elapsed = Date.now() - initStart;
+          if (elapsed > 2000) {
+            logger.warn(`[init] Initialization finished in ${elapsed}ms (>2s)`);
+          } else {
+            logger.log(`[init] Initialization finished in ${elapsed}ms`);
+          }
+        } catch (error) {
+          logger.error('Failed to initialize app data:', error);
+          // Fallback to initial exercises
+          setExercises(INITIAL_EXERCISES);
+        } finally {
+          clearTimeout(watchdog);
+          setIsLoading(false);
+        }
+      } else {
+        // No consent yet, don't block UI
+        clearTimeout(watchdog);
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
   };
 
   initializeApp();
-}, [hasConsent]);
+  }, [hasConsent]);
 
 // Cleanup sync triggers on unmount
 useEffect(() => {
@@ -1571,13 +1626,66 @@ useEffect(() => {
   return cleanup;
 }, []);
 
-  // Proactively nudge a sync on first mount after initialization so cross-device
-  // preferences (favorites/locale/theme) are pulled promptly.
+  // Proactively nudge a sync only AFTER initialization finished to avoid IndexedDB contention.
   useEffect(() => {
-    if (hasConsent) {
-      void syncService.sync();
+    if (hasConsent && !isLoading) {
+      logger.log('[init] Post-init sync disabled temporarily');
+      // Temporarily disabled due to timeout issues
+      // const t = setTimeout(() => { void syncService.sync(); }, 500);
+      // return () => clearTimeout(t);
     }
-  }, [hasConsent]);
+  }, [hasConsent, isLoading]);
+
+  // Safety rehydrate: if UI has zero exercises after init, but DB has data, retry-load a few times
+  useEffect(() => {
+    let cancelled = false;
+    let attempts = 0;
+    const delays = [250, 750, 1500, 3000]; // progressive backoff (ms)
+
+    const tryRehydrate = async () => {
+      if (isLoading || exercises.length > 0) return;
+      // If consent missing, we can still safely peek built-ins to hydrate UI without storing anything
+      if (!hasConsent) {
+        try {
+          const count = await storageService.peekExerciseCount().catch(() => 0);
+          if (count > 0) {
+            logger.warn(`[rehydrate] No consent, but DB has ${count} exercises; loading built-in catalog (read-only)`);
+            const builtins = await storageService.getBuiltInExercisesFastUnsafe();
+            if (!cancelled && builtins.length > 0) {
+              logger.log(`[rehydrate] Loaded ${builtins.length} built-in exercises (no-consent fast path)`);
+              setExercises(builtins);
+            }
+          }
+        } catch (e) {
+          logger.warn('[rehydrate] No-consent built-in peek failed:', e);
+        }
+        return;
+      }
+      while (!cancelled && attempts < delays.length && exercises.length === 0) {
+        try {
+          const stats = await storageService.getStorageStats().catch(() => null);
+          if (cancelled) return;
+          if (stats && stats.exerciseCount > 0) {
+            logger.warn(`[rehydrate] UI list empty but DB has ${stats.exerciseCount} exercises; reloading from storage...`);
+            const list = await storageService.getExercises();
+            if (!cancelled && list.length > 0) {
+              logger.log(`[rehydrate] Loaded ${list.length} exercises from storage`);
+              setExercises(list);
+              return;
+            }
+          } else {
+            logger.debug('[rehydrate] Stats not ready or zero; will retry');
+          }
+        } catch (e) {
+          logger.warn('[rehydrate] Failed to rehydrate exercises (attempt ' + (attempts + 1) + '):', e);
+        }
+        const wait = delays[attempts++];
+        await new Promise(r => setTimeout(r, wait));
+      }
+    };
+    void tryRehydrate();
+    return () => { cancelled = true; };
+  }, [hasConsent, isLoading, exercises.length]);
 
   // Listen for consent changes
   useEffect(() => {

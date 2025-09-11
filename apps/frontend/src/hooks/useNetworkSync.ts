@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { SyncService, type SyncStatus } from '../services/syncService';
+import { syncService as syncServiceFactory, type SyncStatus } from '../services/syncService';
+import logger from '../utils/logger';
 
 export interface NetworkSyncState {
   isOnline: boolean;
@@ -28,9 +29,9 @@ export interface UseNetworkSyncResult {
 export function useNetworkSync(): UseNetworkSyncResult {
   const [syncService] = useState(() => {
     try {
-      return SyncService.getInstance();
+      return syncServiceFactory;
     } catch (error) {
-      console.warn('SyncService not available:', error);
+      logger.warn('Sync service not available:', error as unknown as Record<string, unknown>);
       return null;
     }
   });
@@ -63,7 +64,7 @@ export function useNetworkSync(): UseNetworkSyncResult {
         canSync: initialStatus.isOnline && !initialStatus.isSyncing
       };
     } catch (error) {
-      console.warn('Failed to get initial sync status:', error);
+      logger.warn('Failed to get initial sync status:', error as unknown as Record<string, unknown>);
       return baseState;
     }
   });
@@ -95,14 +96,14 @@ export function useNetworkSync(): UseNetworkSyncResult {
   // Actions
   const triggerSync = useCallback(async () => {
     if (!syncService) {
-      console.warn('SyncService not available');
+      logger.warn('SyncService not available');
       return;
     }
 
     try {
       await syncService.sync();
     } catch (error) {
-      console.error('Manual sync failed:', error);
+      logger.error('Manual sync failed:', error as unknown as Record<string, unknown>);
     }
   }, [syncService]);
 
@@ -116,14 +117,14 @@ export function useNetworkSync(): UseNetworkSyncResult {
 
   const retry = useCallback(async () => {
     if (!syncService) {
-      console.warn('SyncService not available');
+      logger.warn('SyncService not available');
       return;
     }
 
     try {
       await syncService.sync(true); // Force sync
     } catch (error) {
-      console.error('Retry sync failed:', error);
+      logger.error('Retry sync failed:', error as unknown as Record<string, unknown>);
     }
   }, [syncService]);
 

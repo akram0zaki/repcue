@@ -1,16 +1,11 @@
 /**
- * SyncService — orchestrates client↔server synchronization.
- * Maintainer docs: see docs/sync/READM.md for architecture, flows, and how to add new entities.
+ * SyncService V2 — simplified sync service using only CorrectSyncService
+ * Old legacy SyncService has been completely removed
  */
-import { StorageService } from './storageService';
-import { ConsentService } from './consentService';
-import { AuthService } from './authService';
-import { supabase } from '../config/supabase';
-import { SYNC_ENABLED, SYNC_USE_INVOKE, SYNC_ENGINE } from '../config/features';
 import { correctSyncService } from './correctSyncService';
 import logger from '../utils/logger';
-import type { AppSettings } from '../types';
 
+// Legacy interfaces maintained for backward compatibility with existing code
 export interface SyncResult {
   success: boolean;
   tablesProcessed: number;
@@ -38,1281 +33,139 @@ export interface SyncStatus {
   errors: SyncError[];
 }
 
-export interface SyncRequest {
-  since?: string;
-  tables: {
-    [tableName: string]: {
-      upserts: Record<string, unknown>[];
-      deletes: string[];
-    };
-  };
-  clientInfo?: {
-    appVersion: string;
-    deviceId: string;
-  };
-}
-
-export interface SyncResponse {
-  changes: {
-    [tableName: string]: {
-      upserts: Record<string, unknown>[];
-      deletes: string[];
-    };
-  };
-  cursor: string;
-}
-
-// List of syncable tables in the order they should be processed
-// IMPORTANT: exercises must sync before user_favorites for foreign key integrity
-const SYNCABLE_TABLES = [
-  'user_preferences',    // Built-in exercise favorites (slug IDs)
-  'app_settings', 
-  'exercises',           // Must sync BEFORE user_favorites
-  'workouts',
-  'user_favorites',      // User-created exercise favorites (UUID IDs) 
-  'activity_logs',
-  'workout_sessions'
-] as const;
-
-export class SyncService {
-  private static instance: SyncService;
-  private storageService: StorageService;
-  private consentService: ConsentService;
-  private authService: AuthService;
-  private isOnline: boolean = navigator.onLine;
-  private isSyncing: boolean = false;
-  private syncInProgress: Promise<SyncResult> | null = null;
+/**
+ * V2 Sync Service - wraps CorrectSyncService with legacy interface compatibility
+ */
+class V2SyncService {
+  private listeners: Set<(status: SyncStatus) => void> = new Set();
+  private errors: SyncError[] = [];
   private lastSyncAttempt?: number;
   private lastSuccessfulSync?: number;
-  private lastSyncCursor?: string;
-  private syncErrors: SyncError[] = [];
-  private listeners: ((status: SyncStatus) => void)[] = [];
-  // Internal: multi-pass hydration guard
-  private maxHydrationPasses = 3;
+  private isSyncing = false;
 
-  /**
-   * Create a structured sync error
-   */
-  private createSyncError(
-    type: SyncError['type'],
-    message: string,
-    table?: string,
-    recordId?: string,
-    details?: Record<string, unknown>
-  ): SyncError {
-    return {
-      type,
-      message,
-      table,
-      recordId,
-      timestamp: new Date().toISOString(),
-      details
-    };
+  constructor(private correctSync: typeof correctSyncService) {
+    // Initialize with current status
+    this.notify();
   }
 
-  /**
-   * Validate a record before syncing
-   */
-  private validateRecord(record: Record<string, unknown>, tableName: string): SyncError | null {
-    // Check required fields
-    if (!record.id) {
-      return this.createSyncError(
-        'validation',
-        'Record missing required id field',
-        tableName,
-        record.id as string,
-        { record }
-      );
-    }
-
-    // Validate timestamp fields
-    if (record.updated_at && typeof record.updated_at === 'string') {
-      try {
-        new Date(record.updated_at);
-      } catch {
-        return this.createSyncError(
-          'validation',
-          'Invalid updated_at timestamp format',
-          tableName,
-          record.id as string,
-          { updated_at: record.updated_at }
-        );
-      }
-    }
-
-    // Validate version field
-    if (record.version && (typeof record.version !== 'number' || record.version < 1)) {
-      return this.createSyncError(
-        'validation',
-        'Invalid version field - must be a positive number',
-        tableName,
-        record.id as string,
-        { version: record.version }
-      );
-    }
-
-    // Table-specific validation
-    switch (tableName) {
-      case 'exercises':
-        if (!record.name || typeof record.name !== 'string') {
-          return this.createSyncError(
-            'validation',
-            'Exercise missing required name field',
-            tableName,
-            record.id as string,
-            { name: record.name }
-          );
-        }
-        if (!record.exercise_type || !['time_based', 'repetition_based'].includes(record.exercise_type as string)) {
-          return this.createSyncError(
-            'validation',
-            'Exercise has invalid exercise_type',
-            tableName,
-            record.id as string,
-            { exercise_type: record.exercise_type }
-          );
-        }
-        break;
-
-      case 'workouts':
-        if (!record.name || typeof record.name !== 'string') {
-          return this.createSyncError(
-            'validation',
-            'Workout missing required name field',
-            tableName,
-            record.id as string,
-            { name: record.name }
-          );
-        }
-        if (!Array.isArray(record.exercises)) {
-          return this.createSyncError(
-            'validation',
-            'Workout exercises field must be an array',
-            tableName,
-            record.id as string,
-            { exercises: record.exercises }
-          );
-        }
-        break;
-
-      case 'activity_logs':
-        if (!record.exercise_name || typeof record.exercise_name !== 'string') {
-          return this.createSyncError(
-            'validation',
-            'Activity log missing required exercise_name field',
-            tableName,
-            record.id as string,
-            { exercise_name: record.exercise_name }
-          );
-        }
-        if (typeof record.duration !== 'number' || record.duration < 0) {
-          return this.createSyncError(
-            'validation',
-            'Activity log duration must be a positive number',
-            tableName,
-            record.id as string,
-            { duration: record.duration }
-          );
-        }
-        break;
-    }
-
-    return null; // Validation passed
-  }
-
-
-  private constructor() {
-    this.storageService = StorageService.getInstance();
-    this.consentService = ConsentService.getInstance();
-    this.authService = AuthService.getInstance();
-
-    // Listen for online/offline events
-    window.addEventListener('online', this.handleOnline.bind(this));
-    window.addEventListener('offline', this.handleOffline.bind(this));
-    document.addEventListener('visibilitychange', () => {
-      try {
-        if (document.visibilityState === 'visible' && this.authService?.getAuthState()?.isAuthenticated) {
-          this.scheduleSync();
-        }
-  } catch {
-        // Non-fatal
-      }
-    });
-
-    // Load last sync cursor from localStorage
-    this.loadSyncCursor();
-  }
-
-  public static getInstance(): SyncService {
-    if (!SyncService.instance) {
-      SyncService.instance = new SyncService();
-    }
-    return SyncService.instance;
-  }
-
-  /**
-   * Load last sync cursor from localStorage
-   */
-  private loadSyncCursor(): void {
-    try {
-      const stored = localStorage.getItem('repcue_last_sync_cursor');
-      if (stored) {
-        this.lastSyncCursor = stored;
-      }
-    } catch (error) {
-  logger.warn('Failed to load sync cursor:', error);
-    }
-  }
-
-  /**
-   * Save sync cursor to localStorage
-   */
-  private saveSyncCursor(cursor: string): void {
-    try {
-      localStorage.setItem('repcue_last_sync_cursor', cursor);
-      this.lastSyncCursor = cursor;
-    } catch (error) {
-  logger.warn('Failed to save sync cursor:', error);
-    }
-  }
-
-  /**
-   * Handle network coming back online
-   */
-  private handleOnline(): void {
-    this.isOnline = true;
-    this.notifyListeners();
-
-    // Trigger sync when network comes back if authenticated
-    if (this.authService?.getAuthState()?.isAuthenticated) {
-      this.scheduleSync();
-    }
-  }
-
-  /**
-   * Handle network going offline
-   */
-  private handleOffline(): void {
-    this.isOnline = false;
-    this.notifyListeners();
-  }
-
-  /**
-   * Debounced sync scheduler to coalesce rapid triggers (online/visibility/etc.)
-   */
-  private debounceTimer: number | null = null;
-  private scheduleWindowMs = 500;
-  private scheduleSync(): void {
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer);
-    }
-    this.debounceTimer = window.setTimeout(() => {
-  // Avoid piling up if already syncing
-  if (this.isSyncing) return;
-  this.sync().catch(err => logger.warn('Scheduled sync failed:', err));
-    }, this.scheduleWindowMs);
-  }
-
-  /**
-   * Add a listener for sync status changes
-   */
-  onSyncStatusChange(listener: (status: SyncStatus) => void): () => void {
-    this.listeners.push(listener);
-    
-    // Immediately call with current status
-    listener(this.getSyncStatus());
-    
-    // Return unsubscribe function
-    return () => {
-      const index = this.listeners.indexOf(listener);
-      if (index > -1) {
-        this.listeners.splice(index, 1);
-      }
-    };
-  }
-
-  /**
-   * Get current sync status
-   */
   getSyncStatus(): SyncStatus {
     return {
-      isOnline: this.isOnline,
+      isOnline: navigator.onLine,
       isSyncing: this.isSyncing,
       lastSyncAttempt: this.lastSyncAttempt,
       lastSuccessfulSync: this.lastSuccessfulSync,
-      hasChangesToSync: false, // Will be updated by notifyListeners when needed
-      errors: this.syncErrors
+      hasChangesToSync: false, // V2 doesn't track this granularly
+      errors: this.errors
     };
   }
 
-  /**
-   * Get sync status with up-to-date hasChangesToSync calculation
-   */
-  async getSyncStatusWithChanges(): Promise<SyncStatus> {
-    const baseStatus = this.getSyncStatus();
-    
-    let hasChangesToSync = false;
-    try {
-      hasChangesToSync = await this.hasChangesToSync();
-    } catch (error) {
-  logger.error('Error getting sync status with changes:', error);
-      hasChangesToSync = false;
-    }
-    
-    return {
-      ...baseStatus,
-      hasChangesToSync
-    };
+  onSyncStatusChange(listener: (status: SyncStatus) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
   }
 
-  /**
-   * Notify all listeners of status change
-   */
-  private notifyListeners(): void {
-    // Use async method to get accurate hasChangesToSync status
-    this.getSyncStatusWithChanges().then(status => {
-      this.listeners.forEach(listener => {
-        try {
-          listener(status);
-        } catch (error) {
-          logger.error('Error in sync status listener:', error);
-        }
-      });
-    }).catch(error => {
-  logger.error('Error getting sync status with changes:', error);
-      // Fallback to basic status
-      const status = this.getSyncStatus();
-      this.listeners.forEach(listener => {
-        try {
-          listener(status);
-        } catch (error) {
-          logger.error('Error in sync status listener:', error);
-        }
-      });
+  clearErrors(): void {
+    this.errors = [];
+    this.notify();
+  }
+
+  private notify(): void {
+    const status = this.getSyncStatus();
+    this.listeners.forEach(listener => {
+      try {
+        listener(status);
+      } catch (error) {
+        logger.warn('Sync status listener error:', error);
+      }
     });
   }
 
-  /**
-   * Main sync function - implements the full sync protocol
-   */
-  async sync(force: boolean = false): Promise<SyncResult> {
-    // Check if sync is enabled
-    if (!SYNC_ENABLED) {
-      return this.createEmptyResult();
-    }
-
-    // Check consent
-    if (!this.consentService.hasConsent()) {
-      return this.createEmptyResult();
-    }
-
-    // Check authentication
-    const authState = this.authService.getAuthState();
-    if (!authState.isAuthenticated || !authState.accessToken) {
-      return this.createEmptyResult();
-    }
-
-    // Prevent concurrent syncs
-    if (this.isSyncing && !force) {
-      return this.syncInProgress || this.createEmptyResult();
-    }
-
-    // Check network
-    if (!this.isOnline) {
+  async sync(force?: boolean): Promise<SyncResult> {
+    if (this.isSyncing) {
+      // Return early with info message instead of queuing
+      logger.debug('[sync:v2] sync already in progress, returning early');
       return {
         success: true,
         tablesProcessed: 0,
         recordsPushed: 0,
         recordsPulled: 0,
         conflicts: 0,
-        errors: [this.createSyncError('network', 'Device is offline')]
+        errors: [{ 
+          type: 'unknown', 
+          message: 'Sync already in progress', 
+          timestamp: new Date().toISOString() 
+        } as SyncError]
       };
     }
 
     this.isSyncing = true;
     this.lastSyncAttempt = Date.now();
-    this.syncErrors = [];
-    this.notifyListeners();
-
-    const syncPromise = this.performSync(authState.accessToken, force);
-    this.syncInProgress = syncPromise;
+    this.notify();
 
     try {
-      const result = await syncPromise;
+      const mode = force ? 'full' : 'light';
+      const res = await this.correctSync.sync(mode as 'light' | 'full');
+      this.lastSuccessfulSync = res.success ? Date.now() : this.lastSuccessfulSync;
       
-      if (result.success) {
-        this.lastSuccessfulSync = Date.now();
-        // Broadcast a sync completion event so UI can refresh dependent views (workouts, activity logs, etc.)
-        if (typeof window !== 'undefined' && result.recordsPulled > 0) {
-          try {
-            window.dispatchEvent(new CustomEvent('sync:applied', { detail: { result } }));
-          } catch (e) {
-            // Non-fatal
-            logger.debug('sync:applied event dispatch failed (ignored):', e);
-          }
-        }
-      } else {
-  logger.warn(`⚠️ Sync completed with errors:`, result.errors);
-        this.syncErrors = result.errors;
-      }
+      // Map CorrectSyncResult to legacy SyncResult
+      const mappedResult: SyncResult = {
+        success: res.success,
+        tablesProcessed: res.tables,
+        recordsPushed: res.pushed,
+        recordsPulled: res.pulled,
+        conflicts: 0,
+        errors: (res.errors || []).map(e => ({ 
+          type: 'unknown' as const, 
+          message: e.message, 
+          timestamp: new Date().toISOString() 
+        } as SyncError))
+      };
 
-      return result;
-    } catch (error) {
-      const syncError = this.createSyncError(
-        error instanceof Error && error.message.includes('network') ? 'network' : 'unknown',
-        error instanceof Error ? error.message : 'Unknown sync error',
-        undefined,
-        undefined,
-        { originalError: error }
-      );
+      this.errors = mappedResult.errors;
+      return mappedResult;
+
+    } catch (err) {
+      const syncErr: SyncError = {
+        type: 'unknown',
+        message: err instanceof Error ? err.message : 'Unknown sync error',
+        timestamp: new Date().toISOString()
+      };
       
-  logger.error('❌ Sync failed:', syncError);
-      this.syncErrors = [syncError];
-      
+      this.errors = [syncErr];
       return {
         success: false,
         tablesProcessed: 0,
         recordsPushed: 0,
         recordsPulled: 0,
         conflicts: 0,
-        errors: [syncError]
+        errors: [syncErr]
       };
     } finally {
       this.isSyncing = false;
-      this.syncInProgress = null;
-      this.notifyListeners();
+      this.notify();
     }
-  }
-
-  /**
-   * Perform the actual sync operation
-   */
-  private async performSync(accessToken: string, force: boolean = false): Promise<SyncResult> {
-    const result: SyncResult = {
-        success: true,
-      tablesProcessed: 0,
-      recordsPushed: 0,
-      recordsPulled: 0,
-      conflicts: 0,
-        errors: []
-    };
-
-    // Normalize legacy IDs locally to align with server UUID schema before pushing
-    try {
-      await this.storageService.normalizeIdsForSync();
-      // ID normalization completed
-    } catch (e) {
-  logger.warn('ID normalization failed, proceeding anyway:', e);
-    }
-
-    try {
-      // Detect initial hydration scenario: brand-new device (no cursor) and no local user data
-      const initialHydration = await this.isInitialHydration();
-      // Also force a full pull if critical user tables are missing locally (e.g., user_preferences)
-      const missingCriticalData = await this.needsCriticalDataHydration();
-      const forceFullPull = initialHydration || missingCriticalData;
-      if (initialHydration) {
-        // Initial hydration detected
-      } else if (missingCriticalData) {
-        // Critical data missing locally
-      }
-
-      // Step 1: Gather dirty records from all tables
-      const syncRequest: SyncRequest = {
-  // For initial hydration or when critical data is missing, omit since cursor to request full server state
-  ...(!forceFullPull && this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
-        tables: {},
-        clientInfo: {
-          appVersion: '1.0.0', // TODO: get from package.json
-          deviceId: this.getDeviceId()
-        }
-      };
-
-      for (const tableName of SYNCABLE_TABLES) {
-        try {
-          const dirtyRecords = await this.getDirtyRecords(tableName);
-          syncRequest.tables[tableName] = dirtyRecords;
-          
-          if (dirtyRecords.upserts.length > 0 || dirtyRecords.deletes.length > 0) {
-            result.recordsPushed += dirtyRecords.upserts.length + dirtyRecords.deletes.length;
-          }
-        } catch (error) {
-          const syncError = this.createSyncError(
-            'storage',
-            `Failed to gather dirty records for ${tableName}`,
-            tableName,
-            undefined,
-            { originalError: error }
-          );
-          logger.error(`Error gathering dirty records for ${tableName}:`, syncError);
-          result.errors.push(syncError);
-        }
-      }
-
-      // Check if there's actually anything to sync before making the request
-      const hasChanges = Object.values(syncRequest.tables).some(table => 
-        table.upserts.length > 0 || table.deletes.length > 0
-      );
-      
-      
-      // Only skip sync if we have no local changes AND we're certain we don't need server data
-      // We should always sync on first login (when lastSuccessfulSync is undefined)
-      // or when force sync is requested
-  const shouldSkipSync = !forceFullPull && !hasChanges && 
-           this.lastSyncCursor && 
-           this.lastSuccessfulSync && 
-           !force &&
-           (Date.now() - this.lastSuccessfulSync) < 30000; // Skip if synced within last 30 seconds
-                           
-      if (shouldSkipSync) {
-        return {
-          success: true,
-          tablesProcessed: SYNCABLE_TABLES.length,
-          recordsPushed: 0,
-          recordsPulled: 0,
-          conflicts: 0,
-          errors: []
-        };
-      }
-      
-
-      // Step 2: Call sync endpoint
-  const syncResponse = await this.callSyncEndpoint(syncRequest, accessToken);
-
-      // Step 3: Apply server changes locally
-      for (const tableName of SYNCABLE_TABLES) {
-        try {
-          const changes = syncResponse.changes[tableName];
-          if (changes) {
-            await this.applyServerChanges(tableName, changes);
-            result.recordsPulled += changes.upserts.length + changes.deletes.length;
-          }
-          result.tablesProcessed++;
-        } catch (error) {
-          const syncError = this.createSyncError(
-            'storage',
-            `Failed to apply server changes for ${tableName}`,
-            tableName,
-            undefined,
-            { originalError: error }
-          );
-          logger.error(`Error applying server changes for ${tableName}:`, syncError);
-          result.errors.push(syncError);
-        }
-      }
-
-      // Step 4: Mark local records as clean
-      await this.markRecordsAsClean();
-
-      // Step 5: Update sync cursor with overlap buffer to prevent missed records due to timing differences
-      // Subtract 30 seconds from the server cursor to create an overlap buffer
-      // This ensures we don't miss records that fall in timing gaps between client/server
-      const serverCursor = new Date(syncResponse.cursor);
-      const bufferSize = 30 * 1000; // 30 seconds in milliseconds
-      const bufferedCursor = new Date(serverCursor.getTime() - bufferSize);
-      this.saveSyncCursor(bufferedCursor.toISOString());
-
-      // Optional multi-pass hydration: if initial hydration or server returned changes
-      // and there are still dirty records to push (batch-limited) or we just pulled data,
-      // run a few more passes to finish hydration.
-      let passes = 0;
-      while (passes < this.maxHydrationPasses) {
-        passes++;
-        const stillDirty = await this.hasChangesToSync();
-        // Only continue if we still have dirty records to push;
-        // we'll also continue if this pass pulls new records from server.
-        if (!stillDirty && this.lastSyncCursor) {
-          // Probe once more only if we had no cursor before (first pass handled above)
-          // If nothing dirty and we already have a cursor, break.
-          break;
-        }
-
-        const followUpReq: SyncRequest = {
-          ...(this.lastSyncCursor ? { since: this.lastSyncCursor } : {}),
-          tables: {},
-          clientInfo: {
-            appVersion: '1.0.0',
-            deviceId: this.getDeviceId()
-          }
-        };
-        // Re-gather dirty (next batch)
-        for (const tableName of SYNCABLE_TABLES) {
-          try {
-            const dirty = await this.getDirtyRecords(tableName);
-            followUpReq.tables[tableName] = dirty;
-            if (dirty.upserts.length > 0 || dirty.deletes.length > 0) {
-              result.recordsPushed += dirty.upserts.length + dirty.deletes.length;
-            }
-          } catch {
-            // continue
-          }
-        }
-
-        const followResp = await this.callSyncEndpoint(followUpReq, accessToken);
-        let pulledThisPass = 0;
-        for (const tableName of SYNCABLE_TABLES) {
-          const changes = followResp.changes[tableName];
-          if (changes) {
-            await this.applyServerChanges(tableName, changes);
-            const pulled = changes.upserts.length + changes.deletes.length;
-            result.recordsPulled += pulled;
-            pulledThisPass += pulled;
-          }
-          result.tablesProcessed++;
-        }
-        await this.markRecordsAsClean();
-        // Apply same buffer logic for follow-up syncs
-        const followServerCursor = new Date(followResp.cursor);
-        const followBufferSize = 30 * 1000; // 30 seconds
-        const followBufferedCursor = new Date(followServerCursor.getTime() - followBufferSize);
-        this.saveSyncCursor(followBufferedCursor.toISOString());
-        // If we didn't pull anything and have no more dirty records, stop early
-        if (pulledThisPass === 0) {
-          const anyDirty = await this.hasChangesToSync();
-          if (!anyDirty) break;
-        }
-      }
-
-      if (result.errors.length > 0) {
-        result.success = false;
-      }
-
-      return result;
-    } catch (error) {
-      logger.error('Sync operation failed:', error);
-      result.success = false;
-      result.errors.push(this.createSyncError(
-        'unknown',
-        error instanceof Error ? error.message : 'Unknown error',
-        undefined,
-        undefined,
-        { originalError: error }
-      ));
-      return result;
-    }
-  }
-
-  /**
-   * Map database table names to IndexedDB table names
-   * Phase 2: No mapping needed - table names are consistent
-   */
-  private getIndexedDBTableName(tableName: string): string {
-    // With Phase 2 complete, IndexedDB and server table names match exactly
-    return tableName;
-  }
-
-  /**
-   * Get dirty records for a table
-   */
-  private async getDirtyRecords(tableName: string): Promise<{ upserts: Record<string, unknown>[]; deletes: string[] }> {
-    const db = this.storageService.getDatabase();
-    const indexedDBTableName = this.getIndexedDBTableName(tableName);
-    const table = (db as unknown as Record<string, unknown>)[indexedDBTableName];
-    
-    if (!table || typeof table !== 'object') {
-      return { upserts: [], deletes: [] };
-    }
-
-    try {
-      // Get all dirty records (dirty field is stored as number: 0 = clean, 1 = dirty)
-      // Limit to 5 records per sync to avoid overwhelming the edge function
-      const dirtyRecords = await (table as {
-        where: (field: string) => {
-          equals: (value: number) => {
-            limit: (count: number) => {
-              toArray: () => Promise<Record<string, unknown>[]>;
-            };
-          };
-        };
-      }).where('dirty').equals(1).limit(5).toArray();
-      
-      const upserts: Record<string, unknown>[] = [];
-      const deletes: string[] = [];
-
-      // Filter out shared exercises for the exercises table - only sync owned exercises
-      let filteredRecords = dirtyRecords;
-      if (tableName === 'exercises') {
-        const userId = this.authService.getAuthState().user?.id;
-        if (userId) {
-          filteredRecords = dirtyRecords.filter(record => {
-            // Only sync exercises owned by current user
-            return (record as Record<string, unknown>).owner_id === userId;
-          });
-          
-          if (filteredRecords.length !== dirtyRecords.length) {
-            logger.log(`🔒 Filtered ${dirtyRecords.length - filteredRecords.length} non-owned exercises from sync`);
-          }
-        }
-      }
-
-      for (const record of filteredRecords) {
-        try {
-          if (record.op === 'delete' || record.deleted) {
-            deletes.push(record.id as string);
-          } else {
-          // Activity log hygiene: backfill missing exercise_name defensively
-          const shouldReplaceGenericName = (name?: unknown) => !name || typeof name !== 'string' || name.trim() === '' || name === 'Unknown Exercise' || name === 'Workout';
-          if (tableName === 'activity_logs' && shouldReplaceGenericName(record.exercise_name)) {
-            try {
-              if (record.is_workout && record.workout_id) {
-                const workout = await (db.workouts as unknown as { get: (id: string) => Promise<Record<string, unknown> | undefined> }).get(record.workout_id as string);
-                record.exercise_name = (workout?.workout_name as string) || (workout?.name as string) || 'Workout';
-              } else if (record.exercise_id) {
-                const ex = await (db.exercises as unknown as { get: (id: string) => Promise<Record<string, unknown> | undefined> }).get(record.exercise_id as string);
-                record.exercise_name = (ex?.name as string) || 'Unknown Exercise';
-              } else {
-                record.exercise_name = 'Unknown Exercise';
-              }
-            } catch {
-              record.exercise_name = record.is_workout ? 'Workout' : 'Unknown Exercise';
-            }
-          }
-
-          // Remove local-only sync metadata before sending
-          const { dirty: _dirty, op: _op, synced_at: _synced_at, ...cleanRecord } = record as Record<string, unknown>;
-          
-          // Apply field mapping for app_settings table
-          let mappedRecord = cleanRecord;
-          if (tableName === 'app_settings') {
-            mappedRecord = this.storageService.convertAppSettingsForSync(cleanRecord as unknown as AppSettings);
-          }
-          
-          // Validate record before adding to sync
-          const validationError = this.validateRecord(mappedRecord, tableName);
-          if (validationError) {
-            logger.error(`Validation failed for record ${mappedRecord.id}:`, validationError);
-            // Skip invalid records to prevent sync failures
-            continue;
-          }
-          
-          upserts.push(mappedRecord);
-        }
-        } catch (recordError) {
-          logger.error(`Error processing record ${record.id} for table ${tableName}:`, recordError);
-          // Skip this problematic record and continue with others
-        }
-      }
-
-      return { upserts, deletes };
-    } catch (error) {
-      logger.error(`Error getting dirty records for ${tableName}:`, error);
-      return { upserts: [], deletes: [] };
-    }
-  }
-
-  /**
-   * Call the sync endpoint
-   */
-  private async callSyncEndpoint(syncRequest: SyncRequest, accessToken: string): Promise<SyncResponse> {
-    // Debug logging to see what's being sent
-    
-    // Add extra validation to ensure we never send truly empty requests
-    if (!syncRequest.tables || Object.keys(syncRequest.tables).length === 0) {
-      logger.error('🚨 Attempting to send sync request with empty tables object!');
-      throw new Error('Invalid sync request: empty tables object');
-    }
-    
-
-    // Choose path based on feature flag. Prefer direct fetch by default for reliability.
-    if (SYNC_USE_INVOKE) {
-      try {
-        return await this.callSyncEndpointInvoke(syncRequest, accessToken);
-      } catch (e) {
-        logger.warn('Invoke path failed, falling back to direct fetch:', e);
-        return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
-      }
-    }
-    return await this.callSyncEndpointDirectFetch(syncRequest, accessToken);
-  }
-
-  /**
-   * Call sync endpoint using supabase.functions.invoke with enhanced diagnostics
-   */
-  private async callSyncEndpointInvoke(syncRequest: SyncRequest, _accessToken: string): Promise<SyncResponse> {
-    try {
-      const { data, error } = await supabase.functions.invoke('sync', {
-        body: syncRequest
-      });
-      if (error) {
-        logger.error('🟥 Invoke error:', {
-          name: (error as unknown as { name?: string }).name,
-          message: (error as { message?: string }).message,
-          status: (error as unknown as { status?: number }).status,
-          cause: (error as unknown as { cause?: unknown }).cause
-        });
-        throw error;
-      }
-      if (!data || typeof data !== 'object' || !('changes' in data)) {
-        throw new Error('Invalid response from invoke: missing changes');
-      }
-      return data as SyncResponse;
-    } catch (err) {
-      logger.error('🔴 callSyncEndpointInvoke failed:', err);
-      throw err;
-    }
-  }
-
-  /**
-   * Fallback sync endpoint call using direct fetch
-   */
-  private async callSyncEndpointDirectFetch(syncRequest: SyncRequest, accessToken: string): Promise<SyncResponse> {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const functionUrl = `${supabaseUrl}/functions/v1/sync`;
-    
-    
-    const requestBody = JSON.stringify(syncRequest);
-    
-    const attempt = async (token: string) => {
-      return fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'X-Client-Info': 'repcue-frontend@1.0.0'
-        },
-        body: requestBody
-      });
-    };
-
-    try {
-      let response = await attempt(accessToken);
-
-
-      // If token invalid/expired, try a one-time refresh then retry
-      if (response.status === 401) {
-        try {
-          // Attempt our service refresh; ignore result
-          await this.authService.refreshSession();
-        } catch {}
-
-        try {
-          const { data: sessionData } = await supabase.auth.getSession();
-          const refreshedToken = sessionData?.session?.access_token;
-          if (refreshedToken) {
-            response = await attempt(refreshedToken);
-          }
-        } catch (e) {
-          logger.warn('Token refresh check failed:', e);
-        }
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error('🔴 Direct fetch error response:', errorText);
-        throw new Error(`Direct fetch error: ${response.status} ${errorText}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      logger.error('🔴 Direct fetch failed:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Apply server changes to local database
-   */
-  private async applyServerChanges(tableName: string, changes: { upserts: Record<string, unknown>[]; deletes: string[] }): Promise<void> {
-    const db = this.storageService.getDatabase();
-    const table = (db as unknown as Record<string, unknown>)[tableName];
-    
-    if (!table || typeof table !== 'object') {
-      return;
-    }
-
-    try {
-      const typedTable = table as {
-        get: (id: string) => Promise<Record<string, unknown> | undefined>;
-        put: (record: Record<string, unknown>) => Promise<void>;
-        update: (id: string, changes: Record<string, unknown>) => Promise<void>;
-      };
-
-      // Apply upserts with enhanced conflict resolution
-      for (const serverRecord of changes.upserts) {
-        try {
-          // Apply field mapping for app_settings from server format to client format
-          let mappedServerRecord = serverRecord;
-          if (tableName === 'app_settings') {
-            mappedServerRecord = this.storageService.convertAppSettingsFromSync(serverRecord) as unknown as Record<string, unknown>;
-          }
-          
-          // Get local record to check for conflicts
-          const localRecord = await typedTable.get(mappedServerRecord.id as string);
-          
-          if (localRecord) {
-            // Handle conflict resolution
-            const resolvedRecord = await this.resolveConflict(tableName, localRecord, mappedServerRecord);
-            
-            // Apply resolved record with sync metadata
-            await typedTable.put({
-              ...resolvedRecord,
-              dirty: 0,
-              op: undefined,
-              synced_at: new Date().toISOString()
-            });
-          } else {
-            // No local record - apply server record directly
-            await typedTable.put({
-              ...mappedServerRecord,
-              dirty: 0,
-              op: undefined,
-              synced_at: new Date().toISOString()
-            });
-          }
-
-          // Special handling: user_preferences should exist as a single row. Deduplicate and reflect favorites.
-          if (tableName === 'user_preferences') {
-            try {
-              const prefsTable = (db as unknown as { user_preferences?: { toArray: () => Promise<Array<Record<string, unknown>>>; delete: (id: string) => Promise<void> } }).user_preferences;
-              if (prefsTable && typeof prefsTable.toArray === 'function') {
-                const allPrefs = await prefsTable.toArray();
-                // Delete any other rows with different id to avoid ambiguity
-                const others = allPrefs.filter((p) => (p.id as string) !== (serverRecord.id as string));
-                for (const other of others) {
-                  try { await prefsTable.delete(other.id as string); } catch {}
-                }
-
-                // Best-effort immediate UX: update exercises.is_favorite flags per preferences (no dirty)
-                const favRaw = (serverRecord as Record<string, unknown>)['favorite_exercises'];
-                const favorites = Array.isArray(favRaw) ? (favRaw.filter((v): v is string => typeof v === 'string')) : [];
-                const exTable = (db as unknown as { exercises?: { toArray: () => Promise<Array<{ id: string; is_favorite?: boolean }>>; update: (id: string, changes: Record<string, unknown>) => Promise<number> } }).exercises;
-                if (exTable && typeof exTable.toArray === 'function') {
-                  try {
-                    const allEx = await exTable.toArray();
-                    const favSet = new Set(favorites);
-                    const nowIso = new Date().toISOString();
-                    for (const ex of allEx) {
-                      const newVal = favSet.has(ex.id);
-                      if (ex.is_favorite !== newVal) {
-                        await exTable.update(ex.id, { is_favorite: newVal, updated_at: nowIso });
-                      }
-                    }
-                  } catch {}
-                }
-              }
-            } catch {
-              // Ignore non-fatal issues
-            }
-          }
-
-          // Special handling: exercises - ensure proper ownership handling
-          if (tableName === 'exercises') {
-            try {
-              const userId = this.authService.getAuthState().user?.id;
-              const exerciseRecord = serverRecord as Record<string, unknown>;
-              
-              
-              // Mark exercises as not owned by current user if they're shared/public
-              if (userId && exerciseRecord.owner_id !== userId) {
-                // This is a shared or public exercise - ensure it's read-only locally
-                await typedTable.put({
-                  ...exerciseRecord,
-                  dirty: 0, // Never mark shared exercises as dirty
-                  op: undefined,
-                  synced_at: new Date().toISOString()
-                });
-              } else if (userId && exerciseRecord.owner_id === userId) {
-                // This is user's own exercise - handle normally with potential dirty state
-                const isLocallyModified = localRecord && (localRecord as Record<string, unknown>).dirty === 1;
-                await typedTable.put({
-                  ...exerciseRecord,
-                  dirty: isLocallyModified ? 1 : 0, // Preserve local dirty state for user's exercises
-                  op: isLocallyModified ? (localRecord as Record<string, unknown>).op : undefined,
-                  synced_at: new Date().toISOString()
-                });
-              } else {
-                // Handle case where userId is null or undefined - this might be the bug!
-                logger.warn('🚨 Sync Bug - Missing userId or owner_id mismatch:', {
-                  userId,
-                  exerciseRecord: { id: exerciseRecord.id, name: exerciseRecord.name, owner_id: exerciseRecord.owner_id },
-                  authState: this.authService.getAuthState()
-                });
-                
-                // Fallback: preserve owner_id and ensure proper handling
-                await typedTable.put({
-                  ...exerciseRecord,
-                  dirty: 0,
-                  op: undefined,
-                  synced_at: new Date().toISOString()
-                });
-              }
-            } catch (error) {
-              logger.warn('Exercise sync handling failed:', error);
-              // Fallback to standard handling
-              await typedTable.put({
-                ...serverRecord,
-                dirty: 0,
-                op: undefined,
-                synced_at: new Date().toISOString()
-              });
-            }
-          }
-
-          // Special handling: app_settings should exist as a single row. Deduplicate.
-          if (tableName === 'app_settings') {
-            try {
-              const settingsTable = (db as unknown as { app_settings?: { toArray: () => Promise<Array<Record<string, unknown>>>; delete: (id: string) => Promise<void> } }).app_settings;
-              if (settingsTable && typeof settingsTable.toArray === 'function') {
-                const all = await settingsTable.toArray();
-                const others = all.filter((s) => (s.id as string) !== (serverRecord.id as string));
-                for (const other of others) {
-                  try { await settingsTable.delete(other.id as string); } catch {}
-                }
-                // Apply theme immediately when settings change
-                const dm = (serverRecord as Record<string, unknown>)['dark_mode'];
-                if (typeof dm === 'boolean') {
-                  if (dm) document.documentElement.classList.add('dark');
-                  else document.documentElement.classList.remove('dark');
-                }
-              }
-            } catch {
-              // ignore
-            }
-          }
-        } catch (error) {
-          logger.error(`Error applying upsert for ${tableName}:${serverRecord.id}:`, error);
-          // Continue with other records
-        }
-      }
-
-      // Apply deletes
-      for (const recordId of changes.deletes) {
-        await typedTable.update(recordId, {
-          deleted: true,
-          dirty: 0,
-          op: undefined,
-          synced_at: new Date().toISOString()
-        });
-      }
-    } catch (error) {
-      logger.error(`Error applying server changes for ${tableName}:`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Mark all dirty records as clean
-   */
-  private async markRecordsAsClean(): Promise<void> {
-    const db = this.storageService.getDatabase();
-    
-    for (const tableName of SYNCABLE_TABLES) {
-      try {
-  // Phase 1 hybrid: skip exercises (catalog) to avoid unnecessary sync churn
-  if (tableName === 'exercises') continue;
-        const table = (db as unknown as Record<string, unknown>)[tableName];
-        if (!table || typeof table !== 'object') continue;
-
-        await (table as {
-          where: (field: string) => {
-            equals: (value: number) => {
-              modify: (changes: Record<string, unknown>) => Promise<void>;
-            };
-          };
-        }).where('dirty').equals(1).modify({
-          dirty: 0,
-          op: undefined,
-          synced_at: new Date().toISOString()
-        });
-      } catch (error) {
-        logger.error(`Error marking records as clean for ${tableName}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Get or generate device ID
-   */
-  private getDeviceId(): string {
-    try {
-      let deviceId = localStorage.getItem('repcue_device_id');
-      if (!deviceId) {
-        deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('repcue_device_id', deviceId);
-      }
-      return deviceId;
-    } catch {
-      return `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-  }
-
-  /**
-   * Create empty sync result
-   */
-  private createEmptyResult(errors: SyncError[] = []): SyncResult {
-    return {
-      success: errors.length === 0,
-      tablesProcessed: 0,
-      recordsPushed: 0,
-      recordsPulled: 0,
-      conflicts: 0,
-      errors
-    };
-  }
-
-  /**
-   * Determine if this device likely needs an initial full hydration from server.
-   * Criteria: no existing cursor AND key user tables empty (ignoring seeded exercises).
-   */
-  private async isInitialHydration(): Promise<boolean> {
-    if (this.lastSyncCursor) return false;
-    try {
-      const db = this.storageService.getDatabase();
-      const getCount = async (name: string): Promise<number> => {
-        const table = (db as unknown as Record<string, unknown>)[name];
-        if (!table || typeof table !== 'object') return 0;
-        return await (table as { count: () => Promise<number> }).count();
-      };
-      // Workouts, activity logs, and sessions indicate meaningful user data
-      const [w, a, s] = await Promise.all([
-        getCount('workouts'),
-        getCount('activity_logs'),
-        getCount('workout_sessions')
-      ]);
-      return (w + a + s) === 0;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Determine if we are missing critical user-scoped data locally and should force a pull.
-   * Specifically, if user_preferences has no rows but we do have a sync cursor (implying a prior sync),
-   * then another device might have created preferences that we must pull for UX (favorites/locale/dark mode).
-   */
-  private async needsCriticalDataHydration(): Promise<boolean> {
-    try {
-      const db = this.storageService.getDatabase();
-      const prefsTable = (db as unknown as Record<string, unknown>)['user_preferences'];
-      const settingsTable = (db as unknown as Record<string, unknown>)['app_settings'];
-      const counts = await Promise.all([
-        prefsTable && typeof prefsTable === 'object' ? (prefsTable as { count: () => Promise<number> }).count() : Promise.resolve(0),
-        settingsTable && typeof settingsTable === 'object' ? (settingsTable as { count: () => Promise<number> }).count() : Promise.resolve(0)
-      ]);
-      const [prefsCount, settingsCount] = counts;
-      // If we already have a cursor but are missing either preferences or settings locally,
-      // force a full pull to hydrate cross-device personalization.
-      return !!this.lastSyncCursor && (prefsCount === 0 || settingsCount === 0);
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Check if there are changes to sync
-   */
-  async hasChangesToSync(): Promise<boolean> {
-    if (!SYNC_ENABLED) {
-      return false;
-    }
-
-    if (!this.consentService?.hasConsent()) {
-      return false;
-    }
-
-    const db = this.storageService?.getDatabase();
-    if (!db) {
-      return false;
-    }
-    
-    for (const tableName of SYNCABLE_TABLES) {
-      try {
-        const table = (db as unknown as Record<string, unknown>)[tableName];
-        if (!table || typeof table !== 'object') continue;
-
-        const dirtyCount = await (table as {
-          where: (field: string) => {
-            equals: (value: number) => {
-              count: () => Promise<number>;
-            };
-          };
-        }).where('dirty').equals(1).count();
-        if (dirtyCount > 0) {
-          return true;
-        }
-      } catch (error) {
-        logger.error(`Error checking dirty records for ${tableName}:`, error);
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Clear sync errors
-   */
-  clearErrors(): void {
-    this.syncErrors = [];
-    this.notifyListeners();
-  }
-
-  /**
-   * Force sync for testing/development
-   */
-  async forcSync(): Promise<SyncResult> {
-    return this.sync(true);
-  }
-
-  /**
-   * Resolve conflicts between local and server records
-   */
-  private async resolveConflict(
-    tableName: string, 
-    localRecord: Record<string, unknown>, 
-    serverRecord: Record<string, unknown>
-  ): Promise<Record<string, unknown>> {
-  // If local record is anonymous but server has an owner, prefer server for user-scoped tables
-  if ((tableName === 'user_preferences' || tableName === 'app_settings')) {
-    const localOwner = (localRecord as Record<string, unknown>)['owner_id'];
-    const serverOwner = (serverRecord as Record<string, unknown>)['owner_id'];
-  if ((!localOwner || localOwner === null) && serverOwner) {
-      return serverRecord;
-    }
-  }
-  // Use snake_case updated_at consistently across records
-  const localUpdatedAt = new Date((localRecord.updated_at as string) || 0);
-  const serverUpdatedAt = new Date((serverRecord.updated_at as string) || 0);
-    
-    // Enhanced conflict resolution rules
-    if (localRecord.dirty) {
-      if (serverUpdatedAt > localUpdatedAt) {
-        // Server is newer - accept server version
-        return serverRecord;
-      } else if (localUpdatedAt > serverUpdatedAt) {
-        // Local is newer - keep local changes (will be pushed to server in next sync)
-        return localRecord;
-      } else {
-        // Same timestamp - handle special cases
-        return this.resolveTimestampTie(localRecord, serverRecord);
-      }
-    } else {
-      // Local record is clean - accept server version
-      return serverRecord;
-    }
-  }
-
-  /**
-   * Handle cases where timestamps are equal
-   */
-  private resolveTimestampTie(
-    localRecord: Record<string, unknown>,
-    serverRecord: Record<string, unknown>
-  ): Record<string, unknown> {
-    // Special rule: prefer deletes for safety
-    if (localRecord.deleted !== serverRecord.deleted) {
-      const result = localRecord.deleted || serverRecord.deleted ? 
-        { ...serverRecord, deleted: true } : 
-        serverRecord;
-      
-      return result;
-    }
-
-    // For other conflicts with equal timestamps, prefer server version
-    return serverRecord;
   }
 }
 
-// Export singleton instance
-// Factory export honoring SYNC_ENGINE flag.
-export const syncService = SYNC_ENGINE === 'v2' ? correctSyncService : SyncService.getInstance();
+// Singleton instance
+let _syncServiceInstance: V2SyncService | null = null;
+
+function getSyncServiceInstance(): V2SyncService {
+  if (!_syncServiceInstance) {
+    _syncServiceInstance = new V2SyncService(correctSyncService);
+  }
+  return _syncServiceInstance;
+}
+
+// Export singleton instance as factory
+export const syncService: {
+  getSyncStatus: () => SyncStatus;
+  onSyncStatusChange: (listener: (status: SyncStatus) => void) => () => void;
+  clearErrors: () => void;
+  sync: (force?: boolean) => Promise<SyncResult>;
+} = {
+  getSyncStatus: () => getSyncServiceInstance().getSyncStatus(),
+  onSyncStatusChange: (listener: (status: SyncStatus) => void) => getSyncServiceInstance().onSyncStatusChange(listener),
+  clearErrors: () => getSyncServiceInstance().clearErrors(),
+  sync: (force?: boolean) => getSyncServiceInstance().sync(force)
+};

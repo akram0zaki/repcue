@@ -11,7 +11,6 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
 import { syncService } from '../services/syncService';
 import { correctSyncService } from '../services/correctSyncService';
-import { SYNC_ENGINE } from '../config/features';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
 import { ProfileSection } from '../components/ProfileSection';
@@ -94,10 +93,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   // Force a FULL sync cycle using v2 engine if enabled, otherwise fall back to legacy manual sync
   const handleForceFullSync = async () => {
     if (!hasConsent || !isAuthenticated) return;
-    if (SYNC_ENGINE !== 'v2') {
-      // Legacy path: reuse manual sync (force flag already triggers push/pull best-effort)
-      return handleSyncNow();
-    }
     try {
       setIsForceFullSyncing(true);
       await correctSyncService.sync('full');
@@ -108,9 +103,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     }
   };
 
-  // Reset local sync state (v2) then immediately request a full sync
+  // Reset local sync state then immediately request a full sync
   const handleResetSyncState = async () => {
-    if (SYNC_ENGINE !== 'v2') return; // Only meaningful for v2
     if (!hasConsent || !isAuthenticated) return;
     try {
       setIsResettingSyncState(true);
@@ -508,9 +502,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </p>
           </div>
 
-          {/* Advanced Sync Controls (v2 only) */}
-          {SYNC_ENGINE === 'v2' && (
-            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" data-testid="advanced-sync-controls">
+          {/* Advanced Sync Controls */}
+          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" data-testid="advanced-sync-controls">
               <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {t('settings.syncAdvanced')}
               </h3>
@@ -536,7 +529,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 {t('settings.syncAdvancedHelp')}
               </p>
             </div>
-          )}
 
           {/* Refresh Exercises Button */}
           <div className="mb-3">

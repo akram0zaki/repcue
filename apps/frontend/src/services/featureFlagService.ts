@@ -41,6 +41,16 @@ export class FeatureFlagService {
 
   private async _loadFlags(): Promise<void> {
     try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // Use fallback flags when not authenticated
+        logger.log('User not authenticated, using fallback feature flags');
+        this.loadFallbackFlags();
+        return;
+      }
+
       const { data, error } = await supabase
         .from('feature_flags')
         .select('*')
@@ -48,46 +58,7 @@ export class FeatureFlagService {
 
       if (error) {
         logger.error('Failed to load feature flags:', error);
-        
-        // Fallback: Enable user-created exercises when API fails
-        // This ensures the feature works even when feature_flags table is missing
-        logger.log('Using fallback feature flags due to API error');
-        const fallbackFlags: FeatureFlag[] = [
-          {
-            id: 'fallback-1',
-            flag_name: 'user_created_exercises',
-            is_enabled: true,
-            description: 'Allow users to create custom exercises (fallback)',
-            target_audience: 'all',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          {
-            id: 'fallback-2', 
-            flag_name: 'user_created_workouts',
-            is_enabled: false,
-            description: 'Allow users to create custom workouts (fallback)',
-            target_audience: 'authenticated',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          {
-            id: 'fallback-3',
-            flag_name: 'custom_video_upload',
-            is_enabled: true,
-            description: 'Allow users to upload custom exercise videos (fallback)',
-            target_audience: 'authenticated',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        ];
-        
-        this.flags.clear();
-        fallbackFlags.forEach(flag => {
-          this.flags.set(flag.flag_name, flag);
-        });
-        this.loaded = true;
-        logger.log(`Loaded ${this.flags.size} fallback feature flags`);
+        this.loadFallbackFlags();
         return;
       }
 
@@ -110,6 +81,73 @@ export class FeatureFlagService {
     } catch (error) {
       logger.error('Error loading feature flags:', error);
     }
+  }
+
+  private loadFallbackFlags(): void {
+    logger.log('Using fallback feature flags');
+    const fallbackFlags: FeatureFlag[] = [
+      {
+        id: 'fallback-1',
+        flag_name: 'user_created_exercises',
+        is_enabled: true,
+        description: 'Allow users to create custom exercises (fallback)',
+        target_audience: 'all',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: 'fallback-2', 
+        flag_name: 'user_created_workouts',
+        is_enabled: false,
+        description: 'Allow users to create custom workouts (fallback)',
+        target_audience: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: 'fallback-3',
+        flag_name: 'custom_video_upload',
+        is_enabled: true,
+        description: 'Allow users to upload custom exercise videos (fallback)',
+        target_audience: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: 'fallback-4',
+        flag_name: 'exercise_sharing',
+        is_enabled: true,
+        description: 'Allow users to share exercises (fallback)',
+        target_audience: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: 'fallback-5',
+        flag_name: 'workout_sharing',
+        is_enabled: true,
+        description: 'Allow users to share workouts (fallback)',
+        target_audience: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: 'fallback-6',
+        flag_name: 'exercise_rating',
+        is_enabled: true,
+        description: 'Allow users to rate exercises (fallback)',
+        target_audience: 'authenticated',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
+    
+    this.flags.clear();
+    fallbackFlags.forEach(flag => {
+      this.flags.set(flag.flag_name, flag);
+    });
+    this.loaded = true;
+    logger.log(`Loaded ${this.flags.size} fallback feature flags`);
   }
 
   /**

@@ -20,7 +20,7 @@ export class AuthService {
   };
   private listeners: Array<(authState: AuthState) => void> = [];
   private migrationInProgress = false;
-  private syncInProgress = false;
+  private ownershipClaimedForUserId: string | null = null;
 
   private constructor() {
     this.initializeAuth();
@@ -108,11 +108,11 @@ export class AuthService {
         }
       } catch {}
 
-      // Claim ownership of anonymous data on first sign-in
-      await this.claimAnonymousData();
+  // Claim ownership of anonymous data on first sign-in (non-blocking with guard)
+  this.claimAnonymousData().catch(err => logger.warn('Ownership claim failed (non-blocking):', err));
 
-      // Trigger sync after successful sign-in with a small delay to ensure auth state is settled
-      this.triggerDelayedSync();
+  // Trigger sync after successful sign-in with a small delay to ensure auth state is settled
+  this.triggerDelayedSync();
     } else {
       this.authState = {
         isAuthenticated: false,
@@ -145,19 +145,38 @@ export class AuthService {
   private async claimAnonymousData(): Promise<void> {
     if (!this.authState.user?.id) return;
     if (this.migrationInProgress) return;
+    // Skip if already claimed during this session or persisted flag exists
+    if (this.ownershipClaimedForUserId === this.authState.user.id) return;
+    try {
+      const persisted = localStorage.getItem(`repcue_claim_ownership_done_${this.authState.user.id}`);
+      if (persisted === 'true') return;
+    } catch {}
 
     this.migrationInProgress = true;
     try {
       logger.log('🔄 Starting anonymous data migration...');
-      const migrationResult = await storageService.claimOwnership(this.authState.user.id);
+      // Enforce a 15s timeout so we never block UX
+      const timeout = new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error('claimOwnership timeout')), 15000));
+      const migrationResult = await Promise.race([
+        storageService.claimOwnership(this.authState.user.id),
+        timeout
+      ] as const).catch((err) => {
+        logger.warn('Ownership claim aborted:', err);
+        return { success: false, recordsClaimed: 0, tableStats: {}, error: err instanceof Error ? err.message : 'Unknown' };
+      });
       
       if (migrationResult.success && migrationResult.recordsClaimed > 0) {
         logger.log(`✅ Migration successful! Claimed ${migrationResult.recordsClaimed} records:`, migrationResult.tableStats);
         
         // Show migration success notification
         this.showMigrationSuccess(migrationResult);
+        // Mark as claimed for this user to prevent re-runs
+        this.ownershipClaimedForUserId = this.authState.user.id;
+        try { localStorage.setItem(`repcue_claim_ownership_done_${this.authState.user.id}`, 'true'); } catch {}
       } else if (migrationResult.recordsClaimed === 0) {
         logger.log('ℹ️ No anonymous data found to migrate (new user or already migrated)');
+        this.ownershipClaimedForUserId = this.authState.user.id;
+        try { localStorage.setItem(`repcue_claim_ownership_done_${this.authState.user.id}`, 'true'); } catch {}
       } else {
         logger.warn('⚠️ Migration encountered issues:', migrationResult.error);
       }
@@ -197,34 +216,33 @@ export class AuthService {
           return;
         }
 
-        // Prevent multiple concurrent sync operations
-        if (this.syncInProgress) {
-          logger.log('⚠️ Skipping post-auth sync: sync already in progress');
-          return;
-        }
-
-        this.syncInProgress = true;
-
-        // Dynamically import and trigger sync to avoid circular dependencies
-        import('./syncService').then(({ syncService }) => {
-          logger.log('🔄 Starting post-authentication sync...');
-          syncService.sync().then(result => {
-            if (result.success) {
-              logger.log('✅ Post-authentication sync completed successfully');
-            } else {
-              logger.warn('⚠️ Post-authentication sync completed with errors:', result.errors);
-              // Don't show error toasts for initial sync issues to avoid overwhelming users
-              // who just successfully signed in and saw migration success
-            }
+        // Delay sync to avoid circular dependency during app initialization
+        setTimeout(() => {
+          import('./syncService').then(({ syncService }) => {
+            logger.log('🔄 Starting delayed post-authentication sync...');
+            syncService.sync().then(result => {
+              if (result.success) {
+                if (result.errors?.length > 0) {
+                  // Check if it's just "sync already in progress" info message
+                  const hasRealErrors = result.errors.some(err => !err.message.includes('Sync already in progress'));
+                  if (hasRealErrors) {
+                    logger.warn('⚠️ Post-authentication sync completed with errors:', result.errors);
+                  } else {
+                    logger.log('✅ Post-authentication sync completed (or was already running)');
+                  }
+                } else {
+                  logger.log('✅ Post-authentication sync completed successfully');
+                }
+              } else {
+                logger.warn('⚠️ Post-authentication sync failed:', result.errors);
+              }
+            }).catch(error => {
+              logger.warn('❌ Post-authentication sync failed:', error);
+            });
           }).catch(error => {
-            logger.warn('❌ Post-authentication sync failed:', error);
-            // Silent failure - don't show error toast to avoid conflicting with migration success
-          }).finally(() => {
-            this.syncInProgress = false;
+            logger.warn('Failed to load sync service:', error);
           });
-        }).catch(error => {
-          logger.warn('Failed to load sync service:', error);
-        });
+        }, 2000); // 2 second delay to ensure app initialization completes
       }, 1000); // 1 second delay to ensure auth state is settled
     } catch (error) {
       logger.warn('Failed to trigger delayed sync:', error);
@@ -419,8 +437,8 @@ export class AuthService {
 
       // Proactively clear any sync errors so banners disappear immediately after sign-out
   try {
-        const { SyncService } = await import('./syncService');
-        SyncService.getInstance().clearErrors();
+    const { syncService } = await import('./syncService');
+    syncService.clearErrors();
   } catch {
         // Non-fatal: sync service may not be initialized in some environments
       }
