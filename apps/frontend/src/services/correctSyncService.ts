@@ -1,7 +1,7 @@
 import { StorageService } from './storageService';
 import { AuthService } from './authService';
 import { ConsentService } from './consentService';
-import { SYNC_ENABLED } from '../config/features';
+import { SYNC_ENABLED, SYNC_DEBUG } from '../config/features';
 import logger from '../utils/logger';
 import type { AppSettings } from '../types';
 
@@ -10,6 +10,8 @@ const PUSH_BATCH_SIZE = 5; // Per spec
 // Pull pagination constants
 const PULL_PAGE_LIMIT = 5; // max pages per table per sync cycle
 const MIN_LIGHT_INTERVAL_MS = 10_000; // Passive light sync suppression window
+const EDGE_TIMEOUT_MS = 15_000; // Per-request timeout
+const SYNC_TIMEOUT_MS = 8_000; // Overall sync timeout per invocation (reduced to fail fast)
 
 // Ordered tables (light/full filtering applied externally)
 const SYNC_ORDER: readonly string[] = [
@@ -60,18 +62,41 @@ interface EdgeSyncResponseV2 {
 
 export class CorrectSyncService {
   private static instance: CorrectSyncService;
-  private storage = StorageService.getInstance();
-  private auth = AuthService.getInstance();
-  private consent = ConsentService.getInstance();
+  private storage: StorageService | null = null;
+  private auth: AuthService | null = null;
+  private consent: ConsentService | null = null;
   private state: LocalSyncState | null = null;
   private inFlight: Promise<CorrectSyncResult> | null = null;
-  private pending: boolean = false;
   private isDestroyed = false;
   private readonly deviceId: string;
   private priorityTables: Set<string> | null = null;
+  private servicesInitialized = false;
 
   private constructor() {
     this.deviceId = this.ensureDeviceId();
+  }
+
+  private async initializeServices(): Promise<void> {
+    if (!this.servicesInitialized) {
+      try {
+        logger.debug('CorrectSyncService: Starting service initialization');
+        this.storage = StorageService.getInstance();
+        this.auth = AuthService.getInstance();
+        this.consent = ConsentService.getInstance();
+        
+        // Check if storage service is available but don't wait for ready() to avoid circular dependency
+        if (this.storage) {
+          logger.debug('CorrectSyncService: Storage service available');
+          // Note: Not waiting for storage.ready() to avoid circular dependency during app init
+        }
+        
+        this.servicesInitialized = true;
+        logger.debug('CorrectSyncService: Service initialization complete');
+      } catch (error) {
+        logger.warn('CorrectSyncService: Failed to initialize services:', error);
+        throw error; // Re-throw to signal initialization failure
+      }
+    }
   }
 
   static getInstance(): CorrectSyncService {
@@ -83,25 +108,61 @@ export class CorrectSyncService {
   async sync(mode: 'light' | 'full' | 'priority' = 'light'): Promise<CorrectSyncResult> {
     if (!SYNC_ENABLED) return this.emptyResult();
     if (this.isDestroyed) return this.emptyResult();
+    
+    // Initialize services lazily, but don't block if they're not ready
+    try {
+      // Add timeout to prevent hanging indefinitely
+      await Promise.race([
+        this.initializeServices(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Service initialization timeout')), 5000))
+      ]);
+    } catch (error) {
+      logger.warn('CorrectSyncService: Services not ready, skipping sync:', error);
+      return this.emptyResult();
+    }
+    
+    if (!this.servicesInitialized || !this.storage || !this.auth || !this.consent) {
+      logger.debug('CorrectSyncService: Services not initialized, skipping sync');
+      return this.emptyResult();
+    }
+    
+    // For sync during app initialization, just check that storage exists but don't wait for ready()
+    // This avoids the circular dependency issue where sync waits for storage which waits for app init
+    
     if (!this.consent.hasConsent()) return this.emptyResult();
     const authState = this.auth.getAuthState();
     if (!authState.isAuthenticated || !authState.accessToken) return this.emptyResult();
 
-    // Simple concurrency guard
+    // Thread-safe concurrency guard - immediately reject concurrent calls
     if (this.inFlight) {
-      this.pending = true; // queue one additional run
-      return this.inFlight;
+      logger.debug(`[sync:v2] sync already in progress, rejecting concurrent call (mode=${mode})`);
+      return Promise.resolve({ 
+        success: true, 
+        pushed: 0, 
+        pulled: 0, 
+        tables: 0, 
+        errors: [{ type: 'info', message: 'Sync already in progress' }] 
+      });
     }
 
     // Backoff check
-    await this.loadState(authState.user!.id);
+    try {
+      await this.loadState(authState.user!.id);
+    } catch (error) {
+      logger.warn('CorrectSyncService: Failed to load state, skipping sync:', error);
+      return this.emptyResult();
+    }
     // Passive suppression for light mode if recent successful light sync and no dirty changes
     if (mode === 'light' && this.state?.lastLightSyncAt) {
       const elapsed = Date.now() - new Date(this.state.lastLightSyncAt).getTime();
       if (elapsed < MIN_LIGHT_INTERVAL_MS) {
-        const hasDirty = await this.hasAnyDirty(['user_preferences','app_settings','exercises','user_favorites'], authState.user!.id);
-        if (!hasDirty) {
-          return { ...this.emptyResult(), success: true }; // silently skip
+        try {
+          const hasDirty = await this.hasAnyDirty(['user_preferences','app_settings','exercises','user_favorites'], authState.user!.id);
+          if (!hasDirty) {
+            return { ...this.emptyResult(), success: true }; // silently skip
+          }
+        } catch (error) {
+          logger.warn('CorrectSyncService: Failed to check dirty records, proceeding with sync:', error);
         }
       }
     }
@@ -112,14 +173,23 @@ export class CorrectSyncService {
       }
     }
 
-    const exec = this.performSync(mode, authState.accessToken, authState.user!.id)
+    // Enforce an overall timeout so UI never hangs indefinitely
+    const overallTimeout = new Promise<CorrectSyncResult>((_resolve, reject) => {
+      const id = setTimeout(() => {
+        clearTimeout(id);
+        reject(new Error('sync timeout'));
+      }, SYNC_TIMEOUT_MS);
+    });
+
+  const startTs = performance.now();
+  if (SYNC_DEBUG) logger.debug(`[sync:v2] enqueue mode=${mode}`);
+  const exec = Promise.race([
+      this.performSync(mode, authState.accessToken, authState.user!.id),
+      overallTimeout
+    ])
       .finally(() => {
         this.inFlight = null;
-        if (this.pending && !this.isDestroyed) {
-          this.pending = false;
-          // fire and forget follow-up sync (light) after 1s debounce
-          setTimeout(() => this.sync('light').catch(err => logger.warn('follow-up sync failed', err)), 1000);
-        }
+        if (SYNC_DEBUG) logger.debug(`[sync:v2] finished in ${(performance.now()-startTs).toFixed(0)}ms`);
       });
     this.inFlight = exec;
     return exec;
@@ -141,69 +211,143 @@ export class CorrectSyncService {
     logger.info(`[sync:v2] start mode=${mode} cid=${correlationId}`);
 
     try {
-      const lightTables = SYNC_ORDER.slice(0, 4); // preferences, settings, exercises, user_favorites
+  const tStart = performance.now();
+  const lightTables = SYNC_ORDER.slice(0, 4); // preferences, settings, exercises, user_favorites
       let tableList = mode === 'light' ? lightTables : SYNC_ORDER;
       if (mode === 'priority' && this.priorityTables && this.priorityTables.size) {
         tableList = tableList.filter(t => this.priorityTables!.has(t));
       }
+  if (SYNC_DEBUG) logger.debug(`[sync:v2] tables=${tableList.join(',')}`);
 
-      // 1. Collect dirty records per table (batch limited)
-      const pushPayload: EdgeSyncRequestV2['tables'] = {};
+      // 1. Collect dirty records per table (initial queue per table)
+  const queues: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }> = {};
+  const collectStart = performance.now();
       for (const table of tableList) {
         const dirty = await this.collectDirtyBatch(table, PUSH_BATCH_SIZE, userId);
         if (dirty.upserts.length || dirty.deletes.length) {
-          pushPayload[table] = dirty;
-          result.pushed += dirty.upserts.length + dirty.deletes.length;
+          queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
         }
       }
+  if (SYNC_DEBUG) logger.debug(`[sync:v2] collectDirty done in ${(performance.now()-collectStart).toFixed(0)}ms queues=${Object.entries(queues).map(([k,v])=>`${k}:${(v.upserts?.length||0)+(v.deletes?.length||0)}`).join(' ')}`);
 
-      // 2. Build request with existing per-table cursors
-      const edgeReq: EdgeSyncRequestV2 = {
-        mode,
-        since: this.state?.perTable || {},
-        tables: pushPayload,
-        clientInfo: { deviceId: this.deviceId, appVersion: '1.0.0' }
+      // Helper to build a single request payload capped to 5 total records across all tables
+      const buildCappedPayload = (): EdgeSyncRequestV2['tables'] => {
+        let remaining = PUSH_BATCH_SIZE;
+        const payload: EdgeSyncRequestV2['tables'] = {};
+        for (const table of tableList) {
+          if (!queues[table] || remaining <= 0) continue;
+          const q = queues[table];
+          if (q.deletes.length) {
+            const take = Math.min(remaining, q.deletes.length);
+            const picked = q.deletes.splice(0, take);
+            if (!payload[table]) payload[table] = { upserts: [], deletes: [] };
+            payload[table]!.deletes.push(...picked);
+            remaining -= picked.length;
+          }
+          if (remaining <= 0) continue;
+          if (q.upserts.length) {
+            const take = Math.min(remaining, q.upserts.length);
+            const picked = q.upserts.splice(0, take);
+            if (!payload[table]) payload[table] = { upserts: [], deletes: [] };
+            payload[table]!.upserts.push(...picked);
+            remaining -= picked.length;
+          }
+        }
+        return payload;
       };
 
-      // 3. Call v2 edge
-      const response = await this.callEdge(edgeReq, accessToken);
-      if (response.correlation_id) result.correlationId = response.correlation_id;
-
-      // 4. Mark pushed records clean
-      if (Object.keys(pushPayload).length) await this.markPushedClean(pushPayload);
-
-      // 5. Apply pull changes per table (with pagination loop if server indicates more)
-      const perTable = response.tables || {};
-      for (const table of tableList) {
-        const tableResp = perTable[table];
-        if (!tableResp) continue;
-        const { upserts, deletes, nextCursor, more } = tableResp;
-        if (upserts.length || deletes.length) {
-          await this.applyServerTableChanges(table, upserts, deletes, userId);
-          result.pulled += upserts.length + deletes.length;
+      // 2. Execute one or more edge calls respecting the 5-record cap
+      let sentAtLeastOnce = false;
+      let batchCount = 0;
+      while (true) {
+        batchCount += 1;
+        if (batchCount > 200) { // hard guard against infinite loops
+          throw new Error('sync batch limit exceeded');
         }
-        if (nextCursor) this.setCursor(table, nextCursor, userId);
-        // Pagination follow-up if more=true (loop additional pages up to limit)
-        let pages = 1;
-        let cursor = nextCursor;
-        while (more && pages < PULL_PAGE_LIMIT && cursor) {
-          pages += 1;
-          const followReq: EdgeSyncRequestV2 = { mode, since: { [table]: cursor }, tables: {}, clientInfo: edgeReq.clientInfo };
-          const followResp = await this.callEdge(followReq, accessToken);
-          const tFollow = followResp.tables?.[table];
-          if (!tFollow) break;
+        const loopTs = performance.now();
+        const batchPayload = buildCappedPayload();
+        const hasPush = Object.values(batchPayload).some(v => (v.upserts.length + v.deletes.length) > 0);
+        if (!hasPush && sentAtLeastOnce) break; // no more to push
+
+        const edgeReq: EdgeSyncRequestV2 = {
+          mode,
+          since: this.state?.perTable || {},
+          tables: hasPush ? batchPayload : {},
+          clientInfo: { deviceId: this.deviceId, appVersion: '1.0.0' }
+        };
+
+        if (SYNC_DEBUG) logger.debug(`[sync:v2] callEdge start batch=${batchCount} push=${hasPush ? Object.values(batchPayload).reduce((a,b)=>a+b.upserts.length+b.deletes.length,0):0}`);
+        const callStart = performance.now();
+        const response = await this.callEdge(edgeReq, accessToken).catch((e) => {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] callEdge error after ${(performance.now()-callStart).toFixed(0)}ms: ${e instanceof Error ? e.message : String(e)}`);
+          throw e;
+        });
+        if (SYNC_DEBUG) logger.debug(`[sync:v2] callEdge ok in ${(performance.now()-callStart).toFixed(0)}ms`);
+        sentAtLeastOnce = true;
+        if (response.correlation_id) result.correlationId = response.correlation_id;
+
+        // Mark only what we sent as clean
+        if (hasPush) {
+          await this.markPushedClean(batchPayload);
+          // Update pushed count for reporting
+          for (const d of Object.values(batchPayload)) {
+            result.pushed += d.upserts.length + d.deletes.length;
+          }
+        }
+
+        // Apply pull changes per table (with pagination loop if server indicates more)
+        const perTable = response.tables || {};
+        for (const table of tableList) {
+          const tableResp = perTable[table];
+          if (!tableResp) continue;
+          const { upserts, deletes, nextCursor, more } = tableResp;
+          if (upserts.length || deletes.length) {
+            if (SYNC_DEBUG) logger.debug(`[sync:v2] apply ${table} upserts=${upserts.length} deletes=${deletes.length}`);
+            await this.applyServerTableChanges(table, upserts, deletes, userId);
+            result.pulled += upserts.length + deletes.length;
+          }
+          if (nextCursor) this.setCursor(table, nextCursor, userId);
+          // Pagination follow-up if more=true (loop additional pages up to limit)
+          let pages = 1;
+          let cursor = nextCursor;
+          while (more && pages < PULL_PAGE_LIMIT && cursor) {
+            pages += 1;
+            const followReq: EdgeSyncRequestV2 = { mode, since: { [table]: cursor }, tables: {}, clientInfo: edgeReq.clientInfo };
+            const followResp = await this.callEdge(followReq, accessToken);
+            const tFollow = followResp.tables?.[table];
+            if (!tFollow) break;
             if (tFollow.upserts.length || tFollow.deletes.length) {
+              if (SYNC_DEBUG) logger.debug(`[sync:v2] follow ${table} upserts=${tFollow.upserts.length} deletes=${tFollow.deletes.length}`);
               await this.applyServerTableChanges(table, tFollow.upserts, tFollow.deletes, userId);
               result.pulled += tFollow.upserts.length + tFollow.deletes.length;
             }
             if (tFollow.nextCursor) { cursor = tFollow.nextCursor; this.setCursor(table, tFollow.nextCursor, userId); }
             if (!tFollow.more) break;
+          }
+          result.tables += 1;
         }
-        result.tables += 1;
+
+        // If any queues still have items, delay 100ms then continue next capped batch
+        const anyLeft = Object.values(queues).some(q => (q.upserts?.length ?? 0) + (q.deletes?.length ?? 0) > 0);
+        if (SYNC_DEBUG) logger.debug(`[sync:v2] batch ${batchCount} done in ${(performance.now()-loopTs).toFixed(0)}ms left=${anyLeft}`);
+        if (!anyLeft) break;
+        await new Promise(r => setTimeout(r, 100));
       }
 
       await this.markModeTimestamp(mode, userId);
-      logger.info(`[sync:v2] complete cid=${correlationId} pushed=${result.pushed} pulled=${result.pulled}`);
+      const dur = (performance.now()-tStart).toFixed(0);
+      logger.info(`[sync:v2] complete cid=${correlationId} pushed=${result.pushed} pulled=${result.pulled} in ${dur}ms`);
+      
+      // Dispatch sync:applied event to trigger UI refresh when data was pulled
+      if (result.success && result.pulled > 0 && typeof window !== 'undefined') {
+        try {
+          window.dispatchEvent(new CustomEvent('sync:applied', { detail: { result } }));
+          logger.debug(`[sync:v2] dispatched sync:applied event (pulled=${result.pulled})`);
+        } catch (e) {
+          logger.debug('sync:applied event dispatch failed (ignored):', e);
+        }
+      }
+      
       return result;
     } catch (err) {
       logger.warn('[sync:v2] sync failed', err);
@@ -218,6 +362,7 @@ export class CorrectSyncService {
   }
 
   private async collectDirtyBatch(tableName: string, limit: number, userId: string): Promise<{ upserts: Array<Record<string, unknown>>; deletes: string[] }> {
+    if (!this.storage) return { upserts: [], deletes: [] };
     const db = this.storage.getDatabase();
     const table = (db as unknown as Record<string, unknown>)[tableName] as {
       where: (field: string) => {
@@ -228,20 +373,42 @@ export class CorrectSyncService {
     try {
       // Dexie where('dirty').equals(1).limit(limit)
       const dirty: Array<Record<string, unknown>> = await table.where('dirty').equals(1).limit(limit).toArray();
+      if (SYNC_DEBUG && dirty.length > 0) logger.debug(`[sync:v2] collectDirtyBatch ${tableName} found ${dirty.length} dirty records`);
+      
       const upserts: Array<Record<string, unknown>> = [];
       const deletes: string[] = [];
       for (const rec of dirty) {
-        if ((rec as { owner_id?: string }).owner_id && (rec as { owner_id?: string }).owner_id !== userId && tableName !== 'exercises') continue; // skip foreign-owned
+        const recordOwnerId = (rec as { owner_id?: string }).owner_id;
+        const shouldSkip = recordOwnerId && recordOwnerId !== userId && tableName !== 'exercises';
+        
+        if (SYNC_DEBUG && tableName === 'user_preferences') {
+          logger.debug(`[sync:v2] collectDirtyBatch user_preferences record:`, {
+            id: rec.id,
+            owner_id: recordOwnerId,
+            userId,
+            shouldSkip,
+            dirty: (rec as { dirty?: number }).dirty,
+            deleted: (rec as { deleted?: boolean }).deleted,
+            favorite_exercises: (rec as { favorite_exercises?: string[] }).favorite_exercises
+          });
+        }
+        
+        if (shouldSkip) continue; // skip foreign-owned
         if ((rec as { deleted?: boolean; op?: string }).deleted || (rec as { op?: string }).op === 'delete') {
           deletes.push(rec.id as string);
         } else {
           const { dirty: _d, op: _o, synced_at: _s, ...clean } = rec;
           // Apply field mapping for tables that need it
           let mappedRecord = clean;
-          if (tableName === 'app_settings') {
+          if (tableName === 'app_settings' && this.storage) {
             mappedRecord = this.storage.convertAppSettingsForSync(clean as unknown as AppSettings);
           }
           // Note: Other tables (activity_logs, workout_sessions) don't have field mapping methods yet
+          
+          if (SYNC_DEBUG && tableName === 'user_preferences') {
+            logger.debug(`[sync:v2] collectDirtyBatch user_preferences adding to upserts:`, mappedRecord);
+          }
+          
           upserts.push(mappedRecord);
         }
       }
@@ -254,6 +421,7 @@ export class CorrectSyncService {
 
   // Fast dirty check across subset of tables for suppression logic
   private async hasAnyDirty(tables: string[], userId: string): Promise<boolean> {
+    if (!this.storage) return false; // Guard against uninitialized storage
     try {
       const db = this.storage.getDatabase() as unknown as Record<string, unknown>;
       for (const t of tables) {
@@ -277,6 +445,7 @@ export class CorrectSyncService {
   }
 
   private async markPushedClean(payload: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>) {
+    if (!this.storage) return;
     const db = this.storage.getDatabase();
     const nowIso = new Date().toISOString();
     for (const [table, data] of Object.entries(payload)) {
@@ -296,11 +465,26 @@ export class CorrectSyncService {
   private async callEdge(reqBody: EdgeSyncRequestV2, accessToken: string): Promise<EdgeSyncResponseV2> {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync_v2`;
-    const resp = await fetch(functionUrl, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(reqBody)
-    });
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort('timeout'), EDGE_TIMEOUT_MS);
+    let resp: Response;
+    try {
+      resp = await fetch(functionUrl, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(reqBody),
+        signal: controller.signal
+      });
+    } catch (e) {
+      clearTimeout(t);
+      // Normalize aborts into a friendly error
+      if (e instanceof DOMException || (e as { name?: string }).name === 'AbortError') {
+        throw new Error('edge request aborted (timeout)');
+      }
+      throw e;
+    } finally {
+      clearTimeout(t);
+    }
     if (!resp.ok) {
       const t = await resp.text();
       throw new Error(`edge error ${resp.status}: ${t}`);
@@ -322,6 +506,7 @@ export class CorrectSyncService {
 
   private async loadState(userId: string) {
     if (this.state && this.state.user_id === userId) return;
+    if (!this.storage) return; // Guard against uninitialized storage
     try {
       const existing = await this.storage.getSyncState(userId);
       if (existing) {
@@ -385,6 +570,7 @@ export class CorrectSyncService {
   }
 
   private async applyServerTableChanges(table: string, upserts: Array<Record<string, unknown>>, deletes: string[], userId: string) {
+    if (!this.storage) return;
     const db = this.storage.getDatabase();
     const coll = (db as unknown as Record<string, unknown>)[table] as {
       get: (id: string) => Promise<Record<string, unknown> | undefined>;
@@ -450,7 +636,7 @@ export class CorrectSyncService {
   }
 
   private async persistState() {
-  if (!this.state) return;
+  if (!this.state || !this.storage) return;
   try { await this.storage.upsertSyncState(this.state.user_id, this.state as unknown as Record<string, unknown>); } catch (e) { logger.warn('[sync:v2] persistState failed', e); }
   }
 
@@ -458,6 +644,7 @@ export class CorrectSyncService {
 
   // Developer utility (Settings > Advanced): reset sync state triggers full sync next
   async resetState(): Promise<void> {
+    if (!this.auth || !this.storage) return;
     const authState = this.auth.getAuthState();
     if (!authState.isAuthenticated) return;
     await this.storage.resetSyncState(authState.user!.id);

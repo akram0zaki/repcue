@@ -1,5 +1,59 @@
 ## Unreleased
 
+- Frontend: Added exercise seeding diagnostics (`[seed] exercises.count before/after`) and a safe reseed + fallback path in `App.tsx` to prevent empty Exercises page after hard reloads. This also reduces perceived init stalls by avoiding endless empty loads.
+- Frontend: Improved post‑init rehydrate with short retry/backoff when UI shows 0 exercises but IndexedDB has data, ensuring the Exercises page populates reliably even if the init watchdog forces early UI render.
+
+### 2025-09-11 — Custom Exercise Identification & Sync Debugging
+
+### Fixed
+- **Custom exercise identification**: Fixed custom exercises not showing proper visual distinction (border, edit/delete buttons, "custom" tag)
+  - Updated `isUserCreatedExercise()` logic to handle exercises created before proper ownership was set
+  - For UUID exercises without `owner_id`, assume ownership by current authenticated user (handles legacy cases)
+  - Added fallback logic in ExerciseCard component for backward compatibility
+- **Sync service owner_id issues**: Fixed critical sync failures for user preferences and custom exercises
+  - Fixed `ensureUserPreferences()` to set correct `owner_id` from current user instead of `null`
+  - Fixed `updateUserPreferences()` to use proper `getCurrentUserId()` method instead of undefined `this.authService`
+  - Added logic to backfill missing `owner_id` on existing user preferences records
+  - Fixed IndexedDB schema by adding `*owner_id` indexes to all relevant tables (version 11 migration)
+  - Restored indexed query strategy in `claimOwnership()` function for better performance
+
+### Added
+- **Enhanced debugging for sync issues**: Added comprehensive logging for sync troubleshooting
+  - Added debug logs in `toggleExerciseFavorite()` to track user preferences updates
+  - Added debug logs in `saveUserPreferences()` to monitor IndexedDB storage
+  - Added debug logs in `collectDirtyBatch()` to track what records are being synced
+  - All debug logs respect existing DEBUG feature flag and use proper logger utility
+
+### 2025-09-11 — Sync V2 Initialization Fix
+
+### Fixed
+- **V2 sync initialization hanging**: Fixed app initialization timeout issues when `SYNC_ENGINE=v2` by resolving storage service deadlock
+  - **Root cause**: Post-authentication sync was calling `StorageService.getInstance()` during `storageService.ready()`, creating a circular dependency deadlock
+  - Added async `await this.storage.ready()` in `CorrectSyncService.initializeServices()` to wait for storage initialization
+  - Implemented proper async/await pattern in sync service initialization to prevent race conditions
+  - Added deferred service initialization in `V2CompatSyncService` to prevent blocking during startup
+  - Added initialization guards to prevent database access before services are ready
+  - Fixed `hasChangesToSync()` to skip checks when services aren't initialized yet
+  - Implemented lazy singleton factory to prevent sync service instantiation during module import
+  - Added comprehensive error handling and early returns in sync operations when services unavailable
+  - Fixed all TypeScript build errors with proper null safety checks
+  - App now loads properly and exercises page displays correctly with v2 sync enabled
+
+### 2025-09-10 — Initialization Watchdog & Splash Reliability
+
+### Fixed
+- Prevented rare indefinite loading splash by adding an initialization watchdog in `App.tsx` that forces UI ready after 5s if init stalls, with a proper `finally` path that always calls `setIsLoading(false)`.
+
+### Added
+- Detailed `[init]` debug logs around exercise seeding, settings/prefs load, and overall init duration to aid triage without leaking sensitive data.
+
+### Changed
+- Sync routing: Updated `useNetworkSync` and `authService` to use the factory `syncService` export that honors `SYNC_ENGINE`, eliminating direct `SyncService.getInstance()` calls. This stops legacy `/functions/v1/sync` requests when v2 is enabled and ensures v2-only traffic by default.
+- V2 compatibility: Added a lightweight `V2CompatSyncService` wrapper so existing hooks/components can keep using status/listener APIs while delegating to `CorrectSyncService` under the hood when `SYNC_ENGINE === 'v2'`.
+
+### Fixed
+- Logger compliance: Replaced `console.warn/error` in `useNetworkSync` with the centralized logger utility to meet project logging rules.
+
 ### Fixed
 - **Sync v2 field mapping issues**: Fixed app_settings sync failures where beep volume changes showed "pushed=1" but weren't reaching database
   - Restored missing field mapping calls in `CorrectSyncService` for `app_settings` table

@@ -47,25 +47,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
 
-  // Debug logging
-  // React.useEffect(() => {
-  //   const hamadaExercises = exercises.filter(ex => ex.name.includes('7amada'));
-  //   logger.log('🔍 ExercisePage Debug Info:', {
-  //     totalExercises: exercises.length,
-  //     currentUser: user,
-  //     currentUserId: user?.id,
-  //     userCreatedExercises: exercises.filter(ex => ex.owner_id && ex.owner_id !== null),
-  //     userOwnedExercises: exercises.filter(ex => ex.owner_id === user?.id),
-  //     hamadaExercises: hamadaExercises.map(ex => ({ 
-  //       id: ex.id, 
-  //       name: ex.name, 
-  //       owner_id: ex.owner_id,
-  //       isUserOwned: ex.owner_id === user?.id,
-  //       hasOwner: !!ex.owner_id
-  //     })),
-  //     sampleExerciseOwnerIds: exercises.slice(0, 5).map(ex => ({ id: ex.id, name: ex.name, owner_id: ex.owner_id }))
-  //   });
-  // }, [exercises, user]);
+  // Debug logging (removed - using storageService logging instead)
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -224,6 +206,17 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Helper function to check if exercise is user-created
   const isUserCreatedExercise = (exercise: Exercise): boolean => {
     const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
+    // For UUID exercises (user-created), check if they either have an owner_id or if user is authenticated
+    // This handles the case where exercises were created before proper ownership was set
+    if (isUUIDFormat && user?.id) {
+      // If exercise has owner_id, check it matches current user
+      if (exercise.owner_id) {
+        return exercise.owner_id === user.id;
+      }
+      // If exercise has no owner_id but is UUID format, assume it belongs to current user
+      // This handles exercises created before the ownership fix
+      return true;
+    }
     return isUUIDFormat && !!exercise.owner_id;
   };
 
@@ -727,30 +720,33 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   
   // Check if the exercise is user-created and belongs to the current user
   // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
-  const isUserCreatedExercise = (id: string): boolean => {
+  const isUserCreatedExerciseCard = (id: string): boolean => {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   };
   
   // Only show edit/delete for user-created exercises owned by current user
-  const isUserCreated = isUserCreatedExercise(exercise.id) && 
-                        exercise.owner_id && 
+  const isUserCreated = isUserCreatedExerciseCard(exercise.id) && 
                         currentUser && 
-                        exercise.owner_id === currentUser.id;
+                        (exercise.owner_id === currentUser.id || !exercise.owner_id);
   
-  // Debug logging for ownership issues
-  // React.useEffect(() => {
-  //   if (exercise.name.includes('7amada')) {
-  //     logger.log('🔍 ExerciseCard Debug - 7amada exercise ownership check:', {
-  //       exerciseName: exercise.name,
-  //       exerciseOwnerId: exercise.owner_id,
-  //       currentUserId: currentUser?.id,
-  //       isUserCreated,
-  //       hasCurrentUser: !!currentUser,
-  //       hasOwnerId: !!exercise.owner_id,
-  //       idsMatch: exercise.owner_id === currentUser?.id
-  //     });
-  //   }
-  // }, [exercise, currentUser, isUserCreated]);
+  // Debug logging for ownership issues  
+  React.useEffect(() => {
+    // Debug any UUID-based exercise (user-created)
+    if (isUserCreatedExerciseCard(exercise.id)) {
+      logger.log('🔍 ExerciseCard Debug - UUID exercise ownership check:', {
+        exerciseName: exercise.name,
+        exerciseId: exercise.id,
+        exerciseOwnerId: exercise.owner_id,
+        ownerIdType: typeof exercise.owner_id,
+        currentUserId: currentUser?.id,
+        isUserCreated,
+        hasCurrentUser: !!currentUser,
+        hasOwnerId: !!exercise.owner_id,
+        idsMatch: exercise.owner_id === currentUser?.id,
+        assumeOwnership: !exercise.owner_id && !!currentUser
+      });
+    }
+  }, [exercise, currentUser, isUserCreated]);
 
   const handleTagExpansionToggle = () => {
     setIsTagsExpanded(!isTagsExpanded);

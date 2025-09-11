@@ -52,6 +52,7 @@ class RepCueDatabase extends Dexie {
   workout_sessions!: Table<StoredWorkoutSession>;
 
   constructor() {
+    logger.log('[RepCueDatabase] Constructor: Creating database with name RepCueDB');
     super('RepCueDB');
     
     // Version 3: Original schema (kept for historical reference)
@@ -144,6 +145,18 @@ class RepCueDatabase extends Dexie {
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       // sync_state: key = user_id (only one row per user) — store JSON blobs for cursors & metrics
+      sync_state: 'user_id'
+    });
+
+    // Version 11: Add owner_id indexes for better claimOwnership query performance
+    this.version(11).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty, *owner_id',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty, *owner_id',
+      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty, *owner_id',
       sync_state: 'user_id'
     });
   }
@@ -412,6 +425,11 @@ export class StorageService {
   private static instance: StorageService;
   private db: RepCueDatabase;
   private fallbackStorage = new Map<string, unknown>();
+  private readyPromise: Promise<void>;
+  // Throttle consent warnings to avoid log spam
+  private lastConsentWarnAt: number | null = null;
+  // Flag to track database reset in progress
+  private isResetting = false;
   
   /**
    * Resolve workout name by ID using primary DB path with automatic fallback.
@@ -444,15 +462,37 @@ export class StorageService {
   }
 
   private constructor() {
+    logger.log('[StorageService] Constructor: Creating RepCueDatabase instance');
     this.db = new RepCueDatabase();
-    this.initializeDatabase();
+    logger.log('[StorageService] Constructor: Starting initializeDatabase()');
+    this.readyPromise = this.initializeDatabase().catch((e) => {
+      // Swallow errors here; callers can proceed with fallback paths
+      logger.error('[StorageService] initializeDatabase failed (continuing with fallbacks):', e);
+      logger.error('[StorageService] Stack trace:', e instanceof Error ? e.stack : 'No stack available');
+    });
   }
 
   public static getInstance(): StorageService {
     if (!StorageService.instance) {
+      logger.log('[StorageService] getInstance: Creating new StorageService instance');
       StorageService.instance = new StorageService();
+      logger.log('[StorageService] getInstance: StorageService instance created');
+    } else {
+      logger.log('[StorageService] getInstance: Returning existing StorageService instance');
     }
     return StorageService.instance;
+  }
+
+  /** Wait for IndexedDB open/health checks to complete */
+  public async ready(): Promise<void> {
+    logger.log('[StorageService] ready() called, waiting for readyPromise...');
+    try { 
+      await this.readyPromise; 
+      logger.log('[StorageService] ready() completed successfully');
+    } catch (error) { 
+      logger.error('[StorageService] ready() failed:', error);
+      /* ignore */ 
+    }
   }
 
   // === v2 sync_state helpers ===
@@ -662,11 +702,42 @@ export class StorageService {
    * Initialize database and handle errors gracefully
    */
   private async initializeDatabase(): Promise<void> {
+    logger.log('[StorageService] initializeDatabase() starting...');
     try {
-      await this.db.open();
+      logger.log('[StorageService] Opening database...');
+      logger.log('[StorageService] Database current version:', this.db.verno);
+      
+      // Add timeout to db.open() to detect hangs
+      const tOpenStart = Date.now();
+      const openTimeout = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Database open timeout after 5s')), 5000);
+      });
+      
+      try {
+        await Promise.race([this.db.open(), openTimeout]);
+        logger.log('[StorageService] Database opened successfully');
+      } catch (error) {
+        logger.error('[StorageService] Database open failed:', error);
+        
+        // If database open times out or fails, try to reset it
+        await this.performDatabaseReset();
+      }
+      const openMs = Date.now() - tOpenStart;
+      if (openMs > 1000) {
+        logger.warn(`[db] open took ${openMs}ms (verno=${this.db.verno})`);
+      } else {
+        logger.log(`[db] open took ${openMs}ms (verno=${this.db.verno})`);
+      }
       
       // Check database health after opening
+      const tHealthStart = Date.now();
       const healthCheck = await this.checkAndRepairDatabase();
+      const healthMs = Date.now() - tHealthStart;
+      if (healthMs > 1000) {
+        logger.warn(`[db] health check took ${healthMs}ms (repaired=${healthCheck.repaired})`);
+      } else {
+        logger.log(`[db] health check took ${healthMs}ms (repaired=${healthCheck.repaired})`);
+      }
       if (healthCheck.repaired) {
         logger.log('🔧 Database was automatically repaired during initialization');
       } else if (!healthCheck.healthy) {
@@ -697,10 +768,126 @@ export class StorageService {
   }
 
   /**
+   * Perform database reset with proper state management to prevent concurrent access issues
+   */
+  private async performDatabaseReset(): Promise<void> {
+    if (this.isResetting) {
+      logger.warn('[StorageService] Database reset already in progress, skipping concurrent reset');
+      return;
+    }
+
+    this.isResetting = true;
+    logger.warn('[StorageService] Starting database reset process...');
+
+    try {
+      // Step 1: Close the current database connection
+      logger.log('[StorageService] Step 1: Closing database connection...');
+      if (this.db.isOpen()) {
+        this.db.close();
+        logger.log('[StorageService] Database connection closed');
+      } else {
+        logger.log('[StorageService] Database was already closed');
+      }
+
+      // Step 2: Delete the database
+      logger.log('[StorageService] Step 2: Deleting database...');
+      await this.db.delete();
+      logger.log('[StorageService] Database deleted successfully');
+
+      // Step 3: Create a new database instance
+      logger.log('[StorageService] Step 3: Creating new database instance...');
+      this.db = new RepCueDatabase();
+      logger.log('[StorageService] New database instance created');
+
+      // Step 4: Open the new database with timeout
+      logger.log('[StorageService] Step 4: Opening new database...');
+      const reopenTimeout = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Database reopen timeout after 5s')), 5000);
+      });
+      
+      await Promise.race([this.db.open(), reopenTimeout]);
+      logger.log('[StorageService] ✅ New database opened successfully');
+
+      // Step 5: Create a new readyPromise since the database has been reset
+      logger.log('[StorageService] Step 5: Initializing new ready promise...');
+      this.readyPromise = Promise.resolve();
+      
+      logger.log('[StorageService] 🎉 Database reset completed successfully');
+    } catch (resetError) {
+      logger.error('[StorageService] ❌ Database reset failed:', resetError);
+      // Try to recover by creating a fresh instance
+      try {
+        logger.warn('[StorageService] Attempting recovery with fresh database instance...');
+        this.db = new RepCueDatabase();
+        await this.db.open();
+        this.readyPromise = Promise.resolve();
+        logger.log('[StorageService] 🔧 Recovery successful');
+      } catch (recoveryError) {
+        logger.error('[StorageService] 💥 Recovery failed:', recoveryError);
+        // Set readyPromise to rejected state
+        this.readyPromise = Promise.reject(new Error('Database reset and recovery failed'));
+        throw resetError;
+      }
+    } finally {
+      this.isResetting = false;
+      logger.log('[StorageService] Database reset process completed, reset flag cleared');
+    }
+  }
+
+  /**
+   * Check if error is a DatabaseClosedError (during reset or corruption)
+   */
+  private isDatabaseClosedError(error: unknown): boolean {
+    return error instanceof Error && (
+      error.name === 'DatabaseClosedError' || 
+      error.message.includes('Database has been closed') ||
+      error.message.includes('DatabaseClosedError')
+    );
+  }
+
+  /**
+   * Handle database access when database might be resetting
+   */
+  private async safeDatabaseAccess<T>(operation: () => Promise<T>, fallback: () => T): Promise<T> {
+    // If we're in the middle of a reset, wait a bit and return fallback
+    if (this.isResetting) {
+      logger.warn('[StorageService] Database operation attempted during reset, returning fallback');
+      return fallback();
+    }
+
+    try {
+      return await operation();
+    } catch (error) {
+      if (this.isDatabaseClosedError(error)) {
+        logger.warn('[StorageService] DatabaseClosedError detected, returning fallback');
+        return fallback();
+      }
+      throw error; // Re-throw other errors
+    }
+  }
+
+  /**
    * Check if we can store data (consent required)
    */
   private canStoreData(): boolean {
-    return consentService.hasConsent();
+    const ok = consentService.hasConsent();
+    if (!ok) {
+      const now = Date.now();
+      if (!this.lastConsentWarnAt || now - this.lastConsentWarnAt > 5000) {
+        this.lastConsentWarnAt = now;
+        try {
+          const status = consentService.getConsentStatus();
+          logger.warn('[consent] Storage blocked: no consent. status=', {
+            hasConsent: status.hasConsent,
+            version: status.version,
+            isLatestVersion: status.isLatestVersion
+          });
+        } catch {
+          logger.warn('[consent] Storage blocked: no consent.');
+        }
+      }
+    }
+    return ok;
   }
 
   /**
@@ -715,6 +902,33 @@ export class StorageService {
    */
   async getMigrationStatus() {
     return await this.db.getMigrationStatus();
+  }
+
+  /**
+   * Capture a lightweight snapshot for debugging DB state (counts only; no PII).
+   */
+  public async debugSnapshot(): Promise<{
+    verno: number;
+    tables: Record<string, number>;
+    exerciseIdsSample: string[];
+  }> {
+    const snapshot = { verno: 0, tables: {} as Record<string, number>, exerciseIdsSample: [] as string[] };
+    try {
+      snapshot.verno = this.db.verno;
+      const tableNames = ['exercises', 'activity_logs', 'user_preferences', 'app_settings', 'workouts', 'workout_sessions'];
+      const counts = await Promise.all(tableNames.map(n => this.db.table(n).count().catch(() => 0)));
+      tableNames.forEach((n, i) => { snapshot.tables[n] = counts[i]; });
+      // Sample first few exercise IDs only (non-PII)
+      const sample = await this.db.exercises.limit(5).toArray().catch(() => [] as StoredExercise[]);
+      snapshot.exerciseIdsSample = sample.map(e => e.id).filter(Boolean).slice(0, 5) as string[];
+    } catch (e) {
+      if (e && typeof e === 'object' && 'name' in e && (e as { name: string }).name === 'DatabaseClosedError') {
+        logger.warn('[db] Database closed, skipping debugSnapshot');
+        return snapshot;
+      }
+      logger.warn('[db] debugSnapshot failed:', e);
+    }
+    return snapshot;
   }
 
   /**
@@ -779,39 +993,37 @@ export class StorageService {
       return [];
     }
 
-    try {
-      const [storedExercises, prefs] = await Promise.all([
-        this.db.exercises.toArray(),
-        this.getUserPreferences().catch(() => null)
-      ]);
-      const favorites = prefs?.favorite_exercises || [];
-      const allExercises = storedExercises
-        .map(this.convertStoredExercise)
-        .map(ex => ({
-          ...ex,
-          // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
-          is_favorite: favorites.includes(ex.id)
-        }));
-      return filterActiveRecords(allExercises);
-    } catch (error) {
-      logger.warn('Failed to load exercises from IndexedDB:', error);
-      // Try fallback storage
-      const exercises: Exercise[] = [];
-      this.fallbackStorage.forEach((value, key) => {
-        if (key.startsWith('exercise_')) {
-          exercises.push(this.convertStoredExercise(value as StoredExercise));
-        }
-      });
-      // Merge favorites from preferences fallback if present
-      try {
-        const prefs = await this.getUserPreferences();
+    return await this.safeDatabaseAccess(
+      async () => {
+        const [storedExercises, prefs] = await Promise.all([
+          this.db.exercises.toArray(),
+          this.getUserPreferences().catch(() => null)
+        ]);
+        const favorites = prefs?.favorite_exercises || [];
+        const allExercises = storedExercises
+          .map(this.convertStoredExercise)
+          .map(ex => ({
+            ...ex,
+            // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
+            is_favorite: favorites.includes(ex.id)
+          }));
+        return filterActiveRecords(allExercises);
+      },
+      () => {
+        // Fallback to in-memory storage
+        const exercises: Exercise[] = [];
+        this.fallbackStorage.forEach((value, key) => {
+          if (key.startsWith('exercise_')) {
+            exercises.push(this.convertStoredExercise(value as StoredExercise));
+          }
+        });
+        // Try to get preferences for favorites, but don't wait if database is unavailable
+        const prefs = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
         const favorites = prefs?.favorite_exercises || [];
         const merged = exercises.map(ex => ({ ...ex, is_favorite: favorites.includes(ex.id) }));
         return filterActiveRecords(merged);
-      } catch {
-        return filterActiveRecords(exercises);
       }
-    }
+    );
   }
 
   /**
@@ -820,41 +1032,55 @@ export class StorageService {
    */
   public async ensureExercisesSeeded(): Promise<number> {
     if (!this.canStoreData()) {
+  logger.warn('[seed] Skipping seeding: consent not granted');
       return 0;
     }
 
     try {
-      const existingCount = await this.db.exercises.count();
-      if (existingCount > 0) return existingCount;
+  const tSeedStart = Date.now();
+  const existingCount = await this.db.exercises.count();
+  logger.log(`[seed] exercises.count before=${existingCount}`);
+  if (existingCount > 0) return existingCount;
 
       // Lazy import to avoid upfront bundle cost and circular deps
       const { INITIAL_EXERCISES } = await import('../data/exercises');
-      // Insert catalog entries with explicit clean sync metadata to avoid syncing to server
-      for (const exercise of INITIAL_EXERCISES) {
-        try {
-          // Built-in exercises should never be dirty or owned by users
-          const cleanExercise: StoredExercise = {
-            ...exercise,
-            // Explicit clean sync metadata for built-in exercises
-            dirty: 0,
-            version: 1,
-            created_at: '2025-01-01T00:00:00.000Z', // Static date for built-ins
-            updated_at: '2025-01-01T00:00:00.000Z',
-            deleted: false,
-            owner_id: null, // Built-in exercises have no owner
-            op: 'seed' // Special operation type for seeded data
-          } as StoredExercise;
-          
-          await this.db.exercises.put(cleanExercise);
-        } catch (error) {
-          logger.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
-          this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
+      // Prepare clean seed records and insert in a single transaction using bulkPut for speed
+      const cleanSeeds: StoredExercise[] = INITIAL_EXERCISES.map(exercise => ({
+        ...exercise,
+        dirty: 0,
+        version: 1,
+        created_at: '2025-01-01T00:00:00.000Z',
+        updated_at: '2025-01-01T00:00:00.000Z',
+        deleted: false,
+        owner_id: null,
+        op: 'seed'
+      } as StoredExercise));
+
+  try {
+        await this.db.transaction('rw', this.db.exercises, async () => {
+          await this.db.exercises.bulkPut(cleanSeeds);
+        });
+      } catch (txErr) {
+        // Fallback to individual puts if bulkPut fails (should be rare)
+        logger.warn('bulkPut failed during seeding; falling back to sequential puts', txErr);
+        for (const exercise of cleanSeeds) {
+          try { await this.db.exercises.put(exercise); }
+          catch (error) {
+            logger.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
+            this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
+          }
         }
       }
       // Also clean up any existing built-in exercises that might be dirty
       await this.cleanBuiltInExercises();
-      
-      return await this.db.exercises.count();
+  const finalCount = await this.db.exercises.count();
+  const seedMs = Date.now() - tSeedStart;
+  if (seedMs > 1000) {
+    logger.warn(`[seed] completed in ${seedMs}ms; count after=${finalCount}`);
+  } else {
+    logger.log(`[seed] completed in ${seedMs}ms; count after=${finalCount}`);
+  }
+  return finalCount;
     } catch (error) {
       logger.warn('Failed to seed exercises catalog:', error);
       return 0;
@@ -942,11 +1168,25 @@ export class StorageService {
     }
 
     try {
+      logger.log('🔄 toggleExerciseFavorite called for:', exerciseId);
+      
       // Update preferences source of truth (store slug/id in array)
       const prefs = await this.ensureUserPreferences();
+      logger.log('📝 Current user preferences:', { id: prefs.id, favorite_exercises: prefs.favorite_exercises });
+      
       const current = new Set(prefs.favorite_exercises || []);
+      const wasAlreadyFavorite = current.has(exerciseId);
       if (current.has(exerciseId)) current.delete(exerciseId); else current.add(exerciseId);
-      await this.updateUserPreferences({ favorite_exercises: Array.from(current) });
+      
+      const newFavorites = Array.from(current);
+      logger.log('📝 Updating user preferences with favorites:', { 
+        exerciseId, 
+        wasAlreadyFavorite, 
+        newFavorites,
+        action: wasAlreadyFavorite ? 'remove' : 'add'
+      });
+      
+      await this.updateUserPreferences({ favorite_exercises: newFavorites });
 
       // Best-effort UI reflection: flip local exercise flag WITHOUT marking record dirty
       const now = new Date().toISOString();
@@ -1145,10 +1385,18 @@ export class StorageService {
 
     const prefId = preferences.id || crypto.randomUUID();
     const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, prefId);
+    
+    logger.log('💾 Saving user preferences to IndexedDB:', { 
+      id: storedPreferences.id,
+      favorite_exercises: storedPreferences.favorite_exercises,
+      dirty: storedPreferences.dirty,
+      owner_id: storedPreferences.owner_id
+    });
 
     try {
       // Use put() to handle both insert and update operations
       await this.db.user_preferences.put(storedPreferences);
+      logger.log('✅ Successfully saved user preferences to IndexedDB');
     } catch (error) {
       logger.warn('Failed to save user preferences to IndexedDB:', error);
       this.fallbackStorage.set('user_preferences', storedPreferences);
@@ -1171,9 +1419,10 @@ export class StorageService {
     }
 
     const now = new Date().toISOString();
+    const userId = this.getCurrentUserId();
     const base: UserPreferences = {
       id: crypto.randomUUID(),
-      owner_id: null,
+      owner_id: userId,
       updated_at: now,
       created_at: now,
       deleted: false,
@@ -1207,8 +1456,15 @@ export class StorageService {
 
     const existing = await this.getUserPreferences();
     if (existing) {
+      // Ensure owner_id is set if missing
+      const userId = this.getCurrentUserId();
       const updated: UserPreferences = prepareUpsert(
-        { ...existing, ...patch } as UserPreferences,
+        { 
+          ...existing, 
+          ...patch,
+          // Fix owner_id if it's null/undefined
+          owner_id: existing.owner_id || userId
+        } as UserPreferences,
         existing.id
       );
       await this.saveUserPreferences(updated);
@@ -1227,20 +1483,16 @@ export class StorageService {
       return null;
     }
 
-    try {
-      const storedPreferences = await this.db.user_preferences.orderBy('updated_at').last();
-      if (storedPreferences) {
-        return storedPreferences;
+    return await this.safeDatabaseAccess(
+      async () => {
+        const storedPreferences = await this.db.user_preferences.orderBy('updated_at').last();
+        return storedPreferences || null;
+      },
+      () => {
+        const fallback = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
+        return fallback || null;
       }
-      return null;
-    } catch (error) {
-      logger.warn('Failed to load user preferences from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
-      if (fallback) {
-        return fallback;
-      }
-      return null;
-    }
+    );
   }
 
   /**
@@ -1276,20 +1528,16 @@ export class StorageService {
       return null;
     }
 
-    try {
-      const storedSettings = await this.db.app_settings.orderBy('updated_at').last();
-      if (storedSettings) {
-        return storedSettings;
+    return await this.safeDatabaseAccess(
+      async () => {
+        const storedSettings = await this.db.app_settings.orderBy('updated_at').last();
+        return storedSettings || null;
+      },
+      () => {
+        const fallback = this.fallbackStorage.get('app_settings') as AppSettings | undefined;
+        return fallback || null;
       }
-      return null;
-    } catch (error) {
-      logger.warn('Failed to load app settings from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('app_settings') as AppSettings | undefined;
-      if (fallback) {
-        return fallback;
-      }
-      return null;
-    }
+    );
   }
 
 
@@ -1334,12 +1582,19 @@ export class StorageService {
     }
 
     try {
+      const tStatsStart = Date.now();
       const [exerciseCount, logCount, preferences, settings] = await Promise.all([
         this.db.exercises.count(),
         this.db.activity_logs.count(),
         this.getUserPreferences(),
         this.getAppSettings()
       ]);
+      const statsMs = Date.now() - tStatsStart;
+      if (statsMs > 1000) {
+        logger.warn(`[stats] getStorageStats took ${statsMs}ms (exercises=${exerciseCount}, logs=${logCount})`);
+      } else {
+        logger.log(`[stats] getStorageStats took ${statsMs}ms (exercises=${exerciseCount}, logs=${logCount})`);
+      }
 
       return {
         exerciseCount,
@@ -1348,6 +1603,15 @@ export class StorageService {
         hasSettings: settings !== null
       };
     } catch (error) {
+      if (error && typeof error === 'object' && 'name' in error && (error as { name: string }).name === 'DatabaseClosedError') {
+        logger.warn('Database closed, returning empty storage stats');
+        return {
+          exerciseCount: 0,
+          logCount: 0,
+          hasPreferences: false,
+          hasSettings: false
+        };
+      }
       logger.warn('Failed to get storage stats:', error);
       return {
         exerciseCount: 0,
@@ -1355,6 +1619,62 @@ export class StorageService {
         hasPreferences: false,
         hasSettings: false
       };
+    }
+  }
+
+  /**
+   * Peek the number of exercises without requiring consent.
+   * Read-only and used for diagnostics/rehydration paths.
+   */
+  public async peekExerciseCount(): Promise<number> {
+    try {
+      return await this.db.exercises.count();
+    } catch (e) {
+      logger.warn('peekExerciseCount failed:', e);
+      return 0;
+    }
+  }
+
+  /**
+   * Quickly load built-in exercises without requiring consent (read-only).
+   * This intentionally excludes any user-created content for privacy.
+   */
+  public async getBuiltInExercisesFastUnsafe(): Promise<Exercise[]> {
+    try {
+      const stored = await this.db.exercises
+        .filter(exercise => {
+          // Built-ins have slug IDs (non-UUID) and no owner
+          const isUuid = typeof exercise.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(exercise.id);
+          return !isUuid && (exercise.owner_id == null);
+        })
+        .toArray();
+      return filterActiveRecords(stored.map(this.convertStoredExercise));
+    } catch (e) {
+      logger.warn('getBuiltInExercisesFastUnsafe failed:', e);
+      return [];
+    }
+  }
+
+  /**
+   * Fast path to fetch exercises without consulting preferences (no favorites merge).
+   * Useful as a fallback when we need quick UI hydration.
+   */
+  public async getExercisesFast(): Promise<Exercise[]> {
+    if (!this.canStoreData()) return [];
+    try {
+      const tFastStart = Date.now();
+      const stored = await this.db.exercises.toArray();
+      const list = filterActiveRecords(stored.map(this.convertStoredExercise));
+      const fastMs = Date.now() - tFastStart;
+      if (fastMs > 1000) {
+        logger.warn(`[fast] getExercisesFast took ${fastMs}ms (n=${list.length})`);
+      } else {
+        logger.log(`[fast] getExercisesFast took ${fastMs}ms (n=${list.length})`);
+      }
+      return list;
+    } catch (error) {
+      logger.warn('getExercisesFast failed:', error);
+      return [];
     }
   }
 
@@ -1399,19 +1719,21 @@ export class StorageService {
       return [];
     }
 
-    try {
-      const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
-      return storedWorkouts.map(this.convertStoredWorkout);
-    } catch (error) {
-      logger.warn('Failed to load workouts from IndexedDB:', error);
-      const workouts: Workout[] = [];
-      this.fallbackStorage.forEach((value, key) => {
-        if (key.startsWith('workout_')) {
-          workouts.push(this.convertStoredWorkout(value as StoredWorkout));
-        }
-      });
-      return workouts;
-    }
+    return await this.safeDatabaseAccess(
+      async () => {
+        const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
+        return storedWorkouts.map(this.convertStoredWorkout);
+      },
+      () => {
+        const workouts: Workout[] = [];
+        this.fallbackStorage.forEach((value, key) => {
+          if (key.startsWith('workout_')) {
+            workouts.push(this.convertStoredWorkout(value as StoredWorkout));
+          }
+        });
+        return workouts;
+      }
+    );
   }
 
   /**
@@ -1731,16 +2053,50 @@ export class StorageService {
       const results = await Promise.all(
         tablesToClaim.map(async ({ table, name }) => {
           try {
-            // Enumerate and update records with empty/null/undefined owner_id
-            const allRecords = await table.toArray() as Array<{ id: string; owner_id?: string | null }>;
-            const targets = allRecords.filter(r => r.owner_id === '' || r.owner_id == null);
+            // Prefer indexed query paths when available; otherwise stream in batches
+            const coll = table as unknown as {
+              where?: (field: string) => { equals: (v: unknown) => { limit: (n: number) => { toArray: () => Promise<Array<{ id: string }>> } } };
+              toCollection?: () => { offset: (n: number) => { limit: (m: number) => { toArray: () => Promise<Array<{ id: string; owner_id?: string | null }>> } } };
+              update: (id: string, changes: Record<string, unknown>) => Promise<number>;
+            };
+
             let modified = 0;
-            for (const rec of targets) {
-              // Use a minimally-typed update signature to avoid any-casts
-              const updater = table as unknown as { update: (id: string, changes: Record<string, unknown>) => Promise<number> };
-              await updater.update(rec.id, claimData as Record<string, unknown>);
-              modified++;
+            const BATCH = 50;
+
+            // Strategy 1: Use indexed queries on owner_id for efficient lookups (available from v11+)
+            if (coll.where) {
+              for (const val of [null, '']) {
+                let batch = await coll.where('owner_id').equals(val).limit(BATCH).toArray();
+                while (batch.length) {
+                  for (const rec of batch) {
+                    await coll.update(rec.id, claimData as Record<string, unknown>);
+                    modified++;
+                  }
+                  // Yield to event loop to keep UI responsive
+                  await new Promise(r => setTimeout(r, 0));
+                  batch = await coll.where('owner_id').equals(val).limit(BATCH).toArray();
+                }
+              }
+            } else if (coll.toCollection) {
+              // Strategy 2: Fallback scan in small pages
+              let offset = 0;
+              // Limit pages to avoid pathological stalls
+              const MAX_PAGES = 200; // up to 10k rows in worst case
+              for (let page = 0; page < MAX_PAGES; page++) {
+                const rows = await coll.toCollection().offset(offset).limit(BATCH).toArray();
+                if (!rows.length) break;
+                for (const rec of rows) {
+                  const owner = (rec as { owner_id?: string | null }).owner_id;
+                  if (owner === '' || owner == null) {
+                    await coll.update(rec.id, claimData as Record<string, unknown>);
+                    modified++;
+                  }
+                }
+                offset += rows.length;
+                await new Promise(r => setTimeout(r, 0));
+              }
             }
+
             return { name, count: modified };
           } catch (error) {
             logger.warn(`Failed to claim ${name}:`, error);
