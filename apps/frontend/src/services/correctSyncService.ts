@@ -3,7 +3,7 @@ import { AuthService } from './authService';
 import { ConsentService } from './consentService';
 import { SYNC_ENABLED, SYNC_DEBUG } from '../config/features';
 import logger from '../utils/logger';
-import type { AppSettings } from '../types';
+import type { AppSettings, UserFavorite } from '../types';
 
 // v2 Sync core constants
 const PUSH_BATCH_SIZE = 5; // Per spec
@@ -402,6 +402,8 @@ export class CorrectSyncService {
           let mappedRecord = clean;
           if (tableName === 'app_settings' && this.storage) {
             mappedRecord = this.storage.convertAppSettingsForSync(clean as unknown as AppSettings);
+          } else if (tableName === 'user_favorites' && this.storage) {
+            mappedRecord = this.storage.convertUserFavoritesForSync(clean as unknown as UserFavorite);
           }
           // Note: Other tables (activity_logs, workout_sessions) don't have field mapping methods yet
           

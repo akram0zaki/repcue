@@ -2312,6 +2312,16 @@ export class StorageService {
   }
 
   /**
+   * Convert client UserFavorite to Supabase user_favorites format
+   * Filters out legacy user_id field during migration period
+   */
+  public convertUserFavoritesForSync(favorite: UserFavorite): Record<string, unknown> {
+    // Extract only the fields we want to sync, excluding legacy user_id
+    const { user_id, ...rest } = favorite as unknown as UserFavorite & { user_id?: string };
+    return rest;
+  }
+
+  /**
    * Convert Supabase app_settings to client AppSettings format
    * Handles field name differences between server and client schemas
    */
