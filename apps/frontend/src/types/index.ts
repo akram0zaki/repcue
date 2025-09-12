@@ -246,7 +246,7 @@ export interface WorkoutRating extends SyncMetadata {
 }
 
 export interface UserFavorite extends SyncMetadata {
-  user_id: string;
+  owner_id: string;
   item_id: string; // Can be slug (builtin) or UUID (user-created)
   item_type: 'exercise' | 'workout';
   exercise_type: 'builtin' | 'user_created' | 'shared';

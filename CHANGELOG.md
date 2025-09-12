@@ -1,5 +1,22 @@
 ## Unreleased
 
+### Fixed
+- **Critical sync schema inconsistency**: Fixed `user_favorites` table using `user_id` while server expected `owner_id`
+  - Updated IndexedDB schema to version 12 with `owner_id` field for `user_favorites` table
+  - Added automatic migration logic to convert existing `user_id` records to `owner_id`
+  - Fixed `UserFavorite` TypeScript interface to use `owner_id` instead of `user_id`
+  - Updated all database queries and operations to use consistent `owner_id` field
+  - Resolves 422 sync errors where "2 of 3 operations failed" due to unknown field names
+  - Client now sends consistent field names that match server database schema
+
+### Enhanced
+- **Sync investigation documentation**: Added comprehensive troubleshooting guide at `docs/sync-investigation.md`
+  - Root cause analysis of all sync issues identified and resolved
+  - Step-by-step methodology for investigating future sync problems
+  - Debugging tools and correlation ID tracing techniques
+  - Prevention strategies for schema consistency and error handling
+
+### Previous Unreleased Changes
 - Frontend: Added exercise seeding diagnostics (`[seed] exercises.count before/after`) and a safe reseed + fallback path in `App.tsx` to prevent empty Exercises page after hard reloads. This also reduces perceived init stalls by avoiding endless empty loads.
 - Frontend: Improved post‑init rehydrate with short retry/backoff when UI shows 0 exercises but IndexedDB has data, ensuring the Exercises page populates reliably even if the init watchdog forces early UI render.
 

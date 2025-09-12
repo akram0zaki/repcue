@@ -160,6 +160,26 @@ class RepCueDatabase extends Dexie {
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       sync_state: 'user_id'
     });
+
+    // Version 12: Fix user_favorites schema inconsistency - change user_id to owner_id
+    this.version(12).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id'
+    }).upgrade(tx => {
+      // Migrate user_favorites data from user_id to owner_id
+      return tx.table('user_favorites').toCollection().modify(record => {
+        if (record.user_id && !record.owner_id) {
+          record.owner_id = record.user_id;
+          delete record.user_id;
+        }
+      });
+    });
   }
 
   /**
@@ -2206,7 +2226,7 @@ export class StorageService {
     try {
       // Check if already favorited
       const existing = await this.db.user_favorites
-        .where('user_id').equals(userId)
+        .where('owner_id').equals(userId)
         .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
         .first();
 
@@ -2218,7 +2238,7 @@ export class StorageService {
       } else {
         // Add to favorites
         const newFavorite: StoredUserFavorite = prepareUpsert({
-          user_id: userId,
+          owner_id: userId,
           item_id: exerciseId,
           item_type: 'exercise' as const,
           exercise_type: 'user_created' as const
@@ -2242,7 +2262,7 @@ export class StorageService {
 
     try {
       const existing = await this.db.user_favorites
-        .where('user_id').equals(userId)
+        .where('owner_id').equals(userId)
         .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
         .first();
       
