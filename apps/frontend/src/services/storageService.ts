@@ -2317,7 +2317,7 @@ export class StorageService {
    */
   public convertUserFavoritesForSync(favorite: UserFavorite): Record<string, unknown> {
     // Extract only the fields we want to sync, excluding legacy user_id
-    const { user_id, ...rest } = favorite as unknown as UserFavorite & { user_id?: string };
+    const { user_id: _user_id, ...rest } = favorite as unknown as UserFavorite & { user_id?: string };
     return rest;
   }
 
