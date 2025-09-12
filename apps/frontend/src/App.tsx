@@ -123,11 +123,10 @@ const setupSyncTriggers = () => {
   // Trigger sync on page visibility change (app foreground)
   const handleVisibilityChange = () => {
     if (!document.hidden) {
-      logger.log('📱 App came to foreground - sync disabled temporarily');
-      // Temporarily disabled due to timeout issues
-      // syncService.sync().catch(error => {
-      //   logger.warn('Foreground sync failed:', error);
-      // });
+      logger.log('📱 App came to foreground - triggering sync');
+      syncService.sync().catch(error => {
+        logger.warn('Foreground sync failed:', error);
+      });
     }
   };
 
@@ -138,16 +137,16 @@ const setupSyncTriggers = () => {
       clearInterval(syncInterval.current);
     }
     
-    // Temporarily disabled due to timeout issues
-    // syncInterval = setInterval(() => {
-    //   if (!document.hidden) {
-    //     logger.log('⏰ Periodic sync triggered');
-    //     syncService.sync().catch(error => {
-    //       logger.warn('Periodic sync failed:', error);
-    //     });
-    //   }
-    // }, 5 * 60 * 1000); // 5 minutes
-    logger.log('⏰ Periodic sync disabled temporarily');
+    // Re-enabled periodic sync every 5 minutes when active
+    syncInterval.current = setInterval(() => {
+      if (!document.hidden) {
+        logger.log('⏰ Periodic sync triggered');
+        syncService.sync().catch(error => {
+          logger.warn('Periodic sync failed:', error);
+        });
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+    logger.log('⏰ Periodic sync re-enabled');
   };
 
   // Setup event listeners

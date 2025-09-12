@@ -7,7 +7,8 @@ import { useSnackbar } from '../components/SnackbarProvider';
 import { storageService } from '../services/storageService';
 import { useAuth } from '../hooks/useAuth';
 import type { Exercise } from '../types';
-import { DEBUG } from '../config/features';
+// import { DEBUG } from '../config/features';
+import logger from '../utils/logger';
 
 export const CreateExercisePage: React.FC = () => {
   const navigate = useNavigate();
@@ -63,16 +64,16 @@ export const CreateExercisePage: React.FC = () => {
         version: 1
       };
       
-      if (DEBUG) {
-        console.log('=== EXERCISE CREATION DEBUG ===');
-        console.log('User:', user);
-        console.log('Exercise payload:', JSON.stringify(exercisePayload, null, 2));
-        console.log('muscle_groups:', exercisePayload.muscle_groups, 'type:', typeof exercisePayload.muscle_groups, 'isArray:', Array.isArray(exercisePayload.muscle_groups));
-        console.log('equipment_needed:', exercisePayload.equipment_needed, 'type:', typeof exercisePayload.equipment_needed, 'isArray:', Array.isArray(exercisePayload.equipment_needed));
-        console.log('instructions:', exercisePayload.instructions, 'type:', typeof exercisePayload.instructions);
-        console.log('tags:', exercisePayload.tags, 'type:', typeof exercisePayload.tags);
-        console.log('===============================');
-      }
+      // if (DEBUG) {
+      //   logger.log('=== EXERCISE CREATION DEBUG ===');
+      //   logger.log('User:', user);
+      //   logger.log('Exercise payload:', JSON.stringify(exercisePayload, null, 2));
+      //   logger.log('muscle_groups:', exercisePayload.muscle_groups, 'type:', typeof exercisePayload.muscle_groups, 'isArray:', Array.isArray(exercisePayload.muscle_groups));
+      //   logger.log('equipment_needed:', exercisePayload.equipment_needed, 'type:', typeof exercisePayload.equipment_needed, 'isArray:', Array.isArray(exercisePayload.equipment_needed));
+      //   logger.log('instructions:', exercisePayload.instructions, 'type:', typeof exercisePayload.instructions);
+      //   logger.log('tags:', exercisePayload.tags, 'type:', typeof exercisePayload.tags);
+      //   logger.log('===============================');
+      // }
       
       // Save to IndexedDB (this will mark it as dirty for sync)
       await storageService.saveExercise(exercisePayload);
@@ -91,7 +92,7 @@ export const CreateExercisePage: React.FC = () => {
       // Navigate back to exercises page
       navigate('/exercises');
     } catch (error) {
-      console.error('Failed to create exercise:', error);
+      logger.error('Failed to create exercise:', error);
       showSnackbar(
         t('exercises.createError', 'Failed to create exercise. Please try again.'),
         { type: 'error' }

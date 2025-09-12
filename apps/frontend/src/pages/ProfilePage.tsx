@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import type { UserProfile, Connection } from '../types';
 import { profileService } from '../services/profileService';
 import { EditIcon } from '../components/icons/NavigationIcons';
+import logger from '../utils/logger';
 
 interface ProfilePageProps {
   isOwnProfile?: boolean;
@@ -43,7 +44,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
         setConnections(connectionsData || []);
         setConnectionsCount((connectionsData || []).length);
       } catch (error) {
-        console.error('Failed to load profile:', error);
+        logger.error('Failed to load profile:', error);
       } finally {
         setLoading(false);
       }

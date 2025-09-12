@@ -19,6 +19,7 @@ import {
 import { ExerciseRating } from '../components/ExerciseRating';
 import { CopyExerciseButton } from '../components/CopyExerciseButton';
 import { favoritesService } from '../services/favoritesService';
+import logger from '../utils/logger';
 
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -109,7 +110,7 @@ const ExerciseDetailPage: React.FC = () => {
       setIsFavorite(favoriteStatus);
 
     } catch (err) {
-      console.error('Error loading exercise details:', err);
+      logger.error('Error loading exercise details:', err);
       setError(t('exercise.loadError'));
     } finally {
       setLoading(false);
@@ -127,7 +128,7 @@ const ExerciseDetailPage: React.FC = () => {
       );
       setIsFavorite(newStatus);
     } catch (err) {
-      console.error('Error toggling favorite:', err);
+      logger.error('Error toggling favorite:', err);
     }
   };
 

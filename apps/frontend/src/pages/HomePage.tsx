@@ -12,6 +12,7 @@ import { localizeExercise } from '../utils/localizeExercise';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { SignInButton } from '../components/auth';
 import { useAuth } from '../hooks/useAuth';
+import logger from '../utils/logger';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -106,7 +107,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             }
           }
         } catch (error) {
-          console.error('Failed to load upcoming workout:', error);
+          logger.error('Failed to load upcoming workout:', error);
         }
       }
     };

@@ -19,6 +19,7 @@ import {
   clearPWACaches, 
   forceUpdateServiceWorker 
 } from '../utils/serviceWorker';
+import logger from '../utils/logger';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -70,7 +71,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       }
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to export data:', error);
+      logger.error('Failed to export data:', error);
     }
   };
 
@@ -84,7 +85,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   // Legacy sync (and v2 wrapper) accept optional force flag; current typing expects no args
   await syncService.sync();
     } catch (err) {
-      console.error('Manual sync failed:', err);
+      logger.error('Manual sync failed:', err);
     } finally {
       setIsManualSyncing(false);
     }
@@ -97,7 +98,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       setIsForceFullSyncing(true);
       await correctSyncService.sync('full');
     } catch (err) {
-      console.error('Force full sync failed:', err);
+      logger.error('Force full sync failed:', err);
     } finally {
       setIsForceFullSyncing(false);
     }
@@ -111,7 +112,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       await correctSyncService.resetState();
       await correctSyncService.sync('full');
     } catch (err) {
-      console.error('Reset sync state failed:', err);
+      logger.error('Reset sync state failed:', err);
     } finally {
       setIsResettingSyncState(false);
     }
@@ -131,7 +132,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         window.location.href = '/';
       }
     } catch (error) {
-      console.error('Failed to clear data:', error);
+      logger.error('Failed to clear data:', error);
     }
   };
 
@@ -155,7 +156,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       // Trigger a page reload to show updated exercises
       window.location.reload();
     } catch (error) {
-      console.error('Failed to refresh exercises:', error);
+      logger.error('Failed to refresh exercises:', error);
     }
   };
 
@@ -168,7 +169,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       setIsRefreshing(true);
       await forceRefreshFromServer();
     } catch (error) {
-      console.error('Force refresh failed:', error);
+      logger.error('Force refresh failed:', error);
       setIsRefreshing(false);
     }
   };
@@ -179,7 +180,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       await clearPWACaches();
       setIsRefreshing(false);
     } catch (error) {
-      console.error('Clear caches failed:', error);
+      logger.error('Clear caches failed:', error);
       setIsRefreshing(false);
     }
   };
@@ -189,7 +190,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       setIsRefreshing(true);
       await forceUpdateServiceWorker();
     } catch (error) {
-      console.error('Service worker update failed:', error);
+      logger.error('Service worker update failed:', error);
       setIsRefreshing(false);
     }
   };

@@ -11,6 +11,7 @@ import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import { useExerciseVideo } from '../hooks/useExerciseVideo';
 import getVideoSources from '../utils/videoSources';
+import logger from '../utils/logger';
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -62,7 +63,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
   useEffect(() => {
     if (!videoFeatureEnabled) return;
-    loadExerciseMedia().then(setMediaIndex).catch(err => { console.warn('Failed to load exercise media', err); });
+    loadExerciseMedia().then(setMediaIndex).catch(err => { logger.warn('Failed to load exercise media', err); });
   }, [videoFeatureEnabled]);
 
   const restingNow = workoutMode?.isResting || isResting;
@@ -205,7 +206,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     if (exerciseVideo.error) reasons.push('error state');
     if (reasons.length) {
       // One concise debug line (no PII) to assist diagnosing missing video rendering
-      console.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
+      logger.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
     }
   }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error, appSettings.show_exercise_videos]);
   
@@ -670,7 +671,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     onClick={() => {
                       // Note: This would need state management through props
                       // For now, this is a placeholder for rep advancement
-                      console.log('Next rep clicked');
+                      logger.log('Next rep clicked');
                     }}
                     disabled={(currentRep || 0) >= (totalReps || 0)}
                     className="btn-secondary text-xs py-2 disabled:opacity-50"
@@ -687,7 +688,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       if (isLastSet) {
                         onStopTimer(true);
                       } else {
-                        console.log('Next set clicked');
+                        logger.log('Next set clicked');
                       }
                     }}
                     className="btn-primary text-xs py-2"

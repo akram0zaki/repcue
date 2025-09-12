@@ -9,6 +9,7 @@ import { favoritesService } from '../services/favoritesService';
 import { communityCacheService } from '../services/communityCache';
 import { FeatureGuard } from '../components/FeatureGuard';
 import { SearchIcon, FilterIcon, StarIcon } from '../components/icons/NavigationIcons';
+import logger from '../utils/logger';
 
 interface CommunityExercise extends Exercise {
   creator_name?: string;
@@ -168,7 +169,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       setExercises(processedExercises);
       setWorkouts(processedWorkouts);
     } catch (err) {
-      console.error('Error loading community content:', err);
+      logger.error('Error loading community content:', err);
       setError(t('community.loadError'));
     } finally {
       setLoading(false);
@@ -253,7 +254,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
         ));
       }
     } catch (err) {
-      console.error('Error toggling favorite:', err);
+      logger.error('Error toggling favorite:', err);
     }
   };
 
@@ -275,7 +276,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       // Show success message or redirect to copied exercise
       alert(t('community.exerciseCopied'));
     } catch (err) {
-      console.error('Error copying exercise:', err);
+      logger.error('Error copying exercise:', err);
       alert(t('community.copyError'));
     }
   };

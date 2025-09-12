@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../config/supabase';
 import { Routes } from '../types';
+import logger from '../utils/logger';
 
 /**
  * OAuth callback page that handles authentication redirects
@@ -46,7 +47,7 @@ const AuthCallbackPage: React.FC = () => {
               friendlyMessage = t('errors.oauthGeneric', 'Sign-in failed. Please try again.');
           }
           
-          console.error('OAuth error from URL params:', { error: errorParam, description: errorDescription });
+          logger.error('OAuth error from URL params:', { error: errorParam, description: errorDescription });
           setError(friendlyMessage);
           
           // Redirect to home with error after a delay
@@ -60,7 +61,7 @@ const AuthCallbackPage: React.FC = () => {
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Auth callback error:', error);
+          logger.error('Auth callback error:', error);
           
           // Map Supabase auth errors to user-friendly messages
           let friendlyMessage = error.message;
@@ -86,7 +87,7 @@ const AuthCallbackPage: React.FC = () => {
 
         if (data.session?.user) {
           // Successfully authenticated
-          console.log('OAuth authentication successful:', {
+          logger.log('OAuth authentication successful:', {
             provider: data.session.user.app_metadata?.provider,
             userId: data.session.user.id,
             email: data.session.user.email
@@ -100,7 +101,7 @@ const AuthCallbackPage: React.FC = () => {
           }, 2000);
         } else {
           // No session found - could be a refresh issue
-          console.warn('No session found during OAuth callback');
+          logger.warn('No session found during OAuth callback');
           setError(t('errors.noSessionFound', 'Authentication session not found. Please try signing in again.'));
           
           setTimeout(() => {
@@ -108,7 +109,7 @@ const AuthCallbackPage: React.FC = () => {
           }, 3000);
         }
       } catch (err) {
-        console.error('Unexpected error during auth callback:', err);
+        logger.error('Unexpected error during auth callback:', err);
         setError(t('errors.signInFailed', 'An unexpected error occurred. Please try again.'));
         
         // Redirect to home after a delay

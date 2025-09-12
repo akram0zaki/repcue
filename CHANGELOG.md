@@ -1,6 +1,12 @@
 ## Unreleased
 
 ### Fixed
+- **Sync system re-enabled**: Fixed sync not working by re-enabling automatic sync triggers
+  - **Root cause**: Automatic sync triggers were disabled in `App.tsx` due to "timeout issues" comments
+  - **Re-enabled periodic sync**: Every 5 minutes when app is active
+  - **Re-enabled foreground sync**: When app comes to foreground (tab/window focus)
+  - **Manual sync available**: Settings page "Sync Now" button for immediate sync
+  - **User data now syncs**: Workouts and activity logs with `dirty: 1` will sync to Supabase
 - **Complete sync system overhaul**: Resolved all critical sync failures with systematic approach
   - **Undefined field filtering**: Added universal `filterUndefinedValues()` method to prevent 422 database errors
     - Applied to all sync payload types (app_settings, user_favorites, etc.)
