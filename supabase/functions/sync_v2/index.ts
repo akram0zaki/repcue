@@ -53,6 +53,12 @@ const SYNC_TABLES: readonly string[] = [
   'workout_sessions'
 ];
 
+// Singleton tables: one record per user, sync by owner_id not by id
+const SINGLETON_TABLES: readonly string[] = [
+  'app_settings',
+  'user_preferences'
+];
+
 const PUSH_BATCH_LIMIT = 5; // Max total records (upserts+deletes) per request
 const PULL_PAGE_SIZE = 50;  // Max rows per table per page
 const MAX_SERVER_ERRORS_LOGGED = 5; // Cap noisy logs per request
@@ -290,12 +296,26 @@ serve(async (req) => {
           
           console.log(`[${correlationId}] Processing ${table}:${id} - incoming fields:`, Object.keys(record).join(', '));
           
-          // Fetch existing
-          const { data: existing, error: fetchError } = await supabase
-            .from(table)
-            .select('id, version, owner_id, deleted, updated_at')
-            .eq('id', id)
-            .maybeSingle();
+          // Fetch existing - use owner_id for singleton tables, id for others
+          let existing, fetchError;
+          if (SINGLETON_TABLES.includes(table)) {
+            console.log(`[${correlationId}] 🔸 Singleton table: fetching by owner_id for ${table}`);
+            const { data, error } = await supabase
+              .from(table)
+              .select('id, version, owner_id, deleted, updated_at')
+              .eq('owner_id', userId)
+              .maybeSingle();
+            existing = data;
+            fetchError = error;
+          } else {
+            const { data, error } = await supabase
+              .from(table)
+              .select('id, version, owner_id, deleted, updated_at')
+              .eq('id', id)
+              .maybeSingle();
+            existing = data;
+            fetchError = error;
+          }
           
           if (fetchError) {
             console.error(`[${correlationId}] Fetch error for ${table}:${id}:`, fetchError);
@@ -309,11 +329,17 @@ serve(async (req) => {
           if (!existing) {
             // Insert new
             const insertRecord = scrubIncoming(record, userId, now, incomingVersion, correlationId);
-            console.log(`[${correlationId}] Inserting new record in ${table}:${id} with fields:`, Object.keys(insertRecord).join(', '));
+            const singletonNote = SINGLETON_TABLES.includes(table) ? ' (first singleton record)' : '';
+            console.log(`[${correlationId}] Inserting new record in ${table}:${id}${singletonNote} with fields:`, Object.keys(insertRecord).join(', '));
             
             const { error: insertError } = await supabase.from(table).insert(insertRecord);
             if (insertError) {
-              console.error(`[${correlationId}] Insert error for ${table}:${id}:`, insertError);
+              console.error(`[${correlationId}] Insert error for ${table}:${id}:`, {
+                message: insertError.message,
+                details: insertError.details,
+                hint: insertError.hint,
+                code: insertError.code
+              });
               pushErrors++;
             } else {
               console.log(`[${correlationId}] Successfully inserted ${table}:${id}`);
@@ -339,18 +365,24 @@ serve(async (req) => {
             }
             
             const updateRecord = scrubIncoming(record, userId, now, incomingVersion, correlationId);
-            console.log(`[${correlationId}] Updating record in ${table}:${id} with fields:`, Object.keys(updateRecord).join(', '));
+            const targetId = SINGLETON_TABLES.includes(table) ? existing.id : id;
+            console.log(`[${correlationId}] Updating record in ${table}:${targetId} ${SINGLETON_TABLES.includes(table) ? '(singleton)' : ''} with fields:`, Object.keys(updateRecord).join(', '));
             
             const { error: updateError } = await supabase
               .from(table)
               .update(updateRecord)
-              .eq('id', id);
+              .eq('id', targetId);
               
             if (updateError) {
-              console.error(`[${correlationId}] Update error for ${table}:${id}:`, updateError);
+              console.error(`[${correlationId}] Update error for ${table}:${targetId}:`, {
+                message: updateError.message,
+                details: updateError.details,
+                hint: updateError.hint,
+                code: updateError.code
+              });
               pushErrors++;
             } else {
-              console.log(`[${correlationId}] Successfully updated ${table}:${id}`);
+              console.log(`[${correlationId}] Successfully updated ${table}:${targetId}`);
               pushSuccesses++;
             }
           }
@@ -409,12 +441,35 @@ serve(async (req) => {
     
     console.log(`[${correlationId}] Push phase completed: ${pushSuccesses} successes, ${pushErrors} errors`);
     
+    // Check if push phase had critical errors
+    if (pushErrors > 0) {
+      console.error(`[${correlationId}] Push phase failed with ${pushErrors} errors`);
+      return json({
+        error: 'Push operations failed',
+        details: `${pushErrors} of ${pushSuccesses + pushErrors} operations failed`,
+        successes: pushSuccesses,
+        errors: pushErrors
+      }, 422, correlationId); // 422 Unprocessable Entity - some records failed
+    }
+    
     // 2. Pull changes per table with pagination via composite cursor
+    let pullErrors = 0;
+    let pullSuccesses = 0;
+    
     for (const table of SYNC_TABLES) {
       const cursor = body.since?.[table];
       console.log(`[${correlationId}] Pulling ${table} since:`, cursor);
       
-      const { rows, more, nextCursor } = await pullTablePage(supabase, table, userId, cursor, PULL_PAGE_SIZE, correlationId);
+      const pullResult = await pullTablePage(supabase, table, userId, cursor, PULL_PAGE_SIZE, correlationId);
+      
+      if (pullResult.error) {
+        console.error(`[${correlationId}] Pull error for ${table}: ${pullResult.errorMessage}`);
+        pullErrors++;
+        continue; // Skip this table but continue with others
+      }
+      
+      const { rows, more, nextCursor } = pullResult;
+      pullSuccesses++;
       
       const upserts: Record<string, unknown>[] = [];
       const deletes: string[] = [];
@@ -432,6 +487,20 @@ serve(async (req) => {
         nextCursor,
         more
       };
+    }
+    
+    console.log(`[${correlationId}] Pull phase completed: ${pullSuccesses} successes, ${pullErrors} errors`);
+    
+    // Check if pull phase had critical errors  
+    if (pullErrors > 0) {
+      console.error(`[${correlationId}] Pull phase failed with ${pullErrors} errors`);
+      return json({
+        error: 'Pull operations failed',
+        details: `${pullErrors} of ${pullSuccesses + pullErrors} tables failed to pull`,
+        successes: pullSuccesses,
+        errors: pullErrors,
+        partialResponse: response.tables // Include partial results
+      }, 422, correlationId);
     }
     
     console.log(`[${correlationId}] Sync completed successfully`);
@@ -466,11 +535,15 @@ function scrubIncoming(record: Record<string, unknown>, userId: string, now: str
   let fieldsFiltered = 0;
   
   for (const [k, v] of Object.entries(record)) {
-    if (MUTABLE_FIELD_ALLOWLIST.has(k)) {
+    if (MUTABLE_FIELD_ALLOWLIST.has(k) && v !== undefined) {
       cleaned[k] = v;
     } else {
       fieldsFiltered++;
-      console.log(`[${correlationId}] Filtered field '${k}' from record`);
+      if (!MUTABLE_FIELD_ALLOWLIST.has(k)) {
+        console.log(`[${correlationId}] Filtered disallowed field '${k}' from record`);
+      } else {
+        console.log(`[${correlationId}] Filtered undefined field '${k}' from record`);
+      }
     }
   }
   
@@ -509,10 +582,19 @@ async function pullTablePage(supabase: any, table: string, userId: string, curso
   }
   
   if (cursor) {
-    // Composite OR filter (updated_at > lastUpdatedAt) OR (updated_at = lastUpdatedAt AND id > lastId)
-    const ts = encodeURIComponent(cursor.lastUpdatedAt);
-    const id = encodeURIComponent(cursor.lastId);
-    baseQuery = baseQuery.or(`and(updated_at.eq.${ts},id.gt.${id}),updated_at.gt.${ts}`);
+    // Handle both client field names (lastUpdatedAt) and server field names (last_updated_at)
+    const lastUpdatedAt = (cursor as any).lastUpdatedAt || cursor.last_updated_at;
+    const lastId = (cursor as any).lastId || '0';
+    
+    if (lastUpdatedAt) {
+      // Composite OR filter (updated_at > lastUpdatedAt) OR (updated_at = lastUpdatedAt AND id > lastId)
+      const ts = encodeURIComponent(lastUpdatedAt);
+      const id = encodeURIComponent(lastId);
+      baseQuery = baseQuery.or(`and(updated_at.eq.${ts},id.gt.${id}),updated_at.gt.${ts}`);
+      console.log(`[${correlationId}] Applied cursor filter: updated_at > ${ts} OR (updated_at = ${ts} AND id > ${id})`);
+    } else {
+      console.log(`[${correlationId}] Warning: cursor missing lastUpdatedAt field:`, cursor);
+    }
   }
   
   const { data, error } = await baseQuery.limit(pageSize + 1); // fetch one extra to detect more
@@ -524,7 +606,9 @@ async function pullTablePage(supabase: any, table: string, userId: string, curso
       nextCursor: cursor || {
         lastUpdatedAt: '1970-01-01T00:00:00.000Z',
         lastId: '0'
-      }
+      },
+      error: true,
+      errorMessage: error.message
     };
   }
   
@@ -544,6 +628,7 @@ async function pullTablePage(supabase: any, table: string, userId: string, curso
   return {
     rows: page,
     more,
-    nextCursor
+    nextCursor,
+    error: false
   };
 }
