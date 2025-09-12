@@ -236,6 +236,8 @@ export class CorrectSyncService {
       // 1. Collect dirty records per table (initial queue per table)
   const queues: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }> = {};
   const collectStart = performance.now();
+      // Track records we push in this sync cycle to avoid overwriting them with pulled data
+      const pushedRecords = new Set<string>();
       for (const table of tableList) {
         const dirty = await this.collectDirtyBatch(table, PUSH_BATCH_SIZE, userId);
         if (dirty.upserts.length || dirty.deletes.length) {
@@ -282,6 +284,18 @@ export class CorrectSyncService {
         const batchPayload = buildCappedPayload();
         const hasPush = Object.values(batchPayload).some(v => (v.upserts.length + v.deletes.length) > 0);
         if (!hasPush && sentAtLeastOnce) break; // no more to push
+        
+        // Track records being pushed in this sync cycle
+        if (hasPush) {
+          Object.entries(batchPayload).forEach(([table, data]) => {
+            data.upserts.forEach(record => {
+              pushedRecords.add(`${table}:${record.id}`);
+            });
+            data.deletes.forEach(id => {
+              pushedRecords.add(`${table}:${id}`);
+            });
+          });
+        }
 
         const edgeReq: EdgeSyncRequestV2 = {
           mode,
@@ -317,7 +331,7 @@ export class CorrectSyncService {
           const { upserts, deletes, nextCursor, more } = tableResp;
           if (upserts.length || deletes.length) {
             if (SYNC_DEBUG) logger.debug(`[sync:v2] apply ${table} upserts=${upserts.length} deletes=${deletes.length}`);
-            await this.applyServerTableChanges(table, upserts, deletes, userId);
+            await this.applyServerTableChanges(table, upserts, deletes, userId, pushedRecords);
             result.pulled += upserts.length + deletes.length;
           }
           if (nextCursor) this.setCursor(table, nextCursor, userId);
@@ -332,7 +346,7 @@ export class CorrectSyncService {
             if (!tFollow) break;
             if (tFollow.upserts.length || tFollow.deletes.length) {
               if (SYNC_DEBUG) logger.debug(`[sync:v2] follow ${table} upserts=${tFollow.upserts.length} deletes=${tFollow.deletes.length}`);
-              await this.applyServerTableChanges(table, tFollow.upserts, tFollow.deletes, userId);
+              await this.applyServerTableChanges(table, tFollow.upserts, tFollow.deletes, userId, pushedRecords);
               result.pulled += tFollow.upserts.length + tFollow.deletes.length;
             }
             if (tFollow.nextCursor) { cursor = tFollow.nextCursor; this.setCursor(table, tFollow.nextCursor, userId); }
@@ -484,11 +498,6 @@ export class CorrectSyncService {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync_v2`;
     
-    // Debug logging for network requests
-    console.log(`[SYNC DEBUG] callEdge URL: ${functionUrl}`);
-    console.log(`[SYNC DEBUG] callEdge payload:`, reqBody);
-    console.log(`[SYNC DEBUG] callEdge auth token: ${accessToken ? `${accessToken.substring(0, 20)}...` : 'MISSING'}`);
-    
     if (SYNC_DEBUG) {
       logger.debug(`[sync:v2] callEdge URL: ${functionUrl}`);
       logger.debug(`[sync:v2] callEdge payload:`, reqBody);
@@ -535,9 +544,6 @@ export class CorrectSyncService {
       throw new Error(`edge error ${resp.status}: ${t}`);
     }
     const json = await resp.json();
-    
-    // Debug successful response
-    console.log(`[SYNC DEBUG] callEdge success response:`, json);
     
     if (SYNC_DEBUG) {
       logger.debug(`[sync:v2] callEdge success response:`, json);
@@ -622,7 +628,7 @@ export class CorrectSyncService {
     this.state.perTable[table] = cursor;
   }
 
-  private async applyServerTableChanges(table: string, upserts: Array<Record<string, unknown>>, deletes: string[], userId: string) {
+  private async applyServerTableChanges(table: string, upserts: Array<Record<string, unknown>>, deletes: string[], userId: string, pushedRecords?: Set<string>) {
     if (!this.storage) return;
     const db = this.storage.getDatabase();
     const coll = (db as unknown as Record<string, unknown>)[table] as {
@@ -646,6 +652,13 @@ export class CorrectSyncService {
     // Apply upserts with conflict resolution
     for (const row of upserts) {
       try {
+        // Skip records that we just pushed in this sync cycle to avoid race conditions
+        const recordKey = `${table}:${row.id}`;
+        if (pushedRecords?.has(recordKey)) {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] skipping pulled record we just pushed: ${recordKey}`);
+          continue;
+        }
+        
         const existing = await coll.get(row.id as string);
         if (!existing) {
           await coll.put({ ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });

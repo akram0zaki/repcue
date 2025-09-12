@@ -53,223 +53,209 @@ const SYNC_TABLES: readonly string[] = [
   'workout_sessions'
 ];
 
-// Singleton tables: one record per user, sync by owner_id not by id
+// Singleton tables that have one record per user
 const SINGLETON_TABLES: readonly string[] = [
-  'app_settings',
-  'user_preferences'
+  'user_preferences',
+  'app_settings'
 ];
 
-const PUSH_BATCH_LIMIT = 5; // Max total records (upserts+deletes) per request
-const PULL_PAGE_SIZE = 50;  // Max rows per table per page
-const MAX_SERVER_ERRORS_LOGGED = 5; // Cap noisy logs per request
+const PULL_PAGE_SIZE = 50; // Standard batch size for pulling server changes
 
-// Comprehensive allow‑list of mutable fields using database field names
-const MUTABLE_FIELD_ALLOWLIST = new Set([
-  'id',
-  'name',
-  'title',
-  'description',
-  'exercise_id',
-  'workout_id',
-  'settings',
-  'locale',
-  'units',
-  'rep_speed_factor',
-  'cues',
-  'data',
-  'metadata',
-  'payload',
-  'version',
-  'deleted',
-  // app_settings fields (using database field names)
-  'beep_volume',
-  'dark_mode',
-  'vibration_enabled',
-  'reduce_motion',
-  'auto_start_next',
-  'default_rest_time',
-  'pre_timer_countdown',
-  'show_exercise_videos',
-  'last_selected_exercise_id',
-  'beep_interval_seconds',
-  'beep_sound_enabled',
-  'data_auto_save',
-  // Additional app_settings fields from schema
-  'interval_duration',
-  'sound_enabled',
-  // user_preferences fields
-  'favorite_exercises',
-  'daily_goal',
-  'weekly_goal',
-  'preferred_units',
-  'notification_preferences',
-  'privacy_settings',
-  'default_interval_duration',
-  // exercises fields
-  'instructions',
-  'muscle_groups',
-  'difficulty',
-  'equipment_needed',
-  'video_url',
-  'image_url',
-  'tags',
-  'category',
-  'duration_seconds',
-  'exercise_type',
-  'rep_duration_seconds',
-  'is_favorite',
-  'is_public',
-  'is_verified',
-  'rating_average',
-  'rating_count',
-  'copy_count',
-  'difficulty_level',
-  'custom_video_url',
-  'has_video',
-  'default_duration',
-  'default_sets',
-  'default_reps',
-  // user_favorites fields
-  'favorited_at',
-  'notes',
-  'item_id',
-  'item_type',
-  'exercise_type',
-  // workouts fields
-  'exercises',
-  'total_duration',
-  'difficulty_level',
-  'tags_list',
-  'is_public',
-  'created_by',
-  'category_name',
-  // activity_logs fields
-  'exercise_name',
-  'workout_name',
-  'duration',
-  'timestamp',
-  'notes',
-  'sets',
-  'reps',
-  // workout_sessions fields
-  'workout_name',
-  'start_time',
-  'end_time',
-  'total_duration',
-  'total_exercises',
-  'exercises_completed',
-  'is_completed',
-  'started_at',
-  'completed_at',
-  'total_time',
-  'notes_session',
-  'performance_rating'
-]);
+// Allowlisted fields per table (security measure to prevent unauthorized data modification)
+const MUTABLE_FIELD_ALLOWLIST: Record<string, Set<string>> = {
+  user_preferences: new Set([
+    'id', 'owner_id', 'language', 'theme_mode', 'notification_enabled',
+    'default_exercise_duration', 'default_rest_duration', 'sound_profile',
+    'haptic_feedback', 'auto_lock_screen', 'keep_screen_on', 'privacy_analytics',
+    'data_sync_enabled', 'exercise_history_retention_days', 'workout_reminders_enabled',
+    'achievement_notifications', 'social_sharing_enabled', 'export_format_preference',
+    'timezone', 'date_format', 'time_format', 'measurement_units',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  app_settings: new Set([
+    'id', 'owner_id', 'beep_interval_seconds', 'beep_sound_enabled', 'beep_volume',
+    'vibration_enabled', 'dark_mode', 'reduce_motion', 'auto_start_next',
+    'pre_timer_countdown', 'show_exercise_videos', 'data_auto_save', 'default_rest_time',
+    'rep_speed_factor', 'last_selected_exercise_id',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  exercises: new Set([
+    'id', 'owner_id', 'name', 'description', 'category', 'exercise_type',
+    'default_sets', 'default_reps', 'default_duration', 'default_rest_time',
+    'instructions', 'tips', 'difficulty_level', 'equipment_needed', 'muscle_groups',
+    'tags', 'is_favorite', 'custom_fields', 'rep_duration_seconds', 'has_video',
+    'video_url', 'image_url', 'created_by', 'is_public', 'rating', 'times_used',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  user_favorites: new Set([
+    'id', 'owner_id', 'item_id', 'item_type', 'exercise_type',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  workouts: new Set([
+    'id', 'owner_id', 'name', 'description', 'category', 'difficulty_level',
+    'estimated_duration', 'equipment_needed', 'is_favorite', 'is_public',
+    'tags', 'instructions', 'exercises', 'rest_between_exercises', 'rest_between_sets',
+    'created_by', 'rating', 'times_used', 'total_exercises', 'total_sets',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  activity_logs: new Set([
+    'id', 'owner_id', 'exercise_id', 'workout_id', 'session_id', 'activity_type',
+    'duration', 'sets_completed', 'reps_completed', 'weight_used', 'distance',
+    'calories_burned', 'heart_rate_avg', 'heart_rate_max', 'notes',
+    'difficulty_rating', 'completion_status', 'started_at', 'completed_at',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  workout_sessions: new Set([
+    'id', 'owner_id', 'workout_id', 'session_name', 'planned_duration', 'actual_duration',
+    'total_exercises', 'completed_exercises', 'total_sets', 'completed_sets',
+    'total_reps', 'completed_reps', 'calories_burned', 'average_heart_rate',
+    'max_heart_rate', 'difficulty_rating', 'completion_percentage', 'notes',
+    'started_at', 'paused_at', 'resumed_at', 'completed_at',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ])
+};
 
-serve(async (req) => {
-  console.log(`Incoming ${req.method} request from ${req.headers.get('origin')}`);
+// Validate and scrub incoming record fields against allowlist
+function scrubIncoming(table: string, record: Record<string, unknown>): Record<string, unknown> {
+  const allowlist = MUTABLE_FIELD_ALLOWLIST[table];
+  if (!allowlist) {
+    console.warn(`No field allowlist defined for table: ${table}`);
+    return record; // Allow all fields if no allowlist (fallback)
+  }
+  
+  const scrubbed: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(record)) {
+    if (allowlist.has(key)) {
+      scrubbed[key] = value;
+    } else {
+      console.warn(`Filtered disallowed field '${key}' from ${table} record`);
+    }
+  }
+  
+  return scrubbed;
+}
+
+// Pull changes from a table with cursor-based pagination
+async function pullTablePage(
+  supabase: any,
+  table: string,
+  userId: string,
+  cursor: TableCursor | undefined,
+  limit: number,
+  correlationId: string
+): Promise<{
+  records: Record<string, unknown>[];
+  nextCursor: TableCursor;
+  hasMore: boolean;
+  error: boolean;
+  errorMessage?: string;
+}> {
+  try {
+    console.log(`[${correlationId}] Pulling ${table} with cursor:`, cursor, `limit: ${limit}`);
+    
+    // Build query - fetch records newer than cursor or all if no cursor
+    let query = supabase
+      .from(table)
+      .select('*')
+      .eq('owner_id', userId)
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true }) // Secondary sort for stable pagination
+      .limit(limit + 1); // +1 to detect if there are more records
+    
+    if (cursor) {
+      // Use composite cursor: (updated_at > cursor.lastUpdatedAt) OR (updated_at = cursor.lastUpdatedAt AND id > cursor.lastId)
+      query = query.or(`updated_at.gt.${cursor.lastUpdatedAt},and(updated_at.eq.${cursor.lastUpdatedAt},id.gt.${cursor.lastId})`);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error(`[${correlationId}] Pull query failed for ${table}:`, error);
+      return {
+        records: [],
+        nextCursor: cursor || { lastUpdatedAt: '', lastId: '' },
+        hasMore: false,
+        error: true,
+        errorMessage: error.message
+      };
+    }
+    
+    const records = data || [];
+    const hasMore = records.length > limit;
+    const actualRecords = hasMore ? records.slice(0, limit) : records;
+    
+    // Generate next cursor from last record
+    const nextCursor = actualRecords.length > 0
+      ? {
+          lastUpdatedAt: actualRecords[actualRecords.length - 1].updated_at,
+          lastId: actualRecords[actualRecords.length - 1].id
+        }
+      : cursor || { lastUpdatedAt: '', lastId: '' };
+    
+    console.log(`[${correlationId}] Pulled ${actualRecords.length} records from ${table}, hasMore: ${hasMore}`);
+    
+    return {
+      records: actualRecords,
+      nextCursor,
+      hasMore,
+      error: false
+    };
+  } catch (e) {
+    console.error(`[${correlationId}] Pull operation failed for ${table}:`, e);
+    return {
+      records: [],
+      nextCursor: cursor || { lastUpdatedAt: '', lastId: '' },
+      hasMore: false,
+      error: true,
+      errorMessage: e.message
+    };
+  }
+}
+
+serve(async (req: Request) => {
+  console.log(`🚀 sync_v2 edge function called: ${req.method} ${req.url}`);
   
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    console.log('Handling CORS preflight request');
-    return new Response('ok', {
-      status: 200,
-      headers: corsHeaders
-    });
+    return new Response('ok', { headers: corsHeaders });
   }
   
+  // Generate correlation ID for request tracing
   const correlationId = crypto.randomUUID();
-  console.log(`[${correlationId}] Sync request started - Method: ${req.method}`);
+  console.log(`[${correlationId}] Processing sync request`);
   
   try {
-    if (req.method !== 'POST') {
-      console.log(`[${correlationId}] Method not allowed: ${req.method}`);
-      return json({
-        error: 'Method not allowed'
-      }, 405, correlationId);
-    }
-    
+    // 1. Extract and validate JWT
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.log(`[${correlationId}] Missing authorization header`);
-      return json({
-        error: 'Missing authorization header'
-      }, 401, correlationId);
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.log(`[${correlationId}] Missing or invalid Authorization header`);
+      return json({ error: 'Missing Authorization header' }, 401, correlationId);
     }
     
-    const jwt = authHeader.replace('Bearer ', '');
+    const jwt = authHeader.substring(7);
     const userId = await validateJWT(jwt);
     if (!userId) {
-      console.log(`[${correlationId}] Invalid token`);
-      return json({
-        error: 'Invalid token'
-      }, 401, correlationId);
+      console.log(`[${correlationId}] JWT validation failed`);
+      return json({ error: 'Invalid or expired token' }, 401, correlationId);
     }
     
-    console.log(`[${correlationId}] Validated user: ${userId}`);
+    console.log(`[${correlationId}] Authenticated user: ${userId}`);
     
-    const rawBody = await req.text();
-    if (!rawBody) return json({
-      error: 'Empty body'
-    }, 400, correlationId);
-    
-    if (rawBody.length > 32_000) return json({
-      error: 'Payload too large'
-    }, 413, correlationId);
-    
-    let body: EdgeSyncRequestV2;
-    try {
-      body = JSON.parse(rawBody);
-    } catch (e) {
-      console.log(`[${correlationId}] Invalid JSON:`, e.message);
-      return json({
-        error: 'Invalid JSON',
-        message: e.message
-      }, 400, correlationId);
-    }
-    
-    // Basic shape validation
-    if (!body || typeof body !== 'object' || !body.tables) return json({
-      error: 'Invalid request shape'
-    }, 400, correlationId);
-    
-    if (!body.mode || !['light', 'full', 'priority'].includes(body.mode)) return json({
-      error: 'Invalid mode'
-    }, 400, correlationId);
-    
-    console.log(`[${correlationId}] Mode: ${body.mode}, Tables: ${Object.keys(body.tables).join(', ')}`);
-    
-    // Enforce push batch limit
-    let pushCount = 0;
-    for (const [table, payload] of Object.entries(body.tables)) {
-      if (!SYNC_TABLES.includes(table)) return json({
-        error: `Table not allowed: ${table}`
-      }, 400, correlationId);
-      
-      pushCount += (payload.upserts?.length || 0) + (payload.deletes?.length || 0);
-      if (pushCount > PUSH_BATCH_LIMIT) return json({
-        error: 'Batch too large',
-        max: PUSH_BATCH_LIMIT
-      }, 400, correlationId);
-    }
-    
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'); // Required for server authoritative writes
-    
-    if (!supabaseUrl || !serviceKey) {
-      console.error(`[${correlationId}] Missing environment variables`);
-      return json({
-        error: 'Server configuration error'
-      }, 500, correlationId);
-    }
-    
-    const supabase = createClient(supabaseUrl, serviceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
+    // 2. Parse request body
+    const body: EdgeSyncRequestV2 = await req.json();
+    console.log(`[${correlationId}] Request body:`, {
+      mode: body.mode,
+      tablesWithData: Object.keys(body.tables || {}),
+      sinceKeys: Object.keys(body.since || {}),
+      clientInfo: body.clientInfo
     });
     
+    // 3. Connect to Supabase with service key for admin operations
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // 4. Initialize response
     const response: EdgeSyncResponseV2 = {
       correlation_id: correlationId,
       server_time: new Date().toISOString(),
@@ -327,114 +313,92 @@ serve(async (req) => {
           const incomingVersion = typeof record.version === 'number' ? record.version : 1;
           
           if (!existing) {
-            // Insert new
-            const insertRecord = scrubIncoming(record, userId, now, incomingVersion, correlationId);
-            const singletonNote = SINGLETON_TABLES.includes(table) ? ' (first singleton record)' : '';
-            console.log(`[${correlationId}] Inserting new record in ${table}:${id}${singletonNote} with fields:`, Object.keys(insertRecord).join(', '));
+            // INSERT: New record
+            console.log(`[${correlationId}] 🆕 INSERT: ${table}:${id} (new record)`);
+            const scrubbedRecord = scrubIncoming(table, {
+              ...record,
+              owner_id: userId,
+              created_at: record.created_at || now,
+              updated_at: now,
+              version: incomingVersion
+            });
             
-            const { error: insertError } = await supabase.from(table).insert(insertRecord);
+            const { error: insertError } = await supabase
+              .from(table)
+              .insert(scrubbedRecord);
+            
             if (insertError) {
-              console.error(`[${correlationId}] Insert error for ${table}:${id}:`, {
-                message: insertError.message,
-                details: insertError.details,
-                hint: insertError.hint,
-                code: insertError.code
-              });
+              console.error(`[${correlationId}] Insert error for ${table}:${id}:`, { message: insertError.message, details: insertError.details });
               pushErrors++;
             } else {
-              console.log(`[${correlationId}] Successfully inserted ${table}:${id}`);
+              console.log(`[${correlationId}] ✅ INSERT success: ${table}:${id}`);
               pushSuccesses++;
             }
           } else {
-            // Ownership check
-            if (existing.owner_id && existing.owner_id !== userId) {
-              console.log(`[${correlationId}] Skipping ${table}:${id} - ownership mismatch`);
-              continue;
-            }
+            // UPDATE: Handle version conflicts and resurrection
+            const existingVersion = existing.version || 1;
+            const existingDeleted = existing.deleted || false;
             
-            // Resurrection prevention: if server row is deleted and client isn't explicitly deleting, skip
-            if (existing.deleted && !record.deleted) {
-              console.log(`[${correlationId}] Skipping ${table}:${id} - resurrection prevention`);
-              continue;
-            }
+            console.log(`[${correlationId}] 🔄 UPDATE: ${table}:${id} - existing v${existingVersion} (deleted: ${existingDeleted}) vs incoming v${incomingVersion}`);
             
-            // If client version <= existing version, skip (server authoritative)
-            if ((existing.version ?? 0) >= incomingVersion) {
-              console.log(`[${correlationId}] Skipping ${table}:${id} - version conflict (existing: ${existing.version}, incoming: ${incomingVersion})`);
-              continue;
-            }
-            
-            const updateRecord = scrubIncoming(record, userId, now, incomingVersion, correlationId);
-            const targetId = SINGLETON_TABLES.includes(table) ? existing.id : id;
-            console.log(`[${correlationId}] Updating record in ${table}:${targetId} ${SINGLETON_TABLES.includes(table) ? '(singleton)' : ''} with fields:`, Object.keys(updateRecord).join(', '));
-            
-            const { error: updateError } = await supabase
-              .from(table)
-              .update(updateRecord)
-              .eq('id', targetId);
-              
-            if (updateError) {
-              console.error(`[${correlationId}] Update error for ${table}:${targetId}:`, {
-                message: updateError.message,
-                details: updateError.details,
-                hint: updateError.hint,
-                code: updateError.code
+            if (incomingVersion > existingVersion || (incomingVersion === existingVersion && !existingDeleted && record.deleted)) {
+              // Version wins OR resurrection case
+              console.log(`[${correlationId}] 📝 Updating ${table}:${id} (version precedence: ${incomingVersion} > ${existingVersion})`);
+              const scrubbedRecord = scrubIncoming(table, {
+                ...record,
+                owner_id: userId,
+                updated_at: now,
+                version: incomingVersion
               });
-              pushErrors++;
+              
+              const { error: updateError } = await supabase
+                .from(table)
+                .update(scrubbedRecord)
+                .eq('id', existing.id);
+              
+              if (updateError) {
+                console.error(`[${correlationId}] Update error for ${table}:${id}:`, { message: updateError.message, details: updateError.details });
+                pushErrors++;
+              } else {
+                console.log(`[${correlationId}] ✅ UPDATE success: ${table}:${id}`);
+                pushSuccesses++;
+              }
             } else {
-              console.log(`[${correlationId}] Successfully updated ${table}:${targetId}`);
-              pushSuccesses++;
+              // Skip due to version conflict or no change needed
+              console.log(`[${correlationId}] ⏭️ SKIP: ${table}:${id} (version conflict: incoming ${incomingVersion} <= existing ${existingVersion})`);
+              pushSuccesses++; // Count as success since it's handled correctly
             }
           }
         } catch (e) {
-          if (pushErrors < MAX_SERVER_ERRORS_LOGGED) {
-            console.error(`[${correlationId}] Upsert failed for ${table}:`, e.message);
-            pushErrors++;
-          }
+          console.error(`[${correlationId}] Upsert processing error for ${table}:`, e);
+          pushErrors++;
         }
       }
       
-      // Deletes -> soft delete
-      for (const id of deletes) {
+      // Deletes
+      for (const deleteId of deletes) {
         try {
-          const now = new Date().toISOString();
-          // Only update if owned by user; version bump by incrementing (select current version first for safety)
-          const { data: existing } = await supabase
-            .from(table)
-            .select('version, owner_id')
-            .eq('id', id)
-            .maybeSingle();
-            
-          if (!existing || existing.owner_id && existing.owner_id !== userId) {
-            console.log(`[${correlationId}] Skipping delete ${table}:${id} - not found or not owned`);
-            continue;
-          }
-          
-          const newVersion = (existing.version ?? 0) + 1;
-          console.log(`[${correlationId}] Soft deleting ${table}:${id}`);
+          console.log(`[${correlationId}] 🗑️ DELETE: ${table}:${deleteId}`);
           
           const { error: deleteError } = await supabase
             .from(table)
             .update({
               deleted: true,
-              updated_at: now,
-              version: newVersion
+              updated_at: new Date().toISOString()
             })
-            .eq('id', id)
-            .eq('owner_id', userId);
-            
+            .eq('id', deleteId)
+            .eq('owner_id', userId); // Security: only delete user's own records
+          
           if (deleteError) {
-            console.error(`[${correlationId}] Delete error for ${table}:${id}:`, deleteError);
+            console.error(`[${correlationId}] Delete error for ${table}:${deleteId}:`, deleteError);
             pushErrors++;
           } else {
-            console.log(`[${correlationId}] Successfully deleted ${table}:${id}`);
+            console.log(`[${correlationId}] ✅ DELETE success: ${table}:${deleteId}`);
             pushSuccesses++;
           }
         } catch (e) {
-          if (pushErrors < MAX_SERVER_ERRORS_LOGGED) {
-            console.error(`[${correlationId}] Delete failed for ${table}:`, e.message);
-            pushErrors++;
-          }
+          console.error(`[${correlationId}] Delete processing error for ${table}:${deleteId}:`, e);
+          pushErrors++;
         }
       }
     }
@@ -464,24 +428,18 @@ serve(async (req) => {
         continue; // Skip this table but continue with others
       }
       
-      const { rows, more, nextCursor } = pullResult;
       pullSuccesses++;
+      const { records, nextCursor, hasMore } = pullResult;
+      const upserts = records.filter(r => !r.deleted);
+      const deletes = records.filter(r => r.deleted).map(r => r.id as string);
       
-      const upserts: Record<string, unknown>[] = [];
-      const deletes: string[] = [];
-      
-      for (const row of rows) {
-        if (row.deleted) deletes.push(row.id as string);
-        else upserts.push(stripServerOnly(row));
-      }
-      
-      console.log(`[${correlationId}] ${table} pull result: ${upserts.length} upserts, ${deletes.length} deletes, more: ${more}`);
+      console.log(`[${correlationId}] ${table} pull results: ${upserts.length} upserts, ${deletes.length} deletes, hasMore: ${hasMore}`);
       
       response.tables[table] = {
         upserts,
         deletes,
         nextCursor,
-        more
+        more: hasMore
       };
     }
     
@@ -526,118 +484,15 @@ serve(async (req) => {
 function json(body: Record<string, unknown>, status = 200, correlationId: string) {
   const payload = {
     ...body,
-    correlation_id: correlationId
+    correlation_id: correlationId,
+    timestamp: new Date().toISOString()
   };
+  
   return new Response(JSON.stringify(payload), {
     status,
     headers: {
-      ...corsHeaders,
       'Content-Type': 'application/json',
-      'X-Correlation-Id': correlationId || ''
+      ...corsHeaders
     }
   });
-}
-
-function scrubIncoming(record: Record<string, unknown>, userId: string, now: string, version: number, correlationId: string) {
-  // Whitelist allowed mutable fields only
-  const cleaned: Record<string, unknown> = {};
-  let fieldsFiltered = 0;
-  
-  for (const [k, v] of Object.entries(record)) {
-    if (MUTABLE_FIELD_ALLOWLIST.has(k) && v !== undefined) {
-      cleaned[k] = v;
-    } else {
-      fieldsFiltered++;
-      if (!MUTABLE_FIELD_ALLOWLIST.has(k)) {
-        console.log(`[${correlationId}] Filtered disallowed field '${k}' from record`);
-      } else {
-        console.log(`[${correlationId}] Filtered undefined field '${k}' from record`);
-      }
-    }
-  }
-  
-  if (fieldsFiltered > 0) {
-    console.log(`[${correlationId}] Filtered ${fieldsFiltered} fields from record`);
-  }
-  
-  cleaned.id = record.id; // ensure id present
-  cleaned.owner_id = userId; // All tables now use owner_id consistently
-  cleaned.updated_at = now;
-  cleaned.version = version;
-  // Allow explicit deleted=true coming from client (late delivery); else default false
-  cleaned.deleted = record.deleted === true;
-  
-  return cleaned;
-}
-
-function stripServerOnly(row: Record<string, unknown>) {
-  // Remove owner_id for privacy; retain domain + meta fields required client-side
-  const { owner_id, created_at, ...rest } = row;
-  return rest;
-}
-
-async function pullTablePage(supabase: any, table: string, userId: string, cursor: TableCursor | undefined, pageSize: number, correlationId: string) {
-  // Build filter for user scope (owner_id) except exercises may include shared/public in future; for now owner only or owner=null for builtin exercises
-  let baseQuery = supabase
-    .from(table)
-    .select('*')
-    .order('updated_at', { ascending: true })
-    .order('id', { ascending: true });
-    
-  if (table === 'exercises') {
-    baseQuery = baseQuery.or(`owner_id.eq.${userId},owner_id.is.null`);
-  } else {
-    baseQuery = baseQuery.eq('owner_id', userId);
-  }
-  
-  if (cursor) {
-    // Handle both client field names (lastUpdatedAt) and server field names (last_updated_at)
-    const lastUpdatedAt = (cursor as any).lastUpdatedAt || cursor.last_updated_at;
-    const lastId = (cursor as any).lastId || '0';
-    
-    if (lastUpdatedAt) {
-      // Composite OR filter (updated_at > lastUpdatedAt) OR (updated_at = lastUpdatedAt AND id > lastId)
-      const ts = encodeURIComponent(lastUpdatedAt);
-      const id = encodeURIComponent(lastId);
-      baseQuery = baseQuery.or(`and(updated_at.eq.${ts},id.gt.${id}),updated_at.gt.${ts}`);
-      console.log(`[${correlationId}] Applied cursor filter: updated_at > ${ts} OR (updated_at = ${ts} AND id > ${id})`);
-    } else {
-      console.log(`[${correlationId}] Warning: cursor missing lastUpdatedAt field:`, cursor);
-    }
-  }
-  
-  const { data, error } = await baseQuery.limit(pageSize + 1); // fetch one extra to detect more
-  if (error) {
-    console.error(`[${correlationId}] Pull failed for ${table}:`, error.message);
-    return {
-      rows: [],
-      more: false,
-      nextCursor: cursor || {
-        lastUpdatedAt: '1970-01-01T00:00:00.000Z',
-        lastId: '0'
-      },
-      error: true,
-      errorMessage: error.message
-    };
-  }
-  
-  const rows = data || [];
-  const more = rows.length > pageSize;
-  const page = more ? rows.slice(0, pageSize) : rows;
-  const last = page[page.length - 1];
-  
-  const nextCursor = last ? {
-    lastUpdatedAt: last.updated_at,
-    lastId: last.id
-  } : cursor || {
-    lastUpdatedAt: '1970-01-01T00:00:00.000Z',
-    lastId: '0'
-  };
-  
-  return {
-    rows: page,
-    more,
-    nextCursor,
-    error: false
-  };
 }
