@@ -1,20 +1,26 @@
 ## Unreleased
 
 ### Fixed
-- **Critical sync schema inconsistency**: Fixed `user_favorites` table using `user_id` while server expected `owner_id`
-  - Updated IndexedDB schema to version 12 with `owner_id` field for `user_favorites` table
-  - Added automatic migration logic to convert existing `user_id` records to `owner_id`
-  - Fixed `UserFavorite` TypeScript interface to use `owner_id` instead of `user_id`
-  - Updated all database queries and operations to use consistent `owner_id` field
-  - Resolves 422 sync errors where "2 of 3 operations failed" due to unknown field names
-  - Client now sends consistent field names that match server database schema
+- **Complete sync system overhaul**: Resolved all critical sync failures with systematic approach
+  - **Undefined field filtering**: Added universal `filterUndefinedValues()` method to prevent 422 database errors
+    - Applied to all sync payload types (app_settings, user_favorites, etc.)
+    - Filters out `undefined` values like `owner_id: undefined`, `dirty: undefined` that caused sync failures
+    - Implemented in both StorageService and CorrectSyncService as safety net
+  - **Resilient sync architecture**: Changed from fail-fast to partial success handling
+    - Edge function returns 207 Multi-Status for partial success instead of 422 failure
+    - Client accepts both 200 (full success) and 207 (partial success) responses
+    - Individual record failures no longer crash entire sync batch
+    - Added comprehensive sync metadata with detailed success/error breakdown
+  - **Schema consistency**: Fixed `user_favorites` table using `user_id` while server expected `owner_id`
+    - Updated IndexedDB schema to version 12 with `owner_id` field migration
+    - Fixed `UserFavorite` TypeScript interface and all database operations
+    - Resolves "2 of 3 operations failed" errors from field name mismatches
+- **Debug cleanup**: Removed verbose "ExerciseCard Debug - UUID exercise ownership check" console logging
 
-### Enhanced
+### Enhanced  
 - **Sync investigation documentation**: Added comprehensive troubleshooting guide at `docs/sync-investigation.md`
-  - Root cause analysis of all sync issues identified and resolved
-  - Step-by-step methodology for investigating future sync problems
-  - Debugging tools and correlation ID tracing techniques
-  - Prevention strategies for schema consistency and error handling
+  - Root cause analysis methodology and correlation ID tracing
+  - Prevention strategies for future sync issues
 
 ### Previous Unreleased Changes
 - Frontend: Added exercise seeding diagnostics (`[seed] exercises.count before/after`) and a safe reseed + fallback path in `App.tsx` to prevent empty Exercises page after hard reloads. This also reduces perceived init stalls by avoiding endless empty loads.

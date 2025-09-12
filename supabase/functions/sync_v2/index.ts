@@ -441,16 +441,12 @@ serve(async (req) => {
     
     console.log(`[${correlationId}] Push phase completed: ${pushSuccesses} successes, ${pushErrors} errors`);
     
-    // Check if push phase had critical errors
-    if (pushErrors > 0) {
-      console.error(`[${correlationId}] Push phase failed with ${pushErrors} errors`);
-      return json({
-        error: 'Push operations failed',
-        details: `${pushErrors} of ${pushSuccesses + pushErrors} operations failed`,
-        successes: pushSuccesses,
-        errors: pushErrors
-      }, 422, correlationId); // 422 Unprocessable Entity - some records failed
-    }
+    // Store push phase results for final response (don't fail fast on partial errors)
+    const pushPhaseResults = {
+      successes: pushSuccesses,
+      errors: pushErrors,
+      hasErrors: pushErrors > 0
+    };
     
     // 2. Pull changes per table with pagination via composite cursor
     let pullErrors = 0;
@@ -491,20 +487,33 @@ serve(async (req) => {
     
     console.log(`[${correlationId}] Pull phase completed: ${pullSuccesses} successes, ${pullErrors} errors`);
     
-    // Check if pull phase had critical errors  
-    if (pullErrors > 0) {
-      console.error(`[${correlationId}] Pull phase failed with ${pullErrors} errors`);
-      return json({
-        error: 'Pull operations failed',
-        details: `${pullErrors} of ${pullSuccesses + pullErrors} tables failed to pull`,
-        successes: pullSuccesses,
-        errors: pullErrors,
-        partialResponse: response.tables // Include partial results
-      }, 422, correlationId);
-    }
+    // Determine overall sync status and response
+    const totalErrors = pushPhaseResults.errors + pullErrors;
+    const totalSuccesses = pushPhaseResults.successes + pullSuccesses;
     
-    console.log(`[${correlationId}] Sync completed successfully`);
-    return json(response, 200, correlationId);
+    // Add sync metadata to response
+    response.sync_metadata = {
+      push_successes: pushPhaseResults.successes,
+      push_errors: pushPhaseResults.errors,
+      pull_successes: pullSuccesses,
+      pull_errors: pullErrors,
+      total_successes: totalSuccesses,
+      total_errors: totalErrors
+    };
+    
+    if (totalErrors > 0) {
+      // Partial success - return 207 Multi-Status with detailed results
+      console.log(`[${correlationId}] Sync completed with partial success: ${totalSuccesses} successes, ${totalErrors} errors`);
+      return json({
+        ...response,
+        status: 'partial_success',
+        message: `Sync completed with ${totalErrors} errors out of ${totalSuccesses + totalErrors} total operations`
+      }, 207, correlationId); // 207 Multi-Status for partial success
+    } else {
+      // Full success
+      console.log(`[${correlationId}] Sync completed successfully: ${totalSuccesses} successes, 0 errors`);
+      return json(response, 200, correlationId);
+    }
   } catch (e) {
     console.error(`[${correlationId}] Sync failed with error:`, e.message, e.stack);
     return json({

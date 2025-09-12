@@ -2284,8 +2284,22 @@ export class StorageService {
    * Convert client AppSettings to Supabase app_settings format
    * Handles field name differences between client and server schemas
    */
+  /**
+   * Filter out undefined values from any object to prevent database errors
+   * This is critical for sync payloads since undefined values cause 422 errors
+   */
+  private filterUndefinedValues(obj: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+
   public convertAppSettingsForSync(settings: AppSettings): Record<string, unknown> {
-    return {
+    const rawResult = {
       id: settings.id,
       // Map client field names to Supabase field names
       beep_interval_seconds: settings.interval_duration,
@@ -2299,7 +2313,7 @@ export class StorageService {
       show_exercise_videos: settings.show_exercise_videos,
       data_auto_save: settings.auto_save,
       default_rest_time: settings.default_rest_time,
-      // Include sync metadata
+      // Include all sync metadata (filtering happens below)
       owner_id: settings.owner_id,
       created_at: settings.created_at,
       updated_at: settings.updated_at,
@@ -2309,6 +2323,9 @@ export class StorageService {
       synced_at: settings.synced_at,
       op: settings.op
     };
+
+    // Filter out undefined values to prevent 422 database errors
+    return this.filterUndefinedValues(rawResult);
   }
 
   /**
@@ -2318,7 +2335,9 @@ export class StorageService {
   public convertUserFavoritesForSync(favorite: UserFavorite): Record<string, unknown> {
     // Extract only the fields we want to sync, excluding legacy user_id
     const { user_id: _user_id, ...rest } = favorite as unknown as UserFavorite & { user_id?: string };
-    return rest;
+    
+    // Filter out undefined values to prevent 422 database errors
+    return this.filterUndefinedValues(rest);
   }
 
   /**

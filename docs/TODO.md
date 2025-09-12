@@ -181,6 +181,14 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - Smart onboarding: Use GenAI to have a chat with the user at the first run with the purpose of creating a workout schedule for them. During this onboarding chat, the AI assistant would ask questions about the user's patterns, goals, injuries, preferences, etc then suggest a workout tailored for them. For example it doesn't make sense to suggest Planks to someone who has a shoulder injury.
 
+- Add error handling to AI instructions, and a log to register one-time fixes.
+
+- We don't need real migration:
+
+// Type for database records during migration - supports both user_id and owner_id
+type DatabaseUserFavorite = {}
+
+
 ---
 
 Icons: ☐ ✅ ❌ 👉 🔄 ⏳⌛🚫

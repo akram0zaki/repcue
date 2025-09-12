@@ -79,7 +79,8 @@
       "mcp__supabase-prod__deploy_edge_function",
       "Bash(do echo \"Adding exercise filter translations to $lang\")",
       "mcp__supabase-prod__list_edge_functions",
-      "mcp__supabase__get_edge_function"
+      "mcp__supabase__get_edge_function",
+      "WebFetch(domain:xwzrsfkzqxdybjrkkkvh.supabase.co)"
     ],
     "deny": [],
     "ask": []

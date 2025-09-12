@@ -203,6 +203,20 @@ export class CorrectSyncService {
 
   destroy() { this.isDestroyed = true; }
 
+  /**
+   * Filter out undefined values from any object to prevent database errors
+   * This is critical for sync payloads since undefined values cause 422 errors
+   */
+  private filterUndefinedValues(obj: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+
   // Core implementation
   private async performSync(mode: 'light' | 'full' | 'priority', accessToken: string, userId: string): Promise<CorrectSyncResult> {
     const result: CorrectSyncResult = { success: true, pushed: 0, pulled: 0, tables: 0, errors: [] };
@@ -404,8 +418,10 @@ export class CorrectSyncService {
             mappedRecord = this.storage.convertAppSettingsForSync(clean as unknown as AppSettings);
           } else if (tableName === 'user_favorites' && this.storage) {
             mappedRecord = this.storage.convertUserFavoritesForSync(clean as unknown as UserFavorite);
+          } else {
+            // For tables without specific converters, apply universal undefined filtering
+            mappedRecord = this.filterUndefinedValues(clean);
           }
-          // Note: Other tables (activity_logs, workout_sessions) don't have field mapping methods yet
           
           if (SYNC_DEBUG && tableName === 'user_preferences') {
             logger.debug(`[sync:v2] collectDirtyBatch user_preferences adding to upserts:`, mappedRecord);
@@ -510,7 +526,8 @@ export class CorrectSyncService {
       logger.debug(`[sync:v2] callEdge response headers:`, Object.fromEntries(resp.headers.entries()));
     }
     
-    if (!resp.ok) {
+    // Accept 200 (full success) and 207 (partial success) as valid responses
+    if (resp.status !== 200 && resp.status !== 207) {
       const t = await resp.text();
       if (SYNC_DEBUG) {
         logger.debug(`[sync:v2] callEdge error response body:`, t);

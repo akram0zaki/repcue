@@ -729,24 +729,6 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                         currentUser && 
                         (exercise.owner_id === currentUser.id || !exercise.owner_id);
   
-  // Debug logging for ownership issues  
-  React.useEffect(() => {
-    // Debug any UUID-based exercise (user-created)
-    if (isUserCreatedExerciseCard(exercise.id)) {
-      logger.log('🔍 ExerciseCard Debug - UUID exercise ownership check:', {
-        exerciseName: exercise.name,
-        exerciseId: exercise.id,
-        exerciseOwnerId: exercise.owner_id,
-        ownerIdType: typeof exercise.owner_id,
-        currentUserId: currentUser?.id,
-        isUserCreated,
-        hasCurrentUser: !!currentUser,
-        hasOwnerId: !!exercise.owner_id,
-        idsMatch: exercise.owner_id === currentUser?.id,
-        assumeOwnership: !exercise.owner_id && !!currentUser
-      });
-    }
-  }, [exercise, currentUser, isUserCreated]);
 
   const handleTagExpansionToggle = () => {
     setIsTagsExpanded(!isTagsExpanded);
