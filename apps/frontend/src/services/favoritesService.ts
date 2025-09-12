@@ -2,6 +2,20 @@ import { supabase } from '../config/supabase';
 import type { UserFavorite } from '../types';
 import logger from '../utils/logger';
 
+// Type for database records during migration - supports both user_id and owner_id
+type DatabaseUserFavorite = {
+  id: string;
+  item_id: string;
+  item_type: string;
+  exercise_type: string;
+  created_at: string;
+  updated_at: string;
+  deleted: boolean;
+  version: number;
+  user_id?: string; // Legacy field
+  owner_id?: string; // New field
+};
+
 /**
  * Service for managing unified favorites system
  * Handles both builtin exercises (slug IDs) and user-created content (UUID IDs)
@@ -103,7 +117,7 @@ export class FavoritesService {
 
         const { error } = await supabase
           .from('user_favorites')
-          .upsert(favoriteData as any); // Type assertion needed during owner_id migration
+          .upsert(favoriteData as DatabaseUserFavorite); // Type assertion needed during owner_id migration
 
         if (error) throw error;
 
@@ -138,9 +152,10 @@ export class FavoritesService {
       this.favorites.clear();
       data?.forEach(fav => {
         // Transform to match UserFavorite type - handle both user_id and owner_id from database
+        const dbFav = fav as DatabaseUserFavorite;
         const userFavorite: UserFavorite = {
-          id: fav.id,
-          owner_id: (fav as any).owner_id || (fav as any).user_id, // Handle both field names during transition
+          id: dbFav.id,
+          owner_id: dbFav.owner_id || dbFav.user_id || '', // Handle both field names during transition
           item_id: fav.item_id,
           item_type: (fav.item_type as 'exercise' | 'workout') || 'exercise',
           exercise_type: (fav.exercise_type as 'builtin' | 'user_created' | 'shared') || 'builtin',
@@ -152,17 +167,20 @@ export class FavoritesService {
         this.favorites.set(`${userId}:${fav.item_id}`, userFavorite);
       });
 
-      return (data || []).map(fav => ({
-        id: fav.id,
-        owner_id: (fav as any).owner_id || (fav as any).user_id, // Handle both field names during transition
-        item_id: fav.item_id,
-        item_type: (fav.item_type as 'exercise' | 'workout') || 'exercise',
-        exercise_type: (fav.exercise_type as 'builtin' | 'user_created' | 'shared') || 'builtin',
-        created_at: fav.created_at || new Date().toISOString(),
-        updated_at: fav.updated_at || new Date().toISOString(),
-        deleted: fav.deleted || false,
-        version: fav.version || 1
-      }));
+      return (data || []).map(fav => {
+        const dbFav = fav as DatabaseUserFavorite;
+        return {
+          id: dbFav.id,
+          owner_id: dbFav.owner_id || dbFav.user_id || '', // Handle both field names during transition
+          item_id: fav.item_id,
+          item_type: (fav.item_type as 'exercise' | 'workout') || 'exercise',
+          exercise_type: (fav.exercise_type as 'builtin' | 'user_created' | 'shared') || 'builtin',
+          created_at: fav.created_at || new Date().toISOString(),
+          updated_at: fav.updated_at || new Date().toISOString(),
+          deleted: fav.deleted || false,
+          version: fav.version || 1
+        };
+      });
     } catch (error) {
       logger.error('Error getting favorites:', error);
       return [];
