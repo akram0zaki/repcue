@@ -91,7 +91,7 @@ export class FavoritesService {
         // Add to favorites
         const favoriteData = {
           id: crypto.randomUUID(),
-          user_id: userId,
+          owner_id: userId,
           item_id: itemId,
           item_type: itemType,
           exercise_type: exerciseType,
@@ -103,7 +103,7 @@ export class FavoritesService {
 
         const { error } = await supabase
           .from('user_favorites')
-          .upsert(favoriteData);
+          .upsert(favoriteData as any); // Type assertion needed during owner_id migration
 
         if (error) throw error;
 
@@ -137,24 +137,30 @@ export class FavoritesService {
       // Update local cache
       this.favorites.clear();
       data?.forEach(fav => {
-        // Transform to match UserFavorite type
+        // Transform to match UserFavorite type - handle both user_id and owner_id from database
         const userFavorite: UserFavorite = {
-          ...fav,
+          id: fav.id,
+          owner_id: (fav as any).owner_id || (fav as any).user_id, // Handle both field names during transition
+          item_id: fav.item_id,
           item_type: (fav.item_type as 'exercise' | 'workout') || 'exercise',
           exercise_type: (fav.exercise_type as 'builtin' | 'user_created' | 'shared') || 'builtin',
           created_at: fav.created_at || new Date().toISOString(),
           updated_at: fav.updated_at || new Date().toISOString(),
+          deleted: fav.deleted || false,
           version: fav.version || 1
         };
         this.favorites.set(`${userId}:${fav.item_id}`, userFavorite);
       });
 
       return (data || []).map(fav => ({
-        ...fav,
+        id: fav.id,
+        owner_id: (fav as any).owner_id || (fav as any).user_id, // Handle both field names during transition
+        item_id: fav.item_id,
         item_type: (fav.item_type as 'exercise' | 'workout') || 'exercise',
         exercise_type: (fav.exercise_type as 'builtin' | 'user_created' | 'shared') || 'builtin',
         created_at: fav.created_at || new Date().toISOString(),
         updated_at: fav.updated_at || new Date().toISOString(),
+        deleted: fav.deleted || false,
         version: fav.version || 1
       }));
     } catch (error) {
