@@ -3,6 +3,32 @@
 - Frontend: Added exercise seeding diagnostics (`[seed] exercises.count before/after`) and a safe reseed + fallback path in `App.tsx` to prevent empty Exercises page after hard reloads. This also reduces perceived init stalls by avoiding endless empty loads.
 - Frontend: Improved post‑init rehydrate with short retry/backoff when UI shows 0 exercises but IndexedDB has data, ensuring the Exercises page populates reliably even if the init watchdog forces early UI render.
 
+### 2025-09-12 — Sync Field Naming Consistency and Database Schema Standardization
+
+### Fixed
+- **Database schema inconsistency**: Standardized all table column naming from mixed `user_id`/`owner_id` to consistent `owner_id` across all tables
+  - Renamed columns in `sync_cursors`, `profiles`, `audit_logs`, `user_authenticators`, `webauthn_challenges`, `exercise_ratings`, `workout_ratings` 
+  - Eliminates confusion between field naming conventions that was causing sync logic inconsistencies
+  - All sync and non-sync tables now use consistent `owner_id` field naming for user ownership
+
+- **Sync edge function field allowlist**: Fixed sync returning 200 status but records not being inserted into Supabase
+  - Removed duplicate `scrubIncoming()` function definition that was overwriting the correct implementation
+  - Added missing fields to `MUTABLE_FIELD_ALLOWLIST`: `interval_duration`, `sound_enabled`, `default_interval_duration`, and many schema fields
+  - Enhanced field filtering with detailed logging to show which fields are processed vs filtered
+  - Records now properly insert/update in database instead of silently failing due to field validation
+
+- **CORS preflight handling**: Fixed sync edge function CORS errors preventing client requests
+  - Enhanced CORS headers with `Access-Control-Allow-Methods` and `Access-Control-Max-Age`
+  - Improved OPTIONS handler with explicit 200 status and proper CORS response
+  - Added comprehensive request logging for better debugging visibility
+
+### Enhanced
+- **Sync debugging**: Added extensive logging throughout sync edge function for troubleshooting
+  - Correlation IDs for tracing requests end-to-end
+  - Detailed field processing logs showing incoming/outgoing field names
+  - Database operation success/failure tracking with specific error messages
+  - Environment variable validation and JWT token validation logging
+
 ### 2025-09-11 — Complete Sync and Storage Resolution
 
 ### Fixed

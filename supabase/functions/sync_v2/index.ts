@@ -176,41 +176,61 @@ serve(async (req) => {
       for (const record of upserts) {
         try {
           const id = record.id as string | undefined;
-            if (!id) continue;
-            // Fetch existing
-            const { data: existing } = await supabase.from(table).select('id, version, owner_id, deleted, updated_at').eq('id', id).maybeSingle();
-            const now = new Date().toISOString();
-            const incomingVersion = typeof record.version === 'number' ? record.version : 0;
-            if (!existing) {
-              // Insert new
-              const insertRecord = scrubIncoming(record, userId, now, incomingVersion);
-              console.log(`[DEBUG] Inserting new ${table}:${id}`, insertRecord);
-              const { error: insertError } = await supabase.from(table).insert(insertRecord);
-              if (insertError) console.log(`[DEBUG] Insert error:`, insertError);
-              else console.log(`[DEBUG] Insert successful`);
+          console.log(`[DEBUG] Processing upsert for ${table}:${id}`, { record });
+          if (!id) {
+            console.log(`[DEBUG] Skipping ${table} record - no id`);
+            continue;
+          }
+          // Fetch existing
+          console.log(`[DEBUG] Fetching existing record for ${table}:${id}`);
+          const { data: existing, error: fetchError } = await supabase.from(table).select('id, version, owner_id, deleted, updated_at').eq('id', id).maybeSingle();
+          if (fetchError) {
+            console.log(`[DEBUG] Fetch error for ${table}:${id}:`, fetchError);
+          }
+          console.log(`[DEBUG] Existing record for ${table}:${id}:`, existing);
+          
+          const now = new Date().toISOString();
+          const incomingVersion = typeof record.version === 'number' ? record.version : 1;
+          console.log(`[DEBUG] Processing ${table}:${id} - incomingVersion: ${incomingVersion}, userId: ${userId}`);
+          
+          if (!existing) {
+            // Insert new
+            const insertRecord = scrubIncoming(record, userId, now, incomingVersion);
+            console.log(`[DEBUG] Inserting new ${table}:${id}`, JSON.stringify(insertRecord));
+            const { data: insertData, error: insertError } = await supabase.from(table).insert(insertRecord).select('id');
+            if (insertError) {
+              console.log(`[DEBUG] Insert error for ${table}:${id}:`, JSON.stringify(insertError));
             } else {
-              // Ownership check
-              if (existing.owner_id && existing.owner_id !== userId) {
-                console.log(`[DEBUG] Skipping ${table}:${id} - ownership mismatch`);
-                continue;
-              }
-              // Resurrection prevention: if server row is deleted and client isn't explicitly deleting, skip
-              if (existing.deleted && !record.deleted) {
-                console.log(`[DEBUG] Skipping ${table}:${id} - resurrection prevention`);
-                continue;
-              }
-              // If client version <= existing version, skip (server authoritative)
-              if ((existing.version ?? 0) >= incomingVersion) {
-                console.log(`[DEBUG] Skipping ${table}:${id} - version conflict (existing: ${existing.version}, incoming: ${incomingVersion})`);
-                continue;
-              }
-              const updateRecord = scrubIncoming(record, userId, now, incomingVersion);
-              console.log(`[DEBUG] Updating ${table}:${id}`, updateRecord);
-              const { error: updateError } = await supabase.from(table).update(updateRecord).eq('id', id);
-              if (updateError) console.log(`[DEBUG] Update error:`, updateError);
-              else console.log(`[DEBUG] Update successful`);
+              console.log(`[DEBUG] Insert successful for ${table}:${id}:`, insertData);
             }
+          } else {
+            console.log(`[DEBUG] Record exists for ${table}:${id}, checking conditions...`);
+            // Ownership check
+            if (existing.owner_id && existing.owner_id !== userId) {
+              console.log(`[DEBUG] Skipping ${table}:${id} - ownership mismatch (existing: ${existing.owner_id}, user: ${userId})`);
+              continue;
+            }
+            // Resurrection prevention: if server row is deleted and client isn't explicitly deleting, skip
+            if (existing.deleted && !record.deleted) {
+              console.log(`[DEBUG] Skipping ${table}:${id} - resurrection prevention (existing.deleted: ${existing.deleted}, record.deleted: ${record.deleted})`);
+              continue;
+            }
+            // If client version <= existing version, skip (server authoritative)
+            if ((existing.version ?? 0) >= incomingVersion) {
+              console.log(`[DEBUG] Skipping ${table}:${id} - version conflict (existing: ${existing.version}, incoming: ${incomingVersion})`);
+              continue;
+            }
+            const updateRecord = scrubIncoming(record, userId, now, incomingVersion);
+            console.log(`[DEBUG] Updating ${table}:${id}`, JSON.stringify(updateRecord));
+            const { data: updateData, error: updateError } = await supabase.from(table).update(updateRecord).eq('id', id).select('id');
+            if (updateError) {
+              console.log(`[DEBUG] Update error for ${table}:${id}:`, JSON.stringify(updateError));
+            } else {
+              console.log(`[DEBUG] Update successful for ${table}:${id}:`, updateData);
+            }
+          }
         } catch (e) {
+          console.log(`[DEBUG] Exception in upsert for ${table}:${record?.id}:`, (e as Error).message, (e as Error).stack);
           if (pushErrors < MAX_SERVER_ERRORS_LOGGED) {
             console.log(JSON.stringify({ level: 'error', msg: 'upsert_failed', table, id: (record as any)?.id, correlation_id: correlationId, error: (e as Error).message }));
             pushErrors++;
