@@ -46,6 +46,7 @@ interface StoredVideoFile extends SyncMetadata {
   file_size: number;
   mime_type: string;
   upload_pending: boolean; // true if needs to sync to cloud storage
+  storage_path?: string; // Path in Supabase Storage after successful upload
 }
 
 /**
@@ -1189,7 +1190,7 @@ export class StorageService {
     try {
       // Get all video files in batch for efficiency
       const videoFiles = await this.db.video_files
-        .where('deleted').equals(false)
+        .where('deleted').equals(0)
         .toArray();
 
       // Create a map of exercise_id -> video file for fast lookup

@@ -1,5 +1,5 @@
 import { storageService } from '../services/storageService';
-import { supabase } from '../services/supabase';
+import { supabase } from '../config/supabase';
 import logger from './logger';
 
 /**
