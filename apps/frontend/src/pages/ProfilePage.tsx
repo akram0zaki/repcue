@@ -89,16 +89,16 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
         <div className="container mx-auto px-4 py-8 max-w-md text-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {t('profile:signInRequired')}
+              {t('profile.signInRequired')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              {t('profile:signInToViewProfile')}
+              {t('profile.signInToViewProfile')}
             </p>
             <button
               onClick={() => navigate('/settings')}
               className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
             >
-              {t('common:signIn')}
+              {t('common.signIn')}
             </button>
           </div>
         </div>
@@ -124,16 +124,16 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
         <div className="container mx-auto px-4 py-8 max-w-md text-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {t('profile:notFound')}
+              {t('profile.notFound')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              {t('profile:profileNotFoundMessage')}
+              {t('profile.profileNotFoundMessage')}
             </p>
             <button
               onClick={() => navigate(-1)}
               className="w-full py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
             >
-              {t('common:goBack')}
+              {t('common.goBack')}
             </button>
           </div>
         </div>
@@ -141,7 +141,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
     );
   }
 
-  const displayName = profile.display_name || user?.displayName || user?.email?.split('@')[0] || t('profile:anonymous');
+  const displayName = profile.display_name || user?.displayName || user?.email?.split('@')[0] || t('profile.anonymous');
   const initials = getInitials(profile.display_name, user?.email);
 
   return (
@@ -150,13 +150,13 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {isViewingOwnProfile ? t('profile:myProfile') : t('profile:profile')}
+            {isViewingOwnProfile ? t('profile.myProfile') : t('profile.profile')}
           </h1>
           {isViewingOwnProfile && (
             <button
               onClick={handleEditProfile}
               className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-              aria-label={t('profile:editProfile')}
+              aria-label={t('profile.editProfile')}
             >
               <EditIcon size={20} />
             </button>
@@ -208,10 +208,10 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                 </svg>
                 <div className="text-left">
                   <p className="font-medium text-gray-900 dark:text-white">
-                    {t('profile:connections')}
+                    {t('profile.connections')}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t('profile:connectionsCount', { count: connectionsCount })}
+                    {t('profile.connectionsCount', { count: connectionsCount })}
                   </p>
                 </div>
               </div>
@@ -227,7 +227,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
           {profile.stats && profile.privacy_settings.show_stats && (
             <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                {t('profile:stats')}
+                {t('profile.stats')}
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -235,7 +235,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                     {profile.stats.total_workouts}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {t('profile:totalWorkouts')}
+                    {t('profile.totalWorkouts')}
                   </p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -243,7 +243,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                     {profile.stats.streak_days}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {t('profile:currentStreak')}
+                    {t('profile.currentStreak')}
                   </p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -251,7 +251,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                     {profile.stats.total_exercises_created}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {t('profile:exercisesCreated')}
+                    {t('profile.exercisesCreated')}
                   </p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -259,7 +259,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                     {profile.stats.total_workouts_created}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {t('profile:workoutsCreated')}
+                    {t('profile.workoutsCreated')}
                   </p>
                 </div>
               </div>
@@ -269,7 +269,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
           {/* Member Since */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t('profile:memberSince', { 
+              {t('profile.memberSince', { 
                 date: new Date(profile.join_date).toLocaleDateString() 
               })}
             </p>
@@ -282,7 +282,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
               <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t('profile:connections')}
+                  {t('profile.connections')}
                 </h3>
                 <button
                   onClick={() => setShowConnectionsList(false)}
@@ -307,13 +307,13 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-900 dark:text-white truncate">
-                          {connection.nickname || t('profile:unknownUser')}
+                          {connection.nickname || t('profile.unknownUser')}
                         </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t('profile:connectedSince', { 
+                          {t('profile.connectedSince', { 
                             date: connection.accepted_at 
                               ? new Date(connection.accepted_at).toLocaleDateString() 
-                              : t('profile:pending')
+                              : t('profile.pending')
                           })}
                         </p>
                       </div>
