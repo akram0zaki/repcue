@@ -14,7 +14,13 @@
     - Modified TimerPage prefetch system to handle custom video URL resolution
     - Implemented proper blob URL cleanup to prevent memory leaks
   - **Additional fix**: Skipped HEAD request preflight checks for blob URLs to prevent ERR_METHOD_NOT_SUPPORTED errors
-  - **Result**: Custom exercise videos now work seamlessly in both preview modal and timer ring, matching built-in exercise behavior
+  - **Bidirectional sync**: Implemented complete video sync system for cross-device availability
+    - Videos upload from Device A → Supabase Storage during sync
+    - Videos download to Device B → IndexedDB when accessing exercises
+    - Added exercise enrichment with video URLs during data loading
+    - Enhanced resolveVideoUrl() to download missing videos from cloud storage
+    - Maintains offline-first architecture while enabling cross-device sync
+  - **Result**: Custom exercise videos now work seamlessly across all devices and browsers, matching built-in exercise behavior
 - **Video sync system**: Implemented complete offline-first video upload and sync functionality
   - **Root cause analysis**: Videos failed to sync due to multiple architectural issues
     1. **Missing sync table**: `video_files` table was not included in Edge Function `SYNC_TABLES` array
