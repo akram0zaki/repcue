@@ -476,7 +476,7 @@ export class CorrectSyncService {
         converted.file_data = Array.from(uint8Array);
         
         if (SYNC_DEBUG) {
-          logger.debug(`[sync:v2] File converted to byte array, length:`, converted.file_data.length);
+          logger.debug(`[sync:v2] File converted to byte array, length:`, (converted.file_data as number[]).length);
         }
       } catch (error) {
         logger.error(`[sync:v2] Failed to convert File to ArrayBuffer for sync:`, error);

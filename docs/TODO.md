@@ -183,6 +183,13 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - Add error handling to AI instructions, and a log to register one-time fixes.
 
+- I edited exercise Ya 7amada 6 and successfully uploaded a video that was stored into indexeddb with dirty = 1 then I saved the exercise. I switched tabs to force a sync and the sync was partially successful and I guess the video was not synced because I couldn't find it in supabase. I copied the console output of this full attempt to console.log at the workspace root.
+
+
+- The built-in exercise system assumes 3 videos of different resolutions for each exercise, and picks up the relevant version based on the screen dimentions. I am allowing users to upload only one video for custom exercises, and the video system needs to handle that for custom exercises there is only one video.
+
+
+
 - We don't need real migration:
 
 // Type for database records during migration - supports both user_id and owner_id
