@@ -1182,6 +1182,41 @@ export class StorageService {
   }
 
   /**
+   * Enrich exercises with custom_video_url for offline-first bidirectional sync
+   * Sets blob-pending-sync URLs for exercises that have video files
+   */
+  private async enrichExercisesWithVideoUrls(exercises: Exercise[]): Promise<Exercise[]> {
+    try {
+      // Get all video files in batch for efficiency
+      const videoFiles = await this.db.video_files
+        .where('deleted').equals(false)
+        .toArray();
+
+      // Create a map of exercise_id -> video file for fast lookup
+      const videoFileMap = new Map<string, StoredVideoFile>();
+      for (const videoFile of videoFiles) {
+        videoFileMap.set(videoFile.exercise_id, videoFile);
+      }
+
+      // Enrich exercises with video URLs
+      return exercises.map(exercise => {
+        const videoFile = videoFileMap.get(exercise.id);
+        if (videoFile) {
+          return {
+            ...exercise,
+            custom_video_url: `blob-pending-sync://${exercise.id}/${videoFile.file_name}`,
+            has_video: false // Keep as false since this is custom video, not built-in
+          };
+        }
+        return exercise;
+      });
+    } catch (error) {
+      logger.error('💾 [EnrichVideo] Failed to enrich exercises with video URLs:', error);
+      return exercises; // Return original exercises if enrichment fails
+    }
+  }
+
+  /**
    * Get video file for an exercise
    */
   public async getVideoFile(exerciseId: string): Promise<StoredVideoFile | null> {
@@ -1327,13 +1362,17 @@ export class StorageService {
           this.getUserPreferences().catch(() => null)
         ]);
         const favorites = prefs?.favorite_exercises || [];
-        const allExercises = storedExercises
+        let allExercises = storedExercises
           .map(this.convertStoredExercise)
           .map(ex => ({
             ...ex,
             // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
             is_favorite: favorites.includes(ex.id)
           }));
+
+        // Enrich exercises with video URLs for offline-first bidirectional sync
+        allExercises = await this.enrichExercisesWithVideoUrls(allExercises);
+
         return filterActiveRecords(allExercises);
       },
       () => {
