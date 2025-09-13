@@ -695,10 +695,25 @@ export class CorrectSyncService {
           if (SYNC_DEBUG) logger.debug(`[sync:v2] skipping pulled record we just pushed: ${recordKey}`);
           continue;
         }
-        
+
+        // Special handling for video_files table - download video content for offline access
+        if (table === 'video_files' && row.storage_path && !row.upload_pending && !row.file_data) {
+          try {
+            await this.downloadVideoFileForOfflineAccess(row);
+          } catch (e) {
+            logger.warn(`[sync:v2] Failed to download video file for offline access: ${row.id}`, e);
+            // Continue with sync even if download fails - we'll try again next time
+          }
+        }
+
         const existing = await coll.get(row.id as string);
         if (!existing) {
           await coll.put({ ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
+
+          // If this is a new video file, update the corresponding exercise's custom_video_url
+          if (table === 'video_files' && row.exercise_id && row.file_name) {
+            await this.updateExerciseVideoUrl(row.exercise_id as string, row.file_name as string);
+          }
           continue;
         }
         // If local dirty and local version > incoming, keep local (will push later)
@@ -712,9 +727,83 @@ export class CorrectSyncService {
           if (localTime > incomingTime) continue; // keep local newer timestamp
         }
         await coll.put({ ...existing, ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
+
+        // If this is an updated video file, update the corresponding exercise's custom_video_url
+        if (table === 'video_files' && row.exercise_id && row.file_name) {
+          await this.updateExerciseVideoUrl(row.exercise_id as string, row.file_name as string);
+        }
       } catch (e) {
         logger.warn(`[sync:v2] apply upsert failed ${table}`, e);
       }
+    }
+  }
+
+  /**
+   * Downloads video file from Supabase storage and stores it locally for offline access
+   */
+  private async downloadVideoFileForOfflineAccess(videoFileRow: Record<string, unknown>): Promise<void> {
+    if (!this.storage || !videoFileRow.storage_path) return;
+
+    const storagePath = videoFileRow.storage_path as string;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const videoUrl = `${supabaseUrl}/storage/v1/object/public/videos/${storagePath}`;
+
+    logger.debug(`[sync:v2] Downloading video file for offline access: ${videoUrl}`);
+
+    try {
+      const response = await fetch(videoUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download video: ${response.status} ${response.statusText}`);
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const file = new File([arrayBuffer], videoFileRow.file_name as string, {
+        type: videoFileRow.mime_type as string || 'video/mp4'
+      });
+
+      // Update the video file record with the downloaded file data
+      const db = this.storage.getDatabase();
+      const videoColl = (db as unknown as Record<string, unknown>)['video_files'] as {
+        update: (id: string, changes: Record<string, unknown>) => Promise<number>;
+      };
+
+      await videoColl.update(videoFileRow.id as string, {
+        file_data: file,
+        synced_at: new Date().toISOString()
+      });
+
+      logger.debug(`[sync:v2] Successfully downloaded and stored video file: ${videoFileRow.id}`);
+    } catch (error) {
+      logger.error(`[sync:v2] Failed to download video file ${videoFileRow.id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Updates the exercise's custom_video_url to use blob-pending-sync format for offline access
+   */
+  private async updateExerciseVideoUrl(exerciseId: string, fileName: string): Promise<void> {
+    if (!this.storage) return;
+
+    const db = this.storage.getDatabase();
+    const exerciseColl = (db as unknown as Record<string, unknown>)['exercises'] as {
+      get: (id: string) => Promise<Record<string, unknown> | undefined>;
+      update: (id: string, changes: Record<string, unknown>) => Promise<number>;
+    };
+
+    try {
+      const exercise = await exerciseColl.get(exerciseId);
+      if (exercise) {
+        const blobPendingSyncUrl = `blob-pending-sync://${exerciseId}/${fileName}`;
+        await exerciseColl.update(exerciseId, {
+          custom_video_url: blobPendingSyncUrl,
+          has_video: false, // Keep as false since this is custom video, not built-in
+          synced_at: new Date().toISOString()
+        });
+        logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${blobPendingSyncUrl}`);
+      }
+    } catch (error) {
+      logger.warn(`[sync:v2] Failed to update exercise video URL for ${exerciseId}:`, error);
     }
   }
 

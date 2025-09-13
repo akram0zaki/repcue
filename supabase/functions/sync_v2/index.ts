@@ -34,7 +34,8 @@ const SYNC_TABLES = [
   'user_favorites',
   'workouts',
   'activity_logs',
-  'workout_sessions'
+  'workout_sessions',
+  'video_files'
 ];
 // Singleton tables that have one record per user
 const SINGLETON_TABLES = [
@@ -123,7 +124,8 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'created_at',
     'updated_at',
     'version',
-    'deleted'
+    'deleted',
+    'custom_video_url'
   ]),
   user_favorites: new Set([
     'id',
@@ -226,8 +228,124 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'updated_at',
     'version',
     'deleted'
+  ]),
+  video_files: new Set([
+    'id',
+    'owner_id',
+    'exercise_id',
+    'file_name',
+    'file_data',
+    'file_size',
+    'mime_type',
+    'upload_pending',
+    'storage_path',
+    'created_at',
+    'updated_at',
+    'version',
+    'deleted'
   ])
 };
+// Handle file upload to Supabase Storage
+async function uploadFileToStorage(supabase, fileData, fileName, mimeType, bucket = 'videos') {
+  try {
+    // Convert byte array back to Uint8Array for upload
+    let uint8Array;
+    if (Array.isArray(fileData)) {
+      // Client sent file_data as byte array
+      uint8Array = new Uint8Array(fileData);
+      console.log(`Converting byte array to Uint8Array: ${fileData.length} bytes`);
+    } else if (fileData instanceof ArrayBuffer) {
+      uint8Array = new Uint8Array(fileData);
+    } else if (fileData instanceof Uint8Array) {
+      uint8Array = fileData;
+    } else {
+      throw new Error(`Unsupported file_data type: ${typeof fileData}`);
+    }
+    console.log(`Uploading file to storage: ${fileName}, size: ${uint8Array.length}, type: ${mimeType}`);
+    const { data, error } = await supabase.storage.from(bucket).upload(fileName, uint8Array, {
+      contentType: mimeType,
+      upsert: true // Allow overwriting existing files
+    });
+    if (error) {
+      console.error('Storage upload error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+    console.log('Storage upload success:', data);
+    return {
+      success: true,
+      path: data.path
+    };
+  } catch (e) {
+    console.error('Storage upload exception:', e);
+    return {
+      success: false,
+      error: e.message
+    };
+  }
+}
+// Enforce singleton pattern for video files per exercise
+async function enforceVideoFileSingleton(supabase, userId, exerciseId, currentVideoId, correlationId) {
+  try {
+    console.log(`[${correlationId}] 🎯 Enforcing video file singleton for exercise ${exerciseId}`);
+    // Find all existing video files for this exercise (excluding the current one being processed)
+    const { data: existingFiles, error } = await supabase.from('video_files').select('id, file_name, storage_path').eq('owner_id', userId).eq('exercise_id', exerciseId).eq('deleted', false).neq('id', currentVideoId); // Exclude current video being processed
+    if (error) {
+      console.error(`[${correlationId}] Error querying existing video files:`, error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+    if (existingFiles && existingFiles.length > 0) {
+      console.log(`[${correlationId}] 📹 Found ${existingFiles.length} existing video files to delete (singleton enforcement)`);
+      for (const file of existingFiles){
+        try {
+          // Mark the database record as deleted
+          const { error: deleteError } = await supabase.from('video_files').update({
+            deleted: true,
+            updated_at: new Date().toISOString()
+          }).eq('id', file.id);
+          if (deleteError) {
+            console.error(`[${correlationId}] Failed to mark video file ${file.id} as deleted:`, deleteError);
+          } else {
+            console.log(`[${correlationId}] ✅ Marked existing video file ${file.id} as deleted`);
+          }
+          // Clean up storage file if it exists
+          if (file.storage_path) {
+            try {
+              const { error: storageError } = await supabase.storage.from('videos').remove([
+                file.storage_path
+              ]);
+              if (storageError) {
+                console.warn(`[${correlationId}] Failed to delete storage file ${file.storage_path}:`, storageError);
+              } else {
+                console.log(`[${correlationId}] 🗑️ Cleaned up storage file: ${file.storage_path}`);
+              }
+            } catch (storageCleanupError) {
+              console.warn(`[${correlationId}] Storage cleanup error for ${file.storage_path}:`, storageCleanupError);
+            }
+          }
+        } catch (fileError) {
+          console.error(`[${correlationId}] Error processing existing file ${file.id}:`, fileError);
+        }
+      }
+    } else {
+      console.log(`[${correlationId}] ✨ No existing video files found - singleton constraint satisfied`);
+    }
+    return {
+      success: true
+    };
+  } catch (e) {
+    console.error(`[${correlationId}] Singleton enforcement error:`, e);
+    return {
+      success: false,
+      error: e.message
+    };
+  }
+}
 // Validate and scrub incoming record fields against allowlist
 function scrubIncoming(table, record) {
   const allowlist = MUTABLE_FIELD_ALLOWLIST[table];
@@ -256,7 +374,7 @@ async function pullTablePage(supabase, table, userId, cursor, limit, correlation
       ascending: true
     }) // Secondary sort for stable pagination
     .limit(limit + 1); // +1 to detect if there are more records
-    if (cursor) {
+    if (cursor && cursor.lastUpdatedAt && cursor.lastId) {
       // Use composite cursor: (updated_at > cursor.lastUpdatedAt) OR (updated_at = cursor.lastUpdatedAt AND id > cursor.lastId)
       query = query.or(`updated_at.gt.${cursor.lastUpdatedAt},and(updated_at.eq.${cursor.lastUpdatedAt},id.gt.${cursor.lastId})`);
     }
@@ -360,7 +478,7 @@ serve(async (req)=>{
       const { upserts = [], deletes = [] } = body.tables[table];
       console.log(`[${correlationId}] Processing ${table}: ${upserts.length} upserts, ${deletes.length} deletes`);
       // Upserts
-      for (const record of upserts){
+      for (let record of upserts){
         try {
           const id = record.id;
           if (!id) {
@@ -368,6 +486,34 @@ serve(async (req)=>{
             continue;
           }
           console.log(`[${correlationId}] Processing ${table}:${id} - incoming fields:`, Object.keys(record).join(', '));
+          // Special handling for video_files table with file uploads
+          if (table === 'video_files' && record.file_data && record.upload_pending) {
+            console.log(`[${correlationId}] 📹 Processing video file upload for ${id}`);
+            // SINGLETON ENFORCEMENT: Delete any existing video files for this exercise
+            const singletonResult = await enforceVideoFileSingleton(supabase, userId, record.exercise_id, id, correlationId);
+            if (!singletonResult.success) {
+              console.error(`[${correlationId}] Singleton enforcement failed: ${singletonResult.error}`);
+            // Continue with upload even if singleton enforcement fails (best effort)
+            }
+            // Generate storage path: userId/exerciseId/fileName
+            const storagePath = `${userId}/${record.exercise_id}/${record.file_name}`;
+            // Upload file to Supabase Storage
+            const uploadResult = await uploadFileToStorage(supabase, record.file_data, storagePath, record.mime_type);
+            if (!uploadResult.success) {
+              console.error(`[${correlationId}] Storage upload failed for ${id}: ${uploadResult.error}`);
+              pushErrors++;
+              continue;
+            }
+            console.log(`[${correlationId}] ✅ Video uploaded to storage: ${uploadResult.path}`);
+            // Update record to remove file_data and mark as uploaded
+            record = {
+              ...record,
+              file_data: null,
+              upload_pending: false,
+              storage_path: uploadResult.path
+            };
+          }
+
           // Fetch existing - use owner_id for singleton tables, id for others
           let existing, fetchError;
           if (SINGLETON_TABLES.includes(table)) {

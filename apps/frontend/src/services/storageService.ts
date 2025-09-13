@@ -1318,6 +1318,25 @@ export class StorageService {
   }
 
   /**
+   * Get video files for a specific exercise ID
+   */
+  public async getVideoFilesByExerciseId(exerciseId: string): Promise<StoredVideoFile[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      return await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .toArray();
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to get video files by exercise ID:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get all video files pending sync to cloud storage
    */
   public async getVideoFilesPendingSync(): Promise<StoredVideoFile[]> {

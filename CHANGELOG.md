@@ -1,5 +1,27 @@
 ## Unreleased
 
+## 2025-09-14
+
+### Fixed
+- **Custom exercise video sync architecture**: Corrected offline-first video sync to maintain proper blob-pending-sync URLs
+  - **Issue**: Previous fix broke offline-first architecture by converting blob-pending-sync URLs to storage URLs server-side
+  - **Root cause**: Edge Function was incorrectly converting local `blob-pending-sync://` URLs to Supabase storage URLs during sync
+  - **Problem**: This forced devices to fetch videos from network instead of local IndexedDB, breaking offline functionality
+  - **Corrected architecture**:
+    - **Device A**: Upload video → IndexedDB → Sync video_files table → Keep `blob-pending-sync://` URL for local playback
+    - **Device B**: Receive video_files sync → Auto-download video to IndexedDB → Generate `blob-pending-sync://` URL
+    - **Both devices**: All video playback uses IndexedDB blob URLs (fully offline-first)
+  - **Enhanced sync service**: Added automatic video file download and exercise URL updates
+    ```typescript
+    // Client sync now handles video downloads automatically
+    if (table === 'video_files' && row.storage_path && !row.file_data) {
+      await this.downloadVideoFileForOfflineAccess(row);
+      await this.updateExerciseVideoUrl(exerciseId, fileName);
+    }
+    ```
+  - **Sharing capability**: Added `getShareableVideoUrl()` utility to convert blob-pending-sync URLs to storage URLs only when needed for external sharing
+  - **Result**: Maintains true offline-first architecture while enabling future exercise sharing features
+
 ## 2025-09-13
 
 ### Fixed
