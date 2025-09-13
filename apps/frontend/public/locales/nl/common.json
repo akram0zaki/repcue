@@ -429,6 +429,24 @@
     "workouts": "Trainingen",
     "workoutsOnly": "Alleen Trainingen"
   },
+  "video": {
+    "exerciseVideo": "Oefenvideo",
+    "uploadsNotAvailable": "Video-uploads zijn momenteel niet beschikbaar.",
+    "urlPlaceholderHelper": "Je kunt voorlopig een video-URL als placeholder toevoegen.",
+    "urlPlaceholder": "Video-URL (optioneel)",
+    "currentVideo": "Huidige video",
+    "removeVideo": "Video verwijderen",
+    "clickToUpload": "Klik om een video te uploaden",
+    "supportedFormats": "MP4, MOV, AVI tot 50 MB",
+    "maxFileSize": "Maximale bestandsgrootte: 50 MB",
+    "uploadHint": "Upload een demonstratievideo voor deze oefening (optioneel)",
+    "fileTooLarge": "Het bestand is te groot. De maximale grootte is 50 MB.",
+    "invalidFileType": "Selecteer een geldig videobestand.",
+    "unsupportedFormat": "Niet-ondersteund videoformaat. Gebruik MP4, WebM of OGG voor de beste compatibiliteit.",
+    "uploadFailed": "Uploaden van video mislukt. Probeer het opnieuw.",
+    "uploaded": "geüpload",
+    "loadError": "Video laden mislukt"
+  },
   "profile": {
     "title": "Profiel",
     "myProfile": "Mijn Profiel",

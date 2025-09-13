@@ -21,7 +21,8 @@ const SYNC_ORDER: readonly string[] = [
   'user_favorites',
   'workouts',
   'activity_logs',
-  'workout_sessions'
+  'workout_sessions',
+  'video_files'
 ];
 
 // Local sync_state in-memory shape (persisted via IndexedDB generic table added later if absent)

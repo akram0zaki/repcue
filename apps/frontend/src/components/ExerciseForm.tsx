@@ -180,6 +180,27 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     newEquipment, newMuscleGroup, newTag, persistenceKey, canUploadVideos
   ]);
 
+  // Update form state when exercise prop changes (for editing mode)
+  useEffect(() => {
+    if (isEditing && exercise) {
+      setName(exercise.name || '');
+      setDescription(exercise.description || '');
+      setCategory(exercise.category || Categories.CORE);
+      setExerciseType(exercise.exercise_type || Types.TIME_BASED);
+      setDefaultDuration(exercise.default_duration?.toString() || '');
+      setDefaultSets(exercise.default_sets?.toString() || '');
+      setDefaultReps(exercise.default_reps?.toString() || '');
+      setRepDurationSeconds(exercise.rep_duration_seconds?.toString() || '');
+      setDifficultyLevel(exercise.difficulty_level || 'beginner');
+      setEquipmentNeeded(exercise.equipment_needed || []);
+      setMuscleGroups(exercise.muscle_groups || []);
+      setTags(exercise.tags || []);
+      setInstructions(exercise.instructions || [{ step: 1, text: '' }]);
+      setIsPublic(exercise.is_public || false);
+      setCustomVideoUrl(exercise.custom_video_url || '');
+    }
+  }, [exercise, isEditing]);
+
   // Restore form state on component mount
   useEffect(() => {
     const savedState = localStorage.getItem(persistenceKey);

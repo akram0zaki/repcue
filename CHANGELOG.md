@@ -1,5 +1,23 @@
 ## Unreleased
 
+## 2025-01-13
+
+### Fixed
+- **Video upload format compatibility**: Implemented singleton video per exercise and enhanced format validation
+  - **Root cause**: Multiple video records per exercise caused query confusion, and unsupported video codecs triggered `DEMUXER_ERROR_NO_SUPPORTED_STREAMS` errors
+  - **Singleton approach**: Modified `saveVideoFile` to delete existing videos before saving new ones, ensuring only one video per exercise
+  - **Enhanced format validation**: Added specific browser-compatible format checking in both storage service and UI
+    - Supported formats: MP4, WebM, OGG, AVI, MOV, QuickTime
+    - Client-side validation prevents upload attempts with incompatible formats
+    - Clear error messages guide users to use compatible formats
+  - **Improved user experience**: Better error feedback with new `video.unsupportedFormat` translation key
+  - **Result**: Eliminates video storage conflicts and prevents codec compatibility issues that caused failed video playback
+
+### Enhanced
+- **Video upload error handling**: Added comprehensive format validation and user-friendly error messages
+- **Internationalization**: Added `video.unsupportedFormat` translation key to all locales
+- **Debug logging**: Enhanced video upload logging to track singleton deletion and format validation processes
+
 ### Fixed
 - **Timer state persistence bug**: Fixed critical issue where stale workout data persisted after workout completion
   - **Root cause**: `workoutMode` state remained active when users immediately selected standalone exercises after completing workouts

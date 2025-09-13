@@ -404,6 +404,24 @@
     "workouts": "Entrenamientos",
     "workoutsOnly": "Solo Entrenamientos"
   },
+    "video": {
+    "exerciseVideo": "Video de ejercicio",
+    "uploadsNotAvailable": "Las cargas de video aún no están disponibles.",
+    "urlPlaceholderHelper": "Por ahora puede añadir un marcador de posición con una URL de video.",
+    "urlPlaceholder": "URL del video (opcional)",
+    "currentVideo": "Video actual",
+    "removeVideo": "Eliminar video",
+    "clickToUpload": "Haga clic para subir un video",
+    "supportedFormats": "MP4, MOV, AVI hasta 50 MB",
+    "maxFileSize": "Tamaño máximo de archivo: 50 MB",
+    "uploadHint": "Suba un video de demostración para este ejercicio (opcional)",
+    "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es 50 MB.",
+    "invalidFileType": "Por favor, seleccione un archivo de video válido.",
+    "unsupportedFormat": "Formato de video no compatible. Use MP4, WebM o OGG para una mejor compatibilidad.",
+    "uploadFailed": "Error al subir el video. Inténtelo de nuevo.",
+    "uploaded": "subido",
+    "loadError": "Error al cargar el video"
+  },
   "profile": {
     "title": "Perfil",
     "myProfile": "Mi Perfil",

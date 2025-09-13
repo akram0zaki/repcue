@@ -404,6 +404,24 @@
     "workouts": "Trainings",
     "workoutsOnly": "Allinne Trainings"
   },
+  "video": {
+    "exerciseVideo": "Oefenfideo",
+    "uploadsNotAvailable": "Fideouploads binne noch net beskikber.",
+    "urlPlaceholderHelper": "Jo kinne foar no in fideo-URL as plakholder tafoegje.",
+    "urlPlaceholder": "Fideo-URL (opsjoneel)",
+    "currentVideo": "Aktuele fideo",
+    "removeVideo": "Fideo fuortsmite",
+    "clickToUpload": "Klik om in fideo te uploaden",
+    "supportedFormats": "MP4, MOV, AVI oant 50 MB",
+    "maxFileSize": "Maksimale bestânsgrutte: 50 MB",
+    "uploadHint": "Upload in demonstraasjefideo foar dizze oefening (opsjoneel)",
+    "fileTooLarge": "It bestân is te grut. De maksimale grutte is 50 MB.",
+    "invalidFileType": "Kies in jildich fideobestân.",
+    "unsupportedFormat": "Net-stipe fideoformaat. Brûk graach MP4, WebM of OGG foar de bêste kompatibiliteit.",
+    "uploadFailed": "Fideoupload mislearre. Probearje it opnij.",
+    "uploaded": "upload klear",
+    "loadError": "Fideo laden mislearre"
+  },
   "profile": {
     "title": "Profyl",
     "myProfile": "Myn Profyl",

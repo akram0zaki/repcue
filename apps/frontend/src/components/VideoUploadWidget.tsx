@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../config/supabase';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
+import { storageService } from '../services/storageService';
+import logger from '../utils/logger';
 
 interface VideoUploadWidgetProps {
   exerciseId: string;
@@ -21,106 +22,216 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [videoLoadError, setVideoLoadError] = useState(false);
+  const [actualVideoUrl, setActualVideoUrl] = useState<string | null>(null);
 
   const canUpload = flags.canUploadVideos || false;
 
+  // Effect to restore blob URL from IndexedDB when component mounts or video URL changes
+  useEffect(() => {
+    const restoreBlobUrl = async () => {
+      if (!currentVideoUrl || !currentVideoUrl.startsWith('blob-pending-sync://')) {
+        // For regular URLs (http, https, etc), use them directly
+        setActualVideoUrl(currentVideoUrl || null);
+        return;
+      }
+
+      try {
+        logger.log('🎥 [VideoDisplay] Restoring blob URL from IndexedDB for exercise:', exerciseId);
+        
+        // Get the stored video file from IndexedDB
+        const storedVideoFile = await storageService.getVideoFile(exerciseId);
+        
+        if (storedVideoFile) {
+          logger.log('🎥 [VideoDisplay] Found stored video file:', {
+            id: storedVideoFile.id,
+            exercise_id: storedVideoFile.exercise_id,
+            file_name: storedVideoFile.file_name,
+            file_size: storedVideoFile.file_size,
+            mime_type: storedVideoFile.mime_type,
+            hasFileData: !!storedVideoFile.file_data,
+            fileDataType: typeof storedVideoFile.file_data,
+            fileDataConstructor: storedVideoFile.file_data?.constructor?.name,
+            fileDataSize: storedVideoFile.file_data?.size,
+            fileDataType_blob: storedVideoFile.file_data?.type
+          });
+
+          if (storedVideoFile.file_data) {
+            // Create a blob URL directly from the stored Blob/File
+            const newBlobUrl = URL.createObjectURL(storedVideoFile.file_data);
+            setActualVideoUrl(newBlobUrl);
+            logger.log('🎥 [VideoDisplay] Successfully restored blob URL from stored file:', {
+              newBlobUrl,
+              fileSize: storedVideoFile.file_size,
+              mimeType: storedVideoFile.mime_type,
+              fileBlobSize: storedVideoFile.file_data.size,
+              fileBlobType: storedVideoFile.file_data.type
+            });
+          } else {
+            logger.warn('🎥 [VideoDisplay] Stored video file has no file_data:', {
+              storedVideoFile: Object.keys(storedVideoFile)
+            });
+            setActualVideoUrl(null);
+            setVideoLoadError(true);
+          }
+        } else {
+          logger.warn('🎥 [VideoDisplay] No stored video file found for exercise:', exerciseId);
+          setActualVideoUrl(null);
+          setVideoLoadError(true);
+        }
+      } catch (error) {
+        logger.error('🎥 [VideoDisplay] Failed to restore blob URL from IndexedDB:', error);
+        setActualVideoUrl(null);
+        setVideoLoadError(true);
+      }
+    };
+
+    // Add a small delay to ensure IndexedDB transaction completes
+    const timeoutId = setTimeout(restoreBlobUrl, 100);
+    return () => clearTimeout(timeoutId);
+  }, [currentVideoUrl, exerciseId]);
+
+  // Cleanup blob URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (actualVideoUrl && actualVideoUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(actualVideoUrl);
+      }
+    };
+  }, [actualVideoUrl]);
+
   const handleVideoUpload = async (file: File) => {
-    if (!file) return;
+    logger.log('🎥 [VideoUpload] Starting offline-first upload process', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      exerciseId
+    });
+
+    if (!file) {
+      logger.warn('🎥 [VideoUpload] No file provided');
+      return;
+    }
 
     // Validate file size (max 50MB for now)
     const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
+      logger.warn('🎥 [VideoUpload] File too large', { size: file.size, maxSize });
       setError(t('video.fileTooLarge'));
       return;
     }
 
-    // Validate file type
-    if (!file.type.startsWith('video/')) {
-      setError(t('video.invalidFileType'));
+    // Validate file type with specific format support
+    const supportedTypes = [
+      'video/mp4',
+      'video/webm', 
+      'video/ogg',
+      'video/avi',
+      'video/mov',
+      'video/quicktime'
+    ];
+    
+    if (!supportedTypes.includes(file.type)) {
+      logger.warn('🎥 [VideoUpload] Unsupported video format', { 
+        type: file.type,
+        supportedTypes 
+      });
+      setError(t('video.unsupportedFormat'));
       return;
     }
 
+    logger.log('🎥 [VideoUpload] File validation passed, creating local blob URL...');
     setUploading(true);
     setUploadProgress(0);
     setError(null);
+    setVideoLoadError(false);
 
     try {
-      if (canUpload && supabase) {
-        // Real upload to Supabase Storage
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${exerciseId}_${Date.now()}.${fileExt}`;
-        const filePath = `exercise-videos/${fileName}`;
-
-        // Upload file to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from('exercise-videos')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from('exercise-videos')
-          .getPublicUrl(filePath);
-
-        if (urlData?.publicUrl) {
-          // Save video metadata to database
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const { error: dbError } = await supabase.from('exercise_videos').insert({
-              exercise_id: exerciseId,
-              uploader_id: user.id,
-              video_url: urlData.publicUrl,
-              file_size: file.size,
-              duration_seconds: null, // Could be extracted from video metadata
-              is_approved: false // Requires admin approval
-              // Let database handle: id, created_at, updated_at, deleted, version
-            });
-            
-            if (dbError) {
-              console.error('Database error saving video metadata:', dbError);
-              throw dbError;
-            }
+      // OFFLINE-FIRST: Store the video file in IndexedDB with dirty flag
+      logger.log('🎥 [VideoUpload] Storing video file in IndexedDB for offline-first approach');
+      
+      // Simulate progress for user feedback
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(progressInterval);
+            return 100;
           }
+          return prev + 10; // Slower progress since we're actually storing data
+        });
+      }, 150);
 
-          onVideoUploaded(urlData.publicUrl);
-        }
-      } else {
-        // Fallback: simulate upload for testing
-        const progressInterval = setInterval(() => {
-          setUploadProgress(prev => {
-            if (prev >= 100) {
-              clearInterval(progressInterval);
-              return 100;
-            }
-            return prev + 10;
-          });
-        }, 200);
-
-        // Simulate upload completion
-        setTimeout(() => {
-          clearInterval(progressInterval);
-          const simulatedUrl = `placeholder://uploads/exercises/${exerciseId}/${file.name}`;
-          onVideoUploaded(simulatedUrl);
-        }, 2000);
-      }
+      // Store in IndexedDB via storage service
+      const localVideoUrl = await storageService.saveVideoFile(exerciseId, file);
+      
+      // Complete the progress
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
+      logger.log('🎥 [VideoUpload] Video file stored in IndexedDB successfully');
+      logger.log('🎥 [VideoUpload] Local video URL:', localVideoUrl);
+      
+      // Create a blob URL for immediate display
+      const immediateBlobUrl = URL.createObjectURL(file);
+      setActualVideoUrl(immediateBlobUrl);
+      
+      // Return the blob URL for immediate use
+      onVideoUploaded(localVideoUrl);
+      
+      logger.log('🎥 [VideoUpload] Video ready for offline use, sync will handle cloud upload when online');
 
     } catch (error) {
-      console.error('Video upload failed:', error);
+      logger.error('🎥 [VideoUpload] Failed to create local blob URL:', error);
       setError(error instanceof Error ? error.message : t('video.uploadFailed'));
     } finally {
-      setUploading(false);
-      setUploadProgress(0);
+      // Clean up after short delay to show completion
+      setTimeout(() => {
+        setUploading(false);
+        setUploadProgress(0);
+      }, 1000);
     }
   };
 
-  const handleRemoveVideo = () => {
+  const handleRemoveVideo = async () => {
+    logger.log('🎥 [VideoUpload] Removing video file');
+    
+    try {
+      // Clean up video file from IndexedDB
+      await storageService.deleteVideoFile(exerciseId);
+      logger.log('🎥 [VideoUpload] Video file removed from IndexedDB');
+    } catch (error) {
+      logger.warn('🎥 [VideoUpload] Failed to remove video file from IndexedDB:', error);
+    }
+    
+    // Clean up the current blob URL
+    if (actualVideoUrl && actualVideoUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(actualVideoUrl);
+    }
+    
+    setActualVideoUrl(null);
     onVideoUploaded('');
+    setError(null);
+    setVideoLoadError(false);
+  };
+
+  const handleVideoLoadError = (event: any) => {
+    const videoElement = event.target;
+    logger.error('🎥 [VideoDisplay] Video failed to load', { 
+      currentVideoUrl,
+      isPlaceholder: currentVideoUrl?.startsWith('placeholder://'),
+      error: videoElement?.error,
+      networkState: videoElement?.networkState,
+      readyState: videoElement?.readyState,
+      errorCode: videoElement?.error?.code,
+      errorMessage: videoElement?.error?.message
+    });
+    setVideoLoadError(true);
+    setError(t('video.loadError', 'Failed to load video. The video file may be corrupted or incompatible.'));
+  };
+
+  const handleVideoLoaded = () => {
+    logger.log('🎥 [VideoDisplay] Video loaded successfully', { currentVideoUrl, actualVideoUrl });
+    setVideoLoadError(false);
     setError(null);
   };
 
@@ -160,15 +271,53 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
 
       {currentVideoUrl && !currentVideoUrl.startsWith('placeholder://') ? (
         <div className="current-video bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-          <video 
-            src={currentVideoUrl} 
-            controls 
-            className="w-full max-h-64 rounded-md mb-3"
-            onError={() => setError(t('video.loadError'))}
-          />
+          {(() => {
+            // Check if this is a local blob video pending sync
+            const isLocalBlob = currentVideoUrl.startsWith('blob-pending-sync://');
+            
+            return !videoLoadError && actualVideoUrl ? (
+              <>
+                <video 
+                  src={actualVideoUrl} 
+                  controls 
+                  className="w-full max-h-64 rounded-md mb-3"
+                  onError={handleVideoLoadError}
+                  onLoadedData={handleVideoLoaded}
+                  onCanPlay={handleVideoLoaded}
+                />
+                {isLocalBlob && (
+                  <div className="mb-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm text-blue-800 dark:text-blue-200">
+                        {t('video.pendingSync', 'Video ready offline - will sync when online')}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-32 bg-gray-200 dark:bg-gray-700 rounded-md mb-3 flex items-center justify-center">
+                <div className="text-center">
+                  <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('video.cannotDisplay', 'Cannot display video')}</p>
+                </div>
+              </div>
+            );
+          })()}
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {t('video.currentVideo')}
+              {(() => {
+                if (videoLoadError) {
+                  return t('video.videoWithIssues', 'Video with issues');
+                }
+                if (currentVideoUrl.startsWith('blob-pending-sync://')) {
+                  return t('video.localVideo', 'Local video (offline-ready)');
+                }
+                return t('video.currentVideo');
+              })()}
             </span>
             <button 
               onClick={handleRemoveVideo}

@@ -7,7 +7,8 @@ import type {
   AppSettings,
   Workout,
   WorkoutSession,
-  UserFavorite
+  UserFavorite,
+  SyncMetadata
 } from '../types';
 import { consentService } from './consentService';
 import { authService } from './authService';
@@ -37,7 +38,15 @@ type StoredWorkout = Workout;
 
 type StoredWorkoutSession = WorkoutSession;
 
-
+// Video file storage for offline-first approach
+interface StoredVideoFile extends SyncMetadata {
+  exercise_id: string;
+  file_name: string;
+  file_data: Blob; // The actual video file stored as Blob for IndexedDB compatibility
+  file_size: number;
+  mime_type: string;
+  upload_pending: boolean; // true if needs to sync to cloud storage
+}
 
 /**
  * IndexedDB-based storage service using Dexie
@@ -51,6 +60,7 @@ class RepCueDatabase extends Dexie {
   user_favorites!: Table<StoredUserFavorite>;
   workouts!: Table<StoredWorkout>;
   workout_sessions!: Table<StoredWorkoutSession>;
+  video_files!: Table<StoredVideoFile>;
 
   constructor() {
     logger.log('[RepCueDatabase] Constructor: Creating database with name RepCueDB');
@@ -180,6 +190,32 @@ class RepCueDatabase extends Dexie {
           delete record.user_id;
         }
       });
+    });
+
+    // Version 13: Add video_files table for offline-first video storage
+    this.version(13).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 14: Update video_files schema to include file_size and mime_type indexes for better querying
+    this.version(14).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
     });
   }
 
@@ -1004,6 +1040,275 @@ export class StorageService {
       logger.warn('Failed to save exercise to IndexedDB:', error);
   // Use the resolved exerciseId to avoid undefined keys when caller didn't provide one
   this.fallbackStorage.set(`exercise_${exerciseId}`, storedExercise);
+    }
+  }
+
+  /**
+   * Debug method to check database state
+   */
+  public async debugDatabaseState(): Promise<void> {
+    try {
+      logger.log('💾 [Debug] Database version:', this.db.verno);
+      logger.log('💾 [Debug] Available tables:', this.db.tables.map(t => t.name));
+      logger.log('💾 [Debug] Video files table schema:', {
+        name: this.db.video_files?.name,
+        schema: this.db.video_files?.schema
+      });
+      
+      // Check if we can access the table
+      const count = await this.db.video_files.count();
+      logger.log('💾 [Debug] Current video files count:', count);
+    } catch (error) {
+      logger.error('💾 [Debug] Database state check failed:', error);
+    }
+  }
+
+  /**
+   * Save video file to IndexedDB for offline-first storage
+   */
+  public async saveVideoFile(exerciseId: string, file: File): Promise<string> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    // Validate video format for browser compatibility
+    const supportedTypes = [
+      'video/mp4',
+      'video/webm', 
+      'video/ogg',
+      'video/avi',
+      'video/mov',
+      'video/quicktime'
+    ];
+    
+    if (!supportedTypes.includes(file.type)) {
+      logger.warn('💾 [VideoFile] Unsupported video format:', file.type);
+      throw new Error(`Unsupported video format: ${file.type}. Please use MP4, WebM, or OGG format.`);
+    }
+
+    logger.log('💾 [VideoFile] Saving video file to IndexedDB (singleton approach):', { 
+      exerciseId, 
+      fileName: file.name, 
+      fileSize: file.size,
+      mimeType: file.type 
+    });
+
+    // SINGLETON APPROACH: Delete any existing video files for this exercise first
+    logger.log('💾 [VideoFile] Deleting existing video files for exercise (singleton approach)...');
+    try {
+      const existingFiles = await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .toArray();
+      
+      if (existingFiles.length > 0) {
+        logger.log('💾 [VideoFile] Found existing files to delete:', existingFiles.length);
+        await this.db.video_files
+          .where('exercise_id')
+          .equals(exerciseId)
+          .delete();
+        logger.log('💾 [VideoFile] Existing files deleted successfully');
+      } else {
+        logger.log('💾 [VideoFile] No existing files found');
+      }
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to delete existing files:', error);
+      // Continue with save even if deletion fails
+    }
+
+    // Debug database state first
+    await this.debugDatabaseState();
+
+    const videoFileId = crypto.randomUUID();
+    const userId = this.getCurrentUserId();
+    
+    // Store File directly as Blob for IndexedDB compatibility
+    logger.log('💾 [VideoFile] Storing file directly as Blob...');
+    logger.log('💾 [VideoFile] File details:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      constructor: file.constructor.name
+    });
+    
+    const storedVideoFile: StoredVideoFile = prepareUpsert({
+      id: videoFileId,
+      exercise_id: exerciseId,
+      file_name: file.name,
+      file_data: file, // Store the File object directly (which is a Blob)
+      file_size: file.size,
+      mime_type: file.type,
+      upload_pending: true,
+      owner_id: userId
+    }, videoFileId, userId);
+
+    try {
+      logger.log('💾 [VideoFile] About to save video file to IndexedDB:', {
+        videoFileId,
+        exerciseId,
+        fileName: file.name,
+        dataSize: file.size,
+        storedVideoFileKeys: Object.keys(storedVideoFile)
+      });
+
+      // Check if the table exists
+      const tableExists = this.db.video_files !== undefined;
+      logger.log('💾 [VideoFile] Table exists check:', { tableExists });
+
+      const result = await this.db.video_files.put(storedVideoFile);
+      logger.log('💾 [VideoFile] Put operation result:', result);
+
+      // Verify the save by immediately querying back
+      const verification = await this.db.video_files.where('id').equals(videoFileId).first();
+      logger.log('💾 [VideoFile] Verification query:', {
+        found: !!verification,
+        id: verification?.id,
+        exercise_id: verification?.exercise_id
+      });
+
+      logger.log('💾 [VideoFile] Video file saved to IndexedDB successfully');
+      
+      // Return the blob URL format that the VideoUploadWidget expects
+      return `blob-pending-sync://${exerciseId}/${file.name}`;
+    } catch (error) {
+      logger.error('💾 [VideoFile] Failed to save video file to IndexedDB:', error);
+      logger.error('💾 [VideoFile] Error details:', {
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get video file for an exercise
+   */
+  public async getVideoFile(exerciseId: string): Promise<StoredVideoFile | null> {
+    if (!this.canStoreData()) {
+      logger.warn('💾 [VideoFile] Cannot get video file - no data storage consent');
+      return null;
+    }
+
+    try {
+      logger.log('💾 [VideoFile] Querying for video file with exercise_id:', exerciseId);
+      
+      const videoFiles = await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .and(record => !record.deleted)
+        .toArray();
+      
+      logger.log('💾 [VideoFile] Query result:', {
+        exerciseId,
+        foundFiles: videoFiles.length,
+        files: videoFiles.map(f => ({ 
+          id: f.id, 
+          exercise_id: f.exercise_id, 
+          file_name: f.file_name,
+          deleted: f.deleted,
+          file_size: f.file_size,
+          created_at: f.created_at,
+          hasFileData: !!f.file_data
+        }))
+      });
+      
+      // Sort by created_at descending to get the most recent file first
+      videoFiles.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      // Try to find a file with actual file_data first
+      const fileWithData = videoFiles.find(f => f.file_data);
+      if (fileWithData) {
+        logger.log('💾 [VideoFile] Found video file with data:', {
+          id: fileWithData.id,
+          created_at: fileWithData.created_at,
+          hasFileData: !!fileWithData.file_data,
+          fileDataSize: fileWithData.file_data?.size
+        });
+        return fileWithData;
+      }
+      
+      logger.warn('💾 [VideoFile] No video files with file_data found, returning most recent:', {
+        mostRecentId: videoFiles[0]?.id,
+        mostRecentCreatedAt: videoFiles[0]?.created_at
+      });
+      
+      return videoFiles.length > 0 ? videoFiles[0] : null;
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to get video file from IndexedDB:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Delete video file from IndexedDB
+   */
+  public async deleteVideoFile(exerciseId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      return;
+    }
+
+    try {
+      const videoFiles = await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .toArray();
+      
+      for (const videoFile of videoFiles) {
+        // Soft delete the record
+        const updatedVideoFile: Partial<StoredVideoFile> = {
+          deleted: true,
+          updated_at: new Date().toISOString(),
+          dirty: 1
+        };
+        await this.db.video_files.update(videoFile.id, updatedVideoFile);
+      }
+      
+      logger.log('💾 [VideoFile] Video file deleted successfully for exercise:', exerciseId);
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to delete video file:', error);
+    }
+  }
+
+  /**
+   * Get all video files pending sync to cloud storage
+   */
+  public async getVideoFilesPendingSync(): Promise<StoredVideoFile[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      return await this.db.video_files
+        .where('upload_pending')
+        .equals(1)
+        .and(record => !record.deleted)
+        .toArray();
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to get video files pending sync:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Mark video file as uploaded to cloud storage
+   */
+  public async markVideoFileUploaded(videoFileId: string, cloudUrl: string): Promise<void> {
+    if (!this.canStoreData()) {
+      return;
+    }
+
+    try {
+      const updatedVideoFile: Partial<StoredVideoFile> = {
+        upload_pending: false,
+        updated_at: new Date().toISOString(),
+        dirty: 1
+      };
+      await this.db.video_files.update(videoFileId, updatedVideoFile);
+      
+      logger.log('💾 [VideoFile] Video file marked as uploaded:', { videoFileId, cloudUrl });
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to mark video file as uploaded:', error);
     }
   }
 

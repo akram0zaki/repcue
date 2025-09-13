@@ -416,6 +416,24 @@
     "workouts": "التدريبات",
     "workoutsOnly": "التدريبات بس"
   },
+  "video": {
+    "exerciseVideo": "فيديو التمرين",
+    "uploadsNotAvailable": "رفع الفيديوهات لسه مش متاح دلوقتي.",
+    "urlPlaceholderHelper": "ممكن تضيف لينك فيديو مؤقت دلوقتي.",
+    "urlPlaceholder": "لينك الفيديو (اختياري)",
+    "currentVideo": "الفيديو الحالي",
+    "removeVideo": "شيل الفيديو",
+    "clickToUpload": "اضغط علشان ترفع فيديو",
+    "supportedFormats": "MP4, MOV, AVI لحد 50 ميجا",
+    "maxFileSize": "أقصى حجم للملف: 50 ميجا",
+    "uploadHint": "ارفع فيديو توضيحي للتمرين ده (اختياري)",
+    "fileTooLarge": "الملف كبير أوي. الحد الأقصى 50 ميجا.",
+    "invalidFileType": "من فضلك اختار ملف فيديو صالح.",
+    "unsupportedFormat": "صيغة الفيديو مش مدعومة. استخدم MP4 أو WebM أو OGG علشان يشتغل كويس.",
+    "uploadFailed": "رفع الفيديو فشل. جرب تاني.",
+    "uploaded": "اترفع",
+    "loadError": "محصلش تحميل للفيديو"
+  },
   "profile": {
     "title": "البروفايل",
     "myProfile": "بروفايلي",

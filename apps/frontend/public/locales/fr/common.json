@@ -439,6 +439,24 @@
     "tooltip": "Copier {{name}} dans votre bibliothèque",
     "genericError": "Échec de la copie de l'exercice"
   },
+  "video": {
+    "exerciseVideo": "Vidéo d'exercice",
+    "uploadsNotAvailable": "Le téléversement de vidéos n’est pas encore disponible.",
+    "urlPlaceholderHelper": "Vous pouvez ajouter pour l’instant un lien vidéo en guise d’espace réservé.",
+    "urlPlaceholder": "URL de la vidéo (optionnel)",
+    "currentVideo": "Vidéo actuelle",
+    "removeVideo": "Supprimer la vidéo",
+    "clickToUpload": "Cliquez pour téléverser une vidéo",
+    "supportedFormats": "MP4, MOV, AVI jusqu’à 50 Mo",
+    "maxFileSize": "Taille maximale du fichier : 50 Mo",
+    "uploadHint": "Téléversez une vidéo de démonstration pour cet exercice (optionnel)",
+    "fileTooLarge": "Le fichier est trop volumineux. La taille maximale est de 50 Mo.",
+    "invalidFileType": "Veuillez sélectionner un fichier vidéo valide.",
+    "unsupportedFormat": "Format vidéo non pris en charge. Veuillez utiliser MP4, WebM ou OGG pour une meilleure compatibilité.",
+    "uploadFailed": "Échec du téléversement de la vidéo. Veuillez réessayer.",
+    "uploaded": "téléversé",
+    "loadError": "Échec du chargement de la vidéo"
+  },
   "profile": {
     "title": "Profil",
     "myProfile": "Mon Profil",

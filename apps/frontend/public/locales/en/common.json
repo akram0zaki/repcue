@@ -504,6 +504,7 @@
     "uploadHint": "Upload a demonstration video for this exercise (optional)",
     "fileTooLarge": "File is too large. Maximum size is 50MB.",
     "invalidFileType": "Please select a valid video file.",
+    "unsupportedFormat": "Unsupported video format. Please use MP4, WebM, or OGG format for best compatibility.",
     "uploadFailed": "Video upload failed. Please try again.",
     "uploaded": "uploaded",
     "loadError": "Failed to load video"
