@@ -13,6 +13,7 @@
     - Updated ExercisePage preview logic to resolve custom video URLs before display
     - Modified TimerPage prefetch system to handle custom video URL resolution
     - Implemented proper blob URL cleanup to prevent memory leaks
+  - **Additional fix**: Skipped HEAD request preflight checks for blob URLs to prevent ERR_METHOD_NOT_SUPPORTED errors
   - **Result**: Custom exercise videos now work seamlessly in both preview modal and timer ring, matching built-in exercise behavior
 - **Video sync system**: Implemented complete offline-first video upload and sync functionality
   - **Root cause analysis**: Videos failed to sync due to multiple architectural issues
