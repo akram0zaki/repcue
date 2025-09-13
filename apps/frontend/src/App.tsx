@@ -304,7 +304,7 @@ function App() {
     setTimerState(prev => {
       // If targetTime is already set (e.g., from workout mode), use it; otherwise use selectedDuration
       const actualTargetTime = prev.targetTime || selectedDuration;
-      logger.log('startActualTimer: Setting targetTime to:', actualTargetTime, 'from prev.targetTime:', prev.targetTime, 'selectedDuration:', selectedDuration);
+      // logger.log('startActualTimer: Setting targetTime to:', actualTargetTime, 'from prev.targetTime:', prev.targetTime, 'selectedDuration:', selectedDuration);
       
       return {
         ...prev,
@@ -325,7 +325,7 @@ function App() {
     });
 
     // Start the main timer interval
-    logger.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
+    // logger.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
     
     // Use the helper function to create appropriate timer interval
     // In workout mode, check the current exercise in the workout; otherwise use selectedExercise
@@ -570,17 +570,17 @@ function App() {
     const currentIndex = workoutMode.currentExerciseIndex;
     const isLastExercise = currentIndex >= workoutMode.exercises.length - 1;
     
-    logger.log('advanceWorkout called:', {
-      currentIndex,
-      totalExercises: workoutMode.exercises.length,
-      isLastExercise,
-      workoutName: workoutMode.workoutName
-    });
+    // logger.log('advanceWorkout called:', {
+    //   currentIndex,
+    //   totalExercises: workoutMode.exercises.length,
+    //   isLastExercise,
+    //   workoutName: workoutMode.workoutName
+    // });
 
     if (isLastExercise) {
       // Workout completed
       logger.log('🎉 Workout completed! Logging workout session...');
-      logger.log('🔍 About to check consent and session for workout logging...');
+      // logger.log('🔍 About to check consent and session for workout logging...');
       if (appSettings.sound_enabled) {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
@@ -588,11 +588,11 @@ function App() {
       // Save workout session completion
       const hasConsent = consentService.hasConsent();
       const hasSessionId = !!workoutMode.sessionId;
-      logger.log('Workout completion - consent check:', {
-        hasConsent,
-        hasSessionId,
-        sessionId: workoutMode.sessionId
-      });
+      // logger.log('Workout completion - consent check:', {
+      //   hasConsent,
+      //   hasSessionId,
+      //   sessionId: workoutMode.sessionId
+      // });
       
       if (hasConsent && hasSessionId) {
   logger.log('✅ Creating workout session for logging...');
@@ -617,12 +617,12 @@ function App() {
         };
         
         try {
-          logger.log('💾 Saving workout session to storage...', workoutSession);
+          // logger.log('💾 Saving workout session to storage...', workoutSession);
           await storageService.saveWorkoutSession(workoutSession);
-          logger.log('✅ Workout session saved successfully');
+          // logger.log('✅ Workout session saved successfully');
           
           // Create a single workout activity log entry for the activity log page
-          logger.log('📝 Creating workout activity log entry...');
+          // logger.log('📝 Creating workout activity log entry...');
           const { perExercise, total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
           const exerciseNameById = new Map(exercises.map(ex => [ex.id, ex.name]));
           
@@ -650,12 +650,11 @@ function App() {
           
           logger.log(`📝 Saving workout activity log:`, workoutActivityLog);
           await storageService.saveActivityLog(workoutActivityLog);
-          logger.log('✅ Workout activity log saved successfully');
         } catch (error) {
           logger.error('❌ Failed to save workout session or activity logs:', error);
         }
       } else {
-        logger.log('❌ Workout session not saved:', {
+        logger.warn('❌ Workout session not saved:', {
           reason: !hasConsent ? 'No consent' : 'No session ID',
           hasConsent,
           hasSessionId
@@ -891,11 +890,11 @@ function App() {
             // Set duration/reps for next exercise
             if (nextExercise.exercise_type === 'time_based') {
               const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
-              logger.log('Setting duration for', nextExercise.name, ':', {
-                custom_duration: nextWorkoutExercise.custom_duration,
-                default_duration: nextExercise.default_duration,
-                finalDuration: duration
-              });
+              // logger.log('Setting duration for', nextExercise.name, ':', {
+              //   custom_duration: nextWorkoutExercise.custom_duration,
+              //   default_duration: nextExercise.default_duration,
+              //   finalDuration: duration
+              // });
               setSelectedDuration(duration as TimerPreset);
               logger.log('After setSelectedDuration, selectedDuration should be:', duration);
               
@@ -950,7 +949,6 @@ function App() {
             // Auto-start the timer after a short delay to ensure state is updated
             setTimeout(() => {
               logger.log('Auto-starting timer with selectedDuration:', selectedDuration, 'for exercise:', nextExercise.name);
-              logger.log('Calling startActualTimer directly since targetTime is already set correctly');
               startActualTimer(); // Call startActualTimer directly instead of startTimer
             }, 100);
           }
@@ -960,9 +958,9 @@ function App() {
           const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
           const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
           
-          logger.log('Processing exercise completion for:', actualCurrentExercise?.name);
-          logger.log('Exercise type:', actualCurrentExercise?.exercise_type);
-          logger.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
+          // logger.log('Processing exercise completion for:', actualCurrentExercise?.name);
+          // logger.log('Exercise type:', actualCurrentExercise?.exercise_type);
+          // logger.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
           
           // Check if this is a repetition-based exercise that needs rep/set advancement
           if (actualCurrentExercise?.exercise_type === 'repetition_based' && workoutMode.totalReps && workoutMode.totalSets) {
@@ -1108,7 +1106,6 @@ function App() {
           } else {
             // Time-based exercise completed, advance workout
             logger.log('Time-based exercise completed in workout mode:', actualCurrentExercise?.name);
-            logger.log('Calling advanceWorkout to move to next exercise or complete workout...');
             advanceWorkout();
           }
         }
@@ -1511,7 +1508,7 @@ function App() {
         try {
           logger.log('[init] Starting initialization with consent');
           if (process.env.NODE_ENV === 'development') {
-            logger.log('🚀 Initializing app with consent granted');
+            // logger.log('🚀 Initializing app with consent granted');
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
@@ -1572,13 +1569,13 @@ function App() {
             const snap = await storageService.debugSnapshot();
             logger.log('[init] DB snapshot:', snap);
           } catch {}
-          logger.log('[init] Ensuring exercise catalog is seeded');
+          // logger.log('[init] Ensuring exercise catalog is seeded');
           await storageService.ensureExercisesSeeded();
           const seedMs = Date.now() - tSeedStart;
           if (seedMs > 1000) logger.warn(`[init] seeding took ${seedMs}ms`); else logger.log(`[init] seeding took ${seedMs}ms`);
 
           const tLoadStart = Date.now();
-          logger.log('[init] Loading exercises from storage');
+          // logger.log('[init] Loading exercises from storage');
           let allExercises = await storageService.getExercises();
           const loadMs = Date.now() - tLoadStart;
           if (loadMs > 1000) logger.warn(`[init] getExercises took ${loadMs}ms (n=${allExercises.length})`); else logger.log(`[init] getExercises took ${loadMs}ms (n=${allExercises.length})`);
@@ -1586,8 +1583,8 @@ function App() {
             // Defensive: if the catalog is still empty, try one more seed then fall back to in-memory list
             logger.warn('[init] Exercises list is empty after initial seed. Retrying seeding and reload…');
             try {
-              const reseeded = await storageService.ensureExercisesSeeded();
-              logger.log(`[init] Reseed attempt completed. exercises.count=${reseeded}`);
+              // const reseeded = await storageService.ensureExercisesSeeded();
+              // logger.log(`[init] Reseed attempt completed. exercises.count=${reseeded}`);
               const tReload = Date.now();
               allExercises = await storageService.getExercises();
               const reloadMs = Date.now() - tReload;
@@ -1612,7 +1609,7 @@ function App() {
           setExercises(allExercises);
 
           // Load app settings
-          logger.log('[init] Loading app settings');
+          // logger.log('[init] Loading app settings');
           const tSettingsStart = Date.now();
           const storedSettings = await storageService.getAppSettings();
           const settingsMs = Date.now() - tSettingsStart;
@@ -1641,7 +1638,7 @@ function App() {
           setAppSettings(settingsToSet);
 
           // Load and apply user preferences (locale) for cross-device sync
-          logger.log('[init] Loading user preferences');
+          // logger.log('[init] Loading user preferences');
           try {
             const tPrefsStart = Date.now();
             const prefs = await storageService.getUserPreferences();

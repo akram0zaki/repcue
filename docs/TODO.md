@@ -123,7 +123,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ Being a PWA application with optional sign-up/sign-in, means that it shouldn't be an issue if exercises exist without an owner id. Maybe the owner id will be added if the user signs in?
 
-- The video couldn't be uploaded at the time of creating an exercise because supabase mandated having the exercise uuid in order to be able to write the record to database. Changing the behavior of create/edit exercise to be offline-first, would I be able to upload the video at the same time I am creating the exercise?
+- ✅ The video couldn't be uploaded at the time of creating an exercise because supabase mandated having the exercise uuid in order to be able to write the record to database. Changing the behavior of create/edit exercise to be offline-first, would I be able to upload the video at the same time I am creating the exercise?
 
 - ✅ The exercise card on ExercisesPage is missing a delete button for user-owned exercises.
 
@@ -168,6 +168,15 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - Add feature to allow users to give rating and feedback on the app.
 
+- Add feature allowing a user to share the custom exercise they created. Optimally the share link would point to a public page listing the exercise along with its video (if available) without storing anything on the user's device so we don't have to ask for consent. It's okay if we must ask for consent but then the consent dialog should be rendered on top of the page content, not in a previous step. In addition to listing the exercise details there should be some inviting cool text encouraging the user to use RepCue, with a save button that would then prompt the user to sign-up/sign-in. I want suggestions on how to implement this sharing functionality given the following:
+  + User A must be authenticated in order to share exercises
+  + User B may or may not have a RepCue profile
+  + Sharing might be to an email address, or to anyone who has the link
+  + If sharing to an email address, then supabase database design should cater for both scenarios that user B is an existing RepCue user, or an anonymous one who would claim access to the shared exercise once they authenticate. The authentication flow can start with a Save button. Once authenticated, the shared exercise would then show on the exercise catalog under the "Shared with me" toggle.
+  + The core principle of offline-first must be respected with one exception, the view shared exercise page because I prefer if this page doesn't store anything on the user device to avoid consent banner and streamline the user experience.
+
+- Custom exercise favorites are not synced from Device A where they were added to Device B where user is authenticated with the same email address.
+
 - Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
 
 - Gamification:
@@ -183,12 +192,12 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - Add error handling to AI instructions, and a log to register one-time fixes.
 
-- I edited exercise Ya 7amada 6 and successfully uploaded a video that was stored into indexeddb with dirty = 1 then I saved the exercise. I switched tabs to force a sync and the sync was partially successful and I guess the video was not synced because I couldn't find it in supabase. I copied the console output of this full attempt to console.log at the workspace root.
+- ✅ I edited exercise Ya 7amada 6 and successfully uploaded a video that was stored into indexeddb with dirty = 1 then I saved the exercise. I switched tabs to force a sync and the sync was partially successful and I guess the video was not synced because I couldn't find it in supabase. I copied the console output of this full attempt to console.log at the workspace root.
 
 
-- The built-in exercise system assumes 3 videos of different resolutions for each exercise, and picks up the relevant version based on the screen dimentions. I am allowing users to upload only one video for custom exercises, and the video system needs to handle that for custom exercises there is only one video. Similar to built-in exercises, the exercise card on ExercisePage should display a play button if the exercise has a video. Also if the custom exercise has a video it should be displayed inside the timer ring, similar to built-in exercises.
+- ✅ The built-in exercise system assumes 3 videos of different resolutions for each exercise, and picks up the relevant version based on the screen dimentions. I am allowing users to upload only one video for custom exercises, and the video system needs to handle that for custom exercises there is only one video. Similar to built-in exercises, the exercise card on ExercisePage should display a play button if the exercise has a video. Also if the custom exercise has a video it should be displayed inside the timer ring, similar to built-in exercises.
 
-
+- ✅ I uploaded a video to a custom exercise Ya 7amada 5 on Edge browser, and I am trying to see if it sync correctly to Chrome where I am logged on with the same user. The custom exercise itself is synced correctly but not the video. I noticed that in supabase dev project the custom_video_url column is null for my exercise (id = 65b00af8-e9b6-4ec3-b17d-82ef25e56c43) while in my IndexedDB on Edge it has the value "blob-pending-sync://65b00af8-e9b6-4ec3-b17d-82ef25e56c43/BearCrawl_720x576.mp4". On Chrome the value is null in indexeddb. That makes me think that this column is for some reason dropped from the sync. You need to figure out why it is not synced and solve it.
 
 - We don't need real migration:
 

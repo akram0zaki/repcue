@@ -7,6 +7,7 @@ import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import type { Exercise, Workout, WorkoutExercise, Weekday } from '../types';
 import { Routes } from '../types';
+import logger from '../utils/logger';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -44,7 +45,7 @@ const CreateWorkoutPage: React.FC = () => {
           const exercises = await storageService.getExercises();
           setAvailableExercises(exercises);
         } catch (error) {
-          console.error('Failed to load exercises:', error);
+          logger.error('Failed to load exercises:', error);
           setError(t('workouts.loadExercisesError'));
         }
       }
@@ -208,7 +209,7 @@ const CreateWorkoutPage: React.FC = () => {
       // Navigate back to workouts page
       navigate(Routes.WORKOUTS);
     } catch (error) {
-      console.error('Failed to save workout:', error);
+      logger.error('Failed to save workout:', error);
       setError('Failed to save workout. Please try again.');
     } finally {
       setSaving(false);

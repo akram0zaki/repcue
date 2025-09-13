@@ -64,7 +64,6 @@ class RepCueDatabase extends Dexie {
   video_files!: Table<StoredVideoFile>;
 
   constructor() {
-    logger.log('[RepCueDatabase] Constructor: Creating database with name RepCueDB');
     super('RepCueDB');
     
     // Version 3: Original schema (kept for historical reference)
@@ -521,9 +520,7 @@ export class StorageService {
   }
 
   private constructor() {
-    logger.log('[StorageService] Constructor: Creating RepCueDatabase instance');
     this.db = new RepCueDatabase();
-    logger.log('[StorageService] Constructor: Starting initializeDatabase()');
     this.readyPromise = this.initializeDatabase().catch((e) => {
       // Swallow errors here; callers can proceed with fallback paths
       logger.error('[StorageService] initializeDatabase failed (continuing with fallbacks):', e);
@@ -533,9 +530,7 @@ export class StorageService {
 
   public static getInstance(): StorageService {
     if (!StorageService.instance) {
-      logger.log('[StorageService] getInstance: Creating new StorageService instance');
       StorageService.instance = new StorageService();
-      logger.log('[StorageService] getInstance: StorageService instance created');
     } else {
       logger.log('[StorageService] getInstance: Returning existing StorageService instance');
     }
@@ -544,10 +539,8 @@ export class StorageService {
 
   /** Wait for IndexedDB open/health checks to complete */
   public async ready(): Promise<void> {
-    logger.log('[StorageService] ready() called, waiting for readyPromise...');
     try { 
       await this.readyPromise; 
-      logger.log('[StorageService] ready() completed successfully');
     } catch (error) { 
       logger.error('[StorageService] ready() failed:', error);
       /* ignore */ 
@@ -761,9 +754,7 @@ export class StorageService {
    * Initialize database and handle errors gracefully
    */
   private async initializeDatabase(): Promise<void> {
-    logger.log('[StorageService] initializeDatabase() starting...');
     try {
-      logger.log('[StorageService] Opening database...');
       logger.log('[StorageService] Database current version:', this.db.verno);
       
       // Add timeout to db.open() to detect hangs
@@ -774,7 +765,6 @@ export class StorageService {
       
       try {
         await Promise.race([this.db.open(), openTimeout]);
-        logger.log('[StorageService] Database opened successfully');
       } catch (error) {
         logger.error('[StorageService] Database open failed:', error);
         

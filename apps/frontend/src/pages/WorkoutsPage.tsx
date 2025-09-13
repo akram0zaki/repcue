@@ -6,6 +6,7 @@ import { consentService } from '../services/consentService';
 import type { Workout, Weekday } from '../types';
 import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
+import logger from '../utils/logger';
 
 const WorkoutsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const WorkoutsPage: React.FC = () => {
           const allWorkouts = await storageService.getWorkouts();
           setWorkouts(allWorkouts);
         } catch (error) {
-          console.error('Failed to load workouts:', error);
+          logger.error('Failed to load workouts:', error);
         }
       }
       setLoading(false);
@@ -41,7 +42,7 @@ const WorkoutsPage: React.FC = () => {
           setWorkouts(allWorkouts);
         }
       } catch (e) {
-        console.warn('Failed to refresh workouts after sync:', e);
+        logger.warn('Failed to refresh workouts after sync:', e);
       }
     };
     window.addEventListener('sync:applied', handleSyncApplied as EventListener);
@@ -80,7 +81,7 @@ const WorkoutsPage: React.FC = () => {
       setWorkouts(prev => prev.filter(w => w.id !== workout_id));
       setDeleteConfirm(null);
     } catch (error) {
-      console.error('Failed to delete workout:', error);
+      logger.error('Failed to delete workout:', error);
     }
   };
 
