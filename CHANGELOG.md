@@ -3,6 +3,17 @@
 ## 2025-09-13
 
 ### Fixed
+- **Custom exercise video playback**: Fixed blob-pending-sync URL resolution for video preview and timer display
+  - **Issue**: Custom exercise videos stored as `blob-pending-sync://` URLs couldn't be played in preview modal or timer ring
+  - **Root cause**: Video URLs were stored as temporary placeholders that needed resolution to actual blob URLs via IndexedDB
+  - **Error**: `Fetch API cannot load blob-pending-sync://...` - URL scheme not supported for direct playback
+  - **Solution**: Created comprehensive URL resolution system
+    - Added `resolveVideoUrl()` utility to convert blob-pending-sync URLs to playable blob URLs
+    - Enhanced `useExerciseVideo` hook with async URL resolution for custom exercises
+    - Updated ExercisePage preview logic to resolve custom video URLs before display
+    - Modified TimerPage prefetch system to handle custom video URL resolution
+    - Implemented proper blob URL cleanup to prevent memory leaks
+  - **Result**: Custom exercise videos now work seamlessly in both preview modal and timer ring, matching built-in exercise behavior
 - **Video sync system**: Implemented complete offline-first video upload and sync functionality
   - **Root cause analysis**: Videos failed to sync due to multiple architectural issues
     1. **Missing sync table**: `video_files` table was not included in Edge Function `SYNC_TABLES` array

@@ -28,6 +28,7 @@ import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import getVideoSources from '../utils/videoSources';
+import { resolveVideoUrl, createVideoUrlCleanup } from '../utils/resolveVideoUrl';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
@@ -145,14 +146,23 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     setPreviewExercise(exercise);
     setPreviewOpen(true);
 
-    const idx = await ensureMediaIndex();
-    if (!idx) return;
-    const media = idx[exercise.id];
-    const url = selectVideoVariant(
-      media,
-      typeof window !== 'undefined' ? window.innerWidth : undefined,
-      typeof window !== 'undefined' ? window.innerHeight : undefined
-    );
+    let url: string | null = null;
+
+    // For custom exercises with custom_video_url, resolve the URL (handles blob-pending-sync URLs)
+    if (exercise.custom_video_url) {
+      url = await resolveVideoUrl(exercise.custom_video_url);
+    } else {
+      // For built-in exercises, use the media index
+      const idx = await ensureMediaIndex();
+      if (!idx) return;
+      const media = idx[exercise.id];
+      url = selectVideoVariant(
+        media,
+        typeof window !== 'undefined' ? window.innerWidth : undefined,
+        typeof window !== 'undefined' ? window.innerHeight : undefined
+      );
+    }
+
     if (!url) {
       showSnackbar(
         t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
@@ -221,6 +231,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   const closePreview = () => {
+    // Clean up blob URL if it's a blob URL
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setPreviewOpen(false);
     setPreviewExercise(null);
     setPreviewUrl(null);
@@ -816,7 +830,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {exercise.has_video && (
+            {(exercise.has_video || exercise.custom_video_url) && (
               <button
                 onClick={() => onPreview && onPreview(exercise)}
                 className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
