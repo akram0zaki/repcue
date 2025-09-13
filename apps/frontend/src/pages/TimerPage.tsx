@@ -168,15 +168,19 @@ const TimerPage: React.FC<TimerPageProps> = ({
       }
 
       if (prefetchUrl) {
-        const existing = document.querySelector(`link[rel="prefetch"][data-ex-video="${prefetchUrl}"]`);
-        if (!existing) {
-          const link = document.createElement('link');
-          link.rel = 'prefetch';
-          link.as = 'video';
-          link.href = prefetchUrl;
-          link.dataset.exVideo = prefetchUrl;
-          document.head.appendChild(link);
-          // Note: Cleanup is handled by next effect run or component unmount
+        // Skip prefetch for blob URLs as they're already in memory and don't need network prefetching
+        const isBlobUrl = prefetchUrl.startsWith('blob:');
+        if (!isBlobUrl) {
+          const existing = document.querySelector(`link[rel="prefetch"][data-ex-video="${prefetchUrl}"]`);
+          if (!existing) {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.as = 'video';
+            link.href = prefetchUrl;
+            link.dataset.exVideo = prefetchUrl;
+            document.head.appendChild(link);
+            // Note: Cleanup is handled by next effect run or component unmount
+          }
         }
       }
     };
