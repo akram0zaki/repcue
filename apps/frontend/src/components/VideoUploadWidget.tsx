@@ -214,7 +214,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
     setVideoLoadError(false);
   };
 
-  const handleVideoLoadError = (event: any) => {
+  const handleVideoLoadError = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     const videoElement = event.target;
     const mediaError = videoElement?.error;
     const errorCode = mediaError?.code;
