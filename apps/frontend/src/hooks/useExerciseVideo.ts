@@ -71,7 +71,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
             setMedia(null);
             setVideoUrl(null);
           }
-        } catch (error) {
+        } catch {
           setMedia(null);
           setVideoUrl(null);
         }
