@@ -1,5 +1,48 @@
 ## Unreleased
 
+## 2025-09-13
+
+### Fixed
+- **Video sync system**: Implemented complete offline-first video upload and sync functionality
+  - **Root cause analysis**: Videos failed to sync due to multiple architectural issues
+    1. **Missing sync table**: `video_files` table was not included in Edge Function `SYNC_TABLES` array
+    2. **File serialization failure**: File objects cannot be JSON serialized, causing empty `{}` uploads
+    3. **Missing storage bucket**: `videos` bucket didn't exist in Supabase Storage
+    4. **Missing database schema**: `video_files` table didn't exist in production database
+  - **Complete solution implemented**:
+    - **Database migration**: Created `video_files` table with proper schema, indexes, and RLS policies
+    - **Storage infrastructure**: Created `videos` bucket with user-folder security policies (`userId/exerciseId/fileName`)
+    - **Client-side serialization**: Added `convertVideoFileForSync()` method to convert File objects to byte arrays
+    - **Edge Function enhancement**: Updated sync handler to process byte arrays and upload to Storage
+    - **Offline-first workflow**: Videos stored in IndexedDB → sync converts to byte array → Edge Function uploads to Storage
+  - **Technical implementation**:
+    ```typescript
+    // Client: Convert File to JSON-serializable byte array
+    const arrayBuffer = await file.arrayBuffer();
+    converted.file_data = Array.from(new Uint8Array(arrayBuffer));
+    
+    // Server: Convert byte array back to binary and upload
+    const uint8Array = new Uint8Array(record.file_data);
+    await supabase.storage.from('videos').upload(path, uint8Array);
+    ```
+  - **Result**: Complete offline-first video functionality with cloud sync - videos work offline and sync automatically
+
+### Enhanced
+- **ExercisePage filter persistence**: Implemented localStorage-based filter state preservation
+  - **Issue**: Filter settings (search, categories, sort) were lost when navigating away and returning
+  - **Solution**: Auto-save filter state to localStorage with 'exercise-page-filters' key
+  - **Features**: Restores search terms, selected categories, sort preferences, and filter types across sessions
+  - **Error handling**: Graceful fallback to defaults if localStorage fails
+  - **User experience**: Maintains context and reduces re-filtering effort
+
+### Added
+- **Comprehensive video sync infrastructure**:
+  - Database table: `video_files` with complete metadata schema
+  - Storage bucket: `videos` with secure user-folder organization
+  - RLS security: Users can only access their own video files
+  - Edge Function support: Full video file processing in sync_v2
+  - Error handling: Graceful fallback for failed uploads and storage issues
+
 ## 2025-01-13
 
 ### Fixed

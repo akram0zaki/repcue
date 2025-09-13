@@ -4,6 +4,8 @@
     "stop": "بطّل",
     "cancel": "سيب",
     "confirm": "تأكيد",
+    "delete": "حذف",
+    "signIn": "تسجيل الدخول",
     "reset": "ابدأ من جديد",
     "choose": "اختار",
     "close": "اقفل",
@@ -37,7 +39,12 @@
     "saving": "حفظ...",
     "sharing": "مشاركة",
     "videoUploadAfterSave": "رفع الفيديو هيكون متاح بعد ما نحفظ التمرين.",
-    "minutes": "دقايق"
+    "minutes": "دقايق",
+    "discard": "تجاهل",
+    "cancelTitle": "إلغاء",
+    "clear": "مسح",
+    "clearFormTitle": "مسح النموذج",
+    "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك."
   },
   "navigation": {
     "home": "البيت",
@@ -73,6 +80,8 @@
     "consentMigrationWarning": "⚠️ بيانات الموافقة هتتنقل للإصدار الجديد في تحميل البرنامج الجاي.",
     "exportData": "صدّر البيانات",
     "exportDataHelp": "نزّل بيانات التمرين بتاعتك كملف JSON",
+    "exportInProgress": "جارٍ التصدير...",
+    "exportSuccess": "تم تصدير بياناتك بنجاح!",
     "exportRateLimit": "تقدر تطلب لحدّ 3 تصديرات في اليوم",
     "exportNow": "صدّر دلوقتي",
     "exportNowHelp": "صدّر أحدث بياناتك فوراً لملف JSON.",
@@ -96,7 +105,11 @@
     "exportYourData": "صدّر بياناتك",
     "deleteAccount": "امسح الحساب",
     "deleteMyAccount": "امسح حسابي",
-    "deleteAccountHelp": "امسح حسابك نهائياً مع كل البيانات اللي معاه. العملية دي ليها فترة سماح 30 يوم."
+    "deleteAccountHelp": "امسح حسابك نهائياً مع كل البيانات اللي معاه. العملية دي ليها فترة سماح 30 يوم.",
+    "forceFullSync": "فرض مزامنة كاملة",
+    "resetSyncState": "إعادة تعيين حالة المزامنة",
+    "syncAdvanced": "مزامنة متقدمة",
+    "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة."
   },
   "timer": {
     "restNext": "استراحة (الجاي: {{next}})",
@@ -329,6 +342,8 @@
     "createSuccess": "اتعمل التمرين بنجاح!",
     "editExercise": "عدّل التمرين",
     "editExerciseAria": "عدّل {{name}}",
+    "editExerciseSubtitle": "تحديث تفاصيل التمرين المخصص الخاص بك",
+    "updateSuccess": "تم تحديث التمرين بنجاح!",
     "deleteExercise": "امسح التمرين",
     "deleteExerciseTitle": "امسح التمرين",
     "deleteExerciseAria": "امسح {{name}}",
@@ -389,7 +404,11 @@
   "sharing": "مشاركة",
   "errors": {
     "featureNotAvailable": "الميزة مش متاحة",
-    "notAuthenticated": "لو سمحت سجل دخولك عشان تقدر تعمل تمارين"
+    "notAuthenticated": "لو سمحت سجل دخولك عشان تقدر تعمل تمارين",
+    "exerciseNotFound": "لم يتم العثور على التمرين",
+    "unauthorized": "يمكنك فقط تعديل تمارينك الخاصة",
+    "loadFailed": "فشل في تحميل التمرين",
+    "updateFailed": "فشل في تحديث التمرين"
   },
   "community": {
     "allCategories": "كل الفئات",
@@ -432,7 +451,18 @@
     "unsupportedFormat": "صيغة الفيديو مش مدعومة. استخدم MP4 أو WebM أو OGG علشان يشتغل كويس.",
     "uploadFailed": "رفع الفيديو فشل. جرب تاني.",
     "uploaded": "اترفع",
-    "loadError": "محصلش تحميل للفيديو"
+    "loadError": "محصلش تحميل للفيديو",
+    "codecNotSupported": "هذا الفيديو يستخدم ترميز غير مدعوم. حاول تحويله إلى تنسيق H.264 MP4 للحصول على توافق أفضل مع المتصفح.",
+    "formatError": "تنسيق الفيديو غير معترف به. يرجى استخدام ملف فيديو قياسي MP4 أو WebM أو OGG.",
+    "formatNotSupported": "تنسيق الفيديو غير مدعوم من قبل المتصفح الخاص بك. حاول استخدام MP4 مع ترميز H.264.",
+    "decodeError": "يبدو أن ملف الفيديو تالف أو يستخدم ترميز غير مدعوم. حاول إعادة ترميز الفيديو.",
+    "networkError": "خطأ في الشبكة أثناء تحميل الفيديو. تحقق من اتصالك وحاول مرة أخرى.",
+    "loadAborted": "تم قطع تحميل الفيديو. يرجى محاولة الرفع مرة أخرى.",
+    "codecSuggestion": "موصى به: استخدم FFmpeg أو HandBrake للتحويل إلى MP4 مع فيديو H.264 وصوت AAC.",
+    "cannotDisplay": "لا يمكن عرض الفيديو",
+    "localVideo": "ملف الفيديو المحلي",
+    "pendingSync": "الفيديو في انتظار المزامنة",
+    "videoWithIssues": "الفيديو به مشكلات"
   },
   "profile": {
     "title": "البروفايل",

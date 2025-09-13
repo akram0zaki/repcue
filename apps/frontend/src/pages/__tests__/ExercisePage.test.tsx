@@ -153,4 +153,87 @@ describe('ExercisePage', () => {
       expect(expandButton).toHaveAttribute('aria-label', 'Show 1 more tag');
     });
   });
+
+  describe('Filter State Persistence', () => {
+    beforeEach(() => {
+      // Clear localStorage before each test
+      localStorage.clear();
+    });
+
+    it('should save filter state to localStorage on change', async () => {
+      renderExercisePage();
+      
+      // Change search value
+      const searchInput = screen.getByPlaceholderText(/Search by name, description, or tag/i);
+      fireEvent.change(searchInput, { target: { value: 'test search' } });
+      
+      // Wait a bit for useEffect to run
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // Check that localStorage was updated
+      const savedState = JSON.parse(localStorage.getItem('exercise-page-filters') || '{}');
+      expect(savedState.searchTerm).toBe('test search');
+    });
+
+    it('should handle localStorage errors gracefully', () => {
+      // Temporarily replace console.warn to avoid test output noise
+      const originalWarn = console.warn;
+      console.warn = vi.fn();
+
+      // Mock localStorage to throw an error only for getItem (during load)
+      const originalGetItem = localStorage.getItem;
+      const mockGetItem = vi.fn().mockImplementation(() => {
+        throw new Error('localStorage error');
+      });
+      
+      Object.defineProperty(window, 'localStorage', {
+        value: {
+          ...localStorage,
+          getItem: mockGetItem
+        },
+        writable: true
+      });
+
+      // Should not crash when localStorage fails on load
+      expect(() => renderExercisePage()).not.toThrow();
+
+      // Restore localStorage and console.warn
+      Object.defineProperty(window, 'localStorage', {
+        value: {
+          ...localStorage,
+          getItem: originalGetItem
+        },
+        writable: true
+      });
+      console.warn = originalWarn;
+    });
+
+    it('should clear filter state when clear filters is clicked', async () => {
+      renderExercisePage();
+      
+      // Change some filter values
+      const searchInput = screen.getByPlaceholderText(/Search by name, description, or tag/i);
+      fireEvent.change(searchInput, { target: { value: 'test search' } });
+      
+      // Wait for useEffect to save state
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // Verify state was saved
+      expect(JSON.parse(localStorage.getItem('exercise-page-filters') || '{}').searchTerm).toBe('test search');
+      
+      // Find and click clear filters button
+      const clearButton = screen.getByText('Clear Filters');
+      fireEvent.click(clearButton);
+      
+      // Wait for state update
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // Verify localStorage was cleared
+      const clearedState = JSON.parse(localStorage.getItem('exercise-page-filters') || '{}');
+      expect(clearedState.searchTerm).toBe('');
+      
+      // Verify UI was cleared
+      expect(searchInput).toHaveValue('');
+    });
+  });
 });

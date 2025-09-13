@@ -216,17 +216,67 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
 
   const handleVideoLoadError = (event: any) => {
     const videoElement = event.target;
+    const mediaError = videoElement?.error;
+    const errorCode = mediaError?.code;
+    const errorMessage = mediaError?.message;
+    
     logger.error('🎥 [VideoDisplay] Video failed to load', { 
       currentVideoUrl,
       isPlaceholder: currentVideoUrl?.startsWith('placeholder://'),
-      error: videoElement?.error,
+      error: mediaError,
       networkState: videoElement?.networkState,
       readyState: videoElement?.readyState,
-      errorCode: videoElement?.error?.code,
-      errorMessage: videoElement?.error?.message
+      errorCode,
+      errorMessage
     });
+    
     setVideoLoadError(true);
-    setError(t('video.loadError', 'Failed to load video. The video file may be corrupted or incompatible.'));
+    
+    // Provide specific error messages based on MediaError codes and messages
+    let userFriendlyError = t('video.loadError', 'Failed to load video.');
+    let shouldDeleteFile = false;
+    
+    if (errorCode === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED
+      shouldDeleteFile = true; // Delete files that can't be played
+      if (errorMessage?.includes('DEMUXER_ERROR_NO_SUPPORTED_STREAMS')) {
+        userFriendlyError = t('video.codecNotSupported', 
+          'This video uses an unsupported codec. Try converting to H.264 MP4 format for better browser compatibility.') + 
+          ' ' + t('video.codecSuggestion', 'Recommended: Use FFmpeg or HandBrake to convert to MP4 with H.264 video and AAC audio.');
+      } else if (errorMessage?.includes('FORMAT_ERROR')) {
+        userFriendlyError = t('video.formatError', 
+          'Video format not recognized. Please use a standard MP4, WebM, or OGG video file.');
+      } else {
+        userFriendlyError = t('video.formatNotSupported', 
+          'Video format not supported by your browser. Try using MP4 with H.264 codec.');
+      }
+    } else if (errorCode === 3) { // MEDIA_ERR_DECODE
+      shouldDeleteFile = true; // Delete corrupted files
+      userFriendlyError = t('video.decodeError', 
+        'Video file appears corrupted or uses unsupported encoding. Try re-encoding the video.');
+    } else if (errorCode === 2) { // MEDIA_ERR_NETWORK
+      userFriendlyError = t('video.networkError', 
+        'Network error while loading video. Check your connection and try again.');
+    } else if (errorCode === 1) { // MEDIA_ERR_ABORTED
+      userFriendlyError = t('video.loadAborted', 
+        'Video loading was interrupted. Please try uploading again.');
+    }
+    
+    // Clean up IndexedDB for files that can't be played
+    if (shouldDeleteFile && currentVideoUrl?.startsWith('blob-pending-sync://')) {
+      logger.log('🎥 [VideoDisplay] Removing unplayable video file from IndexedDB');
+      storageService.deleteVideoFile(exerciseId)
+        .then(() => {
+          logger.log('🎥 [VideoDisplay] Unplayable video file removed from IndexedDB');
+          // Reset the video URL to indicate no video
+          onVideoUploaded('');
+          setActualVideoUrl(null);
+        })
+        .catch((cleanupError) => {
+          logger.warn('🎥 [VideoDisplay] Failed to clean up unplayable video file:', cleanupError);
+        });
+    }
+    
+    setError(userFriendlyError);
   };
 
   const handleVideoLoaded = () => {
@@ -320,6 +370,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
               })()}
             </span>
             <button 
+              type="button"
               onClick={handleRemoveVideo}
               className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
             >

@@ -4,6 +4,8 @@
     "stop": "Stopje",
     "cancel": "Annulearje",
     "confirm": "Befestigje",
+    "delete": "Wiskje",
+    "signIn": "Oanmelde",
     "reset": "Tebeksette",
     "choose": "Kieze",
     "close": "Slute",
@@ -37,7 +39,12 @@
     "saving": "Bewarje...",
     "sharing": "Diele",
     "videoUploadAfterSave": "Fideo oplade sil beskikber wêze nei it bewarjen fan de oefening.",
-    "minutes": "minuten"
+    "minutes": "minuten",
+    "discard": "Fuortsmite",
+    "cancelTitle": "Annulearje",
+    "clear": "Effacer",
+    "clearFormTitle": "Formulier wiske",
+    "confirmClearForm":"Bist der wis fan dat jo it formulier wiske wolle? Dit sil jo brouillon ferwiderje."
   },
   "navigation": {
     "home": "Thús",
@@ -73,6 +80,8 @@
     "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
     "exportData": "Gegevens eksportearje",
     "exportDataHelp": "Laad jo traininggegevens yn as JSON-bestân",
+    "exportInProgress": "Exportearje...",
+    "exportSuccess": "Jo gegevens binne mei súkses eksportearre!",
     "exportRateLimit": "Jo kinne oant 3 eksporten per dei oanfreegje",
     "exportNow": "No eksportearje",
     "exportNowHelp": "Eksportearje daliks jo nijste gegevens nei in JSON-bestân.",
@@ -96,7 +105,11 @@
     "exportYourData": "Jo gegevens eksportearje",
     "deleteAccount": "Account wiskje",
     "deleteMyAccount": "Myn account wiskje",
-    "deleteAccountHelp": "Permanint jo account en alle assosjearre gegevens wiskje. Dizze aksje hat in grâseperioade fan 30 dagen."
+    "deleteAccountHelp": "Permanint jo account en alle assosjearre gegevens wiskje. Dizze aksje hat in grâseperioade fan 30 dagen.",
+    "forceFullSync": "Folsleine synchronisaasje twinge",
+    "resetSyncState": "Synchronisaasjestatus weromsette",
+    "syncAdvanced": "Feroare synchronisaasje",
+    "syncAdvancedHelp": "Help by it oplossen fan synchronisaasjeproblemen."
   },
   "timer": {
     "restNext": "Rêstperioade (Folgjende: {{next}})",
@@ -317,6 +330,8 @@
     "createSuccess": "Oefening mei sukses makke!",
     "editExercise": "Oefening bewurkje",
     "editExerciseAria": "{{name}} bewurkje",
+    "editExerciseSubtitle": "Wurkje dyn oanpaste oefeningdetails by",
+    "updateSuccess": "Oefening mei sukses bywurke!",
     "deleteExercise": "Oefening wiskje",
     "deleteExerciseTitle": "Oefening Wiskje",
     "deleteExerciseAria": "{{name}} wiskje",
@@ -377,7 +392,11 @@
   "sharing": "Diele",
   "errors": {
     "featureNotAvailable": "Funksje Net Beskikber",
-    "notAuthenticated": "Meld jo oan om oefeningen te meitsjen"
+    "notAuthenticated": "Meld jo oan om oefeningen te meitsjen",
+    "exerciseNotFound": "Oefening net fûn",
+    "unauthorized": "Jo kinne allinnich jo eigen oefeningen bewurkje",
+    "loadFailed": "It laden fan 'e oefening is mislearre",
+    "updateFailed": "It bywurkje fan 'e oefening is mislearre"
   },
   "community": {
     "allCategories": "Alle Kategoryen",
@@ -420,7 +439,18 @@
     "unsupportedFormat": "Net-stipe fideoformaat. Brûk graach MP4, WebM of OGG foar de bêste kompatibiliteit.",
     "uploadFailed": "Fideoupload mislearre. Probearje it opnij.",
     "uploaded": "upload klear",
-    "loadError": "Fideo laden mislearre"
+    "loadError": "Fideo laden mislearre",
+    "codecNotSupported": "Dizze fideo brûkt in net-stipe codec. Besykje om te konvertearjen nei H.264 MP4-formaat foar bettere browserkompatibiliteit.",
+    "formatError": "Videoformaat net erkend. Brûk asjebleaft in standert MP4-, WebM- of OGG-fideobestân.",
+    "formatNotSupported": "Videoformaat net stipe troch jo browser. Besykje om MP4 mei H.264-codec te brûken.",
+    "decodeError": "Fideo-bestân liket korrumpearre te wêzen of brûkt net-stipe kodering. Besykje om de fideo te herkodearjen.",
+    "networkError": "Netwurkflater by it laden fan 'e fideo. Kontrolearje jo ferbining en besykje it opnij.",
+    "loadAborted": "It laden fan 'e fideo is ûnderbrocht. Besykje it opnij te uploaden.",
+    "codecSuggestion": "Recommandé : Utilisez FFmpeg ou HandBrake pour convertir en MP4 avec vidéo H.264 et audio AAC.",
+    "cannotDisplay": "Fideo kin net toand wurde",
+    "localVideo": "Lokaal fideobestân",
+    "pendingSync": "Fideo wachtet op syngronisaasje",
+    "videoWithIssues": "Fideo hat problemen"
   },
   "profile": {
     "title": "Profyl",

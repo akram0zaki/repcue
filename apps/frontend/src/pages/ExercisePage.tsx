@@ -47,12 +47,42 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
 
-  // Debug logging (removed - using storageService logging instead)
-  const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>('name');
+  // Filter state with persistence
+  const FILTER_STORAGE_KEY = 'exercise-page-filters';
+  
+  // Helper to load saved filter state
+  const loadSavedFilters = () => {
+    try {
+      const saved = localStorage.getItem(FILTER_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          selectedCategories: new Set<ExerciseCategory>(parsed.selectedCategories || []),
+          searchTerm: parsed.searchTerm || '',
+          showFavoritesOnly: parsed.showFavoritesOnly || false,
+          exerciseFilter: parsed.exerciseFilter || 'all',
+          sortBy: parsed.sortBy || 'name'
+        };
+      }
+    } catch (error) {
+      logger.warn('[ExercisePage] Failed to load saved filter state:', error);
+    }
+    return {
+      selectedCategories: new Set<ExerciseCategory>(),
+      searchTerm: '',
+      showFavoritesOnly: false,
+      exerciseFilter: 'all' as const,
+      sortBy: 'name' as const
+    };
+  };
+
+  // Initialize state with saved values
+  const savedFilters = loadSavedFilters();
+  const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(savedFilters.selectedCategories);
+  const [searchTerm, setSearchTerm] = useState(savedFilters.searchTerm);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(savedFilters.showFavoritesOnly);
+  const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom'>(savedFilters.exerciseFilter);
+  const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>(savedFilters.sortBy);
   // Video preview state
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -63,6 +93,39 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Delete confirmation modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
+
+  // Save filter state whenever it changes
+  useEffect(() => {
+    try {
+      const filterState = {
+        selectedCategories: Array.from(selectedCategories),
+        searchTerm,
+        showFavoritesOnly,
+        exerciseFilter,
+        sortBy
+      };
+      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
+      logger.log('[ExercisePage] Filter state saved:', filterState);
+    } catch (error) {
+      logger.warn('[ExercisePage] Failed to save filter state:', error);
+    }
+  }, [selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy]);
+
+  // Clear all filters and reset to defaults
+  const clearAllFilters = () => {
+    setSelectedCategories(new Set());
+    setSearchTerm('');
+    setShowFavoritesOnly(false);
+    setExerciseFilter('all');
+    setSortBy('name');
+    // Clear persisted state
+    try {
+      localStorage.removeItem(FILTER_STORAGE_KEY);
+      logger.log('[ExercisePage] Filter state cleared');
+    } catch (error) {
+      logger.warn('[ExercisePage] Failed to clear filter state:', error);
+    }
+  };
 
   // Lazy-load media index only when needed
   const ensureMediaIndex = async (): Promise<ExerciseMediaIndex | null> => {
@@ -437,7 +500,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               ))}
               {selectedCategories.size > 0 && (
                 <button
-                  onClick={() => setSelectedCategories(new Set())}
+                  onClick={clearAllFilters}
                   className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   {t('exercises.clearFilters')}
@@ -586,13 +649,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               {t('exercises.emptyBody')}
             </p>
             <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCategories(new Set());
-                setShowFavoritesOnly(false);
-                setExerciseFilter('all');
-                setSortBy('name');
-              }}
+              onClick={clearAllFilters}
               className="px-4 py-2.5 bg-blue-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px]"
             >
               {t('exercises.clearFilters')}

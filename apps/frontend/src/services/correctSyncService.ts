@@ -433,6 +433,9 @@ export class CorrectSyncService {
             mappedRecord = this.storage.convertAppSettingsForSync(clean as unknown as AppSettings);
           } else if (tableName === 'user_favorites' && this.storage) {
             mappedRecord = this.storage.convertUserFavoritesForSync(clean as unknown as UserFavorite);
+          } else if (tableName === 'video_files') {
+            // Special handling for video_files: convert File to serializable format
+            mappedRecord = await this.convertVideoFileForSync(clean);
           } else {
             // For tables without specific converters, apply universal undefined filtering
             mappedRecord = this.filterUndefinedValues(clean);
@@ -450,6 +453,39 @@ export class CorrectSyncService {
       logger.error(`[sync:v2] collect dirty failed ${tableName}`, e);
       return { upserts: [], deletes: [] };
     }
+  }
+
+  // Convert video file record for sync - handle File object serialization
+  private async convertVideoFileForSync(record: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const converted = { ...record };
+    
+    // Convert File object to ArrayBuffer for JSON serialization
+    if (converted.file_data && converted.file_data instanceof File) {
+      try {
+        if (SYNC_DEBUG) {
+          logger.debug(`[sync:v2] Converting File object to ArrayBuffer for sync:`, {
+            fileName: converted.file_data.name,
+            fileSize: converted.file_data.size,
+            fileType: converted.file_data.type
+          });
+        }
+        
+        // Convert File to ArrayBuffer, then to Array for JSON serialization
+        const arrayBuffer = await converted.file_data.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        converted.file_data = Array.from(uint8Array);
+        
+        if (SYNC_DEBUG) {
+          logger.debug(`[sync:v2] File converted to byte array, length:`, converted.file_data.length);
+        }
+      } catch (error) {
+        logger.error(`[sync:v2] Failed to convert File to ArrayBuffer for sync:`, error);
+        // Remove file_data if conversion fails to prevent sync errors
+        converted.file_data = null;
+      }
+    }
+    
+    return this.filterUndefinedValues(converted);
   }
 
   // Fast dirty check across subset of tables for suppression logic

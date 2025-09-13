@@ -4,6 +4,8 @@
     "stop": "Stop",
     "cancel": "Annuleren",
     "confirm": "Bevestigen",
+    "delete": "Verwijderen",
+    "signIn": "Inloggen",
     "reset": "Reset",
     "choose": "Kiezen",
     "close": "Sluiten",
@@ -37,7 +39,12 @@
     "saving": "Opslaan...",
     "sharing": "Delen",
     "videoUploadAfterSave": "Video uploaden wordt beschikbaar na het opslaan van de oefening.",
-    "minutes": "minuten"
+    "minutes": "minuten",
+    "discard": "Afwijzen",
+    "cancelTitle": "Annuleren",
+    "clear": "Wissen",
+    "clearFormTitle": "Formulier wissen",
+    "confirmClearForm":"Weet u zeker dat u het formulier wilt wissen? Dit verwijdert uw concept."
   },
   "navigation": {
     "home": "Home",
@@ -73,6 +80,8 @@
     "consentMigrationWarning": "⚠️ Toestemmingsgegevens worden gemigreerd naar de nieuwste versie bij volgende app start.",
     "exportData": "Gegevens Exporteren",
     "exportDataHelp": "Download uw trainingsgegevens als een JSON-bestand",
+    "exportInProgress": "Exporteren...",
+    "exportSuccess": "Uw gegevens zijn succesvol geëxporteerd!",
     "exportRateLimit": "U kunt tot 3 exports per dag aanvragen",
     "exportNow": "Nu exporteren",
     "exportNowHelp": "Exporteer direct uw meest recente gegevens naar een JSON-bestand.",
@@ -96,7 +105,11 @@
     "exportYourData": "Uw gegevens exporteren",
     "deleteAccount": "Account verwijderen",
     "deleteMyAccount": "Mijn account verwijderen",
-    "deleteAccountHelp": "Uw account en alle bijbehorende gegevens permanent verwijderen. Deze actie heeft een graceperiode van 30 dagen."
+    "deleteAccountHelp": "Uw account en alle bijbehorende gegevens permanent verwijderen. Deze actie heeft een graceperiode van 30 dagen.",
+    "forceFullSync": "Forceer Volledige Synchronisatie",
+    "resetSyncState": "Reset Synchronisatie Status",
+    "syncAdvanced": "Geavanceerde Synchronisatie",
+    "syncAdvancedHelp": "Help bij het oplossen van synchronisatieproblemen."
   },
   "timer": {
     "restNext": "Rustperiode (Volgende: {{next}})",
@@ -317,6 +330,8 @@
     "createSuccess": "Oefening succesvol aangemaakt!",
     "editExercise": "Oefening bewerken",
     "editExerciseAria": "{{name}} bewerken",
+    "editExerciseSubtitle": "Werk je aangepaste oefeningdetails bij",
+    "updateSuccess": "Oefening succesvol bijgewerkt!",
     "deleteExercise": "Oefening verwijderen",
     "deleteExerciseTitle": "Oefening Verwijderen",
     "deleteExerciseAria": "{{name}} verwijderen",
@@ -401,7 +416,11 @@
   },
   "errors": {
     "featureNotAvailable": "Functie Niet Beschikbaar",
-    "notAuthenticated": "Log in om oefeningen te maken"
+    "notAuthenticated": "Log in om oefeningen te maken",
+    "exerciseNotFound": "Oefening niet gevonden",
+    "unauthorized": "Je kunt alleen je eigen oefeningen bewerken",
+    "loadFailed": "Laden van oefening is mislukt",
+    "updateFailed": "Bijwerken van oefening is mislukt"
   },
   "community": {
     "allCategories": "Alle Categorieën",
@@ -445,7 +464,18 @@
     "unsupportedFormat": "Niet-ondersteund videoformaat. Gebruik MP4, WebM of OGG voor de beste compatibiliteit.",
     "uploadFailed": "Uploaden van video mislukt. Probeer het opnieuw.",
     "uploaded": "geüpload",
-    "loadError": "Video laden mislukt"
+    "loadError": "Video laden mislukt",
+    "codecNotSupported": "Deze video gebruikt een niet-ondersteunde codec. Probeer te converteren naar H.264 MP4-indeling voor betere browsercompatibiliteit.",
+    "formatError": "Videoformaat niet herkend. Gebruik een standaard MP4-, WebM- of OGG-videobestand.",
+    "formatNotSupported": "Videoformaat wordt niet ondersteund door je browser. Probeer MP4 met H.264-codec te gebruiken.",
+    "decodeError": "Videobestand lijkt beschadigd of gebruikt een niet-ondersteunde codering. Probeer de video opnieuw te coderen.",
+    "networkError": "Netwerkfout bij het laden van video. Controleer je verbinding en probeer het opnieuw.",
+    "loadAborted": "Video laden is onderbroken. Probeer het opnieuw te uploaden.",
+    "codecSuggestion": "Aanbevolen: Gebruik FFmpeg of HandBrake om te converteren naar MP4 met H.264-video en AAC-audio.",
+    "cannotDisplay": "Kan video niet weergeven",
+    "localVideo": "Lokaal videobestand",
+    "pendingSync": "Video wacht op synchronisatie",
+    "videoWithIssues": "Video heeft problemen"
   },
   "profile": {
     "title": "Profiel",

@@ -5,6 +5,7 @@
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "delete": "حذف",
+    "signIn": "تسجيل الدخول",
     "reset": "إعادة تعيين",
     "choose": "اختر",
     "close": "إغلاق",
@@ -38,7 +39,12 @@
     "saving": "حفظ...",
     "sharing": "مشاركة",
     "videoUploadAfterSave": "سيكون رفع الفيديو متاحًا بعد حفظ التمرين.",
-    "minutes": "دقائق"
+    "minutes": "دقائق",
+    "discard": "تجاهل",
+    "cancelTitle": "إلغاء",
+    "clear": "مسح",
+    "clearFormTitle": "مسح النموذج",
+    "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك."
   },
   "navigation": {
     "home": "الرئيسية",
@@ -74,6 +80,8 @@
     "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
     "exportData": "تصدير البيانات",
     "exportDataHelp": "تحميل بيانات التمرين كملف JSON",
+    "exportInProgress": "جارٍ التصدير...",
+    "exportSuccess": "تم تصدير بياناتك بنجاح!",
     "exportRateLimit": "يمكنك طلب حتى 3 عمليات تصدير يومياً",
     "exportNow": "تصدير الآن",
     "exportNowHelp": "تصدير أحدث بياناتك فوراً إلى ملف JSON.",
@@ -97,7 +105,11 @@
     "exportYourData": "تصدير بياناتك",
     "deleteAccount": "حذف الحساب",
     "deleteMyAccount": "حذف حسابي",
-    "deleteAccountHelp": "حذف حسابك نهائياً مع جميع البيانات المرتبطة. هذا الإجراء له فترة سماح 30 يوماً."
+    "deleteAccountHelp": "حذف حسابك نهائياً مع جميع البيانات المرتبطة. هذا الإجراء له فترة سماح 30 يوماً.",
+    "forceFullSync": "فرض مزامنة كاملة",
+    "resetSyncState": "إعادة تعيين حالة المزامنة",
+    "syncAdvanced": "مزامنة متقدمة",
+    "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة."
   },
   "timer": {
     "restNext": "فترة راحة (التالي: {{next}})",
@@ -330,6 +342,8 @@
     "createSuccess": "تم إنشاء التمرين بنجاح!",
     "editExercise": "تعديل التمرين",
     "editExerciseAria": "تعديل {{name}}",
+    "editExerciseSubtitle": "تحديث تفاصيل التمرين المخصص الخاص بك",
+    "updateSuccess": "تم تحديث التمرين بنجاح!",
     "deleteExercise": "حذف التمرين",
     "deleteExerciseTitle": "حذف التمرين",
     "deleteExerciseAria": "حذف {{name}}",
@@ -390,7 +404,11 @@
   "sharing": "مشاركة",
   "errors": {
     "featureNotAvailable": "الميزة غير متاحة",
-    "notAuthenticated": "يرجى تسجيل الدخول لإنشاء التمارين"
+    "notAuthenticated": "يرجى تسجيل الدخول لإنشاء التمارين",
+    "exerciseNotFound": "لم يتم العثور على التمرين",
+    "unauthorized": "يمكنك فقط تعديل تمارينك الخاصة",
+    "loadFailed": "فشل في تحميل التمرين",
+    "updateFailed": "فشل في تحديث التمرين"
   },
   "community": {
     "allCategories": "جميع الفئات",
@@ -433,7 +451,18 @@
     "unsupportedFormat": "تنسيق الفيديو غير مدعوم. يرجى استخدام صيغة MP4 أو WebM أو OGG للحصول على أفضل توافق.",
     "uploadFailed": "فشل رفع الفيديو. يرجى المحاولة مرة أخرى.",
     "uploaded": "تم الرفع",
-    "loadError": "فشل تحميل الفيديو"
+    "loadError": "فشل تحميل الفيديو",
+    "codecNotSupported": "هذا الفيديو يستخدم ترميز غير مدعوم. حاول تحويله إلى تنسيق H.264 MP4 للحصول على توافق أفضل مع المتصفح.",
+    "formatError": "تنسيق الفيديو غير معترف به. يرجى استخدام ملف فيديو قياسي MP4 أو WebM أو OGG.",
+    "formatNotSupported": "تنسيق الفيديو غير مدعوم من قبل المتصفح الخاص بك. حاول استخدام MP4 مع ترميز H.264.",
+    "decodeError": "يبدو أن ملف الفيديو تالف أو يستخدم ترميز غير مدعوم. حاول إعادة ترميز الفيديو.",
+    "networkError": "خطأ في الشبكة أثناء تحميل الفيديو. تحقق من اتصالك وحاول مرة أخرى.",
+    "loadAborted": "تم قطع تحميل الفيديو. يرجى محاولة الرفع مرة أخرى.",
+    "codecSuggestion": "موصى به: استخدم FFmpeg أو HandBrake للتحويل إلى MP4 مع فيديو H.264 وصوت AAC.",
+    "cannotDisplay": "لا يمكن عرض الفيديو",
+    "localVideo": "ملف الفيديو المحلي",
+    "pendingSync": "الفيديو في انتظار المزامنة",
+    "videoWithIssues": "الفيديو به مشكلات"
   },
   "profile": {
     "title": "الملف الشخصي",

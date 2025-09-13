@@ -4,6 +4,8 @@
     "stop": "Detener",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "signIn": "Iniciar sesión",
     "reset": "Reiniciar",
     "choose": "Elegir",
     "close": "Cerrar",
@@ -37,7 +39,12 @@
     "saving": "Guardando...",
     "sharing": "Compartir",
     "videoUploadAfterSave": "La carga de video estará disponible después de guardar el ejercicio.",
-    "minutes": "minutos"
+    "minutes": "minutos",
+    "discard": "Descartar",
+    "cancelTitle": "Cancelar",
+    "clear": "Borrar",
+    "clearFormTitle": "Borrar formulario",
+    "confirmClearForm":"¿Estás seguro de que deseas borrar el formulario? Esto eliminará tu borrador."
   },
   "navigation": {
     "home": "Inicio",
@@ -73,6 +80,8 @@
     "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
     "exportData": "Exportar datos",
     "exportDataHelp": "Descarga tus datos de entrenamiento como archivo JSON",
+    "exportInProgress": "Exportando...",
+    "exportSuccess": "Tus datos han sido exportados con éxito!",
     "exportRateLimit": "Puedes solicitar hasta 3 exportaciones por día",
     "exportNow": "Exportar ahora",
     "exportNowHelp": "Exporta inmediatamente tus datos más recientes a un archivo JSON.",
@@ -96,7 +105,11 @@
     "exportYourData": "Exportar tus datos",
     "deleteAccount": "Eliminar cuenta",
     "deleteMyAccount": "Eliminar mi cuenta",
-    "deleteAccountHelp": "Eliminar permanentemente tu cuenta y todos los datos asociados. Esta acción tiene un período de gracia de 30 días."
+    "deleteAccountHelp": "Eliminar permanentemente tu cuenta y todos los datos asociados. Esta acción tiene un período de gracia de 30 días.",
+    "forceFullSync": "Forzar sincronización completa",
+    "resetSyncState": "Restablecer estado de sincronización",
+    "syncAdvanced": "Sincronización avanzada",
+    "syncAdvancedHelp": "Ayuda para solucionar problemas de sincronización."
   },
   "timer": {
     "restNext": "Período de descanso (Siguiente: {{next}})",
@@ -317,6 +330,8 @@
     "createSuccess": "¡Ejercicio creado con éxito!",
     "editExercise": "Editar ejercicio",
     "editExerciseAria": "Editar {{name}}",
+    "editExerciseSubtitle": "Actualiza los detalles de tu ejercicio personalizado",
+    "updateSuccess": "¡Ejercicio actualizado con éxito!",
     "deleteExercise": "Eliminar ejercicio",
     "deleteExerciseTitle": "Eliminar Ejercicio",
     "deleteExerciseAria": "Eliminar {{name}}",
@@ -377,7 +392,11 @@
   "sharing": "Compartir",
   "errors": {
     "featureNotAvailable": "Función No Disponible",
-    "notAuthenticated": "Por favor inicia sesión para crear ejercicios"
+    "notAuthenticated": "Por favor inicia sesión para crear ejercicios",
+    "exerciseNotFound": "Ejercicio no encontrado",
+    "unauthorized": "Solo puedes editar tus propios ejercicios",
+    "loadFailed": "Error al cargar el ejercicio",
+    "updateFailed": "Error al actualizar el ejercicio"
   },
   "community": {
     "allCategories": "Todas las Categorías",
@@ -420,7 +439,18 @@
     "unsupportedFormat": "Formato de video no compatible. Use MP4, WebM o OGG para una mejor compatibilidad.",
     "uploadFailed": "Error al subir el video. Inténtelo de nuevo.",
     "uploaded": "subido",
-    "loadError": "Error al cargar el video"
+    "loadError": "Error al cargar el video",
+    "codecNotSupported": "Este video utiliza un códec no compatible. Intente convertirlo al formato H.264 MP4 para obtener una mejor compatibilidad con el navegador.",
+    "formatError": "Formato de video no reconocido. Por favor, use un archivo de video estándar MP4, WebM u OGG.",
+    "formatNotSupported": "Formato de video no compatible con su navegador. Intente usar MP4 con códec H.264.",
+    "decodeError": "El archivo de video parece estar dañado o utiliza una codificación no compatible. Intente volver a codificar el video.",
+    "networkError": "Error de red al cargar el video. Verifique su conexión e inténtelo de nuevo.",
+    "loadAborted": "La carga del video fue interrumpida. Por favor, intente subirlo nuevamente.",
+    "codecSuggestion": "Recomendado: Use FFmpeg o HandBrake para convertir a MP4 con video H.264 y audio AAC.",
+    "cannotDisplay": "No se puede mostrar el video",
+    "localVideo": "Archivo de video local",
+    "pendingSync": "El video está pendiente de sincronización",
+    "videoWithIssues": "El video tiene problemas"
   },
   "profile": {
     "title": "Perfil",

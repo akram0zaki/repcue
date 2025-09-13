@@ -4,6 +4,8 @@
     "stop": "Arrêter",
     "cancel": "Annuler",
     "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "signIn": "Se connecter",
     "reset": "Réinitialiser",
     "choose": "Choisir",
     "close": "Fermer",
@@ -37,7 +39,12 @@
     "saving": "Enregistrement...",
     "sharing": "Partage",
     "videoUploadAfterSave": "Le téléchargement de vidéo sera disponible après avoir sauvegardé l'exercice.",
-    "minutes": "minutes"
+    "minutes": "minutes",
+    "discard": "Ignorer",
+    "cancelTitle": "Annuler",
+    "clear": "Effacer",
+    "clearFormTitle": "Effacer le formulaire",
+    "confirmClearForm":"Êtes-vous sûr de vouloir effacer le formulaire ? Cela supprimera votre brouillon."
   },
   "navigation": {
     "home": "Accueil",
@@ -98,7 +105,11 @@
     "exportYourData": "Exporter vos données",
     "deleteAccount": "Supprimer le compte",
     "deleteMyAccount": "Supprimer mon compte",
-    "deleteAccountHelp": "Supprimer définitivement votre compte et toutes les données associées. Cette action a une période de grâce de 30 jours."
+    "deleteAccountHelp": "Supprimer définitivement votre compte et toutes les données associées. Cette action a une période de grâce de 30 jours.",
+    "forceFullSync": "Forcer la synchronisation complète",
+    "resetSyncState": "Réinitialiser l'état de synchronisation",
+    "syncAdvanced": "Synchronisation avancée",
+    "syncAdvancedHelp": "Aide pour résoudre les problèmes de synchronisation."
   },
   "timer": {
     "restNext": "Période de repos (Suivant : {{next}})",
@@ -316,6 +327,8 @@
     "createDescription": "Créez un exercice personnalisé que vous pouvez utiliser dans vos entraînements",
     "editExercise": "Modifier l'exercice",
     "editExerciseAria": "Modifier {{name}}",
+    "editExerciseSubtitle": "Mettez à jour les détails de votre exercice personnalisé",
+    "updateSuccess": "Exercice mis à jour avec succès !",
     "deleteExercise": "Supprimer l'exercice",
     "deleteExerciseTitle": "Supprimer l'Exercice",
     "deleteExerciseAria": "Supprimer {{name}}",
@@ -403,7 +416,11 @@
   },
   "errors": {
     "featureNotAvailable": "Fonctionnalité Non Disponible",
-    "notAuthenticated": "Veuillez vous connecter pour créer des exercices"
+    "notAuthenticated": "Veuillez vous connecter pour créer des exercices",
+    "exerciseNotFound": "Exercice non trouvé",
+    "unauthorized": "Vous ne pouvez modifier que vos propres exercices",
+    "loadFailed": "Échec du chargement de l'exercice",
+    "updateFailed": "Échec de la mise à jour de l'exercice"
   },
   "community": {
     "allCategories": "Toutes les Catégories",
@@ -455,7 +472,18 @@
     "unsupportedFormat": "Format vidéo non pris en charge. Veuillez utiliser MP4, WebM ou OGG pour une meilleure compatibilité.",
     "uploadFailed": "Échec du téléversement de la vidéo. Veuillez réessayer.",
     "uploaded": "téléversé",
-    "loadError": "Échec du chargement de la vidéo"
+    "loadError": "Échec du chargement de la vidéo",
+    "codecNotSupported": "Cette vidéo utilise un codec non pris en charge. Essayez de la convertir au format H.264 MP4 pour une meilleure compatibilité avec le navigateur.",
+    "formatError": "Format vidéo non reconnu. Veuillez utiliser un fichier vidéo standard MP4, WebM ou OGG.",
+    "formatNotSupported": "Format vidéo non pris en charge par votre navigateur. Essayez d'utiliser MP4 avec le codec H.264.",
+    "decodeError": "Le fichier vidéo semble être corrompu ou utilise un encodage non pris en charge. Essayez de réencoder la vidéo.",
+    "networkError": "Erreur réseau lors du chargement de la vidéo. Vérifiez votre connexion et réessayez.",
+    "loadAborted": "Le chargement de la vidéo a été interrompu. Veuillez réessayer de téléverser.",
+    "codecSuggestion": "Recommandé : Utilisez FFmpeg ou HandBrake pour convertir en MP4 avec vidéo H.264 et audio AAC.",
+    "cannotDisplay": "Impossible d'afficher la vidéo",
+    "localVideo": "Fichier vidéo local",
+    "pendingSync": "Vidéo en attente de synchronisation",
+    "videoWithIssues": "Vidéo avec problèmes"
   },
   "profile": {
     "title": "Profil",
