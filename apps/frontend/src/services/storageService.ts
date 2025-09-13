@@ -1188,10 +1188,15 @@ export class StorageService {
    */
   private async enrichExercisesWithVideoUrls(exercises: Exercise[]): Promise<Exercise[]> {
     try {
-      // Get all video files in batch for efficiency
-      const videoFiles = await this.db.video_files
-        .where('deleted').equals(0)
-        .toArray();
+      logger.log('💾 [EnrichVideo] Starting exercise enrichment with video URLs');
+
+      // Get all video files (try both approaches to handle different data types)
+      let videoFiles = await this.db.video_files.toArray();
+      logger.log('💾 [EnrichVideo] Found video files:', videoFiles.length, videoFiles);
+
+      // Filter out deleted files (handle both boolean and numeric values)
+      videoFiles = videoFiles.filter(vf => !vf.deleted && vf.deleted !== 1);
+      logger.log('💾 [EnrichVideo] Active video files after filtering:', videoFiles.length);
 
       // Create a map of exercise_id -> video file for fast lookup
       const videoFileMap = new Map<string, StoredVideoFile>();
@@ -1200,9 +1205,10 @@ export class StorageService {
       }
 
       // Enrich exercises with video URLs
-      return exercises.map(exercise => {
+      const enrichedExercises = exercises.map(exercise => {
         const videoFile = videoFileMap.get(exercise.id);
         if (videoFile) {
+          logger.log('💾 [EnrichVideo] Enriching exercise with video:', exercise.name, videoFile.file_name);
           return {
             ...exercise,
             custom_video_url: `blob-pending-sync://${exercise.id}/${videoFile.file_name}`,
@@ -1211,6 +1217,11 @@ export class StorageService {
         }
         return exercise;
       });
+
+      const enrichedCount = enrichedExercises.filter(e => e.custom_video_url).length;
+      logger.log('💾 [EnrichVideo] Enrichment complete. Exercises with videos:', enrichedCount);
+
+      return enrichedExercises;
     } catch (error) {
       logger.error('💾 [EnrichVideo] Failed to enrich exercises with video URLs:', error);
       return exercises; // Return original exercises if enrichment fails
