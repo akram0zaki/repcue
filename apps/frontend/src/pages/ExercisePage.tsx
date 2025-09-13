@@ -171,9 +171,11 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       return;
     }
     // Preflight: verify asset exists before opening modal (non-blocking short timeout)
-    // In test environments, perform preflight (tests expect behavior), but keep it fast
+    // Skip preflight for blob URLs as they don't support HEAD requests
     const isTest = typeof window !== 'undefined' && (window as Window & { __TEST__?: boolean }).__TEST__ === true;
-    if (!isTest) {
+    const isBlobUrl = url.startsWith('blob:');
+
+    if (!isBlobUrl && !isTest) {
       try {
         const controller = new AbortController();
         const tid = window.setTimeout(() => controller.abort(), 1000);
@@ -198,7 +200,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         );
         return;
       }
-    } else {
+    } else if (!isBlobUrl && isTest) {
       try {
         const res = await fetch(url, { method: 'HEAD' });
         const ct = res.headers.get('content-type') || '';
@@ -225,6 +227,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         return;
       }
     }
+    // For blob URLs, skip preflight and proceed directly to opening the preview
     setPreviewUrl(url);
     // Wait a microtask to allow dialog to mount before assertions in tests
     await Promise.resolve();
