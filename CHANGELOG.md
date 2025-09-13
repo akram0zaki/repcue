@@ -1,6 +1,21 @@
 ## Unreleased
 
 ### Fixed
+- **Timer state persistence bug**: Fixed critical issue where stale workout data persisted after workout completion
+  - **Root cause**: `workoutMode` state remained active when users immediately selected standalone exercises after completing workouts
+  - **Symptoms**: Timer displayed wrong exercise data (e.g., "burpees 2×8" when selecting "Bicycle Crunches")
+  - **Solution**: Implemented double-safety state clearing mechanism
+    - Primary: Clear `workoutMode` immediately on workout completion
+    - Secondary: Force-clear stale `workoutMode` in exercise selection handler
+    - Enhanced debug logging to track state transitions during workout completion
+  - **Prevents**: Race conditions between workout completion and exercise selection that caused UI state corruption
+- **Video demo state management**: Fixed video display issues after workout completion
+  - **Issue**: Videos continued showing for completed workouts when `currentExerciseIndex >= total exercises`
+  - **Fix**: Added bounds checking in `TimerPage.tsx` to prevent video display when workout is completed
+  - **Enhanced**: Proper video state cleanup when transitioning from workout mode to standalone exercises
+- **Debug logging cleanup**: Commented out verbose timer completion debug statements while preserving core functionality
+  - Reduced console noise while maintaining essential debugging capabilities
+  - Debug statements can be easily re-enabled for troubleshooting
 - **Sync system re-enabled**: Fixed sync not working by re-enabling automatic sync triggers
   - **Root cause**: Automatic sync triggers were disabled in `App.tsx` due to "timeout issues" comments
   - **Re-enabled periodic sync**: Every 5 minutes when app is active

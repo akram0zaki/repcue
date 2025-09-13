@@ -122,7 +122,12 @@ const TimerPage: React.FC<TimerPageProps> = ({
   
   // Define exerciseForVideo with proper workout mode support
   const exerciseForVideo = isWorkoutMode 
-    ? (workoutCurrentExercise && workoutCurrentExercise.has_video ? workoutCurrentExercise : null)
+    ? (
+        // If workout is completed (currentExerciseIndex >= total exercises), don't show any video
+        workoutMode && workoutMode.currentExerciseIndex >= workoutMode.exercises.length
+          ? null
+          : (workoutCurrentExercise && workoutCurrentExercise.has_video ? workoutCurrentExercise : null)
+      )
     : (selectedExercise && selectedExercise.has_video ? selectedExercise : null);
     
   // Initialize video hook with the correct exercise

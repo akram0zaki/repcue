@@ -662,19 +662,48 @@ function App() {
         });
       }
 
-      // Update timer state to show workout completion before resetting
-      setTimerState(prev => ({
-        ...prev,
-        workoutMode: prev.workoutMode ? {
-          ...prev.workoutMode,
-          currentExerciseIndex: prev.workoutMode.exercises.length, // Set to total count to show 100%
-          isResting: false
-        } : prev.workoutMode,
-        isRunning: false
-      }));
+      // Update timer state to show workout completion and immediately clear problematic state
+      logger.debug('🔧 Setting timer state to cleared mode and clearing exercise state');
+      setTimerState(prev => {
+        // logger.debug('🔧 BEFORE workout completion state update:', {
+        //   workoutMode: !!prev.workoutMode,
+        //   workoutModeData: prev.workoutMode ? {
+        //     currentExerciseIndex: prev.workoutMode.currentExerciseIndex,
+        //     exercises: prev.workoutMode.exercises.length
+        //   } : null
+        // });
+        
+        const newState = {
+          ...prev,
+          workoutMode: undefined, // Clear workout mode completely
+          isRunning: false,
+          // Immediately clear ALL exercise-related state to prevent stale data when user selects new exercise
+          currentSet: undefined,
+          totalSets: undefined,
+          currentRep: undefined,
+          totalReps: undefined,
+          currentTime: 0,
+          targetTime: undefined,
+          startTime: undefined,
+          currentExercise: undefined,
+          isCountdown: false,
+          countdownTime: 0,
+          restTimeRemaining: undefined
+        };
+        
+        // logger.debug('🔧 AFTER workout completion state update:', {
+        //   workoutMode: !!newState.workoutMode,
+        //   currentExercise: 'cleared'
+        // });
+        
+        return newState;
+      });
 
-      // Delay reset to allow UI to show completion state
+      // Delay full reset to allow UI to show completion state, but clear selected exercise immediately
+      setSelectedExercise(null);
+      logger.debug('🔧 Cleared selectedExercise, scheduling full reset in 2 seconds');
       setTimeout(async () => {
+        logger.debug('🔧 Executing delayed resetTimer after workout completion');
         await resetTimer();
       }, 2000); // 2 second delay to show completion
     } else {
@@ -807,20 +836,38 @@ function App() {
         intervalRef.current = null;
       }
       
-      logger.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
+      // logger.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
+      // logger.debug('🔧 Timer completion debug state:', {
+      //   currentExercise: currentExercise?.name,
+      //   workoutMode: !!workoutMode,
+      //   workoutModeData: workoutMode ? {
+      //     currentExerciseIndex: workoutMode.currentExerciseIndex,
+      //     totalExercises: workoutMode.exercises.length,
+      //     isResting: workoutMode.isResting
+      //   } : null,
+      //   timerState: {
+      //     currentSet: timerState.currentSet,
+      //     totalSets: timerState.totalSets,
+      //     currentRep: timerState.currentRep,
+      //     totalReps: timerState.totalReps,
+      //     isRunning,
+      //     currentTime,
+      //     targetTime
+      //   }
+      // });
       
       if (workoutMode) {
         // Get the actual current exercise from workout mode for accurate logging
-        const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
-        const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
-        logger.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
-        logger.log('Workout state:', {
-          currentExerciseIndex: workoutMode.currentExerciseIndex,
-          totalExercises: workoutMode.exercises.length,
-          isResting: workoutMode.isResting,
-          selectedExerciseName: currentExercise?.name,
-          actualExerciseName: actualCurrentExercise?.name
-        });
+        // const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
+        // const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
+        // logger.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
+        // logger.log('Workout state:', {
+        //   currentExerciseIndex: workoutMode.currentExerciseIndex,
+        //   totalExercises: workoutMode.exercises.length,
+        //   isResting: workoutMode.isResting,
+        //   selectedExerciseName: currentExercise?.name,
+        //   actualExerciseName: actualCurrentExercise?.name
+        // });
         
         if (workoutMode.isResting) {
           // Rest period completed, start next exercise automatically
@@ -1394,6 +1441,32 @@ function App() {
   }, [hasConsent, appSettings]);
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
+    logger.debug('🔧 handleSetSelectedExercise called:', {
+      exerciseName: exercise?.name || 'null',
+      currentWorkoutMode: !!timerState.workoutMode,
+      timerStateDebug: {
+        currentExercise: timerState.currentExercise?.name,
+        currentSet: timerState.currentSet,
+        currentRep: timerState.currentRep,
+        totalSets: timerState.totalSets,
+        totalReps: timerState.totalReps
+      }
+    });
+    
+    // FORCE clear workoutMode if it exists when selecting a standalone exercise
+    if (timerState.workoutMode && exercise) {
+      logger.debug('🔧 FORCE clearing stale workoutMode when selecting standalone exercise');
+      setTimerState(prev => ({
+        ...prev,
+        workoutMode: undefined,
+        currentSet: undefined,
+        totalSets: undefined,
+        currentRep: undefined,
+        totalReps: undefined,
+        currentExercise: undefined
+      }));
+    }
+    
     setSelectedExercise(exercise);
     updateAppSettings({ last_selected_exercise_id: exercise ? exercise.id : null });
     
@@ -1414,7 +1487,7 @@ function App() {
         });
       }
     }
-  }, [updateAppSettings]);
+  }, [updateAppSettings, timerState.workoutMode, timerState.currentExercise, timerState.currentSet, timerState.currentRep, timerState.totalSets, timerState.totalReps]);
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
