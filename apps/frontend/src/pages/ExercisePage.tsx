@@ -28,7 +28,7 @@ import { localizeExercise } from '../utils/localizeExercise';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import getVideoSources from '../utils/videoSources';
-import { resolveVideoUrl, createVideoUrlCleanup } from '../utils/resolveVideoUrl';
+import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
