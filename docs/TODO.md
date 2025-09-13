@@ -186,7 +186,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 - I edited exercise Ya 7amada 6 and successfully uploaded a video that was stored into indexeddb with dirty = 1 then I saved the exercise. I switched tabs to force a sync and the sync was partially successful and I guess the video was not synced because I couldn't find it in supabase. I copied the console output of this full attempt to console.log at the workspace root.
 
 
-- The built-in exercise system assumes 3 videos of different resolutions for each exercise, and picks up the relevant version based on the screen dimentions. I am allowing users to upload only one video for custom exercises, and the video system needs to handle that for custom exercises there is only one video.
+- The built-in exercise system assumes 3 videos of different resolutions for each exercise, and picks up the relevant version based on the screen dimentions. I am allowing users to upload only one video for custom exercises, and the video system needs to handle that for custom exercises there is only one video. Similar to built-in exercises, the exercise card on ExercisePage should display a play button if the exercise has a video. Also if the custom exercise has a video it should be displayed inside the timer ring, similar to built-in exercises.
 
 
 

@@ -215,12 +215,12 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   };
 
   const handleVideoLoadError = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    const videoElement = event.target;
+    const videoElement = event.target as HTMLVideoElement;
     const mediaError = videoElement?.error;
     const errorCode = mediaError?.code;
     const errorMessage = mediaError?.message;
-    
-    logger.error('🎥 [VideoDisplay] Video failed to load', { 
+
+    logger.error('🎥 [VideoDisplay] Video failed to load', {
       currentVideoUrl,
       isPlaceholder: currentVideoUrl?.startsWith('placeholder://'),
       error: mediaError,
