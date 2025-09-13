@@ -101,7 +101,7 @@ export function useNetworkSync(): UseNetworkSyncResult {
     }
 
     try {
-      await syncService.sync();
+      await syncService.sync(true);
     } catch (error) {
       logger.error('Manual sync failed:', error as unknown as Record<string, unknown>);
     }

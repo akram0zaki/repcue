@@ -37,6 +37,15 @@
     - Fixed `UserFavorite` TypeScript interface and all database operations
     - Resolves "2 of 3 operations failed" errors from field name mismatches
 - **Debug cleanup**: Removed verbose "ExerciseCard Debug - UUID exercise ownership check" console logging
+- **Workout data sync failure**: Fixed critical issue preventing activity_logs and workout_sessions from syncing to Supabase
+  - **Root cause**: Edge function field allowlists were missing key fields defined in TypeScript interfaces
+    - `activity_logs` missing: `exercise_name`, `timestamp`, `is_workout`, `exercises`, `sets_count`, `reps_count`
+    - `workout_sessions` missing: `workout_name`, `start_time`, `end_time`, `exercises`, `is_completed`, `total_duration`
+  - **Symptoms**: Records marked as clean (dirty=0) in IndexedDB but never appeared in Supabase database
+  - **Solution**: Updated sync_v2 edge function allowlists to include all required fields from TypeScript interfaces
+  - **Result**: All workout data now syncs successfully from IndexedDB to Supabase cloud database
+  - **Owner_id fix**: Resolved undefined owner_id issue by ensuring all `prepareUpsert()` calls include current user ID
+  - **Anonymous-to-authenticated flow**: Verified proper ownership claiming when users sign in after creating anonymous data
 
 ### Enhanced  
 - **Sync investigation documentation**: Added comprehensive troubleshooting guide at `docs/sync-investigation.md`

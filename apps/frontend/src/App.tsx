@@ -124,7 +124,7 @@ const setupSyncTriggers = () => {
   const handleVisibilityChange = () => {
     if (!document.hidden) {
       logger.log('📱 App came to foreground - triggering sync');
-      syncService.sync().catch(error => {
+      syncService.sync(true).catch(error => {
         logger.warn('Foreground sync failed:', error);
       });
     }
@@ -141,7 +141,7 @@ const setupSyncTriggers = () => {
     syncInterval.current = setInterval(() => {
       if (!document.hidden) {
         logger.log('⏰ Periodic sync triggered');
-        syncService.sync().catch(error => {
+        syncService.sync(true).catch(error => {
           logger.warn('Periodic sync failed:', error);
         });
       }
@@ -1434,7 +1434,7 @@ function App() {
     try {
   await storageService.saveAppSettings(nextSettings);
   // Nudge sync so app_settings exist on server for other devices
-  void syncService.sync();
+  void syncService.sync(true);
     } catch (error) {
       logger.error('Failed to save app settings:', error);
     }
@@ -1812,7 +1812,7 @@ useEffect(() => {
       }
       
       // Promptly sync so favorites show up on other devices
-      void syncService.sync();
+      void syncService.sync(true);
       
       // Update local UI state
       setExercises(prev => 
@@ -1834,7 +1834,7 @@ useEffect(() => {
     try {
       await storageService.deleteCustomExercise(exercise_id);
       // Promptly sync so deletion reflects on other devices
-      void syncService.sync();
+      void syncService.sync(true);
       
       // Remove the exercise from the local state
       setExercises(prev => prev.filter(exercise => exercise.id !== exercise_id));

@@ -83,7 +83,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     try {
       setIsManualSyncing(true);
   // Legacy sync (and v2 wrapper) accept optional force flag; current typing expects no args
-  await syncService.sync();
+  await syncService.sync(true);
     } catch (err) {
       logger.error('Manual sync failed:', err);
     } finally {

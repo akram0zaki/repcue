@@ -220,7 +220,7 @@ export class AuthService {
         setTimeout(() => {
           import('./syncService').then(({ syncService }) => {
             logger.log('🔄 Starting delayed post-authentication sync...');
-            syncService.sync().then(result => {
+            syncService.sync(true).then(result => {
               if (result.success) {
                 if (result.errors?.length > 0) {
                   // Check if it's just "sync already in progress" info message

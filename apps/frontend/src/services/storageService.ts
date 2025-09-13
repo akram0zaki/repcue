@@ -11,6 +11,7 @@ import type {
 } from '../types';
 import { consentService } from './consentService';
 import { authService } from './authService';
+import { SYNC_DEBUG } from '../config/features';
 import { 
   prepareUpsert, 
   prepareSoftDelete, 
@@ -1292,7 +1293,7 @@ export class StorageService {
       }
     }
 
-    const logWithSync = prepareUpsert({ ...log, exercise_name: ensuredName }, logId);
+    const logWithSync = prepareUpsert({ ...log, exercise_name: ensuredName }, logId, this.getCurrentUserId());
     const storedLog: StoredActivityLog = {
       ...logWithSync,
       timestamp: log.timestamp
@@ -1405,7 +1406,7 @@ export class StorageService {
     }
 
     const prefId = preferences.id || crypto.randomUUID();
-    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, prefId);
+    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, prefId, this.getCurrentUserId());
     
     logger.log('💾 Saving user preferences to IndexedDB:', { 
       id: storedPreferences.id,
@@ -1486,7 +1487,8 @@ export class StorageService {
           // Fix owner_id if it's null/undefined
           owner_id: existing.owner_id || userId
         } as UserPreferences,
-        existing.id
+        existing.id,
+        this.getCurrentUserId()
       );
       await this.saveUserPreferences(updated);
     } else {
@@ -1526,7 +1528,7 @@ export class StorageService {
 
   // Ensure UUID id so server accepts row
   const settingsId = this.isUuid(settings.id) ? settings.id! : crypto.randomUUID();
-    const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId);
+    const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId, this.getCurrentUserId());
 
     try {
       // Use put() to handle both insert and update operations
@@ -1717,7 +1719,7 @@ export class StorageService {
     }
 
   const workoutId = workout.id || crypto.randomUUID();
-  const workoutWithSync = prepareUpsert(workout, workoutId);
+  const workoutWithSync = prepareUpsert(workout, workoutId, this.getCurrentUserId());
     const storedWorkout: StoredWorkout = {
       ...workoutWithSync,
       created_at: typeof workout.created_at === 'string' ? workout.created_at : new Date().toISOString()
@@ -1810,7 +1812,7 @@ export class StorageService {
     }
 
   const sessionId = session.id || crypto.randomUUID();
-    const sessionWithSync = prepareUpsert(session, sessionId);
+    const sessionWithSync = prepareUpsert(session, sessionId, this.getCurrentUserId());
     const storedSession: StoredWorkoutSession = {
       ...sessionWithSync,
       start_time: session.start_time,
@@ -2509,7 +2511,7 @@ export class StorageService {
         deleted: false,
         version: 1,
         dirty: 1 // Mark for sync
-      } as Exercise);
+      } as Exercise, undefined, userId);
 
       await this.db.exercises.add(exercise);
       logger.log('Custom exercise created:', exercise.name);
@@ -2548,7 +2550,7 @@ export class StorageService {
         ...updates,
         updated_at: new Date().toISOString(),
         dirty: 1 // Mark for sync
-      });
+      }, undefined, this.getCurrentUserId());
 
       await this.db.exercises.put(updatedExercise);
       logger.log('Custom exercise updated:', updatedExercise.name);
@@ -2643,7 +2645,7 @@ export class StorageService {
         updated_at: new Date().toISOString(),
         version: 1,
         dirty: 1 // Mark for sync
-      } as Exercise);
+      } as Exercise, undefined, userId);
 
       await this.db.exercises.add(copiedExercise);
       logger.log('Exercise copied:', copiedExercise.name);
@@ -2691,7 +2693,11 @@ export class StorageService {
    */
   private getCurrentUserId(): string | null {
     const user = authService.getCurrentUser();
-    return user?.id || null;
+    const userId = user?.id || null;
+    if (!userId && SYNC_DEBUG) {
+      logger.debug('[storageService] getCurrentUserId: user not authenticated', { user, authState: authService.getAuthState() });
+    }
+    return userId;
   }
 
   /**
