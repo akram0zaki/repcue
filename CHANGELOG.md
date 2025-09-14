@@ -11,6 +11,14 @@
 - **TypeScript compilation error**: Fixed type comparison error in video file filtering logic
   - **Issue**: `vf.deleted` boolean type compared to number `1` causing TS2367 error
   - **Fix**: Simplified logic to use `!vf.deleted` which correctly handles both boolean and numeric representations
+- **Missing favorite button on custom exercise cards**: Fixed layout issue where favorite button was not visible
+  - **Issue**: Custom exercises with video, edit, and delete buttons caused the favorite button to be pushed off-screen
+  - **Root cause**: Button container layout couldn't accommodate 4 action buttons (Play, Edit, Delete, Favorite) on mobile screens
+  - **Fix**: Enhanced responsive layout with tighter spacing and smaller buttons on mobile while maintaining accessibility
+    - Reduced button gaps from `gap-2` to `gap-1 sm:gap-2` for better mobile spacing
+    - Made buttons smaller on mobile: `min-h-[36px]` vs `min-h-[44px]` on desktop
+    - Added `flex-shrink-0` to button container to prevent layout collapse
+    - Maintained WCAG-compliant touch targets and all accessibility features
 
 ## 2025-09-14 (Earlier)
 

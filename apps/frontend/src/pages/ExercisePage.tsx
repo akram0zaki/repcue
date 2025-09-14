@@ -832,44 +832,44 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {(exercise.has_video || exercise.custom_video_url) && (
               <button
                 onClick={() => onPreview && onPreview(exercise)}
-                className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                 title={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
                 aria-label={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
               >
-                <PlayIcon size={20} />
+                <PlayIcon size={18} className="sm:!w-5 sm:!h-5" />
               </button>
             )}
             {isUserCreated && onEdit && (
               <button
                 onClick={() => onEdit(exercise)}
-                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                 title={t('exercises.editExercise', { defaultValue: 'Edit exercise' })}
                 aria-label={t('exercises.editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
               >
-                <EditIcon size={20} />
+                <EditIcon size={18} className="sm:!w-5 sm:!h-5" />
               </button>
             )}
             {isUserCreated && onDelete && (
               <button
                 onClick={() => onDelete(exercise.id)}
-                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                 title={t('exercises.deleteExercise', { defaultValue: 'Delete exercise' })}
                 aria-label={t('exercises.deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
               >
-                <DeleteIcon size={20} />
+                <DeleteIcon size={18} className="sm:!w-5 sm:!h-5" />
               </button>
             )}
             <button
               onClick={() => onToggleFavorite(exercise.id)}
-              className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
+              className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
               title={exercise.is_favorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
               aria-label={exercise.is_favorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
             >
-              {exercise.is_favorite ? <StarFilledIcon size={20} /> : <StarIcon size={20} />}
+              {exercise.is_favorite ? <StarFilledIcon size={18} className="sm:!w-5 sm:!h-5" /> : <StarIcon size={18} className="sm:!w-5 sm:!h-5" />}
             </button>
           </div>
         </div>
