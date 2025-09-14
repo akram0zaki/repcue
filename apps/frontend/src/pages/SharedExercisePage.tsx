@@ -323,16 +323,30 @@ const SharedExercisePage: React.FC = () => {
               </div>
             )}
 
-            {/* Custom Instructions */}
-            {exercise.custom_instructions && (
+            {/* Instructions */}
+            {exercise.instructions && exercise.instructions.length > 0 && (
               <div className="mb-6">
                 <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t('exercises.instructions', 'Instructions')}
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {exercise.custom_instructions}
-                  </p>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3">
+                  {exercise.instructions.map((instruction, index) => (
+                    <div key={index} className="flex gap-3">
+                      <div className="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full flex items-center justify-center text-sm font-medium">
+                        {instruction.step}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                          {instruction.text}
+                        </p>
+                        {instruction.duration_seconds && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            {t('exercises.duration', 'Duration')}: {instruction.duration_seconds}s
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
