@@ -1,12 +1,12 @@
 {
-  "addReview": "[ar] Add Review",
-  "characters": "[ar] characters",
-  "hideReview": "[ar] Hide Review",
-  "loginToRate": "[ar] Please log in to rate",
-  "rateThis": "[ar] Rate this",
-  "reviewPlaceholder": "مشاركة your experience with this exercise...",
-  "reviews": "[ar] Reviews",
-  "submitError": "[ar] Failed to submit rating",
-  "submitting": "[ar] Submitting...",
-  "yourRating": "Your تقييم"
+  "addReview": "إضافة مراجعة",
+  "characters": "عدد الأحرف",
+  "hideReview": "إخفاء المراجعة",
+  "loginToRate": "يرجى تسجيل الدخول لتقييم",
+  "rateThis": "تقييم هذا",
+  "reviewPlaceholder": "مشاركة تجربتك مع هذا التمرين...",
+  "reviews": "المراجعات",
+  "submitError": "فشل في تقديم التقييم",
+  "submitting": "جاري التقديم...",
+  "yourRating": "تقييمك"
 }

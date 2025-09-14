@@ -68,5 +68,7 @@
   },
   "repBased": {
     "name": "Basé sur les répétitions"
-  }
+  },
+  "filterShared": "Partagés avec moi",
+  "shared": "Partagé"
 }

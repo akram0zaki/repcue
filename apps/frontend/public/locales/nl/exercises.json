@@ -68,5 +68,7 @@
   },
   "repBased": {
     "name": "Op herhalingen gebaseerd"
-  }
+  },
+  "filterShared": "Gedeeld met mij",
+  "shared": "Gedeeld"
 }
