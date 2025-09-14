@@ -166,16 +166,25 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ Scan the entire codebase to replace direct console.log() with logger.log().
 
-- Add feature to allow users to give rating and feedback on the app.
+- ✅ Favorite button is not shown on the exercise card for custom exercise "Ya 7amada 5". Maybe it is rendered out of border but not visible on screen? This exercise has several buttons: Video play, edit, and delete.
 
-- Add feature allowing a user to share the custom exercise they created. Optimally the share link would point to a public page listing the exercise along with its video (if available) without storing anything on the user's device so we don't have to ask for consent. It's okay if we must ask for consent but then the consent dialog should be rendered on top of the page content, not in a previous step. In addition to listing the exercise details there should be some inviting cool text encouraging the user to use RepCue, with a save button that would then prompt the user to sign-up/sign-in. I want suggestions on how to implement this sharing functionality given the following:
+- Custom exercise favorites are not synced from Device A where they were added to Device B where user is authenticated with the same email address.
+
+- ✅ I had a setting on the SettingsPage earlier rep_speed_factor which was a number between 0.5 to 2.0. It is meant to control the video playback speed as a multiplier. So picking 0.5 means playback speed = original speed x 0.5 = slower playback. And the opposite for > 1 which would mean faster playback. This was set on the SettingsPage and used by the Timer to control video playback speed. This is not there on screen anymore. Good to check the history of these 2 pages and see when it was dropped.
+
+- Don't implement anything until we have refined the requirement and answered design questions. I want to add a feature allowing a user to share the custom exercise they created. Optimally the share link would point to a public page listing the exercise along with its video (if available) without storing anything on the user's device so we don't have to ask for consent. It's okay if we must ask for consent but then the consent dialog should be rendered on top of the page content, not in a previous step. In addition to listing the exercise details there should be some inviting cool text encouraging the user to use RepCue, with a save button that would then prompt the user to sign-up/sign-in. I want suggestions on how to implement this sharing functionality given the following:
   + User A must be authenticated in order to share exercises
   + User B may or may not have a RepCue profile
   + Sharing might be to an email address, or to anyone who has the link
   + If sharing to an email address, then supabase database design should cater for both scenarios that user B is an existing RepCue user, or an anonymous one who would claim access to the shared exercise once they authenticate. The authentication flow can start with a Save button. Once authenticated, the shared exercise would then show on the exercise catalog under the "Shared with me" toggle.
   + The core principle of offline-first must be respected with one exception, the view shared exercise page because I prefer if this page doesn't store anything on the user device to avoid consent banner and streamline the user experience.
+I want you to go through the workspace to understand the current implementation and how it can be extended to implement this new feature. Your analysis must include the existing database schemas (indexeddb and supabase), UI elements, screen flows, and any other elements you need to complete the job. Ask me questions if you need to to be able to come up with a complete requirement, design, and implementation plan. Write your final output to docs\implementation-plans\exercise-sharing-implementation-plan.md
 
-- Custom exercise favorites are not synced from Device A where they were added to Device B where user is authenticated with the same email address.
+- Add feature to allow users to give rating and feedback on the app.
+
+- This is client-side validation for UI rendering. The actual edit/delete operations should also be validated server-side (in the Edge Functions or database policies) for complete security, but the UI-level restriction is working correctly.
+
+- Introduce a server-side validation library to enforce input validation and business rules. The library should be used by the edge functions.
 
 - Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
 
