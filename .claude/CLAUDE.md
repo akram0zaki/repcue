@@ -16,8 +16,9 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 
 ## Deployment topology
 - The application uses Supabase for database and storage (uploaded files).
-- The production supabase project is RepCue and the development supabase project is repcue-dev.
-- There are two supabase MCP servers configured; supabase points to the production project, and supabase-dev points to the development project.
+- The production supabase project is RepCue (zumzzuvfsuzvvymhpymk) and the development supabase project is repcue-dev (xwzrsfkzqxdybjrkkkvh).
+- There are two supabase MCP servers configured; supabase-prod points to the production project, and supabase points to the development project.
+- **CRITICAL**: Always verify environment synchronization before major changes. Use MCP tools to compare schemas and edge functions between environments. Production can lag significantly behind development.
 
 ## Project conventions
 - Types in `src/types/index.ts` (+ `src/types/media.ts`). Constants in `src/constants/index.ts`.
