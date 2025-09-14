@@ -19,6 +19,11 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - Supabase Personal Access Token is stored in environment variable SUPABASE_ACCESS_TOKEN
 
+- **Supabase Environment Management**: RepCue uses dual Supabase environments:
+  - Development: Project `repcue-dev` (xwzrsfkzqxdybjrkkkvh) - accessed via `mcp_supabase_*` tools
+  - Production: Project `RepCue` (zumzzuvfsuzvvymhpymk) - accessed via `mcp_supabase-prod_*` tools
+  - **CRITICAL**: Always verify environment synchronization before major changes. Production can lag significantly behind development in both database schema and edge functions. See `.github/instructions/supabase.instructions.md` for comprehensive migration guidance.
+
 - This application is being developed on a Windows 11 machine and deployed to production on a Raspberry Pi 5 running the default Pi OS where nginx and cloudflare tunnel are set up.
 
 - Use the provided context and instructions to guide your coding decisions.
@@ -32,6 +37,13 @@ You are an AI coding assistant, your role is to create software based on the pro
 - The application must be compliant with relevant data protection regulations, such as GDPR.
 
 - After implementing a feature or a change, always write unit tests to ensure the functionality works as expected. Also revisit README.md to update any relevant documentation. Make sure to track the changes in CHANGELOG.md under a headline with the date of the change.
+
+- **Supabase Migration Workflow**: Before implementing any feature that involves database changes:
+  1. Compare database schemas between dev and prod environments using MCP tools
+  2. Compare edge function versions between environments  
+  3. Apply any missing migrations to production
+  4. Deploy any outdated edge functions to production
+  5. Verify environment parity before proceeding with new changes
 
 - This goes without saying but obviously you need it because you tend to ignore build errors, when you build the application, make sure to wait until build is complete and read the result on terminal before proceeding to the next step.
 

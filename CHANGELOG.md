@@ -1,5 +1,15 @@
 ## Unreleased
 
+### Added
+- **Supabase Migration and Synchronization Instructions**: Comprehensive AI agent guidance to prevent environment drift issues
+  - **New Instruction File**: Created `.github/instructions/supabase.instructions.md` with detailed migration and synchronization protocols
+  - **Environment Management**: Clear guidelines for dual environment setup (dev: xwzrsfkzqxdybjrkkkvh, prod: zumzzuvfsuzvvymhpymk)
+  - **Critical Workflow**: Step-by-step process for verifying environment parity before major changes
+  - **Migration Tools**: MCP tool references for comparing schemas, functions, and applying updates
+  - **Emergency Procedures**: Documentation for handling significant environment drift and schema recreation
+  - **Best Practices**: Security considerations, rollback procedures, and continuous monitoring recommendations
+  - **Updated Agent Instructions**: Enhanced all AI agent instruction files with Supabase synchronization requirements
+
 ## 2025-09-14
 
 ### Added
