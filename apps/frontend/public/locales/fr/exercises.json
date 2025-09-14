@@ -70,5 +70,24 @@
     "name": "Basé sur les répétitions"
   },
   "filterShared": "Partagés avec moi",
-  "shared": "Partagé"
+  "shared": "Partagé",
+  "shareExercise": "Partager l'exercice",
+  "shareDescription": "Créer un lien partageable pour \"{{name}}\"",
+  "generateShareLink": "Générer un lien partageable",
+  "generateShareLinkDesc": "Quiconque possède ce lien pourra voir et enregistrer votre exercice",
+  "optionalEmailPlaceholder": "Optionnel : e-mail du destinataire",
+  "generateLink": "Générer un lien partageable",
+  "shareLinkGenerated": "Lien de partage généré avec succès !",
+  "shareError": "Échec de la génération du lien de partage",
+  "shareLinkReady": "Lien de partage prêt !",
+  "shareLinkReadyDesc": "Copiez ce lien pour partager votre exercice avec d'autres",
+  "sharedExercise": "Exercice partagé",
+  "shareNotFound": "Exercice non trouvé",
+  "shareExpired": "Ce lien de partage peut avoir expiré ou est invalide.",
+  "sharedBy": "Partagé par {{name}}",
+  "saveToLibrary": "Enregistrer dans ma bibliothèque",
+  "exerciseSaved": "Exercice enregistré dans votre bibliothèque !",
+  "saveFailed": "Échec de l'enregistrement de l'exercice",
+  "tagsLabel": "Tags",
+  "defaultDurationLabel": "Durée par défaut"
 }

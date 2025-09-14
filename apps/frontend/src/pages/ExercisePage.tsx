@@ -34,6 +34,7 @@ import { useSnackbar } from '../components/SnackbarProvider';
 import type { ExerciseMediaIndex } from '../types/media';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
+import { ShareButton } from '../components/ShareButton';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -82,7 +83,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(savedFilters.selectedCategories);
   const [searchTerm, setSearchTerm] = useState(savedFilters.searchTerm);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(savedFilters.showFavoritesOnly);
-  const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom'>(savedFilters.exerciseFilter);
+  const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom' | 'shared'>(savedFilters.exerciseFilter);
   const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>(savedFilters.sortBy);
   // Video preview state
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
@@ -300,6 +301,23 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     return isUUIDFormat && !!exercise.owner_id;
   };
 
+  // Helper function to check if exercise is shared with current user
+  const isSharedExercise = (exercise: Exercise): boolean => {
+    if (!user?.id) return false;
+
+    // Check if the exercise is user-created (UUID format) but NOT owned by current user
+    const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
+
+    if (isUUIDFormat && exercise.owner_id && exercise.owner_id !== user.id) {
+      // This is a UUID exercise owned by someone else, so it's potentially shared
+      // For now, we'll consider any UUID exercise not owned by current user as shared
+      // This will be properly integrated with user_favorites table in the sync system
+      return true;
+    }
+
+    return false;
+  };
+
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -316,7 +334,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       // Apply exercise type filter
       const matchesExerciseFilter = exerciseFilter === 'all' ||
         (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise)) ||
-        (exerciseFilter === 'custom' && isUserCreatedExercise(exercise));
+        (exerciseFilter === 'custom' && isUserCreatedExercise(exercise)) ||
+        (exerciseFilter === 'shared' && isSharedExercise(exercise));
       
       return matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
     });
@@ -560,6 +579,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               >
                 {t('exercises.filterCustom', { defaultValue: 'Custom' })}
               </button>
+              <button
+                onClick={() => setExerciseFilter('shared')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                  exerciseFilter === 'shared'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                {t('exercises.filterShared', { defaultValue: 'Shared with me' })}
+              </button>
             </div>
             
             {/* Sort Dropdown */}
@@ -799,9 +828,15 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   };
   
   // Only show edit/delete for user-created exercises owned by current user
-  const isUserCreated = isUserCreatedExerciseCard(exercise.id) && 
-                        currentUser && 
+  const isUserCreated = isUserCreatedExerciseCard(exercise.id) &&
+                        currentUser &&
                         (exercise.owner_id === currentUser.id || !exercise.owner_id);
+
+  // Check if exercise is shared (UUID format but not owned by current user)
+  const isSharedExerciseCard = currentUser?.id &&
+                               isUserCreatedExerciseCard(exercise.id) &&
+                               exercise.owner_id &&
+                               exercise.owner_id !== currentUser.id;
   
 
   const handleTagExpansionToggle = () => {
@@ -830,6 +865,11 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   {t('exercises.custom', { defaultValue: 'Custom' })}
                 </span>
               )}
+              {currentUser && isSharedExerciseCard && (
+                <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
+                  {t('exercises.shared', { defaultValue: 'Shared' })}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -852,6 +892,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               >
                 <EditIcon size={18} className="sm:!w-5 sm:!h-5" />
               </button>
+            )}
+            {isUserCreated && (
+              <ShareButton
+                exerciseId={exercise.id}
+                exerciseName={loc.name}
+                ownerId={exercise.owner_id}
+                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+              />
             )}
             {isUserCreated && onDelete && (
               <button

@@ -148,5 +148,29 @@
   },
   "repBased": {
     "name": "Rep-based"
-  }
+  },
+  "filterShared": "Shared with me",
+  "shared": "Shared",
+  "shareExercise": "Share Exercise",
+  "shareDescription": "Create a shareable link for \"{{name}}\"",
+  "generateShareLink": "Generate Share Link",
+  "generateShareLinkDesc": "Anyone with this link will be able to view and save your exercise",
+  "optionalEmailPlaceholder": "Optional: Recipient email",
+  "generateLink": "Generate Share Link",
+  "shareLinkGenerated": "Share link generated successfully!",
+  "shareError": "Failed to generate share link",
+  "shareLinkReady": "Share Link Ready!",
+  "shareLinkReadyDesc": "Copy this link to share your exercise with others",
+  "sharedExercise": "Shared Exercise",
+  "shareNotFound": "Exercise Not Found",
+  "shareExpired": "This share link may have expired or is invalid.",
+  "sharedBy": "Shared by {{name}}",
+  "saveToLibrary": "Save to My Library",
+  "exerciseSaved": "Exercise saved to your library!",
+  "saveFailed": "Failed to save exercise",
+  "tagsLabel": "Tags",
+  "defaultDurationLabel": "Default Duration",
+  "defaultSets": "Default Sets",
+  "defaultReps": "Default Reps",
+  "instructions": "Instructions"
 }

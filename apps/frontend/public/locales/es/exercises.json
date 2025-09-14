@@ -147,8 +147,6 @@
   "repBased": {
     "name": "Basado en repeticiones"
   },
-  "filterShared": "Compartidos conmigo",
-  "shared": "Compartido",
   "difficulties": {
     "beginner": "Principiante",
     "intermediate": "Intermedio",
@@ -165,9 +163,6 @@
   "namePlaceholder": "Introduce el nombre del ejercicio",
   "permissionLevel": "Nivel de Permiso",
   "publicHelp": "Los ejercicios públicos pueden ser descubiertos por otros usuarios",
-  "shareDescription": "Compartir este ejercicio con otros",
-  "shareError": "Error al compartir el ejercicio",
-  "shareExercise": "Compartir Ejercicio",
   "sharePublic": "Compartir Públicamente",
   "sharePublicDesc": "Cualquiera puede encontrar y copiar este ejercicio",
   "shareWithUser": "Compartir con Usuario",
@@ -207,5 +202,26 @@
     "repetition_based": "Basado en Repeticiones",
     "time_based": "Basado en Tiempo"
   },
-  "viewOnly": "Solo Vista"
+  "viewOnly": "Solo Vista",
+  "filterShared": "Compartidos conmigo",
+  "shared": "Compartido",
+  "shareExercise": "Compartir Ejercicio",
+  "shareDescription": "Crear un enlace compartible para \"{{name}}\"",
+  "generateShareLink": "Generar Enlace Compartible",
+  "generateShareLinkDesc": "Cualquiera con este enlace podrá ver y guardar tu ejercicio",
+  "optionalEmailPlaceholder": "Opcional: Correo electrónico del destinatario",
+  "generateLink": "Generar Enlace Compartible",
+  "shareLinkGenerated": "¡Enlace compartible generado con éxito!",
+  "shareError": "Error al generar el enlace compartible",
+  "shareLinkReady": "¡Enlace Compartible Listo!",
+  "shareLinkReadyDesc": "Copia este enlace para compartir tu ejercicio con otros",
+  "sharedExercise": "Ejercicio Compartido",
+  "shareNotFound": "Ejercicio No Encontrado",
+  "shareExpired": "Este enlace compartible puede haber expirado o no ser válido.",
+  "sharedBy": "Compartido por {{name}}",
+  "saveToLibrary": "Guardar en Mi Biblioteca",
+  "exerciseSaved": "¡Ejercicio guardado en tu biblioteca!",
+  "saveFailed": "Error al guardar el ejercicio",
+  "tagsLabel": "Etiquetas",
+  "defaultDurationLabel": "Duración Predeterminada"
 }

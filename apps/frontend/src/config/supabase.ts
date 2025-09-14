@@ -49,6 +49,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   }
 });
 
+// Export the base URL for edge functions
+export const supabaseFunctionBaseUrl = supabaseUrl;
+
 // Export utility types from supabase.ts
 export type { Json } from '../types/supabase';
 export type { Session, User } from '@supabase/supabase-js';

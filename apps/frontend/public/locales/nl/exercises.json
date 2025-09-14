@@ -70,5 +70,24 @@
     "name": "Op herhalingen gebaseerd"
   },
   "filterShared": "Gedeeld met mij",
-  "shared": "Gedeeld"
+  "shared": "Gedeeld",
+  "shareExercise": "Deel Oefening",
+  "shareDescription": "Maak een deelbare link voor \"{{name}}\"",
+  "generateShareLink": "Genereer Deel Link",
+  "generateShareLinkDesc": "Iedereen met deze link kan je oefening bekijken en opslaan",
+  "optionalEmailPlaceholder": "Optioneel: E-mailadres van ontvanger",
+  "generateLink": "Genereer Deel Link",
+  "shareLinkGenerated": "Deel-link succesvol gegenereerd!",
+  "shareError": "Het genereren van de deel-link is mislukt",
+  "shareLinkReady": "Deel-link gereed!",
+  "shareLinkReadyDesc": "Kopieer deze link om je oefening met anderen te delen",
+  "sharedExercise": "Gedeelde Oefening",
+  "shareNotFound": "Oefening Niet Gevonden",
+  "shareExpired": "Deze deel-link is mogelijk verlopen of ongeldig.",
+  "sharedBy": "Gedeeld door {{name}}",
+  "saveToLibrary": "Opslaan in Mijn Bibliotheek",
+  "exerciseSaved": "Oefening opgeslagen in je bibliotheek!",
+  "saveFailed": "Opslaan van oefening mislukt",
+  "tagsLabel": "Tags",
+  "defaultDurationLabel": "Standaard Duur"
 }

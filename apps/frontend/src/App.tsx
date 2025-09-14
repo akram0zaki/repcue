@@ -22,14 +22,15 @@ import logger from './utils/logger';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
-import { 
-  HomePage, 
-  ExercisePage, 
+import {
+  HomePage,
+  ExercisePage,
   CreateExercisePage,
   EditExercisePage,
   ExerciseDetailPage,
-  TimerPage, 
-  ActivityLogPage, 
+  SharedExercisePage,
+  TimerPage,
+  ActivityLogPage,
   SettingsPage,
   WorkoutsPage,
   CreateWorkoutPage,
@@ -171,7 +172,21 @@ function App() {
   
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
-  useAuth();
+  const { user } = useAuth();
+
+  // Handle pending share token after authentication
+  useEffect(() => {
+    const handlePendingShareToken = async () => {
+      const pendingToken = sessionStorage.getItem('pendingShareToken');
+      if (pendingToken && user) {
+        // User is now authenticated, redirect to shared exercise page
+        sessionStorage.removeItem('pendingShareToken');
+        window.location.href = `/share/${pendingToken}`;
+      }
+    };
+
+    handlePendingShareToken();
+  }, [user]);
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -1997,21 +2012,29 @@ useEffect(() => {
                   </Suspense>
                 } 
               />
-              <Route 
-                path={AppRoutes.EXERCISE_DETAIL} 
+              <Route
+                path={AppRoutes.EXERCISE_DETAIL}
                 element={
                   <Suspense fallback={createRouteLoader('Exercise Detail')}>
                     <ExerciseDetailPage />
                   </Suspense>
-                } 
+                }
               />
-              <Route 
-                path={AppRoutes.WORKOUTS} 
+              <Route
+                path={AppRoutes.SHARED_EXERCISE}
+                element={
+                  <Suspense fallback={createRouteLoader('Shared Exercise')}>
+                    <SharedExercisePage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={AppRoutes.WORKOUTS}
                 element={
                   <Suspense fallback={createRouteLoader('Workouts')}>
                     <WorkoutsPage />
                   </Suspense>
-                } 
+                }
               />
               <Route 
                 path={AppRoutes.CREATE_WORKOUT} 

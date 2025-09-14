@@ -2,6 +2,28 @@
 
 ## 2025-09-14
 
+### Added
+- **Exercise Sharing Feature**: Complete implementation of exercise sharing functionality allowing users to share their custom exercises with others
+  - **Share Creation**: Users can generate shareable links for their custom exercises with optional email targeting
+  - **Public Viewing**: Recipients can view shared exercises without authentication or consent requirements
+  - **Save to Library**: Authenticated users can save shared exercises to their own library with one click
+  - **Edge Functions**: Three new Supabase Edge Functions handle the sharing workflow:
+    - `share-exercise`: Creates secure share tokens and public URLs
+    - `get-shared-exercise`: Retrieves exercise data via share token (public endpoint)
+    - `save-shared-exercise`: Copies shared exercises to user's library with proper ownership
+  - **Database Schema**: Added `share_token` column to existing `exercise_shares` table for public link sharing
+  - **Security**: Cryptographically secure share tokens with proper access controls and ownership validation
+  - **Responsive UI**: Mobile-optimized sharing modal and public viewing page with clear call-to-action buttons
+  - **Environment-Aware**: Dynamic Supabase URL configuration supporting both development and production environments
+
+### Fixed
+- **TypeScript Build Errors**: Fixed Supabase URL access errors in sharing components
+  - **Issue**: Direct access to protected `supabaseUrl` property caused TS2445 compilation errors
+  - **Solution**: Created `supabaseFunctionBaseUrl` export in supabase config using environment variables
+  - **Result**: Edge Function calls now work correctly across development and production environments
+
+## 2025-09-14 (Earlier)
+
 ### Fixed
 - **Unit test failures**: Fixed failing tests for storage service and sync service components
   - **Storage service tests**: Enhanced error handling in `safeDatabaseAccess()` to gracefully handle general IndexedDB errors in test environments

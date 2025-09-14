@@ -210,9 +210,15 @@ export const ExerciseDetailPage = lazy(() =>
   }))
 );
 
-export const ProfilePage = lazy(() => 
+export const ProfilePage = lazy(() =>
   import('../pages/ProfilePage').catch(() => ({
     default: () => <div>Error loading Profile page</div>
+  }))
+);
+
+export const SharedExercisePage = lazy(() =>
+  import('../pages/SharedExercisePage').catch(() => ({
+    default: () => <div>Error loading Shared Exercise page</div>
   }))
 );
 

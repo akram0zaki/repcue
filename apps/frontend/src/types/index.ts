@@ -320,6 +320,7 @@ export const Routes = {
   CREATE_EXERCISE: '/exercises/create',
   EDIT_EXERCISE: '/exercises/edit/:id',
   EXERCISE_DETAIL: '/exercises/:id',
+  SHARED_EXERCISE: '/share/:shareToken',
   TIMER: '/timer',
   ACTIVITY_LOG: '/activity',
   SETTINGS: '/settings',

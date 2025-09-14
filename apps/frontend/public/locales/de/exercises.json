@@ -147,8 +147,6 @@
   "repBased": {
     "name": "Wiederholungsbasiert"
   },
-  "filterShared": "Mit mir geteilt",
-  "shared": "Geteilt",
   "difficulties": {
     "beginner": "Anfänger",
     "intermediate": "Fortgeschritten",
@@ -165,9 +163,6 @@
   "namePlaceholder": "Geben Sie den Übungsnamen ein",
   "permissionLevel": "Berechtigungsstufe",
   "publicHelp": "Öffentliche Übungen können von anderen Benutzern entdeckt werden",
-  "shareDescription": "Teilen Sie diese Übung mit anderen",
-  "shareError": "Fehler beim Teilen der Übung",
-  "shareExercise": "Teilen Übung",
   "sharePublic": "Teilen Öffentlich",
   "sharePublicDesc": "Jeder kann diese Übung finden und kopieren",
   "shareWithUser": "Teilen mit Benutzer",
@@ -207,5 +202,26 @@
     "repetition_based": "Wiederholungsbasiert",
     "time_based": "Zeitbasiert"
   },
-  "viewOnly": "Nur ansehen"
+  "viewOnly": "Nur ansehen",
+  "filterShared": "Mit mir geteilt",
+  "shared": "Geteilt",
+  "shareExercise": "Teilen Übung",
+  "shareDescription": "Erstellen Sie einen freigebbaren Link für \"{{name}}\"",
+  "generateShareLink": "Freigabelink generieren",
+  "generateShareLinkDesc": "Jeder mit diesem Link kann Ihre Übung anzeigen und speichern",
+  "optionalEmailPlaceholder": "Optional: Empfänger-E-Mail",
+  "generateLink": "Freigabelink generieren",
+  "shareLinkGenerated": "Freigabelink erfolgreich generiert!",
+  "shareError": "Fehler beim Generieren des Freigabelinks",
+  "shareLinkReady": "Freigabelink bereit!",
+  "shareLinkReadyDesc": "Kopieren Sie diesen Link, um Ihre Übung mit anderen zu teilen",
+  "sharedExercise": "Geteilte Übung",
+  "shareNotFound": "Übung nicht gefunden",
+  "shareExpired": "Dieser Freigabelink ist möglicherweise abgelaufen oder ungültig.",
+  "sharedBy": "Geteilt von {{name}}",
+  "saveToLibrary": "In Meine Bibliothek speichern",
+  "exerciseSaved": "Übung in Ihrer Bibliothek gespeichert!",
+  "saveFailed": "Fehler beim Speichern der Übung",
+  "tagsLabel": "Tags",
+  "defaultDurationLabel": "Standarddauer"
 }
