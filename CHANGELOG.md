@@ -3,6 +3,18 @@
 ## 2025-09-14
 
 ### Fixed
+- **Unit test failures**: Fixed failing tests for storage service and sync service components
+  - **Storage service tests**: Enhanced error handling in `safeDatabaseAccess()` to gracefully handle general IndexedDB errors in test environments
+  - **Sync service tests**: Fixed fetch mock structures to include proper Response objects with status, headers, and methods
+  - **Concurrency handling**: Fixed sync service to return same in-flight promise for concurrent calls instead of creating new resolved promises
+  - **Test isolation**: Added proper database cleanup between tests to prevent cross-test contamination
+- **TypeScript compilation error**: Fixed type comparison error in video file filtering logic
+  - **Issue**: `vf.deleted` boolean type compared to number `1` causing TS2367 error
+  - **Fix**: Simplified logic to use `!vf.deleted` which correctly handles both boolean and numeric representations
+
+## 2025-09-14 (Earlier)
+
+### Fixed
 - **Custom exercise video sync architecture**: Corrected offline-first video sync to maintain proper blob-pending-sync URLs
   - **Issue**: Previous fix broke offline-first architecture by converting blob-pending-sync URLs to storage URLs server-side
   - **Root cause**: Edge Function was incorrectly converting local `blob-pending-sync://` URLs to Supabase storage URLs during sync

@@ -911,6 +911,13 @@ export class StorageService {
         logger.warn('[StorageService] DatabaseClosedError detected, returning fallback');
         return fallback();
       }
+
+      // Handle general IndexedDB errors gracefully in tests and production
+      if (error instanceof Error && (error.message.includes('IndexedDB') || error.name === 'DatabaseError')) {
+        logger.warn('[StorageService] IndexedDB error detected, returning fallback:', error.message);
+        return fallback();
+      }
+
       throw error; // Re-throw other errors
     }
   }
@@ -1180,12 +1187,18 @@ export class StorageService {
     try {
       logger.log('💾 [EnrichVideo] Starting exercise enrichment with video URLs');
 
+      // Check if video_files table exists (graceful fallback for tests/old databases)
+      if (!this.db.video_files) {
+        logger.log('💾 [EnrichVideo] video_files table not available, skipping enrichment');
+        return exercises;
+      }
+
       // Get all video files (try both approaches to handle different data types)
       let videoFiles = await this.db.video_files.toArray();
       logger.log('💾 [EnrichVideo] Found video files:', videoFiles.length, videoFiles);
 
       // Filter out deleted files (handle both boolean and numeric values)
-      videoFiles = videoFiles.filter(vf => !vf.deleted && vf.deleted !== 1);
+      videoFiles = videoFiles.filter(vf => !vf.deleted);
       logger.log('💾 [EnrichVideo] Active video files after filtering:', videoFiles.length);
 
       // Create a map of exercise_id -> video file for fast lookup

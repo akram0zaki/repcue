@@ -134,16 +134,10 @@ export class CorrectSyncService {
     const authState = this.auth.getAuthState();
     if (!authState.isAuthenticated || !authState.accessToken) return this.emptyResult();
 
-    // Thread-safe concurrency guard - immediately reject concurrent calls
+    // Thread-safe concurrency guard - return same in-flight promise
     if (this.inFlight) {
-      logger.debug(`[sync:v2] sync already in progress, rejecting concurrent call (mode=${mode})`);
-      return Promise.resolve({ 
-        success: true, 
-        pushed: 0, 
-        pulled: 0, 
-        tables: 0, 
-        errors: [{ type: 'info', message: 'Sync already in progress' }] 
-      });
+      logger.debug(`[sync:v2] sync already in progress, returning in-flight promise (mode=${mode})`);
+      return this.inFlight;
     }
 
     // Backoff check
