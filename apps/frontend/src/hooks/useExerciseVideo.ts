@@ -3,6 +3,7 @@ import type { Exercise } from '../types';
 import type { ExerciseMediaIndex, ExerciseMedia } from '../types/media';
 import { VIDEO_DEMOS_ENABLED } from '../config/features';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
+import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 
 interface UseExerciseVideoOptions {
   exercise: Exercise | null | undefined;
@@ -42,12 +43,52 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
   // Resolve metadata & choose initial variant (square -> portrait -> landscape)
   useEffect(() => {
-    if (!exercise || !mediaIndex || !exercise.has_video) {
+    if (!exercise || (!exercise.has_video && !exercise.custom_video_url)) {
       setMedia(null);
       setVideoUrl(null);
       setReady(false);
       return;
     }
+
+    // For custom exercises with custom_video_url, create a mock media object and resolve URL
+    if (exercise.custom_video_url) {
+      const resolveCustomVideo = async () => {
+        try {
+          const resolvedUrl = await resolveVideoUrl(exercise.custom_video_url);
+          if (resolvedUrl) {
+            // Create a mock media object for custom exercises
+            const mockMedia: ExerciseMedia = {
+              id: exercise.id,
+              repsPerLoop: 1,
+              fps: 30,
+              video: {
+                square: resolvedUrl
+              }
+            };
+            setMedia(mockMedia);
+            setVideoUrl(resolvedUrl);
+          } else {
+            setMedia(null);
+            setVideoUrl(null);
+          }
+        } catch {
+          setMedia(null);
+          setVideoUrl(null);
+        }
+      };
+
+      resolveCustomVideo();
+      return;
+    }
+
+    // For built-in exercises, use the media index
+    if (!mediaIndex) {
+      setMedia(null);
+      setVideoUrl(null);
+      setReady(false);
+      return;
+    }
+
     const m = mediaIndex[exercise.id];
     setMedia(m ?? null);
     if (!m) { setVideoUrl(null); return; }
@@ -137,6 +178,15 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     v.addEventListener('error', failed);
     return () => { v.removeEventListener('loadeddata', loaded); v.removeEventListener('error', failed); };
   }, [videoUrl, shouldPlay, exercise]);
+
+  // Cleanup blob URLs when component unmounts or video URL changes
+  useEffect(() => {
+    return () => {
+      if (videoUrl && videoUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(videoUrl);
+      }
+    };
+  }, [videoUrl]);
 
   return { videoRef, media, videoUrl, ready, error, onLoop };
 }

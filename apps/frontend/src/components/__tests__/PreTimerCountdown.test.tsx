@@ -14,12 +14,20 @@ vi.mock('../../services/audioService', () => ({
   },
 }));
 
-vi.mock('../../services/storageService', () => ({
-  storageService: {
+vi.mock('../../services/storageService', () => {
+  const mockStorageService = {
     exportAllData: vi.fn(),
     clearAllData: vi.fn()
-  }
-}));
+  };
+  
+  const MockStorageService = vi.fn().mockImplementation(() => mockStorageService);
+  MockStorageService.getInstance = vi.fn(() => mockStorageService);
+  
+  return {
+    StorageService: MockStorageService,
+    storageService: mockStorageService
+  };
+});
 
 vi.mock('../../services/consentService', () => ({
   consentService: {

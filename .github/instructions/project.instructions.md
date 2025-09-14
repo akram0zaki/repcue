@@ -41,4 +41,6 @@ You are an AI coding assistant, your role is to create software based on the pro
 
 - After successfully implementing a Module or a number of related tasks in the plan, and fully testing it successfully (by running `pnpm test:ci`), update the progress for this module/tasks in the plan.
 
+- Never use console.log() directly. Always use the logger utility from apps/frontend/src/utils/logger.ts which respects the DEBUG feature flag. Import: `import logger from '../utils/logger';` then use `logger.log()`, `logger.warn()`, `logger.error()`, etc.
+
 

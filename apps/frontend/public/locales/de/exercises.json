@@ -37,36 +37,173 @@
     "rotation": "Rotation",
     "proprioception": "Propriozeption"
   },
-  "plank": { "name": "Unterarmstütz (Plank)", "description": "Körper in gerader Linie halten, auf Unterarmen und Zehen gestützt" },
-  "side-plank": { "name": "Seitstütz", "description": "Seitlich stützen, auf einem Unterarm halten" },
-  "mountain-climbers": { "name": "Bergsteiger", "description": "Abwechselnd Knie in der Plank-Position zur Brust ziehen" },
-  "bicycle-crunches": { "name": "Fahrrad-Crunches", "description": "Ellenbogen zum gegenüberliegenden Knie im Wechsel" },
-  "push-ups": { "name": "Liegestütze", "description": "Körper aus der Bauchlage mit den Armen senken und heben" },
-  "squats": { "name": "Kniebeugen", "description": "Knie beugen zum Absenken und wieder aufrichten" },
-  "lunges": { "name": "Ausfallschritte", "description": "Schritt nach vorn und Körper absenken, Beine abwechseln" },
-  "wall-sit": { "name": "Wandsitz", "description": "An der Wand herunterrutschen bis Oberschenkel waagrecht, Haltung halten" },
-  "burpees": { "name": "Burpees", "description": "Kniebeuge, in die Plank springen, Liegestütz, zurückspringen, Sprung nach oben" },
-  "jumping-jacks": { "name": "Hampelmänner", "description": "Beine spreizen und Arme heben, dann wieder schließen" },
-  "high-knees": { "name": "Hohe Knie", "description": "Auf der Stelle laufen, Knie bis auf Hüfthöhe anheben" },
-  "butt-kicks": { "name": "Fersen zum Gesäß", "description": "Auf der Stelle laufen und Fersen nach hinten zum Gesäß ziehen" },
-  "downward-dog": { "name": "Herabschauender Hund", "description": "Umgekehrtes V mit Händen und Füßen am Boden bilden" },
-  "child-pose": { "name": "Kindhaltung", "description": "Knien, auf die Fersen setzen und Arme nach vorn strecken" },
-  "cat-cow": { "name": "Katze-Kuh", "description": "Wirbelsäule im Vierfüßler abwechselnd runden und durchhängen lassen" },
-  "single-leg-stand": { "name": "Einbeinstand", "description": "Auf einem Bein stehen und halten, dann wechseln" },
-  "tree-pose": { "name": "Baum", "description": "Auf einem Bein stehen, anderen Fuß an die Innenseite des Oberschenkels setzen" },
-  "warrior-3": { "name": "Krieger III", "description": "Auf einem Bein balancieren, anderes Bein nach hinten strecken" },
-  "dead-bug": { "name": "Toter Käfer", "description": "Rückenlage, gegenüberliegenden Arm und das Bein abwechselnd strecken" },
-  "glute-bridges": { "name": "Hüftbrücke", "description": "In Rückenlage die Hüfte durch Anspannen der Gesäßmuskeln anheben" },
-  "finger-roll": { "name": "Fingerrollen", "description": "Finger von der Faust zur vollständigen Streckung einzeln abrollen" },
-  "tricep-dips": { "name": "Trizeps-Dips", "description": "Körper mit den Armen an einer Kante senken und heben" },
-  "calf-raises": { "name": "Wadenheben", "description": "Auf die Zehenspitzen heben, kurz halten und wieder absenken" },
-  "russian-twists": { "name": "Russische Drehungen", "description": "Sitz, Füße angehoben, Oberkörper nach rechts und links rotieren" },
-  "bear-crawl": { "name": "Bärenlauf", "description": "Auf Händen und Füßen vorwärts krabbeln, Knie vom Boden abgehoben" },
-  "forward-fold": { "name": "Vorbeuge", "description": "Im Stand nach vorn beugen und zu den Zehen greifen" },
+  "plank": {
+    "name": "Unterarmstütz (Plank)",
+    "description": "Körper in gerader Linie halten, auf Unterarmen und Zehen gestützt"
+  },
+  "side-plank": {
+    "name": "Seitstütz",
+    "description": "Seitlich stützen, auf einem Unterarm halten"
+  },
+  "mountain-climbers": {
+    "name": "Bergsteiger",
+    "description": "Abwechselnd Knie in der Plank-Position zur Brust ziehen"
+  },
+  "bicycle-crunches": {
+    "name": "Fahrrad-Crunches",
+    "description": "Ellenbogen zum gegenüberliegenden Knie im Wechsel"
+  },
+  "push-ups": {
+    "name": "Liegestütze",
+    "description": "Körper aus der Bauchlage mit den Armen senken und heben"
+  },
+  "squats": {
+    "name": "Kniebeugen",
+    "description": "Knie beugen zum Absenken und wieder aufrichten"
+  },
+  "lunges": {
+    "name": "Ausfallschritte",
+    "description": "Schritt nach vorn und Körper absenken, Beine abwechseln"
+  },
+  "wall-sit": {
+    "name": "Wandsitz",
+    "description": "An der Wand herunterrutschen bis Oberschenkel waagrecht, Haltung halten"
+  },
+  "burpees": {
+    "name": "Burpees",
+    "description": "Kniebeuge, in die Plank springen, Liegestütz, zurückspringen, Sprung nach oben"
+  },
+  "jumping-jacks": {
+    "name": "Hampelmänner",
+    "description": "Beine spreizen und Arme heben, dann wieder schließen"
+  },
+  "high-knees": {
+    "name": "Hohe Knie",
+    "description": "Auf der Stelle laufen, Knie bis auf Hüfthöhe anheben"
+  },
+  "butt-kicks": {
+    "name": "Fersen zum Gesäß",
+    "description": "Auf der Stelle laufen und Fersen nach hinten zum Gesäß ziehen"
+  },
+  "downward-dog": {
+    "name": "Herabschauender Hund",
+    "description": "Umgekehrtes V mit Händen und Füßen am Boden bilden"
+  },
+  "child-pose": {
+    "name": "Kindhaltung",
+    "description": "Knien, auf die Fersen setzen und Arme nach vorn strecken"
+  },
+  "cat-cow": {
+    "name": "Katze-Kuh",
+    "description": "Wirbelsäule im Vierfüßler abwechselnd runden und durchhängen lassen"
+  },
+  "single-leg-stand": {
+    "name": "Einbeinstand",
+    "description": "Auf einem Bein stehen und halten, dann wechseln"
+  },
+  "tree-pose": {
+    "name": "Baum",
+    "description": "Auf einem Bein stehen, anderen Fuß an die Innenseite des Oberschenkels setzen"
+  },
+  "warrior-3": {
+    "name": "Krieger III",
+    "description": "Auf einem Bein balancieren, anderes Bein nach hinten strecken"
+  },
+  "dead-bug": {
+    "name": "Toter Käfer",
+    "description": "Rückenlage, gegenüberliegenden Arm und das Bein abwechselnd strecken"
+  },
+  "glute-bridges": {
+    "name": "Hüftbrücke",
+    "description": "In Rückenlage die Hüfte durch Anspannen der Gesäßmuskeln anheben"
+  },
+  "finger-roll": {
+    "name": "Fingerrollen",
+    "description": "Finger von der Faust zur vollständigen Streckung einzeln abrollen"
+  },
+  "tricep-dips": {
+    "name": "Trizeps-Dips",
+    "description": "Körper mit den Armen an einer Kante senken und heben"
+  },
+  "calf-raises": {
+    "name": "Wadenheben",
+    "description": "Auf die Zehenspitzen heben, kurz halten und wieder absenken"
+  },
+  "russian-twists": {
+    "name": "Russische Drehungen",
+    "description": "Sitz, Füße angehoben, Oberkörper nach rechts und links rotieren"
+  },
+  "bear-crawl": {
+    "name": "Bärenlauf",
+    "description": "Auf Händen und Füßen vorwärts krabbeln, Knie vom Boden abgehoben"
+  },
+  "forward-fold": {
+    "name": "Vorbeuge",
+    "description": "Im Stand nach vorn beugen und zu den Zehen greifen"
+  },
   "timeBased": {
     "name": "Zeitbasiert"
   },
   "repBased": {
     "name": "Wiederholungsbasiert"
-  }
+  },
+  "difficulties": {
+    "beginner": "Anfänger",
+    "intermediate": "Fortgeschritten",
+    "advanced": "Fortgeschritten"
+  },
+  "difficulty": "Schwierigkeit",
+  "emailRequired": "[de] Email address is required",
+  "equipment": "Ausrüstung",
+  "equipmentPlaceholder": "[de] e.g., Dumbbells, Resistance band",
+  "makePublic": "[de] Make public",
+  "muscleGroupPlaceholder": "[de] e.g., Chest, Arms, Legs",
+  "muscleGroups": "[de] Muscle Groups",
+  "name": "Name",
+  "namePlaceholder": "[de] Enter exercise name",
+  "permissionLevel": "[de] Permission Level",
+  "publicHelp": "Öffentlich exercises can be discovered by other users",
+  "shareDescription": "Teilen this exercise with others",
+  "shareError": "[de] Failed to share exercise",
+  "shareExercise": "Teilen Übung",
+  "sharePublic": "Teilen Öffentlichly",
+  "sharePublicDesc": "[de] Anyone can find and copy this exercise",
+  "shareWithUser": "Teilen with User",
+  "shareWithUserDesc": "Teilen with a specific user by email",
+  "sharedPublicly": "Teilend publicly",
+  "sharedWithUser": "Teilend with user",
+  "sharing": "[de] Sharing",
+  "stepDuration": "Step Dauer",
+  "tagPlaceholder": "[de] e.g., Core, Cardio, Strength",
+  "type": "Typ",
+  "viewOnlyDesc": "[de] User can view but not edit",
+  "addStep": "[de] Add Step",
+  "basicInfo": "[de] Basic Information",
+  "canCopy": "Can Kopieren",
+  "canCopyDesc": "[de] User can copy this exercise to their library",
+  "categories": {
+    "balance": "[de] Balance",
+    "cardio": "[de] Cardio",
+    "core": "[de] Core",
+    "flexibility": "[de] Flexibility",
+    "strength": "[de] Strength"
+  },
+  "category": "Kategorie",
+  "createDescription": "Erstellen a new exercise for your workouts",
+  "createError": "Übung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+  "createExercise": "Erstellen Übung",
+  "createNotEnabled": "Übung creation is not available",
+  "createSuccess": "Übung created successfully",
+  "defaultReps": "[de] Default Reps",
+  "defaultSets": "[de] Default Sets",
+  "description": "Beschreibung",
+  "descriptionPlaceholder": "[de] Describe the exercise",
+  "instructionPlaceholder": "[de] Enter step instructions",
+  "instructions": "Anweisungen",
+  "repDuration": "Rep Dauer",
+  "types": {
+    "repetition_based": "[de] Repetition Based",
+    "time_based": "[de] Time Based"
+  },
+  "viewOnly": "[de] View Only"
 }

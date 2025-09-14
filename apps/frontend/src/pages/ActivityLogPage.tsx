@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { Exercise, ActivityLog, Workout } from '../types';
 import { storageService } from '../services/storageService';
 import { ExerciseCategory } from '../types';
+import logger from '../utils/logger';
 
 interface ActivityLogPageProps {
   exercises: Exercise[];
@@ -118,11 +119,11 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           setWorkoutNameMap(map);
         } catch (e) {
           // Non-fatal; UI will fall back to log.exercise_name
-          console.debug('Workout name map load failed (non-fatal):', e);
+          logger.debug('Workout name map load failed (non-fatal):', e);
         }
         setActivityLogs(logs);
       } catch (error) {
-        console.error('Failed to load activity logs:', error);
+        logger.error('Failed to load activity logs:', error);
       } finally {
         setIsLoading(false);
       }
@@ -142,7 +143,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
         for (const w of workouts) map[w.id] = w.name;
         setWorkoutNameMap(map);
       } catch (e) {
-        console.warn('Failed to refresh activity logs after sync:', e);
+        logger.warn('Failed to refresh activity logs after sync:', e);
       }
     };
     window.addEventListener('sync:applied', handleSyncApplied as EventListener);

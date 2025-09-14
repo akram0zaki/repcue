@@ -1,0 +1,17 @@
+{
+  "clickToUpload": "[es] Click to upload video",
+  "currentVideo": "[es] Current Video",
+  "exerciseVideo": "Ejercicio Video",
+  "fileTooLarge": "[es] File is too large",
+  "invalidFileType": "[es] Invalid file type",
+  "loadError": "[es] Failed to load video",
+  "maxFileSize": "[es] Maximum file size",
+  "removeVideo": "[es] Remove Video",
+  "supportedFormats": "[es] Supported formats",
+  "uploadFailed": "Subir failed",
+  "uploadHint": "Subir a video demonstration",
+  "uploaded": "[es] Video uploaded",
+  "uploadsNotAvailable": "[es] Video uploads are not available",
+  "urlPlaceholder": "[es] Enter video URL",
+  "urlPlaceholderHelper": "[es] YouTube, Vimeo, or direct video URL"
+}

@@ -7,6 +7,7 @@ import type { Exercise, Workout, WorkoutExercise, Weekday } from '../types';
 import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
+import logger from '../utils/logger';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -90,7 +91,7 @@ const EditWorkoutPage: React.FC = () => {
 
         setSelectedExercises(selectedExs);
       } catch (error) {
-        console.error('Failed to load workout:', error);
+        logger.error('Failed to load workout:', error);
         setError(t('workouts.loadFailed'));
       }
       setLoading(false);
@@ -154,7 +155,7 @@ const EditWorkoutPage: React.FC = () => {
       // Navigate back to workouts page
       navigate(Routes.WORKOUTS);
     } catch (error) {
-      console.error('Failed to update workout:', error);
+      logger.error('Failed to update workout:', error);
       setError(t('workouts.updateFailed'));
     } finally {
       setSaving(false);

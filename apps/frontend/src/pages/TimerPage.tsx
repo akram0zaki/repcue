@@ -11,6 +11,8 @@ import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import { useExerciseVideo } from '../hooks/useExerciseVideo';
 import getVideoSources from '../utils/videoSources';
+import { resolveVideoUrl } from '../utils/resolveVideoUrl';
+import logger from '../utils/logger';
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -62,7 +64,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
   useEffect(() => {
     if (!videoFeatureEnabled) return;
-    loadExerciseMedia().then(setMediaIndex).catch(err => { console.warn('Failed to load exercise media', err); });
+    loadExerciseMedia().then(setMediaIndex).catch(err => { logger.warn('Failed to load exercise media', err); });
   }, [videoFeatureEnabled]);
 
   const restingNow = workoutMode?.isResting || isResting;
@@ -120,9 +122,14 @@ const TimerPage: React.FC<TimerPageProps> = ({
   
   
   // Define exerciseForVideo with proper workout mode support
-  const exerciseForVideo = isWorkoutMode 
-    ? (workoutCurrentExercise && workoutCurrentExercise.has_video ? workoutCurrentExercise : null)
-    : (selectedExercise && selectedExercise.has_video ? selectedExercise : null);
+  const exerciseForVideo = isWorkoutMode
+    ? (
+        // If workout is completed (currentExerciseIndex >= total exercises), don't show any video
+        workoutMode && workoutMode.currentExerciseIndex >= workoutMode.exercises.length
+          ? null
+          : (workoutCurrentExercise && (workoutCurrentExercise.has_video || workoutCurrentExercise.custom_video_url) ? workoutCurrentExercise : null)
+      )
+    : (selectedExercise && (selectedExercise.has_video || selectedExercise.custom_video_url) ? selectedExercise : null);
     
   // Initialize video hook with the correct exercise
   const exerciseVideo = useExerciseVideo({
@@ -136,34 +143,51 @@ const TimerPage: React.FC<TimerPageProps> = ({
   
   // Phase 3 T-3.3: Prefetch upcoming exercise video during rest or pre-countdown
   useEffect(() => {
-    if (!videoFeatureEnabled || !mediaIndex) return;
-    let prefetchUrl: string | null = null;
-    // During rest in workout mode: prefetch next exercise's video
-    if (workoutMode?.isResting) {
-      const nextWorkoutEx = workoutMode.currentExerciseIndex < workoutMode.exercises.length
-        ? workoutMode.exercises[workoutMode.currentExerciseIndex]
-        : null;
-      const nextExercise = nextWorkoutEx ? exercises.find(e => e.id === nextWorkoutEx.exercise_id) : null;
-      if (nextExercise?.has_video) {
-        const m = mediaIndex[nextExercise.id];
-        if (m) prefetchUrl = selectVideoVariant(m);
+    if (!videoFeatureEnabled) return;
+
+    const prefetchVideos = async () => {
+      let prefetchUrl: string | null = null;
+
+      // During rest in workout mode: prefetch next exercise's video
+      if (workoutMode?.isResting) {
+        const nextWorkoutEx = workoutMode.currentExerciseIndex < workoutMode.exercises.length
+          ? workoutMode.exercises[workoutMode.currentExerciseIndex]
+          : null;
+        const nextExercise = nextWorkoutEx ? exercises.find(e => e.id === nextWorkoutEx.exercise_id) : null;
+        if (nextExercise?.has_video || nextExercise?.custom_video_url) {
+          if (nextExercise.custom_video_url) {
+            prefetchUrl = await resolveVideoUrl(nextExercise.custom_video_url);
+          } else if (mediaIndex) {
+            const m = mediaIndex[nextExercise.id];
+            if (m) prefetchUrl = selectVideoVariant(m);
+          }
+        }
+      } else if (isCountdown && exerciseForVideo && exerciseVideo.media) {
+        // Standalone or workout about to start: prefetch current exercise video prior to playback
+        prefetchUrl = videoUrl || null;
       }
-    } else if (isCountdown && exerciseForVideo && exerciseVideo.media) {
-      // Standalone or workout about to start: prefetch current exercise video prior to playback
-      prefetchUrl = videoUrl || null;
-    }
-    if (prefetchUrl) {
-      const existing = document.querySelector(`link[rel="prefetch"][data-ex-video="${prefetchUrl}"]`);
-      if (!existing) {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.as = 'video';
-        link.href = prefetchUrl;
-        link.dataset.exVideo = prefetchUrl;
-        document.head.appendChild(link);
-        return () => { if (link.parentNode) link.parentNode.removeChild(link); };
+
+      if (prefetchUrl) {
+        // Skip prefetch for blob URLs as they're already in memory and don't need network prefetching
+        const isBlobUrl = prefetchUrl.startsWith('blob:');
+        if (!isBlobUrl) {
+          const existing = document.querySelector(`link[rel="prefetch"][data-ex-video="${prefetchUrl}"]`);
+          if (!existing) {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.as = 'video';
+            link.href = prefetchUrl;
+            link.dataset.exVideo = prefetchUrl;
+            document.head.appendChild(link);
+            // Note: Cleanup is handled by next effect run or component unmount
+          }
+        }
       }
-    }
+    };
+
+    prefetchVideos().catch(error => {
+      logger.warn('Failed to prefetch video:', error);
+    });
   }, [videoFeatureEnabled, mediaIndex, workoutMode?.isResting, workoutMode?.currentExerciseIndex, workoutMode?.exercises, isCountdown, videoUrl, exercises, exerciseForVideo, exerciseVideo.media]);
 
   useEffect(() => {
@@ -180,7 +204,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     if (v) {
       try { v.load(); } catch {}
     }
-  }, [videoUrl]);
+  }, [videoUrl, exerciseVideo.videoRef]);
 
   useEffect(() => {
     if (!exerciseVideo || !isRepBased) return;
@@ -205,9 +229,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
     if (exerciseVideo.error) reasons.push('error state');
     if (reasons.length) {
       // One concise debug line (no PII) to assist diagnosing missing video rendering
-      console.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
+      logger.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
     }
-  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error]);
+  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error, appSettings.show_exercise_videos]);
   
   // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
   
@@ -670,7 +694,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     onClick={() => {
                       // Note: This would need state management through props
                       // For now, this is a placeholder for rep advancement
-                      console.log('Next rep clicked');
+                      logger.log('Next rep clicked');
                     }}
                     disabled={(currentRep || 0) >= (totalReps || 0)}
                     className="btn-secondary text-xs py-2 disabled:opacity-50"
@@ -687,7 +711,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       if (isLastSet) {
                         onStopTimer(true);
                       } else {
-                        console.log('Next set clicked');
+                        logger.log('Next set clicked');
                       }
                     }}
                     className="btn-primary text-xs py-2"

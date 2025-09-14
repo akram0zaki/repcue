@@ -6,14 +6,19 @@ import type {
   UserPreferences, 
   AppSettings,
   Workout,
-  WorkoutSession
+  WorkoutSession,
+  UserFavorite,
+  SyncMetadata
 } from '../types';
 import { consentService } from './consentService';
+import { authService } from './authService';
+import { SYNC_DEBUG } from '../config/features';
 import { 
   prepareUpsert, 
   prepareSoftDelete, 
   filterActiveRecords 
 } from './syncHelpers';
+import logger from '../utils/logger';
 
 // Database schema interfaces with sync metadata
 interface StoredActivityLog extends Omit<ActivityLog, 'timestamp'> {
@@ -24,6 +29,8 @@ type StoredUserPreferences = UserPreferences;
 
 type StoredAppSettings = AppSettings;
 
+type StoredUserFavorite = UserFavorite;
+
 type StoredExercise = Exercise;
 
 // Workout-related data interfaces  
@@ -31,7 +38,16 @@ type StoredWorkout = Workout;
 
 type StoredWorkoutSession = WorkoutSession;
 
-
+// Video file storage for offline-first approach
+interface StoredVideoFile extends SyncMetadata {
+  exercise_id: string;
+  file_name: string;
+  file_data: Blob; // The actual video file stored as Blob for IndexedDB compatibility
+  file_size: number;
+  mime_type: string;
+  upload_pending: boolean; // true if needs to sync to cloud storage
+  storage_path?: string; // Path in Supabase Storage after successful upload
+}
 
 /**
  * IndexedDB-based storage service using Dexie
@@ -42,8 +58,10 @@ class RepCueDatabase extends Dexie {
   activity_logs!: Table<StoredActivityLog>;
   user_preferences!: Table<StoredUserPreferences>;
   app_settings!: Table<StoredAppSettings>;
+  user_favorites!: Table<StoredUserFavorite>;
   workouts!: Table<StoredWorkout>;
   workout_sessions!: Table<StoredWorkoutSession>;
+  video_files!: Table<StoredVideoFile>;
 
   constructor() {
     super('RepCueDB');
@@ -115,6 +133,89 @@ class RepCueDatabase extends Dexie {
       app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 9: Add user_favorites table for user-created exercise favorites
+    this.version(9).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 10: Add sync_state table for per-user per-table cursor and metadata (v2 sync engine)
+    this.version(10).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      // sync_state: key = user_id (only one row per user) — store JSON blobs for cursors & metrics
+      sync_state: 'user_id'
+    });
+
+    // Version 11: owner_id indexes are already present from version 6 - no schema changes needed
+    // Just increment version for migration tracking purposes
+    this.version(11).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id'
+    });
+
+    // Version 12: Fix user_favorites schema inconsistency - change user_id to owner_id
+    this.version(12).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id'
+    }).upgrade(tx => {
+      // Migrate user_favorites data from user_id to owner_id
+      return tx.table('user_favorites').toCollection().modify(record => {
+        if (record.user_id && !record.owner_id) {
+          record.owner_id = record.user_id;
+          delete record.user_id;
+        }
+      });
+    });
+
+    // Version 13: Add video_files table for offline-first video storage
+    this.version(13).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 14: Update video_files schema to include file_size and mime_type indexes for better querying
+    this.version(14).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
     });
   }
 
@@ -330,7 +431,7 @@ class RepCueDatabase extends Dexie {
       }
 
     } catch (error) {
-      console.error('Migration to unified schema failed:', error);
+      logger.error('Migration to unified schema failed:', error);
       // Don't throw - let the migration continue with warnings
     }
   }
@@ -367,7 +468,7 @@ class RepCueDatabase extends Dexie {
         migrationComplete: isV6Schema && Object.values(tableStats).some(count => count > 0)
       };
     } catch (error) {
-      console.error('Error getting migration status:', error);
+      logger.error('Error getting migration status:', error);
       return {
         currentVersion: 0,
         isV6Schema: false,
@@ -382,6 +483,11 @@ export class StorageService {
   private static instance: StorageService;
   private db: RepCueDatabase;
   private fallbackStorage = new Map<string, unknown>();
+  private readyPromise: Promise<void>;
+  // Throttle consent warnings to avoid log spam
+  private lastConsentWarnAt: number | null = null;
+  // Flag to track database reset in progress
+  private isResetting = false;
   
   /**
    * Resolve workout name by ID using primary DB path with automatic fallback.
@@ -415,14 +521,65 @@ export class StorageService {
 
   private constructor() {
     this.db = new RepCueDatabase();
-    this.initializeDatabase();
+    this.readyPromise = this.initializeDatabase().catch((e) => {
+      // Swallow errors here; callers can proceed with fallback paths
+      logger.error('[StorageService] initializeDatabase failed (continuing with fallbacks):', e);
+      logger.error('[StorageService] Stack trace:', e instanceof Error ? e.stack : 'No stack available');
+    });
   }
 
   public static getInstance(): StorageService {
     if (!StorageService.instance) {
       StorageService.instance = new StorageService();
+    } else {
+      logger.log('[StorageService] getInstance: Returning existing StorageService instance');
     }
     return StorageService.instance;
+  }
+
+  /** Wait for IndexedDB open/health checks to complete */
+  public async ready(): Promise<void> {
+    try { 
+      await this.readyPromise; 
+    } catch (error) { 
+      logger.error('[StorageService] ready() failed:', error);
+      /* ignore */ 
+    }
+  }
+
+  // === v2 sync_state helpers ===
+  public async getSyncState(userId: string): Promise<Record<string, unknown> | null> {
+    try {
+  const maybeDb = this.db as unknown as { sync_state?: { get: (key: string) => Promise<unknown> } };
+  const table = maybeDb.sync_state;
+  if (!table) return null;
+  return (await table.get(userId)) as Record<string, unknown> | null;
+    } catch (e) {
+      logger.warn('sync_state get failed', e);
+      return null;
+    }
+  }
+
+  public async upsertSyncState(userId: string, data: Record<string, unknown>): Promise<void> {
+    try {
+  const maybeDb = this.db as unknown as { sync_state?: { put: (value: Record<string, unknown>) => Promise<unknown> } };
+  const table = maybeDb.sync_state;
+  if (!table) return;
+  await table.put({ user_id: userId, ...data });
+    } catch (e) {
+      logger.warn('sync_state put failed', e);
+    }
+  }
+
+  public async resetSyncState(userId: string): Promise<void> {
+    try {
+  const maybeDb = this.db as unknown as { sync_state?: { delete: (key: string) => Promise<unknown> } };
+  const table = maybeDb.sync_state;
+  if (!table) return;
+  await table.delete(userId);
+    } catch (e) {
+      logger.warn('sync_state delete failed', e);
+    }
   }
 
   // Utility: simple UUID v4 check
@@ -598,17 +755,170 @@ export class StorageService {
    */
   private async initializeDatabase(): Promise<void> {
     try {
-      await this.db.open();
+      logger.log('[StorageService] Database current version:', this.db.verno);
+      
+      // Add timeout to db.open() to detect hangs
+      const tOpenStart = Date.now();
+      const openTimeout = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Database open timeout after 5s')), 5000);
+      });
+      
+      try {
+        await Promise.race([this.db.open(), openTimeout]);
+      } catch (error) {
+        logger.error('[StorageService] Database open failed:', error);
+        
+        // If database open times out or fails, try to reset it
+        await this.performDatabaseReset();
+      }
+      const openMs = Date.now() - tOpenStart;
+      if (openMs > 1000) {
+        logger.warn(`[db] open took ${openMs}ms (verno=${this.db.verno})`);
+      } else {
+        logger.log(`[db] open took ${openMs}ms (verno=${this.db.verno})`);
+      }
       
       // Check database health after opening
+      const tHealthStart = Date.now();
       const healthCheck = await this.checkAndRepairDatabase();
+      const healthMs = Date.now() - tHealthStart;
+      if (healthMs > 1000) {
+        logger.warn(`[db] health check took ${healthMs}ms (repaired=${healthCheck.repaired})`);
+      } else {
+        logger.log(`[db] health check took ${healthMs}ms (repaired=${healthCheck.repaired})`);
+      }
       if (healthCheck.repaired) {
-        console.log('🔧 Database was automatically repaired during initialization');
+        logger.log('🔧 Database was automatically repaired during initialization');
       } else if (!healthCheck.healthy) {
-        console.warn('⚠️ Database health check failed but could not be repaired:', healthCheck.error);
+        logger.warn('⚠️ Database health check failed but could not be repaired:', healthCheck.error);
       }
     } catch (error) {
-      console.warn('IndexedDB not available, falling back to memory storage:', error);
+      // Check if this is a schema migration error that we can fix
+      const errorObj = error as Error;
+      if (errorObj.name === 'UpgradeError' || errorObj.message?.includes('changing primary key')) {
+        logger.warn('💾 IndexedDB schema migration failed, clearing database and starting fresh...', error);
+        try {
+          // Close the current database instance
+          this.db.close();
+          
+          // Delete the entire database to clear schema conflicts
+          await this.db.delete();
+          
+          // Recreate the database with the current schema
+          await this.db.open();
+          logger.log('✅ IndexedDB cleared and recreated successfully');
+          return;
+        } catch (resetError) {
+          logger.error('❌ Failed to reset IndexedDB:', resetError);
+        }
+      }
+      logger.warn('IndexedDB not available, falling back to memory storage:', error);
+    }
+  }
+
+  /**
+   * Perform database reset with proper state management to prevent concurrent access issues
+   */
+  private async performDatabaseReset(): Promise<void> {
+    if (this.isResetting) {
+      logger.warn('[StorageService] Database reset already in progress, skipping concurrent reset');
+      return;
+    }
+
+    this.isResetting = true;
+    logger.warn('[StorageService] Starting database reset process...');
+
+    try {
+      // Step 1: Close the current database connection
+      logger.log('[StorageService] Step 1: Closing database connection...');
+      if (this.db.isOpen()) {
+        this.db.close();
+        logger.log('[StorageService] Database connection closed');
+      } else {
+        logger.log('[StorageService] Database was already closed');
+      }
+
+      // Step 2: Delete the database
+      logger.log('[StorageService] Step 2: Deleting database...');
+      await this.db.delete();
+      logger.log('[StorageService] Database deleted successfully');
+
+      // Step 3: Create a new database instance
+      logger.log('[StorageService] Step 3: Creating new database instance...');
+      this.db = new RepCueDatabase();
+      logger.log('[StorageService] New database instance created');
+
+      // Step 4: Open the new database with timeout
+      logger.log('[StorageService] Step 4: Opening new database...');
+      const reopenTimeout = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Database reopen timeout after 5s')), 5000);
+      });
+      
+      await Promise.race([this.db.open(), reopenTimeout]);
+      logger.log('[StorageService] ✅ New database opened successfully');
+
+      // Step 5: Create a new readyPromise since the database has been reset
+      logger.log('[StorageService] Step 5: Initializing new ready promise...');
+      this.readyPromise = Promise.resolve();
+      
+      logger.log('[StorageService] 🎉 Database reset completed successfully');
+    } catch (resetError) {
+      logger.error('[StorageService] ❌ Database reset failed:', resetError);
+      // Try to recover by creating a fresh instance
+      try {
+        logger.warn('[StorageService] Attempting recovery with fresh database instance...');
+        this.db = new RepCueDatabase();
+        await this.db.open();
+        this.readyPromise = Promise.resolve();
+        logger.log('[StorageService] 🔧 Recovery successful');
+      } catch (recoveryError) {
+        logger.error('[StorageService] 💥 Recovery failed:', recoveryError);
+        // Set readyPromise to rejected state
+        this.readyPromise = Promise.reject(new Error('Database reset and recovery failed'));
+        throw resetError;
+      }
+    } finally {
+      this.isResetting = false;
+      logger.log('[StorageService] Database reset process completed, reset flag cleared');
+    }
+  }
+
+  /**
+   * Check if error is a DatabaseClosedError (during reset or corruption)
+   */
+  private isDatabaseClosedError(error: unknown): boolean {
+    return error instanceof Error && (
+      error.name === 'DatabaseClosedError' || 
+      error.message.includes('Database has been closed') ||
+      error.message.includes('DatabaseClosedError')
+    );
+  }
+
+  /**
+   * Handle database access when database might be resetting
+   */
+  private async safeDatabaseAccess<T>(operation: () => Promise<T>, fallback: () => T): Promise<T> {
+    // If we're in the middle of a reset, wait a bit and return fallback
+    if (this.isResetting) {
+      logger.warn('[StorageService] Database operation attempted during reset, returning fallback');
+      return fallback();
+    }
+
+    try {
+      return await operation();
+    } catch (error) {
+      if (this.isDatabaseClosedError(error)) {
+        logger.warn('[StorageService] DatabaseClosedError detected, returning fallback');
+        return fallback();
+      }
+
+      // Handle general IndexedDB errors gracefully in tests and production
+      if (error instanceof Error && (error.message.includes('IndexedDB') || error.name === 'DatabaseError')) {
+        logger.warn('[StorageService] IndexedDB error detected, returning fallback:', error.message);
+        return fallback();
+      }
+
+      throw error; // Re-throw other errors
     }
   }
 
@@ -616,7 +926,24 @@ export class StorageService {
    * Check if we can store data (consent required)
    */
   private canStoreData(): boolean {
-    return consentService.hasConsent();
+    const ok = consentService.hasConsent();
+    if (!ok) {
+      const now = Date.now();
+      if (!this.lastConsentWarnAt || now - this.lastConsentWarnAt > 5000) {
+        this.lastConsentWarnAt = now;
+        try {
+          const status = consentService.getConsentStatus();
+          logger.warn('[consent] Storage blocked: no consent. status=', {
+            hasConsent: status.hasConsent,
+            version: status.version,
+            isLatestVersion: status.isLatestVersion
+          });
+        } catch {
+          logger.warn('[consent] Storage blocked: no consent.');
+        }
+      }
+    }
+    return ok;
   }
 
   /**
@@ -634,6 +961,33 @@ export class StorageService {
   }
 
   /**
+   * Capture a lightweight snapshot for debugging DB state (counts only; no PII).
+   */
+  public async debugSnapshot(): Promise<{
+    verno: number;
+    tables: Record<string, number>;
+    exerciseIdsSample: string[];
+  }> {
+    const snapshot = { verno: 0, tables: {} as Record<string, number>, exerciseIdsSample: [] as string[] };
+    try {
+      snapshot.verno = this.db.verno;
+      const tableNames = ['exercises', 'activity_logs', 'user_preferences', 'app_settings', 'workouts', 'workout_sessions'];
+      const counts = await Promise.all(tableNames.map(n => this.db.table(n).count().catch(() => 0)));
+      tableNames.forEach((n, i) => { snapshot.tables[n] = counts[i]; });
+      // Sample first few exercise IDs only (non-PII)
+      const sample = await this.db.exercises.limit(5).toArray().catch(() => [] as StoredExercise[]);
+      snapshot.exerciseIdsSample = sample.map(e => e.id).filter(Boolean).slice(0, 5) as string[];
+    } catch (e) {
+      if (e && typeof e === 'object' && 'name' in e && (e as { name: string }).name === 'DatabaseClosedError') {
+        logger.warn('[db] Database closed, skipping debugSnapshot');
+        return snapshot;
+      }
+      logger.warn('[db] debugSnapshot failed:', e);
+    }
+    return snapshot;
+  }
+
+  /**
    * Export all data for backup purposes
    */
   async exportAllData(): Promise<Record<string, unknown[] | object>> {
@@ -647,7 +1001,7 @@ export class StorageService {
         try {
           data[tableName] = await this.db.table(tableName).toArray();
         } catch (error) {
-          console.error(`Error exporting ${tableName}:`, error);
+          logger.error(`Error exporting ${tableName}:`, error);
           data[tableName] = [];
         }
       }
@@ -662,7 +1016,7 @@ export class StorageService {
         ...data
       };
     } catch (error) {
-      console.error('Error exporting data:', error);
+      logger.error('Error exporting data:', error);
       throw error;
     }
   }
@@ -681,9 +1035,349 @@ export class StorageService {
     try {
   await this.db.exercises.put(storedExercise);
     } catch (error) {
-      console.warn('Failed to save exercise to IndexedDB:', error);
+      logger.warn('Failed to save exercise to IndexedDB:', error);
   // Use the resolved exerciseId to avoid undefined keys when caller didn't provide one
   this.fallbackStorage.set(`exercise_${exerciseId}`, storedExercise);
+    }
+  }
+
+  /**
+   * Debug method to check database state
+   */
+  public async debugDatabaseState(): Promise<void> {
+    try {
+      logger.log('💾 [Debug] Database version:', this.db.verno);
+      logger.log('💾 [Debug] Available tables:', this.db.tables.map(t => t.name));
+      logger.log('💾 [Debug] Video files table schema:', {
+        name: this.db.video_files?.name,
+        schema: this.db.video_files?.schema
+      });
+      
+      // Check if we can access the table
+      const count = await this.db.video_files.count();
+      logger.log('💾 [Debug] Current video files count:', count);
+    } catch (error) {
+      logger.error('💾 [Debug] Database state check failed:', error);
+    }
+  }
+
+  /**
+   * Save video file to IndexedDB for offline-first storage
+   */
+  public async saveVideoFile(exerciseId: string, file: File): Promise<string> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    // Validate video format for browser compatibility
+    const supportedTypes = [
+      'video/mp4',
+      'video/webm', 
+      'video/ogg',
+      'video/avi',
+      'video/mov',
+      'video/quicktime'
+    ];
+    
+    if (!supportedTypes.includes(file.type)) {
+      logger.warn('💾 [VideoFile] Unsupported video format:', file.type);
+      throw new Error(`Unsupported video format: ${file.type}. Please use MP4, WebM, or OGG format.`);
+    }
+
+    logger.log('💾 [VideoFile] Saving video file to IndexedDB (singleton approach):', { 
+      exerciseId, 
+      fileName: file.name, 
+      fileSize: file.size,
+      mimeType: file.type 
+    });
+
+    // SINGLETON APPROACH: Delete any existing video files for this exercise first
+    logger.log('💾 [VideoFile] Deleting existing video files for exercise (singleton approach)...');
+    try {
+      const existingFiles = await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .toArray();
+      
+      if (existingFiles.length > 0) {
+        logger.log('💾 [VideoFile] Found existing files to delete:', existingFiles.length);
+        await this.db.video_files
+          .where('exercise_id')
+          .equals(exerciseId)
+          .delete();
+        logger.log('💾 [VideoFile] Existing files deleted successfully');
+      } else {
+        logger.log('💾 [VideoFile] No existing files found');
+      }
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to delete existing files:', error);
+      // Continue with save even if deletion fails
+    }
+
+    // Debug database state first
+    await this.debugDatabaseState();
+
+    const videoFileId = crypto.randomUUID();
+    const userId = this.getCurrentUserId();
+    
+    // Store File directly as Blob for IndexedDB compatibility
+    logger.log('💾 [VideoFile] Storing file directly as Blob...');
+    logger.log('💾 [VideoFile] File details:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      constructor: file.constructor.name
+    });
+    
+    const storedVideoFile: StoredVideoFile = prepareUpsert({
+      id: videoFileId,
+      exercise_id: exerciseId,
+      file_name: file.name,
+      file_data: file, // Store the File object directly (which is a Blob)
+      file_size: file.size,
+      mime_type: file.type,
+      upload_pending: true,
+      owner_id: userId
+    }, videoFileId, userId);
+
+    try {
+      logger.log('💾 [VideoFile] About to save video file to IndexedDB:', {
+        videoFileId,
+        exerciseId,
+        fileName: file.name,
+        dataSize: file.size,
+        storedVideoFileKeys: Object.keys(storedVideoFile)
+      });
+
+      // Check if the table exists
+      const tableExists = this.db.video_files !== undefined;
+      logger.log('💾 [VideoFile] Table exists check:', { tableExists });
+
+      const result = await this.db.video_files.put(storedVideoFile);
+      logger.log('💾 [VideoFile] Put operation result:', result);
+
+      // Verify the save by immediately querying back
+      const verification = await this.db.video_files.where('id').equals(videoFileId).first();
+      logger.log('💾 [VideoFile] Verification query:', {
+        found: !!verification,
+        id: verification?.id,
+        exercise_id: verification?.exercise_id
+      });
+
+      logger.log('💾 [VideoFile] Video file saved to IndexedDB successfully');
+      
+      // Return the blob URL format that the VideoUploadWidget expects
+      return `blob-pending-sync://${exerciseId}/${file.name}`;
+    } catch (error) {
+      logger.error('💾 [VideoFile] Failed to save video file to IndexedDB:', error);
+      logger.error('💾 [VideoFile] Error details:', {
+        errorName: error instanceof Error ? error.name : 'Unknown',
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Enrich exercises with custom_video_url for offline-first bidirectional sync
+   * Sets blob-pending-sync URLs for exercises that have video files
+   */
+  private async enrichExercisesWithVideoUrls(exercises: Exercise[]): Promise<Exercise[]> {
+    try {
+      logger.log('💾 [EnrichVideo] Starting exercise enrichment with video URLs');
+
+      // Check if video_files table exists (graceful fallback for tests/old databases)
+      if (!this.db.video_files) {
+        logger.log('💾 [EnrichVideo] video_files table not available, skipping enrichment');
+        return exercises;
+      }
+
+      // Get all video files (try both approaches to handle different data types)
+      let videoFiles = await this.db.video_files.toArray();
+      logger.log('💾 [EnrichVideo] Found video files:', videoFiles.length, videoFiles);
+
+      // Filter out deleted files (handle both boolean and numeric values)
+      videoFiles = videoFiles.filter(vf => !vf.deleted);
+      logger.log('💾 [EnrichVideo] Active video files after filtering:', videoFiles.length);
+
+      // Create a map of exercise_id -> video file for fast lookup
+      const videoFileMap = new Map<string, StoredVideoFile>();
+      for (const videoFile of videoFiles) {
+        videoFileMap.set(videoFile.exercise_id, videoFile);
+      }
+
+      // Enrich exercises with video URLs
+      const enrichedExercises = exercises.map(exercise => {
+        const videoFile = videoFileMap.get(exercise.id);
+        if (videoFile) {
+          logger.log('💾 [EnrichVideo] Enriching exercise with video:', exercise.name, videoFile.file_name);
+          return {
+            ...exercise,
+            custom_video_url: `blob-pending-sync://${exercise.id}/${videoFile.file_name}`,
+            has_video: false // Keep as false since this is custom video, not built-in
+          };
+        }
+        return exercise;
+      });
+
+      const enrichedCount = enrichedExercises.filter(e => e.custom_video_url).length;
+      logger.log('💾 [EnrichVideo] Enrichment complete. Exercises with videos:', enrichedCount);
+
+      return enrichedExercises;
+    } catch (error) {
+      logger.error('💾 [EnrichVideo] Failed to enrich exercises with video URLs:', error);
+      return exercises; // Return original exercises if enrichment fails
+    }
+  }
+
+  /**
+   * Get video file for an exercise
+   */
+  public async getVideoFile(exerciseId: string): Promise<StoredVideoFile | null> {
+    if (!this.canStoreData()) {
+      logger.warn('💾 [VideoFile] Cannot get video file - no data storage consent');
+      return null;
+    }
+
+    try {
+      logger.log('💾 [VideoFile] Querying for video file with exercise_id:', exerciseId);
+      
+      const videoFiles = await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .and(record => !record.deleted)
+        .toArray();
+      
+      logger.log('💾 [VideoFile] Query result:', {
+        exerciseId,
+        foundFiles: videoFiles.length,
+        files: videoFiles.map(f => ({ 
+          id: f.id, 
+          exercise_id: f.exercise_id, 
+          file_name: f.file_name,
+          deleted: f.deleted,
+          file_size: f.file_size,
+          created_at: f.created_at,
+          hasFileData: !!f.file_data
+        }))
+      });
+      
+      // Sort by created_at descending to get the most recent file first
+      videoFiles.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      // Try to find a file with actual file_data first
+      const fileWithData = videoFiles.find(f => f.file_data);
+      if (fileWithData) {
+        logger.log('💾 [VideoFile] Found video file with data:', {
+          id: fileWithData.id,
+          created_at: fileWithData.created_at,
+          hasFileData: !!fileWithData.file_data,
+          fileDataSize: fileWithData.file_data?.size
+        });
+        return fileWithData;
+      }
+      
+      logger.warn('💾 [VideoFile] No video files with file_data found, returning most recent:', {
+        mostRecentId: videoFiles[0]?.id,
+        mostRecentCreatedAt: videoFiles[0]?.created_at
+      });
+      
+      return videoFiles.length > 0 ? videoFiles[0] : null;
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to get video file from IndexedDB:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Delete video file from IndexedDB
+   */
+  public async deleteVideoFile(exerciseId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      return;
+    }
+
+    try {
+      const videoFiles = await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .toArray();
+      
+      for (const videoFile of videoFiles) {
+        // Soft delete the record
+        const updatedVideoFile: Partial<StoredVideoFile> = {
+          deleted: true,
+          updated_at: new Date().toISOString(),
+          dirty: 1
+        };
+        await this.db.video_files.update(videoFile.id, updatedVideoFile);
+      }
+      
+      logger.log('💾 [VideoFile] Video file deleted successfully for exercise:', exerciseId);
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to delete video file:', error);
+    }
+  }
+
+  /**
+   * Get video files for a specific exercise ID
+   */
+  public async getVideoFilesByExerciseId(exerciseId: string): Promise<StoredVideoFile[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      return await this.db.video_files
+        .where('exercise_id')
+        .equals(exerciseId)
+        .toArray();
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to get video files by exercise ID:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get all video files pending sync to cloud storage
+   */
+  public async getVideoFilesPendingSync(): Promise<StoredVideoFile[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      return await this.db.video_files
+        .where('upload_pending')
+        .equals(1)
+        .and(record => !record.deleted)
+        .toArray();
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to get video files pending sync:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Mark video file as uploaded to cloud storage
+   */
+  public async markVideoFileUploaded(videoFileId: string, cloudUrl: string): Promise<void> {
+    if (!this.canStoreData()) {
+      return;
+    }
+
+    try {
+      const updatedVideoFile: Partial<StoredVideoFile> = {
+        upload_pending: false,
+        updated_at: new Date().toISOString(),
+        dirty: 1
+      };
+      await this.db.video_files.update(videoFileId, updatedVideoFile);
+      
+      logger.log('💾 [VideoFile] Video file marked as uploaded:', { videoFileId, cloudUrl });
+    } catch (error) {
+      logger.warn('💾 [VideoFile] Failed to mark video file as uploaded:', error);
     }
   }
 
@@ -695,39 +1389,41 @@ export class StorageService {
       return [];
     }
 
-    try {
-      const [storedExercises, prefs] = await Promise.all([
-        this.db.exercises.toArray(),
-        this.getUserPreferences().catch(() => null)
-      ]);
-      const favorites = prefs?.favorite_exercises || [];
-      const allExercises = storedExercises
-        .map(this.convertStoredExercise)
-        .map(ex => ({
-          ...ex,
-          // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
-          is_favorite: favorites.includes(ex.id)
-        }));
-      return filterActiveRecords(allExercises);
-    } catch (error) {
-      console.warn('Failed to load exercises from IndexedDB:', error);
-      // Try fallback storage
-      const exercises: Exercise[] = [];
-      this.fallbackStorage.forEach((value, key) => {
-        if (key.startsWith('exercise_')) {
-          exercises.push(this.convertStoredExercise(value as StoredExercise));
-        }
-      });
-      // Merge favorites from preferences fallback if present
-      try {
-        const prefs = await this.getUserPreferences();
+    return await this.safeDatabaseAccess(
+      async () => {
+        const [storedExercises, prefs] = await Promise.all([
+          this.db.exercises.toArray(),
+          this.getUserPreferences().catch(() => null)
+        ]);
+        const favorites = prefs?.favorite_exercises || [];
+        let allExercises = storedExercises
+          .map(this.convertStoredExercise)
+          .map(ex => ({
+            ...ex,
+            // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
+            is_favorite: favorites.includes(ex.id)
+          }));
+
+        // Enrich exercises with video URLs for offline-first bidirectional sync
+        allExercises = await this.enrichExercisesWithVideoUrls(allExercises);
+
+        return filterActiveRecords(allExercises);
+      },
+      () => {
+        // Fallback to in-memory storage
+        const exercises: Exercise[] = [];
+        this.fallbackStorage.forEach((value, key) => {
+          if (key.startsWith('exercise_')) {
+            exercises.push(this.convertStoredExercise(value as StoredExercise));
+          }
+        });
+        // Try to get preferences for favorites, but don't wait if database is unavailable
+        const prefs = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
         const favorites = prefs?.favorite_exercises || [];
         const merged = exercises.map(ex => ({ ...ex, is_favorite: favorites.includes(ex.id) }));
         return filterActiveRecords(merged);
-      } catch {
-        return filterActiveRecords(exercises);
       }
-    }
+    );
   }
 
   /**
@@ -736,28 +1432,130 @@ export class StorageService {
    */
   public async ensureExercisesSeeded(): Promise<number> {
     if (!this.canStoreData()) {
+  logger.warn('[seed] Skipping seeding: consent not granted');
       return 0;
     }
 
     try {
-      const existingCount = await this.db.exercises.count();
-      if (existingCount > 0) return existingCount;
+  const tSeedStart = Date.now();
+  const existingCount = await this.db.exercises.count();
+  logger.log(`[seed] exercises.count before=${existingCount}`);
+  if (existingCount > 0) return existingCount;
 
       // Lazy import to avoid upfront bundle cost and circular deps
       const { INITIAL_EXERCISES } = await import('../data/exercises');
-      // Insert catalog entries as-is to keep dirty=0 and avoid syncing to server
-      for (const exercise of INITIAL_EXERCISES) {
-        try {
-          await this.db.exercises.put(exercise as unknown as StoredExercise);
-        } catch (error) {
-          console.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
-          this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
+      // Prepare clean seed records and insert in a single transaction using bulkPut for speed
+      const cleanSeeds: StoredExercise[] = INITIAL_EXERCISES.map(exercise => ({
+        ...exercise,
+        dirty: 0,
+        version: 1,
+        created_at: '2025-01-01T00:00:00.000Z',
+        updated_at: '2025-01-01T00:00:00.000Z',
+        deleted: false,
+        owner_id: null,
+        op: 'seed'
+      } as StoredExercise));
+
+  try {
+        await this.db.transaction('rw', this.db.exercises, async () => {
+          await this.db.exercises.bulkPut(cleanSeeds);
+        });
+      } catch (txErr) {
+        // Fallback to individual puts if bulkPut fails (should be rare)
+        logger.warn('bulkPut failed during seeding; falling back to sequential puts', txErr);
+        for (const exercise of cleanSeeds) {
+          try { await this.db.exercises.put(exercise); }
+          catch (error) {
+            logger.warn('Seeding exercise failed, using fallback cache:', exercise.id, error);
+            this.fallbackStorage.set(`exercise_${exercise.id}`, exercise);
+          }
         }
       }
-      return await this.db.exercises.count();
+      // Also clean up any existing built-in exercises that might be dirty
+      await this.cleanBuiltInExercises();
+  const finalCount = await this.db.exercises.count();
+  const seedMs = Date.now() - tSeedStart;
+  if (seedMs > 1000) {
+    logger.warn(`[seed] completed in ${seedMs}ms; count after=${finalCount}`);
+  } else {
+    logger.log(`[seed] completed in ${seedMs}ms; count after=${finalCount}`);
+  }
+  return finalCount;
     } catch (error) {
-      console.warn('Failed to seed exercises catalog:', error);
+      logger.warn('Failed to seed exercises catalog:', error);
       return 0;
+    }
+  }
+
+  /**
+   * Public method to trigger cleanup of built-in exercises
+   */
+  public async cleanupBuiltInExercises(): Promise<void> {
+    await this.cleanBuiltInExercises();
+  }
+
+  /**
+   * Sync built-in exercises with the current INITIAL_EXERCISES catalog
+   */
+  private async cleanBuiltInExercises(): Promise<void> {
+    try {
+      const { INITIAL_EXERCISES } = await import('../data/exercises');
+      const currentBuiltInIds = new Set(INITIAL_EXERCISES.map(ex => ex.id));
+      
+      // Get all existing built-in exercises (those with slug IDs, not UUIDs)
+      const existingBuiltInExercises = await this.db.exercises
+        .filter(exercise => 
+          // Built-in exercises have slug IDs (no hyphens in UUID format)
+          !!exercise.id && !exercise.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+        )
+        .toArray();
+
+      // 1. Clean up existing built-in exercises that should remain
+      for (const exercise of existingBuiltInExercises) {
+        if (currentBuiltInIds.has(exercise.id)) {
+          // This built-in exercise should remain - ensure it's clean
+          if (exercise.dirty === 1 || exercise.owner_id !== null) {
+            const cleanedExercise: StoredExercise = {
+              ...exercise,
+              dirty: 0,
+              version: 1,
+              created_at: '2025-01-01T00:00:00.000Z',
+              updated_at: '2025-01-01T00:00:00.000Z',
+              deleted: false,
+              owner_id: null,
+              op: 'seed'
+            } as StoredExercise;
+            
+            await this.db.exercises.put(cleanedExercise);
+          }
+        } else {
+          // This built-in exercise was removed from catalog - delete it
+          logger.log(`🗑️ Removing obsolete built-in exercise: ${exercise.name} (${exercise.id})`);
+          await this.db.exercises.delete(exercise.id);
+        }
+      }
+
+      // 2. Add any new built-in exercises that don't exist yet
+      const existingIds = new Set(existingBuiltInExercises.map(ex => ex.id));
+      for (const exercise of INITIAL_EXERCISES) {
+        if (!existingIds.has(exercise.id)) {
+          logger.log(`➕ Adding new built-in exercise: ${exercise.name} (${exercise.id})`);
+          const cleanExercise: StoredExercise = {
+            ...exercise,
+            dirty: 0,
+            version: 1,
+            created_at: '2025-01-01T00:00:00.000Z',
+            updated_at: '2025-01-01T00:00:00.000Z',
+            deleted: false,
+            owner_id: null,
+            op: 'seed'
+          } as StoredExercise;
+          
+          await this.db.exercises.put(cleanExercise);
+        }
+      }
+    } catch (error) {
+      logger.warn('Failed to clean built-in exercises:', error);
     }
   }
 
@@ -770,11 +1568,25 @@ export class StorageService {
     }
 
     try {
+      logger.log('🔄 toggleExerciseFavorite called for:', exerciseId);
+      
       // Update preferences source of truth (store slug/id in array)
       const prefs = await this.ensureUserPreferences();
+      logger.log('📝 Current user preferences:', { id: prefs.id, favorite_exercises: prefs.favorite_exercises });
+      
       const current = new Set(prefs.favorite_exercises || []);
+      const wasAlreadyFavorite = current.has(exerciseId);
       if (current.has(exerciseId)) current.delete(exerciseId); else current.add(exerciseId);
-      await this.updateUserPreferences({ favorite_exercises: Array.from(current) });
+      
+      const newFavorites = Array.from(current);
+      logger.log('📝 Updating user preferences with favorites:', { 
+        exerciseId, 
+        wasAlreadyFavorite, 
+        newFavorites,
+        action: wasAlreadyFavorite ? 'remove' : 'add'
+      });
+      
+      await this.updateUserPreferences({ favorite_exercises: newFavorites });
 
       // Best-effort UI reflection: flip local exercise flag WITHOUT marking record dirty
       const now = new Date().toISOString();
@@ -794,7 +1606,7 @@ export class StorageService {
         }
       }
     } catch (error) {
-      console.warn('Failed to update exercise favorite:', error);
+      logger.warn('Failed to update exercise favorite:', error);
       // Try fallback storage
       const key = `exercise_${exerciseId}`;
       const exercise = this.fallbackStorage.get(key) as StoredExercise | undefined;
@@ -859,7 +1671,7 @@ export class StorageService {
       }
     }
 
-    const logWithSync = prepareUpsert({ ...log, exercise_name: ensuredName }, logId);
+    const logWithSync = prepareUpsert({ ...log, exercise_name: ensuredName }, logId, this.getCurrentUserId());
     const storedLog: StoredActivityLog = {
       ...logWithSync,
       timestamp: log.timestamp
@@ -868,7 +1680,7 @@ export class StorageService {
     try {
       await this.db.activity_logs.put(storedLog);
     } catch (error) {
-      console.warn('Failed to save activity log to IndexedDB:', error);
+      logger.warn('Failed to save activity log to IndexedDB:', error);
       // Use generated logId to ensure consistent fallback key
       this.fallbackStorage.set(`log_${logId}`, storedLog);
     }
@@ -934,12 +1746,12 @@ export class StorageService {
         }
       }
       if (repairPromises.length) {
-        try { await Promise.all(repairPromises); } catch (e) { console.warn('Activity log repair failed:', e); }
+        try { await Promise.all(repairPromises); } catch (e) { logger.warn('Activity log repair failed:', e); }
       }
 
       return repairedLogs.map(this.convertStoredActivityLog);
     } catch (error) {
-      console.warn('Failed to load activity logs from IndexedDB:', error);
+      logger.warn('Failed to load activity logs from IndexedDB:', error);
       // Try fallback storage and ensure names are backfilled
       const logs: ActivityLog[] = [];
       const shouldReplaceGenericName = (name?: string) => !name || typeof name !== 'string' || name.trim() === '' || name === 'Unknown Exercise' || name === 'Workout';
@@ -972,13 +1784,21 @@ export class StorageService {
     }
 
     const prefId = preferences.id || crypto.randomUUID();
-    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, prefId);
+    const storedPreferences: StoredUserPreferences = prepareUpsert(preferences, prefId, this.getCurrentUserId());
+    
+    logger.log('💾 Saving user preferences to IndexedDB:', { 
+      id: storedPreferences.id,
+      favorite_exercises: storedPreferences.favorite_exercises,
+      dirty: storedPreferences.dirty,
+      owner_id: storedPreferences.owner_id
+    });
 
     try {
       // Use put() to handle both insert and update operations
       await this.db.user_preferences.put(storedPreferences);
+      logger.log('✅ Successfully saved user preferences to IndexedDB');
     } catch (error) {
-      console.warn('Failed to save user preferences to IndexedDB:', error);
+      logger.warn('Failed to save user preferences to IndexedDB:', error);
       this.fallbackStorage.set('user_preferences', storedPreferences);
     }
   }
@@ -999,9 +1819,10 @@ export class StorageService {
     }
 
     const now = new Date().toISOString();
+    const userId = this.getCurrentUserId();
     const base: UserPreferences = {
       id: crypto.randomUUID(),
-      owner_id: null,
+      owner_id: userId,
       updated_at: now,
       created_at: now,
       deleted: false,
@@ -1035,9 +1856,17 @@ export class StorageService {
 
     const existing = await this.getUserPreferences();
     if (existing) {
+      // Ensure owner_id is set if missing
+      const userId = this.getCurrentUserId();
       const updated: UserPreferences = prepareUpsert(
-        { ...existing, ...patch } as UserPreferences,
-        existing.id
+        { 
+          ...existing, 
+          ...patch,
+          // Fix owner_id if it's null/undefined
+          owner_id: existing.owner_id || userId
+        } as UserPreferences,
+        existing.id,
+        this.getCurrentUserId()
       );
       await this.saveUserPreferences(updated);
     } else {
@@ -1055,20 +1884,16 @@ export class StorageService {
       return null;
     }
 
-    try {
-      const storedPreferences = await this.db.user_preferences.orderBy('updated_at').last();
-      if (storedPreferences) {
-        return storedPreferences;
+    return await this.safeDatabaseAccess(
+      async () => {
+        const storedPreferences = await this.db.user_preferences.orderBy('updated_at').last();
+        return storedPreferences || null;
+      },
+      () => {
+        const fallback = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
+        return fallback || null;
       }
-      return null;
-    } catch (error) {
-      console.warn('Failed to load user preferences from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
-      if (fallback) {
-        return fallback;
-      }
-      return null;
-    }
+    );
   }
 
   /**
@@ -1081,13 +1906,13 @@ export class StorageService {
 
   // Ensure UUID id so server accepts row
   const settingsId = this.isUuid(settings.id) ? settings.id! : crypto.randomUUID();
-    const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId);
+    const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId, this.getCurrentUserId());
 
     try {
       // Use put() to handle both insert and update operations
       await this.db.app_settings.put(storedSettings);
     } catch (error) {
-      console.warn('Failed to save app settings to IndexedDB:', error);
+      logger.warn('Failed to save app settings to IndexedDB:', error);
       this.fallbackStorage.set('app_settings', storedSettings);
     }
   }
@@ -1104,20 +1929,16 @@ export class StorageService {
       return null;
     }
 
-    try {
-      const storedSettings = await this.db.app_settings.orderBy('updated_at').last();
-      if (storedSettings) {
-        return storedSettings;
+    return await this.safeDatabaseAccess(
+      async () => {
+        const storedSettings = await this.db.app_settings.orderBy('updated_at').last();
+        return storedSettings || null;
+      },
+      () => {
+        const fallback = this.fallbackStorage.get('app_settings') as AppSettings | undefined;
+        return fallback || null;
       }
-      return null;
-    } catch (error) {
-      console.warn('Failed to load app settings from IndexedDB:', error);
-      const fallback = this.fallbackStorage.get('app_settings') as AppSettings | undefined;
-      if (fallback) {
-        return fallback;
-      }
-      return null;
-    }
+    );
   }
 
 
@@ -1138,7 +1959,7 @@ export class StorageService {
       // Clear fallback storage
       this.fallbackStorage.clear();
     } catch (error) {
-      console.error('Failed to clear all data:', error);
+      logger.error('Failed to clear all data:', error);
       throw error;
     }
   }
@@ -1162,12 +1983,19 @@ export class StorageService {
     }
 
     try {
+      const tStatsStart = Date.now();
       const [exerciseCount, logCount, preferences, settings] = await Promise.all([
         this.db.exercises.count(),
         this.db.activity_logs.count(),
         this.getUserPreferences(),
         this.getAppSettings()
       ]);
+      const statsMs = Date.now() - tStatsStart;
+      if (statsMs > 1000) {
+        logger.warn(`[stats] getStorageStats took ${statsMs}ms (exercises=${exerciseCount}, logs=${logCount})`);
+      } else {
+        logger.log(`[stats] getStorageStats took ${statsMs}ms (exercises=${exerciseCount}, logs=${logCount})`);
+      }
 
       return {
         exerciseCount,
@@ -1176,13 +2004,78 @@ export class StorageService {
         hasSettings: settings !== null
       };
     } catch (error) {
-      console.warn('Failed to get storage stats:', error);
+      if (error && typeof error === 'object' && 'name' in error && (error as { name: string }).name === 'DatabaseClosedError') {
+        logger.warn('Database closed, returning empty storage stats');
+        return {
+          exerciseCount: 0,
+          logCount: 0,
+          hasPreferences: false,
+          hasSettings: false
+        };
+      }
+      logger.warn('Failed to get storage stats:', error);
       return {
         exerciseCount: 0,
         logCount: 0,
         hasPreferences: false,
         hasSettings: false
       };
+    }
+  }
+
+  /**
+   * Peek the number of exercises without requiring consent.
+   * Read-only and used for diagnostics/rehydration paths.
+   */
+  public async peekExerciseCount(): Promise<number> {
+    try {
+      return await this.db.exercises.count();
+    } catch (e) {
+      logger.warn('peekExerciseCount failed:', e);
+      return 0;
+    }
+  }
+
+  /**
+   * Quickly load built-in exercises without requiring consent (read-only).
+   * This intentionally excludes any user-created content for privacy.
+   */
+  public async getBuiltInExercisesFastUnsafe(): Promise<Exercise[]> {
+    try {
+      const stored = await this.db.exercises
+        .filter(exercise => {
+          // Built-ins have slug IDs (non-UUID) and no owner
+          const isUuid = typeof exercise.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(exercise.id);
+          return !isUuid && (exercise.owner_id == null);
+        })
+        .toArray();
+      return filterActiveRecords(stored.map(this.convertStoredExercise));
+    } catch (e) {
+      logger.warn('getBuiltInExercisesFastUnsafe failed:', e);
+      return [];
+    }
+  }
+
+  /**
+   * Fast path to fetch exercises without consulting preferences (no favorites merge).
+   * Useful as a fallback when we need quick UI hydration.
+   */
+  public async getExercisesFast(): Promise<Exercise[]> {
+    if (!this.canStoreData()) return [];
+    try {
+      const tFastStart = Date.now();
+      const stored = await this.db.exercises.toArray();
+      const list = filterActiveRecords(stored.map(this.convertStoredExercise));
+      const fastMs = Date.now() - tFastStart;
+      if (fastMs > 1000) {
+        logger.warn(`[fast] getExercisesFast took ${fastMs}ms (n=${list.length})`);
+      } else {
+        logger.log(`[fast] getExercisesFast took ${fastMs}ms (n=${list.length})`);
+      }
+      return list;
+    } catch (error) {
+      logger.warn('getExercisesFast failed:', error);
+      return [];
     }
   }
 
@@ -1204,7 +2097,7 @@ export class StorageService {
     }
 
   const workoutId = workout.id || crypto.randomUUID();
-  const workoutWithSync = prepareUpsert(workout, workoutId);
+  const workoutWithSync = prepareUpsert(workout, workoutId, this.getCurrentUserId());
     const storedWorkout: StoredWorkout = {
       ...workoutWithSync,
       created_at: typeof workout.created_at === 'string' ? workout.created_at : new Date().toISOString()
@@ -1213,7 +2106,7 @@ export class StorageService {
     try {
       await this.db.workouts.put(storedWorkout);
     } catch (error) {
-      console.warn('Failed to save workout to IndexedDB:', error);
+      logger.warn('Failed to save workout to IndexedDB:', error);
       // Use the resolved workoutId so downstream lookups (e.g., resolveWorkoutName) find it
       this.fallbackStorage.set(`workout_${workoutId}`, storedWorkout);
     }
@@ -1227,19 +2120,21 @@ export class StorageService {
       return [];
     }
 
-    try {
-      const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
-      return storedWorkouts.map(this.convertStoredWorkout);
-    } catch (error) {
-      console.warn('Failed to load workouts from IndexedDB:', error);
-      const workouts: Workout[] = [];
-      this.fallbackStorage.forEach((value, key) => {
-        if (key.startsWith('workout_')) {
-          workouts.push(this.convertStoredWorkout(value as StoredWorkout));
-        }
-      });
-      return workouts;
-    }
+    return await this.safeDatabaseAccess(
+      async () => {
+        const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
+        return storedWorkouts.map(this.convertStoredWorkout);
+      },
+      () => {
+        const workouts: Workout[] = [];
+        this.fallbackStorage.forEach((value, key) => {
+          if (key.startsWith('workout_')) {
+            workouts.push(this.convertStoredWorkout(value as StoredWorkout));
+          }
+        });
+        return workouts;
+      }
+    );
   }
 
   /**
@@ -1254,7 +2149,7 @@ export class StorageService {
       const storedWorkout = await this.db.workouts.get(workoutId);
       return storedWorkout ? this.convertStoredWorkout(storedWorkout) : null;
     } catch (error) {
-      console.warn('Failed to get workout from IndexedDB:', error);
+      logger.warn('Failed to get workout from IndexedDB:', error);
       const fallback = this.fallbackStorage.get(`workout_${workoutId}`);
       return fallback ? this.convertStoredWorkout(fallback as StoredWorkout) : null;
     }
@@ -1273,10 +2168,10 @@ export class StorageService {
       if (workout) {
         const deletedWorkout = prepareSoftDelete(workout);
         await this.db.workouts.put(deletedWorkout);
-        console.log(`Workout ${workoutId} soft deleted successfully`);
+        logger.log(`Workout ${workoutId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete workout from IndexedDB:', error);
+      logger.error('Failed to soft delete workout from IndexedDB:', error);
       // For fallback storage, we can still use hard delete since it's temporary
       this.fallbackStorage.delete(`workout_${workoutId}`);
     }
@@ -1295,7 +2190,7 @@ export class StorageService {
     }
 
   const sessionId = session.id || crypto.randomUUID();
-    const sessionWithSync = prepareUpsert(session, sessionId);
+    const sessionWithSync = prepareUpsert(session, sessionId, this.getCurrentUserId());
     const storedSession: StoredWorkoutSession = {
       ...sessionWithSync,
       start_time: session.start_time,
@@ -1305,7 +2200,7 @@ export class StorageService {
     try {
       await this.db.workout_sessions.put(storedSession);
     } catch (error) {
-      console.warn('Failed to save workout session to IndexedDB:', error);
+      logger.warn('Failed to save workout session to IndexedDB:', error);
       // Use generated sessionId to ensure consistent fallback key
       this.fallbackStorage.set(`session_${sessionId}`, storedSession);
     }
@@ -1341,7 +2236,7 @@ export class StorageService {
       const storedSessions = await query.toArray();
       return storedSessions.map(this.convertStoredWorkoutSession);
     } catch (error) {
-      console.warn('Failed to load workout sessions from IndexedDB:', error);
+      logger.warn('Failed to load workout sessions from IndexedDB:', error);
       const sessions: WorkoutSession[] = [];
       this.fallbackStorage.forEach((value, key) => {
         if (key.startsWith('session_')) {
@@ -1367,10 +2262,10 @@ export class StorageService {
       if (session) {
         const deletedSession = prepareSoftDelete(session);
         await this.db.workout_sessions.put(deletedSession);
-        console.log(`Workout session ${sessionId} soft deleted successfully`);
+        logger.log(`Workout session ${sessionId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete workout session from IndexedDB:', error);
+      logger.error('Failed to soft delete workout session from IndexedDB:', error);
       this.fallbackStorage.delete(`session_${sessionId}`);
     }
   }
@@ -1388,10 +2283,10 @@ export class StorageService {
       if (exercise) {
         const deletedExercise = prepareSoftDelete(exercise);
         await this.db.exercises.put(deletedExercise);
-        console.log(`Exercise ${exerciseId} soft deleted successfully`);
+        logger.log(`Exercise ${exerciseId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete exercise from IndexedDB:', error);
+      logger.error('Failed to soft delete exercise from IndexedDB:', error);
       // Remove from fallback storage
       this.fallbackStorage.delete(`exercise_${exerciseId}`);
     }
@@ -1410,10 +2305,10 @@ export class StorageService {
       if (log) {
         const deletedLog = prepareSoftDelete(log);
         await this.db.activity_logs.put(deletedLog);
-        console.log(`Activity log ${activityLogId} soft deleted successfully`);
+        logger.log(`Activity log ${activityLogId} soft deleted successfully`);
       }
     } catch (error) {
-      console.error('Failed to soft delete activity log from IndexedDB:', error);
+      logger.error('Failed to soft delete activity log from IndexedDB:', error);
       // Remove from fallback storage (align with 'log_' prefix used for fallback saves)
       this.fallbackStorage.delete(`log_${activityLogId}`);
     }
@@ -1431,6 +2326,7 @@ export class StorageService {
     activityLogs: ActivityLog[];
     userPreferences: UserPreferences[];
     appSettings: AppSettings[];
+    userFavorites: UserFavorite[];
     workouts: Workout[];
     workoutSessions: WorkoutSession[];
   }> {
@@ -1440,16 +2336,18 @@ export class StorageService {
         activityLogs: [],
         userPreferences: [],
         appSettings: [],
+        userFavorites: [],
         workouts: [],
         workoutSessions: []
       };
     }
 
     try {
-      const [activityLogs, userPreferences, appSettings, workouts, workoutSessions] = await Promise.all([
+      const [activityLogs, userPreferences, appSettings, userFavorites, workouts, workoutSessions] = await Promise.all([
         this.db.activity_logs.where('dirty').equals(1).toArray(),
         this.db.user_preferences.where('dirty').equals(1).toArray(),
         this.db.app_settings.where('dirty').equals(1).toArray(),
+        this.db.user_favorites.where('dirty').equals(1).toArray(),
         this.db.workouts.where('dirty').equals(1).toArray(),
         this.db.workout_sessions.where('dirty').equals(1).toArray()
       ]);
@@ -1461,16 +2359,18 @@ export class StorageService {
         activityLogs: activityLogs.map(this.convertStoredActivityLog),
         userPreferences: userPreferences.map(this.convertStoredUserPreferences),
         appSettings: appSettings.map(this.convertStoredAppSettings),
+        userFavorites: userFavorites.map(this.convertStoredUserFavorite),
         workouts: workouts.map(this.convertStoredWorkout),
         workoutSessions: workoutSessions.map(this.convertStoredWorkoutSession)
       };
     } catch (error) {
-      console.warn('Failed to get dirty records:', error);
+      logger.warn('Failed to get dirty records:', error);
       return {
         exercises: [],
         activityLogs: [],
         userPreferences: [],
         appSettings: [],
+        userFavorites: [],
         workouts: [],
         workoutSessions: []
       };
@@ -1510,7 +2410,7 @@ export class StorageService {
           break;
       }
     } catch (error) {
-      console.warn(`Failed to mark ${table} records as synced:`, error);
+      logger.warn(`Failed to mark ${table} records as synced:`, error);
     }
   }
 
@@ -1554,19 +2454,72 @@ export class StorageService {
       const results = await Promise.all(
         tablesToClaim.map(async ({ table, name }) => {
           try {
-            // Enumerate and update records with empty/null/undefined owner_id
-            const allRecords = await table.toArray() as Array<{ id: string; owner_id?: string | null }>;
-            const targets = allRecords.filter(r => r.owner_id === '' || r.owner_id == null);
+            // Prefer indexed query paths when available; otherwise stream in batches
+            const coll = table as unknown as {
+              where?: (field: string) => { equals: (v: unknown) => { limit: (n: number) => { toArray: () => Promise<Array<{ id: string }>> } } };
+              toCollection?: () => { offset: (n: number) => { limit: (m: number) => { toArray: () => Promise<Array<{ id: string; owner_id?: string | null }>> } } };
+              update: (id: string, changes: Record<string, unknown>) => Promise<number>;
+            };
+
             let modified = 0;
-            for (const rec of targets) {
-              // Use a minimally-typed update signature to avoid any-casts
-              const updater = table as unknown as { update: (id: string, changes: Record<string, unknown>) => Promise<number> };
-              await updater.update(rec.id, claimData as Record<string, unknown>);
-              modified++;
+            const BATCH = 50;
+
+            // Strategy 1: Use indexed queries on owner_id for efficient lookups (available from v11+)
+            if (coll.where) {
+              // Query for empty string owner_id values (Dexie can't query null with equals)
+              let batch = await coll.where('owner_id').equals('').limit(BATCH).toArray();
+              while (batch.length) {
+                for (const rec of batch) {
+                  await coll.update(rec.id, claimData as Record<string, unknown>);
+                  modified++;
+                }
+                // Yield to event loop to keep UI responsive
+                await new Promise(r => setTimeout(r, 0));
+                batch = await coll.where('owner_id').equals('').limit(BATCH).toArray();
+              }
+              
+              // Also need to scan for null values since Dexie can't query null with equals()
+              // Use toCollection scan to find null owner_id values
+              if (coll.toCollection) {
+                let offset = 0;
+                const MAX_PAGES = 200; // up to 10k rows in worst case
+                for (let page = 0; page < MAX_PAGES; page++) {
+                  const rows = await coll.toCollection().offset(offset).limit(BATCH).toArray();
+                  if (!rows.length) break;
+                  for (const rec of rows) {
+                    const owner = (rec as { owner_id?: string | null }).owner_id;
+                    if (owner == null) { // Only handle null, empty string was handled above
+                      await coll.update(rec.id, claimData as Record<string, unknown>);
+                      modified++;
+                    }
+                  }
+                  offset += rows.length;
+                  await new Promise(r => setTimeout(r, 0));
+                }
+              }
+            } else if (coll.toCollection) {
+              // Strategy 2: Fallback scan in small pages
+              let offset = 0;
+              // Limit pages to avoid pathological stalls
+              const MAX_PAGES = 200; // up to 10k rows in worst case
+              for (let page = 0; page < MAX_PAGES; page++) {
+                const rows = await coll.toCollection().offset(offset).limit(BATCH).toArray();
+                if (!rows.length) break;
+                for (const rec of rows) {
+                  const owner = (rec as { owner_id?: string | null }).owner_id;
+                  if (owner === '' || owner == null) {
+                    await coll.update(rec.id, claimData as Record<string, unknown>);
+                    modified++;
+                  }
+                }
+                offset += rows.length;
+                await new Promise(r => setTimeout(r, 0));
+              }
             }
+
             return { name, count: modified };
           } catch (error) {
-            console.warn(`Failed to claim ${name}:`, error);
+            logger.warn(`Failed to claim ${name}:`, error);
             return { name, count: 0 };
           }
         })
@@ -1580,7 +2533,7 @@ export class StorageService {
         totalClaimed += count;
       });
 
-      console.log(`✅ Successfully claimed ${totalClaimed} anonymous records for user ${ownerId}:`, tableStats);
+      logger.log(`✅ Successfully claimed ${totalClaimed} anonymous records for user ${ownerId}:`, tableStats);
 
       return {
         success: true,
@@ -1588,7 +2541,7 @@ export class StorageService {
         tableStats,
       };
     } catch (error) {
-      console.error('Failed to claim ownership of records:', error);
+      logger.error('Failed to claim ownership of records:', error);
       return {
         success: false,
         recordsClaimed: 0,
@@ -1635,10 +2588,169 @@ export class StorageService {
   }
 
   /**
+   * Convert stored user favorite to runtime format
+   */
+  private convertStoredUserFavorite(stored: StoredUserFavorite): UserFavorite {
+    return stored;
+  }
+
+  /**
+   * Toggle favorite status for a user-created exercise (UUID ID)
+   * Stores in user_favorites table for sync
+   */
+  public async toggleUserCreatedExerciseFavorite(exerciseId: string, userId: string): Promise<boolean> {
+    if (!this.canStoreData()) {
+      throw new Error('Cannot store data without user consent');
+    }
+
+    try {
+      // Check if already favorited
+      const existing = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
+        .first();
+
+      if (existing) {
+        // Remove from favorites (soft delete)
+        const updatedFavorite: StoredUserFavorite = prepareSoftDelete(existing, userId);
+        await this.db.user_favorites.put(updatedFavorite);
+        return false;
+      } else {
+        // Add to favorites
+        const newFavorite: StoredUserFavorite = prepareUpsert({
+          owner_id: userId,
+          item_id: exerciseId,
+          item_type: 'exercise' as const,
+          exercise_type: 'user_created' as const
+        } as UserFavorite, undefined, userId);
+        await this.db.user_favorites.put(newFavorite);
+        return true;
+      }
+    } catch (error) {
+      logger.warn('Failed to toggle user favorite:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a user-created exercise is favorited
+   */
+  public async isUserCreatedExerciseFavorited(exerciseId: string, userId: string): Promise<boolean> {
+    if (!this.canStoreData()) {
+      return false;
+    }
+
+    try {
+      const existing = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
+        .first();
+      
+      return !!existing;
+    } catch (error) {
+      logger.warn('Failed to check favorite status:', error);
+      return false;
+    }
+  }
+
+  /**
    * Convert stored app settings to runtime format
    */
   private convertStoredAppSettings(stored: StoredAppSettings): AppSettings {
     return stored;
+  }
+
+  /**
+   * Convert client AppSettings to Supabase app_settings format
+   * Handles field name differences between client and server schemas
+   */
+  /**
+   * Filter out undefined values from any object to prevent database errors
+   * This is critical for sync payloads since undefined values cause 422 errors
+   */
+  private filterUndefinedValues(obj: Record<string, unknown>): Record<string, unknown> {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    }
+    return result;
+  }
+
+  public convertAppSettingsForSync(settings: AppSettings): Record<string, unknown> {
+    const rawResult = {
+      id: settings.id,
+      // Map client field names to Supabase field names
+      beep_interval_seconds: settings.interval_duration,
+      beep_sound_enabled: settings.sound_enabled,
+      beep_volume: settings.beep_volume,
+      vibration_enabled: settings.vibration_enabled,
+      dark_mode: settings.dark_mode,
+      reduce_motion: settings.reduce_motion,
+      auto_start_next: settings.auto_start_next,
+      pre_timer_countdown: settings.pre_timer_countdown,
+      show_exercise_videos: settings.show_exercise_videos,
+      data_auto_save: settings.auto_save,
+      default_rest_time: settings.default_rest_time,
+      // Include all sync metadata (filtering happens below)
+      owner_id: settings.owner_id,
+      created_at: settings.created_at,
+      updated_at: settings.updated_at,
+      version: settings.version,
+      deleted: settings.deleted,
+      dirty: settings.dirty,
+      synced_at: settings.synced_at,
+      op: settings.op
+    };
+
+    // Filter out undefined values to prevent 422 database errors
+    return this.filterUndefinedValues(rawResult);
+  }
+
+  /**
+   * Convert client UserFavorite to Supabase user_favorites format
+   * Filters out legacy user_id field during migration period
+   */
+  public convertUserFavoritesForSync(favorite: UserFavorite): Record<string, unknown> {
+    // Extract only the fields we want to sync, excluding legacy user_id
+    const { user_id: _user_id, ...rest } = favorite as unknown as UserFavorite & { user_id?: string };
+    
+    // Filter out undefined values to prevent 422 database errors
+    return this.filterUndefinedValues(rest);
+  }
+
+  /**
+   * Convert Supabase app_settings to client AppSettings format
+   * Handles field name differences between server and client schemas
+   */
+  public convertAppSettingsFromSync(serverData: Record<string, unknown>): AppSettings {
+    return {
+      id: serverData.id as string,
+      // Map Supabase field names to client field names
+      interval_duration: (serverData.beep_interval_seconds as number) || 30,
+      sound_enabled: (serverData.beep_sound_enabled as boolean) ?? true,
+      beep_volume: (serverData.beep_volume as number) || 0.5,
+      vibration_enabled: (serverData.vibration_enabled as boolean) ?? true,
+      dark_mode: (serverData.dark_mode as boolean) || false,
+      reduce_motion: (serverData.reduce_motion as boolean) || false,
+      auto_start_next: (serverData.auto_start_next as boolean) || false,
+      pre_timer_countdown: (serverData.pre_timer_countdown as number) || 3,
+      show_exercise_videos: (serverData.show_exercise_videos as boolean) ?? true,
+      auto_save: (serverData.data_auto_save as boolean) ?? true,
+      default_rest_time: (serverData.default_rest_time as number) || 60,
+      rep_speed_factor: 1.0, // This stays client-side only for now
+      last_selected_exercise_id: null, // This stays client-side only for now
+      // Include sync metadata
+      owner_id: serverData.owner_id as string | null,
+      created_at: serverData.created_at as string,
+      updated_at: serverData.updated_at as string,
+      version: (serverData.version as number) || 1,
+      deleted: (serverData.deleted as boolean) || false,
+      dirty: 0, // Mark as clean when coming from server
+      synced_at: serverData.synced_at as string | undefined,
+      op: 'upsert' as const
+    };
   }
 
   /**
@@ -1665,7 +2777,7 @@ export class StorageService {
    */
   public async resetDatabase(): Promise<void> {
     try {
-      console.warn('🔄 Resetting RepCue database...');
+      logger.warn('🔄 Resetting RepCue database...');
       
       // Close the current connection
       await this.db.close();
@@ -1676,7 +2788,7 @@ export class StorageService {
       } catch (hardDeleteError) {
         // In test/JSDOM or constrained environments, delete() may not work because
         // indexedDB.deleteDatabase returns an incomplete mock/request. Fall back to a soft reset.
-        console.warn('⚠️ Hard delete failed, performing soft reset instead:', hardDeleteError);
+        logger.warn('⚠️ Hard delete failed, performing soft reset instead:', hardDeleteError);
         try {
           // Best-effort: attempt to clear all known tables if the DB can be accessed
           await Promise.allSettled([
@@ -1689,7 +2801,7 @@ export class StorageService {
           ]);
         } catch (softError) {
           // Ignore – we'll recreate a fresh instance anyway
-          console.warn('Soft clear during reset encountered issues (safe to ignore in tests):', softError);
+          logger.warn('Soft clear during reset encountered issues (safe to ignore in tests):', softError);
         }
       }
 
@@ -1699,15 +2811,15 @@ export class StorageService {
         await this.db.open();
       } catch (openErr) {
         // In environments without IndexedDB, open may fail; we still consider reset successful
-        console.warn('DB open after reset failed (likely no IndexedDB in test env). Continuing with in-memory fallback.', openErr);
+        logger.warn('DB open after reset failed (likely no IndexedDB in test env). Continuing with in-memory fallback.', openErr);
       }
       
       // Clear fallback storage as well
       this.fallbackStorage.clear();
       
-      console.log('✅ Database reset successfully');
+      logger.log('✅ Database reset successfully');
     } catch (error) {
-      console.error('❌ Failed to reset database:', error);
+      logger.error('❌ Failed to reset database:', error);
       throw new Error('Database reset failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   }
@@ -1722,26 +2834,268 @@ export class StorageService {
   }> {
     try {
       // Try a simple operation to test database health
+      if (!this.db) {
+        throw new Error('Database not initialized');
+      }
       await this.db.exercises.count();
       await this.db.user_preferences.count();
       await this.db.app_settings.count();
       
       return { healthy: true, repaired: false };
     } catch (error) {
-      console.warn('🔧 Database health check failed, attempting repair:', error);
+      logger.warn('Database health check failed, attempting repair:', error);
       
       try {
         await this.resetDatabase();
         return { healthy: true, repaired: true };
       } catch (repairError) {
         const errorMsg = repairError instanceof Error ? repairError.message : 'Unknown repair error';
-        console.error('❌ Database repair failed:', repairError);
+        logger.error('Database repair failed:', repairError);
         return { 
           healthy: false, 
           repaired: false, 
           error: errorMsg 
         };
       }
+    }
+  }
+
+  // ===============================
+  // Custom Exercise Methods
+  // ===============================
+
+  /**
+   * Create a custom exercise
+   */
+  public async createCustomExercise(exerciseData: Omit<Exercise, 'id' | 'created_at' | 'updated_at' | 'version' | 'synced_at' | 'is_dirty'>): Promise<Exercise> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to create custom exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to create custom exercises');
+      }
+
+      const exercise = prepareUpsert({
+        ...exerciseData,
+        id: crypto.randomUUID(),
+        owner_id: userId,
+        is_public: (exerciseData as Partial<Exercise>).is_public || false,
+        is_verified: false, // User-created exercises require admin verification
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        deleted: false,
+        version: 1,
+        dirty: 1 // Mark for sync
+      } as Exercise, undefined, userId);
+
+      await this.db.exercises.add(exercise);
+      logger.log('Custom exercise created:', exercise.name);
+      return exercise;
+    } catch (error) {
+      logger.error('Failed to create custom exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a custom exercise (only for owned exercises)
+   */
+  public async updateCustomExercise(exerciseId: string, updates: Partial<Exercise>): Promise<Exercise> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to update exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to update exercises');
+      }
+
+      const existing = await this.db.exercises.get(exerciseId);
+      if (!existing) {
+        throw new Error('Exercise not found');
+      }
+
+      if (existing.owner_id !== userId) {
+        throw new Error('Can only update exercises you created');
+      }
+
+      const updatedExercise = prepareUpsert({
+        ...existing,
+        ...updates,
+        updated_at: new Date().toISOString(),
+        dirty: 1 // Mark for sync
+      }, undefined, this.getCurrentUserId());
+
+      await this.db.exercises.put(updatedExercise);
+      logger.log('Custom exercise updated:', updatedExercise.name);
+      return updatedExercise;
+    } catch (error) {
+      logger.error('Failed to update custom exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get exercises shared with current user (synced from server)
+   */
+  public async getSharedExercises(): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) return [];
+
+      // Get exercises where owner_id is not current user (i.e., shared or public)
+      const sharedExercises = await this.db.exercises
+        .where('owner_id')
+        .notEqual(userId)
+        .and(exercise => !exercise.deleted && (exercise.is_public || false))
+        .toArray();
+
+      return filterActiveRecords(sharedExercises);
+    } catch (error) {
+      logger.error('Failed to get shared exercises:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get exercises created by current user
+   */
+  public async getUserCreatedExercises(): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) return [];
+
+      const userExercises = await this.db.exercises
+        .where('owner_id')
+        .equals(userId)
+        .and(exercise => !exercise.deleted)
+        .toArray();
+
+      return filterActiveRecords(userExercises);
+    } catch (error) {
+      logger.error('Failed to get user-created exercises:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Copy an exercise to user's library
+   */
+  public async copyExercise(sourceExercise: Exercise): Promise<Exercise> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to copy exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to copy exercises');
+      }
+
+      const copyName = sourceExercise.name.includes('(Copy)') 
+        ? sourceExercise.name 
+        : `${sourceExercise.name} (Copy)`;
+
+      const copiedExercise = prepareUpsert({
+        ...sourceExercise,
+        id: crypto.randomUUID(),
+        name: copyName,
+        owner_id: userId,
+        is_public: false, // Copies are private by default
+        is_verified: false,
+        // Remove community stats from copy
+        rating_average: undefined,
+        rating_count: undefined,
+        copy_count: undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        version: 1,
+        dirty: 1 // Mark for sync
+      } as Exercise, undefined, userId);
+
+      await this.db.exercises.add(copiedExercise);
+      logger.log('Exercise copied:', copiedExercise.name);
+      return copiedExercise;
+    } catch (error) {
+      logger.error('Failed to copy exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a custom exercise (soft delete for owned exercises only)
+   */
+  public async deleteCustomExercise(exerciseId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      throw new Error('Storage consent required to delete exercises');
+    }
+
+    try {
+      const userId = this.getCurrentUserId();
+      if (!userId) {
+        throw new Error('User authentication required to delete exercises');
+      }
+
+      const exercise = await this.db.exercises.get(exerciseId);
+      if (!exercise) {
+        throw new Error('Exercise not found');
+      }
+
+      if (exercise.owner_id !== userId) {
+        throw new Error('Can only delete exercises you created');
+      }
+
+      const deletedExercise = prepareSoftDelete(exercise);
+      await this.db.exercises.put(deletedExercise);
+      logger.log('Custom exercise deleted:', exercise.name);
+    } catch (error) {
+      logger.error('Failed to delete custom exercise:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get current user ID from authentication context
+   */
+  private getCurrentUserId(): string | null {
+    const user = authService.getCurrentUser();
+    const userId = user?.id || null;
+    if (!userId && SYNC_DEBUG) {
+      logger.debug('[storageService] getCurrentUserId: user not authenticated', { user, authState: authService.getAuthState() });
+    }
+    return userId;
+  }
+
+  /**
+   * Get all exercises (builtin + user-created + shared)
+   */
+  public async getAllExercises(): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const allExercises = await this.db.exercises
+        .where('deleted')
+        .equals(0) // Only get non-deleted exercises
+        .toArray();
+
+      return filterActiveRecords(allExercises);
+    } catch (error) {
+      logger.error('Failed to get all exercises:', error);
+      return [];
     }
   }
 }

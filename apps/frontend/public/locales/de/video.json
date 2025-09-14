@@ -1,0 +1,17 @@
+{
+  "clickToUpload": "[de] Click to upload video",
+  "currentVideo": "[de] Current Video",
+  "exerciseVideo": "Übung Video",
+  "fileTooLarge": "[de] File is too large",
+  "invalidFileType": "[de] Invalid file type",
+  "loadError": "[de] Failed to load video",
+  "maxFileSize": "[de] Maximum file size",
+  "removeVideo": "[de] Remove Video",
+  "supportedFormats": "[de] Supported formats",
+  "uploadFailed": "Hochladen failed",
+  "uploadHint": "Hochladen a video demonstration",
+  "uploaded": "[de] Video uploaded",
+  "uploadsNotAvailable": "[de] Video uploads are not available",
+  "urlPlaceholder": "[de] Enter video URL",
+  "urlPlaceholderHelper": "[de] YouTube, Vimeo, or direct video URL"
+}

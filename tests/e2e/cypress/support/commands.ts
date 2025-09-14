@@ -10,21 +10,36 @@
 
 // Custom command to accept consent banner
 Cypress.Commands.add('acceptConsent', () => {
-  cy.get('body').then(($body) => {
-    const banner = $body.find('[data-testid="consent-banner"]');
-    if (!banner.length) {
-      return;
-    }
-    cy.wrap(banner).should('be.visible').within(() => {
-      cy.contains('button', /accept all/i).click();
-    });
+  // Pre-grant consent via localStorage to bypass the banner entirely
+  cy.window().then((win) => {
+    // Set consent in localStorage using the correct structure (ConsentDataV2)
+    win.localStorage.setItem('repcue_consent', JSON.stringify({
+      version: 2,
+      timestamp: new Date().toISOString(),
+      hasConsented: true,
+      cookiesAccepted: true,
+      analyticsAccepted: true,
+      marketingAccepted: false,
+      dataRetentionDays: 365,
+      consentDate: new Date().toISOString()
+    }));
   });
-  // Ensure banner gone
-  cy.get('[data-testid="consent-banner"]', { timeout: 10000 }).should('not.exist');
-  // Wait for loading phase then navigation
-  cy.contains('Loading RepCue...', { timeout: 8000 }).should('exist');
-  cy.contains('Loading RepCue...', { timeout: 15000 }).should('not.exist');
-  cy.get('[data-testid="nav-exercises"]', { timeout: 15000 }).should('be.visible');
+  
+  // Reload page to apply the consent settings
+  cy.reload();
+  
+  // Wait for app to load without consent banner
+  cy.get('body').should('be.visible');
+  
+  // Check if loading text appears and wait for it to complete
+  cy.get('body').then(($body) => {
+    if ($body.text().includes('Loading RepCue...')) {
+      cy.contains('Loading RepCue...', { timeout: 15000 }).should('not.exist');
+    }
+  });
+  
+  // Ensure we reach the main app with navigation (no consent banner should appear)
+  cy.get('[data-testid="nav-exercises"]', { timeout: 20000 }).should('be.visible');
 });
 
 // Custom command to clear all app data

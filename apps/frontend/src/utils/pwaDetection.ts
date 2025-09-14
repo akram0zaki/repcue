@@ -2,6 +2,12 @@
  * PWA Detection and Deep Link Utilities
  */
 
+// Declare the BeforeInstallPromptEvent interface for PWA install prompts
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 /**
  * Detect if the app is running as a PWA
  */
@@ -10,7 +16,7 @@ export function isPWA(): boolean {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
   
   // Check iOS standalone mode
-  const isIOSStandalone = (window.navigator as any).standalone === true;
+  const isIOSStandalone = ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
   
   // Check Android TWA (Trusted Web Activity)
   const isAndroidTWA = document.referrer.includes('android-app://');
@@ -116,12 +122,12 @@ export function registerPWALinkHandlers(): void {
  * Add install prompt enhancement for better PWA adoption
  */
 export function enhanceInstallPrompt(): void {
-  let deferredPrompt: any;
+  let deferredPrompt: BeforeInstallPromptEvent | null = null;
   
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-infobar from appearing on mobile
     e.preventDefault();
-    deferredPrompt = e;
+    deferredPrompt = e as BeforeInstallPromptEvent;
     
     // Show custom install button if needed
     const installButton = document.getElementById('pwa-install-button');

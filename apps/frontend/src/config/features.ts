@@ -10,6 +10,12 @@ export const SYNC_ENABLED = true;
 // Use Supabase functions.invoke for sync (dev reliability favors direct fetch). Default false.
 export const SYNC_USE_INVOKE = false;
 
+// Sync engine is now permanently V2 - legacy sync service has been removed
+// This flag is kept for backward compatibility but always returns 'v2'
+export const SYNC_ENGINE = 'v2' as const;
+
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = false;
+export const DEBUG = true;
+// Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
+export const SYNC_DEBUG = true;

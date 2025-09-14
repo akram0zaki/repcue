@@ -1,4 +1,5 @@
 import { supabase, type Json } from '../config/supabase';
+import logger from '../utils/logger';
 
 export interface DataExportResult {
   success: boolean;
@@ -73,7 +74,7 @@ export class SecurityService {
       };
 
     } catch (error) {
-      console.error('Data export error:', error);
+      logger.error('Data export error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Export failed'
@@ -119,7 +120,7 @@ export class SecurityService {
       };
 
     } catch (error) {
-      console.error('Account deletion error:', error);
+      logger.error('Account deletion error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Account deletion failed'
@@ -150,11 +151,14 @@ export class SecurityService {
       }
 
       return {
-        logs: data || []
+        logs: (data || []).map(log => ({
+          ...log,
+          ip_address: log.ip_address as string | null
+        }))
       };
 
     } catch (error) {
-      console.error('Audit logs fetch error:', error);
+      logger.error('Audit logs fetch error:', error);
       return {
         logs: [],
         error: error instanceof Error ? error.message : 'Failed to fetch audit logs'
@@ -182,7 +186,7 @@ export class SecurityService {
       URL.revokeObjectURL(url);
 
     } catch (error) {
-      console.error('Download failed:', error);
+      logger.error('Download failed:', error);
       throw new Error('Failed to download export file');
     }
   }
@@ -234,7 +238,7 @@ export class SecurityService {
       };
 
     } catch (error) {
-      console.error('Deletion status check error:', error);
+      logger.error('Deletion status check error:', error);
       return {
         isDeletionRequested: false,
         error: error instanceof Error ? error.message : 'Status check failed'
@@ -275,7 +279,7 @@ export class SecurityService {
       };
 
     } catch (error) {
-      console.error('Cancel deletion error:', error);
+      logger.error('Cancel deletion error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Cancellation failed'

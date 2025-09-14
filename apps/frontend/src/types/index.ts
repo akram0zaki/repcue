@@ -8,7 +8,7 @@ export interface SyncMetadata {
   created_at: string; // ISO timestamp
   // Local-only fields (not synced to server)
   dirty?: number; // 1 if local changes need to be synced, 0 if not
-  op?: 'upsert' | 'delete'; // pending operation type
+  op?: 'upsert' | 'delete' | 'seed'; // pending operation type
   synced_at?: string; // ISO timestamp of last successful sync
 }
 
@@ -19,6 +19,14 @@ export const ExerciseType = {
 } as const;
 
 export type ExerciseType = typeof ExerciseType[keyof typeof ExerciseType];
+
+// Exercise instruction structure for detailed user-created exercises
+export interface ExerciseInstruction {
+  step: number;
+  text: string;
+  image_url?: string; // Future: step-by-step images
+  duration_seconds?: number; // For timed steps
+}
 
 // Core exercise types
 export interface Exercise extends SyncMetadata {
@@ -39,6 +47,20 @@ export interface Exercise extends SyncMetadata {
   has_video?: boolean; // default false in catalog initialization
   is_favorite: boolean;
   tags: string[];
+  
+  // Enhanced fields for user-created exercises
+  instructions?: ExerciseInstruction[]; // Rich instructions for user-created exercises
+  difficulty_level?: 'beginner' | 'intermediate' | 'advanced';
+  equipment_needed?: string[]; // Required equipment
+  muscle_groups?: string[]; // Target muscle groups
+  is_public?: boolean; // can be shared publicly
+  is_verified?: boolean; // admin-verified quality
+  custom_video_url?: string; // User-uploaded video URL
+  
+  // Community stats (read-only from server)
+  rating_average?: number;
+  rating_count?: number;
+  copy_count?: number;
 }
 
 export const ExerciseCategory = {
@@ -71,6 +93,17 @@ export interface Workout extends SyncMetadata {
   scheduled_days: Weekday[]; // Added: Direct scheduling without separate Schedule entity
   is_active: boolean; // Added: Allow pause/resume without deletion
   estimated_duration?: number; // calculated total time in seconds
+  
+  // Enhanced fields for user-created workouts
+  difficulty_level?: 'beginner' | 'intermediate' | 'advanced';
+  is_public?: boolean; // can be shared publicly
+  is_verified?: boolean; // admin-verified quality
+  tags?: string[]; // Workout tags (cardio, strength, etc.)
+  
+  // Community stats
+  rating_average?: number;
+  rating_count?: number;
+  copy_count?: number;
 }
 
 // Weekday structure
@@ -182,6 +215,76 @@ export interface UserPreferences extends SyncMetadata {
   rep_speed_factor: number;
 }
 
+// User-created content and community feature types
+
+export interface ExerciseShare extends SyncMetadata {
+  exercise_id: string;
+  shared_with_user_id?: string; // undefined = public share
+  permission_level: 'view' | 'copy';
+}
+
+export interface WorkoutShare extends SyncMetadata {
+  workout_id: string;
+  shared_with_user_id?: string;
+  permission_level: 'view' | 'copy';
+}
+
+export interface ExerciseRating extends SyncMetadata {
+  exercise_id: string;
+  user_id: string;
+  rating: number; // 1-5
+  review_text?: string;
+  is_verified: boolean;
+}
+
+export interface WorkoutRating extends SyncMetadata {
+  workout_id: string;
+  user_id: string;
+  rating: number; // 1-5
+  review_text?: string;
+  is_verified: boolean;
+}
+
+export interface UserFavorite extends SyncMetadata {
+  owner_id: string;
+  item_id: string; // Can be slug (builtin) or UUID (user-created)
+  item_type: 'exercise' | 'workout';
+  exercise_type: 'builtin' | 'user_created' | 'shared';
+}
+
+export interface FeatureFlag {
+  id: string;
+  flag_name: string;
+  is_enabled: boolean;
+  description?: string;
+  target_audience: 'all' | 'authenticated' | 'beta' | 'admin';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ContentModeration {
+  id: string;
+  content_type: 'exercise' | 'workout' | 'review' | 'video';
+  content_id: string;
+  status: 'pending' | 'approved' | 'rejected' | 'flagged';
+  ai_confidence?: number;
+  ai_reasoning?: string;
+  human_reviewer_id?: string;
+  human_decision?: 'approved' | 'rejected' | 'needs_review';
+  human_notes?: string;
+  created_at: string;
+  reviewed_at?: string;
+}
+
+export interface ExerciseVideo extends SyncMetadata {
+  exercise_id: string;
+  uploader_id: string;
+  video_url: string;
+  file_size?: number;
+  duration_seconds?: number;
+  is_approved: boolean;
+}
+
 // Consent and privacy
 export interface ConsentData {
   has_consented: boolean;
@@ -214,13 +317,20 @@ export interface AppSettings extends SyncMetadata {
 export const Routes = {
   HOME: '/',
   EXERCISES: '/exercises',
+  CREATE_EXERCISE: '/exercises/create',
+  EDIT_EXERCISE: '/exercises/edit/:id',
+  EXERCISE_DETAIL: '/exercises/:id',
   TIMER: '/timer',
   ACTIVITY_LOG: '/activity',
   SETTINGS: '/settings',
   PRIVACY: '/privacy',
+  PROFILE: '/profile',
+  PROFILE_VIEW: '/profile/:userId',
+  CONNECTIONS: '/connections',
   WORKOUTS: '/workouts', // Changed from SCHEDULE
   CREATE_WORKOUT: '/workout/create',
   EDIT_WORKOUT: '/workout/edit',
+  COMMUNITY: '/community',
   AUTH_CALLBACK: '/auth/callback'
 } as const;
 
@@ -264,6 +374,69 @@ export interface AuthUserProfile {
   email?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Profile and connection types
+export interface UserProfile extends SyncMetadata {
+  user_id: string; // Auth user ID
+  display_name?: string; // How they like to be called
+  bio?: string;
+  location?: string;
+  website?: string;
+  privacy_settings: UserPrivacySettings;
+  stats?: UserStats;
+  badges?: UserBadge[];
+  join_date: string; // ISO timestamp
+  last_active?: string; // ISO timestamp
+}
+
+export interface UserPrivacySettings {
+  profile_visibility: 'public' | 'connections' | 'private';
+  show_stats: boolean;
+  show_activity: boolean;
+  allow_connection_requests: boolean;
+}
+
+export interface UserStats {
+  total_workouts: number;
+  total_exercises_created: number;
+  total_workouts_created: number;
+  streak_days: number;
+  longest_streak: number;
+  favorite_category?: ExerciseCategory;
+}
+
+export interface UserBadge {
+  id: string;
+  name: string;
+  description: string;
+  icon_url?: string;
+  earned_at: string; // ISO timestamp
+}
+
+export interface Connection extends SyncMetadata {
+  user_id: string; // The user who owns this connection
+  connected_user_id: string; // The user they're connected to
+  status: ConnectionStatus;
+  requested_at: string; // ISO timestamp
+  accepted_at?: string; // ISO timestamp
+  nickname?: string; // Custom name for this connection
+}
+
+export const ConnectionStatus = {
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  BLOCKED: 'blocked'
+} as const;
+
+export type ConnectionStatus = typeof ConnectionStatus[keyof typeof ConnectionStatus];
+
+export interface ConnectionRequest extends SyncMetadata {
+  from_user_id: string;
+  to_user_id: string;
+  message?: string;
+  requested_at: string; // ISO timestamp
+  status: 'pending' | 'accepted' | 'rejected';
 }
 
 export interface AuthState {

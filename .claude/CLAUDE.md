@@ -14,6 +14,11 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
   - Durations: `repDurationSeconds || BASE_REP_TIME` from `src/constants/index.ts`; apply `settings.repSpeedFactor`.
 - Video demos (feature-gated): flag in `src/config/features.ts` + user setting + reduced‑motion. Loader: `src/utils/loadExerciseMedia.ts`; variant: `src/utils/selectVideoVariant.ts`; hook: `src/hooks/useExerciseVideo.ts`; UI in `src/pages/TimerPage.tsx`.
 
+## Deployment topology
+- The application uses Supabase for database and storage (uploaded files).
+- The production supabase project is RepCue and the development supabase project is repcue-dev.
+- There are two supabase MCP servers configured; supabase points to the production project, and supabase-dev points to the development project.
+
 ## Project conventions
 - Types in `src/types/index.ts` (+ `src/types/media.ts`). Constants in `src/constants/index.ts`.
 - Tests colocated under `src/**/__tests__` and `src/__tests__`. Browser APIs mocked in `src/test/setup.ts`.
@@ -52,6 +57,12 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 
 ## Security & privacy defaults
 - Never hardcode secrets; use env vars in server paths. HTTPS for network calls. Parameterize any DB queries (Dexie used). Sanitize any HTML via DOMPurify before `dangerouslySetInnerHTML` (rare; prefer text).
+
+## Debug logging
+- **Never use `console.log()` directly** - use the logger utility from `src/utils/logger.ts`
+- Logger respects DEBUG feature flag: `logger.log()`, `logger.info()`, `logger.debug()`, `logger.warn()` only output when `DEBUG=true`
+- `logger.error()` always outputs for production error tracking
+- Import: `import logger from '../utils/logger';` (adjust path as needed)
 
 ## When in doubt
 - Check CHANGELOG.md for recent behavior changes (timer, workouts, i18n). Keep UX consistent and accessibility compliant.

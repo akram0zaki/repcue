@@ -10,6 +10,7 @@ import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
 import { syncService } from '../services/syncService';
+import { correctSyncService } from '../services/correctSyncService';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
 import { ProfileSection } from '../components/ProfileSection';
@@ -18,6 +19,7 @@ import {
   clearPWACaches, 
   forceUpdateServiceWorker 
 } from '../utils/serviceWorker';
+import logger from '../utils/logger';
 
 interface SettingsPageProps {
   appSettings: AppSettings;
@@ -32,6 +34,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const { isAuthenticated } = useAuth();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isForceFullSyncing, setIsForceFullSyncing] = useState(false);
+  const [isResettingSyncState, setIsResettingSyncState] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -67,7 +71,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       }
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Failed to export data:', error);
+      logger.error('Failed to export data:', error);
     }
   };
 
@@ -78,11 +82,39 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const handleSyncNow = async () => {
     try {
       setIsManualSyncing(true);
-      await syncService.sync(true);
+  // Legacy sync (and v2 wrapper) accept optional force flag; current typing expects no args
+  await syncService.sync(true);
     } catch (err) {
-      console.error('Manual sync failed:', err);
+      logger.error('Manual sync failed:', err);
     } finally {
       setIsManualSyncing(false);
+    }
+  };
+
+  // Force a FULL sync cycle using v2 engine if enabled, otherwise fall back to legacy manual sync
+  const handleForceFullSync = async () => {
+    if (!hasConsent || !isAuthenticated) return;
+    try {
+      setIsForceFullSyncing(true);
+      await correctSyncService.sync('full');
+    } catch (err) {
+      logger.error('Force full sync failed:', err);
+    } finally {
+      setIsForceFullSyncing(false);
+    }
+  };
+
+  // Reset local sync state then immediately request a full sync
+  const handleResetSyncState = async () => {
+    if (!hasConsent || !isAuthenticated) return;
+    try {
+      setIsResettingSyncState(true);
+      await correctSyncService.resetState();
+      await correctSyncService.sync('full');
+    } catch (err) {
+      logger.error('Reset sync state failed:', err);
+    } finally {
+      setIsResettingSyncState(false);
     }
   };
 
@@ -100,7 +132,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         window.location.href = '/';
       }
     } catch (error) {
-      console.error('Failed to clear data:', error);
+      logger.error('Failed to clear data:', error);
     }
   };
 
@@ -124,7 +156,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       // Trigger a page reload to show updated exercises
       window.location.reload();
     } catch (error) {
-      console.error('Failed to refresh exercises:', error);
+      logger.error('Failed to refresh exercises:', error);
     }
   };
 
@@ -137,7 +169,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       setIsRefreshing(true);
       await forceRefreshFromServer();
     } catch (error) {
-      console.error('Force refresh failed:', error);
+      logger.error('Force refresh failed:', error);
       setIsRefreshing(false);
     }
   };
@@ -148,7 +180,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       await clearPWACaches();
       setIsRefreshing(false);
     } catch (error) {
-      console.error('Clear caches failed:', error);
+      logger.error('Clear caches failed:', error);
       setIsRefreshing(false);
     }
   };
@@ -158,7 +190,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       setIsRefreshing(true);
       await forceUpdateServiceWorker();
     } catch (error) {
-      console.error('Service worker update failed:', error);
+      logger.error('Service worker update failed:', error);
       setIsRefreshing(false);
     }
   };
@@ -172,8 +204,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         {/* Profile Section */}
         <ProfileSection 
           onViewProfile={() => {
-            // TODO: Open profile settings modal
-            console.log('View profile clicked');
+            window.location.href = '/profile';
           }}
         />
 
@@ -308,10 +339,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               onChange={handleIntervalChange}
               className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value={15}>Every 15 seconds</option>
-              <option value={30}>Every 30 seconds</option>
-              <option value={45}>Every 45 seconds</option>
-              <option value={60}>Every 60 seconds</option>
+              <option value={15}>{t('timer.beepInterval15')}</option>
+              <option value={30}>{t('timer.beepInterval30')}</option>
+              <option value={45}>{t('timer.beepInterval45')}</option>
+              <option value={60}>{t('timer.beepInterval60')}</option>
             </select>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {t('settings.beepIntervalHelp')}
@@ -471,6 +502,34 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               {t('settings.syncNowHelp')}
             </p>
           </div>
+
+          {/* Advanced Sync Controls */}
+          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" data-testid="advanced-sync-controls">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {t('settings.syncAdvanced')}
+              </h3>
+              <div className="space-y-2">
+                <button
+                  onClick={handleForceFullSync}
+                  disabled={!hasConsent || !isAuthenticated || isForceFullSyncing}
+                  className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  data-testid="btn-force-full-sync"
+                >
+                  {isForceFullSyncing ? t('settings.syncInProgress') : t('settings.forceFullSync')}
+                </button>
+                <button
+                  onClick={handleResetSyncState}
+                  disabled={!hasConsent || !isAuthenticated || isResettingSyncState}
+                  className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  data-testid="btn-reset-sync-state"
+                >
+                  {isResettingSyncState ? t('common.loading') : t('settings.resetSyncState')}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                {t('settings.syncAdvancedHelp')}
+              </p>
+            </div>
 
           {/* Refresh Exercises Button */}
           <div className="mb-3">

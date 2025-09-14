@@ -6,6 +6,7 @@ import type {
   AuthenticatorAttachment
 } from '@simplewebauthn/types';
 import { supabase } from '../config/supabase';
+import logger from '../utils/logger';
 
 export interface PasskeyRegistrationResult {
   success: boolean;
@@ -101,7 +102,7 @@ export class WebAuthnService {
     try {
       return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
     } catch (error) {
-      console.warn('Error checking platform authenticator availability:', error);
+      logger.warn('Error checking platform authenticator availability:', error);
       return false;
     }
   }
@@ -185,7 +186,7 @@ export class WebAuthnService {
       };
 
     } catch (error) {
-      console.error('Passkey registration error:', error);
+      logger.error('Passkey registration error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Passkey registration failed'
@@ -274,7 +275,7 @@ export class WebAuthnService {
       };
 
     } catch (error) {
-      console.error('Passkey authentication error:', error);
+      logger.error('Passkey authentication error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Passkey authentication failed'

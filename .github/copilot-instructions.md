@@ -62,3 +62,8 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 ## When in doubt
 - Check CHANGELOG.md for recent behavior changes (timer, workouts, i18n). Keep UX consistent and accessibility compliant.
 
+## Debug Logging
+- Never use console.log() directly. Always use the logger utility from apps/frontend/src/utils/logger.ts which respects the DEBUG feature flag. 
+- Import: `import logger from '../utils/logger';` then use `logger.log()`, `logger.warn()`, `logger.error()`, etc.
+- Logger methods: `logger.log()`, `logger.info()`, `logger.debug()`, `logger.warn()` (only when DEBUG=true), `logger.error()` (always shown)
+

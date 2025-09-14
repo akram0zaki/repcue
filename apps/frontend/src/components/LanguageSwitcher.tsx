@@ -35,7 +35,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       try {
         await storageService.updateUserPreferences({ locale: languageCode });
         // Promptly push the change so other devices pick it up
-        void syncService.sync();
+        void syncService.sync(true);
       } catch (e) {
         // Non-fatal: UI language has already switched via i18n
         console.debug('Locale persistence skipped:', e);

@@ -89,7 +89,102 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - ✅ After I install the app as PWA on my iphone's home screen and try to login via magic link, when I click the link in my inbox it opens the web browser and doesn't go to my installed pwa app. How can I resolve this?
 
-- I want to add a feature allowing authenticated users to create their own exercises and also share them with other users. How does this impact the application and the database, and what's the best way to go about it? Don't implement anything until we agree on the implementation plan.
+- 👉 🔄 I want to add a feature allowing authenticated users to create their own exercises and also share them with other users. How does this impact the application and the database, and what's the best way to go about it? Don't implement anything until we agree on the implementation plan. -> docs\implementation-plans\user-created-exercises-implementation-plan.md
+
+    - ✅ Implement [Phase 1: Database Schema Extensions] and update progress in the plan
+
+    - ✅ docs\implementation-plans\user-created-exercises-implementation-plan.md: Implement any remaining tasks in phase 1 then implement [Phase 2: Backend API Extensions] and update progress in the plan per task/phase. Use supabase MCP if you need to access the database and edge functions if needed.
+
+    - ✅ docs\implementation-plans\user-created-exercises-implementation-plan.md: Implement any remaining tasks in phase 2 then implement [Phase 3: Frontend UI Implementation] and update progress in the plan per task/phase. Use supabase MCP if you need to access the database and edge functions if needed.
+
+    - ✅ docs\implementation-plans\user-created-exercises-implementation-plan.md: Implement any remaining tasks in phase 3 then implement [Phase 4: Discovery, Sharing & Rating Features] and update progress in the plan per task/phase. Use supabase MCP if you need to access the database and edge functions if needed.
+
+    - ✅ docs\implementation-plans\user-created-exercises-implementation-plan.md: Implement any remaining tasks in phase 4 then implement [Phase 5: Storage & Sync Updates] and update progress in the plan per task/phase. Use supabase MCP if you need to access the database and edge functions if needed.
+
+    - ✅ docs\implementation-plans\user-created-exercises-implementation-plan.md: Implement any remaining tasks in phase 5 then implement [Phase 6: Testing & Polish] and update progress in the plan per task/phase. Use supabase MCP if you need to access the database and edge functions if needed.
+    
+    - ✅ **MAJOR SUCCESS**: Created comprehensive translation generation script that reduced missing i18n keys from 1,200+ to just 25 across all 8 supported languages (98%+ complete). Generated 5 new namespace files and 100+ additional translation keys with smart fallback system.
+
+- ✅ I don't see why the feature_flags table shouldn't exist. As explained earlier, the production supabase project "RepCue" is where all the recent changes were implemented while the dev project "repcue-dev" is missing all database changes related to exercise creation and sharing. I am not sure which supabase project the workspace is pointing to but it should be "repcue-dev" and repcue-dev should be brought up to date with the migrations. Give me a script to run on supabase console to fix the dev project then make sure that the workspace is pointing to the dev project and tell me how to verify that manually. The application should take care of updating IndexedDB where necessary to bring it up to date if it is not.
+
+- ✅ How can I protect the application against the applicable OWASP top 10 (e.g. sql injection, session hijacking, cross-side scripting, etc) attacks if it's all running client-side? Can I perform input validation/sanitization on the edge functions on supabase? Make suggestions but don't implement unless I confirm. -> created owasp-implementation-plan.md
+
+- ✅ While on the create exercise page, if I fill in some fields then change visibility (e.g. change tabs or change windows), the page resets and the entered fields disappear.
+
+- 👉 🔄 The Edit Exercise page works now however I found a number of other issues:
+    - ✅ While creating the exercise I entered some details like equipment, muscle groups, and tags. On the edit page these were all empty which suggests they were not saved.
+    - ✅ I changed the sets/reps from 2x8 to 2x9 then clicked Save which took me back to the Exercises page and it was still showing 2x8 for the exercise I just edited. After refreshing the page the correct number was displayed 2x9.
+    - 🔄 I created a number of other exercises earlier but there was a problem in the owner id so I cannot edit them now. However when creating these exercises I never marked them as Public, so if my owner id is not the same then I shouldn't see them at all because I don't own them and they're not public. Those exercises are: Pelvix (time-based), Pelvix (time-based), Ya 7amada (rep-based).
+    - ✅ The listing of time-based user-created exercises seem to have a problem where the duration is not displayed on the card. Instead it says: "Default: exercises.variable".
+    - ✅ There is a migration that's not applied to production yet, the column storing exercise duration is missing from the exercises table on production supabase project.
+    - ✅ Rep duration should allow decimal point.
+
+- ✅ What is the sequence of events when changing any data in the application? I assumed that all changes always go to IndexedDB first and the record is marked dirty then the sync service would push the changes to server. If that's the case, then when I edit an exercise then it should be saved to IndexedDB first and even if the sync hasn't taken place, the Exercises page should render up to date data. This application is meant to work completely offline (PWA).
+
+- ✅ Being a PWA application with optional sign-up/sign-in, means that it shouldn't be an issue if exercises exist without an owner id. Maybe the owner id will be added if the user signs in?
+
+- ✅ The video couldn't be uploaded at the time of creating an exercise because supabase mandated having the exercise uuid in order to be able to write the record to database. Changing the behavior of create/edit exercise to be offline-first, would I be able to upload the video at the same time I am creating the exercise?
+
+- ✅ The exercise card on ExercisesPage is missing a delete button for user-owned exercises.
+
+ - ✅ On Exercises page, the listing is mixed between built-in and user-created exercises. User-created exercises should be denoted somehow on the UI.
+ I want to follow a combo/balanced approach to improve this:
+    - ✅ Keep one listing, not split.
+    - ✅ Built-in cards keep current look.
+    - ✅ User-created cards:
+        + ✅ Show a “Custom” badge next to the title.
+        + ✅ Use a different border color (for example blue/green instead of red).
+        + ✅ Retain edit/delete icons.
+    - Improve Filter/Sort Options:
+        + ✅ Add toggle buttons: "All" | "Built-in" | "Custom"
+        + ✅ Sort options: "Name", "Type", "Recently Added"
+        + ✅ Search functionality that works across both types
+
+- 🔄 Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile:
+  1. ProfileService StorageService Integration ✅
+    - Replaced non-existent getTable() and saveToTable() methods with mock
+  implementation
+    - Simplified service to return mock data until proper database integration is        
+  implemented
+    - Removed unused ConnectionStatus import
+  2. ProfilePage Component Issues ✅
+    - Fixed missing icon imports (MoreHorizontalIcon, UsersIcon, SettingsIcon)
+    - Replaced UsersIcon with inline SVG for connections section
+    - Removed unused UserStats import and isOwnProfile prop usage
+  3. ExercisePage Snackbar Type Errors ✅
+    - Fixed showSnackbar calls to use proper options object format
+    - Changed from showSnackbar(message, 'success') to showSnackbar(message, { type:     
+  'success' })
+    - Both success and error snackbar calls now use correct TypeScript signature
+  4. Unused Parameters and Variables ✅
+    - Added underscore prefix to intentionally unused parameters in ProfileService       
+  methods
+    - All TypeScript compilation warnings resolved
+
+- ✅ CreateExercise issues:
+    - ✅ I created exercise "Ya 7amada 4" which is time-based and I was able to view it in IndexedDB and could also see the edit/delete links on the exercise card on ExercisesPage. A few minutes later after sync was done I was also able to see it in the exercises table in supabase-dev project, but then the edit/delete buttons disappeared on the UI. I think due to a sync bug I lost ownership of the exercise.
+
+- ✅ Scan the entire codebase to replace direct console.log() with logger.log().
+
+- ✅ Favorite button is not shown on the exercise card for custom exercise "Ya 7amada 5". Maybe it is rendered out of border but not visible on screen? This exercise has several buttons: Video play, edit, and delete.
+
+- Custom exercise favorites are not synced from Device A where they were added to Device B where user is authenticated with the same email address.
+
+- ✅ I had a setting on the SettingsPage earlier rep_speed_factor which was a number between 0.5 to 2.0. It is meant to control the video playback speed as a multiplier. So picking 0.5 means playback speed = original speed x 0.5 = slower playback. And the opposite for > 1 which would mean faster playback. This was set on the SettingsPage and used by the Timer to control video playback speed. This is not there on screen anymore. Good to check the history of these 2 pages and see when it was dropped.
+
+- Don't implement anything until we have refined the requirement and answered design questions. I want to add a feature allowing a user to share the custom exercise they created. Optimally the share link would point to a public page listing the exercise along with its video (if available) without storing anything on the user's device so we don't have to ask for consent. It's okay if we must ask for consent but then the consent dialog should be rendered on top of the page content, not in a previous step. In addition to listing the exercise details there should be some inviting cool text encouraging the user to use RepCue, with a save button that would then prompt the user to sign-up/sign-in. I want suggestions on how to implement this sharing functionality given the following:
+  + User A must be authenticated in order to share exercises
+  + User B may or may not have a RepCue profile
+  + Sharing might be to an email address, or to anyone who has the link
+  + If sharing to an email address, then supabase database design should cater for both scenarios that user B is an existing RepCue user, or an anonymous one who would claim access to the shared exercise once they authenticate. The authentication flow can start with a Save button. Once authenticated, the shared exercise would then show on the exercise catalog under the "Shared with me" toggle.
+  + The core principle of offline-first must be respected with one exception, the view shared exercise page because I prefer if this page doesn't store anything on the user device to avoid consent banner and streamline the user experience.
+I want you to go through the workspace to understand the current implementation and how it can be extended to implement this new feature. Your analysis must include the existing database schemas (indexeddb and supabase), UI elements, screen flows, and any other elements you need to complete the job. Ask me questions if you need to to be able to come up with a complete requirement, design, and implementation plan. Write your final output to docs\implementation-plans\exercise-sharing-implementation-plan.md
+
+- Add feature to allow users to give rating and feedback on the app.
+
+- This is client-side validation for UI rendering. The actual edit/delete operations should also be validated server-side (in the Edge Functions or database policies) for complete security, but the UI-level restriction is working correctly.
+
+- Introduce a server-side validation library to enforce input validation and business rules. The library should be used by the edge functions.
 
 - Add feature to allow users to invite others to view their own-created exercises. This can be useful for personal trainers to connect with their customers and view their progress.
 
@@ -104,6 +199,21 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 
 - Smart onboarding: Use GenAI to have a chat with the user at the first run with the purpose of creating a workout schedule for them. During this onboarding chat, the AI assistant would ask questions about the user's patterns, goals, injuries, preferences, etc then suggest a workout tailored for them. For example it doesn't make sense to suggest Planks to someone who has a shoulder injury.
 
+- Add error handling to AI instructions, and a log to register one-time fixes.
+
+- ✅ I edited exercise Ya 7amada 6 and successfully uploaded a video that was stored into indexeddb with dirty = 1 then I saved the exercise. I switched tabs to force a sync and the sync was partially successful and I guess the video was not synced because I couldn't find it in supabase. I copied the console output of this full attempt to console.log at the workspace root.
+
+
+- ✅ The built-in exercise system assumes 3 videos of different resolutions for each exercise, and picks up the relevant version based on the screen dimentions. I am allowing users to upload only one video for custom exercises, and the video system needs to handle that for custom exercises there is only one video. Similar to built-in exercises, the exercise card on ExercisePage should display a play button if the exercise has a video. Also if the custom exercise has a video it should be displayed inside the timer ring, similar to built-in exercises.
+
+- ✅ I uploaded a video to a custom exercise Ya 7amada 5 on Edge browser, and I am trying to see if it sync correctly to Chrome where I am logged on with the same user. The custom exercise itself is synced correctly but not the video. I noticed that in supabase dev project the custom_video_url column is null for my exercise (id = 65b00af8-e9b6-4ec3-b17d-82ef25e56c43) while in my IndexedDB on Edge it has the value "blob-pending-sync://65b00af8-e9b6-4ec3-b17d-82ef25e56c43/BearCrawl_720x576.mp4". On Chrome the value is null in indexeddb. That makes me think that this column is for some reason dropped from the sync. You need to figure out why it is not synced and solve it.
+
+- We don't need real migration:
+
+// Type for database records during migration - supports both user_id and owner_id
+type DatabaseUserFavorite = {}
+
+
 ---
 
-Icons: ☐ ✅ ❌ 🔄 ⏳⌛👉 🚫
+Icons: ☐ ✅ ❌ 👉 🔄 ⏳⌛🚫

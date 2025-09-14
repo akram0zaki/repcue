@@ -4,6 +4,7 @@ import { consentService } from './services/consentService';
 import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
+import { authService } from './services/authService';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
@@ -17,19 +18,25 @@ import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 import { computeWorkoutDurations } from './utils/workoutDuration';
 import i18n from './i18n';
+import logger from './utils/logger';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
 import { 
   HomePage, 
   ExercisePage, 
+  CreateExercisePage,
+  EditExercisePage,
+  ExerciseDetailPage,
   TimerPage, 
   ActivityLogPage, 
   SettingsPage,
   WorkoutsPage,
   CreateWorkoutPage,
   EditWorkoutPage,
+  CommunityPage,
   AuthCallbackPage,
+  ProfilePage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -116,28 +123,30 @@ const setupSyncTriggers = () => {
   // Trigger sync on page visibility change (app foreground)
   const handleVisibilityChange = () => {
     if (!document.hidden) {
-      console.log('📱 App came to foreground - triggering sync');
-      syncService.sync().catch(error => {
-        console.warn('Foreground sync failed:', error);
+      logger.log('📱 App came to foreground - triggering sync');
+      syncService.sync(true).catch(error => {
+        logger.warn('Foreground sync failed:', error);
       });
     }
   };
 
   // Setup periodic sync (every 5 minutes when active)
-  let syncInterval: NodeJS.Timeout | null = null;
+  const syncInterval: { current: NodeJS.Timeout | null } = { current: null };
   const setupPeriodicSync = () => {
-    if (syncInterval) {
-      clearInterval(syncInterval);
+    if (syncInterval.current) {
+      clearInterval(syncInterval.current);
     }
     
-    syncInterval = setInterval(() => {
+    // Re-enabled periodic sync every 5 minutes when active
+    syncInterval.current = setInterval(() => {
       if (!document.hidden) {
-        console.log('⏰ Periodic sync triggered');
-        syncService.sync().catch(error => {
-          console.warn('Periodic sync failed:', error);
+        logger.log('⏰ Periodic sync triggered');
+        syncService.sync(true).catch(error => {
+          logger.warn('Periodic sync failed:', error);
         });
       }
     }, 5 * 60 * 1000); // 5 minutes
+    logger.log('⏰ Periodic sync re-enabled');
   };
 
   // Setup event listeners
@@ -147,8 +156,8 @@ const setupSyncTriggers = () => {
   // Cleanup function
   return () => {
     document.removeEventListener('visibilitychange', handleVisibilityChange);
-    if (syncInterval) {
-      clearInterval(syncInterval);
+    if (syncInterval.current) {
+      clearInterval(syncInterval.current);
     }
   };
 };
@@ -180,6 +189,8 @@ function App() {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<TimerPreset>(30);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
+  // Prevent StrictMode dev double-run of initialization
+  const initStartedRef = useRef<boolean>(false);
 
   // Effect to ensure correct duration for rep-based exercises
   useEffect(() => {
@@ -293,7 +304,7 @@ function App() {
     setTimerState(prev => {
       // If targetTime is already set (e.g., from workout mode), use it; otherwise use selectedDuration
       const actualTargetTime = prev.targetTime || selectedDuration;
-      console.log('startActualTimer: Setting targetTime to:', actualTargetTime, 'from prev.targetTime:', prev.targetTime, 'selectedDuration:', selectedDuration);
+      // logger.log('startActualTimer: Setting targetTime to:', actualTargetTime, 'from prev.targetTime:', prev.targetTime, 'selectedDuration:', selectedDuration);
       
       return {
         ...prev,
@@ -314,7 +325,7 @@ function App() {
     });
 
     // Start the main timer interval
-    console.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
+    // logger.log('startActualTimer: Starting interval with targetTime:', timerState.targetTime || selectedDuration);
     
     // Use the helper function to create appropriate timer interval
     // In workout mode, check the current exercise in the workout; otherwise use selectedExercise
@@ -559,17 +570,17 @@ function App() {
     const currentIndex = workoutMode.currentExerciseIndex;
     const isLastExercise = currentIndex >= workoutMode.exercises.length - 1;
     
-    console.log('advanceWorkout called:', {
-      currentIndex,
-      totalExercises: workoutMode.exercises.length,
-      isLastExercise,
-      workoutName: workoutMode.workoutName
-    });
+    // logger.log('advanceWorkout called:', {
+    //   currentIndex,
+    //   totalExercises: workoutMode.exercises.length,
+    //   isLastExercise,
+    //   workoutName: workoutMode.workoutName
+    // });
 
     if (isLastExercise) {
       // Workout completed
-      console.log('🎉 Workout completed! Logging workout session...');
-      console.log('🔍 About to check consent and session for workout logging...');
+      logger.log('🎉 Workout completed! Logging workout session...');
+      // logger.log('🔍 About to check consent and session for workout logging...');
       if (appSettings.sound_enabled) {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
@@ -577,14 +588,14 @@ function App() {
       // Save workout session completion
       const hasConsent = consentService.hasConsent();
       const hasSessionId = !!workoutMode.sessionId;
-      console.log('Workout completion - consent check:', {
-        hasConsent,
-        hasSessionId,
-        sessionId: workoutMode.sessionId
-      });
+      // logger.log('Workout completion - consent check:', {
+      //   hasConsent,
+      //   hasSessionId,
+      //   sessionId: workoutMode.sessionId
+      // });
       
       if (hasConsent && hasSessionId) {
-  console.log('✅ Creating workout session for logging...');
+  logger.log('✅ Creating workout session for logging...');
   // Compute total workout duration consistent with Activity Log aggregation
   const { total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
 
@@ -606,12 +617,12 @@ function App() {
         };
         
         try {
-          console.log('💾 Saving workout session to storage...', workoutSession);
+          // logger.log('💾 Saving workout session to storage...', workoutSession);
           await storageService.saveWorkoutSession(workoutSession);
-          console.log('✅ Workout session saved successfully');
+          // logger.log('✅ Workout session saved successfully');
           
           // Create a single workout activity log entry for the activity log page
-          console.log('📝 Creating workout activity log entry...');
+          // logger.log('📝 Creating workout activity log entry...');
           const { perExercise, total: totalWorkoutDuration } = computeWorkoutDurations(workoutMode.exercises, exercises, appSettings);
           const exerciseNameById = new Map(exercises.map(ex => [ex.id, ex.name]));
           
@@ -637,33 +648,61 @@ function App() {
             version: 1
           };
           
-          console.log(`📝 Saving workout activity log:`, workoutActivityLog);
+          logger.log(`📝 Saving workout activity log:`, workoutActivityLog);
           await storageService.saveActivityLog(workoutActivityLog);
-          console.log('✅ Workout activity log saved successfully');
         } catch (error) {
-          console.error('❌ Failed to save workout session or activity logs:', error);
+          logger.error('❌ Failed to save workout session or activity logs:', error);
         }
       } else {
-        console.log('❌ Workout session not saved:', {
+        logger.warn('❌ Workout session not saved:', {
           reason: !hasConsent ? 'No consent' : 'No session ID',
           hasConsent,
           hasSessionId
         });
       }
 
-      // Update timer state to show workout completion before resetting
-      setTimerState(prev => ({
-        ...prev,
-        workoutMode: prev.workoutMode ? {
-          ...prev.workoutMode,
-          currentExerciseIndex: prev.workoutMode.exercises.length, // Set to total count to show 100%
-          isResting: false
-        } : prev.workoutMode,
-        isRunning: false
-      }));
+      // Update timer state to show workout completion and immediately clear problematic state
+      logger.debug('🔧 Setting timer state to cleared mode and clearing exercise state');
+      setTimerState(prev => {
+        // logger.debug('🔧 BEFORE workout completion state update:', {
+        //   workoutMode: !!prev.workoutMode,
+        //   workoutModeData: prev.workoutMode ? {
+        //     currentExerciseIndex: prev.workoutMode.currentExerciseIndex,
+        //     exercises: prev.workoutMode.exercises.length
+        //   } : null
+        // });
+        
+        const newState = {
+          ...prev,
+          workoutMode: undefined, // Clear workout mode completely
+          isRunning: false,
+          // Immediately clear ALL exercise-related state to prevent stale data when user selects new exercise
+          currentSet: undefined,
+          totalSets: undefined,
+          currentRep: undefined,
+          totalReps: undefined,
+          currentTime: 0,
+          targetTime: undefined,
+          startTime: undefined,
+          currentExercise: undefined,
+          isCountdown: false,
+          countdownTime: 0,
+          restTimeRemaining: undefined
+        };
+        
+        // logger.debug('🔧 AFTER workout completion state update:', {
+        //   workoutMode: !!newState.workoutMode,
+        //   currentExercise: 'cleared'
+        // });
+        
+        return newState;
+      });
 
-      // Delay reset to allow UI to show completion state
+      // Delay full reset to allow UI to show completion state, but clear selected exercise immediately
+      setSelectedExercise(null);
+      logger.debug('🔧 Cleared selectedExercise, scheduling full reset in 2 seconds');
       setTimeout(async () => {
+        logger.debug('🔧 Executing delayed resetTimer after workout completion');
         await resetTimer();
       }, 2000); // 2 second delay to show completion
     } else {
@@ -679,7 +718,7 @@ function App() {
 
         if (restTime > 0) {
           // Start rest period
-          console.log('Starting rest period, selectedExercise remains:', selectedExercise?.name);
+          logger.log('Starting rest period, selectedExercise remains:', selectedExercise?.name);
           setTimerState(prev => ({
             ...prev,
             workoutMode: prev.workoutMode ? {
@@ -796,20 +835,38 @@ function App() {
         intervalRef.current = null;
       }
       
-      console.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
+      // logger.log('Timer completion useEffect triggered for:', currentExercise?.name || 'unknown exercise');
+      // logger.debug('🔧 Timer completion debug state:', {
+      //   currentExercise: currentExercise?.name,
+      //   workoutMode: !!workoutMode,
+      //   workoutModeData: workoutMode ? {
+      //     currentExerciseIndex: workoutMode.currentExerciseIndex,
+      //     totalExercises: workoutMode.exercises.length,
+      //     isResting: workoutMode.isResting
+      //   } : null,
+      //   timerState: {
+      //     currentSet: timerState.currentSet,
+      //     totalSets: timerState.totalSets,
+      //     currentRep: timerState.currentRep,
+      //     totalReps: timerState.totalReps,
+      //     isRunning,
+      //     currentTime,
+      //     targetTime
+      //   }
+      // });
       
       if (workoutMode) {
         // Get the actual current exercise from workout mode for accurate logging
-        const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
-        const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
-        console.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
-        console.log('Workout state:', {
-          currentExerciseIndex: workoutMode.currentExerciseIndex,
-          totalExercises: workoutMode.exercises.length,
-          isResting: workoutMode.isResting,
-          selectedExerciseName: currentExercise?.name,
-          actualExerciseName: actualCurrentExercise?.name
-        });
+        // const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
+        // const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
+        // logger.log('Actual current exercise from workout mode:', actualCurrentExercise?.name);
+        // logger.log('Workout state:', {
+        //   currentExerciseIndex: workoutMode.currentExerciseIndex,
+        //   totalExercises: workoutMode.exercises.length,
+        //   isResting: workoutMode.isResting,
+        //   selectedExerciseName: currentExercise?.name,
+        //   actualExerciseName: actualCurrentExercise?.name
+        // });
         
         if (workoutMode.isResting) {
           // Rest period completed, start next exercise automatically
@@ -818,7 +875,7 @@ function App() {
           
           // Check if workout is complete
           if (nextExerciseIndex >= workoutMode.exercises.length) {
-            console.log('🎉 Workout completed after rest period!');
+            logger.log('🎉 Workout completed after rest period!');
             advanceWorkout();
             return;
           }
@@ -827,19 +884,19 @@ function App() {
           const nextExercise = exercises.find(ex => ex.id === nextWorkoutExercise.exercise_id);
           
           if (nextExercise) {
-            console.log('Rest completed, changing selectedExercise from', selectedExercise?.name, 'to', nextExercise.name);
+            logger.log('Rest completed, changing selectedExercise from', selectedExercise?.name, 'to', nextExercise.name);
             setSelectedExercise(nextExercise);
 
             // Set duration/reps for next exercise
             if (nextExercise.exercise_type === 'time_based') {
               const duration = nextWorkoutExercise.custom_duration || nextExercise.default_duration || 30;
-              console.log('Setting duration for', nextExercise.name, ':', {
-                custom_duration: nextWorkoutExercise.custom_duration,
-                default_duration: nextExercise.default_duration,
-                finalDuration: duration
-              });
+              // logger.log('Setting duration for', nextExercise.name, ':', {
+              //   custom_duration: nextWorkoutExercise.custom_duration,
+              //   default_duration: nextExercise.default_duration,
+              //   finalDuration: duration
+              // });
               setSelectedDuration(duration as TimerPreset);
-              console.log('After setSelectedDuration, selectedDuration should be:', duration);
+              logger.log('After setSelectedDuration, selectedDuration should be:', duration);
               
               setTimerState(prev => ({
                 ...prev,
@@ -891,8 +948,7 @@ function App() {
 
             // Auto-start the timer after a short delay to ensure state is updated
             setTimeout(() => {
-              console.log('Auto-starting timer with selectedDuration:', selectedDuration, 'for exercise:', nextExercise.name);
-              console.log('Calling startActualTimer directly since targetTime is already set correctly');
+              logger.log('Auto-starting timer with selectedDuration:', selectedDuration, 'for exercise:', nextExercise.name);
               startActualTimer(); // Call startActualTimer directly instead of startTimer
             }, 100);
           }
@@ -902,13 +958,13 @@ function App() {
           const currentWorkoutExercise = workoutMode.exercises[workoutMode.currentExerciseIndex];
           const actualCurrentExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
           
-          console.log('Processing exercise completion for:', actualCurrentExercise?.name);
-          console.log('Exercise type:', actualCurrentExercise?.exercise_type);
-          console.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
+          // logger.log('Processing exercise completion for:', actualCurrentExercise?.name);
+          // logger.log('Exercise type:', actualCurrentExercise?.exercise_type);
+          // logger.log('Has workout rep/set state:', !!workoutMode.totalReps, !!workoutMode.totalSets);
           
           // Check if this is a repetition-based exercise that needs rep/set advancement
           if (actualCurrentExercise?.exercise_type === 'repetition_based' && workoutMode.totalReps && workoutMode.totalSets) {
-            console.log('Processing rep-based exercise completion...');
+            logger.log('Processing rep-based exercise completion...');
             const currentRep = workoutMode.currentRep || 0;
             const currentSet = workoutMode.currentSet || 0;
             const totalReps = workoutMode.totalReps;
@@ -1049,8 +1105,7 @@ function App() {
             }
           } else {
             // Time-based exercise completed, advance workout
-            console.log('Time-based exercise completed in workout mode:', actualCurrentExercise?.name);
-            console.log('Calling advanceWorkout to move to next exercise or complete workout...');
+            logger.log('Time-based exercise completed in workout mode:', actualCurrentExercise?.name);
             advanceWorkout();
           }
         }
@@ -1376,13 +1431,39 @@ function App() {
     try {
   await storageService.saveAppSettings(nextSettings);
   // Nudge sync so app_settings exist on server for other devices
-  void syncService.sync();
+  void syncService.sync(true);
     } catch (error) {
-      console.error('Failed to save app settings:', error);
+      logger.error('Failed to save app settings:', error);
     }
   }, [hasConsent, appSettings]);
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
+    logger.debug('🔧 handleSetSelectedExercise called:', {
+      exerciseName: exercise?.name || 'null',
+      currentWorkoutMode: !!timerState.workoutMode,
+      timerStateDebug: {
+        currentExercise: timerState.currentExercise?.name,
+        currentSet: timerState.currentSet,
+        currentRep: timerState.currentRep,
+        totalSets: timerState.totalSets,
+        totalReps: timerState.totalReps
+      }
+    });
+    
+    // FORCE clear workoutMode if it exists when selecting a standalone exercise
+    if (timerState.workoutMode && exercise) {
+      logger.debug('🔧 FORCE clearing stale workoutMode when selecting standalone exercise');
+      setTimerState(prev => ({
+        ...prev,
+        workoutMode: undefined,
+        currentSet: undefined,
+        totalSets: undefined,
+        currentRep: undefined,
+        totalReps: undefined,
+        currentExercise: undefined
+      }));
+    }
+    
     setSelectedExercise(exercise);
     updateAppSettings({ last_selected_exercise_id: exercise ? exercise.id : null });
     
@@ -1403,26 +1484,43 @@ function App() {
         });
       }
     }
-  }, [updateAppSettings]);
+  }, [updateAppSettings, timerState.workoutMode, timerState.currentExercise, timerState.currentSet, timerState.currentRep, timerState.totalSets, timerState.totalReps]);
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
+    if (!hasConsent) return;
+    if (initStartedRef.current) {
+      // In React StrictMode (dev), effects run twice. Skip the duplicate init.
+      logger.log('[init] Skipping duplicate initialization (StrictMode dev)');
+      return;
+    }
+    initStartedRef.current = true;
+
     const initializeApp = async () => {
+      // Watchdog to avoid UI being stuck on splash if init takes too long
+      const initStart = Date.now();
+      const watchdog = setTimeout(() => {
+        logger.warn('[init] Initialization taking too long (>5s). Forcing UI ready.');
+        setIsLoading(false);
+      }, 5000);
+
       if (hasConsent) {
         try {
+          logger.log('[init] Starting initialization with consent');
           if (process.env.NODE_ENV === 'development') {
-            console.log('🚀 Initializing app with consent granted');
+            // logger.log('🚀 Initializing app with consent granted');
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
-              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).storageService = storageService;
+              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).syncService = syncService;
               (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
-              console.log('🔧 Debug helpers: window.storageService, window.resetDB()');
+              logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
             }
           }
 
           // Register service worker for offline functionality
-          console.log('🚀 Initializing PWA capabilities...');
+          logger.log('🚀 Initializing PWA capabilities...');
           
           // Register PWA link handlers for magic link routing
           registerPWALinkHandlers();
@@ -1436,65 +1534,89 @@ function App() {
             maybePromise
               .then((swInfo) => {
                 if (swInfo?.updateAvailable) {
-                  console.log('📦 App update available - refresh to update');
+                  logger.log('📦 App update available - refresh to update');
                 }
               })
               .catch((error) => {
-                console.error('❌ Service worker registration failed:', error);
+                logger.error('❌ Service worker registration failed:', error);
               });
           }
 
-          // Load exercises from storage or use initial data
-          const storedExercises = await storageService.getExercises();
-          let allExercises: Exercise[];
+          const tSeedStart = Date.now();
+          const tReady = Date.now();
           
-          if (storedExercises.length === 0) {
-            // No stored exercises, use all initial exercises
-            for (const exercise of INITIAL_EXERCISES) {
-              await storageService.saveExercise(exercise);
+          // Add timeout to storageService.ready() to fail fast if database is broken
+          const storageReadyTimeout = new Promise<void>((_, reject) => {
+            setTimeout(() => reject(new Error('Storage ready timeout')), 3000);
+          });
+          
+          try {
+            await Promise.race([storageService.ready(), storageReadyTimeout]);
+            const readyMs = Date.now() - tReady;
+            if (readyMs > 800) logger.warn(`[init] storageService.ready() took ${readyMs}ms`);
+          } catch (error) {
+            logger.error(`[init] storageService.ready() failed or timed out after 3s:`, error);
+            // Continue with fallback - try to load built-in exercises without storage
+            logger.warn('[init] Falling back to in-memory exercise catalog');
+            const { INITIAL_EXERCISES: builtInExercises } = await import('./data/exercises');
+            setExercises(builtInExercises);
+            setIsLoading(false);
+            clearTimeout(watchdog);
+            return; // Exit early with built-in exercises only
+          }
+          // Quick DB snapshot for diagnostics (counts only)
+          try {
+            const snap = await storageService.debugSnapshot();
+            logger.log('[init] DB snapshot:', snap);
+          } catch {}
+          // logger.log('[init] Ensuring exercise catalog is seeded');
+          await storageService.ensureExercisesSeeded();
+          const seedMs = Date.now() - tSeedStart;
+          if (seedMs > 1000) logger.warn(`[init] seeding took ${seedMs}ms`); else logger.log(`[init] seeding took ${seedMs}ms`);
+
+          const tLoadStart = Date.now();
+          // logger.log('[init] Loading exercises from storage');
+          let allExercises = await storageService.getExercises();
+          const loadMs = Date.now() - tLoadStart;
+          if (loadMs > 1000) logger.warn(`[init] getExercises took ${loadMs}ms (n=${allExercises.length})`); else logger.log(`[init] getExercises took ${loadMs}ms (n=${allExercises.length})`);
+          if (allExercises.length === 0) {
+            // Defensive: if the catalog is still empty, try one more seed then fall back to in-memory list
+            logger.warn('[init] Exercises list is empty after initial seed. Retrying seeding and reload…');
+            try {
+              // const reseeded = await storageService.ensureExercisesSeeded();
+              // logger.log(`[init] Reseed attempt completed. exercises.count=${reseeded}`);
+              const tReload = Date.now();
+              allExercises = await storageService.getExercises();
+              const reloadMs = Date.now() - tReload;
+              if (reloadMs > 1000) logger.warn(`[init] getExercises (retry) took ${reloadMs}ms (n=${allExercises.length})`);
+            } catch (e) {
+              logger.warn('[init] Reseed attempt failed:', e);
             }
-            allExercises = INITIAL_EXERCISES;
-          } else {
-            // Always use the latest exercise definitions from INITIAL_EXERCISES to ensure
-            // users get updated exercise types, defaults, and any new exercises
-            // This is an AUTOMATIC refresh that preserves user favorites
-            const storedIds = new Set(storedExercises.map(ex => ex.id));
-            const newExercises = INITIAL_EXERCISES.filter(ex => !storedIds.has(ex.id));
-            
-            // Update existing exercises with latest data from INITIAL_EXERCISES while preserving favorites
-            // Note: This differs from manual refresh which resets ALL data including favorites
-            const updatedStoredExercises = storedExercises.map(storedExercise => {
-              const latestExercise = INITIAL_EXERCISES.find(ex => ex.id === storedExercise.id);
-              if (latestExercise) {
-                // Use latest exercise data but preserve user's favorite status (automatic refresh)
-                return {
-                  ...latestExercise,
-                  is_favorite: storedExercise.is_favorite
-                };
+            if (allExercises.length === 0) {
+              // Try a fast path without preferences merge before giving up
+              const tFast = Date.now();
+              const fast = await storageService.getExercisesFast().catch(() => []);
+              const fastMs = Date.now() - tFast;
+              if (fast.length > 0) {
+                logger.warn(`[init] Fast path loaded ${fast.length} exercises in ${fastMs}ms; using fast list`);
+                allExercises = fast;
+              } else {
+                logger.warn('[init] Exercises still empty after reseed — using built-in catalog as temporary fallback');
+                allExercises = INITIAL_EXERCISES;
               }
-              return storedExercise; // Keep old exercise if not found in latest data
-            });
-            
-            // Save updated exercises back to storage
-            for (const exercise of updatedStoredExercises) {
-              await storageService.saveExercise(exercise);
             }
-            
-            // Save any new exercises to storage
-            for (const exercise of newExercises) {
-              await storageService.saveExercise(exercise);
-            }
-            
-            // Combine updated and new exercises
-            allExercises = [...updatedStoredExercises, ...newExercises];
           }
           setExercises(allExercises);
 
           // Load app settings
+          // logger.log('[init] Loading app settings');
+          const tSettingsStart = Date.now();
           const storedSettings = await storageService.getAppSettings();
+          const settingsMs = Date.now() - tSettingsStart;
+          if (settingsMs > 800) logger.warn(`[init] getAppSettings took ${settingsMs}ms`);
           
           if (process.env.NODE_ENV === 'development') {
-            console.log('⚙️ Loaded stored settings:', storedSettings);
+            logger.log('⚙️ Loaded stored settings:', storedSettings);
           }
           
           // Merge with defaults to handle new settings properties
@@ -1504,7 +1626,7 @@ function App() {
           } : DEFAULT_APP_SETTINGS;
           
           if (process.env.NODE_ENV === 'development') {
-            console.log('⚙️ Final settings to set:', settingsToSet);
+            logger.log('⚙️ Final settings to set:', settingsToSet);
           }
           
           if (!storedSettings) {
@@ -1516,8 +1638,12 @@ function App() {
           setAppSettings(settingsToSet);
 
           // Load and apply user preferences (locale) for cross-device sync
+          // logger.log('[init] Loading user preferences');
           try {
+            const tPrefsStart = Date.now();
             const prefs = await storageService.getUserPreferences();
+            const prefsMs = Date.now() - tPrefsStart;
+            if (prefsMs > 800) logger.warn(`[init] getUserPreferences took ${prefsMs}ms`);
             const preferredLocale = prefs?.locale;
             if (preferredLocale && (i18n.resolvedLanguage || i18n.language) !== preferredLocale) {
               await i18n.changeLanguage(preferredLocale);
@@ -1539,17 +1665,29 @@ function App() {
               }
             }
           }
-      } catch (error) {
-        console.error('Failed to initialize app data:', error);
-        // Fallback to initial exercises
-        setExercises(INITIAL_EXERCISES);
+          const elapsed = Date.now() - initStart;
+          if (elapsed > 2000) {
+            logger.warn(`[init] Initialization finished in ${elapsed}ms (>2s)`);
+          } else {
+            logger.log(`[init] Initialization finished in ${elapsed}ms`);
+          }
+        } catch (error) {
+          logger.error('Failed to initialize app data:', error);
+          // Fallback to initial exercises
+          setExercises(INITIAL_EXERCISES);
+        } finally {
+          clearTimeout(watchdog);
+          setIsLoading(false);
+        }
+      } else {
+        // No consent yet, don't block UI
+        clearTimeout(watchdog);
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
   };
 
   initializeApp();
-}, [hasConsent]);
+  }, [hasConsent]);
 
 // Cleanup sync triggers on unmount
 useEffect(() => {
@@ -1557,13 +1695,66 @@ useEffect(() => {
   return cleanup;
 }, []);
 
-  // Proactively nudge a sync on first mount after initialization so cross-device
-  // preferences (favorites/locale/theme) are pulled promptly.
+  // Proactively nudge a sync only AFTER initialization finished to avoid IndexedDB contention.
   useEffect(() => {
-    if (hasConsent) {
-      void syncService.sync();
+    if (hasConsent && !isLoading) {
+      logger.log('[init] Post-init sync disabled temporarily');
+      // Temporarily disabled due to timeout issues
+      // const t = setTimeout(() => { void syncService.sync(); }, 500);
+      // return () => clearTimeout(t);
     }
-  }, [hasConsent]);
+  }, [hasConsent, isLoading]);
+
+  // Safety rehydrate: if UI has zero exercises after init, but DB has data, retry-load a few times
+  useEffect(() => {
+    let cancelled = false;
+    let attempts = 0;
+    const delays = [250, 750, 1500, 3000]; // progressive backoff (ms)
+
+    const tryRehydrate = async () => {
+      if (isLoading || exercises.length > 0) return;
+      // If consent missing, we can still safely peek built-ins to hydrate UI without storing anything
+      if (!hasConsent) {
+        try {
+          const count = await storageService.peekExerciseCount().catch(() => 0);
+          if (count > 0) {
+            logger.warn(`[rehydrate] No consent, but DB has ${count} exercises; loading built-in catalog (read-only)`);
+            const builtins = await storageService.getBuiltInExercisesFastUnsafe();
+            if (!cancelled && builtins.length > 0) {
+              logger.log(`[rehydrate] Loaded ${builtins.length} built-in exercises (no-consent fast path)`);
+              setExercises(builtins);
+            }
+          }
+        } catch (e) {
+          logger.warn('[rehydrate] No-consent built-in peek failed:', e);
+        }
+        return;
+      }
+      while (!cancelled && attempts < delays.length && exercises.length === 0) {
+        try {
+          const stats = await storageService.getStorageStats().catch(() => null);
+          if (cancelled) return;
+          if (stats && stats.exerciseCount > 0) {
+            logger.warn(`[rehydrate] UI list empty but DB has ${stats.exerciseCount} exercises; reloading from storage...`);
+            const list = await storageService.getExercises();
+            if (!cancelled && list.length > 0) {
+              logger.log(`[rehydrate] Loaded ${list.length} exercises from storage`);
+              setExercises(list);
+              return;
+            }
+          } else {
+            logger.debug('[rehydrate] Stats not ready or zero; will retry');
+          }
+        } catch (e) {
+          logger.warn('[rehydrate] Failed to rehydrate exercises (attempt ' + (attempts + 1) + '):', e);
+        }
+        const wait = delays[attempts++];
+        await new Promise(r => setTimeout(r, wait));
+      }
+    };
+    void tryRehydrate();
+    return () => { cancelled = true; };
+  }, [hasConsent, isLoading, exercises.length]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1601,9 +1792,26 @@ useEffect(() => {
     if (!hasConsent) return;
 
     try {
-      await storageService.toggleExerciseFavorite(exercise_id);
-  // Promptly sync so favorites show up on other devices
-  void syncService.sync();
+      // Detect exercise type: UUID = user-created, slug = built-in
+      const isUserCreated = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise_id);
+      
+      if (isUserCreated) {
+        // User-created exercise: use StorageService and user_favorites table
+        const userId = authService.getAuthState().user?.id;
+        if (!userId) {
+          logger.error('Cannot toggle favorite: user not authenticated');
+          return;
+        }
+        await storageService.toggleUserCreatedExerciseFavorite(exercise_id, userId);
+      } else {
+        // Built-in exercise: use existing StorageService and user_preferences.favorite_exercises array
+        await storageService.toggleExerciseFavorite(exercise_id);
+      }
+      
+      // Promptly sync so favorites show up on other devices
+      void syncService.sync(true);
+      
+      // Update local UI state
       setExercises(prev => 
         prev.map(exercise => 
           exercise.id === exercise_id 
@@ -1612,11 +1820,41 @@ useEffect(() => {
         )
       );
     } catch (error) {
-      console.error('Failed to toggle exercise favorite:', error);
+      logger.error('Failed to toggle exercise favorite:', error);
+    }
+  };
+
+  // Delete a user-created exercise
+  const deleteExercise = async (exercise_id: string) => {
+    if (!hasConsent) return;
+
+    try {
+      await storageService.deleteCustomExercise(exercise_id);
+      // Promptly sync so deletion reflects on other devices
+      void syncService.sync(true);
+      
+      // Remove the exercise from the local state
+      setExercises(prev => prev.filter(exercise => exercise.id !== exercise_id));
+      
+      // Dispatch event to notify other components
+      window.dispatchEvent(new CustomEvent('exercise-deleted', { detail: exercise_id }));
+    } catch (error) {
+      logger.error('Failed to delete exercise:', error);
+      throw error; // Re-throw to let ExercisePage handle the error display
     }
   };
 
   
+
+  // Function to refresh exercises from storage
+  const refreshExercises = useCallback(async () => {
+    try {
+      const updatedExercises = await storageService.getExercises();
+      if (updatedExercises.length > 0) setExercises(updatedExercises);
+    } catch (error) {
+      logger.warn('Failed to refresh exercises:', error);
+    }
+  }, []);
 
   // Refresh local state when sync applies server changes
   useEffect(() => {
@@ -1649,6 +1887,20 @@ useEffect(() => {
     return () => window.removeEventListener('sync:applied', handler as EventListener);
   }, []);
 
+  // Listen for local exercise updates
+  useEffect(() => {
+    const handler = () => {
+      // Refresh exercises when they're updated locally
+      refreshExercises();
+    };
+    window.addEventListener('exercise-updated', handler);
+    window.addEventListener('exercise-created', handler);
+    return () => {
+      window.removeEventListener('exercise-updated', handler);
+      window.removeEventListener('exercise-created', handler);
+    };
+  }, [refreshExercises]);
+
   // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {
     // Check system preference for initial theme
@@ -1670,7 +1922,7 @@ useEffect(() => {
 
     // Debug logging in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('🎨 Theme applied:', appSettings.dark_mode ? 'dark' : 'light', {
+      logger.log('🎨 Theme applied:', appSettings.dark_mode ? 'dark' : 'light', {
         hasConsent,
         dark_mode: appSettings.dark_mode
       });
@@ -1724,7 +1976,32 @@ useEffect(() => {
                     <ExercisePage 
                       exercises={exercises}
                       onToggleFavorite={toggleExerciseFavorite}
+                      onDeleteExercise={deleteExercise}
                     />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.CREATE_EXERCISE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Create Exercise')}>
+                    <CreateExercisePage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.EDIT_EXERCISE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Edit Exercise')}>
+                    <EditExercisePage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.EXERCISE_DETAIL} 
+                element={
+                  <Suspense fallback={createRouteLoader('Exercise Detail')}>
+                    <ExerciseDetailPage />
                   </Suspense>
                 } 
               />
@@ -1796,10 +2073,34 @@ useEffect(() => {
                 } 
               />
               <Route 
+                path={AppRoutes.COMMUNITY} 
+                element={
+                  <Suspense fallback={createRouteLoader('Community')}>
+                    <CommunityPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
                 path={AppRoutes.AUTH_CALLBACK} 
                 element={
                   <Suspense fallback={createRouteLoader('Auth Callback')}>
                     <AuthCallbackPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.PROFILE} 
+                element={
+                  <Suspense fallback={createRouteLoader('Profile')}>
+                    <ProfilePage isOwnProfile={true} />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.PROFILE_VIEW} 
+                element={
+                  <Suspense fallback={createRouteLoader('Profile')}>
+                    <ProfilePage isOwnProfile={false} />
                   </Suspense>
                 } 
               />

@@ -46,11 +46,20 @@ playwright/.cache/
 *.tsbuildinfo
 
 .env
+.env.local
+.env.development
+.env.production
+.env.*.local
 
 # Other
 .local/*
 .mcp.json
+.vscode/mcp.json
 console.log
 next.md
 docs/findings
 docs/testing/findings
+.temp/
+
+# Supabase
+supabase/.temp/
