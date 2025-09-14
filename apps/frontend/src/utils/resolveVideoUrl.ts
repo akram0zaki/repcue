@@ -27,7 +27,7 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     logger.log('🎥 [ResolveVideo] Resolving blob-pending-sync URL for exercise:', exerciseId);
 
     // Get the stored video file from IndexedDB
-    let storedVideoFile = await storageService.getVideoFile(exerciseId);
+    const storedVideoFile = await storageService.getVideoFile(exerciseId);
 
     if (storedVideoFile?.file_data) {
       // Create a blob URL from the stored file data
