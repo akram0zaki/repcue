@@ -42,12 +42,26 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
   };
 
   const handleGenerateShareUrl = async () => {
+    logger.info('🔗 [ShareButton] Starting share link generation', { exerciseId, exerciseName, shareWithEmail });
     setIsGeneratingUrl(true);
     try {
+      logger.info('🔗 [ShareButton] Getting authentication session...');
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('No authentication token');
       }
+      logger.info('🔗 [ShareButton] Authentication successful, user ID:', session.user?.id);
+
+      const requestPayload = {
+        exerciseId: exerciseId,
+        isPublic: true,
+        recipientEmail: shareWithEmail || undefined
+      };
+
+      logger.info('🔗 [ShareButton] Making API call to share-exercise function', {
+        url: `${supabaseFunctionBaseUrl}/functions/v1/share-exercise`,
+        payload: requestPayload
+      });
 
       const response = await fetch(`${supabaseFunctionBaseUrl}/functions/v1/share-exercise`, {
         method: 'POST',
@@ -55,31 +69,40 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          exerciseId: exerciseId,
-          isPublic: true,
-          recipientEmail: shareWithEmail || undefined
-        }),
+        body: JSON.stringify(requestPayload),
+      });
+
+      logger.info('🔗 [ShareButton] API response received', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+        logger.error('🔗 [ShareButton] API response error:', errorData);
         throw new Error(errorData.error || 'Failed to create share link');
       }
 
       const data = await response.json();
+      logger.info('🔗 [ShareButton] Share link generated successfully:', {
+        shareUrl: data.shareUrl,
+        responseData: data
+      });
+
       setShareUrl(data.shareUrl);
 
       showSnackbar(t('exercises.shareLinkGenerated', 'Share link generated successfully!'), {
         type: 'success'
       });
     } catch (error) {
-      logger.error('Failed to generate share link:', error);
+      logger.error('🔗 [ShareButton] Failed to generate share link:', error);
       showSnackbar(t('exercises.shareError', 'Failed to generate share link'), {
         type: 'error'
       });
     } finally {
       setIsGeneratingUrl(false);
+      logger.info('🔗 [ShareButton] Share generation process completed');
     }
   };
 

@@ -2,11 +2,69 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase, supabaseFunctionBaseUrl } from '../config/supabase';
-import { useAuth } from '../hooks/useAuth';
-import { useSnackbar } from '../components/SnackbarProvider';
-import type { Exercise } from '../types';
+import type { Exercise, AuthUserProfile } from '../types';
 import { Routes as AppRoutes } from '../types';
 import logger from '../utils/logger';
+
+// Lightweight snackbar for standalone usage
+interface SnackbarContextType {
+  showSnackbar: (message: string, options?: { type?: 'success' | 'error' | 'warning' | 'info' }) => void;
+}
+
+const StandaloneSnackbar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [snackbar, setSnackbar] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+    visible: boolean;
+  } | null>(null);
+
+  const showSnackbar = (message: string, options?: { type?: 'success' | 'error' | 'warning' | 'info' }) => {
+    setSnackbar({ message, type: options?.type || 'info', visible: true });
+    setTimeout(() => setSnackbar(null), 3000);
+  };
+
+  return (
+    <SnackbarContext.Provider value={{ showSnackbar }}>
+      {children}
+      {snackbar?.visible && (
+        <div className={`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg text-white ${
+          snackbar.type === 'success' ? 'bg-green-600' :
+          snackbar.type === 'error' ? 'bg-red-600' :
+          snackbar.type === 'warning' ? 'bg-yellow-600' :
+          'bg-blue-600'
+        }`}>
+          {snackbar.message}
+        </div>
+      )}
+    </SnackbarContext.Provider>
+  );
+};
+
+const SnackbarContext = React.createContext<SnackbarContextType>({
+  showSnackbar: () => {}
+});
+
+const useSnackbar = () => React.useContext(SnackbarContext);
+
+// Lightweight auth checking - only check session without initializing full authService
+const useMinimalAuth = () => {
+  const [user, setUser] = useState<AuthUserProfile | null>(null);
+
+  useEffect(() => {
+    // Only check session without triggering full auth initialization
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email!,
+          display_name: session.user.user_metadata?.display_name || session.user.email!
+        });
+      }
+    });
+  }, []);
+
+  return { user };
+};
 import {
   TargetIcon,
   StrengthIcon,
@@ -32,17 +90,18 @@ interface SharedExerciseData {
   shareInfo: ShareInfo;
 }
 
-const SharedExercisePage: React.FC = () => {
+const SharedExercisePageContent: React.FC = () => {
   const { shareToken } = useParams<{ shareToken: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises']);
-  const { user } = useAuth();
+  const { user } = useMinimalAuth();
   const { showSnackbar } = useSnackbar();
 
   const [sharedData, setSharedData] = useState<SharedExerciseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
   // Load shared exercise data
   useEffect(() => {
@@ -156,7 +215,7 @@ const SharedExercisePage: React.FC = () => {
   };
 
   const formatDuration = (seconds?: number): string => {
-    if (!seconds) return t('exercises.variable');
+    if (!seconds) return t('exercises:variable', 'Variable');
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     if (minutes > 0) {
@@ -257,12 +316,31 @@ const SharedExercisePage: React.FC = () => {
                 </div>
               </div>
 
-              {(exercise.custom_video_url) && (
-                <button className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors">
+              {(exercise.custom_video_url || shareInfo?.videoRecoveryTriggered) && (
+                <button
+                  onClick={() => setShowVideo(true)}
+                  className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                  title={t('exercises.playVideo', 'Play video')}
+                  disabled={!exercise.custom_video_url}
+                >
                   <PlayIcon size={20} />
                 </button>
               )}
             </div>
+
+            {/* Video Recovery Notification */}
+            {shareInfo?.videoRecoveryTriggered && (
+              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                    {t('exercises.videoRecovering', 'Video is being prepared for viewing. The owner will need to sync their device for the video to become available.')}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             {exercise.description && (
@@ -383,7 +461,63 @@ const SharedExercisePage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Video Modal */}
+      {showVideo && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {exercise.name} - {t('exercises.demonstrationVideo', 'Demonstration Video')}
+              </h3>
+              <button
+                onClick={() => setShowVideo(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              {exercise.custom_video_url ? (
+                <video
+                  src={exercise.custom_video_url}
+                  controls
+                  autoPlay
+                  className="w-full h-auto max-h-[60vh] rounded"
+                >
+                  {t('exercises.videoNotSupported', 'Your browser does not support the video tag.')}
+                </video>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-gray-500 dark:text-gray-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V3a1 1 0 011 1v1M7 4V3a1 1 0 011-1v0M7 4H5a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" />
+                    </svg>
+                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                      {t('exercises.videoBeingPrepared', 'Video Being Prepared')}
+                    </h4>
+                    <p className="text-sm">
+                      {t('exercises.videoRecoveryInProgress', 'The video is being prepared for viewing. Please check back shortly or ask the owner to sync their device.')}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+};
+
+// Wrap the content with standalone providers for public access
+const SharedExercisePage: React.FC = () => {
+  return (
+    <StandaloneSnackbar>
+      <SharedExercisePageContent />
+    </StandaloneSnackbar>
   );
 };
 

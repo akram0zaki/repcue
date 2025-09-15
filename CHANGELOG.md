@@ -1,6 +1,44 @@
 ## Unreleased
 
+### Fixed
+- **Video Sync Discrepancy**: Fixed exercise video URL synchronization issue where successful video uploads weren't updating exercise records with correct file names
+  - **Root Cause**: Video upload confirmations were being skipped during sync because they were flagged as "just pushed"
+  - **Solution**: Enhanced sync logic to process video upload confirmations even when record was previously pushed
+  - **Behavior**: Exercise `custom_video_url` now correctly updates to reflect the latest uploaded video file name
+  - **Observability**: Added debug logging for video URL updates during sync process
+  - **Server Sync**: Fixed exercise records are now marked as dirty to ensure server receives updated video URLs
+- **Video Download Authentication**: Fixed video file downloads in sync to use authenticated Supabase client instead of public URLs
+  - **Root Cause**: Video downloads were failing with 400 errors because they used public URLs on a private bucket
+  - **Solution**: Updated `downloadVideoFileForOfflineAccess` to use `supabase.storage.from('videos').download()`
+  - **Cross-Device**: Videos uploaded on one device will now properly download and display on other authenticated devices
+  - **Offline Access**: Downloaded videos are stored in IndexedDB for offline viewing on all user devices
+- **Share Link Video Access**: Fixed video playback for anonymous users accessing shared exercise links
+  - **Root Cause**: Share links used wrong bucket (`exercise-videos` instead of `videos`) and failed public URL access
+  - **Solution**: Updated `get-shared-exercise` Edge Function to use correct `videos` bucket and generate signed URLs
+  - **Anonymous Access**: Share link recipients can now view videos without authentication using temporary signed URLs (1-hour expiry)
+  - **Security**: Signed URLs provide time-limited access without exposing permanent public endpoints
+- **SharedExercisePage App Context Dependencies**: Fixed shared exercise page to work independently without full app initialization
+  - **Root Cause**: SharedExercisePage was using `useAuth()` which triggered IndexedDB initialization and sync services for anonymous users
+  - **Solution**: Created lightweight `useMinimalAuth()` hook and standalone `StandaloneSnackbar` component
+  - **Anonymous Experience**: Share link recipients now see clean page without navigation menu or app initialization logs
+  - **Performance**: Eliminated unnecessary service initialization for public share routes improving load times
+- **Edge Function JWT Authentication**: Fixed 401 errors on public share link access
+  - **Root Cause**: `get-shared-exercise` Edge Function had JWT verification enabled blocking anonymous access
+  - **Solution**: Added `verify_jwt = false` configuration and deployed with `--no-verify-jwt` flag
+  - **Public Access**: Anonymous users can now access shared exercises without authentication tokens
+- **Video Download Sync Error**: Fixed undefined reference error in video file download during sync operations
+  - **Root Cause**: `downloadVideoFileForOfflineAccess` method tried to access `this.supabase` which was undefined
+  - **Solution**: Added dynamic supabase import to avoid circular dependency issues
+  - **Sync Reliability**: Video downloads now complete successfully during cross-device sync operations
+
 ### Added
+- **Comprehensive Video System Documentation**: Created detailed technical documentation for video upload and sharing workflows
+  - **Video Sync Documentation** (`docs/video-sync.md`): Complete video upload/sync flow with diagrams and component breakdowns
+  - **Exercise Sharing Documentation** (`docs/exercise-sharing.md`): Complete sharing workflow from creation to anonymous access
+  - **Cross-Tier Diagrams**: Visual flow charts showing data transformation through IndexedDB → Edge Function → Supabase Storage
+  - **Component Mapping**: Detailed breakdown of which components handle video operations across frontend/backend
+  - **Security Patterns**: Documentation of anonymous vs authenticated access patterns and permission levels
+  - **Troubleshooting Guides**: Common issues, error patterns, and debugging approaches for video/sharing features
 - **Supabase Migration and Synchronization Instructions**: Comprehensive AI agent guidance to prevent environment drift issues
   - **New Instruction File**: Created `.github/instructions/supabase.instructions.md` with detailed migration and synchronization protocols
   - **Environment Management**: Clear guidelines for dual environment setup (dev: xwzrsfkzqxdybjrkkkvh, prod: zumzzuvfsuzvvymhpymk)
@@ -28,6 +66,14 @@
 
 ### Fixed
 - **TypeScript Build Errors**: Fixed Supabase URL access errors in sharing components
+- **Sync Service JWT Token Issues**: Fixed "Invalid JWT" errors during sync operations by implementing fresh session token retrieval
+  - Modified `correctSyncService.callEdge()` to get fresh auth tokens right before API calls
+  - Prevents timing issues where cached tokens expire between sync start and actual API execution
+  - Graceful fallback to cached token if fresh session retrieval fails
+- **Public Share Route Consent Bypass**: Fixed blank page issue when accessing shared exercise links without consent
+  - SharedExercisePage now renders without requiring user consent (exception to offline-first principle)
+  - Prevents IndexedDB creation on public share routes to maintain privacy compliance
+  - Added `isPublicShareRoute()` helper to detect `/share/*` routes and bypass consent checks
   - **Issue**: Direct access to protected `supabaseUrl` property caused TS2445 compilation errors
   - **Solution**: Created `supabaseFunctionBaseUrl` export in supabase config using environment variables
   - **Result**: Edge Function calls now work correctly across development and production environments

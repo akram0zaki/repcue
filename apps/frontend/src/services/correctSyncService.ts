@@ -526,13 +526,34 @@ export class CorrectSyncService {
   }
 
   private async callEdge(reqBody: EdgeSyncRequestV2, accessToken: string): Promise<EdgeSyncResponseV2> {
+    // Get a fresh token right before the API call to avoid expired JWT issues
+    let tokenToUse = accessToken;
+
+    try {
+      // Import supabase dynamically to avoid circular dependency
+      const { supabase } = await import('../config/supabase');
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (!error && session?.access_token) {
+        tokenToUse = session.access_token;
+        if (SYNC_DEBUG && tokenToUse !== accessToken) {
+          logger.debug(`[sync:v2] Using fresh session token instead of cached one`);
+        }
+      }
+    } catch (sessionError) {
+      if (SYNC_DEBUG) {
+        logger.debug(`[sync:v2] Failed to get fresh session, using cached token:`, sessionError);
+      }
+      // Fall back to the original token
+    }
+
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const functionUrl = `${supabaseUrl}/functions/v1/sync_v2`;
-    
+
     if (SYNC_DEBUG) {
       logger.debug(`[sync:v2] callEdge URL: ${functionUrl}`);
       logger.debug(`[sync:v2] callEdge payload:`, reqBody);
-      logger.debug(`[sync:v2] callEdge auth token: ${accessToken ? `${accessToken.substring(0, 20)}...` : 'MISSING'}`);
+      logger.debug(`[sync:v2] callEdge auth token: ${tokenToUse ? `${tokenToUse.substring(0, 20)}...` : 'MISSING'}`);
     }
     
     const controller = new AbortController();
@@ -541,7 +562,7 @@ export class CorrectSyncService {
     try {
       resp = await fetch(functionUrl, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${tokenToUse}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(reqBody),
         signal: controller.signal
       });
@@ -685,9 +706,20 @@ export class CorrectSyncService {
       try {
         // Skip records that we just pushed in this sync cycle to avoid race conditions
         const recordKey = `${table}:${row.id}`;
-        if (pushedRecords?.has(recordKey)) {
+        const wasPushed = pushedRecords?.has(recordKey);
+
+        // Special case: for video_files, we need to process successful upload confirmations
+        // even if we just pushed the record, to update the exercise's custom_video_url
+        const isVideoUploadConfirmation = table === 'video_files' && wasPushed &&
+          row.storage_path && !row.upload_pending;
+
+        if (wasPushed && !isVideoUploadConfirmation) {
           if (SYNC_DEBUG) logger.debug(`[sync:v2] skipping pulled record we just pushed: ${recordKey}`);
           continue;
+        }
+
+        if (isVideoUploadConfirmation) {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] processing video upload confirmation: ${recordKey}`);
         }
 
         // Special handling for video_files table - download video content for offline access
@@ -706,6 +738,7 @@ export class CorrectSyncService {
 
           // If this is a new video file, update the corresponding exercise's custom_video_url
           if (table === 'video_files' && row.exercise_id && row.file_name) {
+            if (SYNC_DEBUG) logger.debug(`[sync:v2] updating exercise video URL for new video: ${row.exercise_id}/${row.file_name}`);
             await this.updateExerciseVideoUrl(row.exercise_id as string, row.file_name as string);
           }
           continue;
@@ -724,6 +757,7 @@ export class CorrectSyncService {
 
         // If this is an updated video file, update the corresponding exercise's custom_video_url
         if (table === 'video_files' && row.exercise_id && row.file_name) {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] updating exercise video URL for updated video: ${row.exercise_id}/${row.file_name}`);
           await this.updateExerciseVideoUrl(row.exercise_id as string, row.file_name as string);
         }
       } catch (e) {
@@ -739,18 +773,26 @@ export class CorrectSyncService {
     if (!this.storage || !videoFileRow.storage_path) return;
 
     const storagePath = videoFileRow.storage_path as string;
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const videoUrl = `${supabaseUrl}/storage/v1/object/public/videos/${storagePath}`;
-
-    logger.debug(`[sync:v2] Downloading video file for offline access: ${videoUrl}`);
+    logger.debug(`[sync:v2] Downloading video file for offline access: ${storagePath}`);
 
     try {
-      const response = await fetch(videoUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to download video: ${response.status} ${response.statusText}`);
+      // Import supabase dynamically to avoid circular dependency
+      const { supabase } = await import('../config/supabase');
+
+      // Use authenticated Supabase client instead of public URL
+      const { data, error } = await supabase.storage
+        .from('videos')
+        .download(storagePath);
+
+      if (error) {
+        throw new Error(`Failed to download video: ${error.message}`);
       }
 
-      const arrayBuffer = await response.arrayBuffer();
+      if (!data) {
+        throw new Error('No data received from storage download');
+      }
+
+      const arrayBuffer = await data.arrayBuffer();
       const file = new File([arrayBuffer], videoFileRow.file_name as string, {
         type: videoFileRow.mime_type as string || 'video/mp4'
       });
@@ -792,7 +834,9 @@ export class CorrectSyncService {
         await exerciseColl.update(exerciseId, {
           custom_video_url: blobPendingSyncUrl,
           has_video: false, // Keep as false since this is custom video, not built-in
-          synced_at: new Date().toISOString()
+          dirty: 1, // Mark as dirty to sync the updated video URL to server
+          op: 'upsert',
+          updated_at: new Date().toISOString()
         });
         logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${blobPendingSyncUrl}`);
       }

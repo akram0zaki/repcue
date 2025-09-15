@@ -114,12 +114,42 @@ class V2SyncService {
         recordsPushed: res.pushed,
         recordsPulled: res.pulled,
         conflicts: 0,
-        errors: (res.errors || []).map(e => ({ 
-          type: 'unknown' as const, 
-          message: e.message, 
-          timestamp: new Date().toISOString() 
+        errors: (res.errors || []).map(e => ({
+          type: 'unknown' as const,
+          message: e.message,
+          table: e.table,
+          timestamp: new Date().toISOString()
         } as SyncError))
       };
+
+      // Enhanced logging for sync results with correlation ID
+      if (res.correlationId) {
+        logger.info(`[sync:v2] 🔗 Correlation ID: ${res.correlationId}`);
+      }
+
+      // Log detailed sync metadata if available
+      if ((res as any).sync_metadata) {
+        const metadata = (res as any).sync_metadata;
+        logger.info(`[sync:v2] 📊 Detailed sync results:`, {
+          correlationId: res.correlationId,
+          pushSuccesses: metadata.push_successes,
+          pushErrors: metadata.push_errors,
+          pullSuccesses: metadata.pull_successes,
+          pullErrors: metadata.pull_errors,
+          totalSuccesses: metadata.total_successes,
+          totalErrors: metadata.total_errors,
+          status: (res as any).status,
+          message: (res as any).message
+        });
+
+        // Log specific error details if there were failures
+        if (metadata.total_errors > 0) {
+          logger.warn(`[sync:v2] ⚠️ Sync completed with ${metadata.total_errors} errors out of ${metadata.total_successes + metadata.total_errors} operations`);
+          if (mappedResult.errors.length > 0) {
+            logger.warn(`[sync:v2] 🔍 Error details:`, mappedResult.errors);
+          }
+        }
+      }
 
       this.errors = mappedResult.errors;
       return mappedResult;

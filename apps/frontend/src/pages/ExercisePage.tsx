@@ -287,6 +287,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Helper function to check if exercise is user-created
   const isUserCreatedExercise = (exercise: Exercise): boolean => {
     const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
+
+
     // For UUID exercises (user-created), check if they either have an owner_id or if user is authenticated
     // This handles the case where exercises were created before proper ownership was set
     if (isUUIDFormat && user?.id) {

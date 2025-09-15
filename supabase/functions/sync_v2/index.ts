@@ -261,16 +261,46 @@ async function uploadFileToStorage(supabase, fileData, fileName, mimeType, bucke
     } else {
       throw new Error(`Unsupported file_data type: ${typeof fileData}`);
     }
-    console.log(`Uploading file to storage: ${fileName}, size: ${uint8Array.length}, type: ${mimeType}`);
+    console.log(`📤 Uploading file to storage: ${fileName}, size: ${uint8Array.length} bytes, type: ${mimeType}, bucket: ${bucket}`);
+
+    // Verify bucket exists and is accessible
+    const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
+    if (bucketError) {
+      console.error('❌ Failed to list storage buckets:', bucketError);
+      return {
+        success: false,
+        error: `Storage access error: ${bucketError.message}`
+      };
+    }
+
+    const bucketExists = buckets?.some(b => b.name === bucket);
+    if (!bucketExists) {
+      console.error(`❌ Storage bucket '${bucket}' does not exist. Available buckets:`, buckets?.map(b => b.name));
+      return {
+        success: false,
+        error: `Storage bucket '${bucket}' not found`
+      };
+    }
+
+    console.log(`✅ Bucket '${bucket}' exists, proceeding with upload...`);
+
     const { data, error } = await supabase.storage.from(bucket).upload(fileName, uint8Array, {
       contentType: mimeType,
       upsert: true // Allow overwriting existing files
     });
     if (error) {
-      console.error('Storage upload error:', error);
+      console.error('❌ Storage upload error:', {
+        message: error.message,
+        name: error.name,
+        details: error,
+        fileName,
+        fileSize: uint8Array.length,
+        mimeType,
+        bucket
+      });
       return {
         success: false,
-        error: error.message
+        error: `Storage upload failed: ${error.message} (${error.name || 'UnknownError'})`
       };
     }
     console.log('Storage upload success:', data);
@@ -473,6 +503,7 @@ serve(async (req)=>{
     };
     let pushErrors = 0;
     let pushSuccesses = 0;
+    const detailedErrors = []; // Collect detailed error information
     // 1. Process pushes (upserts / deletes) respecting version precedence & resurrection rules
     for (const table of Object.keys(body.tables)){
       const { upserts = [], deletes = [] } = body.tables[table];
@@ -500,7 +531,29 @@ serve(async (req)=>{
             // Upload file to Supabase Storage
             const uploadResult = await uploadFileToStorage(supabase, record.file_data, storagePath, record.mime_type);
             if (!uploadResult.success) {
-              console.error(`[${correlationId}] Storage upload failed for ${id}: ${uploadResult.error}`);
+              console.error(`[${correlationId}] 🚨 Storage upload failed for ${id}: ${uploadResult.error}`);
+
+              // Reset upload_pending and clear storage_path to allow retry on next sync
+              try {
+                const { error: resetError } = await supabase
+                  .from('video_files')
+                  .update({
+                    upload_pending: true, // Keep as true to retry next time
+                    storage_path: null,   // Clear failed path
+                    updated_at: new Date().toISOString()
+                  })
+                  .eq('id', id)
+                  .eq('owner_id', userId);
+
+                if (resetError) {
+                  console.error(`[${correlationId}] Failed to reset video file record after upload failure:`, resetError);
+                } else {
+                  console.log(`[${correlationId}] ✅ Reset video file record ${id} for retry after upload failure`);
+                }
+              } catch (resetException) {
+                console.error(`[${correlationId}] Exception resetting video file record:`, resetException);
+              }
+
               pushErrors++;
               continue;
             }
@@ -545,10 +598,16 @@ serve(async (req)=>{
             });
             const { error: insertError } = await supabase.from(table).insert(scrubbedRecord);
             if (insertError) {
-              console.error(`[${correlationId}] Insert error for ${table}:${id}:`, {
+              const errorDetail = {
+                table,
+                operation: 'insert',
+                recordId: id,
                 message: insertError.message,
-                details: insertError.details
-              });
+                details: insertError.details,
+                code: insertError.code
+              };
+              detailedErrors.push(errorDetail);
+              console.error(`[${correlationId}] Insert error for ${table}:${id}:`, errorDetail);
               pushErrors++;
             } else {
               console.log(`[${correlationId}] ✅ INSERT success: ${table}:${id}`);
@@ -570,10 +629,16 @@ serve(async (req)=>{
               });
               const { error: updateError } = await supabase.from(table).update(scrubbedRecord).eq('id', existing.id);
               if (updateError) {
-                console.error(`[${correlationId}] Update error for ${table}:${id}:`, {
+                const errorDetail = {
+                  table,
+                  operation: 'update',
+                  recordId: id,
                   message: updateError.message,
-                  details: updateError.details
-                });
+                  details: updateError.details,
+                  code: updateError.code
+                };
+                detailedErrors.push(errorDetail);
+                console.error(`[${correlationId}] Update error for ${table}:${id}:`, errorDetail);
                 pushErrors++;
               } else {
                 console.log(`[${correlationId}] ✅ UPDATE success: ${table}:${id}`);
@@ -653,7 +718,8 @@ serve(async (req)=>{
       pull_successes: pullSuccesses,
       pull_errors: pullErrors,
       total_successes: totalSuccesses,
-      total_errors: totalErrors
+      total_errors: totalErrors,
+      detailed_errors: detailedErrors // Include detailed error information
     };
     if (totalErrors > 0) {
       // Partial success - return 207 Multi-Status with detailed results

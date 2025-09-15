@@ -1503,6 +1503,13 @@ function App() {
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
+    // Skip initialization for public share routes - they don't need local data
+    if (isPublicShareRoute()) {
+      logger.log('[init] Skipping initialization for public share route');
+      setIsLoading(false);
+      return;
+    }
+
     if (!hasConsent) return;
     if (initStartedRef.current) {
       // In React StrictMode (dev), effects run twice. Skip the duplicate init.
@@ -1720,6 +1727,14 @@ useEffect(() => {
     }
   }, [hasConsent, isLoading]);
 
+  // Helper function to check if we're on a shared exercise route that doesn't require consent
+  const isPublicShareRoute = useCallback(() => {
+    if (typeof window !== 'undefined' && window.location) {
+      return window.location.pathname.startsWith('/share/');
+    }
+    return false;
+  }, []);
+
   // Safety rehydrate: if UI has zero exercises after init, but DB has data, retry-load a few times
   useEffect(() => {
     let cancelled = false;
@@ -1729,7 +1744,12 @@ useEffect(() => {
     const tryRehydrate = async () => {
       if (isLoading || exercises.length > 0) return;
       // If consent missing, we can still safely peek built-ins to hydrate UI without storing anything
+      // But skip this entirely for public share routes since they don't need local exercises
       if (!hasConsent) {
+        if (isPublicShareRoute()) {
+          logger.log('[rehydrate] Skipping exercise rehydration for public share route');
+          return;
+        }
         try {
           const count = await storageService.peekExerciseCount().catch(() => 0);
           if (count > 0) {
@@ -1769,7 +1789,7 @@ useEffect(() => {
     };
     void tryRehydrate();
     return () => { cancelled = true; };
-  }, [hasConsent, isLoading, exercises.length]);
+  }, [hasConsent, isLoading, exercises.length, isPublicShareRoute]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1944,8 +1964,8 @@ useEffect(() => {
     }
   }, [appSettings.dark_mode, hasConsent]);
 
-  // Show consent banner if no consent
-  if (!hasConsent) {
+  // Show consent banner if no consent (except for public share routes)
+  if (!hasConsent && !isPublicShareRoute()) {
     return <ConsentBanner onConsentGranted={handleConsentGranted} />;
   }
 
