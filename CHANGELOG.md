@@ -1,5 +1,21 @@
 ## Unreleased
 
+## 2025-09-15
+
+### Fixed
+- **Exercise Sharing Feature Complete**: Successfully resolved all issues with shared exercise functionality
+  - **Database Schema**: Added shared exercise tracking fields (`shared_from_exercise_id`, `shared_from_user_id`, `is_shared_copy`) to exercises table
+  - **Frontend Display Logic**: Fixed shared exercises showing as "[Custom]" instead of "[Shared with me]" in user's library
+  - **Badge Logic**: Updated `isSharedExercise()` and `isUserCreated()` functions to properly detect and categorize shared exercises
+  - **Edge Function Updates**: Enhanced `save-shared-exercise` edge function (v8) to properly handle video URLs for shared exercises
+  - **Video URL Scheme**: Implemented `shared-video://` URL protocol for handling videos in shared exercises
+  - **Video Resolution**: Updated `resolveVideoUrl()` utility to handle shared video URLs and resolve them to playable blob URLs
+  - **IndexedDB Schema**: Migrated to version 15 with proper shared exercise tracking fields
+  - **Test Updates**: Fixed test cases to include proper shared exercise tracking fields for consistent behavior
+  - **Build Issues**: Resolved TypeScript compilation errors and showSnackbar parameter formatting
+  - **TypeScript Linter**: Fixed `@typescript-eslint/no-explicit-any` violations in syncService.ts by replacing unsafe type assertions with proper type extensions
+  - **Production Deployment**: Deployed updated edge function to both development and production environments
+
 ### Fixed
 - **Video Sync Discrepancy**: Fixed exercise video URL synchronization issue where successful video uploads weren't updating exercise records with correct file names
   - **Root Cause**: Video upload confirmations were being skipped during sync because they were flagged as "just pushed"

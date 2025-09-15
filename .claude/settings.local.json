@@ -84,7 +84,8 @@
       "Bash(do echo \"Adding unsupportedFormat translation to $lang\")",
       "Bash(pntml --filter @repcue/frontend exec tsc --noEmit)",
       "mcp__supabase__get_advisors",
-      "mcp__supabase-prod__execute_sql"
+      "mcp__supabase-prod__execute_sql",
+      "mcp__supabase-prod__get_project_url"
     ],
     "deny": [],
     "ask": []

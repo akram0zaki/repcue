@@ -3,16 +3,62 @@ import { supabase } from '../config/supabase';
 import logger from './logger';
 
 /**
- * Resolves video URLs, handling both regular URLs and blob-pending-sync:// URLs
+ * Resolves video URLs, handling both regular URLs, blob-pending-sync:// URLs, and shared-video:// URLs
  * For blob-pending-sync URLs, fetches the actual video data from IndexedDB and creates a blob URL
+ * For shared-video URLs, fetches video data from the original exercise's video files
  * If video data is missing locally but exists in cloud storage, downloads it first
  */
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
 
   // For regular URLs (http, https, blob, etc.), return them directly
-  if (!videoUrl.startsWith('blob-pending-sync://')) {
+  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('shared-video://')) {
     return videoUrl;
+  }
+
+  // Handle shared video URLs: shared-video://{originalExerciseId}/{originalOwnerId}
+  if (videoUrl.startsWith('shared-video://')) {
+    try {
+      const match = videoUrl.match(/^shared-video:\/\/([^/]+)\/([^/]+)$/);
+      if (!match) {
+        logger.warn('🎥 [ResolveVideo] Invalid shared-video URL format:', videoUrl);
+        return null;
+      }
+
+      const [, originalExerciseId, originalOwnerId] = match;
+      logger.log('🎥 [ResolveVideo] Resolving shared video URL for original exercise:', {
+        originalExerciseId,
+        originalOwnerId,
+        sharedVideoUrl: videoUrl
+      });
+
+      // Try to get the video file for the original exercise ID
+      const originalVideoFile = await storageService.getVideoFile(originalExerciseId);
+
+      if (originalVideoFile?.file_data) {
+        // Create a blob URL from the original exercise's video data
+        const blobUrl = URL.createObjectURL(originalVideoFile.file_data);
+        logger.log('🎥 [ResolveVideo] Successfully created blob URL from shared video data:', {
+          originalExerciseId,
+          originalOwnerId,
+          sharedVideoUrl: videoUrl,
+          blobUrl,
+          fileSize: originalVideoFile.file_size,
+          mimeType: originalVideoFile.mime_type
+        });
+        return blobUrl;
+      }
+
+      logger.warn('🎥 [ResolveVideo] No video file data found for shared exercise:', {
+        originalExerciseId,
+        originalOwnerId,
+        sharedVideoUrl: videoUrl
+      });
+      return null;
+    } catch (error) {
+      logger.error('🎥 [ResolveVideo] Failed to resolve shared-video URL:', error);
+      return null;
+    }
   }
 
   try {

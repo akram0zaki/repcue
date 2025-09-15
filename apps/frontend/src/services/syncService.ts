@@ -128,8 +128,21 @@ class V2SyncService {
       }
 
       // Log detailed sync metadata if available
-      if ((res as any).sync_metadata) {
-        const metadata = (res as any).sync_metadata;
+      const resWithMetadata = res as typeof res & {
+        sync_metadata?: {
+          push_successes: number;
+          push_errors: number;
+          pull_successes: number;
+          pull_errors: number;
+          total_successes: number;
+          total_errors: number;
+        };
+        status?: string;
+        message?: string;
+      };
+
+      if (resWithMetadata.sync_metadata) {
+        const metadata = resWithMetadata.sync_metadata;
         logger.info(`[sync:v2] 📊 Detailed sync results:`, {
           correlationId: res.correlationId,
           pushSuccesses: metadata.push_successes,
@@ -138,8 +151,8 @@ class V2SyncService {
           pullErrors: metadata.pull_errors,
           totalSuccesses: metadata.total_successes,
           totalErrors: metadata.total_errors,
-          status: (res as any).status,
-          message: (res as any).message
+          status: resWithMetadata.status,
+          message: resWithMetadata.message
         });
 
         // Log specific error details if there were failures

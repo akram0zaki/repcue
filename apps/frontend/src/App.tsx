@@ -5,12 +5,16 @@ import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
 import { authService } from './services/authService';
+import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
+import { useSnackbar } from './components/SnackbarProvider';
+import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
+import { AuthModal } from './components/auth/AuthModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
@@ -28,7 +32,6 @@ import {
   CreateExercisePage,
   EditExercisePage,
   ExerciseDetailPage,
-  SharedExercisePage,
   TimerPage,
   ActivityLogPage,
   SettingsPage,
@@ -169,24 +172,33 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
   const { user } = useAuth();
+  const { showSnackbar } = useSnackbar();
+  const { t } = useTranslation(['common', 'exercises']);
 
   // Handle pending share token after authentication
   useEffect(() => {
     const handlePendingShareToken = async () => {
       const pendingToken = sessionStorage.getItem('pendingShareToken');
-      if (pendingToken && user) {
-        // User is now authenticated, redirect to shared exercise page
-        sessionStorage.removeItem('pendingShareToken');
-        window.location.href = `/share/${pendingToken}`;
+      if (pendingToken && user && hasConsent && !isLoading) {
+        // User is now authenticated, try to save the shared exercise
+        logger.log(`[init] User authenticated, processing pending shared exercise: ${pendingToken}`);
+
+        // Temporarily set a URL parameter to trigger the save logic
+        const url = new URL(window.location.href);
+        url.searchParams.set('saveSharedExercise', pendingToken);
+        window.history.replaceState({}, document.title, url.toString());
+
+        // The handleSharedExerciseSave effect will pick this up automatically
       }
     };
 
     handlePendingShareToken();
-  }, [user]);
+  }, [user, hasConsent, isLoading]);
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -1711,6 +1723,105 @@ function App() {
   initializeApp();
   }, [hasConsent]);
 
+  // Handle shared exercise save from redirect
+  useEffect(() => {
+    const handleSharedExerciseSave = async () => {
+      if (!hasConsent || isLoading) return;
+
+      // Check URL parameters for shared exercise save
+      const urlParams = new URLSearchParams(window.location.search);
+      const shareTokenFromUrl = urlParams.get('saveSharedExercise');
+
+      // Also check session storage for pending share token
+      const shareTokenFromSession = sessionStorage.getItem('pendingShareToken');
+
+      const shareToken = shareTokenFromUrl || shareTokenFromSession;
+
+      if (!shareToken) return;
+
+      try {
+        // Clear the pending token and URL parameter
+        sessionStorage.removeItem('pendingShareToken');
+        if (shareTokenFromUrl) {
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete('saveSharedExercise');
+          window.history.replaceState({}, document.title, newUrl.toString());
+        }
+
+        logger.log(`[init] Processing shared exercise save: ${shareToken}`);
+
+        // Get fresh auth session for the API call
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          // User is not authenticated - store the token and prompt for login
+          logger.log(`[init] User not authenticated, storing share token and prompting for login`);
+          sessionStorage.setItem('pendingShareToken', shareToken);
+
+          showSnackbar(
+            t('exercises.loginRequired', 'Please sign in to save this exercise to your library'),
+            { type: 'info', durationMs: 8000 }
+          );
+
+          // Trigger the auth modal to let user sign in
+          setShowAuthModal(true);
+          return;
+        }
+
+        // Call the save-shared-exercise function
+        const response = await fetch(`${supabaseFunctionBaseUrl}/functions/v1/save-shared-exercise`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            shareToken: shareToken
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          logger.error(`[init] Save shared exercise HTTP ${response.status}:`, errorText);
+
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { error: errorText || 'Unknown error' };
+          }
+
+          throw new Error(errorData.error || 'Failed to save exercise');
+        }
+
+        const result = await response.json();
+
+        // Show success message
+        showSnackbar(result.message || t('exercises.exerciseSaved', 'Exercise saved to your library!'), {
+          type: 'success'
+        });
+
+        // Trigger a sync to get the newly saved exercise
+        logger.log('[init] Triggering sync after shared exercise save');
+        try {
+          await syncService.sync();
+          logger.log('[init] Sync completed after shared exercise save');
+        } catch (syncError) {
+          logger.warn('[init] Sync failed after shared exercise save:', syncError);
+          // Still show success since the save itself worked
+        }
+
+      } catch (error) {
+        logger.error('[init] Failed to save shared exercise:', error);
+        showSnackbar(
+          error instanceof Error ? error.message : t('exercises.saveFailed', 'Failed to save exercise'),
+          { type: 'error' }
+        );
+      }
+    };
+
+    handleSharedExerciseSave();
+  }, [hasConsent, isLoading, t, showSnackbar]);
+
 // Cleanup sync triggers on unmount
 useEffect(() => {
   const cleanup = setupSyncTriggers();
@@ -1985,11 +2096,12 @@ useEffect(() => {
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
   return (
-    canUseBrowserRouter ? (
-      <Router>
-      <ChunkErrorBoundary>
-        <MigrationSuccessBanner />
-        <AppShell>
+    <>
+      {canUseBrowserRouter ? (
+        <Router>
+        <ChunkErrorBoundary>
+          <MigrationSuccessBanner />
+          <AppShell>
           <Suspense fallback={createRouteLoader('page')}>
             <Routes>
               <Route 
@@ -2037,14 +2149,6 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('Exercise Detail')}>
                     <ExerciseDetailPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path={AppRoutes.SHARED_EXERCISE}
-                element={
-                  <Suspense fallback={createRouteLoader('Shared Exercise')}>
-                    <SharedExercisePage />
                   </Suspense>
                 }
               />
@@ -2151,17 +2255,24 @@ useEffect(() => {
               <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />
             </Routes>
           </Suspense>
-        </AppShell>
-      </ChunkErrorBoundary>
-    </Router>
-    ) : (
-      // Fallback minimal shell for tests missing location; avoids Router URL creation
-      <ChunkErrorBoundary>
-        <AppShell>
-          <div />
-        </AppShell>
-      </ChunkErrorBoundary>
-    )
+          </AppShell>
+        </ChunkErrorBoundary>
+      </Router>
+      ) : (
+        // Fallback minimal shell for tests missing location; avoids Router URL creation
+        <ChunkErrorBoundary>
+          <AppShell>
+            <div />
+          </AppShell>
+        </ChunkErrorBoundary>
+      )}
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signin"
+      />
+    </>
   );
 }
 

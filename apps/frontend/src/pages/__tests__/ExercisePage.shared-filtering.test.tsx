@@ -92,17 +92,23 @@ describe('ExercisePage Shared Exercise Filtering', () => {
         name: 'My Custom Exercise',
         owner_id: 'current-user-123'
       }),
-      // Shared exercise (UUID ID but different owner)
+      // Shared exercise (UUID ID but different owner, marked as shared copy)
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Exercise',
-        owner_id: 'other-user-456'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456'
       }),
       // Another shared exercise
       createMockExercise({
         id: '33333333-3333-3333-3333-333333333333',
         name: 'Another Shared Exercise',
-        owner_id: 'another-user-789'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-2',
+        shared_from_user_id: 'another-user-789'
       })
     ];
 
@@ -140,7 +146,10 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Exercise',
-        owner_id: 'other-user-456'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456'
       })
     ];
 
@@ -171,7 +180,10 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Exercise',
-        owner_id: 'other-user-456'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456'
       })
     ];
 
@@ -205,7 +217,10 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Exercise',
-        owner_id: 'other-user-456'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456'
       })
     ];
 
@@ -247,12 +262,18 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Exercise 1',
-        owner_id: 'other-user-456'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456'
       }),
       createMockExercise({
         id: '33333333-3333-3333-3333-333333333333',
         name: 'Shared Exercise 2',
-        owner_id: 'another-user-789'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-2',
+        shared_from_user_id: 'another-user-789'
       })
     ];
 

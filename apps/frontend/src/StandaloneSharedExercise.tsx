@@ -1,10 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase, supabaseFunctionBaseUrl } from '../config/supabase';
-import type { Exercise, AuthUserProfile } from '../types';
-import { Routes as AppRoutes } from '../types';
-import logger from '../utils/logger';
+import { supabaseFunctionBaseUrl } from './config/supabase';
+import type { Exercise } from './types';
+import {
+  TargetIcon,
+  StrengthIcon,
+  CardioIcon,
+  FlexibilityIcon,
+  BalanceIcon,
+  HandWarmupIcon,
+  RunnerIcon,
+  PlayIcon
+} from './components/icons/NavigationIcons';
+import { ExerciseCategory as Categories } from './types';
+
+interface ShareInfo {
+  sharedBy: string;
+  sharedAt: string;
+  isPublic: boolean;
+  permissionLevel: string;
+  expiresAt?: string;
+  videoRecoveryTriggered?: boolean;
+}
+
+interface SharedExerciseData {
+  exercise: Exercise;
+  shareInfo: ShareInfo;
+}
 
 // Lightweight snackbar for standalone usage
 interface SnackbarContextType {
@@ -44,66 +66,16 @@ const SnackbarContext = React.createContext<SnackbarContextType>({
   showSnackbar: () => {}
 });
 
-const useSnackbar = () => React.useContext(SnackbarContext);
 
-// Lightweight auth checking - only check session without initializing full authService
-const useMinimalAuth = () => {
-  const [user, setUser] = useState<AuthUserProfile | null>(null);
-
-  useEffect(() => {
-    // Only check session without triggering full auth initialization
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-          displayName: session.user.user_metadata?.display_name || session.user.email!,
-          createdAt: new Date(session.user.created_at),
-          updatedAt: new Date(session.user.updated_at || session.user.created_at)
-        });
-      }
-    });
-  }, []);
-
-  return { user };
-};
-import {
-  TargetIcon,
-  StrengthIcon,
-  CardioIcon,
-  FlexibilityIcon,
-  BalanceIcon,
-  HandWarmupIcon,
-  RunnerIcon,
-  PlayIcon
-} from '../components/icons/NavigationIcons';
-import { ExerciseCategory as Categories } from '../types';
-
-interface ShareInfo {
-  sharedBy: string;
-  sharedAt: string;
-  isPublic: boolean;
-  permissionLevel: string;
-  expiresAt?: string;
-  videoRecoveryTriggered?: boolean;
-}
-
-interface SharedExerciseData {
-  exercise: Exercise;
-  shareInfo: ShareInfo;
-}
-
-const SharedExercisePageContent: React.FC = () => {
-  const { shareToken } = useParams<{ shareToken: string }>();
-  const navigate = useNavigate();
+const StandaloneSharedExercise: React.FC = () => {
   const { t } = useTranslation(['common', 'exercises']);
-  const { user } = useMinimalAuth();
-  const { showSnackbar } = useSnackbar();
+
+  // Extract share token from URL path
+  const shareToken = window.location.pathname.split('/share/')[1];
 
   const [sharedData, setSharedData] = useState<SharedExerciseData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
 
   // Load shared exercise data
@@ -126,7 +98,7 @@ const SharedExercisePageContent: React.FC = () => {
         const data = await response.json();
         setSharedData(data);
       } catch (error) {
-        logger.error('Failed to fetch shared exercise:', error);
+        console.error('Failed to fetch shared exercise:', error);
         setError(error instanceof Error ? error.message : 'Failed to load shared exercise');
       } finally {
         setLoading(false);
@@ -136,60 +108,19 @@ const SharedExercisePageContent: React.FC = () => {
     fetchSharedExercise();
   }, [shareToken]);
 
-  // Handle saving shared exercise to user's library
-  const handleSaveExercise = async () => {
-    if (!user) {
-      // Store the share token in session storage for after authentication
-      sessionStorage.setItem('pendingShareToken', shareToken || '');
-      navigate(AppRoutes.HOME, {
-        state: {
-          message: 'Please sign in to save this exercise to your library',
-          redirectAfterAuth: true
-        }
-      });
-      return;
-    }
-
+  // Handle saving shared exercise - redirect to main app
+  const handleSaveExercise = () => {
     if (!shareToken) return;
 
-    setSaving(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error('No authentication token');
-      }
+    // Store the share token for the main app to process
+    sessionStorage.setItem('pendingShareToken', shareToken);
 
-      const response = await fetch(`${supabaseFunctionBaseUrl}/functions/v1/save-shared-exercise`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          shareToken: shareToken
-        }),
-      });
+    // Redirect to main app home page with a parameter
+    const mainAppUrl = new URL(window.location.origin);
+    mainAppUrl.searchParams.set('saveSharedExercise', shareToken);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save exercise');
-      }
-
-      const result = await response.json();
-      showSnackbar(result.message || t('exercises.exerciseSaved', 'Exercise saved to your library!'), {
-        type: 'success'
-      });
-
-      // Redirect to exercises page
-      navigate(AppRoutes.EXERCISES);
-    } catch (error) {
-      logger.error('Failed to save shared exercise:', error);
-      showSnackbar(error instanceof Error ? error.message : t('exercises.saveFailed', 'Failed to save exercise'), {
-        type: 'error'
-      });
-    } finally {
-      setSaving(false);
-    }
+    // Force a full page navigation to ensure main app initializes properly
+    window.location.href = mainAppUrl.toString();
   };
 
   const getCategoryIcon = (category: string) => {
@@ -227,6 +158,10 @@ const SharedExercisePageContent: React.FC = () => {
     return `${seconds}s`;
   };
 
+  const goToMainApp = () => {
+    window.location.href = window.location.origin;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -250,10 +185,10 @@ const SharedExercisePageContent: React.FC = () => {
             {error || t('exercises.shareExpired', 'This share link may have expired or is invalid.')}
           </p>
           <button
-            onClick={() => navigate(AppRoutes.HOME)}
+            onClick={goToMainApp}
             className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors"
           >
-            {t('common.goHome', 'Go Home')}
+            {t('common.goHome', 'Go to RepCue')}
           </button>
         </div>
       </div>
@@ -438,26 +373,18 @@ const SharedExercisePageContent: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleSaveExercise}
-            disabled={saving}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium transition-colors min-h-[48px] flex items-center justify-center gap-2"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors min-h-[48px] flex items-center justify-center gap-2"
           >
-            {saving ? (
-              <>
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-                {t('common.saving', 'Saving...')}
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                {t('exercises.saveToLibrary', 'Save to My Library')}
-              </>
-            )}
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              {t('exercises.saveToLibrary', 'Save to My Library')}
+            </>
           </button>
 
           <button
-            onClick={() => navigate(AppRoutes.HOME)}
+            onClick={goToMainApp}
             className="px-6 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg font-medium transition-colors min-h-[48px]"
           >
             {t('common.browseExercises', 'Browse Exercises')}
@@ -515,13 +442,13 @@ const SharedExercisePageContent: React.FC = () => {
   );
 };
 
-// Wrap the content with standalone providers for public access
-const SharedExercisePage: React.FC = () => {
+// Wrap with snackbar provider
+const StandaloneSharedExerciseApp: React.FC = () => {
   return (
     <StandaloneSnackbar>
-      <SharedExercisePageContent />
+      <StandaloneSharedExercise />
     </StandaloneSnackbar>
   );
 };
 
-export default SharedExercisePage;
+export default StandaloneSharedExerciseApp;

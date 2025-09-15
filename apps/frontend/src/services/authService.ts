@@ -328,6 +328,14 @@ export class AuthService {
         redirectUrl = `${this.getRedirectBase()}/auth/callback`;
       }
 
+      // Check for pending shared exercise token and preserve it in the redirect URL
+      const pendingShareToken = sessionStorage.getItem('pendingShareToken');
+      if (pendingShareToken) {
+        const url = new URL(redirectUrl);
+        url.searchParams.set('saveSharedExercise', pendingShareToken);
+        redirectUrl = url.toString();
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {

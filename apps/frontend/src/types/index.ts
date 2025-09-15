@@ -61,6 +61,11 @@ export interface Exercise extends SyncMetadata {
   rating_average?: number;
   rating_count?: number;
   copy_count?: number;
+
+  // Shared exercise tracking fields
+  shared_from_exercise_id?: string; // Reference to the original exercise this was copied from via sharing
+  shared_from_user_id?: string; // ID of the user who originally created the shared exercise
+  is_shared_copy?: boolean; // Flag indicating this exercise was copied from a share
 }
 
 export const ExerciseCategory = {
