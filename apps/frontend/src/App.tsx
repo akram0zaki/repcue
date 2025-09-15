@@ -1795,6 +1795,62 @@ function App() {
 
         const result = await response.json();
 
+        // If the shared exercise has a video, download it for offline access
+        if (result.hasVideo && result.sharedFromExerciseId && result.sharedFromUserId) {
+          try {
+            logger.log('🎥 [App] Starting video download for shared exercise:', {
+              exerciseId: result.exerciseId,
+              originalExerciseId: result.sharedFromExerciseId,
+              originalOwnerId: result.sharedFromUserId
+            });
+
+            // List video files in storage for the original exercise
+            const { data: storageFiles, error: listError } = await supabase.storage
+              .from('videos')
+              .list(`${result.sharedFromUserId}/${result.sharedFromExerciseId}`, {
+                limit: 10,
+                sortBy: { column: 'created_at', order: 'desc' }
+              });
+
+            if (listError || !storageFiles || storageFiles.length === 0) {
+              throw new Error(`No video files found in storage for exercise ${result.sharedFromExerciseId}`);
+            }
+
+            // Get the most recent video file
+            const videoFile = storageFiles[0];
+            const storagePath = `${result.sharedFromUserId}/${result.sharedFromExerciseId}/${videoFile.name}`;
+
+            logger.log('🎥 [App] Found video file in storage:', storagePath);
+
+            // Download the video from Supabase Storage
+            const { data: videoBlob, error: downloadError } = await supabase.storage
+              .from('videos')
+              .download(storagePath);
+
+            if (downloadError || !videoBlob) {
+              throw new Error(`Failed to download video: ${downloadError?.message}`);
+            }
+
+            // Convert blob to File object with proper MIME type
+            const fileExtension = videoFile.name.split('.').pop()?.toLowerCase();
+            const mimeType = fileExtension === 'mp4' ? 'video/mp4' :
+                           fileExtension === 'webm' ? 'video/webm' :
+                           'video/mp4'; // default fallback
+
+            const downloadedVideoFile = new File([videoBlob], videoFile.name, {
+              type: mimeType
+            });
+
+            // Save the video to User's IndexedDB using the storage service
+            await storageService.saveVideoFile(result.exerciseId, downloadedVideoFile);
+
+            logger.log('🎥 [App] Successfully saved shared video to local storage for exercise:', result.exerciseId);
+          } catch (videoError) {
+            logger.warn('🎥 [App] Failed to download shared video:', videoError);
+            // Don't block the save operation if video download fails
+          }
+        }
+
         // Show success message
         showSnackbar(result.message || t('exercises.exerciseSaved', 'Exercise saved to your library!'), {
           type: 'success'

@@ -216,11 +216,6 @@ export const ProfilePage = lazy(() =>
   }))
 );
 
-export const SharedExercisePage = lazy(() =>
-  import('../pages/SharedExercisePage').catch(() => ({
-    default: () => <div>Error loading Shared Exercise page</div>
-  }))
-);
 
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule

@@ -3,6 +3,15 @@
 ## 2025-09-15
 
 ### Fixed
+- **Exercise Sharing Video Download Bug**: Fixed critical issue where shared exercise videos weren't downloading to users' local storage
+  - **Root Cause**: Video download logic was only in unused `SharedExercisePage.tsx`, but actual share links use `StandaloneSharedExercise.tsx` → `App.tsx` flow
+  - **Architecture Fix**: Added video download logic to `App.tsx` pending share token processing to handle the actual user flow
+  - **Sync Service Bug**: Fixed `updateExerciseVideoUrl()` setting `has_video: false` instead of `true` for exercises with custom videos
+  - **Offline-First**: Videos are now properly downloaded from Supabase Storage to IndexedDB when saving shared exercises
+  - **Storage Integration**: Video download uses proper storage path pattern and MIME type detection for compatibility
+  - **Error Handling**: Video download failures don't block exercise saving operation
+  - **Code Cleanup**: Removed unused `SharedExercisePage.tsx` component that was causing confusion about share routing
+
 - **Exercise Sharing Feature Complete**: Successfully resolved all issues with shared exercise functionality
   - **Database Schema**: Added shared exercise tracking fields (`shared_from_exercise_id`, `shared_from_user_id`, `is_shared_copy`) to exercises table
   - **Frontend Display Logic**: Fixed shared exercises showing as "[Custom]" instead of "[Shared with me]" in user's library

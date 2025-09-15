@@ -833,7 +833,7 @@ export class CorrectSyncService {
         const blobPendingSyncUrl = `blob-pending-sync://${exerciseId}/${fileName}`;
         await exerciseColl.update(exerciseId, {
           custom_video_url: blobPendingSyncUrl,
-          has_video: false, // Keep as false since this is custom video, not built-in
+          has_video: true, // Set to true since the exercise now has a custom video
           dirty: 1, // Mark as dirty to sync the updated video URL to server
           op: 'upsert',
           updated_at: new Date().toISOString()
