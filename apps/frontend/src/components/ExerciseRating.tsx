@@ -70,7 +70,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
 
         if (!error && data) {
           setUserRating({
-            rating: data.rating,
+            rating: data.rating || 0,
             review_text: data.review_text || undefined
           });
           setReviewText(data.review_text || '');

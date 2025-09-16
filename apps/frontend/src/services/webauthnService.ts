@@ -315,7 +315,7 @@ export class WebAuthnService {
         passkeys: (data || []).map(auth => ({
           id: auth.id,
           deviceName: auth.device_name,
-          createdAt: auth.created_at,
+          createdAt: auth.created_at || new Date().toISOString(),
           lastUsedAt: auth.last_used_at
         }))
       };

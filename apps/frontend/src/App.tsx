@@ -1804,49 +1804,136 @@ function App() {
               originalOwnerId: result.sharedFromUserId
             });
 
-            // List video files in storage for the original exercise
-            const { data: storageFiles, error: listError } = await supabase.storage
-              .from('videos')
-              .list(`${result.sharedFromUserId}/${result.sharedFromExerciseId}`, {
-                limit: 10,
-                sortBy: { column: 'created_at', order: 'desc' }
-              });
+            // Query the video_files table directly to get the storage path
+            // This avoids RLS issues with storage listing permissions
+            const { data: videoFileRecords, error: queryError } = await supabase
+              .from('video_files')
+              .select('file_name, storage_path, file_size, mime_type')
+              .eq('exercise_id', result.sharedFromExerciseId)
+              .not('storage_path', 'is', null)
+              .order('created_at', { ascending: false })
+              .limit(1);
 
-            if (listError || !storageFiles || storageFiles.length === 0) {
-              throw new Error(`No video files found in storage for exercise ${result.sharedFromExerciseId}`);
+            logger.log('🎥 [App] Video file query result:', {
+              queryError: queryError ? {
+                message: queryError.message,
+                code: queryError.code,
+                details: queryError.details
+              } : null,
+              videoFileRecordsCount: videoFileRecords ? videoFileRecords.length : 0,
+              videoFileRecords: videoFileRecords,
+              originalExerciseId: result.sharedFromExerciseId
+            });
+
+            if (queryError) {
+              throw new Error(`Failed to query video files: ${queryError.message || JSON.stringify(queryError)}`);
             }
 
-            // Get the most recent video file
-            const videoFile = storageFiles[0];
-            const storagePath = `${result.sharedFromUserId}/${result.sharedFromExerciseId}/${videoFile.name}`;
-
-            logger.log('🎥 [App] Found video file in storage:', storagePath);
-
-            // Download the video from Supabase Storage
-            const { data: videoBlob, error: downloadError } = await supabase.storage
-              .from('videos')
-              .download(storagePath);
-
-            if (downloadError || !videoBlob) {
-              throw new Error(`Failed to download video: ${downloadError?.message}`);
+            if (!videoFileRecords || videoFileRecords.length === 0) {
+              throw new Error(`No video file records found in database for exercise ${result.sharedFromExerciseId}`);
             }
+
+            // Get the most recent video file record
+            const videoFileRecord = videoFileRecords[0];
+            if (!videoFileRecord.storage_path) {
+              throw new Error(`Video file record found but storage_path is null for exercise ${result.sharedFromExerciseId}`);
+            }
+
+            const storagePath = videoFileRecord.storage_path;
+
+            logger.log('🎥 [App] Found video file in storage:', {
+              storagePath,
+              fileName: videoFileRecord.file_name,
+              fileSize: videoFileRecord.file_size,
+              mimeType: videoFileRecord.mime_type
+            });
+
+            // Download the video using the dedicated edge function with service role access
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+              throw new Error('No valid session for video download');
+            }
+
+            const downloadResponse = await supabase.functions.invoke('download-shared-video', {
+              body: {
+                exerciseId: result.exerciseId,
+                originalExerciseId: result.sharedFromExerciseId,
+                originalOwnerId: result.sharedFromUserId
+              },
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+
+            logger.log('🎥 [App] Edge function download response:', {
+              downloadError: downloadResponse.error ? {
+                message: downloadResponse.error.message,
+                name: downloadResponse.error.name
+              } : null,
+              hasData: !!downloadResponse.data,
+              dataType: downloadResponse.data ? typeof downloadResponse.data : null
+            });
+
+            if (downloadResponse.error) {
+              throw new Error(`Failed to download video via edge function: ${downloadResponse.error.message || JSON.stringify(downloadResponse.error)}`);
+            }
+
+            if (!downloadResponse.data) {
+              throw new Error(`Video download returned no data`);
+            }
+
+            // The edge function returns the video blob directly
+            const videoBlob = downloadResponse.data;
 
             // Convert blob to File object with proper MIME type
-            const fileExtension = videoFile.name.split('.').pop()?.toLowerCase();
-            const mimeType = fileExtension === 'mp4' ? 'video/mp4' :
-                           fileExtension === 'webm' ? 'video/webm' :
-                           'video/mp4'; // default fallback
+            // Use the MIME type from the database record, or infer from file extension
+            const fileExtension = videoFileRecord.file_name.split('.').pop()?.toLowerCase();
+            const mimeType = videoFileRecord.mime_type ||
+                           (fileExtension === 'mp4' ? 'video/mp4' :
+                            fileExtension === 'webm' ? 'video/webm' :
+                            'video/mp4'); // default fallback
 
-            const downloadedVideoFile = new File([videoBlob], videoFile.name, {
+            const downloadedVideoFile = new File([videoBlob], videoFileRecord.file_name, {
               type: mimeType
+            });
+
+            logger.log('🎥 [App] Created video file object:', {
+              fileName: downloadedVideoFile.name,
+              fileSize: downloadedVideoFile.size,
+              mimeType: downloadedVideoFile.type,
+              exerciseId: result.exerciseId
             });
 
             // Save the video to User's IndexedDB using the storage service
             await storageService.saveVideoFile(result.exerciseId, downloadedVideoFile);
+            logger.log('🎥 [App] Video file saved to IndexedDB for exercise:', result.exerciseId);
+
+            // Store the blob URL for updating after sync
+            const blobPendingSyncUrl = `blob-pending-sync://${result.exerciseId}/${videoFileRecord.file_name}`;
+
+            // Store this for later use after sync
+            result.blobPendingSyncUrl = blobPendingSyncUrl;
+            result.videoFileName = videoFileRecord.file_name;
 
             logger.log('🎥 [App] Successfully saved shared video to local storage for exercise:', result.exerciseId);
           } catch (videoError) {
-            logger.warn('🎥 [App] Failed to download shared video:', videoError);
+            const errorDetails = videoError instanceof Error ? {
+              message: videoError.message,
+              name: videoError.name,
+              stack: videoError.stack
+            } : {
+              message: String(videoError),
+              name: 'UnknownError',
+              stack: undefined
+            };
+
+            logger.error('🎥 [App] Failed to download shared video:', {
+              error: videoError,
+              ...errorDetails,
+              exerciseId: result.exerciseId,
+              originalExerciseId: result.sharedFromExerciseId,
+              originalOwnerId: result.sharedFromUserId
+            });
             // Don't block the save operation if video download fails
           }
         }
@@ -1861,6 +1948,23 @@ function App() {
         try {
           await syncService.sync();
           logger.log('[init] Sync completed after shared exercise save');
+
+          // Now update the exercise's custom_video_url if we have a pending video
+          if (result.blobPendingSyncUrl && result.exerciseId) {
+            try {
+              await storageService.updateCustomExercise(result.exerciseId, {
+                custom_video_url: result.blobPendingSyncUrl
+              });
+
+              logger.log('🎥 [App] Exercise updated with blob-pending-sync URL after sync:', {
+                exerciseId: result.exerciseId,
+                newUrl: result.blobPendingSyncUrl
+              });
+            } catch (updateError) {
+              logger.error('🎥 [App] Failed to update exercise URL after sync:', updateError);
+              // Don't fail the whole operation for this
+            }
+          }
         } catch (syncError) {
           logger.warn('[init] Sync failed after shared exercise save:', syncError);
           // Still show success since the save itself worked
@@ -2026,18 +2130,34 @@ useEffect(() => {
     }
   };
 
-  // Delete a user-created exercise
+  // Delete a user-created or shared exercise
   const deleteExercise = async (exercise_id: string) => {
     if (!hasConsent) return;
 
     try {
-      await storageService.deleteCustomExercise(exercise_id);
+      // Find the exercise to check if it's shared
+      const exercise = exercises.find(ex => ex.id === exercise_id);
+      if (!exercise) {
+        throw new Error('Exercise not found');
+      }
+
+      if (exercise.is_shared_copy) {
+        // For shared exercises, delete from local storage only
+        // The sync will handle removing it from the user's data
+        await storageService.deleteCustomExercise(exercise_id);
+        logger.log('Deleted shared exercise from local storage:', exercise.name);
+      } else {
+        // For user-created exercises, delete normally
+        await storageService.deleteCustomExercise(exercise_id);
+        logger.log('Deleted user-created exercise:', exercise.name);
+      }
+
       // Promptly sync so deletion reflects on other devices
       void syncService.sync(true);
-      
+
       // Remove the exercise from the local state
       setExercises(prev => prev.filter(exercise => exercise.id !== exercise_id));
-      
+
       // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('exercise-deleted', { detail: exercise_id }));
     } catch (error) {

@@ -1,5 +1,24 @@
 ## Unreleased
 
+## 2025-09-16
+
+### Fixed
+- **Shared Exercise Video Download Storage Permissions**: Fixed critical storage access issue preventing video downloads for shared exercises
+  - **Root Cause**: Storage bucket RLS policies didn't allow users to download videos from shared exercises due to chicken-and-egg problem where shared exercise record needed to exist before video download could complete
+  - **Solution**: Created new `download-shared-video` edge function with service role access to bypass storage permissions and securely validate user access
+  - **Edge Function**: New dedicated function verifies user owns the shared exercise record then downloads video with elevated permissions
+  - **Client Update**: Modified `App.tsx` to use edge function instead of direct storage access for shared video downloads
+  - **Storage Policies**: Applied consistent RLS policies across development and production environments for video access
+  - **Migration Sync**: Applied all storage policy migrations (`fix_shared_video_storage_download_policy`, `allow_shared_video_access_via_token`, `revert_to_simple_shared_video_policy`) to both dev and prod
+  - **Timing Fix**: Resolved "Exercise not found" error by moving exercise URL update to occur after sync completion when exercise record exists in IndexedDB
+  - **Production Ready**: Video sharing feature now works completely with proper "[Shared with me]" labels, successful video downloads, and offline access
+
+### Technical Details
+- **Enhanced Error Handling**: Comprehensive logging throughout video download chain with correlation IDs for debugging
+- **Fallback Strategy**: Video download failures don't block exercise save operation, ensuring core sharing functionality remains intact
+- **Type Safety**: All changes maintain TypeScript compatibility with proper null safety and error handling
+- **Environment Parity**: Both development and production environments synchronized with identical edge functions and database policies
+
 ## 2025-09-15
 
 ### Fixed

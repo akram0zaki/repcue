@@ -85,7 +85,10 @@
       "Bash(pntml --filter @repcue/frontend exec tsc --noEmit)",
       "mcp__supabase__get_advisors",
       "mcp__supabase-prod__execute_sql",
-      "mcp__supabase-prod__get_project_url"
+      "mcp__supabase-prod__get_project_url",
+      "mcp__supabase-prod__get_edge_function",
+      "mcp__supabase-prod__apply_migration",
+      "mcp__supabase__search_docs"
     ],
     "deny": [],
     "ask": []

@@ -153,7 +153,9 @@ export class SecurityService {
       return {
         logs: (data || []).map(log => ({
           ...log,
-          ip_address: log.ip_address as string | null
+          ip_address: log.ip_address as string | null,
+          success: log.success ?? true,
+          created_at: log.created_at || new Date().toISOString()
         }))
       };
 

@@ -288,6 +288,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const isUserCreatedExercise = (exercise: Exercise): boolean => {
     const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
 
+    // Exclude shared copies from being considered user-created
+    if (exercise.is_shared_copy === true) {
+      return false;
+    }
 
     // For UUID exercises (user-created), check if they either have an owner_id or if user is authenticated
     // This handles the case where exercises were created before proper ownership was set
@@ -321,12 +325,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       const matchesSearch = term.length === 0
         || loc.name.toLowerCase().includes(term)
         || (loc.description || '').toLowerCase().includes(term)
-        || exercise.tags.some(tag => tag.toLowerCase().includes(term));
+        || (exercise.tags || []).some(tag => tag.toLowerCase().includes(term));
       const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
       
       // Apply exercise type filter
       const matchesExerciseFilter = exerciseFilter === 'all' ||
-        (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise)) ||
+        (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise) && !isSharedExercise(exercise)) ||
         (exerciseFilter === 'custom' && isUserCreatedExercise(exercise)) ||
         (exerciseFilter === 'shared' && isSharedExercise(exercise));
       
@@ -810,9 +814,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const { t } = useTranslation(['common', 'exercises']);
   const loc = localizeExercise(exercise, t);
   
-  const visibleTags = isTagsExpanded ? exercise.tags : exercise.tags.slice(0, 2);
-  const additionalTagsCount = exercise.tags.length - 2;
-  const hasMoreTags = exercise.tags.length > 2;
+  const tags = exercise.tags || [];
+  const visibleTags = isTagsExpanded ? tags : tags.slice(0, 2);
+  const additionalTagsCount = tags.length - 2;
+  const hasMoreTags = tags.length > 2;
   
   // Check if the exercise is user-created and belongs to the current user
   // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
@@ -892,7 +897,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
               />
             )}
-            {isUserCreated && onDelete && (
+            {(isUserCreated || isSharedExerciseCard) && onDelete && (
               <button
                 onClick={() => onDelete(exercise.id)}
                 className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"

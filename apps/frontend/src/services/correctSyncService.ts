@@ -773,11 +773,29 @@ export class CorrectSyncService {
     if (!this.storage || !videoFileRow.storage_path) return;
 
     const storagePath = videoFileRow.storage_path as string;
-    logger.debug(`[sync:v2] Downloading video file for offline access: ${storagePath}`);
+    logger.debug(`[sync:v2] Downloading video file for offline access: ${storagePath}`, {
+      videoFileId: videoFileRow.id,
+      fileName: videoFileRow.file_name,
+      fileSize: videoFileRow.file_size,
+      uploadPending: videoFileRow.upload_pending
+    });
 
     try {
       // Import supabase dynamically to avoid circular dependency
       const { supabase } = await import('../config/supabase');
+
+      // Check authentication state
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        logger.warn(`[sync:v2] Authentication issue during video download:`, {
+          authError: authError,
+          hasUser: !!user,
+          userId: user?.id
+        });
+        throw new Error(`Authentication required for video download: ${authError?.message || 'No user'}`);
+      }
+
+      logger.debug(`[sync:v2] Authenticated user for video download: ${user.id}`);
 
       // Use authenticated Supabase client instead of public URL
       const { data, error } = await supabase.storage
@@ -785,7 +803,14 @@ export class CorrectSyncService {
         .download(storagePath);
 
       if (error) {
-        throw new Error(`Failed to download video: ${error.message}`);
+        logger.error(`[sync:v2] Storage download error details:`, {
+          error: error,
+          message: error.message,
+          storagePath: storagePath,
+          bucketName: 'videos',
+          errorString: JSON.stringify(error)
+        });
+        throw new Error(`Failed to download video: ${error.message || JSON.stringify(error)}`);
       }
 
       if (!data) {
