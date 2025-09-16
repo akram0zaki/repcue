@@ -1,5 +1,18 @@
 ## Unreleased
 
+## 2025-09-17
+
+### Improved
+- **Exercise Card Layout Optimization**: Enhanced exercise card layout for better space utilization and content hierarchy
+  - **Top Row Layout**: Restructured exercise cards to use horizontal space more efficiently with tags on left and buttons on right
+  - **Custom/Shared Tags**: Moved custom and shared exercise badges to top row (left-aligned) for immediate visibility and better prominence
+  - **Action Buttons**: Maintained all action buttons (Info, Edit, Delete, Share, Favorite) in top row (right-aligned) for consistent positioning
+  - **Exercise Names**: Cleaned up exercise name section by removing competing badges underneath, providing more breathing room
+  - **Visual Balance**: Improved card visual balance with content distributed across the full width of the top row
+  - **Content Hierarchy**: Clearer separation between administrative tags, exercise content, and action controls
+  - **Consistent Alignment**: Exercise names and descriptions now have uncluttered, consistent presentation across all cards
+  - **Mobile Responsive**: Layout improvements maintain touch-friendly button sizes and proper spacing on mobile devices
+
 ## 2025-09-16
 
 ### Fixed

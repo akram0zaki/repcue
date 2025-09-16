@@ -669,3 +669,22 @@ export const ShareIcon: React.FC<IconProps> = ({ className = '', size = 24 }) =>
     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
   </svg>
 );
+
+export const InfoIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <path d="m9,9 h0 a3,3 0 0,1 6,0c0,2 -3,3 -3,3" />
+    <path d="m9 17h.01" />
+  </svg>
+);

@@ -18,20 +18,20 @@ import {
   PlayIcon,
   PlusIcon,
   EditIcon,
-  DeleteIcon
+  DeleteIcon,
+  InfoIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useAuth } from '../hooks/useAuth';
 import type { AuthUserProfile } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
-import { loadExerciseMedia } from '../utils/loadExerciseMedia';
-import selectVideoVariant from '../utils/selectVideoVariant';
 import getVideoSources from '../utils/videoSources';
-import { resolveVideoUrl } from '../utils/resolveVideoUrl';
+import { VideoThumbnail } from '../components/VideoThumbnail';
+import { ExercisePlaceholder } from '../components/ExercisePlaceholder';
+import { ExerciseDetailModal } from '../components/ExerciseDetailModal';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
-import type { ExerciseMediaIndex } from '../types/media';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
 import { ShareButton } from '../components/ShareButton';
@@ -86,7 +86,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom' | 'shared'>(savedFilters.exerciseFilter);
   const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>(savedFilters.sortBy);
   // Video preview state
-  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -95,6 +94,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Delete confirmation modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
+
+  // Exercise detail modal state
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [exerciseToShow, setExerciseToShow] = useState<Exercise | null>(null);
 
   // Save filter state whenever it changes
   useEffect(() => {
@@ -127,116 +130,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     } catch (error) {
       logger.warn('[ExercisePage] Failed to clear filter state:', error);
     }
-  };
-
-  // Lazy-load media index only when needed
-  const ensureMediaIndex = async (): Promise<ExerciseMediaIndex | null> => {
-    if (mediaIndex) return mediaIndex;
-    try {
-      const idx = await loadExerciseMedia();
-      setMediaIndex(idx);
-      return idx;
-    } catch (err) {
-      logger.warn('[exercise-preview] failed to load media index', err);
-      return null;
-    }
-  };
-
-  const openPreview = async (exercise: Exercise) => {
-    // Open dialog immediately so tests can detect the modal, then resolve media
-    setPreviewExercise(exercise);
-    setPreviewOpen(true);
-
-    let url: string | null = null;
-
-    // For custom exercises with custom_video_url, resolve the URL (handles blob-pending-sync URLs)
-    if (exercise.custom_video_url) {
-      try {
-        url = await resolveVideoUrl(exercise.custom_video_url);
-      } catch (error) {
-        logger.error('🎥 [Preview] Error resolving custom video URL:', error);
-        url = null;
-      }
-    } else {
-      // For built-in exercises, use the media index
-      const idx = await ensureMediaIndex();
-      if (!idx) return;
-      const media = idx[exercise.id];
-      url = selectVideoVariant(
-        media,
-        typeof window !== 'undefined' ? window.innerWidth : undefined,
-        typeof window !== 'undefined' ? window.innerHeight : undefined
-      );
-    }
-
-    if (!url) {
-      showSnackbar(
-        t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
-        { type: 'warning', durationMs: 3000 }
-      );
-      return;
-    }
-    // Preflight: verify asset exists before opening modal (non-blocking short timeout)
-    // Skip preflight for blob URLs as they don't support HEAD requests
-    const isTest = typeof window !== 'undefined' && (window as Window & { __TEST__?: boolean }).__TEST__ === true;
-    const isBlobUrl = url.startsWith('blob:');
-
-    if (!isBlobUrl && !isTest) {
-      try {
-        const controller = new AbortController();
-        const tid = window.setTimeout(() => controller.abort(), 1000);
-        const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
-        window.clearTimeout(tid);
-        const ct = res.headers.get('content-type') || '';
-        const isVideo = /video\//i.test(ct) || url.endsWith('.webm') || url.endsWith('.mp4');
-        if (!res.ok || !isVideo) {
-          recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-failed' });
-          showSnackbar(
-            t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
-            { type: 'warning', durationMs: 3000 }
-          );
-          return;
-        }
-      } catch {
-        // Network/timeout during precheck: treat as unavailable and avoid opening intrusive modal
-        recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-timeout' });
-        showSnackbar(
-          t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
-          { type: 'warning', durationMs: 3000 }
-        );
-        return;
-      }
-    } else if (!isBlobUrl && isTest) {
-      try {
-        const res = await fetch(url, { method: 'HEAD' });
-        const ct = res.headers.get('content-type') || '';
-        const isVideo = /video\//i.test(ct) || url.endsWith('.webm') || url.endsWith('.mp4');
-        if (!res.ok || !isVideo) {
-          recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-failed' });
-          showSnackbar(
-            t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
-            { type: 'warning', durationMs: 3000 }
-          );
-          // Close modal if opened early
-          setPreviewOpen(false);
-          setPreviewExercise(null);
-          return;
-        }
-      } catch {
-        recordVideoLoadError({ exercise_id: exercise.id, url, reason: 'precheck-timeout' });
-        showSnackbar(
-          t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
-          { type: 'warning', durationMs: 3000 }
-        );
-        setPreviewOpen(false);
-        setPreviewExercise(null);
-        return;
-      }
-    }
-    // For blob URLs, skip preflight and proceed directly to opening the preview
-    setPreviewUrl(url);
-    // Wait a microtask to allow dialog to mount before assertions in tests
-    await Promise.resolve();
   };
 
   const closePreview = () => {
@@ -447,6 +340,11 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     setDeleteModalOpen(true);
   };
 
+  const handleShowExerciseDetails = (exercise: Exercise) => {
+    setExerciseToShow(exercise);
+    setDetailModalOpen(true);
+  };
+
   const handleConfirmDelete = async () => {
     if (exerciseToDelete && onDeleteExercise) {
       try {
@@ -655,9 +553,9 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         onStartTimer={handleStartTimer}
                         getCategoryColor={getCategoryColor}
                         formatDuration={formatDuration}
-                        onPreview={openPreview}
                         onEdit={handleEditExercise}
                         onDelete={handleDeleteExercise}
+                        onShowDetails={handleShowExerciseDetails}
                         currentUser={user}
                       />
                     ))}
@@ -677,9 +575,9 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 onStartTimer={handleStartTimer}
                 getCategoryColor={getCategoryColor}
                 formatDuration={formatDuration}
-                onPreview={openPreview}
                 onEdit={handleEditExercise}
                 onDelete={handleDeleteExercise}
+                onShowDetails={handleShowExerciseDetails}
                 currentUser={user}
               />
             ))}
@@ -787,6 +685,18 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       cancelText={t('common.cancel')}
       variant="danger"
     />
+
+    {/* Exercise Detail Modal */}
+    <ExerciseDetailModal
+      exercise={exerciseToShow}
+      isOpen={detailModalOpen}
+      onClose={() => {
+        setDetailModalOpen(false);
+        setExerciseToShow(null);
+      }}
+      getCategoryColor={getCategoryColor}
+      formatDuration={formatDuration}
+    />
     </>
   );
 };
@@ -798,9 +708,9 @@ interface ExerciseCardProps {
   onStartTimer: (exercise: Exercise) => void;
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
-  onPreview?: (exercise: Exercise) => void;
   onEdit?: (exercise: Exercise) => void;
   onDelete?: (exercise_id: string) => Promise<void>;
+  onShowDetails: (exercise: Exercise) => void;
   currentUser?: AuthUserProfile; // User from auth hook
 }
 
@@ -810,19 +720,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onStartTimer,
   getCategoryColor,
   formatDuration,
-  onPreview,
   onEdit,
   onDelete,
+  onShowDetails,
   currentUser
 }) => {
-  const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const { t } = useTranslation(['common', 'exercises']);
   const loc = localizeExercise(exercise, t);
-  
-  const tags = exercise.tags || [];
-  const visibleTags = isTagsExpanded ? tags : tags.slice(0, 2);
-  const additionalTagsCount = tags.length - 2;
-  const hasMoreTags = tags.length > 2;
   
   // Check if the exercise is user-created and belongs to the current user
   // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
@@ -838,29 +742,22 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
   // Check if exercise is shared using the tracking field
   const isSharedExerciseCard = exercise.is_shared_copy === true;
-  
-
-  const handleTagExpansionToggle = () => {
-    setIsTagsExpanded(!isTagsExpanded);
-  };
 
   return (
-  <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
-    isUserCreated 
-      ? 'border-2 border-blue-300 dark:border-blue-600' 
-      : 'border border-gray-200 dark:border-gray-700'
-  }`} data-testid="exercise-card">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+      isUserCreated 
+        ? 'border-2 border-blue-300 dark:border-blue-600' 
+        : 'border border-gray-200 dark:border-gray-700'
+    }`} data-testid="exercise-card">
       {/* Category Header */}
       <div className={`${getCategoryColor(exercise.category)} h-2`}></div>
       
       <div className="p-3 sm:p-4">
-        {/* Exercise Header */}
-        <div className="flex items-start justify-between mb-2 sm:mb-3">
-          <div className="flex-1 mr-2">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight">
-                {loc.name}
-              </h3>
+        {/* Top Row - Custom Tags (Left) and Action Buttons (Right) */}
+        <div className="mb-2">
+          <div className="flex items-center justify-between">
+            {/* Left Side - Custom/Shared Tags */}
+            <div className="flex items-center gap-2">
               {isUserCreated && (
                 <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full">
                   {t('exercises.custom', { defaultValue: 'Custom' })}
@@ -872,64 +769,89 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                 </span>
               )}
             </div>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-            {(exercise.has_video || exercise.custom_video_url) && (
+
+            {/* Right Side - Action Buttons */}
+            <div className="flex items-center gap-1">
+              {/* Info Button - Always visible */}
               <button
-                onClick={() => onPreview && onPreview(exercise)}
-                className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-                title={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
-                aria-label={t('exercises.previewVideo', { defaultValue: 'Preview video' })}
+                onClick={() => onShowDetails(exercise)}
+                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                title={t('exercises.viewDetails', { defaultValue: 'View details' })}
+                aria-label={t('exercises.viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
               >
-                <PlayIcon size={18} className="sm:!w-5 sm:!h-5" />
+                <InfoIcon size={18} className="sm:!w-5 sm:!h-5" />
               </button>
-            )}
-            {isUserCreated && onEdit && (
+
+              {/* Edit Button - Only for user-created */}
+              {isUserCreated && onEdit && (
+                <button
+                  onClick={() => onEdit(exercise)}
+                  className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  title={t('exercises.editExercise', { defaultValue: 'Edit exercise' })}
+                  aria-label={t('exercises.editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
+                >
+                  <EditIcon size={18} className="sm:!w-5 sm:!h-5" />
+                </button>
+              )}
+
+              {/* Delete Button - For user-created and shared */}
+              {(isUserCreated || isSharedExerciseCard) && onDelete && (
+                <button
+                  onClick={() => onDelete(exercise.id)}
+                  className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  title={t('exercises.deleteExercise', { defaultValue: 'Delete exercise' })}
+                  aria-label={t('exercises.deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
+                >
+                  <DeleteIcon size={18} className="sm:!w-5 sm:!h-5" />
+                </button>
+              )}
+
+              {/* Share Button - Only for user-created */}
+              {isUserCreated && (
+                <ShareButton
+                  exerciseId={exercise.id}
+                  exerciseName={loc.name}
+                  ownerId={exercise.owner_id}
+                  className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                />
+              )}
+
+              {/* Favorite Button - Always visible */}
               <button
-                onClick={() => onEdit(exercise)}
-                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-                title={t('exercises.editExercise', { defaultValue: 'Edit exercise' })}
-                aria-label={t('exercises.editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
+                onClick={() => onToggleFavorite(exercise.id)}
+                className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
+                title={exercise.is_favorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
+                aria-label={exercise.is_favorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
               >
-                <EditIcon size={18} className="sm:!w-5 sm:!h-5" />
+                {exercise.is_favorite ? <StarFilledIcon size={18} className="sm:!w-5 sm:!h-5" /> : <StarIcon size={18} className="sm:!w-5 sm:!h-5" />}
               </button>
-            )}
-            {isUserCreated && (
-              <ShareButton
-                exerciseId={exercise.id}
-                exerciseName={loc.name}
-                ownerId={exercise.owner_id}
-                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-              />
-            )}
-            {(isUserCreated || isSharedExerciseCard) && onDelete && (
-              <button
-                onClick={() => onDelete(exercise.id)}
-                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-                title={t('exercises.deleteExercise', { defaultValue: 'Delete exercise' })}
-                aria-label={t('exercises.deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
-              >
-                <DeleteIcon size={18} className="sm:!w-5 sm:!h-5" />
-              </button>
-            )}
-            <button
-              onClick={() => onToggleFavorite(exercise.id)}
-              className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
-              title={exercise.is_favorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
-              aria-label={exercise.is_favorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
-            >
-              {exercise.is_favorite ? <StarFilledIcon size={18} className="sm:!w-5 sm:!h-5" /> : <StarIcon size={18} className="sm:!w-5 sm:!h-5" />}
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2 leading-relaxed">
-          {loc.description}
-        </p>
+        {/* Exercise Name - Lines 2-3 (Fixed height) */}
+        <div className="mb-3">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight line-clamp-2 h-12">
+            {loc.name}
+          </h3>
+        </div>
+
+        {/* Video/Image Area */}
+        <div className="mb-3">
+          {(exercise.has_video || exercise.custom_video_url) ? (
+            <VideoThumbnail
+              exercise={exercise}
+              onVideoLoad={() => {}}
+              onVideoError={() => {}}
+              className="w-full"
+            />
+          ) : (
+            <ExercisePlaceholder size="md" />
+          )}
+        </div>
 
         {/* Exercise Type and Default Values */}
-        <div className="mb-3 sm:mb-4">
+        <div className="mb-3">
           <div className="flex items-center gap-2 mb-2">
             {/* Exercise Type Badge */}
             <span
@@ -944,14 +866,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                {t('exercises:timeBased.name')}
+                  {t('exercises:timeBased.name')}
                 </>
               ) : (
                 <>
                   <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
-                {t('exercises:repBased.name')}
+                  {t('exercises:repBased.name')}
                 </>
               )}
             </span>
@@ -967,48 +889,22 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         </div>
 
-        {/* Tags */}
-        <div className="mb-3 sm:mb-4">
-          <div 
-            className={`flex flex-wrap gap-1 transition-all duration-200 ease-out ${
-              isTagsExpanded ? 'max-h-none' : 'max-h-6 overflow-hidden'
-            }`}
-          >
-            {visibleTags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
-              >
-                {t(`tags.${tag}`, { ns: 'exercises', defaultValue: tag })}
-              </span>
-            ))}
-            {hasMoreTags && (
-              <button
-                onClick={handleTagExpansionToggle}
-                className="inline-block px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-                aria-label={
-                  isTagsExpanded 
-          ? t('exercises.showFewerTags') 
-          : t('exercises.showMoreTags', { count: additionalTagsCount })
-                }
-                aria-expanded={isTagsExpanded}
-              >
-        {isTagsExpanded ? t('exercises.showLess') : `+${additionalTagsCount}`}
-              </button>
-            )}
-          </div>
+        {/* Description - Lines 4-5 (Fixed 2 lines with truncation) */}
+        <div className="mb-4">
+          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 leading-relaxed min-h-[32px]">
+            {loc.description}
+          </p>
         </div>
 
-        {/* Action Button */}
-        <div className="flex justify-end">
-          <button
-            onClick={() => onStartTimer(exercise)}
-            className="w-full sm:w-auto px-3 py-2.5 sm:py-1.5 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px] sm:min-h-0"
-            data-testid="start-exercise-timer"
-          >
-            {t('home.startTimer')}
-          </button>
-        </div>
+        {/* Start Timer Button - Full Width */}
+        <button
+          onClick={() => onStartTimer(exercise)}
+          className="w-full px-4 py-3 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+          data-testid="start-exercise-timer"
+        >
+          <PlayIcon size={18} />
+          {t('home.startTimer')}
+        </button>
       </div>
     </div>
   );
