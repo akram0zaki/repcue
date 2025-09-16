@@ -151,7 +151,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
     // For custom exercises with custom_video_url, resolve the URL (handles blob-pending-sync URLs)
     if (exercise.custom_video_url) {
-      url = await resolveVideoUrl(exercise.custom_video_url);
+      try {
+        url = await resolveVideoUrl(exercise.custom_video_url);
+      } catch (error) {
+        logger.error('🎥 [Preview] Error resolving custom video URL:', error);
+        url = null;
+      }
     } else {
       // For built-in exercises, use the media index
       const idx = await ensureMediaIndex();
