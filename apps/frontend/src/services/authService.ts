@@ -314,7 +314,7 @@ export class AuthService {
       // Check for pending shared exercise token that needs to be preserved
       const pendingShareToken = sessionStorage.getItem('pendingShareToken');
 
-      let otpOptions: {
+      const otpOptions: {
         shouldCreateUser: boolean;
         emailRedirectTo?: string;
         data: {
