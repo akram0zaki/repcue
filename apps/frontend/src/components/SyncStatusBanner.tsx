@@ -27,7 +27,7 @@ const SyncStatusBanner: React.FC = () => {
   // Show sync error state (highest priority) - always show errors regardless of DEBUG flag
   if (isAuthenticated && syncState.errors.length > 0) {
     return (
-      <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4" role="alert" data-testid="sync-status-banner">
+      <div className="fixed top-0 left-0 right-0 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 z-50 shadow-md" role="alert" data-testid="sync-status-banner">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0" aria-hidden="true">
@@ -68,7 +68,7 @@ const SyncStatusBanner: React.FC = () => {
   // Show sync in progress (for authenticated users)
   if (DEBUG && isAuthenticated && syncState.isSyncing) {
     return (
-      <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 mb-4" role="status" data-testid="sync-status-banner">
+      <div className="fixed top-0 left-0 right-0 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 z-50 shadow-md" role="status" data-testid="sync-status-banner">
         <div className="flex items-center">
           <div className="flex-shrink-0" aria-hidden="true">
             <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -89,7 +89,7 @@ const SyncStatusBanner: React.FC = () => {
   // Show offline message (highest priority for non-authenticated users)
   if (isOffline) {
     return (
-      <div className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 mb-4" role="alert" data-testid="sync-status-banner">
+      <div className="fixed top-0 left-0 right-0 bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 z-50 shadow-md" role="alert" data-testid="sync-status-banner">
         <div className="flex items-center">
           <div className="flex-shrink-0" aria-hidden="true">
             📴
@@ -113,7 +113,7 @@ const SyncStatusBanner: React.FC = () => {
   // Show reconnection message briefly (for all users)
   if (isOnline && hasBeenOffline) {
     return (
-      <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-3 mb-4" role="alert" data-testid="sync-status-banner">
+      <div className="fixed top-0 left-0 right-0 bg-green-100 border-l-4 border-green-500 text-green-700 p-3 z-50 shadow-md" role="alert" data-testid="sync-status-banner">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0" aria-hidden="true">
@@ -148,9 +148,9 @@ const SyncStatusBanner: React.FC = () => {
   // Show pending changes indicator (for authenticated users only)
   if (DEBUG && isAuthenticated && isOnline && syncState.hasChangesToSync && !syncState.isSyncing) {
     const lastSyncText = formatTimeAgo(syncState.lastSuccessfulSync);
-    
+
     return (
-      <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 mb-4" role="status" data-testid="sync-status-banner">
+      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 z-50 shadow-md" role="status" data-testid="sync-status-banner">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0" aria-hidden="true">
