@@ -56,7 +56,18 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
         if (exercise.custom_video_url) {
           // For custom exercises, resolve the custom video URL
+          logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
+            exerciseId: exercise.id,
+            customVideoUrl: exercise.custom_video_url,
+            isSharedCopy: exercise.is_shared_copy
+          });
           url = await resolveVideoUrl(exercise.custom_video_url);
+          logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
+            exerciseId: exercise.id,
+            originalUrl: exercise.custom_video_url,
+            resolvedUrl: url,
+            isBlob: url?.startsWith('blob:')
+          });
         } else if (exercise.has_video) {
           // For built-in exercises, load from exercise media
           const mediaIndex = await loadExerciseMedia();
@@ -71,6 +82,17 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         }
 
         if (url) {
+          // Additional blob URL validation for shared exercises
+          if (url.startsWith('blob:') && exercise.is_shared_copy) {
+            logger.log('🎥 [VideoThumbnail] Validating blob URL for shared exercise:', {
+              exerciseId: exercise.id,
+              blobUrl: url,
+              urlValid: url.length > 10, // Basic check that blob URL isn't truncated
+              hasProtocol: url.includes('://'),
+              hasOrigin: url.includes(window.location.origin)
+            });
+          }
+
           setVideoUrl(url);
           setHasError(false);
         } else {
@@ -91,17 +113,75 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     if (!video || !videoUrl) return;
 
     const handleLoadedData = () => {
+      logger.log('🎥 [VideoThumbnail] Video loaded successfully:', {
+        exerciseId: exercise.id,
+        videoUrl: videoUrl,
+        videoDuration: video?.duration,
+        videoWidth: video?.videoWidth,
+        videoHeight: video?.videoHeight,
+        currentSrc: video?.currentSrc
+      });
       setIsLoaded(true);
       onVideoLoad?.();
     };
 
     const handleError = (e: Event) => {
-      logger.error('🎥 [VideoThumbnail] Video loading error:', { 
-        exerciseId: exercise.id, 
+      const target = e.target as HTMLVideoElement;
+      const videoError = target.error;
+
+      // Enhanced debugging for video errors
+      logger.error('🎥 [VideoThumbnail] Video loading error:', {
+        exerciseId: exercise.id,
         videoSrc: video.src,
+        videoUrl: videoUrl,
+        isCustomVideo: !!exercise.custom_video_url,
+        isSharedCopy: exercise.is_shared_copy,
+        originalVideoUrl: exercise.custom_video_url,
         error: e,
-        videoError: video.error 
+        videoError: {
+          code: videoError?.code,
+          message: videoError?.message,
+          MEDIA_ERR_ABORTED: videoError?.code === 1,
+          MEDIA_ERR_NETWORK: videoError?.code === 2,
+          MEDIA_ERR_DECODE: videoError?.code === 3,
+          MEDIA_ERR_SRC_NOT_SUPPORTED: videoError?.code === 4
+        },
+        networkState: video.networkState,
+        readyState: video.readyState,
+        currentSrc: video.currentSrc,
+        duration: video.duration
       });
+
+      // Check if it's a MIME type/format issue (code 4)
+      if (videoError?.code === 4) {
+        logger.error('🎥 [VideoThumbnail] MEDIA_ERR_SRC_NOT_SUPPORTED - Video format not supported by browser:', {
+          exerciseId: exercise.id,
+          blobUrl: videoUrl,
+          videoSrc: video.src,
+          isSharedExercise: exercise.is_shared_copy,
+          possibleCauses: [
+            'Corrupted MP4 metadata',
+            'Invalid file format',
+            'Incomplete download',
+            'Browser codec compatibility'
+          ]
+        });
+
+        // For shared exercises with corrupted videos, try to clear cache and reload
+        if (exercise.is_shared_copy && videoUrl?.startsWith('blob:')) {
+          logger.warn('🎥 [VideoThumbnail] Attempting to clear corrupted shared video cache');
+
+          // Clear the video cache for this exercise (non-blocking)
+          import('../services/storageService').then(({ storageService }) => {
+            storageService.deleteVideoFile(exercise.id).then(() => {
+              logger.log('🎥 [VideoThumbnail] Video cache cleared, reload page to re-download');
+            }).catch((cacheError) => {
+              logger.error('🎥 [VideoThumbnail] Failed to clear video cache:', cacheError);
+            });
+          });
+        }
+      }
+
       setHasError(true);
       onVideoError?.();
     };

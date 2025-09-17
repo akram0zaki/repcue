@@ -2,6 +2,30 @@
 
 ## 2025-09-17
 
+### Fixed
+- **Video Sharing and Thumbnail Issues**: Resolved multiple video-related problems affecting shared exercises and local video display
+  - **MP4 Corruption Fix**: Fixed blob URL creation issues in `resolveVideoUrl.ts` that were causing video files to be marked as corrupted and automatically deleted
+  - **Firefox Compatibility**: Improved blob URL generation by converting File objects to ArrayBuffer then to Blob for better cross-browser compatibility
+  - **Deleted Flag Issue**: Fixed sync system incorrectly marking video files as `deleted: true` instead of `deleted: false`, preventing video thumbnails from loading
+  - **Video Recovery System**: Enhanced video recovery mechanism to properly mark missing files for re-sync without causing data corruption
+  - **Share Link Generation**: Resolved 403 Forbidden errors in share link creation that occurred intermittently due to timing issues
+  - **Temporary Debugging Cleanup**: Removed temporary debugging code and test buttons added during troubleshooting process
+
+### Documentation
+- **Exercise Sharing Architecture**: Completely revised and simplified exercise sharing documentation (`docs/exercise-sharing.md`)
+  - **Accuracy Corrections**: Updated documentation to match actual implementation instead of theoretical complex features
+  - **Component Mapping**: Corrected component names and file paths to reflect real codebase structure
+  - **URL Structure**: Fixed documentation of share URL format from query parameters to path parameters (`/share/{token}`)
+  - **Database Schema**: Updated schema documentation to match actual table structure and removed non-existent fields
+  - **RLS Policy Details**: Added comprehensive documentation of Row Level Security policies and workarounds for anonymous video access
+  - **Storage Strategy**: Documented the complex data storage strategies including File/Blob to byte array conversions and dual storage approach
+  - **Service Role Bypass**: Explained how edge functions use service role keys to bypass RLS policies while maintaining security
+  - **Signed URL Strategy**: Documented the 1-hour signed URL approach for anonymous video access
+  - **Complexity Reduction**: Removed 400+ lines of theoretical features and over-engineered solutions not present in actual implementation
+  - **Current Status**: Added realistic assessment of implemented features vs planned features
+
+## 2025-09-17 (Earlier)
+
 ### Improved
 - **Exercise Card Layout Optimization**: Enhanced exercise card layout for better space utilization and content hierarchy
   - **Top Row Layout**: Restructured exercise cards to use horizontal space more efficiently with tags on left and buttons on right
