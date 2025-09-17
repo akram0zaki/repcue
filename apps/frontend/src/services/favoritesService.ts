@@ -56,7 +56,7 @@ export class FavoritesService {
       const { data, error } = await supabase
         .from('user_favorites')
         .select('id')
-        .eq('user_id', userId)
+        .eq('owner_id', userId)
         .eq('item_id', itemId)
         .eq('deleted', false)
         .single();
@@ -89,11 +89,11 @@ export class FavoritesService {
         // Remove from favorites (soft delete)
         const { error } = await supabase
           .from('user_favorites')
-          .update({ 
-            deleted: true, 
-            updated_at: new Date().toISOString() 
+          .update({
+            deleted: true,
+            updated_at: new Date().toISOString()
           })
-          .eq('user_id', userId)
+          .eq('owner_id', userId)
           .eq('item_id', itemId);
 
         if (error) throw error;
@@ -143,7 +143,7 @@ export class FavoritesService {
       const { data, error } = await supabase
         .from('user_favorites')
         .select('*')
-        .eq('user_id', userId)
+        .eq('owner_id', userId)
         .eq('deleted', false)
         .order('created_at', { ascending: false });
 
@@ -217,7 +217,7 @@ export class FavoritesService {
       const { data, error } = await supabase
         .from('user_favorites')
         .select('item_id')
-        .eq('user_id', userId)
+        .eq('owner_id', userId)
         .in('item_id', itemIds)
         .eq('deleted', false);
 

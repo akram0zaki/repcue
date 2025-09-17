@@ -9,6 +9,13 @@
   - **Verification**: Fixed videos now match exact original file sizes and play correctly across all browsers
   - **Investigation**: Comprehensive debugging revealed session conflicts were red herring; actual issue was client-side data processing
 
+- **Custom Exercise Favorites Being Auto-Unfavorited**: Fixed database schema inconsistency causing favorites to be deleted during sync
+  - **Root Cause**: FavoritesService was using `user_id` field in queries but `owner_id` field for inserts, creating orphaned records
+  - **Symptoms**: Favoriting a custom exercise would immediately unfavorite when favoriting another exercise due to sync conflicts
+  - **Solution**: Updated all database queries in FavoritesService to consistently use `owner_id` field
+  - **Schema Fix**: Corrected IndexedDB schema definitions in StorageService to use `owner_id` across all database versions
+  - **Impact**: Favorites now persist correctly and sync properly between devices without unwanted deletions
+
 ### Improved
 - **Reduced Excessive Debug Logging**: Implemented intelligent logging suppression while maintaining debugging capabilities
   - **Smart Filtering**: Added pattern-based suppression to logger utility to reduce console noise from 280+ to ~20-30 essential messages

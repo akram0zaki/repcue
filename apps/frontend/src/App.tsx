@@ -1855,7 +1855,6 @@ function App() {
               throw new Error(`Video file record found but storage_path is null for exercise ${result.sharedFromExerciseId}`);
             }
 
-            const storagePath = videoFileRecord.storage_path;
 
 
             // Download the video using the dedicated edge function with service role access
