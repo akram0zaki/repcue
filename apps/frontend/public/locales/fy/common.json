@@ -51,7 +51,10 @@
     "cancelTitle": "Annulearje",
     "clear": "Effacer",
     "clearFormTitle": "Formulier wiske",
-    "confirmClearForm":"Bist der wis fan dat jo it formulier wiske wolle? Dit sil jo brouillon ferwiderje."
+    "confirmClearForm":"Bist der wis fan dat jo it formulier wiske wolle? Dit sil jo brouillon ferwiderje.",
+    "noVideo": "Gjin Fideo",
+    "pauseVideo": "Pause Fideo",
+    "playVideo": "Spylje Fideo"
   },
   "navigation": {
     "home": "Thús",

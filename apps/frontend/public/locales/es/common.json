@@ -51,7 +51,10 @@
     "cancelTitle": "Cancelar",
     "clear": "Borrar",
     "clearFormTitle": "Borrar formulario",
-    "confirmClearForm":"¿Estás seguro de que deseas borrar el formulario? Esto eliminará tu borrador."
+    "confirmClearForm":"¿Estás seguro de que deseas borrar el formulario? Esto eliminará tu borrador.",
+    "noVideo": "Sin video",
+    "pauseVideo": "Pausar video",
+    "playVideo": "Reproducir video"
   },
   "navigation": {
     "home": "Inicio",

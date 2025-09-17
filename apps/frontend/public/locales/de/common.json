@@ -51,7 +51,10 @@
     "cancelTitle": "Abbrechen",
     "clear": "Löschen",
     "clearFormTitle": "Formular löschen",
-    "confirmClearForm":"Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht."
+    "confirmClearForm":"Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht.",
+    "noVideo": "Kein Video",
+    "pauseVideo": "Video pausieren",
+    "playVideo": "Video abspielen"
   },
   "navigation": {
     "home": "Startseite",
