@@ -47,7 +47,7 @@ export const ExercisePlaceholder: React.FC<ExercisePlaceholderProps> = ({
       
       {/* No Video Text */}
       <span className={`${textSizes[size]} text-gray-500 dark:text-gray-400 font-medium text-center px-2`}>
-        {t('noVideo', { defaultValue: 'No Video' })}
+        {t('common.noVideo', { defaultValue: 'No Video' })}
       </span>
     </div>
   );

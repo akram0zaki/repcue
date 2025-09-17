@@ -269,7 +269,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       >
         <button
           className="flex items-center justify-center w-16 h-16 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all duration-200 transform hover:scale-110"
-          aria-label={isPlaying ? t('pauseVideo', { defaultValue: 'Pause video' }) : t('playVideo', { defaultValue: 'Play video' })} // i18n-exempt: default value provided for accessibility
+          aria-label={isPlaying ? t('common.pauseVideo', { defaultValue: 'Pause video' }) : t('common.playVideo', { defaultValue: 'Play video' })} // i18n-exempt: default value provided for accessibility
         >
           {isPlaying ? (
             <PauseIcon size={24} />
