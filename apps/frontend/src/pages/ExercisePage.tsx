@@ -772,6 +772,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
             {/* Right Side - Action Buttons */}
             <div className="flex items-center gap-1">
+
               {/* Info Button - Always visible */}
               <button
                 onClick={() => onShowDetails(exercise)}

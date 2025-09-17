@@ -6,6 +6,7 @@ import { PlusIcon, MinusIcon, MoveUpIcon, MoveDownIcon } from '../components/ico
 import { VideoUploadWidget } from './VideoUploadWidget';
 import { ConfirmationModal } from './ui/ConfirmationModal';
 import { useFeatureFlag } from '../hooks/useFeatureFlags';
+import logger from '../utils/logger';
 
 interface ExerciseFormProps {
   exercise?: Partial<Exercise>;
@@ -228,7 +229,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         setNewMuscleGroup(parsedState.newMuscleGroup || '');
         setNewTag(parsedState.newTag || '');
       } catch (error) {
-        console.warn('Failed to restore form state:', error);
+        logger.warn('Failed to restore form state:', error);
       }
     }
   }, [persistenceKey, isEditing, canUploadVideos]);
@@ -321,52 +322,52 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   };
 
   const handleAddArrayItem = (type: 'equipment' | 'muscleGroups' | 'tags', value: string) => {
-    console.log('🔧 DEBUG: handleAddArrayItem called with:', { type, value, trimmed: value.trim() });
+    logger.log('🔧 DEBUG: handleAddArrayItem called with:', { type, value, trimmed: value.trim() });
     if (!value.trim()) {
-      console.log('🔧 DEBUG: handleAddArrayItem returning early - empty value');
+      logger.log('🔧 DEBUG: handleAddArrayItem returning early - empty value');
       return;
     }
     
     // Support comma-separated values - split by comma and process each item
     const items = value.split(',').map(item => item.trim()).filter(item => item.length > 0);
-    console.log('🔧 DEBUG: Split items:', items);
+    logger.log('🔧 DEBUG: Split items:', items);
     
     switch (type) {
       case 'equipment': {
-        console.log('🔧 DEBUG: Adding equipment items, current array:', equipmentNeeded);
+        logger.log('🔧 DEBUG: Adding equipment items, current array:', equipmentNeeded);
         const newEquipmentItems = items.filter(item => !equipmentNeeded.includes(item));
         if (newEquipmentItems.length > 0) {
           const updatedEquipment = [...equipmentNeeded, ...newEquipmentItems];
           setEquipmentNeeded(updatedEquipment);
-          console.log('🔧 DEBUG: Equipment added, new array:', updatedEquipment);
+          logger.log('🔧 DEBUG: Equipment added, new array:', updatedEquipment);
         } else {
-          console.log('🔧 DEBUG: All equipment items already exist');
+          logger.log('🔧 DEBUG: All equipment items already exist');
         }
         setNewEquipment('');
         break;
       }
       case 'muscleGroups': {
-        console.log('🔧 DEBUG: Adding muscle group items, current array:', muscleGroups);
+        logger.log('🔧 DEBUG: Adding muscle group items, current array:', muscleGroups);
         const newMuscleGroupItems = items.filter(item => !muscleGroups.includes(item));
         if (newMuscleGroupItems.length > 0) {
           const updatedMuscleGroups = [...muscleGroups, ...newMuscleGroupItems];
           setMuscleGroups(updatedMuscleGroups);
-          console.log('🔧 DEBUG: Muscle groups added, new array:', updatedMuscleGroups);
+          logger.log('🔧 DEBUG: Muscle groups added, new array:', updatedMuscleGroups);
         } else {
-          console.log('🔧 DEBUG: All muscle group items already exist');
+          logger.log('🔧 DEBUG: All muscle group items already exist');
         }
         setNewMuscleGroup('');
         break;
       }
       case 'tags': {
-        console.log('🔧 DEBUG: Adding tag items, current array:', tags);
+        logger.log('🔧 DEBUG: Adding tag items, current array:', tags);
         const newTagItems = items.filter(item => !tags.includes(item));
         if (newTagItems.length > 0) {
           const updatedTags = [...tags, ...newTagItems];
           setTags(updatedTags);
-          console.log('🔧 DEBUG: Tags added, new array:', updatedTags);
+          logger.log('🔧 DEBUG: Tags added, new array:', updatedTags);
         } else {
-          console.log('🔧 DEBUG: All tag items already exist');
+          logger.log('🔧 DEBUG: All tag items already exist');
         }
         setNewTag('');
         break;

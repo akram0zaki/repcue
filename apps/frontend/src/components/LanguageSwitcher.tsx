@@ -3,6 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { storageService } from '../services/storageService';
 import { syncService } from '../services/syncService';
+import logger from '../utils/logger';
 
 interface LanguageSwitcherProps {
   compact?: boolean;
@@ -38,10 +39,10 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         void syncService.sync(true);
       } catch (e) {
         // Non-fatal: UI language has already switched via i18n
-        console.debug('Locale persistence skipped:', e);
+        logger.debug('Locale persistence skipped:', e);
       }
     } catch (error) {
-      console.error('Failed to change language:', error);
+      logger.error('Failed to change language:', error);
     }
   };
 
