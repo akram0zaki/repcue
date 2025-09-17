@@ -1,22 +1,23 @@
 # Exercise Sharing Architecture
 
-This document explains the complete exercise sharing system in RepCue, including share creation, link distribution, anonymous viewing, and authenticated saving.
+This document explains the exercise sharing system in RepCue, including share creation, link distribution, and anonymous viewing.
 
 ## Overview
 
-RepCue's exercise sharing system allows users to share their custom exercises with others through secure, time-limited links. The system supports both public sharing (anyone with the link) and private sharing (specific email addresses), with different permission levels.
+RepCue's exercise sharing system allows users to share their custom exercises through secure, time-limited links. The current implementation supports public sharing (anyone with the link) with basic permission levels.
 
 ## Components Involved
 
 ### Client-Side (Frontend)
 - **ShareButton** (`src/components/ShareButton.tsx`) - Share link creation UI
-- **SharedExercisePage** (`src/pages/SharedExercisePage.tsx`) - Public viewing interface
-- **ExercisePage** (`src/pages/ExercisePage.tsx`) - Save shared exercise functionality
+- **StandaloneSharedExercise** (`src/StandaloneSharedExercise.tsx`) - Standalone viewing interface for shared exercises
+- **Main App** routing handles `/share/{token}` routes separately from main application
 
-### Server-Side (Supabase)
-- **create-exercise-share** Edge Function - Creates share records and tokens
-- **get-shared-exercise** Edge Function - Retrieves shared exercises for viewing
-- **save-shared-exercise** Edge Function - Saves shared exercises to user's library
+### Server-Side (Supabase Edge Functions)
+- **share-exercise** - Creates share records and tokens
+- **get-shared-exercise** - Retrieves shared exercises for anonymous viewing
+- **save-shared-exercise** - Saves shared exercises to user's library (authenticated users)
+- **download-shared-video** - Handles video access for shared exercises
 
 ### Database Tables
 - **exercise_shares** - Share records and permissions
@@ -24,129 +25,30 @@ RepCue's exercise sharing system allows users to share their custom exercises wi
 - **video_files** - Associated video content
 - **profiles** - User display names
 
-## Complete Sharing Flow Diagram
+## Sharing Flow Overview
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         EXERCISE SHARING FLOW                              │
-└─────────────────────────────────────────────────────────────────────────────┘
+1. USER CREATES SHARE
+   ↓
+   ShareButton → share-exercise Edge Function
+   ↓
+   Generate token → Store in exercise_shares table
+   ↓
+   Return share URL: /share/{token}
 
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│    OWNER     │  │   SHARE      │  │    SHARE     │  │  RECIPIENT   │  │   SAVE TO    │
-│   CREATES    │  │  CREATION    │  │    LINK      │  │   VIEWS      │  │   LIBRARY    │
-│    SHARE     │  │   PROCESS    │  │ DISTRIBUTION │  │   EXERCISE   │  │              │
-└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
-        │                 │                 │                 │                 │
-        ▼                 │                 │                 │                 │
-┌─────────────┐           │                 │                 │                 │
-│ User clicks │           │                 │                 │                 │
-│"Share" btn  │           │                 │                 │                 │
-└─────────────┘           │                 │                 │                 │
-        │                 │                 │                 │                 │
-        ▼                 │                 │                 │                 │
-┌─────────────┐           ▼                 │                 │                 │
-│ Share modal │ ┌─────────────────────┐     │                 │                 │
-│ opens with  │ │ ShareButton.tsx     │     │                 │                 │
-│ options     │ │ handleGenerateShare │     │                 │                 │
-└─────────────┘ │ Url()               │     │                 │                 │
-        │       └─────────────────────┘     │                 │                 │
-        ▼                 │                 │                 │                 │
-┌─────────────┐           ▼                 │                 │                 │
-│ Select:     │ ┌─────────────────────┐     │                 │                 │
-│ - Public    │ │ create-exercise-    │     │                 │                 │
-│ - Private   │ │ share Edge Function │     │                 │                 │
-│ - Email     │ │                     │     │                 │                 │
-│ - Expires   │ └─────────────────────┘     │                 │                 │
-└─────────────┘           │                 │                 │                 │
-        │                 ▼                 │                 │                 │
-        │       ┌─────────────────────┐     │                 │                 │
-        │       │ Database Operations │     │                 │                 │
-        │       │ 1. Create share     │     │                 │                 │
-        │       │    record           │     │                 │                 │
-        │       │ 2. Generate token   │     │                 │                 │
-        │       │ 3. Set permissions  │     │                 │                 │
-        │       │ 4. Set expiry       │     │                 │                 │
-        │       └─────────────────────┘     │                 │                 │
-        │                 │                 │                 │                 │
-        │                 ▼                 │                 │                 │
-        │       ┌─────────────────────┐     ▼                 │                 │
-        │       │ Share URL Created   │ ┌─────────────┐       │                 │
-        │       │ Format:             │ │ User copies │       │                 │
-        │       │ /shared/exercise?   │ │ or shares   │       │                 │
-        │       │ token=abc123xyz     │ │ link        │       │                 │
-        │       └─────────────────────┘ └─────────────┘       │                 │
-        │                 │                 │                 │                 │
-        │                 │                 ▼                 │                 │
-        │                 │       ┌─────────────────────┐     │                 │
-        │                 │       │ Link Distribution   │     │                 │
-        │                 │       │ - Copy to clipboard │     │                 │
-        │                 │       │ - Email (optional)  │     │                 │
-        │                 │       │ - Social media      │     │                 │
-        │                 │       │ - QR code           │     │                 │
-        │                 │       └─────────────────────┘     │                 │
-        │                 │                 │                 │                 │
-        │                 │                 ▼                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ Recipient clicks    │     │
-        │                 │                 │       │ share link          │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ SharedExercisePage  │     │
-        │                 │                 │       │ loads               │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ get-shared-exercise │     │
-        │                 │                 │       │ Edge Function       │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ Share Validation    │     │
-        │                 │                 │       │ 1. Token exists?    │     │
-        │                 │                 │       │ 2. Not expired?     │     │
-        │                 │                 │       │ 3. Not deleted?     │     │
-        │                 │                 │       │ 4. Exercise exists? │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ Video Processing    │     │
-        │                 │                 │       │ 1. Find video file  │     │
-        │                 │                 │       │ 2. Check storage    │     │
-        │                 │                 │       │ 3. Generate signed  │     │
-        │                 │                 │       │    URL (1hr expiry) │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ Exercise Display    │     │
-        │                 │                 │       │ - Name & details    │     │
-        │                 │                 │       │ - Instructions      │     │
-        │                 │                 │       │ - Video player      │     │
-        │                 │                 │       │ - Share info        │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │       ┌─────────────────────┐     │
-        │                 │                 │       │ Optional: Save      │     │
-        │                 │                 │       │ to Library          │     │
-        │                 │                 │       │ (if authenticated)  │     │
-        │                 │                 │       └─────────────────────┘     │
-        │                 │                 │                 │                 │
-        │                 │                 │                 ▼                 │
-        │                 │                 │                 │                 ▼
-        │                 │                 │                 │       ┌─────────────────────┐
-        │                 │                 │                 │       │ save-shared-        │
-        │                 │                 │                 │       │ exercise Function   │
-        │                 │                 │                 │       │ 1. Duplicate data   │
-        │                 │                 │                 │       │ 2. Set new owner    │
-        │                 │                 │                 │       │ 3. Copy video ref   │
-        │                 │                 │                 │       └─────────────────────┘
+2. RECIPIENT ACCESSES LINK
+   ↓
+   Browser loads /share/{token} → StandaloneSharedExercise.tsx
+   ↓
+   Extract token → Call get-shared-exercise?token={token}
+   ↓
+   Validate token → Fetch exercise data → Generate video signed URL
+   ↓
+   Display exercise with temporary video access
+
+3. OPTIONAL: SAVE TO LIBRARY (if authenticated)
+   ↓
+   save-shared-exercise → Duplicate exercise with new owner
 ```
 
 ## Detailed Step-by-Step Flow
@@ -190,38 +92,35 @@ const handleGenerateShareUrl = async () => {
 
 #### 3. Share URL Format
 ```
-https://app.repcue.com/shared/exercise?token=abc123xyz789def456ghi
+https://app.repcue.com/share/abc123xyz789def456ghi
 
 Components:
 - Base URL: app domain
-- Route: /shared/exercise
-- Query param: token={32-byte-hex-string}
+- Route: /share/{token}
+- Token: path parameter (64-character hex string)
 ```
 
 ### Phase 2: Link Distribution
 
-#### Share Options Available
-1. **Copy to Clipboard** - Direct URL copy
-2. **Email Sharing** - Optional email field for targeted sharing
-3. **QR Code** - Generate QR code for mobile sharing
-4. **Social Media** - Pre-formatted share text
+#### Current Implementation
+- **Copy to Clipboard** - Primary sharing method
+- **Simple Modal** - Basic share dialog with copy functionality
 
 #### Security Features
-- **Token Rotation** - New token generated for each share
-- **Expiry Control** - User-configurable expiration dates
-- **Revocation** - Owner can delete/disable shares
-- **Email Targeting** - Restrict access to specific email addresses
+- **Unique Tokens** - 64-character hex tokens for each share
+- **Expiry Support** - Optional expiration dates (implementation in progress)
+- **Revocation** - Shares can be marked as deleted
 
 ### Phase 3: Anonymous Viewing
 
 #### 1. Share Link Access
 ```typescript
-// SharedExercisePage.tsx
+// StandaloneSharedExercise.tsx
 useEffect(() => {
   const fetchSharedExercise = async () => {
-    const token = getTokenFromURL();
+    const shareToken = window.location.pathname.split('/share/')[1];
     const response = await fetch(
-      `${supabaseFunctionBaseUrl}/get-shared-exercise?token=${token}`
+      `${supabaseFunctionBaseUrl}/functions/v1/get-shared-exercise?token=${shareToken}`
     );
     // Process response...
   };
@@ -276,57 +175,13 @@ useEffect(() => {
 
 ### Phase 4: Authenticated Save (Optional)
 
-#### 1. Save Button (If User Logged In)
-```typescript
-// SharedExercisePage.tsx
-const handleSaveExercise = async () => {
-  if (!user) {
-    // Redirect to login
-    router.push('/auth?redirect=' + encodeURIComponent(window.location.href));
-    return;
-  }
+**Note**: This functionality exists in the codebase but is not currently accessible through the UI.
 
-  await saveSharedExercise(token);
-};
-```
-
-#### 2. Exercise Duplication (`save-shared-exercise`)
-```typescript
-// Save process:
-1. Authenticate user
-2. Validate share permissions ('copy' level required)
-3. Check user doesn't already own this exercise
-4. Create new exercise record:
-   {
-     ...originalExercise,
-     id: newUUID,                    // New ID
-     owner_id: savingUserId,         // New owner
-     custom_video_url: null,         // Reset video reference
-     created_at: now,
-     updated_at: now,
-     version: 1                      // Reset version
-   }
-5. If original has video, create video reference for new owner
-6. Return success with new exercise ID
-```
-
-#### 3. Video Handling for Saved Exercises
-```typescript
-// Video reference creation (not duplication):
-1. Find original video file record
-2. Create new video_files record:
-   {
-     id: newUUID,
-     exercise_id: newExerciseId,
-     owner_id: savingUserId,
-     file_name: original.file_name,
-     storage_path: original.storage_path,  // Same file!
-     upload_pending: false,
-     // Note: file_data stays null (reference only)
-   }
-3. Update new exercise:
-   custom_video_url: "blob-pending-sync://newExerciseId/fileName"
-```
+#### Edge Function: `save-shared-exercise`
+- Validates share token and user authentication
+- Creates duplicate exercise with new owner
+- Sets up video file references for the new owner
+- Returns success status and new exercise ID
 
 ## Database Schema Deep Dive
 
@@ -334,225 +189,167 @@ const handleSaveExercise = async () => {
 ```sql
 CREATE TABLE exercise_shares (
   id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  exercise_id           UUID NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
-  owner_id              UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  share_token           TEXT NOT NULL UNIQUE,           -- 32-byte hex string
-  permission_level      TEXT NOT NULL DEFAULT 'view',   -- 'view' | 'copy'
+  exercise_id           UUID REFERENCES exercises(id) ON DELETE CASCADE,
+  owner_id              UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  share_token           TEXT UNIQUE,                    -- 64-character hex string
+  permission_level      VARCHAR,                        -- 'view' | 'copy'
   shared_with_user_id   UUID REFERENCES profiles(id),   -- Target user (optional)
-  shared_with_user_email TEXT,                          -- Target email (optional)
   expires_at            TIMESTAMPTZ,                    -- Expiry (optional)
-  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  deleted               BOOLEAN NOT NULL DEFAULT false,
-
-  -- Indexes for performance
-  INDEX idx_exercise_shares_token (share_token),
-  INDEX idx_exercise_shares_owner (owner_id),
-  INDEX idx_exercise_shares_exercise (exercise_id),
-  INDEX idx_exercise_shares_expires (expires_at) WHERE expires_at IS NOT NULL
+  created_at            TIMESTAMPTZ DEFAULT NOW(),
+  updated_at            TIMESTAMPTZ DEFAULT NOW(),
+  deleted               BOOLEAN DEFAULT false,
+  version               BIGINT DEFAULT 1
 );
 ```
 
+**Note**: The actual schema differs from complex documentation - no email field, simpler structure, version field added.
+
 ### Row Level Security (RLS) Policies
+
+#### Exercise Shares Table
 ```sql
--- Users can only create shares for their own exercises
-CREATE POLICY exercise_shares_insert_own ON exercise_shares
-  FOR INSERT TO authenticated
-  WITH CHECK (owner_id = auth.uid());
+-- Allows anonymous users to read valid share records
+CREATE POLICY "Public read access for exercise shares" ON exercise_shares
+  FOR SELECT TO anon, authenticated
+  USING (share_token IS NOT NULL
+    AND (expires_at IS NULL OR expires_at > now())
+    AND deleted = false);
 
--- Users can only view/update their own shares
-CREATE POLICY exercise_shares_select_own ON exercise_shares
-  FOR SELECT TO authenticated
+-- Users can manage their own shares
+CREATE POLICY "Users can manage their exercise shares" ON exercise_shares
+  FOR ALL TO public
   USING (owner_id = auth.uid());
-
--- Edge functions need full access for public viewing
--- (Service role key bypasses RLS)
 ```
 
-## Permission Levels
+#### Exercises Table
+```sql
+-- Allows anonymous access to exercises that have valid shares
+CREATE POLICY "Public read access for shared exercises" ON exercises
+  FOR SELECT TO anon, authenticated
+  USING (id IN (
+    SELECT exercise_id FROM exercise_shares
+    WHERE share_token IS NOT NULL
+    AND (expires_at IS NULL OR expires_at > now())
+    AND deleted = false
+  ));
+```
 
-### 'view' Permission
-- **Allows**: Viewing exercise details, instructions, video
-- **Restricts**: Cannot save to personal library
-- **Use Case**: Sharing for reference/inspiration only
+#### Video Files Table
+```sql
+-- No direct anonymous access - uses service role bypass
+CREATE POLICY "Users can view their own video files" ON video_files
+  FOR SELECT TO public
+  USING (auth.uid() = owner_id);
 
-### 'copy' Permission
-- **Allows**: Everything from 'view' + saving to library
-- **Creates**: Complete duplicate under new ownership
-- **Use Case**: Sharing templates for others to customize
+-- Shared exercise video access (for saved copies)
+CREATE POLICY "Users can view video files for shared exercises" ON video_files
+  FOR SELECT TO public
+  USING (EXISTS (
+    SELECT 1 FROM exercises e
+    WHERE e.owner_id = auth.uid()
+    AND e.is_shared_copy = true
+    AND e.shared_from_exercise_id = video_files.exercise_id
+  ));
+```
 
-## Share Token Security
+#### Storage Policies
+```sql
+-- Users can only access their own video folders
+CREATE POLICY "Users can download their own videos" ON storage.objects
+  FOR SELECT TO public
+  USING (bucket_id = 'videos' AND auth.uid()::text = foldername(name)[1]);
 
-### Token Generation
+-- No anonymous access to storage - requires signed URLs
+```
+
+## Key Implementation Details
+
+### Permission Levels
+- **'view'**: Viewing exercise details, instructions, video (current default)
+- **'copy'**: Everything from 'view' + saving to library (planned feature)
+
+### Token Security
+- 64-character hex tokens generated using crypto.getRandomValues()
+- Database uniqueness constraint
+- 256 bits of entropy
+
+### Video Sharing
+- Original videos stored as `blob-pending-sync://` URLs
+- Anonymous access uses 1-hour signed URLs from Supabase Storage
+- Video recovery system marks missing files for re-sync
+
+### RLS Policy Workarounds
+
+#### Problem: Supabase RLS prevents anonymous users from accessing video files
+**Solution**: Service Role Key Bypass in Edge Functions
+- `get-shared-exercise` edge function uses `SUPABASE_SERVICE_ROLE_KEY`
+- Service role bypasses all RLS policies
+- Edge function validates share tokens before granting access
+- Generates temporary signed URLs (1-hour expiry) for anonymous access
+
+#### Problem: Storage bucket RLS restricts video access to owners only
+**Solution**: Signed URL Generation
 ```typescript
-// Cryptographically secure random token:
-const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
-const shareToken = Array.from(tokenBytes)
-  .map(byte => byte.toString(16).padStart(2, '0'))
-  .join('');
-// Result: 64-character hex string (256 bits entropy)
+// In get-shared-exercise edge function:
+const { data: signedUrl } = await supabase.storage
+  .from('videos')
+  .createSignedUrl(videoFile.storage_path, 3600); // 1 hour
 ```
+- Signed URLs bypass storage RLS policies
+- Service role key required to generate signed URLs
+- URLs expire automatically for security
 
-### Token Properties
-- **Uniqueness**: Enforced by database constraint
-- **Unpredictability**: Cryptographically secure random
-- **Length**: 64 characters (256 bits)
-- **Character Set**: Hexadecimal (0-9, a-f)
-- **Collision Resistance**: 2^256 possible values
+### Data Storage Strategy Workarounds
 
-## Video Sharing Architecture
-
-### Video Access Patterns
-
-#### 1. Owner Access (Authenticated)
+#### Problem: JSON serialization of File/Blob objects for sync
+**Solution**: File → ArrayBuffer → Byte Array conversion
 ```typescript
-// Full ownership access:
-- Read from IndexedDB (offline)
-- Direct Supabase Storage download (authenticated)
-- Full CRUD operations
+// In sync service when uploading to server:
+const arrayBuffer = await file.arrayBuffer();
+const uint8Array = new Uint8Array(arrayBuffer);
+record.file_data = Array.from(uint8Array); // Convert to plain array for JSON
 ```
 
-#### 2. Anonymous Share Access
+#### Problem: Database storage vs IndexedDB compatibility
+**Solution**: Dual storage approach
+- **Database**: `file_data` column as `bytea` type (stores byte arrays)
+- **IndexedDB**: `file_data` stored as `File`/`Blob` objects for browser compatibility
+- **Conversion**: Automatic conversion during sync operations
+
+#### Problem: Postgres bytea size limits and performance
+**Solution**: Hybrid storage model
+- Small videos: Stored directly in `video_files.file_data` (bytea)
+- Large videos: Stored in Supabase Storage, referenced by `storage_path`
+- Client downloads from storage and caches in IndexedDB for offline access
+
+#### Problem: Cross-browser blob URL compatibility
+**Solution**: ArrayBuffer reconstruction for Firefox
 ```typescript
-// Temporary signed URL access:
-- 1-hour expiry window
-- Read-only access
-- No authentication required
-- Automatic URL rotation
+// In resolveVideoUrl for Firefox compatibility:
+if (storedVideoFile.file_data instanceof File) {
+  const arrayBuffer = await storedVideoFile.file_data.arrayBuffer();
+  const blob = new Blob([arrayBuffer], { type: storedVideoFile.mime_type });
+  blobUrl = URL.createObjectURL(blob);
+}
 ```
 
-#### 3. Saved Exercise Access (New Owner)
-```typescript
-// Reference-based access:
-- Video file record points to same storage file
-- New owner can download via authenticated client
-- Independent of original owner's access
-```
+## Current Status
 
-### Video URL Lifecycle in Sharing
-```
-1. Original owner: blob-pending-sync://originalId/video.mp4
-2. Share creation: No video URL change
-3. Anonymous access: https://supabase.co/.../signedUrl?expires=...
-4. Save to library: blob-pending-sync://newId/video.mp4
-5. New owner sync: Download and store locally
-```
+### Implemented Features
+- Basic share creation and link generation
+- Anonymous viewing of shared exercises with video support
+- Token-based security with expiration support
+- Video recovery system for missing files
+- Edge function architecture for scalability
 
-## Error Handling & Edge Cases
+### Known Limitations
+- Save to library functionality exists but not exposed in UI
+- No advanced permission controls
+- No share analytics or management
+- No email-based sharing workflow
 
-### Share Creation Failures
-```typescript
-// Common failure scenarios:
-1. Exercise not found → 404 error
-2. User doesn't own exercise → 403 error
-3. Invalid email format → 400 error
-4. Database constraint violation → 500 error
-```
-
-### Share Access Failures
-```typescript
-// Anonymous viewing failures:
-1. Invalid token format → 400 "Invalid share token format"
-2. Token not found → 404 "Share token not found or has expired"
-3. Share expired → 404 "Share token has expired"
-4. Exercise deleted → 404 "Exercise not found"
-5. Video missing → Shows exercise without video, triggers recovery
-```
-
-### Video Recovery System
-```typescript
-// When shared video is missing:
-1. Mark video_files as upload_pending: true
-2. Mark exercise as dirty for re-sync
-3. Update sync cursor to trigger owner's next sync
-4. Owner's next sync re-uploads video
-5. Subsequent share access succeeds
-```
-
-### Save Failures
-```typescript
-// Authenticated save failures:
-1. User not logged in → Redirect to auth
-2. Insufficient permissions → 403 "Permission denied"
-3. Already owns exercise → 409 "Exercise already in library"
-4. Duplicate name conflict → Auto-rename with suffix
-```
-
-## Analytics & Monitoring
-
-### Share Creation Metrics
-- Share creation rate per user
-- Permission level distribution (view vs copy)
-- Expiry setting patterns
-- Email vs public share ratio
-
-### Share Access Metrics
-- Share link click-through rates
-- Geographic distribution of access
-- Device/browser patterns
-- Video play rates
-
-### Conversion Metrics
-- Share view → save conversion rate
-- Share view → user registration rate
-- Video engagement in shared exercises
-
-## Security Considerations
-
-### Attack Vectors & Mitigations
-
-#### 1. Token Brute Force
-- **Risk**: Attacker tries to guess share tokens
-- **Mitigation**: 256-bit entropy makes brute force infeasible
-- **Additional**: Rate limiting on Edge Functions
-
-#### 2. Token Leakage
-- **Risk**: Share URLs accidentally exposed in logs/referrers
-- **Mitigation**: Expiry dates, revocation capability
-- **Additional**: HTTPS-only, no-referrer policies
-
-#### 3. Video Access Abuse
-- **Risk**: Anonymous users downloading large video files
-- **Mitigation**: 1-hour signed URL expiry, reasonable file size limits
-- **Additional**: CDN caching, bandwidth monitoring
-
-#### 4. Spam Sharing
-- **Risk**: Users creating excessive shares
-- **Mitigation**: Rate limiting per user
-- **Additional**: Share count monitoring, abuse detection
-
-#### 5. Data Privacy
-- **Risk**: Sensitive exercise data in shares
-- **Mitigation**: Remove owner-identifying fields in public responses
-- **Additional**: User education about sharing implications
-
-## Performance Optimizations
-
-### Database Optimizations
-- **Indexes**: On share_token, owner_id, exercise_id, expires_at
-- **Partitioning**: Consider partitioning by creation date for large datasets
-- **Cleanup**: Regular deletion of expired/old shares
-
-### Edge Function Optimizations
-- **Caching**: Cache exercise data with reasonable TTL
-- **Connection Pooling**: Reuse database connections
-- **Response Compression**: Gzip responses for better performance
-
-### Video Delivery Optimizations
-- **CDN**: Use Supabase CDN for video delivery
-- **Compression**: Encourage video compression before upload
-- **Streaming**: Consider HLS/DASH for large videos
-
-## Future Enhancements
-
-### Planned Features
-1. **Workout Sharing** - Extend system to support workout sharing
-2. **Share Analytics** - Detailed analytics for share creators
-3. **Collaboration** - Allow multiple users to edit shared content
-4. **Version Control** - Track changes to shared exercises
-
-### Scaling Considerations
-1. **Sharding**: Database sharding by owner_id for very large scale
-2. **CDN Integration**: Direct CDN serving for static content
-3. **Background Processing**: Queue-based video processing
-4. **Multi-Region**: Geographic distribution for global users
+### Architecture Notes
+- Uses standalone component for shared exercise viewing
+- Separate routing for `/share/{token}` URLs
+- Videos accessed via 1-hour signed URLs for anonymous users
+- Robust error handling and recovery mechanisms
