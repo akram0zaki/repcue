@@ -114,12 +114,55 @@ class V2SyncService {
         recordsPushed: res.pushed,
         recordsPulled: res.pulled,
         conflicts: 0,
-        errors: (res.errors || []).map(e => ({ 
-          type: 'unknown' as const, 
-          message: e.message, 
-          timestamp: new Date().toISOString() 
+        errors: (res.errors || []).map(e => ({
+          type: 'unknown' as const,
+          message: e.message,
+          table: e.table,
+          timestamp: new Date().toISOString()
         } as SyncError))
       };
+
+      // Enhanced logging for sync results with correlation ID
+      if (res.correlationId) {
+        logger.info(`[sync:v2] 🔗 Correlation ID: ${res.correlationId}`);
+      }
+
+      // Log detailed sync metadata if available
+      const resWithMetadata = res as typeof res & {
+        sync_metadata?: {
+          push_successes: number;
+          push_errors: number;
+          pull_successes: number;
+          pull_errors: number;
+          total_successes: number;
+          total_errors: number;
+        };
+        status?: string;
+        message?: string;
+      };
+
+      if (resWithMetadata.sync_metadata) {
+        const metadata = resWithMetadata.sync_metadata;
+        logger.info(`[sync:v2] 📊 Detailed sync results:`, {
+          correlationId: res.correlationId,
+          pushSuccesses: metadata.push_successes,
+          pushErrors: metadata.push_errors,
+          pullSuccesses: metadata.pull_successes,
+          pullErrors: metadata.pull_errors,
+          totalSuccesses: metadata.total_successes,
+          totalErrors: metadata.total_errors,
+          status: resWithMetadata.status,
+          message: resWithMetadata.message
+        });
+
+        // Log specific error details if there were failures
+        if (metadata.total_errors > 0) {
+          logger.warn(`[sync:v2] ⚠️ Sync completed with ${metadata.total_errors} errors out of ${metadata.total_successes + metadata.total_errors} operations`);
+          if (mappedResult.errors.length > 0) {
+            logger.warn(`[sync:v2] 🔍 Error details:`, mappedResult.errors);
+          }
+        }
+      }
 
       this.errors = mappedResult.errors;
       return mappedResult;

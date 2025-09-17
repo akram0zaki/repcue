@@ -210,11 +210,12 @@ export const ExerciseDetailPage = lazy(() =>
   }))
 );
 
-export const ProfilePage = lazy(() => 
+export const ProfilePage = lazy(() =>
   import('../pages/ProfilePage').catch(() => ({
     default: () => <div>Error loading Profile page</div>
   }))
 );
+
 
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule

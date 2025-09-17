@@ -4,6 +4,6 @@
   "copying": "Copiaring...",
   "error": "Error al copiar",
   "genericError": "Ocurrió un error al copiar",
-  "loginRequired": "[es] Please log in to copy content",
-  "tooltip": "Copiar to your library"
+  "loginRequired": "[es] Por favor, inicie sesión para copiar contenido",
+  "tooltip": "Copiar a tu biblioteca"
 }

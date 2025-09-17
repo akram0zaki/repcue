@@ -16,6 +16,7 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
   - Durations: `repDurationSeconds || BASE_REP_TIME` from `src/constants/index.ts`; apply `settings.repSpeedFactor`.
 - **Video Demos** (feature-gated): flag in `src/config/features.ts` + user setting + reduced‑motion. Loader: `src/utils/loadExerciseMedia.ts`; variant: `src/utils/selectVideoVariant.ts`; hook: `src/hooks/useExerciseVideo.ts`; UI in `src/pages/TimerPage.tsx`.
 - **Authentication**: Supabase auth with magic links, OAuth providers. PWA-aware deep linking via custom protocol handlers (`web+repcue://`)
+- **Supabase Environments**: Dual environment setup (dev: xwzrsfkzqxdybjrkkkvh, prod: zumzzuvfsuzvvymhpymk). ALWAYS verify environment synchronization before major changes - production can lag significantly in schema and edge functions. Use MCP tools to compare and sync environments.
 
 ## Project conventions
 - **File Structure**: Types in `apps/frontend/src/types/index.ts` (+ `src/types/media.ts`). Constants in `src/constants/index.ts`.
@@ -31,6 +32,7 @@ RepCue is a privacy-first fitness tracking PWA for interval training, optimized 
 - **Build**: `pnpm build` (includes splash copy). Prod/Pi: `pnpm build:prod`; serve `pnpm build:serve` or `pnpm start` (Express).
 - **Deploy (Pi)**: `pnpm build:prod; pnpm pm2:start`.
 - **E2E**: `pnpm build && pnpm preview` then `pnpm cypress:run` from `tests/e2e/`
+- **Supabase Sync Check**: Use `mcp_supabase_list_tables` vs `mcp_supabase-prod_list_tables` and similar MCP tools to verify environment parity before major feature work.
 
 ## What to check when touching timer logic
 - Rep progression for a 2×8 example:

@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
 import { isIOS, isAndroid, getOSName } from '../utils/platformDetection';
+import logger from '../utils/logger';
 
 /**
  * Install Banner Props
@@ -151,7 +152,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
         hideBanner();
       }
     } catch (error) {
-      console.error('Install failed:', error);
+      logger.error('Install failed:', error);
     }
   };
 

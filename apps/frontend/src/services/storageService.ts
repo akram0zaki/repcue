@@ -141,7 +141,7 @@ class RepCueDatabase extends Dexie {
       activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
       user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
       app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
-      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty'
     });
@@ -152,7 +152,7 @@ class RepCueDatabase extends Dexie {
       activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
       user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
       app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
-      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       // sync_state: key = user_id (only one row per user) — store JSON blobs for cursors & metrics
@@ -166,7 +166,7 @@ class RepCueDatabase extends Dexie {
       activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
       user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
       app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
-      user_favorites: 'id, user_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
       workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       sync_state: 'user_id'
@@ -208,6 +208,19 @@ class RepCueDatabase extends Dexie {
     // Version 14: Update video_files schema to include file_size and mime_type indexes for better querying
     this.version(14).stores({
       exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 15: Add shared exercise tracking fields to exercises table
+    this.version(15).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
       activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
       user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
       app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
@@ -1378,6 +1391,109 @@ export class StorageService {
       logger.log('💾 [VideoFile] Video file marked as uploaded:', { videoFileId, cloudUrl });
     } catch (error) {
       logger.warn('💾 [VideoFile] Failed to mark video file as uploaded:', error);
+    }
+  }
+
+  /**
+   * Clean up deleted video files from IndexedDB to free up space
+   * This removes records marked as deleted=true that are taking up space
+   */
+  public async cleanupDeletedVideoFiles(): Promise<{ deletedCount: number; freedSpaceMB: number }> {
+    if (!this.canStoreData()) {
+      return { deletedCount: 0, freedSpaceMB: 0 };
+    }
+
+    try {
+      logger.log('💾 [VideoCleanup] Starting cleanup of deleted video files...');
+
+      // Get all deleted video files
+      const deletedVideoFiles = await this.db.video_files
+        .where('deleted')
+        .equals(1)
+        .toArray();
+
+      logger.log(`💾 [VideoCleanup] Found ${deletedVideoFiles.length} deleted video files to remove`);
+
+      if (deletedVideoFiles.length === 0) {
+        return { deletedCount: 0, freedSpaceMB: 0 };
+      }
+
+      // Calculate space to be freed (approximate)
+      const totalSize = deletedVideoFiles.reduce((total, file) => {
+        const fileSize = file.file_size || 0;
+        const blobSize = file.file_data?.size || 0;
+        return total + Math.max(fileSize, blobSize);
+      }, 0);
+
+      const freedSpaceMB = Math.round(totalSize / (1024 * 1024) * 100) / 100;
+
+      // Remove deleted video files in batches to avoid blocking UI
+      const batchSize = 10;
+      let deletedCount = 0;
+
+      for (let i = 0; i < deletedVideoFiles.length; i += batchSize) {
+        const batch = deletedVideoFiles.slice(i, i + batchSize);
+        const idsToDelete = batch.map(file => file.id);
+
+        // Actually delete from IndexedDB (not just mark as deleted)
+        await this.db.video_files.bulkDelete(idsToDelete);
+        deletedCount += idsToDelete.length;
+
+        logger.log(`💾 [VideoCleanup] Deleted batch ${Math.ceil((i + 1) / batchSize)} - removed ${idsToDelete.length} records`);
+
+        // Small delay to avoid blocking UI
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+
+      logger.log(`💾 [VideoCleanup] Cleanup complete! Removed ${deletedCount} deleted video files, freed ~${freedSpaceMB}MB`);
+
+      return { deletedCount, freedSpaceMB };
+    } catch (error) {
+      logger.error('💾 [VideoCleanup] Failed to cleanup deleted video files:', error);
+      return { deletedCount: 0, freedSpaceMB: 0 };
+    }
+  }
+
+  /**
+   * Get statistics about video file storage
+   */
+  public async getVideoFileStats(): Promise<{
+    totalFiles: number;
+    activeFiles: number;
+    deletedFiles: number;
+    totalSizeMB: number;
+    deletedSizeMB: number;
+  }> {
+    if (!this.canStoreData()) {
+      return { totalFiles: 0, activeFiles: 0, deletedFiles: 0, totalSizeMB: 0, deletedSizeMB: 0 };
+    }
+
+    try {
+      const allVideoFiles = await this.db.video_files.toArray();
+      const activeFiles = allVideoFiles.filter(f => !f.deleted);
+      const deletedFiles = allVideoFiles.filter(f => f.deleted);
+
+      const calculateSize = (files: StoredVideoFile[]) => {
+        return files.reduce((total, file) => {
+          const fileSize = file.file_size || 0;
+          const blobSize = file.file_data?.size || 0;
+          return total + Math.max(fileSize, blobSize);
+        }, 0);
+      };
+
+      const totalSize = calculateSize(allVideoFiles);
+      const deletedSize = calculateSize(deletedFiles);
+
+      return {
+        totalFiles: allVideoFiles.length,
+        activeFiles: activeFiles.length,
+        deletedFiles: deletedFiles.length,
+        totalSizeMB: Math.round(totalSize / (1024 * 1024) * 100) / 100,
+        deletedSizeMB: Math.round(deletedSize / (1024 * 1024) * 100) / 100
+      };
+    } catch (error) {
+      logger.error('💾 [VideoStats] Failed to get video file stats:', error);
+      return { totalFiles: 0, activeFiles: 0, deletedFiles: 0, totalSizeMB: 0, deletedSizeMB: 0 };
     }
   }
 

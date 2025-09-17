@@ -4,6 +4,6 @@
   "copying": "Kopierening...",
   "error": "Kopieren fehlgeschlagen",
   "genericError": "Beim Kopieren ist ein Fehler aufgetreten",
-  "loginRequired": "[de] Please log in to copy content",
+  "loginRequired": "Bitte loggen Sie sich ein, um Inhalte zu kopieren",
   "tooltip": "Kopieren to your library"
 }

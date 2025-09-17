@@ -1,6 +1,9 @@
 # AGENTS.md - AI Agent Guide for RepCue
 
-**Last Updated**: 2025-09-06  
+**Last Updated- **Database** | Supabase PostgreSQL | - | User data, exercises, workouts |
+- **Authentication** | Supabase Auth | - | User management |
+- **Storage** | IndexedDB (Dexie) | - | Client-side data persistence |
+- **Cloud Sync** | Supabase (dual env) | - | Dev: xwzrsfkzqxdybjrkkkvh, Prod: zumzzuvfsuzvvymhpymk | 2025-09-06  
 **Version**: 2.0.0  
 **For**: AI Agents working on the RepCue codebase
 
@@ -461,6 +464,7 @@ logger.error('Error occurred:', error);
 7. **Types**: Don't use `any` type - maintain strict TypeScript typing
 8. **Console Logging**: Never use `console.log()` directly - always use the logger utility
 9. **Debug Code**: Don't leave debugging code in production without DEBUG flag protection
+10. **Supabase Environments**: Never assume dev and prod are synchronized - always verify before major changes
 
 ### ✅ Always Do This
 1. **Read CLAUDE.md**: Check `.claude/CLAUDE.md` for latest project instructions
@@ -472,6 +476,7 @@ logger.error('Error occurred:', error);
 7. **Security First**: Follow security best practices for user data
 8. **Mobile First**: Test changes on mobile viewport sizes
 9. **Use Logger**: Always use `logger.log()`, `logger.warn()`, `logger.error()` instead of console methods
+10. **Verify Environment Sync**: Use MCP tools to compare dev/prod environments before major database or function changes
 
 ### 🎯 Timer Logic Validation Example
 ```typescript

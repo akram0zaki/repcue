@@ -208,6 +208,11 @@ I want you to go through the workspace to understand the current implementation 
 
 - ✅ I uploaded a video to a custom exercise Ya 7amada 5 on Edge browser, and I am trying to see if it sync correctly to Chrome where I am logged on with the same user. The custom exercise itself is synced correctly but not the video. I noticed that in supabase dev project the custom_video_url column is null for my exercise (id = 65b00af8-e9b6-4ec3-b17d-82ef25e56c43) while in my IndexedDB on Edge it has the value "blob-pending-sync://65b00af8-e9b6-4ec3-b17d-82ef25e56c43/BearCrawl_720x576.mp4". On Chrome the value is null in indexeddb. That makes me think that this column is for some reason dropped from the sync. You need to figure out why it is not synced and solve it.
 
+- I went to Edge where I am logged on and edited exercise Ya 7amada 6 to attach a video then saved the exercise and switched tabs to trigger sync. I copied the console output to file console.log at the root of this workspace. Please examine the log ainst the dev database and determine if the sync was successful. My expectation is that both exercise, exercise_videos, and video_files tables should all be updated as a result of this sync. If that's the sync investigate why it failed. I also need better error handling so when the sync edge function responds that there were 2 push failures I need to know to which tables. There is a lot of room to improve observability for an application like this one that spans across different tiers. For example, I need to be able to corelate the same customer request across the different tiers with one corelation ID. That should improve the investigation of this and future problems.
+
+-✅ I want to rearrange the layout of the exercise card on ExercisePage. I want to make it visually attractive by displaying a frame of the video on the card with the exercise title and action buttons (edit/share/delete/favorite) above the picture (video frame), and below the video frame I want to display the type (time-based/rep-based) and the duration or reps/sets. I am not decided on where to place the "start timer" button and open to suggestions.
+Not all exercises have videos so if the exercise doesn't have a video we should use a placeholder image.
+
 - We don't need real migration:
 
 // Type for database records during migration - supports both user_id and owner_id

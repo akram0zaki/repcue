@@ -1,12 +1,12 @@
 {
-  "addReview": "[nl] Add Review",
-  "characters": "[nl] characters",
-  "hideReview": "[nl] Hide Review",
-  "loginToRate": "[nl] Please log in to rate",
-  "rateThis": "[nl] Rate this",
-  "reviewPlaceholder": "Delen your experience with this exercise...",
-  "reviews": "[nl] Reviews",
-  "submitError": "[nl] Failed to submit rating",
-  "submitting": "[nl] Submitting...",
-  "yourRating": "Your Beoordeling"
+  "addReview": "Beoordeling toevoegen",
+  "characters": "tekens",
+  "hideReview": "Beoordeling verbergen",
+  "loginToRate": "Log alstublieft in om te beoordelen",
+  "rateThis": "Beoordeel dit",
+  "reviewPlaceholder": "Deel je ervaring met deze oefening...",
+  "reviews": "Beoordelingen",
+  "submitError": "Het indienen van de beoordeling is mislukt",
+  "submitting": "Indienen...",
+  "yourRating": "Jouw beoordeling"
 }

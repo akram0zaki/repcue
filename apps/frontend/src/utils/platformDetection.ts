@@ -183,6 +183,6 @@ export const logPlatformInfo = (): void => {
   logger.log('Platform Info:', info)
   logger.log('User Agent:', navigator.userAgent)
   logger.log('Platform:', navigator.platform)
-  console.log('Install Instructions:', getInstallInstructions());
+  // Install instructions - reducing verbosity
   console.groupEnd();
 };

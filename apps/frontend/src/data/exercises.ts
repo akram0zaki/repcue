@@ -36,7 +36,7 @@ export const INITIAL_EXERCISES: Exercise[] = [
     exercise_type: ExerciseType.TIME_BASED,
     default_duration: 20, // Harder than regular plank, shorter duration
     is_favorite: false,
-    has_video: true,
+    has_video: false,
     tags: ['isometric', 'core', 'obliques']
   }),
   createExercise({

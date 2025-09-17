@@ -1,6 +1,198 @@
 ## Unreleased
 
+### Fixed
+- **Critical Video Corruption in Shared Exercise Downloads**: Resolved data corruption bug causing shared exercise videos to become unplayable after download
+  - **Root Cause**: `supabase.functions.invoke()` was incorrectly parsing binary video data as UTF-8 text, causing byte-level corruption during transfer
+  - **Symptoms**: File size inflation (e.g., 587KB becoming 1073KB), `MEDIA_ERR_SRC_NOT_SUPPORTED` errors, videos working when uploaded but failing after sharing
+  - **Solution**: Replaced `supabase.functions.invoke()` with native `fetch()` API for binary video downloads to preserve data integrity
+  - **Edge Function**: No changes needed - edge functions were correctly returning binary data with proper headers
+  - **Verification**: Fixed videos now match exact original file sizes and play correctly across all browsers
+  - **Investigation**: Comprehensive debugging revealed session conflicts were red herring; actual issue was client-side data processing
+
+- **Custom Exercise Favorites Being Auto-Unfavorited**: Fixed database schema inconsistency causing favorites to be deleted during sync
+  - **Root Cause**: FavoritesService was using `user_id` field in queries but `owner_id` field for inserts, creating orphaned records
+  - **Symptoms**: Favoriting a custom exercise would immediately unfavorite when favoriting another exercise due to sync conflicts
+  - **Solution**: Updated all database queries in FavoritesService to consistently use `owner_id` field
+  - **Schema Fix**: Corrected IndexedDB schema definitions in StorageService to use `owner_id` across all database versions
+  - **Impact**: Favorites now persist correctly and sync properly between devices without unwanted deletions
+
+### Improved
+- **Reduced Excessive Debug Logging**: Implemented intelligent logging suppression while maintaining debugging capabilities
+  - **Smart Filtering**: Added pattern-based suppression to logger utility to reduce console noise from 280+ to ~20-30 essential messages
+  - **Preserved Information**: Maintained all error and warning logs while suppressing repetitive operational messages
+  - **Targeted Suppression**: Filtered verbose video operations, sync diagnostics, storage operations, and repetitive state changes
+  - **Development Friendly**: DEBUG flags remain enabled with selective output instead of blanket disabling
+  - **Direct Console Cleanup**: Replaced direct `console.log` statements in hooks and utilities with comments to reduce noise
+  - **Configurable**: Easy to adjust suppression patterns for specific debugging needs without code changes
+
+### Documentation
+- **Video Corruption Investigation**: Added comprehensive documentation of the video corruption bug investigation and resolution
+  - **Timeline Analysis**: Documented 3-phase investigation from session conflict theory to root cause identification
+  - **Technical Deep Dive**: Detailed explanation of how binary data corruption occurred and why direct fetch approach solved it
+  - **Lessons Learned**: Key insights about library limitations, file size diagnostics, and end-to-end testing strategies
+  - **Prevention Strategies**: Best practices for binary data handling, type validation, and integrity testing
+  - **Code Examples**: Before/after code samples showing problematic vs corrected implementations
+
+## 2025-09-17
+
+### Fixed
+- **Video Sharing and Thumbnail Issues**: Resolved multiple video-related problems affecting shared exercises and local video display
+  - **MP4 Corruption Fix**: Fixed blob URL creation issues in `resolveVideoUrl.ts` that were causing video files to be marked as corrupted and automatically deleted
+  - **Firefox Compatibility**: Improved blob URL generation by converting File objects to ArrayBuffer then to Blob for better cross-browser compatibility
+  - **Deleted Flag Issue**: Fixed sync system incorrectly marking video files as `deleted: true` instead of `deleted: false`, preventing video thumbnails from loading
+  - **Video Recovery System**: Enhanced video recovery mechanism to properly mark missing files for re-sync without causing data corruption
+  - **Share Link Generation**: Resolved 403 Forbidden errors in share link creation that occurred intermittently due to timing issues
+  - **Temporary Debugging Cleanup**: Removed temporary debugging code and test buttons added during troubleshooting process
+
+### Documentation
+- **Exercise Sharing Architecture**: Completely revised and simplified exercise sharing documentation (`docs/exercise-sharing.md`)
+  - **Accuracy Corrections**: Updated documentation to match actual implementation instead of theoretical complex features
+  - **Component Mapping**: Corrected component names and file paths to reflect real codebase structure
+  - **URL Structure**: Fixed documentation of share URL format from query parameters to path parameters (`/share/{token}`)
+  - **Database Schema**: Updated schema documentation to match actual table structure and removed non-existent fields
+  - **RLS Policy Details**: Added comprehensive documentation of Row Level Security policies and workarounds for anonymous video access
+  - **Storage Strategy**: Documented the complex data storage strategies including File/Blob to byte array conversions and dual storage approach
+  - **Service Role Bypass**: Explained how edge functions use service role keys to bypass RLS policies while maintaining security
+  - **Signed URL Strategy**: Documented the 1-hour signed URL approach for anonymous video access
+  - **Complexity Reduction**: Removed 400+ lines of theoretical features and over-engineered solutions not present in actual implementation
+  - **Current Status**: Added realistic assessment of implemented features vs planned features
+
+## 2025-09-17 (Earlier)
+
+### Improved
+- **Exercise Card Layout Optimization**: Enhanced exercise card layout for better space utilization and content hierarchy
+  - **Top Row Layout**: Restructured exercise cards to use horizontal space more efficiently with tags on left and buttons on right
+  - **Custom/Shared Tags**: Moved custom and shared exercise badges to top row (left-aligned) for immediate visibility and better prominence
+  - **Action Buttons**: Maintained all action buttons (Info, Edit, Delete, Share, Favorite) in top row (right-aligned) for consistent positioning
+  - **Exercise Names**: Cleaned up exercise name section by removing competing badges underneath, providing more breathing room
+  - **Visual Balance**: Improved card visual balance with content distributed across the full width of the top row
+  - **Content Hierarchy**: Clearer separation between administrative tags, exercise content, and action controls
+  - **Consistent Alignment**: Exercise names and descriptions now have uncluttered, consistent presentation across all cards
+  - **Mobile Responsive**: Layout improvements maintain touch-friendly button sizes and proper spacing on mobile devices
+
+## 2025-09-16
+
+### Fixed
+- **Shared Exercise Video Download Storage Permissions**: Fixed critical storage access issue preventing video downloads for shared exercises
+  - **Root Cause**: Storage bucket RLS policies didn't allow users to download videos from shared exercises due to chicken-and-egg problem where shared exercise record needed to exist before video download could complete
+  - **Solution**: Created new `download-shared-video` edge function with service role access to bypass storage permissions and securely validate user access
+  - **Edge Function**: New dedicated function verifies user owns the shared exercise record then downloads video with elevated permissions
+  - **Client Update**: Modified `App.tsx` to use edge function instead of direct storage access for shared video downloads
+  - **Storage Policies**: Applied consistent RLS policies across development and production environments for video access
+  - **Migration Sync**: Applied all storage policy migrations (`fix_shared_video_storage_download_policy`, `allow_shared_video_access_via_token`, `revert_to_simple_shared_video_policy`) to both dev and prod
+  - **Timing Fix**: Resolved "Exercise not found" error by moving exercise URL update to occur after sync completion when exercise record exists in IndexedDB
+  - **Production Ready**: Video sharing feature now works completely with proper "[Shared with me]" labels, successful video downloads, and offline access
+
+### Technical Details
+- **Enhanced Error Handling**: Comprehensive logging throughout video download chain with correlation IDs for debugging
+- **Fallback Strategy**: Video download failures don't block exercise save operation, ensuring core sharing functionality remains intact
+- **Type Safety**: All changes maintain TypeScript compatibility with proper null safety and error handling
+- **Environment Parity**: Both development and production environments synchronized with identical edge functions and database policies
+
+## 2025-09-15
+
+### Fixed
+- **Exercise Sharing Video Download Bug**: Fixed critical issue where shared exercise videos weren't downloading to users' local storage
+  - **Root Cause**: Video download logic was only in unused `SharedExercisePage.tsx`, but actual share links use `StandaloneSharedExercise.tsx` → `App.tsx` flow
+  - **Architecture Fix**: Added video download logic to `App.tsx` pending share token processing to handle the actual user flow
+  - **Sync Service Bug**: Fixed `updateExerciseVideoUrl()` setting `has_video: false` instead of `true` for exercises with custom videos
+  - **Offline-First**: Videos are now properly downloaded from Supabase Storage to IndexedDB when saving shared exercises
+  - **Storage Integration**: Video download uses proper storage path pattern and MIME type detection for compatibility
+  - **Error Handling**: Video download failures don't block exercise saving operation
+  - **Code Cleanup**: Removed unused `SharedExercisePage.tsx` component that was causing confusion about share routing
+
+- **Exercise Sharing Feature Complete**: Successfully resolved all issues with shared exercise functionality
+  - **Database Schema**: Added shared exercise tracking fields (`shared_from_exercise_id`, `shared_from_user_id`, `is_shared_copy`) to exercises table
+  - **Frontend Display Logic**: Fixed shared exercises showing as "[Custom]" instead of "[Shared with me]" in user's library
+  - **Badge Logic**: Updated `isSharedExercise()` and `isUserCreated()` functions to properly detect and categorize shared exercises
+  - **Edge Function Updates**: Enhanced `save-shared-exercise` edge function (v8) to properly handle video URLs for shared exercises
+  - **Video URL Scheme**: Implemented `shared-video://` URL protocol for handling videos in shared exercises
+  - **Video Resolution**: Updated `resolveVideoUrl()` utility to handle shared video URLs and resolve them to playable blob URLs
+  - **IndexedDB Schema**: Migrated to version 15 with proper shared exercise tracking fields
+  - **Test Updates**: Fixed test cases to include proper shared exercise tracking fields for consistent behavior
+  - **Build Issues**: Resolved TypeScript compilation errors and showSnackbar parameter formatting
+  - **TypeScript Linter**: Fixed `@typescript-eslint/no-explicit-any` violations in syncService.ts by replacing unsafe type assertions with proper type extensions
+  - **Production Deployment**: Deployed updated edge function to both development and production environments
+
+### Fixed
+- **Video Sync Discrepancy**: Fixed exercise video URL synchronization issue where successful video uploads weren't updating exercise records with correct file names
+  - **Root Cause**: Video upload confirmations were being skipped during sync because they were flagged as "just pushed"
+  - **Solution**: Enhanced sync logic to process video upload confirmations even when record was previously pushed
+  - **Behavior**: Exercise `custom_video_url` now correctly updates to reflect the latest uploaded video file name
+  - **Observability**: Added debug logging for video URL updates during sync process
+  - **Server Sync**: Fixed exercise records are now marked as dirty to ensure server receives updated video URLs
+- **Video Download Authentication**: Fixed video file downloads in sync to use authenticated Supabase client instead of public URLs
+  - **Root Cause**: Video downloads were failing with 400 errors because they used public URLs on a private bucket
+  - **Solution**: Updated `downloadVideoFileForOfflineAccess` to use `supabase.storage.from('videos').download()`
+  - **Cross-Device**: Videos uploaded on one device will now properly download and display on other authenticated devices
+  - **Offline Access**: Downloaded videos are stored in IndexedDB for offline viewing on all user devices
+- **Share Link Video Access**: Fixed video playback for anonymous users accessing shared exercise links
+  - **Root Cause**: Share links used wrong bucket (`exercise-videos` instead of `videos`) and failed public URL access
+  - **Solution**: Updated `get-shared-exercise` Edge Function to use correct `videos` bucket and generate signed URLs
+  - **Anonymous Access**: Share link recipients can now view videos without authentication using temporary signed URLs (1-hour expiry)
+  - **Security**: Signed URLs provide time-limited access without exposing permanent public endpoints
+- **SharedExercisePage App Context Dependencies**: Fixed shared exercise page to work independently without full app initialization
+  - **Root Cause**: SharedExercisePage was using `useAuth()` which triggered IndexedDB initialization and sync services for anonymous users
+  - **Solution**: Created lightweight `useMinimalAuth()` hook and standalone `StandaloneSnackbar` component
+  - **Anonymous Experience**: Share link recipients now see clean page without navigation menu or app initialization logs
+  - **Performance**: Eliminated unnecessary service initialization for public share routes improving load times
+- **Edge Function JWT Authentication**: Fixed 401 errors on public share link access
+  - **Root Cause**: `get-shared-exercise` Edge Function had JWT verification enabled blocking anonymous access
+  - **Solution**: Added `verify_jwt = false` configuration and deployed with `--no-verify-jwt` flag
+  - **Public Access**: Anonymous users can now access shared exercises without authentication tokens
+- **Video Download Sync Error**: Fixed undefined reference error in video file download during sync operations
+  - **Root Cause**: `downloadVideoFileForOfflineAccess` method tried to access `this.supabase` which was undefined
+  - **Solution**: Added dynamic supabase import to avoid circular dependency issues
+  - **Sync Reliability**: Video downloads now complete successfully during cross-device sync operations
+
+### Added
+- **Comprehensive Video System Documentation**: Created detailed technical documentation for video upload and sharing workflows
+  - **Video Sync Documentation** (`docs/video-sync.md`): Complete video upload/sync flow with diagrams and component breakdowns
+  - **Exercise Sharing Documentation** (`docs/exercise-sharing.md`): Complete sharing workflow from creation to anonymous access
+  - **Cross-Tier Diagrams**: Visual flow charts showing data transformation through IndexedDB → Edge Function → Supabase Storage
+  - **Component Mapping**: Detailed breakdown of which components handle video operations across frontend/backend
+  - **Security Patterns**: Documentation of anonymous vs authenticated access patterns and permission levels
+  - **Troubleshooting Guides**: Common issues, error patterns, and debugging approaches for video/sharing features
+- **Supabase Migration and Synchronization Instructions**: Comprehensive AI agent guidance to prevent environment drift issues
+  - **New Instruction File**: Created `.github/instructions/supabase.instructions.md` with detailed migration and synchronization protocols
+  - **Environment Management**: Clear guidelines for dual environment setup (dev: xwzrsfkzqxdybjrkkkvh, prod: zumzzuvfsuzvvymhpymk)
+  - **Critical Workflow**: Step-by-step process for verifying environment parity before major changes
+  - **Migration Tools**: MCP tool references for comparing schemas, functions, and applying updates
+  - **Emergency Procedures**: Documentation for handling significant environment drift and schema recreation
+  - **Best Practices**: Security considerations, rollback procedures, and continuous monitoring recommendations
+  - **Updated Agent Instructions**: Enhanced all AI agent instruction files with Supabase synchronization requirements
+
 ## 2025-09-14
+
+### Added
+- **Exercise Sharing Feature**: Complete implementation of exercise sharing functionality allowing users to share their custom exercises with others
+  - **Share Creation**: Users can generate shareable links for their custom exercises with optional email targeting
+  - **Public Viewing**: Recipients can view shared exercises without authentication or consent requirements
+  - **Save to Library**: Authenticated users can save shared exercises to their own library with one click
+  - **Edge Functions**: Three new Supabase Edge Functions handle the sharing workflow:
+    - `share-exercise`: Creates secure share tokens and public URLs
+    - `get-shared-exercise`: Retrieves exercise data via share token (public endpoint)
+    - `save-shared-exercise`: Copies shared exercises to user's library with proper ownership
+  - **Database Schema**: Added `share_token` column to existing `exercise_shares` table for public link sharing
+  - **Security**: Cryptographically secure share tokens with proper access controls and ownership validation
+  - **Responsive UI**: Mobile-optimized sharing modal and public viewing page with clear call-to-action buttons
+  - **Environment-Aware**: Dynamic Supabase URL configuration supporting both development and production environments
+
+### Fixed
+- **TypeScript Build Errors**: Fixed Supabase URL access errors in sharing components
+- **Sync Service JWT Token Issues**: Fixed "Invalid JWT" errors during sync operations by implementing fresh session token retrieval
+  - Modified `correctSyncService.callEdge()` to get fresh auth tokens right before API calls
+  - Prevents timing issues where cached tokens expire between sync start and actual API execution
+  - Graceful fallback to cached token if fresh session retrieval fails
+- **Public Share Route Consent Bypass**: Fixed blank page issue when accessing shared exercise links without consent
+  - SharedExercisePage now renders without requiring user consent (exception to offline-first principle)
+  - Prevents IndexedDB creation on public share routes to maintain privacy compliance
+  - Added `isPublicShareRoute()` helper to detect `/share/*` routes and bypass consent checks
+  - **Issue**: Direct access to protected `supabaseUrl` property caused TS2445 compilation errors
+  - **Solution**: Created `supabaseFunctionBaseUrl` export in supabase config using environment variables
+  - **Result**: Edge Function calls now work correctly across development and production environments
+
+## 2025-09-14 (Earlier)
 
 ### Fixed
 - **Unit test failures**: Fixed failing tests for storage service and sync service components

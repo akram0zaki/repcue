@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StarIcon } from './icons/NavigationIcons';
 import { supabase } from '../config/supabase';
+import logger from '../utils/logger';
+
 // TODO: Re-enable when rating functionality is restored
 // import type { ExerciseRating as ExerciseRatingType } from '../types';
 
@@ -70,13 +72,13 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
 
         if (!error && data) {
           setUserRating({
-            rating: data.rating,
+            rating: data.rating || 0,
             review_text: data.review_text || undefined
           });
           setReviewText(data.review_text || '');
         }
       } catch (err) {
-        console.error('Error loading user rating:', err);
+        logger.error('Error loading user rating:', err);
       }
     };
 
@@ -127,7 +129,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
 
       setShowReviewInput(false);
     } catch (err) {
-      console.error('Error submitting rating:', err);
+      logger.error('Error submitting rating:', err);
       setError(t('rating.submitError'));
     } finally {
       setIsSubmitting(false);

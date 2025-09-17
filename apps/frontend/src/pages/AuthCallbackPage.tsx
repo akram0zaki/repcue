@@ -95,9 +95,21 @@ const AuthCallbackPage: React.FC = () => {
           
           setSuccess(true);
           
+          // Check for shared exercise token and preserve it during redirect
+          const shareToken = searchParams.get('saveSharedExercise');
+          if (shareToken) {
+            // Store in sessionStorage for the main app to process
+            sessionStorage.setItem('pendingShareToken', shareToken);
+          }
+
           // Show success state briefly before redirecting
           setTimeout(() => {
-            navigate(Routes.HOME, { replace: true });
+            if (shareToken) {
+              // Redirect with the shared exercise parameter
+              navigate(`${Routes.HOME}?saveSharedExercise=${shareToken}`, { replace: true });
+            } else {
+              navigate(Routes.HOME, { replace: true });
+            }
           }, 2000);
         } else {
           // No session found - could be a refresh issue

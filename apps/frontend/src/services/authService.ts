@@ -311,32 +311,50 @@ export class AuthService {
    */
   public async signInWithMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Use hybrid redirect URL approach:
-      // - In PWA mode: use custom protocol for deep linking back to PWA
-      // - In browser mode: use current origin for same-domain redirects
-      let redirectUrl: string;
-      
-      // Check if we're in PWA mode (standalone display)
-      const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                    ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
-      
-      if (isPWA) {
-        // For PWA: use custom protocol to ensure magic links open in the PWA
-        redirectUrl = `web+repcue://auth/callback`;
-      } else {
-        // For browser: use current origin for domain-specific redirects
-        redirectUrl = `${this.getRedirectBase()}/auth/callback`;
+      // Check for pending shared exercise token that needs to be preserved
+      const pendingShareToken = sessionStorage.getItem('pendingShareToken');
+
+      const otpOptions: {
+        shouldCreateUser: boolean;
+        emailRedirectTo?: string;
+        data: {
+          display_name: string;
+        };
+      } = {
+        shouldCreateUser: true,
+        data: {
+          display_name: email.split('@')[0]
+        }
+      };
+
+      // Only set emailRedirectTo if we need to preserve a shared exercise token
+      // Otherwise, let Supabase use the referrer URL (default behavior)
+      if (pendingShareToken) {
+        // For shared exercise flow, use the current origin (referrer) to maintain
+        // the same domain behavior as the default Supabase magic link flow
+        let redirectUrl: string;
+
+        // Check if we're in PWA mode (standalone display)
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                      ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
+
+        if (isPWA) {
+          // For PWA: use custom protocol for deep linking back to PWA
+          redirectUrl = `web+repcue://auth/callback`;
+        } else {
+          // For browser: use current origin (referrer URL) to preserve domain context
+          redirectUrl = `${window.location.origin}/auth/callback`;
+        }
+
+        // Add the shared exercise token to the redirect URL
+        const url = new URL(redirectUrl);
+        url.searchParams.set('saveSharedExercise', pendingShareToken);
+        otpOptions.emailRedirectTo = url.toString();
       }
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          shouldCreateUser: true,
-          emailRedirectTo: redirectUrl,
-          data: {
-            display_name: email.split('@')[0]
-          }
-        }
+        options: otpOptions
       });
 
       if (error) {

@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ShareIcon } from '../components/icons/NavigationIcons';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useSnackbar } from './SnackbarProvider';
-import { supabase } from '../config/supabase';
+import { supabase, supabaseFunctionBaseUrl } from '../config/supabase';
+import logger from '../utils/logger';
 
 interface ShareButtonProps {
   exerciseId: string;
@@ -22,87 +23,98 @@ interface ShareDialogProps {
 const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isOpen, onClose }) => {
   const { t } = useTranslation(['common', 'exercises']);
   const { showSnackbar } = useSnackbar();
-  const [isSharing, setIsSharing] = useState(false);
   const [shareWithEmail, setShareWithEmail] = useState('');
-  const [permissionLevel, setPermissionLevel] = useState<'view' | 'copy'>('view');
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [isGeneratingUrl, setIsGeneratingUrl] = useState(false);
 
-  const handleSharePublic = async () => {
-    setIsSharing(true);
+  const copyToClipboard = async (text: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch('/api/functions/v1/share-exercise', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
-        },
-        body: JSON.stringify({
-          exercise_id: exerciseId,
-          permission_level: permissionLevel,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to share exercise');
-      }
-
-      showSnackbar(t('exercises.sharedPublicly', 'Exercise shared publicly!'), {
+      await navigator.clipboard.writeText(text);
+      showSnackbar(t('common.copiedToClipboard', 'Copied to clipboard!'), {
         type: 'success'
       });
-      
-      onClose();
     } catch (error) {
-      console.error('Failed to share exercise:', error);
-      showSnackbar(t('exercises.shareError', 'Failed to share exercise'), {
+      logger.error('Failed to copy to clipboard:', error);
+      showSnackbar(t('common.copyError', 'Failed to copy to clipboard'), {
         type: 'error'
       });
-    } finally {
-      setIsSharing(false);
     }
   };
 
-  const handleShareWithUser = async () => {
-    if (!shareWithEmail.trim()) {
-      showSnackbar(t('exercises.emailRequired', 'Email is required'), {
-        type: 'error'
-      });
-      return;
-    }
-
-    setIsSharing(true);
+  const handleGenerateShareUrl = async () => {
+    logger.info('🔗 [ShareButton] Starting share link generation', { exerciseId, exerciseName, shareWithEmail });
+    setIsGeneratingUrl(true);
     try {
+      logger.info('🔗 [ShareButton] Getting authentication session...');
       const { data: { session } } = await supabase.auth.getSession();
-      // First, get user ID by email (this would need a backend endpoint)
-      const response = await fetch('/api/functions/v1/share-exercise', {
+      if (!session?.access_token) {
+        throw new Error('No authentication token');
+      }
+      logger.info('🔗 [ShareButton] Authentication successful, user ID:', session.user?.id);
+
+      const requestPayload = {
+        exerciseId: exerciseId,
+        isPublic: true,
+        recipientEmail: shareWithEmail || undefined
+      };
+
+      logger.info('🔗 [ShareButton] Making API call to share-exercise function', {
+        url: `${supabaseFunctionBaseUrl}/functions/v1/share-exercise`,
+        payload: requestPayload
+      });
+
+      const response = await fetch(`${supabaseFunctionBaseUrl}/functions/v1/share-exercise`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          exercise_id: exerciseId,
-          shared_with_email: shareWithEmail,
-          permission_level: permissionLevel,
-        }),
+        body: JSON.stringify(requestPayload),
+      });
+
+      logger.info('🔗 [ShareButton] API response received', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
       });
 
       if (!response.ok) {
-        throw new Error('Failed to share exercise');
+        const errorData = await response.json();
+        logger.error('🔗 [ShareButton] API response error:', errorData);
+        throw new Error(errorData.error || 'Failed to create share link');
       }
 
-      showSnackbar(t('exercises.sharedWithUser', 'Exercise shared with {{email}}!', { email: shareWithEmail }), {
+      const data = await response.json();
+      logger.info('🔗 [ShareButton] Share link generated successfully:', {
+        shareUrl: data.shareUrl,
+        responseData: data
+      });
+
+      setShareUrl(data.shareUrl);
+
+      showSnackbar(t('exercises.shareLinkGenerated', 'Share link generated successfully!'), {
         type: 'success'
       });
-      
-      onClose();
     } catch (error) {
-      console.error('Failed to share exercise:', error);
-      showSnackbar(t('exercises.shareError', 'Failed to share exercise'), {
+      logger.error('🔗 [ShareButton] Failed to generate share link:', error);
+      showSnackbar(t('exercises.shareError', 'Failed to generate share link'), {
         type: 'error'
       });
     } finally {
-      setIsSharing(false);
+      setIsGeneratingUrl(false);
+      logger.info('🔗 [ShareButton] Share generation process completed');
     }
+  };
+
+  const resetDialog = () => {
+    setShareUrl(null);
+    setShareWithEmail('');
+    setIsGeneratingUrl(false);
+  };
+
+  const handleClose = () => {
+    resetDialog();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -116,100 +128,83 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
               {t('exercises.shareExercise', 'Share Exercise')}
             </h3>
             <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              onClick={handleClose}
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
             >
               ×
             </button>
           </div>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            {t('exercises.shareDescription', 'Share "{{name}}" with others', { name: exerciseName })}
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            {t('exercises.shareDescription', 'Create a shareable link for "{{name}}"', { name: exerciseName })}
           </p>
 
-          {/* Permission Level */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('exercises.permissionLevel', 'Permission Level')}
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="permission"
-                  value="view"
-                  checked={permissionLevel === 'view'}
-                  onChange={(e) => setPermissionLevel(e.target.value as 'view')}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {t('exercises.viewOnly', 'View Only')} - {t('exercises.viewOnlyDesc', 'Can view but not copy')}
-                </span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="permission"
-                  value="copy"
-                  checked={permissionLevel === 'copy'}
-                  onChange={(e) => setPermissionLevel(e.target.value as 'copy')}
-                  className="mr-2"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {t('exercises.canCopy', 'Can Copy')} - {t('exercises.canCopyDesc', 'Can view and make a copy')}
-                </span>
-              </label>
-            </div>
-          </div>
+          {/* Share URL Generation */}
+          {!shareUrl ? (
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  {t('exercises.generateShareLink', 'Generate Share Link')}
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  {t('exercises.generateShareLinkDesc', 'Anyone with this link will be able to view and save your exercise')}
+                </p>
 
-          {/* Share Options */}
-          <div className="space-y-4">
-            {/* Share Publicly */}
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                {t('exercises.sharePublic', 'Share Publicly')}
-              </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                {t('exercises.sharePublicDesc', 'Anyone can discover this exercise in the community')}
-              </p>
-              <button
-                onClick={handleSharePublic}
-                disabled={isSharing}
-                className="btn-primary btn-small"
-              >
-                {isSharing ? t('common.sharing', 'Sharing...') : t('exercises.makePublic', 'Make Public')}
-              </button>
-            </div>
-
-            {/* Share with Specific User */}
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                {t('exercises.shareWithUser', 'Share with User')}
-              </h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                {t('exercises.shareWithUserDesc', 'Share with a specific user by email')}
-              </p>
-              <div className="space-y-3">
-                <input
-                  type="email"
-                  value={shareWithEmail}
-                  onChange={(e) => setShareWithEmail(e.target.value)}
-                  placeholder={t('common.emailPlaceholder', 'user@example.com')}
-                  className="form-input"
-                />
-                <button
-                  onClick={handleShareWithUser}
-                  disabled={isSharing || !shareWithEmail.trim()}
-                  className="btn-primary btn-small"
-                >
-                  {isSharing ? t('common.sharing', 'Sharing...') : t('exercises.shareWithUser', 'Share')}
-                </button>
+                <div className="space-y-3">
+                  <input
+                    type="email"
+                    value={shareWithEmail}
+                    onChange={(e) => setShareWithEmail(e.target.value)}
+                    placeholder={t('exercises.optionalEmailPlaceholder', 'Optional: Recipient email')}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                  />
+                  <button
+                    onClick={handleGenerateShareUrl}
+                    disabled={isGeneratingUrl}
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md transition-colors"
+                  >
+                    {isGeneratingUrl ? t('common.generating', 'Generating...') : t('exercises.generateLink', 'Generate Share Link')}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Share URL Display */
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">
+                  {t('exercises.shareLinkReady', 'Share Link Ready!')}
+                </h4>
+                <p className="text-sm text-green-700 dark:text-green-300 mb-3">
+                  {t('exercises.shareLinkReadyDesc', 'Copy this link to share your exercise with others')}
+                </p>
+
+                <div className="bg-white dark:bg-gray-800 border rounded-md p-3 mb-3">
+                  <div className="font-mono text-sm text-gray-700 dark:text-gray-300 break-all">
+                    {shareUrl}
+                  </div>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => copyToClipboard(shareUrl)}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition-colors"
+                  >
+                    {t('common.copyLink', 'Copy Link')}
+                  </button>
+                  <button
+                    onClick={resetDialog}
+                    className="px-4 py-2 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-800/50 rounded-md transition-colors"
+                  >
+                    {t('common.createAnother', 'Create Another')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-end mt-6">
-            <button onClick={onClose} className="btn-secondary">
+            <button onClick={handleClose} className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
               {t('common.close', 'Close')}
             </button>
           </div>

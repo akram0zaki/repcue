@@ -3,16 +3,83 @@ import { supabase } from '../config/supabase';
 import logger from './logger';
 
 /**
- * Resolves video URLs, handling both regular URLs and blob-pending-sync:// URLs
+ * Resolves video URLs, handling both regular URLs, blob-pending-sync:// URLs, and shared-video:// URLs
  * For blob-pending-sync URLs, fetches the actual video data from IndexedDB and creates a blob URL
+ * For shared-video URLs, fetches video data from the original exercise's video files
  * If video data is missing locally but exists in cloud storage, downloads it first
  */
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
 
   // For regular URLs (http, https, blob, etc.), return them directly
-  if (!videoUrl.startsWith('blob-pending-sync://')) {
+  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('shared-video://')) {
     return videoUrl;
+  }
+
+  // Handle shared video URLs: shared-video://{originalExerciseId}/{originalOwnerId}
+  if (videoUrl.startsWith('shared-video://')) {
+    try {
+      const match = videoUrl.match(/^shared-video:\/\/([^/]+)\/([^/]+)$/);
+      if (!match) {
+        logger.warn('🎥 [ResolveVideo] Invalid shared-video URL format:', videoUrl);
+        return null;
+      }
+
+      const [, originalExerciseId, originalOwnerId] = match;
+      logger.log('🎥 [ResolveVideo] Resolving shared video URL for original exercise:', {
+        originalExerciseId,
+        originalOwnerId,
+        sharedVideoUrl: videoUrl
+      });
+
+      // Try to get the video file for the original exercise ID
+      const originalVideoFile = await storageService.getVideoFile(originalExerciseId);
+
+      if (originalVideoFile?.file_data) {
+        // Create a blob URL from the original exercise's video data
+        const blobUrl = URL.createObjectURL(originalVideoFile.file_data);
+        logger.log('🎥 [ResolveVideo] Successfully created blob URL from shared video data:', {
+          originalExerciseId,
+          originalOwnerId,
+          sharedVideoUrl: videoUrl,
+          blobUrl,
+          fileSize: originalVideoFile.file_size,
+          mimeType: originalVideoFile.mime_type
+        });
+
+        // Validate the created blob URL by attempting to fetch it
+        try {
+          const response = await fetch(blobUrl, { method: 'HEAD' });
+          logger.log('🎥 [ResolveVideo] Shared video blob URL validation:', {
+            originalExerciseId,
+            blobUrl,
+            isValid: response.ok,
+            status: response.status,
+            contentType: response.headers.get('Content-Type'),
+            contentLength: response.headers.get('Content-Length'),
+            expectedMimeType: originalVideoFile.mime_type
+          });
+        } catch (validateError) {
+          logger.error('🎥 [ResolveVideo] Shared video blob URL validation failed:', {
+            originalExerciseId,
+            blobUrl,
+            error: validateError
+          });
+        }
+
+        return blobUrl;
+      }
+
+      logger.warn('🎥 [ResolveVideo] No video file data found for shared exercise:', {
+        originalExerciseId,
+        originalOwnerId,
+        sharedVideoUrl: videoUrl
+      });
+      return null;
+    } catch (error) {
+      logger.error('🎥 [ResolveVideo] Failed to resolve shared-video URL:', error);
+      return null;
+    }
   }
 
   try {
@@ -30,15 +97,31 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     const storedVideoFile = await storageService.getVideoFile(exerciseId);
 
     if (storedVideoFile?.file_data) {
-      // Create a blob URL from the stored file data
-      const blobUrl = URL.createObjectURL(storedVideoFile.file_data);
+      // Skip the problematic validation that was causing deletion
+      // Just create the blob URL directly
+
+      // Create blob URL from stored file data using proper Blob constructor
+      let blobUrl: string;
+
+      if (storedVideoFile.file_data instanceof File) {
+        // Convert File to ArrayBuffer then to Blob for better Firefox compatibility
+        const arrayBuffer = await storedVideoFile.file_data.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: storedVideoFile.mime_type });
+        blobUrl = URL.createObjectURL(blob);
+      } else {
+        // Direct blob creation if it's already a Blob
+        blobUrl = URL.createObjectURL(storedVideoFile.file_data);
+      }
+
       logger.log('🎥 [ResolveVideo] Successfully created blob URL from local data:', {
         exerciseId,
         originalUrl: videoUrl,
         blobUrl,
         fileSize: storedVideoFile.file_size,
-        mimeType: storedVideoFile.mime_type
+        mimeType: storedVideoFile.mime_type,
+        dataType: storedVideoFile.file_data.constructor.name
       });
+
       return blobUrl;
     }
 
@@ -54,12 +137,45 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
 
         if (error) {
           logger.error('🎥 [ResolveVideo] Failed to download video from storage:', error);
+
+          // For shared exercises with download failures, check if we can provide a fallback
+          if (videoUrl.startsWith('blob-pending-sync://')) {
+            logger.warn('🎥 [ResolveVideo] Download failed for shared exercise - no video available', {
+              exerciseId,
+              storagePath: storedVideoFile.storage_path,
+              error: error.message
+            });
+          }
+
           return null;
         }
 
         if (data) {
-          // Store the downloaded video data back in IndexedDB
+          // Validate MP4 signature before processing
           const arrayBuffer = await data.arrayBuffer();
+          const bytes = new Uint8Array(arrayBuffer.slice(0, 12));
+          const signature = Array.from(bytes.slice(4, 8)).map(b => String.fromCharCode(b)).join('');
+
+          logger.log('🎥 [ResolveVideo] Downloaded file validation:', {
+            exerciseId,
+            fileSize: arrayBuffer.byteLength,
+            expectedSize: data.size,
+            signature,
+            isValidMP4: signature === 'ftyp',
+            firstBytesHex: Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ')
+          });
+
+          if (signature !== 'ftyp') {
+            logger.error('🎥 [ResolveVideo] Downloaded file is not a valid MP4:', {
+              exerciseId,
+              expectedSignature: 'ftyp',
+              actualSignature: signature,
+              storagePath: storedVideoFile.storage_path
+            });
+            return null;
+          }
+
+          // Store the downloaded video data back in IndexedDB
           const file = new File([arrayBuffer], storedVideoFile.file_name, {
             type: storedVideoFile.mime_type
           });
@@ -67,15 +183,19 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
           // Update the local record with the downloaded data
           await storageService.saveVideoFile(exerciseId, file);
 
-          // Create and return blob URL
-          const blobUrl = URL.createObjectURL(data);
-          logger.log('🎥 [ResolveVideo] Successfully downloaded and created blob URL:', {
+          // Create blob URL directly from the ArrayBuffer instead of the Blob
+          // This works better with Firefox and IndexedDB
+          const directBlob = new Blob([arrayBuffer], { type: storedVideoFile.mime_type });
+          const blobUrl = URL.createObjectURL(directBlob);
+
+          logger.log('🎥 [ResolveVideo] Successfully downloaded and created blob URL from ArrayBuffer:', {
             exerciseId,
             originalUrl: videoUrl,
             blobUrl,
-            fileSize: data.size,
-            mimeType: data.type
+            fileSize: arrayBuffer.byteLength,
+            mimeType: storedVideoFile.mime_type
           });
+
           return blobUrl;
         }
       } catch (downloadError) {

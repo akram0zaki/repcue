@@ -4,6 +4,6 @@
   "copying": "Kopiërening...",
   "error": "Kopiëren mislukt",
   "genericError": "Er is een fout opgetreden bij het kopiëren",
-  "loginRequired": "[nl] Please log in to copy content",
-  "tooltip": "Kopiëren to your library"
+  "loginRequired": "Log alstublieft in om inhoud te kopiëren",
+  "tooltip": "Kopieer naar je bibliotheek"
 }

@@ -19,8 +19,8 @@ export type Database = {
           created_at: string | null
           deleted: boolean | null
           duration: number
-          exercise_id: string
-          exercise_name: string
+          exercise_id: string | null
+          exercise_name: string | null
           exercises: Json | null
           id: string
           is_workout: boolean | null
@@ -32,15 +32,16 @@ export type Database = {
           updated_at: string | null
           version: number | null
           workout_id: string | null
+          workout_name: string | null
         }
         Insert: {
           created_at?: string | null
           deleted?: boolean | null
           duration: number
-          exercise_id: string
-          exercise_name: string
+          exercise_id?: string | null
+          exercise_name?: string | null
           exercises?: Json | null
-          id?: string
+          id: string
           is_workout?: boolean | null
           notes?: string | null
           owner_id?: string | null
@@ -50,13 +51,14 @@ export type Database = {
           updated_at?: string | null
           version?: number | null
           workout_id?: string | null
+          workout_name?: string | null
         }
         Update: {
           created_at?: string | null
           deleted?: boolean | null
           duration?: number
-          exercise_id?: string
-          exercise_name?: string
+          exercise_id?: string | null
+          exercise_name?: string | null
           exercises?: Json | null
           id?: string
           is_workout?: boolean | null
@@ -68,33 +70,26 @@ export type Database = {
           updated_at?: string | null
           version?: number | null
           workout_id?: string | null
+          workout_name?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "activity_logs_workout_id_fkey"
-            columns: ["workout_id"]
-            isOneToOne: false
-            referencedRelation: "workouts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       app_settings: {
         Row: {
-          auto_save: boolean | null
           auto_start_next: boolean | null
+          beep_interval_seconds: number | null
+          beep_sound_enabled: boolean | null
           beep_volume: number | null
           created_at: string | null
           dark_mode: boolean | null
+          data_auto_save: boolean | null
+          default_interval_duration: number | null
           default_rest_time: number | null
           deleted: boolean | null
           id: string
-          interval_duration: number | null
-          last_selected_exercise_id: string | null
           owner_id: string | null
           pre_timer_countdown: number | null
           reduce_motion: boolean | null
-          rep_speed_factor: number | null
           show_exercise_videos: boolean | null
           sound_enabled: boolean | null
           updated_at: string | null
@@ -102,20 +97,20 @@ export type Database = {
           vibration_enabled: boolean | null
         }
         Insert: {
-          auto_save?: boolean | null
           auto_start_next?: boolean | null
+          beep_interval_seconds?: number | null
+          beep_sound_enabled?: boolean | null
           beep_volume?: number | null
           created_at?: string | null
           dark_mode?: boolean | null
+          data_auto_save?: boolean | null
+          default_interval_duration?: number | null
           default_rest_time?: number | null
           deleted?: boolean | null
-          id?: string
-          interval_duration?: number | null
-          last_selected_exercise_id?: string | null
+          id: string
           owner_id?: string | null
           pre_timer_countdown?: number | null
           reduce_motion?: boolean | null
-          rep_speed_factor?: number | null
           show_exercise_videos?: boolean | null
           sound_enabled?: boolean | null
           updated_at?: string | null
@@ -123,72 +118,64 @@ export type Database = {
           vibration_enabled?: boolean | null
         }
         Update: {
-          auto_save?: boolean | null
           auto_start_next?: boolean | null
+          beep_interval_seconds?: number | null
+          beep_sound_enabled?: boolean | null
           beep_volume?: number | null
           created_at?: string | null
           dark_mode?: boolean | null
+          data_auto_save?: boolean | null
+          default_interval_duration?: number | null
           default_rest_time?: number | null
           deleted?: boolean | null
           id?: string
-          interval_duration?: number | null
-          last_selected_exercise_id?: string | null
           owner_id?: string | null
           pre_timer_countdown?: number | null
           reduce_motion?: boolean | null
-          rep_speed_factor?: number | null
           show_exercise_videos?: boolean | null
           sound_enabled?: boolean | null
           updated_at?: string | null
           version?: number | null
           vibration_enabled?: boolean | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_app_settings_last_selected_exercise"
-            columns: ["last_selected_exercise_id"]
-            isOneToOne: false
-            referencedRelation: "exercises"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       audit_logs: {
         Row: {
           action: string
-          created_at: string
+          created_at: string | null
           details: Json | null
           id: string
-          ip_address: unknown | null
+          ip_address: string | null
+          owner_id: string | null
           resource_id: string | null
           resource_type: string
-          success: boolean
+          success: boolean | null
           user_agent: string | null
-          user_id: string | null
         }
         Insert: {
           action: string
-          created_at?: string
+          created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: string | null
+          owner_id?: string | null
           resource_id?: string | null
           resource_type: string
-          success?: boolean
+          success?: boolean | null
           user_agent?: string | null
-          user_id?: string | null
         }
         Update: {
           action?: string
-          created_at?: string
+          created_at?: string | null
           details?: Json | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: string | null
+          owner_id?: string | null
           resource_id?: string | null
           resource_type?: string
-          success?: boolean
+          success?: boolean | null
           user_agent?: string | null
-          user_id?: string | null
         }
         Relationships: []
       }
@@ -199,12 +186,15 @@ export type Database = {
           content_id: string
           content_type: string
           created_at: string | null
+          deleted: boolean | null
           human_decision: string | null
           human_notes: string | null
           human_reviewer_id: string | null
           id: string
           reviewed_at: string | null
           status: string | null
+          updated_at: string | null
+          version: number | null
         }
         Insert: {
           ai_confidence?: number | null
@@ -212,12 +202,15 @@ export type Database = {
           content_id: string
           content_type: string
           created_at?: string | null
+          deleted?: boolean | null
           human_decision?: string | null
           human_notes?: string | null
           human_reviewer_id?: string | null
           id?: string
           reviewed_at?: string | null
           status?: string | null
+          updated_at?: string | null
+          version?: number | null
         }
         Update: {
           ai_confidence?: number | null
@@ -225,131 +218,164 @@ export type Database = {
           content_id?: string
           content_type?: string
           created_at?: string | null
+          deleted?: boolean | null
           human_decision?: string | null
           human_notes?: string | null
           human_reviewer_id?: string | null
           id?: string
           reviewed_at?: string | null
           status?: string | null
+          updated_at?: string | null
+          version?: number | null
         }
         Relationships: []
       }
       exercise_ratings: {
         Row: {
           created_at: string | null
-          deleted: boolean
-          exercise_id: string
+          deleted: boolean | null
+          exercise_id: string | null
           id: string
           is_verified: boolean | null
-          rating: number
+          owner_id: string | null
+          rating: number | null
           review_text: string | null
           updated_at: string | null
-          user_id: string
           version: number | null
         }
         Insert: {
           created_at?: string | null
-          deleted?: boolean
-          exercise_id: string
+          deleted?: boolean | null
+          exercise_id?: string | null
           id?: string
           is_verified?: boolean | null
-          rating: number
+          owner_id?: string | null
+          rating?: number | null
           review_text?: string | null
           updated_at?: string | null
-          user_id: string
           version?: number | null
         }
         Update: {
           created_at?: string | null
-          deleted?: boolean
-          exercise_id?: string
+          deleted?: boolean | null
+          exercise_id?: string | null
           id?: string
           is_verified?: boolean | null
-          rating?: number
+          owner_id?: string | null
+          rating?: number | null
           review_text?: string | null
           updated_at?: string | null
-          user_id?: string
           version?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exercise_ratings_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       exercise_shares: {
         Row: {
           created_at: string | null
-          deleted: boolean
-          exercise_id: string
+          deleted: boolean | null
+          exercise_id: string | null
+          expires_at: string | null
           id: string
-          owner_id: string
+          owner_id: string | null
           permission_level: string | null
+          share_token: string | null
           shared_with_user_id: string | null
           updated_at: string | null
           version: number | null
         }
         Insert: {
           created_at?: string | null
-          deleted?: boolean
-          exercise_id: string
+          deleted?: boolean | null
+          exercise_id?: string | null
+          expires_at?: string | null
           id?: string
-          owner_id: string
+          owner_id?: string | null
           permission_level?: string | null
+          share_token?: string | null
           shared_with_user_id?: string | null
           updated_at?: string | null
           version?: number | null
         }
         Update: {
           created_at?: string | null
-          deleted?: boolean
-          exercise_id?: string
+          deleted?: boolean | null
+          exercise_id?: string | null
+          expires_at?: string | null
           id?: string
-          owner_id?: string
+          owner_id?: string | null
           permission_level?: string | null
+          share_token?: string | null
           shared_with_user_id?: string | null
           updated_at?: string | null
           version?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exercise_shares_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       exercise_videos: {
         Row: {
           created_at: string | null
-          deleted: boolean
+          deleted: boolean | null
           duration_seconds: number | null
-          exercise_id: string
+          exercise_id: string | null
           file_size: number | null
           id: string
           is_approved: boolean | null
           updated_at: string | null
-          uploader_id: string
+          uploader_id: string | null
           version: number | null
           video_url: string
         }
         Insert: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           duration_seconds?: number | null
-          exercise_id: string
+          exercise_id?: string | null
           file_size?: number | null
           id?: string
           is_approved?: boolean | null
           updated_at?: string | null
-          uploader_id: string
+          uploader_id?: string | null
           version?: number | null
           video_url: string
         }
         Update: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           duration_seconds?: number | null
-          exercise_id?: string
+          exercise_id?: string | null
           file_size?: number | null
           id?: string
           is_approved?: boolean | null
           updated_at?: string | null
-          uploader_id?: string
+          uploader_id?: string | null
           version?: number | null
           video_url?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exercise_videos_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       exercises: {
         Row: {
@@ -370,6 +396,7 @@ export type Database = {
           instructions: Json | null
           is_favorite: boolean | null
           is_public: boolean | null
+          is_shared_copy: boolean | null
           is_verified: boolean | null
           muscle_groups: string[] | null
           name: string
@@ -377,7 +404,9 @@ export type Database = {
           rating_average: number | null
           rating_count: number | null
           rep_duration_seconds: number | null
-          tags: Json | null
+          shared_from_exercise_id: string | null
+          shared_from_user_id: string | null
+          tags: string[] | null
           updated_at: string | null
           version: number | null
         }
@@ -395,10 +424,11 @@ export type Database = {
           equipment_needed?: string[] | null
           exercise_type: string
           has_video?: boolean | null
-          id?: string
+          id: string
           instructions?: Json | null
           is_favorite?: boolean | null
           is_public?: boolean | null
+          is_shared_copy?: boolean | null
           is_verified?: boolean | null
           muscle_groups?: string[] | null
           name: string
@@ -406,7 +436,9 @@ export type Database = {
           rating_average?: number | null
           rating_count?: number | null
           rep_duration_seconds?: number | null
-          tags?: Json | null
+          shared_from_exercise_id?: string | null
+          shared_from_user_id?: string | null
+          tags?: string[] | null
           updated_at?: string | null
           version?: number | null
         }
@@ -428,6 +460,7 @@ export type Database = {
           instructions?: Json | null
           is_favorite?: boolean | null
           is_public?: boolean | null
+          is_shared_copy?: boolean | null
           is_verified?: boolean | null
           muscle_groups?: string[] | null
           name?: string
@@ -435,11 +468,21 @@ export type Database = {
           rating_average?: number | null
           rating_count?: number | null
           rep_duration_seconds?: number | null
-          tags?: Json | null
+          shared_from_exercise_id?: string | null
+          shared_from_user_id?: string | null
+          tags?: string[] | null
           updated_at?: string | null
           version?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exercises_shared_from_exercise_id_fkey"
+            columns: ["shared_from_exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       feature_flags: {
         Row: {
@@ -473,28 +516,49 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_locked: boolean | null
           avatar_url: string | null
           created_at: string | null
+          data_export_requested_at: string | null
           deletion_requested_at: string | null
           display_name: string | null
+          failed_login_attempts: number | null
+          last_login_at: string | null
+          last_login_ip: string | null
+          locked_until: string | null
+          login_count: number | null
+          owner_id: string
           updated_at: string | null
-          user_id: string
         }
         Insert: {
+          account_locked?: boolean | null
           avatar_url?: string | null
           created_at?: string | null
+          data_export_requested_at?: string | null
           deletion_requested_at?: string | null
           display_name?: string | null
+          failed_login_attempts?: number | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          locked_until?: string | null
+          login_count?: number | null
+          owner_id: string
           updated_at?: string | null
-          user_id: string
         }
         Update: {
+          account_locked?: boolean | null
           avatar_url?: string | null
           created_at?: string | null
+          data_export_requested_at?: string | null
           deletion_requested_at?: string | null
           display_name?: string | null
+          failed_login_attempts?: number | null
+          last_login_at?: string | null
+          last_login_ip?: string | null
+          locked_until?: string | null
+          login_count?: number | null
+          owner_id?: string
           updated_at?: string | null
-          user_id?: string
         }
         Relationships: []
       }
@@ -502,91 +566,88 @@ export type Database = {
         Row: {
           created_at: string | null
           last_ack_cursor: string | null
+          owner_id: string
           updated_at: string | null
-          user_id: string
         }
         Insert: {
           created_at?: string | null
           last_ack_cursor?: string | null
+          owner_id: string
           updated_at?: string | null
-          user_id: string
         }
         Update: {
           created_at?: string | null
           last_ack_cursor?: string | null
+          owner_id?: string
           updated_at?: string | null
-          user_id?: string
         }
         Relationships: []
       }
       user_authenticators: {
         Row: {
           counter: number
-          created_at: string
+          created_at: string | null
           credential_id: string
           credential_public_key: string
           device_name: string | null
           id: string
           last_used_at: string | null
-          updated_at: string
-          user_id: string
+          owner_id: string
         }
         Insert: {
           counter?: number
-          created_at?: string
+          created_at?: string | null
           credential_id: string
           credential_public_key: string
           device_name?: string | null
           id?: string
           last_used_at?: string | null
-          updated_at?: string
-          user_id: string
+          owner_id: string
         }
         Update: {
           counter?: number
-          created_at?: string
+          created_at?: string | null
           credential_id?: string
           credential_public_key?: string
           device_name?: string | null
           id?: string
           last_used_at?: string | null
-          updated_at?: string
-          user_id?: string
+          owner_id?: string
         }
         Relationships: []
       }
       user_favorites: {
         Row: {
           created_at: string | null
-          deleted: boolean
+          deleted: boolean | null
           exercise_type: string | null
           id: string
           item_id: string
           item_type: string | null
+          owner_id: string | null
           updated_at: string | null
-          user_id: string
           version: number | null
         }
         Insert: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           exercise_type?: string | null
           id?: string
           item_id: string
           item_type?: string | null
+          owner_id?: string | null
           updated_at?: string | null
-          user_id: string
           version?: number | null
         }
         Update: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           exercise_type?: string | null
           id?: string
           item_id?: string
           item_type?: string | null
+          owner_id?: string | null
           updated_at?: string | null
-          user_id?: string
           version?: number | null
         }
         Relationships: []
@@ -595,119 +656,155 @@ export type Database = {
         Row: {
           created_at: string | null
           cues: Json | null
-          dark_mode: boolean | null
-          default_interval_duration: number | null
           deleted: boolean | null
           favorite_exercises: string[] | null
           id: string
           locale: string | null
           owner_id: string | null
           rep_speed_factor: number | null
-          sound_enabled: boolean | null
           units: string | null
           updated_at: string | null
           version: number | null
-          vibration_enabled: boolean | null
         }
         Insert: {
           created_at?: string | null
           cues?: Json | null
-          dark_mode?: boolean | null
-          default_interval_duration?: number | null
           deleted?: boolean | null
           favorite_exercises?: string[] | null
-          id?: string
+          id: string
           locale?: string | null
           owner_id?: string | null
           rep_speed_factor?: number | null
-          sound_enabled?: boolean | null
           units?: string | null
           updated_at?: string | null
           version?: number | null
-          vibration_enabled?: boolean | null
         }
         Update: {
           created_at?: string | null
           cues?: Json | null
-          dark_mode?: boolean | null
-          default_interval_duration?: number | null
           deleted?: boolean | null
           favorite_exercises?: string[] | null
           id?: string
           locale?: string | null
           owner_id?: string | null
           rep_speed_factor?: number | null
-          sound_enabled?: boolean | null
           units?: string | null
           updated_at?: string | null
           version?: number | null
-          vibration_enabled?: boolean | null
+        }
+        Relationships: []
+      }
+      video_files: {
+        Row: {
+          created_at: string | null
+          deleted: boolean | null
+          exercise_id: string
+          file_data: string | null
+          file_name: string
+          file_size: number
+          id: string
+          mime_type: string
+          owner_id: string | null
+          storage_path: string | null
+          updated_at: string | null
+          upload_pending: boolean
+          version: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          deleted?: boolean | null
+          exercise_id: string
+          file_data?: string | null
+          file_name: string
+          file_size: number
+          id?: string
+          mime_type: string
+          owner_id?: string | null
+          storage_path?: string | null
+          updated_at?: string | null
+          upload_pending?: boolean
+          version?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          deleted?: boolean | null
+          exercise_id?: string
+          file_data?: string | null
+          file_name?: string
+          file_size?: number
+          id?: string
+          mime_type?: string
+          owner_id?: string | null
+          storage_path?: string | null
+          updated_at?: string | null
+          upload_pending?: boolean
+          version?: number | null
         }
         Relationships: []
       }
       webauthn_challenges: {
         Row: {
           challenge: string
-          created_at: string
+          created_at: string | null
           expires_at: string
           id: string
+          owner_id: string | null
           type: string
-          user_id: string | null
         }
         Insert: {
           challenge: string
-          created_at?: string
+          created_at?: string | null
           expires_at: string
           id?: string
+          owner_id?: string | null
           type: string
-          user_id?: string | null
         }
         Update: {
           challenge?: string
-          created_at?: string
+          created_at?: string | null
           expires_at?: string
           id?: string
+          owner_id?: string | null
           type?: string
-          user_id?: string | null
         }
         Relationships: []
       }
       workout_ratings: {
         Row: {
           created_at: string | null
-          deleted: boolean
+          deleted: boolean | null
           id: string
           is_verified: boolean | null
-          rating: number
+          owner_id: string | null
+          rating: number | null
           review_text: string | null
           updated_at: string | null
-          user_id: string
           version: number | null
-          workout_id: string
+          workout_id: string | null
         }
         Insert: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           id?: string
           is_verified?: boolean | null
-          rating: number
+          owner_id?: string | null
+          rating?: number | null
           review_text?: string | null
           updated_at?: string | null
-          user_id: string
           version?: number | null
-          workout_id: string
+          workout_id?: string | null
         }
         Update: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           id?: string
           is_verified?: boolean | null
-          rating?: number
+          owner_id?: string | null
+          rating?: number | null
           review_text?: string | null
           updated_at?: string | null
-          user_id?: string
           version?: number | null
-          workout_id?: string
+          workout_id?: string | null
         }
         Relationships: [
           {
@@ -725,95 +822,93 @@ export type Database = {
           created_at: string | null
           deleted: boolean | null
           end_time: string | null
-          exercises: Json
+          exercises: Json | null
+          exercises_completed: number | null
           id: string
           is_completed: boolean | null
           notes: string | null
           owner_id: string | null
           start_time: string
           total_duration: number | null
+          total_exercises: number | null
           updated_at: string | null
           version: number | null
           workout_id: string | null
-          workout_name: string
+          workout_name: string | null
         }
         Insert: {
           completion_percentage?: number | null
           created_at?: string | null
           deleted?: boolean | null
           end_time?: string | null
-          exercises?: Json
-          id?: string
+          exercises?: Json | null
+          exercises_completed?: number | null
+          id: string
           is_completed?: boolean | null
           notes?: string | null
           owner_id?: string | null
           start_time: string
           total_duration?: number | null
+          total_exercises?: number | null
           updated_at?: string | null
           version?: number | null
           workout_id?: string | null
-          workout_name: string
+          workout_name?: string | null
         }
         Update: {
           completion_percentage?: number | null
           created_at?: string | null
           deleted?: boolean | null
           end_time?: string | null
-          exercises?: Json
+          exercises?: Json | null
+          exercises_completed?: number | null
           id?: string
           is_completed?: boolean | null
           notes?: string | null
           owner_id?: string | null
           start_time?: string
           total_duration?: number | null
+          total_exercises?: number | null
           updated_at?: string | null
           version?: number | null
           workout_id?: string | null
-          workout_name?: string
+          workout_name?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "workout_sessions_workout_id_fkey"
-            columns: ["workout_id"]
-            isOneToOne: false
-            referencedRelation: "workouts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       workout_shares: {
         Row: {
           created_at: string | null
-          deleted: boolean
+          deleted: boolean | null
           id: string
-          owner_id: string
+          owner_id: string | null
           permission_level: string | null
           shared_with_user_id: string | null
           updated_at: string | null
           version: number | null
-          workout_id: string
+          workout_id: string | null
         }
         Insert: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           id?: string
-          owner_id: string
+          owner_id?: string | null
           permission_level?: string | null
           shared_with_user_id?: string | null
           updated_at?: string | null
           version?: number | null
-          workout_id: string
+          workout_id?: string | null
         }
         Update: {
           created_at?: string | null
-          deleted?: boolean
+          deleted?: boolean | null
           id?: string
-          owner_id?: string
+          owner_id?: string | null
           permission_level?: string | null
           shared_with_user_id?: string | null
           updated_at?: string | null
           version?: number | null
-          workout_id?: string
+          workout_id?: string | null
         }
         Relationships: [
           {
@@ -855,7 +950,7 @@ export type Database = {
           difficulty_level?: string | null
           estimated_duration?: number | null
           exercises?: Json
-          id?: string
+          id: string
           is_active?: boolean | null
           is_public?: boolean | null
           is_verified?: boolean | null
@@ -896,7 +991,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_challenges: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_expired_shares: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      generate_share_token: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

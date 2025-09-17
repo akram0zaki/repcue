@@ -33,7 +33,7 @@ export const useWakeLock = () => {
       
       // Listen for wake lock release
       const handleRelease = () => {
-        console.log('Wake lock released');
+        // Wake lock released - reducing verbosity
         setIsActive(false);
         wakeLockRef.current = null;
       };
@@ -42,7 +42,7 @@ export const useWakeLock = () => {
         wakeLockRef.current.addEventListener('release', handleRelease);
       }
       
-      console.log('Wake lock acquired - screen will stay active');
+      // Wake lock acquired - reducing verbosity
       setIsActive(true);
       return true;
     } catch (error) {
@@ -55,7 +55,7 @@ export const useWakeLock = () => {
     if (wakeLockRef.current && !wakeLockRef.current.released) {
       try {
         await wakeLockRef.current.release();
-        console.log('Wake lock manually released');
+        // Wake lock manually released - reducing verbosity
       } catch (error) {
         console.error('Failed to release wake lock:', error);
       }
@@ -68,7 +68,7 @@ export const useWakeLock = () => {
   useEffect(() => {
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible' && isActive && !wakeLockRef.current) {
-        console.log('Page became visible, re-requesting wake lock');
+        // Page became visible, re-requesting wake lock - reducing verbosity
         await requestWakeLock();
       }
     };

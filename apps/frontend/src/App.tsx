@@ -5,12 +5,16 @@ import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
 import { authService } from './services/authService';
+import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
+import { useSnackbar } from './components/SnackbarProvider';
+import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
+import { AuthModal } from './components/auth/AuthModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
@@ -22,14 +26,14 @@ import logger from './utils/logger';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
-import { 
-  HomePage, 
-  ExercisePage, 
+import {
+  HomePage,
+  ExercisePage,
   CreateExercisePage,
   EditExercisePage,
   ExerciseDetailPage,
-  TimerPage, 
-  ActivityLogPage, 
+  TimerPage,
+  ActivityLogPage,
   SettingsPage,
   WorkoutsPage,
   CreateWorkoutPage,
@@ -168,10 +172,33 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
-  useAuth();
+  const { user } = useAuth();
+  const { showSnackbar } = useSnackbar();
+  const { t } = useTranslation(['common', 'exercises']);
+
+  // Handle pending share token after authentication
+  useEffect(() => {
+    const handlePendingShareToken = async () => {
+      const pendingToken = sessionStorage.getItem('pendingShareToken');
+      if (pendingToken && user && hasConsent && !isLoading) {
+        // User is now authenticated, try to save the shared exercise
+        logger.log(`[init] User authenticated, processing pending shared exercise: ${pendingToken}`);
+
+        // Temporarily set a URL parameter to trigger the save logic
+        const url = new URL(window.location.href);
+        url.searchParams.set('saveSharedExercise', pendingToken);
+        window.history.replaceState({}, document.title, url.toString());
+
+        // The handleSharedExerciseSave effect will pick this up automatically
+      }
+    };
+
+    handlePendingShareToken();
+  }, [user, hasConsent, isLoading]);
 
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
@@ -1488,6 +1515,13 @@ function App() {
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
+    // Skip initialization for public share routes - they don't need local data
+    if (isPublicShareRoute()) {
+      logger.log('[init] Skipping initialization for public share route');
+      setIsLoading(false);
+      return;
+    }
+
     if (!hasConsent) return;
     if (initStartedRef.current) {
       // In React StrictMode (dev), effects run twice. Skip the duplicate init.
@@ -1512,10 +1546,41 @@ function App() {
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
-              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).storageService = storageService;
-              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).syncService = syncService;
-              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
-              logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
+              const debugWindow = window as Window & {
+                storageService?: StorageService;
+                syncService?: unknown;
+                resetDB?: () => Promise<void>;
+                cleanupDeletedVideos?: () => Promise<void>;
+                getVideoStats?: () => Promise<void>;
+              };
+
+              debugWindow.storageService = storageService;
+              debugWindow.syncService = syncService;
+              debugWindow.resetDB = () => storageService.resetDatabase();
+
+              // Video cleanup utilities
+              debugWindow.cleanupDeletedVideos = async () => {
+                const stats = await storageService.getVideoFileStats();
+                logger.log('💾 [DevTools] Video stats before cleanup:', stats);
+
+                if (stats.deletedFiles === 0) {
+                  logger.log('💾 [DevTools] No deleted video files to clean up');
+                  return;
+                }
+
+                const result = await storageService.cleanupDeletedVideoFiles();
+                logger.log('💾 [DevTools] Cleanup complete:', result);
+
+                const newStats = await storageService.getVideoFileStats();
+                logger.log('💾 [DevTools] Video stats after cleanup:', newStats);
+              };
+
+              debugWindow.getVideoStats = async (): Promise<void> => {
+                const stats = await storageService.getVideoFileStats();
+                logger.log('💾 [DevTools] Current video file stats:', stats);
+              };
+
+              logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB(), window.cleanupDeletedVideos(), window.getVideoStats()');
             }
           }
 
@@ -1689,6 +1754,227 @@ function App() {
   initializeApp();
   }, [hasConsent]);
 
+  // Handle shared exercise save from redirect
+  useEffect(() => {
+    const handleSharedExerciseSave = async () => {
+      if (!hasConsent || isLoading) return;
+
+      // Check URL parameters for shared exercise save
+      const urlParams = new URLSearchParams(window.location.search);
+      const shareTokenFromUrl = urlParams.get('saveSharedExercise');
+
+      // Also check session storage for pending share token
+      const shareTokenFromSession = sessionStorage.getItem('pendingShareToken');
+
+      const shareToken = shareTokenFromUrl || shareTokenFromSession;
+
+      if (!shareToken) return;
+
+      try {
+        // Clear the pending token and URL parameter
+        sessionStorage.removeItem('pendingShareToken');
+        if (shareTokenFromUrl) {
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete('saveSharedExercise');
+          window.history.replaceState({}, document.title, newUrl.toString());
+        }
+
+        logger.log(`[init] Processing shared exercise save: ${shareToken}`);
+
+        // Get fresh auth session for the API call
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          // User is not authenticated - store the token and prompt for login
+          logger.log(`[init] User not authenticated, storing share token and prompting for login`);
+          sessionStorage.setItem('pendingShareToken', shareToken);
+
+          showSnackbar(
+            t('exercises.loginRequired', 'Please sign in to save this exercise to your library'),
+            { type: 'info', durationMs: 8000 }
+          );
+
+          // Trigger the auth modal to let user sign in
+          setShowAuthModal(true);
+          return;
+        }
+
+        // Call the save-shared-exercise function
+        const response = await fetch(`${supabaseFunctionBaseUrl}/functions/v1/save-shared-exercise`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            shareToken: shareToken
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          logger.error(`[init] Save shared exercise HTTP ${response.status}:`, errorText);
+
+          let errorData;
+          try {
+            errorData = JSON.parse(errorText);
+          } catch {
+            errorData = { error: errorText || 'Unknown error' };
+          }
+
+          throw new Error(errorData.error || 'Failed to save exercise');
+        }
+
+        const result = await response.json();
+
+        // If the shared exercise has a video, download it for offline access
+        if (result.hasVideo && result.sharedFromExerciseId && result.sharedFromUserId) {
+          try {
+
+            // Query the video_files table directly to get the storage path
+            // This avoids RLS issues with storage listing permissions
+            const { data: videoFileRecords, error: queryError } = await supabase
+              .from('video_files')
+              .select('file_name, storage_path, file_size, mime_type')
+              .eq('exercise_id', result.sharedFromExerciseId)
+              .not('storage_path', 'is', null)
+              .order('created_at', { ascending: false })
+              .limit(1);
+
+
+            if (queryError) {
+              throw new Error(`Failed to query video files: ${queryError.message || JSON.stringify(queryError)}`);
+            }
+
+            if (!videoFileRecords || videoFileRecords.length === 0) {
+              throw new Error(`No video file records found in database for exercise ${result.sharedFromExerciseId}`);
+            }
+
+            // Get the most recent video file record
+            const videoFileRecord = videoFileRecords[0];
+            if (!videoFileRecord.storage_path) {
+              throw new Error(`Video file record found but storage_path is null for exercise ${result.sharedFromExerciseId}`);
+            }
+
+
+
+            // Download the video using the dedicated edge function with service role access
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+              throw new Error('No valid session for video download');
+            }
+
+            // Use direct fetch to get blob response since supabase.functions.invoke()
+            // doesn't handle binary responses properly (converts to string)
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+            const functionsUrl = `${supabaseUrl}/functions/v1/download-shared-video`;
+            const downloadResponse = await fetch(functionsUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json',
+                'apikey': supabaseAnonKey
+              },
+              body: JSON.stringify({
+                exerciseId: result.exerciseId,
+                originalExerciseId: result.sharedFromExerciseId,
+                originalOwnerId: result.sharedFromUserId
+              })
+            });
+
+
+            if (!downloadResponse.ok) {
+              const errorText = await downloadResponse.text();
+              throw new Error(`Failed to download video via edge function: ${downloadResponse.status} ${downloadResponse.statusText}. ${errorText}`);
+            }
+
+            // Get the video as a Blob from the response
+            const videoBlob = await downloadResponse.blob();
+
+
+            // Convert blob to File object with proper MIME type
+            // Use the MIME type from the database record, or infer from file extension
+            const fileExtension = videoFileRecord.file_name.split('.').pop()?.toLowerCase();
+            const mimeType = videoFileRecord.mime_type ||
+                           (fileExtension === 'mp4' ? 'video/mp4' :
+                            fileExtension === 'webm' ? 'video/webm' :
+                            'video/mp4'); // default fallback
+
+            const downloadedVideoFile = new File([videoBlob], videoFileRecord.file_name, {
+              type: mimeType
+            });
+
+
+            // Save the video to User's IndexedDB using the storage service
+            await storageService.saveVideoFile(result.exerciseId, downloadedVideoFile);
+            // Store the blob URL for updating after sync
+            const blobPendingSyncUrl = `blob-pending-sync://${result.exerciseId}/${videoFileRecord.file_name}`;
+
+            // Store this for later use after sync
+            result.blobPendingSyncUrl = blobPendingSyncUrl;
+            result.videoFileName = videoFileRecord.file_name;
+          } catch (videoError) {
+            const errorDetails = videoError instanceof Error ? {
+              message: videoError.message,
+              name: videoError.name,
+              stack: videoError.stack
+            } : {
+              message: String(videoError),
+              name: 'UnknownError',
+              stack: undefined
+            };
+
+            logger.error('🎥 [App] Failed to download shared video:', {
+              error: videoError,
+              ...errorDetails,
+              exerciseId: result.exerciseId,
+              originalExerciseId: result.sharedFromExerciseId,
+              originalOwnerId: result.sharedFromUserId
+            });
+            // Don't block the save operation if video download fails
+          }
+        }
+
+        // Show success message
+        showSnackbar(result.message || t('exercises.exerciseSaved', 'Exercise saved to your library!'), {
+          type: 'success'
+        });
+
+        // Trigger a sync to get the newly saved exercise
+        logger.log('[init] Triggering sync after shared exercise save');
+        try {
+          await syncService.sync();
+          logger.log('[init] Sync completed after shared exercise save');
+
+          // Now update the exercise's custom_video_url if we have a pending video
+          if (result.blobPendingSyncUrl && result.exerciseId) {
+            try {
+              await storageService.updateCustomExercise(result.exerciseId, {
+                custom_video_url: result.blobPendingSyncUrl
+              });
+
+            } catch (updateError) {
+              logger.error('🎥 [App] Failed to update exercise URL after sync:', updateError);
+              // Don't fail the whole operation for this
+            }
+          }
+        } catch (syncError) {
+          logger.warn('[init] Sync failed after shared exercise save:', syncError);
+          // Still show success since the save itself worked
+        }
+
+      } catch (error) {
+        logger.error('[init] Failed to save shared exercise:', error);
+        showSnackbar(
+          error instanceof Error ? error.message : t('exercises.saveFailed', 'Failed to save exercise'),
+          { type: 'error' }
+        );
+      }
+    };
+
+    handleSharedExerciseSave();
+  }, [hasConsent, isLoading, t, showSnackbar]);
+
 // Cleanup sync triggers on unmount
 useEffect(() => {
   const cleanup = setupSyncTriggers();
@@ -1705,6 +1991,14 @@ useEffect(() => {
     }
   }, [hasConsent, isLoading]);
 
+  // Helper function to check if we're on a shared exercise route that doesn't require consent
+  const isPublicShareRoute = useCallback(() => {
+    if (typeof window !== 'undefined' && window.location) {
+      return window.location.pathname.startsWith('/share/');
+    }
+    return false;
+  }, []);
+
   // Safety rehydrate: if UI has zero exercises after init, but DB has data, retry-load a few times
   useEffect(() => {
     let cancelled = false;
@@ -1714,7 +2008,12 @@ useEffect(() => {
     const tryRehydrate = async () => {
       if (isLoading || exercises.length > 0) return;
       // If consent missing, we can still safely peek built-ins to hydrate UI without storing anything
+      // But skip this entirely for public share routes since they don't need local exercises
       if (!hasConsent) {
+        if (isPublicShareRoute()) {
+          logger.log('[rehydrate] Skipping exercise rehydration for public share route');
+          return;
+        }
         try {
           const count = await storageService.peekExerciseCount().catch(() => 0);
           if (count > 0) {
@@ -1754,7 +2053,7 @@ useEffect(() => {
     };
     void tryRehydrate();
     return () => { cancelled = true; };
-  }, [hasConsent, isLoading, exercises.length]);
+  }, [hasConsent, isLoading, exercises.length, isPublicShareRoute]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -1824,18 +2123,34 @@ useEffect(() => {
     }
   };
 
-  // Delete a user-created exercise
+  // Delete a user-created or shared exercise
   const deleteExercise = async (exercise_id: string) => {
     if (!hasConsent) return;
 
     try {
-      await storageService.deleteCustomExercise(exercise_id);
+      // Find the exercise to check if it's shared
+      const exercise = exercises.find(ex => ex.id === exercise_id);
+      if (!exercise) {
+        throw new Error('Exercise not found');
+      }
+
+      if (exercise.is_shared_copy) {
+        // For shared exercises, delete from local storage only
+        // The sync will handle removing it from the user's data
+        await storageService.deleteCustomExercise(exercise_id);
+        logger.log('Deleted shared exercise from local storage:', exercise.name);
+      } else {
+        // For user-created exercises, delete normally
+        await storageService.deleteCustomExercise(exercise_id);
+        logger.log('Deleted user-created exercise:', exercise.name);
+      }
+
       // Promptly sync so deletion reflects on other devices
       void syncService.sync(true);
-      
+
       // Remove the exercise from the local state
       setExercises(prev => prev.filter(exercise => exercise.id !== exercise_id));
-      
+
       // Dispatch event to notify other components
       window.dispatchEvent(new CustomEvent('exercise-deleted', { detail: exercise_id }));
     } catch (error) {
@@ -1929,8 +2244,8 @@ useEffect(() => {
     }
   }, [appSettings.dark_mode, hasConsent]);
 
-  // Show consent banner if no consent
-  if (!hasConsent) {
+  // Show consent banner if no consent (except for public share routes)
+  if (!hasConsent && !isPublicShareRoute()) {
     return <ConsentBanner onConsentGranted={handleConsentGranted} />;
   }
 
@@ -1950,11 +2265,12 @@ useEffect(() => {
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
   return (
-    canUseBrowserRouter ? (
-      <Router>
-      <ChunkErrorBoundary>
-        <MigrationSuccessBanner />
-        <AppShell>
+    <>
+      {canUseBrowserRouter ? (
+        <Router>
+        <ChunkErrorBoundary>
+          <MigrationSuccessBanner />
+          <AppShell>
           <Suspense fallback={createRouteLoader('page')}>
             <Routes>
               <Route 
@@ -1997,21 +2313,21 @@ useEffect(() => {
                   </Suspense>
                 } 
               />
-              <Route 
-                path={AppRoutes.EXERCISE_DETAIL} 
+              <Route
+                path={AppRoutes.EXERCISE_DETAIL}
                 element={
                   <Suspense fallback={createRouteLoader('Exercise Detail')}>
                     <ExerciseDetailPage />
                   </Suspense>
-                } 
+                }
               />
-              <Route 
-                path={AppRoutes.WORKOUTS} 
+              <Route
+                path={AppRoutes.WORKOUTS}
                 element={
                   <Suspense fallback={createRouteLoader('Workouts')}>
                     <WorkoutsPage />
                   </Suspense>
-                } 
+                }
               />
               <Route 
                 path={AppRoutes.CREATE_WORKOUT} 
@@ -2108,17 +2424,24 @@ useEffect(() => {
               <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />
             </Routes>
           </Suspense>
-        </AppShell>
-      </ChunkErrorBoundary>
-    </Router>
-    ) : (
-      // Fallback minimal shell for tests missing location; avoids Router URL creation
-      <ChunkErrorBoundary>
-        <AppShell>
-          <div />
-        </AppShell>
-      </ChunkErrorBoundary>
-    )
+          </AppShell>
+        </ChunkErrorBoundary>
+      </Router>
+      ) : (
+        // Fallback minimal shell for tests missing location; avoids Router URL creation
+        <ChunkErrorBoundary>
+          <AppShell>
+            <div />
+          </AppShell>
+        </ChunkErrorBoundary>
+      )}
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signin"
+      />
+    </>
   );
 }
 

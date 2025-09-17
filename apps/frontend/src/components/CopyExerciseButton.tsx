@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../config/supabase';
 import { CopyIcon, CheckIcon } from './icons/NavigationIcons';
+import logger from '../utils/logger';
 
 interface CopyExerciseButtonProps {
   exerciseId: string;
@@ -80,7 +81,7 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
       }
 
     } catch (err) {
-      console.error('Error copying exercise:', err);
+      logger.error('Error copying exercise:', err);
       const errorMessage = err instanceof Error ? err.message : t('copy.genericError');
       
       if (onCopyError) {
