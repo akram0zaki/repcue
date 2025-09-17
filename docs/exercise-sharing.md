@@ -333,6 +333,159 @@ if (storedVideoFile.file_data instanceof File) {
 }
 ```
 
+## Video Corruption Investigation & Resolution
+
+### Problem Discovery
+During the implementation of exercise sharing with video support, a critical bug was discovered where shared exercise videos would appear corrupted and unplayable after being saved to a user's library. The symptoms included:
+
+- Videos showing `MEDIA_ERR_SRC_NOT_SUPPORTED` errors
+- File sizes being inflated (e.g., 587,468 bytes becoming 1,073,272 bytes)
+- Videos working perfectly when originally uploaded, but failing after sharing
+- Issue persisting across different browsers, ruling out session conflicts
+
+### Investigation Timeline
+
+#### Phase 1: Session Conflict Theory (Incorrect)
+Initial investigation focused on authentication session conflicts when users clicked magic links while logged in as different users. This was ruled out by:
+- Testing with separate browsers for isolation
+- Confirming the issue persisted with proper session separation
+- Identifying that the root cause was technical, not authentication-related
+
+#### Phase 2: Data Corruption Discovery
+Through detailed logging analysis, the investigation revealed:
+- Original video file: 587,468 bytes (BearCrawl_720x576.mp4)
+- Downloaded video file: 1,073,272 bytes (almost double size)
+- Edge function returning HTTP 200 status with correct Content-Type headers
+- Binary data being converted to string unexpectedly
+
+#### Phase 3: Root Cause Identification
+The bug was traced to the video download process in `apps/frontend/src/App.tsx`:
+
+```typescript
+// PROBLEMATIC CODE - supabase.functions.invoke() converts binary to string
+const downloadResponse = await supabase.functions.invoke('download-shared-video', {...});
+const videoBlob = downloadResponse.data; // This was a STRING, not a Blob!
+```
+
+**Root Cause**: `supabase.functions.invoke()` was incorrectly parsing binary video data as UTF-8 text, causing data corruption when the raw bytes were converted to string format.
+
+### Solution Implementation
+
+#### The Fix: Direct Fetch Approach
+Replaced `supabase.functions.invoke()` with native `fetch()` API to properly handle binary responses:
+
+```typescript
+// CORRECTED CODE - Direct fetch preserves binary data
+const functionsUrl = `${supabaseUrl}/functions/v1/download-shared-video`;
+const downloadResponse = await fetch(functionsUrl, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${session.access_token}`,
+    'Content-Type': 'application/json',
+    'apikey': supabaseAnonKey
+  },
+  body: JSON.stringify({...})
+});
+
+const videoBlob = await downloadResponse.blob(); // Properly extracts binary data
+```
+
+#### Why This Works
+1. **Native Blob Handling**: `fetch().blob()` correctly handles binary response bodies
+2. **No Text Conversion**: Bypasses Supabase client's automatic response parsing
+3. **Preserves File Integrity**: Maintains exact byte-for-byte video data
+4. **Edge Function Unchanged**: No changes needed to the working edge function
+
+### Key Lessons Learned
+
+#### 1. Library Limitations Can Cause Data Corruption
+- High-level SDK methods may not handle all data types correctly
+- Binary data requires special consideration in web APIs
+- When debugging corruption, test with lowest-level APIs first
+
+#### 2. File Size is a Critical Diagnostic Tool
+- Unexpected file size changes immediately indicate data corruption
+- Byte-level comparison reveals parsing/encoding issues
+- Size inflation often suggests text conversion of binary data
+
+#### 3. Comprehensive Logging is Essential
+- Detailed logging at each step revealed the exact failure point
+- Logging both expected and actual values exposed the discrepancy
+- Response type inspection (`typeof response.data`) was crucial
+
+#### 4. Edge Function vs Client-Side Debugging
+- When file corruption occurs, test both ends of the data pipeline
+- Edge functions returning correct data doesn't guarantee client reception
+- Client-side data processing can introduce bugs independent of server logic
+
+#### 5. Browser Isolation Doesn't Solve Data Processing Bugs
+- Authentication and session issues are separate from data corruption
+- Cross-browser testing helps eliminate browser-specific bugs
+- But data processing issues require examining the actual data pipeline
+
+### Prevention Strategies
+
+#### 1. Always Use Type-Appropriate APIs
+```typescript
+// For binary data
+const response = await fetch(url);
+const blob = await response.blob();
+
+// For JSON data
+const response = await supabase.functions.invoke(name, {...});
+const data = response.data;
+```
+
+#### 2. Implement Size Validation
+```typescript
+logger.log('🎥 [App] Received video blob from edge function:', {
+  blobSize: videoBlob.size,
+  blobType: videoBlob.type,
+  expectedSize: videoFileRecord.file_size,
+  expectedType: videoFileRecord.mime_type
+});
+
+// Validate expected vs actual size
+if (Math.abs(videoBlob.size - videoFileRecord.file_size) > 1000) {
+  throw new Error(`File size mismatch: expected ${videoFileRecord.file_size}, got ${videoBlob.size}`);
+}
+```
+
+#### 3. Add Binary Data Type Guards
+```typescript
+// Validate that we got a proper Blob
+if (!(videoBlob instanceof Blob)) {
+  throw new Error(`Expected Blob from edge function, got ${typeof videoBlob}`);
+}
+```
+
+#### 4. Test File Integrity End-to-End
+- Create test cases that verify file byte integrity through the entire sharing pipeline
+- Include both small and large video files in tests
+- Test multiple video formats and codecs
+
+### Technical Documentation
+
+#### Modified Files
+- `apps/frontend/src/App.tsx` - Replaced `supabase.functions.invoke()` with direct `fetch()` for video downloads
+
+#### Edge Functions (Unchanged)
+- `download-shared-video` - Already correctly returning binary video data with proper headers
+
+#### Verification Methods
+- File size comparison (expected vs received)
+- MIME type validation
+- Video playback functionality testing
+- Cross-browser compatibility verification
+
+### Resolution Confirmation
+The fix was verified through:
+- ✅ Exact file size match (1,467,342 bytes expected and received)
+- ✅ Proper MIME type (`video/mp4`)
+- ✅ Successful video loading and playback
+- ✅ No `MEDIA_ERR_SRC_NOT_SUPPORTED` errors
+- ✅ Singleton video file enforcement working correctly
+
 ## Current Status
 
 ### Implemented Features
@@ -341,6 +494,7 @@ if (storedVideoFile.file_data instanceof File) {
 - Token-based security with expiration support
 - Video recovery system for missing files
 - Edge function architecture for scalability
+- **Fixed video corruption in shared exercise downloads**
 
 ### Known Limitations
 - Save to library functionality exists but not exposed in UI
@@ -353,3 +507,4 @@ if (storedVideoFile.file_data instanceof File) {
 - Separate routing for `/share/{token}` URLs
 - Videos accessed via 1-hour signed URLs for anonymous users
 - Robust error handling and recovery mechanisms
+- **Direct fetch() API used for binary video downloads to prevent corruption**

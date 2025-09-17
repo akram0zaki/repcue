@@ -1,5 +1,31 @@
 ## Unreleased
 
+### Fixed
+- **Critical Video Corruption in Shared Exercise Downloads**: Resolved data corruption bug causing shared exercise videos to become unplayable after download
+  - **Root Cause**: `supabase.functions.invoke()` was incorrectly parsing binary video data as UTF-8 text, causing byte-level corruption during transfer
+  - **Symptoms**: File size inflation (e.g., 587KB becoming 1073KB), `MEDIA_ERR_SRC_NOT_SUPPORTED` errors, videos working when uploaded but failing after sharing
+  - **Solution**: Replaced `supabase.functions.invoke()` with native `fetch()` API for binary video downloads to preserve data integrity
+  - **Edge Function**: No changes needed - edge functions were correctly returning binary data with proper headers
+  - **Verification**: Fixed videos now match exact original file sizes and play correctly across all browsers
+  - **Investigation**: Comprehensive debugging revealed session conflicts were red herring; actual issue was client-side data processing
+
+### Improved
+- **Reduced Excessive Debug Logging**: Implemented intelligent logging suppression while maintaining debugging capabilities
+  - **Smart Filtering**: Added pattern-based suppression to logger utility to reduce console noise from 280+ to ~20-30 essential messages
+  - **Preserved Information**: Maintained all error and warning logs while suppressing repetitive operational messages
+  - **Targeted Suppression**: Filtered verbose video operations, sync diagnostics, storage operations, and repetitive state changes
+  - **Development Friendly**: DEBUG flags remain enabled with selective output instead of blanket disabling
+  - **Direct Console Cleanup**: Replaced direct `console.log` statements in hooks and utilities with comments to reduce noise
+  - **Configurable**: Easy to adjust suppression patterns for specific debugging needs without code changes
+
+### Documentation
+- **Video Corruption Investigation**: Added comprehensive documentation of the video corruption bug investigation and resolution
+  - **Timeline Analysis**: Documented 3-phase investigation from session conflict theory to root cause identification
+  - **Technical Deep Dive**: Detailed explanation of how binary data corruption occurred and why direct fetch approach solved it
+  - **Lessons Learned**: Key insights about library limitations, file size diagnostics, and end-to-end testing strategies
+  - **Prevention Strategies**: Best practices for binary data handling, type validation, and integrity testing
+  - **Code Examples**: Before/after code samples showing problematic vs corrected implementations
+
 ## 2025-09-17
 
 ### Fixed

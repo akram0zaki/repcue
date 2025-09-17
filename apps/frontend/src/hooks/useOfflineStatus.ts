@@ -17,14 +17,14 @@ export const useOfflineStatus = (): OfflineStatus => {
   useEffect(() => {
     let suppressOnlineUntilTs = 0;
     const handleOnline = () => {
-      console.log('🌐 Connection restored - switching to online mode');
+      // Network connection restored - reducing verbosity
       if (navigator.onLine === false) return; // Ignore synthetic online when still reported offline
       if (suppressOnlineUntilTs > Date.now()) return;
       setIsOffline(false);
     };
 
     const handleOffline = () => {
-      console.log('📴 Connection lost - switching to offline mode');
+      // Network connection lost - reducing verbosity
       setIsOffline(true);
       setHasBeenOffline(true);
       // Temporarily suppress immediate online events fired by other listeners in the same tick

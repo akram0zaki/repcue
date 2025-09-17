@@ -1546,10 +1546,41 @@ function App() {
             
             // Add storage service to window for debugging
             if (typeof window !== 'undefined') {
-              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).storageService = storageService;
-              (window as Window & { storageService?: StorageService; syncService?: unknown; resetDB?: () => Promise<void> }).syncService = syncService;
-              (window as Window & { storageService?: StorageService; resetDB?: () => Promise<void> }).resetDB = () => storageService.resetDatabase();
-              logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB()');
+              const debugWindow = window as Window & {
+                storageService?: StorageService;
+                syncService?: unknown;
+                resetDB?: () => Promise<void>;
+                cleanupDeletedVideos?: () => Promise<void>;
+                getVideoStats?: () => Promise<void>;
+              };
+
+              debugWindow.storageService = storageService;
+              debugWindow.syncService = syncService;
+              debugWindow.resetDB = () => storageService.resetDatabase();
+
+              // Video cleanup utilities
+              debugWindow.cleanupDeletedVideos = async () => {
+                const stats = await storageService.getVideoFileStats();
+                logger.log('💾 [DevTools] Video stats before cleanup:', stats);
+
+                if (stats.deletedFiles === 0) {
+                  logger.log('💾 [DevTools] No deleted video files to clean up');
+                  return;
+                }
+
+                const result = await storageService.cleanupDeletedVideoFiles();
+                logger.log('💾 [DevTools] Cleanup complete:', result);
+
+                const newStats = await storageService.getVideoFileStats();
+                logger.log('💾 [DevTools] Video stats after cleanup:', newStats);
+              };
+
+              debugWindow.getVideoStats = async (): Promise<void> => {
+                const stats = await storageService.getVideoFileStats();
+                logger.log('💾 [DevTools] Current video file stats:', stats);
+              };
+
+              logger.log('🔧 Debug helpers: window.storageService, window.syncService, window.resetDB(), window.cleanupDeletedVideos(), window.getVideoStats()');
             }
           }
 
@@ -1798,11 +1829,6 @@ function App() {
         // If the shared exercise has a video, download it for offline access
         if (result.hasVideo && result.sharedFromExerciseId && result.sharedFromUserId) {
           try {
-            logger.log('🎥 [App] Starting video download for shared exercise:', {
-              exerciseId: result.exerciseId,
-              originalExerciseId: result.sharedFromExerciseId,
-              originalOwnerId: result.sharedFromUserId
-            });
 
             // Query the video_files table directly to get the storage path
             // This avoids RLS issues with storage listing permissions
@@ -1814,16 +1840,6 @@ function App() {
               .order('created_at', { ascending: false })
               .limit(1);
 
-            logger.log('🎥 [App] Video file query result:', {
-              queryError: queryError ? {
-                message: queryError.message,
-                code: queryError.code,
-                details: queryError.details
-              } : null,
-              videoFileRecordsCount: videoFileRecords ? videoFileRecords.length : 0,
-              videoFileRecords: videoFileRecords,
-              originalExerciseId: result.sharedFromExerciseId
-            });
 
             if (queryError) {
               throw new Error(`Failed to query video files: ${queryError.message || JSON.stringify(queryError)}`);
@@ -1841,12 +1857,6 @@ function App() {
 
             const storagePath = videoFileRecord.storage_path;
 
-            logger.log('🎥 [App] Found video file in storage:', {
-              storagePath,
-              fileName: videoFileRecord.file_name,
-              fileSize: videoFileRecord.file_size,
-              mimeType: videoFileRecord.mime_type
-            });
 
             // Download the video using the dedicated edge function with service role access
             const { data: { session } } = await supabase.auth.getSession();
@@ -1854,36 +1864,34 @@ function App() {
               throw new Error('No valid session for video download');
             }
 
-            const downloadResponse = await supabase.functions.invoke('download-shared-video', {
-              body: {
+            // Use direct fetch to get blob response since supabase.functions.invoke()
+            // doesn't handle binary responses properly (converts to string)
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+            const functionsUrl = `${supabaseUrl}/functions/v1/download-shared-video`;
+            const downloadResponse = await fetch(functionsUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json',
+                'apikey': supabaseAnonKey
+              },
+              body: JSON.stringify({
                 exerciseId: result.exerciseId,
                 originalExerciseId: result.sharedFromExerciseId,
                 originalOwnerId: result.sharedFromUserId
-              },
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
+              })
             });
 
-            logger.log('🎥 [App] Edge function download response:', {
-              downloadError: downloadResponse.error ? {
-                message: downloadResponse.error.message,
-                name: downloadResponse.error.name
-              } : null,
-              hasData: !!downloadResponse.data,
-              dataType: downloadResponse.data ? typeof downloadResponse.data : null
-            });
 
-            if (downloadResponse.error) {
-              throw new Error(`Failed to download video via edge function: ${downloadResponse.error.message || JSON.stringify(downloadResponse.error)}`);
+            if (!downloadResponse.ok) {
+              const errorText = await downloadResponse.text();
+              throw new Error(`Failed to download video via edge function: ${downloadResponse.status} ${downloadResponse.statusText}. ${errorText}`);
             }
 
-            if (!downloadResponse.data) {
-              throw new Error(`Video download returned no data`);
-            }
+            // Get the video as a Blob from the response
+            const videoBlob = await downloadResponse.blob();
 
-            // The edge function returns the video blob directly
-            const videoBlob = downloadResponse.data;
 
             // Convert blob to File object with proper MIME type
             // Use the MIME type from the database record, or infer from file extension
@@ -1897,25 +1905,15 @@ function App() {
               type: mimeType
             });
 
-            logger.log('🎥 [App] Created video file object:', {
-              fileName: downloadedVideoFile.name,
-              fileSize: downloadedVideoFile.size,
-              mimeType: downloadedVideoFile.type,
-              exerciseId: result.exerciseId
-            });
 
             // Save the video to User's IndexedDB using the storage service
             await storageService.saveVideoFile(result.exerciseId, downloadedVideoFile);
-            logger.log('🎥 [App] Video file saved to IndexedDB for exercise:', result.exerciseId);
-
             // Store the blob URL for updating after sync
             const blobPendingSyncUrl = `blob-pending-sync://${result.exerciseId}/${videoFileRecord.file_name}`;
 
             // Store this for later use after sync
             result.blobPendingSyncUrl = blobPendingSyncUrl;
             result.videoFileName = videoFileRecord.file_name;
-
-            logger.log('🎥 [App] Successfully saved shared video to local storage for exercise:', result.exerciseId);
           } catch (videoError) {
             const errorDetails = videoError instanceof Error ? {
               message: videoError.message,
@@ -1956,10 +1954,6 @@ function App() {
                 custom_video_url: result.blobPendingSyncUrl
               });
 
-              logger.log('🎥 [App] Exercise updated with blob-pending-sync URL after sync:', {
-                exerciseId: result.exerciseId,
-                newUrl: result.blobPendingSyncUrl
-              });
             } catch (updateError) {
               logger.error('🎥 [App] Failed to update exercise URL after sync:', updateError);
               // Don't fail the whole operation for this
