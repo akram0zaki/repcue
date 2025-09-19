@@ -94,7 +94,9 @@
       "Bash(do echo \"Adding premium translation to $lang\")",
       "Bash(for lang in de es fr ar-EG)",
       "Bash(do echo \"Fixing $lang catalog structure\")",
-      "Bash(for lang in de es fr nl ar ar-EG fy)"
+      "Bash(for lang in de es fr nl ar ar-EG fy)",
+      "mcp__supabase-prod__list_tables",
+      "mcp__supabase-prod__list_migrations"
     ],
     "deny": [],
     "ask": []
