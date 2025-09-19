@@ -548,25 +548,46 @@ export interface Exercise extends SyncMetadata {
 - [x] **Catalog Data**: Updated catalog definitions with picture URLs and new women-health catalog
 - [x] **Verification**: All exercises properly categorized and include required metadata
 
-### Phase 2: UI Implementation (Week 2)
+### Phase 2: UI Implementation (Week 2) ✅ COMPLETED
 
-#### 2.1 Catalog Selector Component
-- [ ] Create `CatalogSelector.tsx` component
-- [ ] Horizontal scrollable tabs design
-- [ ] Premium lock indicators
-- [ ] Smooth catalog switching with state preservation
+#### 2.1 Catalog Selector Component ✅
+- [x] Create `CatalogSelector.tsx` component
+- [x] Horizontal scrollable tabs design
+- [x] Premium lock indicators
+- [x] Smooth catalog switching with state preservation
 
-#### 2.2 Exercise Page Integration
-- [ ] Integrate catalog selector into exercise page header
-- [ ] Update exercise listing to filter by selected catalog
-- [ ] Preserve search/filter state across catalog switches
-- [ ] Default to general-fitness catalog on load
+#### 2.2 Exercise Page Integration ✅
+- [x] Integrate catalog selector into exercise page header
+- [x] Update exercise listing to filter by selected catalog
+- [x] Preserve search/filter state across catalog switches
+- [x] Default to general-fitness catalog on load
 
-#### 2.3 Search & Filter Adaptation
-- [ ] Update search to work within selected catalog scope
-- [ ] Maintain existing filter UI (categories, tags, etc.)
-- [ ] Add catalog context to search results
-- [ ] Ensure performance with catalog filtering
+#### 2.3 Search & Filter Adaptation ✅
+- [x] Update search to work within selected catalog scope
+- [x] Maintain existing filter UI (categories, tags, etc.)
+- [x] Add catalog context to search results
+- [x] Ensure performance with catalog filtering
+
+#### 2.4 Bug Fixes & Stabilization ✅
+- [x] Fixed catalog name display showing 'name' instead of actual catalog names
+- [x] Fixed catalog filtering issue where only general-fitness exercises were showing
+- [x] Created Version 17 migration to handle catalog_id field naming consistency
+- [x] Updated cleanBuiltInExercises method to use latest exercise data with catalog assignments
+- [x] Added Arabic and Egyptian Arabic translations for catalog system
+- [x] Fixed TypeScript compilation errors with missing catalogId fields
+- [x] Resolved linter errors with proper type checking
+- [x] Verified complete build pipeline works correctly
+
+**Implementation Notes**:
+- Created `CatalogSelector.tsx` with themed buttons, premium badges, and catalog descriptions
+- Integrated catalog filtering into `ExercisePage.tsx` with state persistence via localStorage
+- Added catalog-aware filtering in `filteredExercises` useMemo
+- Updated search results count to show catalog context: "Showing X of Y exercises in [Catalog Name]"
+- Added translation support for catalog names and descriptions in multiple languages
+- Catalog selection clears other filters to provide clean catalog switching experience
+- **Critical Fix**: Resolved database field naming inconsistency between `catalog_id` (database) and `catalogId` (TypeScript)
+- **Critical Fix**: Updated StorageService to properly update built-in exercises with latest catalog data
+- **Localization**: Added comprehensive Arabic translations for the catalog system
 
 ### Phase 3: Localization & Content (Week 3)
 

@@ -54,7 +54,8 @@
     "confirmClearForm":"¿Estás seguro de que deseas borrar el formulario? Esto eliminará tu borrador.",
     "noVideo": "Sin video",
     "pauseVideo": "Pausar video",
-    "playVideo": "Reproducir video"
+    "playVideo": "Reproducir video",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Inicio",
@@ -315,6 +316,7 @@
     },
     "favoritesOnly": "Solo favoritos",
     "showingCount": "Mostrando {{count}} de {{total}}",
+    "showingCountInCatalog": "Mostrando {{count}} de {{total}} ejercicios en {{catalog}}",
     "emptyTitle": "Sin resultados",
     "emptyBody": "Ningún ejercicio coincide con tus filtros. Intenta limpiar los filtros.",
     "clearFilters": "Limpiar filtros",

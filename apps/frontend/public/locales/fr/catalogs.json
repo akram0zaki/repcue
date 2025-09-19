@@ -1,0 +1,20 @@
+{
+  "selectCatalog": "Catalogue d'Exercices",
+  "selectDescription": "Choisissez un catalogue d'exercices pour voir les exercices",
+  "general-fitness": {
+    "name": "Fitness Général",
+    "description": "Exercices de base pour la forme générale et l'entraînement en force"
+  },
+  "tai-chi": {
+    "name": "Tai Chi",
+    "description": "Mouvements doux et fluides pour l'équilibre, la flexibilité et la pleine conscience"
+  },
+  "zumba": {
+    "name": "Zumba",
+    "description": "Exercices cardio basés sur la danse à haute énergie pour un fitness amusant"
+  },
+  "women-health": {
+    "name": "Santé des Femmes",
+    "description": "Exercices spécialisés pour la santé et le bien-être des femmes"
+  }
+}

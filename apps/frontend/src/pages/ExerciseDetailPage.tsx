@@ -101,7 +101,8 @@ const ExerciseDetailPage: React.FC = () => {
                      (typeof exerciseData.instructions === 'string' ? JSON.parse(exerciseData.instructions) : []),
         muscle_groups: exerciseData.muscle_groups || [],
         equipment_needed: exerciseData.equipment_needed || [],
-        difficulty_level: exerciseData.difficulty_level || 'beginner'
+        difficulty_level: exerciseData.difficulty_level || 'beginner',
+        catalogId: 'catalogId' in exerciseData ? (exerciseData as { catalogId: string }).catalogId : 'general-fitness'
       } as Exercise;
       setExercise(transformedExercise);
 

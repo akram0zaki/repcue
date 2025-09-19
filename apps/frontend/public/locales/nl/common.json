@@ -54,7 +54,8 @@
     "confirmClearForm":"Weet u zeker dat u het formulier wilt wissen? Dit verwijdert uw concept.",
     "noVideo": "Geen Video",
     "pauseVideo": "Pauze Video",
-    "playVideo": "Afspelen Video"
+    "playVideo": "Afspelen Video",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Home",
@@ -315,6 +316,7 @@
     },
     "favoritesOnly": "Alleen Favorieten",
     "showingCount": "{{count}} van {{total}} weergegeven",
+    "showingCountInCatalog": "Toont {{count}} van {{total}} oefeningen in {{catalog}}",
     "emptyTitle": "Geen resultaten",
     "emptyBody": "Geen oefeningen komen overeen met uw filters. Probeer filters te wissen.",
     "clearFilters": "Filters Wissen",

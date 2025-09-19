@@ -26,6 +26,7 @@ export const prepareExerciseForInsert = (exercise: Partial<Exercise>): ExerciseI
     name: exercise.name ?? '',
     category: exercise.category ?? 'core' as const,
     exercise_type: exercise.exercise_type ?? 'repetition_based' as const,
+    catalogId: exercise.catalogId ?? 'general-fitness',
     is_favorite: exercise.is_favorite ?? false,
     tags: exercise.tags ?? [],
     created_at: exercise.created_at ?? new Date().toISOString(),

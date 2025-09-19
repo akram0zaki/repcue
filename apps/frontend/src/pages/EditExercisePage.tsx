@@ -115,6 +115,7 @@ export const EditExercisePage: React.FC = () => {
         name: exerciseData.name || exercise.name,
         category: exerciseData.category || exercise.category,
         exercise_type: exerciseData.exercise_type || exercise.exercise_type,
+        catalogId: exercise.catalogId || 'general-fitness', // Preserve existing catalogId
         description: exerciseData.description ?? exercise.description,
         instructions: exerciseData.instructions ?? exercise.instructions,
         tags: exerciseData.tags ?? exercise.tags,

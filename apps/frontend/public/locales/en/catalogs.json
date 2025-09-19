@@ -1,0 +1,20 @@
+{
+  "selectCatalog": "Exercise Catalog",
+  "selectDescription": "Choose an exercise catalog to view exercises",
+  "general-fitness": {
+    "name": "General Fitness",
+    "description": "Core exercises for overall fitness and strength training"
+  },
+  "tai-chi": {
+    "name": "Tai Chi",
+    "description": "Gentle, flowing movements for balance, flexibility, and mindfulness"
+  },
+  "zumba": {
+    "name": "Zumba",
+    "description": "High-energy dance-based cardio exercises for fun fitness"
+  },
+  "women-health": {
+    "name": "Women's Health",
+    "description": "Specialized exercises for women's health and wellness"
+  }
+}

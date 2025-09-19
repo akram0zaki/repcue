@@ -54,7 +54,8 @@
     "confirmClearForm":"Are you sure you want to clear the form? This will delete your draft.",
     "noVideo": "No Video",
     "pauseVideo": "Pause Video",
-    "playVideo": "Play Video"
+    "playVideo": "Play Video",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Home",
@@ -328,6 +329,7 @@
     },
     "favoritesOnly": "Favorites Only",
     "showingCount": "Showing {{count}} of {{total}}",
+    "showingCountInCatalog": "Showing {{count}} of {{total}} exercises in {{catalog}}",
     "emptyTitle": "No results",
     "emptyBody": "No exercises match your filters. Try clearing filters.",
     "clearFilters": "Clear Filters",

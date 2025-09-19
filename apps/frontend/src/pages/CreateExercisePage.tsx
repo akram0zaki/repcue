@@ -38,6 +38,7 @@ export const CreateExercisePage: React.FC = () => {
         name: exerciseData.name || '',
         category: exerciseData.category || 'core',
         exercise_type: exerciseData.exercise_type || 'repetition_based',
+        catalogId: 'general-fitness', // Default to general fitness catalog for user-created exercises
         // Optional fields with defaults
         description: exerciseData.description,
         instructions: exerciseData.instructions || [],

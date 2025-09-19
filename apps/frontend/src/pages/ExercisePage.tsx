@@ -35,6 +35,8 @@ import { useSnackbar } from '../components/SnackbarProvider';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
 import { ShareButton } from '../components/ShareButton';
+import CatalogSelector from '../components/CatalogSelector';
+import { getDefaultCatalog, EXERCISE_CATALOGS } from '../data/catalogs';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -59,6 +61,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
+          selectedCatalogId: parsed.selectedCatalogId || getDefaultCatalog().id,
           selectedCategories: new Set<ExerciseCategory>(parsed.selectedCategories || []),
           searchTerm: parsed.searchTerm || '',
           showFavoritesOnly: parsed.showFavoritesOnly || false,
@@ -70,6 +73,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       logger.warn('[ExercisePage] Failed to load saved filter state:', error);
     }
     return {
+      selectedCatalogId: getDefaultCatalog().id,
       selectedCategories: new Set<ExerciseCategory>(),
       searchTerm: '',
       showFavoritesOnly: false,
@@ -80,6 +84,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
   // Initialize state with saved values
   const savedFilters = loadSavedFilters();
+  const [selectedCatalogId, setSelectedCatalogId] = useState(savedFilters.selectedCatalogId);
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(savedFilters.selectedCategories);
   const [searchTerm, setSearchTerm] = useState(savedFilters.searchTerm);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(savedFilters.showFavoritesOnly);
@@ -103,6 +108,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   useEffect(() => {
     try {
       const filterState = {
+        selectedCatalogId,
         selectedCategories: Array.from(selectedCategories),
         searchTerm,
         showFavoritesOnly,
@@ -114,22 +120,26 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     } catch (error) {
       logger.warn('[ExercisePage] Failed to save filter state:', error);
     }
-  }, [selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy]);
+  }, [selectedCatalogId, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy]);
 
-  // Clear all filters and reset to defaults
+  // Clear all filters and reset to defaults (except catalog)
   const clearAllFilters = () => {
     setSelectedCategories(new Set());
     setSearchTerm('');
     setShowFavoritesOnly(false);
     setExerciseFilter('all');
     setSortBy('name');
-    // Clear persisted state
-    try {
-      localStorage.removeItem(FILTER_STORAGE_KEY);
-      logger.log('[ExercisePage] Filter state cleared');
-    } catch (error) {
-      logger.warn('[ExercisePage] Failed to clear filter state:', error);
-    }
+    // Don't reset catalog - let user keep their catalog selection
+  };
+
+  // Handle catalog change with optional filter reset
+  const handleCatalogChange = (catalogId: string) => {
+    setSelectedCatalogId(catalogId);
+    // Clear other filters when switching catalogs to start fresh
+    setSelectedCategories(new Set());
+    setSearchTerm('');
+    setShowFavoritesOnly(false);
+    setExerciseFilter('all');
   };
 
   const closePreview = () => {
@@ -216,7 +226,26 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
+
+    // Debug: Log exercise catalog distribution
+    const catalogCounts = exercises.reduce((acc, ex) => {
+      const catalog = ex.catalogId || 'undefined';
+      acc[catalog] = (acc[catalog] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    logger.log('[ExercisePage] Exercise catalog distribution:', catalogCounts);
+    logger.log('[ExercisePage] Selected catalog:', selectedCatalogId);
+    logger.log('[ExercisePage] Sample exercises:', exercises.slice(0, 5).map(ex => ({
+      id: ex.id,
+      name: ex.name,
+      catalogId: ex.catalogId
+    })));
+
     const filtered = exercises.filter(exercise => {
+      // Filter by catalog first
+      const matchesCatalog = exercise.catalogId === selectedCatalogId;
+
       const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(exercise.category);
       // Use localized name/description for search while preserving canonical tags
       const loc = localizeExercise(exercise, t);
@@ -225,14 +254,14 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         || (loc.description || '').toLowerCase().includes(term)
         || (exercise.tags || []).some(tag => tag.toLowerCase().includes(term));
       const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
-      
+
       // Apply exercise type filter
       const matchesExerciseFilter = exerciseFilter === 'all' ||
         (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise) && !isSharedExercise(exercise)) ||
         (exerciseFilter === 'custom' && isUserCreatedExercise(exercise)) ||
         (exerciseFilter === 'shared' && isSharedExercise(exercise));
-      
-      return matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
+
+      return matchesCatalog && matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
     });
     
     // Apply sorting
@@ -264,7 +293,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     });
     
     return filtered;
-  }, [exercises, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy, t]);
+  }, [exercises, selectedCatalogId, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy, t]);
 
   // Group exercises by category for better organization
   const exercisesByCategory = useMemo(() => {
@@ -386,6 +415,14 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
             {t('exercises.subtitle')}
           </p>
+        </div>
+
+        {/* Catalog Selector */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4">
+          <CatalogSelector
+            selectedCatalogId={selectedCatalogId}
+            onCatalogChange={handleCatalogChange}
+          />
         </div>
 
         {/* Search and Filters */}
@@ -524,7 +561,17 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
           {/* Results Count */}
           <div className="mt-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            {t('exercises.showingCount', { count: filteredExercises.length, total: exercises.length })}
+            {(() => {
+              const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
+              const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { defaultValue: selectedCatalog.id }) : 'Unknown';
+              const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
+              return t('exercises.showingCountInCatalog', {
+                count: filteredExercises.length,
+                total: totalInCatalog,
+                catalog: catalogName,
+                defaultValue: `Showing ${filteredExercises.length} of ${totalInCatalog} exercises in ${catalogName}`
+              });
+            })()}
           </div>
         </div>
 

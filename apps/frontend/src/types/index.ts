@@ -34,6 +34,7 @@ export interface Exercise extends SyncMetadata {
   description?: string;
   category: ExerciseCategory;
   exercise_type: ExerciseType;
+  catalogId: string;            // References ExerciseCatalog.id
   default_duration?: number; // in seconds - for time-based exercises
   default_sets?: number; // for repetition-based exercises
   default_reps?: number; // for repetition-based exercises
@@ -66,6 +67,14 @@ export interface Exercise extends SyncMetadata {
   shared_from_exercise_id?: string; // Reference to the original exercise this was copied from via sharing
   shared_from_user_id?: string; // ID of the user who originally created the shared exercise
   is_shared_copy?: boolean; // Flag indicating this exercise was copied from a share
+
+  // Extended exercise metadata (for built-in exercises)
+  benefits?: string; // Health and fitness benefits of the exercise
+  limitations?: string; // Contraindications or limitations
+  best_timing?: string; // Optimal times to perform the exercise
+  suggested_combinations?: string[]; // IDs of exercises that pair well with this one
+  notes?: string; // Additional notes or tips
+  exercise_references?: string[]; // Sources, studies, or references
 }
 
 export const ExerciseCategory = {
@@ -78,6 +87,19 @@ export const ExerciseCategory = {
 } as const;
 
 export type ExerciseCategory = typeof ExerciseCategory[keyof typeof ExerciseCategory];
+
+// Exercise catalog types
+export interface ExerciseCatalog {
+  id: string;                    // 'general-fitness', 'tai-chi', 'zumba', 'women-health'
+  nameKey: string;              // i18n key: 'catalogs.general-fitness.name'
+  descriptionKey: string;       // i18n key: 'catalogs.general-fitness.description'
+  isDefault: boolean;           // Only general-fitness = true
+  isPremium: boolean;           // For future monetization
+  displayOrder: number;         // UI sort order
+  icon?: string;                // Optional catalog icon identifier
+  colorTheme?: string;          // CSS theme identifier
+  pictureUrl?: string;          // Catalog header/preview image URL
+}
 
 // Workout structure
 export interface WorkoutExercise {

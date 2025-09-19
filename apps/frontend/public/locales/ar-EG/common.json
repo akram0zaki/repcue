@@ -54,7 +54,8 @@
     "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
-    "playVideo": "تشغيل الفيديو"
+    "playVideo": "تشغيل الفيديو",
+    "premium": "مميز"
   },
   "navigation": {
     "home": "البيت",
@@ -327,6 +328,7 @@
     },
     "favoritesOnly": "المفضلة بس",
     "showingCount": "بيعرض {{count}} من {{total}}",
+    "showingCountInCatalog": "بيعرض {{count}} من {{total}} تمرين في {{catalog}}",
     "emptyTitle": "مافيش نتائج",
     "emptyBody": "مافيش تمارين تطابق الفلاتر بتاعتك. جرب تمسح الفلاتر.",
     "clearFilters": "امسح الفلاتر",

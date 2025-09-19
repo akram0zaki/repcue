@@ -54,7 +54,8 @@
     "confirmClearForm":"Bist der wis fan dat jo it formulier wiske wolle? Dit sil jo brouillon ferwiderje.",
     "noVideo": "Gjin Fideo",
     "pauseVideo": "Pause Fideo",
-    "playVideo": "Spylje Fideo"
+    "playVideo": "Spylje Fideo",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Thús",
@@ -315,6 +316,7 @@
     },
     "favoritesOnly": "Allinnich favoriten",
     "showingCount": "{{count}} fan {{total}} werjûn",
+    "showingCountInCatalog": "Lit {{count}} fan {{total}} oefeningen sjen yn {{catalog}}",
     "emptyTitle": "Gjin resultaten",
     "emptyBody": "Gjin oefeningen passe by jo filters. Probearje filters wis te meitsjen.",
     "clearFilters": "Filters wiskje",

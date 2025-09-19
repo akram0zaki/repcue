@@ -54,7 +54,8 @@
     "confirmClearForm":"Êtes-vous sûr de vouloir effacer le formulaire ? Cela supprimera votre brouillon.",
     "noVideo": "Pas de vidéo",
     "pauseVideo": "Mettre en pause la vidéo",
-    "playVideo": "Lire la vidéo"
+    "playVideo": "Lire la vidéo",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Accueil",
@@ -315,6 +316,7 @@
     },
     "favoritesOnly": "Favoris uniquement",
     "showingCount": "Affichage de {{count}} sur {{total}}",
+    "showingCountInCatalog": "Affichage de {{count}} sur {{total}} exercices dans {{catalog}}",
     "emptyTitle": "Aucun résultat",
     "emptyBody": "Aucun exercice ne correspond à vos filtres. Essayez d'effacer les filtres.",
     "clearFilters": "Effacer les filtres",

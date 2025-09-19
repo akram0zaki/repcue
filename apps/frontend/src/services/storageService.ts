@@ -1,14 +1,15 @@
 import Dexie from 'dexie';
 import type { Table, Transaction } from 'dexie';
-import type { 
-  Exercise, 
-  ActivityLog, 
-  UserPreferences, 
+import type {
+  Exercise,
+  ActivityLog,
+  UserPreferences,
   AppSettings,
   Workout,
   WorkoutSession,
   UserFavorite,
-  SyncMetadata
+  SyncMetadata,
+  ExerciseCatalog
 } from '../types';
 import { consentService } from './consentService';
 import { authService } from './authService';
@@ -62,6 +63,7 @@ class RepCueDatabase extends Dexie {
   workouts!: Table<StoredWorkout>;
   workout_sessions!: Table<StoredWorkoutSession>;
   video_files!: Table<StoredVideoFile>;
+  exercise_catalogs!: Table<ExerciseCatalog>;
 
   constructor() {
     super('RepCueDB');
@@ -229,6 +231,53 @@ class RepCueDatabase extends Dexie {
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       sync_state: 'user_id',
       video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 16: Add catalog support and extended exercise metadata fields
+    this.version(16).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      // NEW: Exercise catalogs table with full sync support
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(trans => {
+      // Migrate existing exercises to add catalogId field
+      return trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+        if (!exercise.catalogId) {
+          exercise.catalogId = 'general-fitness'; // All existing exercises go to general fitness
+        }
+      });
+    });
+
+    // Version 18: Force database refresh to fix catalog assignments
+    this.version(18).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(async (trans) => {
+      // Version 18: Force complete database refresh
+      logger.log('[Migration v18] Clearing all exercises for fresh start with proper catalog assignments');
+
+      // Clear all exercises to force fresh seeding
+      await trans.table('exercises').clear();
+
+      // Clear exercise catalogs to force fresh seeding
+      await trans.table('exercise_catalogs').clear();
+
+      logger.log('[Migration v18] Database cleared, will trigger fresh seeding on next access');
     });
   }
 
@@ -1556,10 +1605,13 @@ export class StorageService {
   const tSeedStart = Date.now();
   const existingCount = await this.db.exercises.count();
   logger.log(`[seed] exercises.count before=${existingCount}`);
-  if (existingCount > 0) return existingCount;
+  // Force seeding after Version 18 migration
+  logger.log(`[seed] Forcing seeding due to Version 18 migration`);
 
       // Lazy import to avoid upfront bundle cost and circular deps
       const { INITIAL_EXERCISES } = await import('../data/exercises');
+
+
       // Prepare clean seed records and insert in a single transaction using bulkPut for speed
       const cleanSeeds: StoredExercise[] = INITIAL_EXERCISES.map(exercise => ({
         ...exercise,
@@ -1617,6 +1669,19 @@ export class StorageService {
     try {
       const { INITIAL_EXERCISES } = await import('../data/exercises');
       const currentBuiltInIds = new Set(INITIAL_EXERCISES.map(ex => ex.id));
+
+      // DEBUG: Log source exercise catalog distribution
+      const sourceCatalogCounts = INITIAL_EXERCISES.reduce((acc, ex) => {
+        const catalog = ex.catalogId || 'undefined';
+        acc[catalog] = (acc[catalog] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      logger.log('[cleanBuiltInExercises] Source catalog distribution:', sourceCatalogCounts);
+      logger.log('[cleanBuiltInExercises] Sample source exercises:', INITIAL_EXERCISES.slice(0, 3).map(ex => ({
+        id: ex.id,
+        name: ex.name,
+        catalogId: ex.catalogId
+      })));
       
       // Get all existing built-in exercises (those with slug IDs, not UUIDs)
       const existingBuiltInExercises = await this.db.exercises
@@ -1629,10 +1694,14 @@ export class StorageService {
       // 1. Clean up existing built-in exercises that should remain
       for (const exercise of existingBuiltInExercises) {
         if (currentBuiltInIds.has(exercise.id)) {
-          // This built-in exercise should remain - ensure it's clean
-          if (exercise.dirty === 1 || exercise.owner_id !== null) {
+          // This built-in exercise should remain - update it with latest data from INITIAL_EXERCISES
+          const latestExerciseData = INITIAL_EXERCISES.find(ex => ex.id === exercise.id);
+          if (latestExerciseData) {
+            // DEBUG: Log the catalog assignment for this exercise
+            logger.log(`[cleanBuiltInExercises] Updating ${exercise.id}: old catalogId=${exercise.catalogId}, new catalogId=${latestExerciseData.catalogId}`);
+
             const cleanedExercise: StoredExercise = {
-              ...exercise,
+              ...latestExerciseData, // Use latest data from catalog
               dirty: 0,
               version: 1,
               created_at: '2025-01-01T00:00:00.000Z',
@@ -1641,7 +1710,7 @@ export class StorageService {
               owner_id: null,
               op: 'seed'
             } as StoredExercise;
-            
+
             await this.db.exercises.put(cleanedExercise);
           }
         } else {
@@ -3213,6 +3282,53 @@ export class StorageService {
       logger.error('Failed to get all exercises:', error);
       return [];
     }
+  }
+
+  // Catalog-aware exercise methods
+  /**
+   * Get exercises from a specific catalog
+   */
+  public async getExercisesByCatalog(catalogId: string): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const allExercises = await this.getAllExercises();
+      return allExercises.filter(exercise => exercise.catalogId === catalogId);
+    } catch (error) {
+      logger.error('Failed to get exercises by catalog:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get catalogs - placeholder for future dynamic catalog support
+   * Currently returns static catalog definitions
+   */
+  public async getCatalogs(): Promise<ExerciseCatalog[]> {
+    // Import here to avoid circular dependencies
+    const { getAllCatalogs } = await import('../data/catalogs');
+    return getAllCatalogs();
+  }
+
+  /**
+   * Get available catalogs based on user's premium status
+   * Currently returns static catalog definitions, filtered by premium status
+   */
+  public async getAvailableCatalogs(isPremiumUser: boolean = false): Promise<ExerciseCatalog[]> {
+    // Import here to avoid circular dependencies
+    const { getAvailableCatalogs } = await import('../data/catalogs');
+    return getAvailableCatalogs(isPremiumUser);
+  }
+
+  /**
+   * Get the default catalog (General Fitness)
+   */
+  public async getDefaultCatalog(): Promise<ExerciseCatalog> {
+    // Import here to avoid circular dependencies
+    const { getDefaultCatalog } = await import('../data/catalogs');
+    return getDefaultCatalog();
   }
 }
 

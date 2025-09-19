@@ -54,7 +54,8 @@
     "confirmClearForm":"Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht.",
     "noVideo": "Kein Video",
     "pauseVideo": "Video pausieren",
-    "playVideo": "Video abspielen"
+    "playVideo": "Video abspielen",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Startseite",
@@ -315,6 +316,7 @@
     },
     "favoritesOnly": "Nur Favoriten",
     "showingCount": "Zeige {{count}} von {{total}}",
+    "showingCountInCatalog": "Zeige {{count}} von {{total}} Übungen in {{catalog}}",
     "emptyTitle": "Keine Ergebnisse",
     "emptyBody": "Keine Übungen entsprechen Ihren Filtern. Versuchen Sie, Filter zu löschen.",
     "clearFilters": "Filter löschen",

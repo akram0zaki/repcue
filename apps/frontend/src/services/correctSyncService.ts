@@ -17,6 +17,7 @@ const SYNC_TIMEOUT_MS = 8_000; // Overall sync timeout per invocation (reduced t
 const SYNC_ORDER: readonly string[] = [
   'user_preferences',
   'app_settings',
+  'exercise_catalogs',  // NEW: Must sync before exercises due to foreign key
   'exercises',
   'user_favorites',
   'workouts',

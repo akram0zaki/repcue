@@ -54,7 +54,8 @@
     "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
-    "playVideo": "تشغيل الفيديو"
+    "playVideo": "تشغيل الفيديو",
+    "premium": "مميز"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -327,6 +328,7 @@
     },
     "favoritesOnly": "المفضلة فقط",
     "showingCount": "عرض {{count}} من {{total}}",
+    "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}",
     "emptyTitle": "لا توجد نتائج",
     "emptyBody": "لا توجد تمارين تطابق فلاترك. جرب مسح الفلاتر.",
     "clearFilters": "مسح الفلاتر",
