@@ -116,7 +116,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         sortBy
       };
       localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
-      logger.log('[ExercisePage] Filter state saved:', filterState);
     } catch (error) {
       logger.warn('[ExercisePage] Failed to save filter state:', error);
     }
@@ -227,20 +226,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
-    // Debug: Log exercise catalog distribution
-    const catalogCounts = exercises.reduce((acc, ex) => {
-      const catalog = ex.catalogId || 'undefined';
-      acc[catalog] = (acc[catalog] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    // Debug: Log exercise catalog distribution (removed unused catalogCounts)
 
-    logger.log('[ExercisePage] Exercise catalog distribution:', catalogCounts);
-    logger.log('[ExercisePage] Selected catalog:', selectedCatalogId);
-    logger.log('[ExercisePage] Sample exercises:', exercises.slice(0, 5).map(ex => ({
-      id: ex.id,
-      name: ex.name,
-      catalogId: ex.catalogId
-    })));
 
     const filtered = exercises.filter(exercise => {
       // Filter by catalog first
@@ -358,8 +345,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   const handleEditExercise = (exercise: Exercise) => {
-    logger.log('🔧 Edit button clicked for exercise:', exercise.name, 'ID:', exercise.id);
-    logger.log('🔧 Navigating to:', `/exercises/edit/${exercise.id}`);
     navigate(`/exercises/edit/${exercise.id}`);
   };
 
@@ -743,6 +728,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       }}
       getCategoryColor={getCategoryColor}
       formatDuration={formatDuration}
+      onNavigateToExercise={(exerciseId) => {
+        // Navigate to the exercise detail page
+        navigate(`/exercises/${exerciseId}`);
+      }}
     />
     </>
   );

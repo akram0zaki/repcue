@@ -1670,18 +1670,7 @@ export class StorageService {
       const { INITIAL_EXERCISES } = await import('../data/exercises');
       const currentBuiltInIds = new Set(INITIAL_EXERCISES.map(ex => ex.id));
 
-      // DEBUG: Log source exercise catalog distribution
-      const sourceCatalogCounts = INITIAL_EXERCISES.reduce((acc, ex) => {
-        const catalog = ex.catalogId || 'undefined';
-        acc[catalog] = (acc[catalog] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      logger.log('[cleanBuiltInExercises] Source catalog distribution:', sourceCatalogCounts);
-      logger.log('[cleanBuiltInExercises] Sample source exercises:', INITIAL_EXERCISES.slice(0, 3).map(ex => ({
-        id: ex.id,
-        name: ex.name,
-        catalogId: ex.catalogId
-      })));
+      // DEBUG: Log source exercise catalog distribution (removed unused sourceCatalogCounts)
       
       // Get all existing built-in exercises (those with slug IDs, not UUIDs)
       const existingBuiltInExercises = await this.db.exercises
@@ -1697,8 +1686,6 @@ export class StorageService {
           // This built-in exercise should remain - update it with latest data from INITIAL_EXERCISES
           const latestExerciseData = INITIAL_EXERCISES.find(ex => ex.id === exercise.id);
           if (latestExerciseData) {
-            // DEBUG: Log the catalog assignment for this exercise
-            logger.log(`[cleanBuiltInExercises] Updating ${exercise.id}: old catalogId=${exercise.catalogId}, new catalogId=${latestExerciseData.catalogId}`);
 
             const cleanedExercise: StoredExercise = {
               ...latestExerciseData, // Use latest data from catalog

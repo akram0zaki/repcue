@@ -1,5 +1,24 @@
 ## Unreleased
 
+## 2025-09-19 (Latest)
+
+### Fixed
+- **Exercise Detail Page Layout and Translation Issues**: Completely redesigned ExerciseDetailPage to match ExerciseDetailModal for consistent user experience
+  - **Layout Transformation**: Converted from wide 3-column grid layout to compact single-column modal-style design for better mobile experience
+  - **Translation Keys Resolution**: Fixed unresolved translation keys by adding proper namespace configuration (`['common', 'exercise', 'exercises']`)
+  - **Content Organization**: Reorganized all exercise information sections to follow modal's logical flow and styling patterns
+  - **New Exercise Attributes Display**: Properly integrated benefits, limitations, best_timing, suggested_combinations, notes, and exercise_references fields
+  - **Suggested Combinations**: Converted from static text to clickable navigation links between related exercises
+  - **Visual Consistency**: Applied modal's typography patterns (`h4` headings, consistent spacing, background styling) throughout the page
+  - **Responsive Design**: Single-column layout provides optimal viewing experience across all device sizes
+  - **TypeScript Cleanup**: Removed unused variables and imports to eliminate build warnings
+
+### Technical Details
+- **Component Architecture**: ExerciseDetailPage now mirrors ExerciseDetailModal structure while maintaining full-page functionality
+- **Translation Namespace**: Unified translation key structure across exercise display components
+- **Navigation Integration**: Suggested combinations use React Router navigation for seamless exercise browsing
+- **Code Quality**: Eliminated 10+ TypeScript compilation errors related to unused variables and imports
+
 ## 2025-09-19
 
 ### Added

@@ -4,6 +4,7 @@ import type { Exercise, ExerciseCategory } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
 import { VideoThumbnail } from './VideoThumbnail';
 import { ExercisePlaceholder } from './ExercisePlaceholder';
+import { getExerciseById } from '../data/exercises';
 
 interface ExerciseDetailModalProps {
   exercise: Exercise | null;
@@ -11,6 +12,7 @@ interface ExerciseDetailModalProps {
   onClose: () => void;
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
+  onNavigateToExercise?: (exerciseId: string) => void;
 }
 
 export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
@@ -18,7 +20,8 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
   isOpen,
   onClose,
   getCategoryColor,
-  formatDuration
+  formatDuration,
+  onNavigateToExercise
 }) => {
   const { t } = useTranslation(['common', 'exercises']);
 
@@ -329,6 +332,110 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
                 {exercise.equipment_needed.map((item, index) => (
                   <li key={index} className="text-gray-600 dark:text-gray-400">
                     {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Benefits */}
+          {exercise.benefits && (
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                {t('exercises.benefits', { defaultValue: 'Benefits' })}
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {exercise.benefits}
+              </p>
+            </div>
+          )}
+
+          {/* Limitations */}
+          {exercise.limitations && (
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                {t('exercises.limitations', { defaultValue: 'Limitations' })}
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {exercise.limitations}
+              </p>
+            </div>
+          )}
+
+          {/* Best Timing */}
+          {exercise.best_timing && (
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                {t('exercises.bestTiming', { defaultValue: 'Best Timing' })}
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {exercise.best_timing}
+              </p>
+            </div>
+          )}
+
+          {/* Suggested Combinations */}
+          {exercise.suggested_combinations && exercise.suggested_combinations.length > 0 && (
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                {t('exercises.suggestedCombinations', { defaultValue: 'Suggested Combinations' })}
+              </h4>
+              <ul className="space-y-1">
+                {exercise.suggested_combinations.map((exerciseId, index) => {
+                  const referencedExercise = getExerciseById(exerciseId);
+                  return (
+                    <li key={index} className="flex items-center space-x-2">
+                      <span className="w-2 h-2 bg-purple-600 rounded-full flex-shrink-0"></span>
+                      {referencedExercise ? (
+                        onNavigateToExercise ? (
+                          <button
+                            onClick={() => {
+                              onClose(); // Close modal first
+                              onNavigateToExercise(exerciseId);
+                            }}
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors text-left"
+                          >
+                            {referencedExercise.name}
+                          </button>
+                        ) : (
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {referencedExercise.name}
+                          </span>
+                        )
+                      ) : (
+                        <span className="text-gray-500 dark:text-gray-400 italic text-sm">
+                          Exercise not found (ID: {exerciseId})
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          {/* Notes */}
+          {exercise.notes && (
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                {t('exercises.notes', { defaultValue: 'Notes' })}
+              </h4>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {exercise.notes}
+              </p>
+            </div>
+          )}
+
+          {/* Exercise References */}
+          {exercise.exercise_references && exercise.exercise_references.length > 0 && (
+            <div className="mb-6">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                {t('exercises.references', { defaultValue: 'References' })}
+              </h4>
+              <ul className="list-disc list-inside space-y-1">
+                {exercise.exercise_references.map((reference, index) => (
+                  <li key={index} className="text-gray-600 dark:text-gray-400">
+                    {reference}
                   </li>
                 ))}
               </ul>

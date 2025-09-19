@@ -21,5 +21,11 @@
   "startTimer": "بدء المؤقت",
   "stats": "الإحصائيات",
   "tags": "علامات",
-  "type": "نوع"
+  "type": "نوع",
+  "benefits": "الفوايد",
+  "limitations": "الحدود",
+  "bestTiming": "أحسن وقت",
+  "suggestedCombinations": "التركيبات المقترحة",
+  "notes": "ملاحظات",
+  "references": "المراجع"
 }

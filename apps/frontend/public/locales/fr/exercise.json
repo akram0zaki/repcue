@@ -21,5 +21,11 @@
   "startTimer": "Démarrer le minuteur",
   "stats": "Statistiques",
   "tags": "Étiquettes",
-  "type": "Type"
+  "type": "Type",
+  "benefits": "Avantages",
+  "limitations": "Limitations",
+  "bestTiming": "Meilleur Moment",
+  "suggestedCombinations": "Combinaisons Suggérées",
+  "notes": "Notes",
+  "references": "Références"
 }

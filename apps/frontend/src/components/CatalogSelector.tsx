@@ -14,7 +14,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   onCatalogChange,
   className = ''
 }) => {
-  const { t, i18n } = useTranslation(['common', 'catalogs']);
+  const { t } = useTranslation(['common', 'catalogs']);
 
 
   // Get color theme classes based on catalog color theme
