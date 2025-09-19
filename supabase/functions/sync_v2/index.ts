@@ -30,6 +30,7 @@ async function validateJWT(jwt) {
 const SYNC_TABLES = [
   'user_preferences',
   'app_settings',
+  'exercise_catalogs',
   'exercises',
   'user_favorites',
   'workouts',
@@ -101,6 +102,7 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'description',
     'category',
     'exercise_type',
+    'catalog_id',
     'default_sets',
     'default_reps',
     'default_duration',
@@ -164,11 +166,27 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'version',
     'deleted'
   ]),
+  exercise_catalogs: new Set([
+    'id',
+    'name_key',
+    'description_key',
+    'is_default',
+    'is_premium',
+    'display_order',
+    'icon',
+    'color_theme',
+    'picture_url',
+    'created_at',
+    'updated_at',
+    'version',
+    'deleted'
+  ]),
   activity_logs: new Set([
     'id',
     'owner_id',
     'exercise_id',
     'exercise_name',
+    'catalog_id',
     'workout_id',
     'session_id',
     'activity_type',

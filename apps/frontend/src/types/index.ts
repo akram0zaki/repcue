@@ -178,6 +178,7 @@ export interface WorkoutSession extends SyncMetadata {
 export interface ActivityLog extends SyncMetadata {
   exercise_id: string;
   exercise_name: string;
+  catalog_id?: string; // References ExerciseCatalog.id
   duration: number; // in seconds
   timestamp: string; // ISO timestamp
   notes?: string;

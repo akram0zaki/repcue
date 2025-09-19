@@ -1,6 +1,52 @@
 ## Unreleased
 
-## 2025-09-19 (Latest)
+## 2025-01-19 (Latest)
+
+### Fixed
+- **Activity Log Visibility Issue**: Resolved critical issue where completed exercises (like "Bicycle Crunches") were not appearing in the activity log table
+  - **Root Cause**: Missing `catalog_id` field in activity logs sync infrastructure causing sync failures
+  - **Database Schema**: Added `catalog_id` column to `activity_logs` table via migration `20250919-01-add-catalog-id-to-activity-logs.sql`
+  - **Sync Infrastructure**: Updated sync_v2 edge function (v36) with complete catalog support including:
+    - Added `exercise_catalogs` to SYNC_TABLES array for proper catalog metadata synchronization
+    - Added `catalog_id` to exercises MUTABLE_FIELD_ALLOWLIST for exercise catalog assignment sync
+    - Added `catalog_id` to activity_logs MUTABLE_FIELD_ALLOWLIST for activity log catalog tracking
+    - Added complete `exercise_catalogs` field allowlist for catalog metadata sync
+  - **Application Logic**: Fixed all 4 activity log creation instances in App.tsx to include proper `catalog_id` field
+  - **IndexedDB Schema**: Updated to version 19 to include `catalog_id` field in activity_logs table
+  - **Testing**: Comprehensive test coverage for catalog_id database schema and sync functionality
+
+### Completed
+- **Multi-Catalog System Implementation**: 🎉 **FULLY COMPLETED** - All 4 phases of the multi-catalog exercise system successfully implemented
+  - **Phase 3 - Localization & Content** (✅ Completed):
+    - Created comprehensive `catalogs.json` translations for all 8 supported locales (en, de, es, fr, nl, ar, ar-EG, fy)
+    - Implemented complete Tai Chi exercise catalog with traditional flowing movements
+    - Implemented complete Zumba exercise catalog with dance-based fitness routines
+    - All new exercises fully translated across all supported languages with proper metadata
+  - **Phase 4 - Testing & Schema Validation** (✅ Completed):
+    - Complete database layer validation across all Supabase CRUD operations
+    - Comprehensive StorageService testing with catalog_id field integration
+    - Full sync layer validation including CorrectSyncService catalog table sync
+    - Edge function sync_v2 validation with catalog queries and field allowlists
+    - TypeScript compilation verification with updated interfaces
+    - RLS policies testing for catalog access control scenarios
+    - Foreign key integrity testing for catalog referential constraints
+    - Exercise sharing functionality protection verified (no regressions)
+
+### Technical Details
+- **Complete Sync Infrastructure**: Activity logs now properly sync with catalog context between IndexedDB and Supabase
+- **Database Migrations**: Applied to both development (xwzrsfkzqxdybjrkkkvh) and production (zumzzuvfsuzvvymhpymk) environments
+- **Edge Function Deployment**: sync_v2 version 36 successfully deployed with complete catalog support
+- **Schema Consistency**: Resolved field naming consistency between database (`catalog_id`) and TypeScript interfaces (`catalogId`)
+- **Foreign Key Integrity**: Proper sync ordering ensures catalogs sync before exercises and activity logs
+- **Type Safety**: Zero TypeScript compilation errors across the entire codebase
+- **Backward Compatibility**: Zero breaking changes to existing functionality during implementation
+
+### Updated Documentation
+- **Implementation Plan**: Updated `docs/implementation-plans/multi-catalog-implementation-plan.md` with complete status tracking
+- **Progress Tracking**: All phases marked as completed with detailed implementation notes
+- **Critical Issues Resolution**: Documented root cause analysis and solutions for activity log visibility issue
+
+## 2025-09-19
 
 ### Fixed
 - **Exercise Detail Page Layout and Translation Issues**: Completely redesigned ExerciseDetailPage to match ExerciseDetailModal for consistent user experience

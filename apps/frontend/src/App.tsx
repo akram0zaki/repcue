@@ -450,6 +450,7 @@ function App() {
         id: crypto.randomUUID(),
         exercise_id: currentExercise.id,
         exercise_name: currentExercise.name,
+        catalog_id: currentExercise.catalogId,
         duration: Math.round(currentTime), // Round to avoid floating-point precision issues
         timestamp: new Date().toISOString(),
         notes: `Stopped after ${Math.round(currentTime)}s`,
@@ -1260,6 +1261,7 @@ function App() {
                     id: crypto.randomUUID(),
                     exercise_id: currentExercise.id,
                     exercise_name: currentExercise.name,
+                    catalog_id: currentExercise.catalogId,
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                     timestamp: new Date().toISOString(),
                     notes: `Completed ${totalSets} sets of ${totalReps} reps`,
@@ -1378,6 +1380,7 @@ function App() {
                 id: crypto.randomUUID(),
                 exercise_id: currentExercise.id,
                 exercise_name: currentExercise.name,
+                catalog_id: currentExercise.catalogId,
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                 timestamp: new Date().toISOString(),
                 notes: `Completed ${totalSets} sets of ${totalReps} reps`,
@@ -1402,6 +1405,7 @@ function App() {
               id: crypto.randomUUID(),
               exercise_id: currentExercise.id,
               exercise_name: currentExercise.name,
+              catalog_id: currentExercise.catalogId,
               duration: targetTime,
               timestamp: new Date().toISOString(),
               notes: `Completed ${targetTime}s interval timer`,
