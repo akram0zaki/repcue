@@ -11,6 +11,10 @@
     "close": "Slute",
     "dismiss": "Fuortsmite",
     "retry": "Nochris probearje",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "en",
     "loading": "Lade...",
     "optional": "opsjoneel",
@@ -120,7 +124,35 @@
     "forceFullSync": "Folsleine synchronisaasje twinge",
     "resetSyncState": "Synchronisaasjestatus weromsette",
     "syncAdvanced": "Feroare synchronisaasje",
-    "syncAdvancedHelp": "Help by it oplossen fan synchronisaasjeproblemen."
+    "syncAdvancedHelp": "Help by it oplossen fan synchronisaasjeproblemen.",
+    "updatePreferences": "App Bywurkings",
+    "updatePrivacyTitle": "Privacy Earst",
+    "updatePrivacyMessage": "Bywurkingskontroles stjoere allinich jo aktuele fersjennûmer. Gjin persoanlike gegevens wurde oerstjoerd.",
+    "updateModeTitle": "Bywurkingsgedrach",
+    "updateMode": {
+      "automatic": {
+        "title": "Automatyske Bywurkings",
+        "description": "Bywurkings automatysk yn 'e eftergrûn ynstallearje. Oanrikke foar de measte brûkers."
+      },
+      "notify": {
+        "title": "Allinnich Notifikaasje",
+        "description": "Meldings foar bywurkings toane mar lit my beslisse wannear se te ynstallearjen."
+      },
+      "manual": {
+        "title": "Allinnich Hânmjittich",
+        "description": "Nea automatysk kontrolearje op bywurkings. Ik sil hânmjittich bywurkje as nedich."
+      }
+    },
+    "securityUpdatesNote": "Kritike feiligheidsbywurkings wurde altyd automatysk tapast, ûnôfhinklik fan jo foarkar.",
+    "meteredConnection": "Datagebrûk",
+    "currentConnection": "Aktuele Ferbining:",
+    "connectionMetered": "Mjitte",
+    "connectionUnmetered": "Net Mjitte",
+    "allowMeteredUpdates": "Bywurkings tastean op mjitte ferbinings",
+    "allowMeteredUpdatesDescription": "Bywurkings kinne mobile data brûke of telle tsjin datalimieten",
+    "additionalPreferences": "Ekstra Opsjes",
+    "showChangelog": "Toan wat nij is",
+    "showChangelogDescription": "Utjefteopmerkings en funksje-hichtepunten nei bywurkings toane"
   },
   "timer": {
     "restNext": "Rêstperioade (Folgjende: {{next}})",
@@ -271,6 +303,10 @@
     "errorLoadingTitle": "Flater by laden training",
     "backToWorkouts": "Werom nei trainingen",
     "retry": "Nochris probearje",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "Training bewarje"
   },
   "activity": {
@@ -501,5 +537,83 @@
     "unknownUser": "Unbekende Brûker",
     "connectedSince": "Ferbûn sûnt {{date}}",
     "pending": "Yn behanneling"
+  },
+  "update": {
+    "force": {
+      "title": "Feiligens­update Fereaske",
+      "action": "No bywurkje",
+      "modal": {
+        "title": "Feiligens­update Fereaske",
+        "warning": {
+          "title": "Belangrike Feiligens­update",
+          "message": "Dizze update befettet krúsjale feiligensreparaasjes en kin net útsteld wurde. De app is net beskikber oant de update foltôge is."
+        },
+        "footer": "Dizze feiligens­update is fereaske om jo gegevens te beskermjen en de funksjonaliteit fan de app te garandearjen."
+      }
+    },
+    "critical": {
+      "title": "Belangrike Update Beskikber"
+    },
+    "optional": {
+      "title": "Nije Fersje Beskikber"
+    },
+    "default": {
+      "title": "Update Beskikber"
+    },
+    "version": "Fersje: {{version}}",
+    "action": "Bywurkje",
+    "postpone": "Letter",
+    "dismiss": "Update-notifikaasje slute",
+    "showChangelog": "Sjoch wat nij is",
+    "hideChangelog": "Ferbergje wat nij is",
+    "estimatedSize": "Skat. {{size}}MB",
+    "meteredConnection": {
+      "title": "Beheinde ferbining ûntdutsen"
+    },
+    "progress": {
+      "title": "Bywurkje...",
+      "label": "Update-foarútgong",
+      "preparing": "Update tariede...",
+      "downloading": "Update downloade...",
+      "installing": "Update ynstallearje...",
+      "completing": "Update ôfmeitsje..."
+    },
+    "error": {
+      "title": "Update mislearre"
+    },
+    "retry": "Update opnij probearje",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "Aktive Workout Fûn",
+      "message": "Jo hawwe in aktive workout. Kies hoe’t jo dizze ôfhannele wolle foar’t de update útfierd wurdt:",
+      "save": "Workout opslaan & bywurkje",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "Wat is Nij",
+    "close": "Changelog slute",
+    "done": "Klear",
+    "empty": {
+      "title": "Gjin detaillearre wizigingen beskikber",
+      "message": "Dizze update omfettet ferskate ferbetteringen en bugfixes."
+    },
+    "privacy": {
+      "title": "Privacy­wizigingen ûntdutsen",
+      "message": "Dizze update omfettet wizigingen yn hoe’t wy jo gegevens behannelje. Lês de wizigingen hjirboppe troch en befêstigje jo begryp.",
+      "acknowledge": "Ik begryp en erken de privacy­wizigingen yn dizze update"
+    }
   }
 }

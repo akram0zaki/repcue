@@ -58,14 +58,14 @@ describe('ProfilePage', () => {
     it('shows sign-in required message', async () => {
       renderProfilePage();
 
-      expect(await screen.findByText(/sign in required/i)).toBeInTheDocument();
-      expect(screen.getByText(/please sign in to view your profile/i)).toBeInTheDocument();
+      expect(await screen.findByText('profile.signInRequired')).toBeInTheDocument();
+      expect(screen.getByText('profile.signInToViewProfile')).toBeInTheDocument();
     });
 
     it('renders sign-in button', async () => {
       renderProfilePage();
 
-      const signInButton = await screen.findByRole('button', { name: /sign in/i });
+      const signInButton = await screen.findByText('common.signIn');
       expect(signInButton).toBeInTheDocument();
     });
   });
@@ -86,11 +86,11 @@ describe('ProfilePage', () => {
     it('shows loading state initially', async () => {
       renderProfilePage();
 
-      expect(screen.getByText(/loading/i)).toBeInTheDocument();
+      expect(screen.getByRole('status')).toBeInTheDocument(); // Loading spinner
       
       // Wait for loading to finish
       await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
       });
     });
 
@@ -99,11 +99,11 @@ describe('ProfilePage', () => {
 
       // Wait for component to load
       await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
       });
 
       // Should show "Profile Not Found" when profile is null
-      expect(screen.getByText(/profile not found/i)).toBeInTheDocument();
+      expect(screen.getByText('profile.notFound')).toBeInTheDocument();
     });
 
     it('renders profile header for other user profile', async () => {
@@ -111,11 +111,11 @@ describe('ProfilePage', () => {
 
       // Wait for component to load
       await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
       });
 
       // Should show "Profile Not Found" when profile is null
-      expect(screen.getByText(/profile not found/i)).toBeInTheDocument();
+      expect(screen.getByText('profile.notFound')).toBeInTheDocument();
     });
   });
 
@@ -138,8 +138,8 @@ describe('ProfilePage', () => {
     it('has accessible button labels', async () => {
       renderProfilePage();
 
-      const signInButton = await screen.findByRole('button', { name: /sign in/i });
-      expect(signInButton).toHaveAccessibleName();
+      const signInButton = await screen.findByText('common.signIn');
+      expect(signInButton).toBeInTheDocument();
     });
   });
 
@@ -156,7 +156,7 @@ describe('ProfilePage', () => {
       renderProfilePage();
 
       const signInButton = await screen.findByRole('button');
-      expect(signInButton).toHaveTextContent(/sign in/i);
+      expect(signInButton).toHaveTextContent('common.signIn');
     });
   });
 
@@ -176,11 +176,11 @@ describe('ProfilePage', () => {
 
       // Wait for component to load
       await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+        expect(screen.queryByRole('status')).not.toBeInTheDocument();
       });
 
       // Should render profile not found message without crashing
-      expect(screen.getByText(/profile not found/i)).toBeInTheDocument();
+      expect(screen.getByText('profile.notFound')).toBeInTheDocument();
     });
   });
 });

@@ -11,6 +11,10 @@
     "close": "Sluiten",
     "dismiss": "Verbergen",
     "retry": "Opnieuw proberen",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "en",
     "loading": "Laden...",
     "optional": "optioneel",
@@ -120,7 +124,35 @@
     "forceFullSync": "Forceer Volledige Synchronisatie",
     "resetSyncState": "Reset Synchronisatie Status",
     "syncAdvanced": "Geavanceerde Synchronisatie",
-    "syncAdvancedHelp": "Help bij het oplossen van synchronisatieproblemen."
+    "syncAdvancedHelp": "Help bij het oplossen van synchronisatieproblemen.",
+    "updatePreferences": "App Updates",
+    "updatePrivacyTitle": "Privacy Eerst",
+    "updatePrivacyMessage": "Update-controles sturen alleen uw huidige versienummer. Er worden geen persoonlijke gegevens verzonden.",
+    "updateModeTitle": "Update Gedrag",
+    "updateMode": {
+      "automatic": {
+        "title": "Automatische Updates",
+        "description": "Installeer updates automatisch op de achtergrond. Aanbevolen voor de meeste gebruikers."
+      },
+      "notify": {
+        "title": "Alleen Melden",
+        "description": "Toon meldingen voor updates maar laat mij beslissen wanneer ze te installeren."
+      },
+      "manual": {
+        "title": "Alleen Handmatig",
+        "description": "Controleer nooit automatisch op updates. Ik zal handmatig updaten wanneer nodig."
+      }
+    },
+    "securityUpdatesNote": "Kritieke beveiligingsupdates worden altijd automatisch toegepast, ongeacht uw voorkeur.",
+    "meteredConnection": "Datagebruik",
+    "currentConnection": "Huidige Verbinding:",
+    "connectionMetered": "Met Meter",
+    "connectionUnmetered": "Zonder Meter",
+    "allowMeteredUpdates": "Sta updates toe op verbindingen met meter",
+    "allowMeteredUpdatesDescription": "Updates kunnen mobiele data gebruiken of tellen tegen datalimieten",
+    "additionalPreferences": "Aanvullende Opties",
+    "showChangelog": "Toon nieuwe functies",
+    "showChangelogDescription": "Toon releaseopmerkingen en functie-highlights na updates"
   },
   "timer": {
     "restNext": "Rustperiode (Volgende: {{next}})",
@@ -271,6 +303,10 @@
     "errorLoadingTitle": "Fout Bij Laden Training",
     "backToWorkouts": "Terug naar Trainingen",
     "retry": "Opnieuw Proberen",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "Training Opslaan"
   },
   "activity": {
@@ -548,5 +584,83 @@
     "unknownUser": "Onbekende Gebruiker",
     "connectedSince": "Verbonden sinds {{date}}",
     "pending": "In behandeling"
+  },
+  "update": {
+    "force": {
+      "title": "Beveiligingsupdate Vereist",
+      "action": "Nu bijwerken",
+      "modal": {
+        "title": "Beveiligingsupdate Vereist",
+        "warning": {
+          "title": "Belangrijke Beveiligingsupdate",
+          "message": "Deze update bevat kritieke beveiligingsoplossingen en kan niet worden uitgesteld. De app is niet beschikbaar totdat de update is voltooid."
+        },
+        "footer": "Deze beveiligingsupdate is vereist om je gegevens te beschermen en de functionaliteit van de app te waarborgen."
+      }
+    },
+    "critical": {
+      "title": "Belangrijke Update Beschikbaar"
+    },
+    "optional": {
+      "title": "Nieuwe Versie Beschikbaar"
+    },
+    "default": {
+      "title": "Update Beschikbaar"
+    },
+    "version": "Versie: {{version}}",
+    "action": "Bijwerken",
+    "postpone": "Later",
+    "dismiss": "Update­melding sluiten",
+    "showChangelog": "Bekijk wat er nieuw is",
+    "hideChangelog": "Verberg wat er nieuw is",
+    "estimatedSize": "Ca. {{size}}MB",
+    "meteredConnection": {
+      "title": "Beperkte verbinding gedetecteerd"
+    },
+    "progress": {
+      "title": "Bezig met bijwerken...",
+      "label": "Voortgang update",
+      "preparing": "Update voorbereiden...",
+      "downloading": "Update downloaden...",
+      "installing": "Update installeren...",
+      "completing": "Update voltooien..."
+    },
+    "error": {
+      "title": "Update mislukt"
+    },
+    "retry": "Update opnieuw proberen",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "Actieve Training Gedetecteerd",
+      "message": "Je hebt een actieve training. Kies hoe je hiermee omgaat voordat je de update uitvoert:",
+      "save": "Training opslaan & bijwerken",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "Wat is Nieuw",
+    "close": "Changelog sluiten",
+    "done": "Klaar",
+    "empty": {
+      "title": "Geen Gedetailleerde Wijzigingen Beschikbaar",
+      "message": "Deze update bevat diverse verbeteringen en foutoplossingen."
+    },
+    "privacy": {
+      "title": "Privacy­wijzigingen Gedetecteerd",
+      "message": "Deze update bevat wijzigingen in hoe we je gegevens verwerken. Bekijk de wijzigingen hierboven en bevestig dat je dit begrijpt.",
+      "acknowledge": "Ik begrijp en erken de privacy­wijzigingen in deze update"
+    }
   }
 }

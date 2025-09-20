@@ -11,6 +11,10 @@
     "close": "Cerrar",
     "dismiss": "Descartar",
     "retry": "Reintentar",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "y",
     "loading": "Cargando...",
     "optional": "opcional",
@@ -120,7 +124,35 @@
     "forceFullSync": "Forzar sincronización completa",
     "resetSyncState": "Restablecer estado de sincronización",
     "syncAdvanced": "Sincronización avanzada",
-    "syncAdvancedHelp": "Ayuda para solucionar problemas de sincronización."
+    "syncAdvancedHelp": "Ayuda para solucionar problemas de sincronización.",
+    "updatePreferences": "Actualizaciones de la App",
+    "updatePrivacyTitle": "Privacidad Primero",
+    "updatePrivacyMessage": "Las verificaciones de actualización solo envían tu número de versión actual. No se transmiten datos personales.",
+    "updateModeTitle": "Comportamiento de Actualizaciones",
+    "updateMode": {
+      "automatic": {
+        "title": "Actualizaciones Automáticas",
+        "description": "Instalar actualizaciones automáticamente en segundo plano. Recomendado para la mayoría de usuarios."
+      },
+      "notify": {
+        "title": "Solo Notificar",
+        "description": "Mostrar notificaciones para actualizaciones pero déjame decidir cuándo instalarlas."
+      },
+      "manual": {
+        "title": "Solo Manual",
+        "description": "Nunca verificar actualizaciones automáticamente. Actualizaré manualmente cuando sea necesario."
+      }
+    },
+    "securityUpdatesNote": "Las actualizaciones críticas de seguridad siempre se aplicarán automáticamente independientemente de tu preferencia.",
+    "meteredConnection": "Uso de Datos",
+    "currentConnection": "Conexión Actual:",
+    "connectionMetered": "Medida",
+    "connectionUnmetered": "Sin Medir",
+    "allowMeteredUpdates": "Permitir actualizaciones en conexiones medidas",
+    "allowMeteredUpdatesDescription": "Las actualizaciones pueden usar datos móviles o contar contra límites de datos",
+    "additionalPreferences": "Opciones Adicionales",
+    "showChangelog": "Mostrar novedades",
+    "showChangelogDescription": "Mostrar notas de versión y destacados de características después de actualizaciones"
   },
   "timer": {
     "restNext": "Período de descanso (Siguiente: {{next}})",
@@ -271,6 +303,10 @@
     "errorLoadingTitle": "Error cargando entrenamiento",
     "backToWorkouts": "Volver a entrenamientos",
     "retry": "Reintentar",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "Guardar entrenamiento"
   },
   "activity": {
@@ -501,5 +537,83 @@
     "unknownUser": "Usuario Desconocido",
     "connectedSince": "Conectado desde {{date}}",
     "pending": "Pendiente"
+  },
+  "update": {
+    "force": {
+      "title": "Actualización de Seguridad Requerida",
+      "action": "Actualizar Ahora",
+      "modal": {
+        "title": "Actualización de Seguridad Requerida",
+        "warning": {
+          "title": "Actualización de Seguridad Importante",
+          "message": "Esta actualización contiene correcciones de seguridad críticas y no se puede posponer. La aplicación no estará disponible hasta que se complete la actualización."
+        },
+        "footer": "Esta actualización de seguridad es necesaria para proteger sus datos y garantizar la funcionalidad de la aplicación."
+      }
+    },
+    "critical": {
+      "title": "Actualización Importante Disponible"
+    },
+    "optional": {
+      "title": "Nueva Versión Disponible"
+    },
+    "default": {
+      "title": "Actualización Disponible"
+    },
+    "version": "Versión: {{version}}",
+    "action": "Actualizar",
+    "postpone": "Más tarde",
+    "dismiss": "Descartar notificación de actualización",
+    "showChangelog": "Ver novedades",
+    "hideChangelog": "Ocultar novedades",
+    "estimatedSize": "Est. {{size}}MB",
+    "meteredConnection": {
+      "title": "Conexión Medida Detectada"
+    },
+    "progress": {
+      "title": "Actualizando...",
+      "label": "Progreso de actualización",
+      "preparing": "Preparando actualización...",
+      "downloading": "Descargando actualización...",
+      "installing": "Instalando actualización...",
+      "completing": "Finalizando actualización..."
+    },
+    "error": {
+      "title": "Actualización Fallida"
+    },
+    "retry": "Reintentar Actualización",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "Entrenamiento Activo Detectado",
+      "message": "Tienes un entrenamiento activo. Elige cómo manejarlo antes de actualizar:",
+      "save": "Guardar Entrenamiento y Actualizar",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "Novedades",
+    "close": "Cerrar registro de cambios",
+    "done": "Hecho",
+    "empty": {
+      "title": "No hay Cambios Detallados Disponibles",
+      "message": "Esta actualización incluye varias mejoras y correcciones de errores."
+    },
+    "privacy": {
+      "title": "Cambios en la Privacidad Detectados",
+      "message": "Esta actualización incluye cambios en la forma en que manejamos sus datos. Revise los cambios anteriores y confirme su comprensión.",
+      "acknowledge": "Entiendo y reconozco los cambios en la privacidad en esta actualización"
+    }
   }
 }

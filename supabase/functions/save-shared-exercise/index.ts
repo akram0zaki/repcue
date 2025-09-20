@@ -79,7 +79,7 @@ serve(async (req: Request) => {
 
     // Parse request body
     const body = await req.json();
-    const { shareToken } = body;
+    const { shareToken, catalogId } = body;
 
     // Validate required fields
     if (!shareToken) {
@@ -109,6 +109,33 @@ serve(async (req: Request) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Determine target catalog
+    let targetCatalogId = catalogId;
+    if (!catalogId) {
+      // Only use default catalog if none was provided
+      targetCatalogId = 'general-fitness';
+      console.log('No catalog ID provided, using default catalog:', targetCatalogId);
+    } else {
+      // Verify the provided catalog exists
+      const { data: catalog, error: catalogError } = await supabase
+        .from('exercise_catalogs')
+        .select('id')
+        .eq('id', targetCatalogId)
+        .single();
+
+      if (catalogError || !catalog) {
+        console.error('Invalid catalog ID provided:', catalogError);
+        return new Response(
+          JSON.stringify({ error: 'Invalid catalog ID' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      console.log('Using provided catalog:', targetCatalogId);
+    }
+
     // Look up share record and exercise details
     const { data: shareData, error: shareError } = await supabase
       .from('exercise_shares')
@@ -122,16 +149,16 @@ serve(async (req: Request) => {
           id,
           name,
           description,
-          muscle_group,
-          primary_muscles,
-          secondary_muscles,
-          equipment,
-          type,
-          difficulty,
+          category,
+          exercise_type,
+          difficulty_level,
+          muscle_groups,
+          equipment_needed,
           rep_duration_seconds,
           custom_video_url,
-          video_file_id,
-          custom_instructions,
+          has_video,
+          instructions,
+          copy_count,
           created_at,
           updated_at
         )
@@ -194,21 +221,22 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check if user has already saved this exercise
-    const { data: existingFavorite } = await supabase
-      .from('user_favorites')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('exercise_id', shareData.exercise_id)
-      .eq('exercise_type', 'shared')
+    // Check if user has already saved this exercise (look for existing copy)
+    const { data: existingExercise } = await supabase
+      .from('exercises')
+      .select('id, name')
+      .eq('owner_id', userId)
+      .eq('shared_from_exercise_id', originalExercise.id)
+      .eq('deleted', false)
       .single();
 
-    if (existingFavorite) {
+    if (existingExercise) {
       return new Response(
         JSON.stringify({
           success: true,
           message: 'Exercise already saved to your library',
-          exerciseId: shareData.exercise_id
+          exerciseId: existingExercise.id,
+          exerciseName: existingExercise.name
         }),
         {
           status: 200,
@@ -217,50 +245,35 @@ serve(async (req: Request) => {
       );
     }
 
-    // Generate new UUID for the copied exercise
-    const { data: newUuidData, error: uuidError } = await supabase.rpc('gen_random_uuid');
-
-    if (uuidError || !newUuidData) {
-      console.error('UUID generation error:', uuidError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to generate new exercise ID' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    const newExerciseId = newUuidData;
     const now = new Date().toISOString();
+    const newExerciseId = crypto.randomUUID();
 
-    // Create copy of exercise for the user
+    // Create a copy of the shared exercise for the user
     const newExercise = {
       id: newExerciseId,
       owner_id: userId,
       name: `${originalExercise.name} (Shared)`,
       description: originalExercise.description,
-      muscle_group: originalExercise.muscle_group,
-      primary_muscles: originalExercise.primary_muscles,
-      secondary_muscles: originalExercise.secondary_muscles,
-      equipment: originalExercise.equipment,
-      type: originalExercise.type,
-      difficulty: originalExercise.difficulty,
+      category: originalExercise.category,
+      exercise_type: originalExercise.exercise_type,
+      difficulty_level: originalExercise.difficulty_level,
+      muscle_groups: originalExercise.muscle_groups,
+      equipment_needed: originalExercise.equipment_needed,
       rep_duration_seconds: originalExercise.rep_duration_seconds,
       custom_video_url: originalExercise.custom_video_url,
-      video_file_id: originalExercise.video_file_id,
-      custom_instructions: originalExercise.custom_instructions,
+      has_video: originalExercise.has_video,
+      instructions: originalExercise.instructions,
+      catalog_id: targetCatalogId,
+      shared_from_exercise_id: originalExercise.id,
+      shared_from_user_id: shareData.owner_id,
+      is_shared_copy: true,
+      copy_count: 0,
       created_at: now,
       updated_at: now,
       deleted: false,
-      version: 1,
-      // Sync metadata
-      dirty: true,
-      op: 'INSERT',
-      synced_at: null
+      version: 1
     };
 
-    // Insert the copied exercise
     const { error: exerciseInsertError } = await supabase
       .from('exercises')
       .insert(newExercise);
@@ -268,7 +281,10 @@ serve(async (req: Request) => {
     if (exerciseInsertError) {
       console.error('Exercise insert error:', exerciseInsertError);
       return new Response(
-        JSON.stringify({ error: 'Failed to save exercise to your library' }),
+        JSON.stringify({
+          error: 'Failed to save exercise to your library',
+          details: exerciseInsertError.message
+        }),
         {
           status: 500,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -276,35 +292,14 @@ serve(async (req: Request) => {
       );
     }
 
-    // Add entry to user_favorites with exercise_type = 'shared'
-    const favoriteEntry = {
-      id: crypto.randomUUID(),
-      user_id: userId,
-      exercise_id: newExerciseId,
-      exercise_type: 'shared',
-      created_at: now
-    };
-
-    const { error: favoriteInsertError } = await supabase
-      .from('user_favorites')
-      .insert(favoriteEntry);
-
-    if (favoriteInsertError) {
-      console.error('Favorite insert error:', favoriteInsertError);
-      // If favorite insert fails, clean up the exercise
-      await supabase
-        .from('exercises')
-        .delete()
-        .eq('id', newExerciseId);
-
-      return new Response(
-        JSON.stringify({ error: 'Failed to add exercise to favorites' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
+    // Increment copy_count on the original exercise
+    await supabase
+      .from('exercises')
+      .update({
+        copy_count: originalExercise.copy_count ? originalExercise.copy_count + 1 : 1,
+        updated_at: now
+      })
+      .eq('id', originalExercise.id);
 
     // Return success response
     return new Response(
@@ -312,7 +307,10 @@ serve(async (req: Request) => {
         success: true,
         exerciseId: newExerciseId,
         exerciseName: newExercise.name,
-        message: 'Exercise successfully saved to your library'
+        message: 'Exercise successfully saved to your library',
+        hasVideo: originalExercise.has_video || !!originalExercise.custom_video_url,
+        sharedFromExerciseId: originalExercise.id,
+        sharedFromUserId: shareData.owner_id
       }),
       {
         status: 201,

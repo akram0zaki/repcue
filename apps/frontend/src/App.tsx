@@ -5,6 +5,8 @@ import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
 import { authService } from './services/authService';
+import { forceUpdateService } from './services/forceUpdateService';
+import { updateService } from './services/updateService';
 import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
@@ -15,6 +17,8 @@ import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import { AuthModal } from './components/auth/AuthModal';
+import { ForceUpdateModal } from './components/ForceUpdateModal';
+import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
@@ -173,6 +177,10 @@ function App() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showForceUpdateModal, setShowForceUpdateModal] = useState(false);
+  const [forceUpdateData, setForceUpdateData] = useState<any>(null);
+  const [showWorkoutForceUpdateModal, setShowWorkoutForceUpdateModal] = useState(false);
+  const [workoutForceUpdateData, setWorkoutForceUpdateData] = useState<any>(null);
   
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
@@ -211,6 +219,60 @@ function App() {
     isResting: false,
     restTimeRemaining: undefined
   });
+
+  // Force Update Service Integration
+  useEffect(() => {
+    // Set timer state reference for workout interruption handling
+    forceUpdateService.setTimerStateRef(timerState);
+    updateService.setTimerStateRef(timerState);
+  }, [timerState]);
+
+  // Force Update Event Handlers
+  useEffect(() => {
+    const handleForceUpdateAvailable = (data: any) => {
+      logger.log('🚨 Force update available in App:', data);
+      setShowForceUpdateModal(true);
+      setForceUpdateData(data);
+    };
+
+    const handleForceUpdateCompleted = () => {
+      logger.log('✅ Force update completed in App');
+      setShowForceUpdateModal(false);
+      setForceUpdateData(null);
+      setShowWorkoutForceUpdateModal(false);
+      setWorkoutForceUpdateData(null);
+    };
+
+    const handleForceUpdateFailed = (errorData: any) => {
+      logger.error('❌ Force update failed in App:', errorData);
+      // Keep modal open to allow retry
+    };
+
+    // Handle workout-blocked force updates
+    const handleUpdateBlockedWorkoutForce = (data: any) => {
+      logger.log('🚨 Force update blocked by active workout:', data);
+      setShowForceUpdateModal(false); // Hide regular force update modal
+      setShowWorkoutForceUpdateModal(true);
+      setWorkoutForceUpdateData(data);
+    };
+
+    // Register force update event listeners
+    forceUpdateService.on('force-update-available', handleForceUpdateAvailable);
+    forceUpdateService.on('force-update-completed', handleForceUpdateCompleted);
+    forceUpdateService.on('force-update-failed', handleForceUpdateFailed);
+
+    // Register update service workout-aware events
+    updateService.on('update-blocked-workout-force', handleUpdateBlockedWorkoutForce);
+
+    return () => {
+      forceUpdateService.off('force-update-available', handleForceUpdateAvailable);
+      forceUpdateService.off('force-update-completed', handleForceUpdateCompleted);
+      forceUpdateService.off('force-update-failed', handleForceUpdateFailed);
+      updateService.off('update-blocked-workout-force', handleUpdateBlockedWorkoutForce);
+    };
+  }, []);
+
+
 
   // Timer UI State
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -522,6 +584,60 @@ function App() {
       }
     }
   }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.rep_speed_factor]);
+
+  // Workout Force Update Event Handlers
+  useEffect(() => {
+    const handleForceUpdateCompleteWorkout = async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      logger.log('🔄 Force update requesting workout completion:', customEvent.detail);
+      try {
+        // If there's an active workout, save it and stop the timer
+        if (timerState.workoutMode && timerState.isRunning) {
+          await stopTimer(true); // true = completion
+        } else if (timerState.isRunning) {
+          // Single exercise timer - just stop it
+          await stopTimer(true);
+        }
+        logger.log('✅ Workout completed for force update');
+      } catch (error) {
+        logger.error('❌ Failed to complete workout for force update:', error);
+      }
+    };
+
+    const handleForceUpdateAbandonWorkout = async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      logger.log('🔄 Force update requesting workout abandonment:', customEvent.detail);
+      try {
+        // Stop timer without saving/completion
+        if (timerState.isRunning) {
+          await resetTimer(); // Reset clears everything
+        }
+        // Clear workout mode
+        setTimerState(prev => ({
+          ...prev,
+          workoutMode: undefined,
+          isResting: false,
+          restTimeRemaining: undefined,
+          currentSet: undefined,
+          totalSets: undefined,
+          currentRep: undefined,
+          totalReps: undefined
+        }));
+        logger.log('✅ Workout abandoned for force update');
+      } catch (error) {
+        logger.error('❌ Failed to abandon workout for force update:', error);
+      }
+    };
+
+    // Add global event listeners for force update workout handling
+    window.addEventListener('force-update-complete-workout', handleForceUpdateCompleteWorkout as EventListener);
+    window.addEventListener('force-update-abandon-workout', handleForceUpdateAbandonWorkout as EventListener);
+
+    return () => {
+      window.removeEventListener('force-update-complete-workout', handleForceUpdateCompleteWorkout as EventListener);
+      window.removeEventListener('force-update-abandon-workout', handleForceUpdateAbandonWorkout as EventListener);
+    };
+  }, [timerState, stopTimer, resetTimer]);
 
   // Start workout-guided timer mode
   const startWorkoutMode = useCallback(async (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => {
@@ -2444,6 +2560,43 @@ useEffect(() => {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode="signin"
+      />
+
+      <ForceUpdateModal
+        isOpen={showForceUpdateModal}
+        updateInfo={forceUpdateData?.updateInfo}
+        workoutData={forceUpdateData?.workoutData}
+        autoForceDelay={forceUpdateData?.autoForceDelay}
+        onApplyUpdate={async () => {
+          try {
+            await forceUpdateService.applyForceUpdate();
+          } catch (error) {
+            logger.error('Failed to apply force update from modal:', error);
+            showSnackbar('Failed to apply update. Please try again.', { type: 'error' });
+          }
+        }}
+        onRetry={async () => {
+          try {
+            await forceUpdateService.retryForceUpdate();
+          } catch (error) {
+            logger.error('Failed to retry force update:', error);
+            showSnackbar('Retry failed. Please try again.', { type: 'error' });
+          }
+        }}
+        onForceReload={() => {
+          forceUpdateService.forceReload();
+        }}
+        blockAppUsage={true}
+      />
+
+      <WorkoutForceUpdateModal
+        isOpen={showWorkoutForceUpdateModal}
+        updateInfo={workoutForceUpdateData?.updateInfo}
+        workoutInfo={workoutForceUpdateData?.workoutInfo}
+        onClose={() => {
+          setShowWorkoutForceUpdateModal(false);
+          setWorkoutForceUpdateData(null);
+        }}
       />
     </>
   );

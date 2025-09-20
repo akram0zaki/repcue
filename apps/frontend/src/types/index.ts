@@ -339,6 +339,10 @@ export interface AppSettings extends SyncMetadata {
   show_exercise_videos?: boolean; // feature flag preference for video demos
   reduce_motion?: boolean;
   auto_start_next?: boolean;
+  // Update preferences
+  update_mode?: 'automatic' | 'notify' | 'manual'; // how to handle updates
+  allow_auto_updates?: boolean; // enable automatic updates
+  update_on_metered?: boolean; // allow updates on metered connections
 }
 
 // Navigation routes
@@ -473,4 +477,147 @@ export interface AuthState {
   user?: AuthUserProfile;
   accessToken?: string;
   refreshToken?: string;
+}
+
+// PWA Update System Types
+export interface UpdateInfo {
+  version: string;
+  policy: UpdatePolicy;
+  changelog?: VersionChangelog;
+  releaseDate: string;
+  downloadSize?: number;
+  forceUpdate?: boolean;
+  message?: string;
+}
+
+export interface VersionChangelog {
+  new_features?: string[];
+  improvements?: string[];
+  bug_fixes?: string[];
+  security_updates?: string[];
+}
+
+export const UpdatePolicy = {
+  FORCE: 'force',
+  CRITICAL: 'critical',
+  OPTIONAL: 'optional'
+} as const;
+
+export type UpdatePolicy = typeof UpdatePolicy[keyof typeof UpdatePolicy];
+
+export interface UpdatePreferences {
+  updateMode: UpdateMode;
+  allowMeteredUpdates: boolean;
+  showChangelog: boolean;
+  lastDismissedVersion?: string;
+  lastDismissedAt?: string;
+}
+
+export const UpdateMode = {
+  AUTOMATIC: 'automatic',
+  NOTIFY_ONLY: 'notify',
+  MANUAL: 'manual'
+} as const;
+
+export type UpdateMode = typeof UpdateMode[keyof typeof UpdateMode];
+
+export interface UpdateState {
+  currentVersion: string;
+  latestVersion?: string;
+  updateAvailable: boolean;
+  updatePolicy?: UpdatePolicy;
+  isUpdating: boolean;
+  updateProgress?: number;
+  lastCheckTime?: Date;
+  userPreferences: UpdatePreferences;
+  pendingUpdate?: UpdateInfo;
+  error?: string;
+}
+
+export interface VersionCheckRequest {
+  current_version: string;
+  client_id?: string;
+  user_consent?: boolean;
+  platform?: string;
+}
+
+export interface VersionCheckResponse {
+  update_available: boolean;
+  latest_version?: string;
+  update_policy?: UpdatePolicy;
+  changelog?: VersionChangelog;
+  download_url?: string;
+  force_update?: boolean;
+  message?: string;
+}
+
+// Error Handling and Recovery Types
+export const UpdateErrorType = {
+  NETWORK_ERROR: 'network_error',
+  DOWNLOAD_ERROR: 'download_error',
+  INSTALLATION_ERROR: 'installation_error',
+  VERIFICATION_ERROR: 'verification_error',
+  STORAGE_ERROR: 'storage_error',
+  SERVICE_WORKER_ERROR: 'service_worker_error',
+  TIMEOUT_ERROR: 'timeout_error',
+  PERMISSION_ERROR: 'permission_error',
+  COMPATIBILITY_ERROR: 'compatibility_error',
+  ROLLBACK_ERROR: 'rollback_error',
+  UNKNOWN_ERROR: 'unknown_error'
+} as const;
+
+export type UpdateErrorType = typeof UpdateErrorType[keyof typeof UpdateErrorType];
+
+export const UpdateErrorSeverity = {
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
+  CRITICAL: 'critical'
+} as const;
+
+export type UpdateErrorSeverity = typeof UpdateErrorSeverity[keyof typeof UpdateErrorSeverity];
+
+export interface UpdateError {
+  type: UpdateErrorType;
+  severity: UpdateErrorSeverity;
+  message: string;
+  originalError?: Error;
+  timestamp: string;
+  retryable: boolean;
+  userActionRequired: boolean;
+  metadata?: {
+    statusCode?: number;
+    networkInfo?: any;
+    updateVersion?: string;
+    previousVersion?: string;
+    rollbackAvailable?: boolean;
+    suggestedActions?: string[];
+  };
+}
+
+export interface RetryConfig {
+  maxAttempts: number;
+  baseDelay: number; // in milliseconds
+  maxDelay: number;
+  backoffMultiplier: number;
+  retryableErrors: UpdateErrorType[];
+}
+
+export interface RecoveryAction {
+  id: string;
+  label: string;
+  description: string;
+  action: () => Promise<void> | void;
+  dangerous?: boolean;
+  confirmationRequired?: boolean;
+}
+
+export interface UpdateRecoveryState {
+  currentError?: UpdateError;
+  retryAttempts: number;
+  lastRetryTime?: string;
+  recoveryActions: RecoveryAction[];
+  rollbackInProgress: boolean;
+  previousVersion?: string;
+  canRollback: boolean;
 }

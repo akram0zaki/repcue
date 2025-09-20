@@ -96,7 +96,12 @@
       "Bash(do echo \"Fixing $lang catalog structure\")",
       "Bash(for lang in de es fr nl ar ar-EG fy)",
       "mcp__supabase-prod__list_tables",
-      "mcp__supabase-prod__list_migrations"
+      "mcp__supabase-prod__list_migrations",
+      "Bash(do echo \"Adding update preference translations to $lang\")",
+      "Bash(for lang in fr nl ar ar-EG fy)",
+      "Bash(do echo \"Adding update translations to $lang\")",
+      "Bash(echo:*)",
+      "Bash(do echo:*)"
     ],
     "deny": [],
     "ask": []

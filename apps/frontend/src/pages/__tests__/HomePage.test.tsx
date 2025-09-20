@@ -127,7 +127,7 @@ describe('HomePage', () => {
   it('navigates to exercises page when browse exercises is clicked', async () => {
     renderHomePage();
     
-    const browseButton = screen.getByRole('button', { name: /browse exercises/i });
+    const browseButton = screen.getByTestId('exercises-count-link');
     fireEvent.click(browseButton);
 
     await waitFor(() => {

@@ -606,6 +606,22 @@ export class CorrectSyncService {
     return json as EdgeSyncResponseV2;
   }
 
+  /**
+   * Maps exercise field names from server format to client format
+   * Handles field name differences between Supabase edge functions and frontend
+   */
+  private mapExerciseFieldsFromServer(row: Record<string, unknown>): Record<string, unknown> {
+    const mapped = { ...row };
+
+    // Map catalog_id (server) to catalogId (client)
+    if ('catalog_id' in mapped) {
+      mapped.catalogId = mapped.catalog_id;
+      delete mapped.catalog_id;
+    }
+
+    return mapped;
+  }
+
   private ensureDeviceId(): string {
     try {
       let id = localStorage.getItem('repcue_device_id');
@@ -735,7 +751,9 @@ export class CorrectSyncService {
 
         const existing = await coll.get(row.id as string);
         if (!existing) {
-          await coll.put({ ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
+          // Apply field mapping for exercises table to normalize field names
+          const mappedRow = table === 'exercises' ? this.mapExerciseFieldsFromServer(row) : row;
+          await coll.put({ ...mappedRow, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
 
           // If this is a new video file, update the corresponding exercise's custom_video_url
           if (table === 'video_files' && row.exercise_id && row.file_name) {
@@ -754,7 +772,9 @@ export class CorrectSyncService {
           const incomingTime = new Date(incomingUpdated as string | number).getTime();
           if (localTime > incomingTime) continue; // keep local newer timestamp
         }
-        await coll.put({ ...existing, ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
+        // Apply field mapping for exercises table to normalize field names
+        const mappedRow = table === 'exercises' ? this.mapExerciseFieldsFromServer(row) : row;
+        await coll.put({ ...existing, ...mappedRow, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
 
         // If this is an updated video file, update the corresponding exercise's custom_video_url
         if (table === 'video_files' && row.exercise_id && row.file_name) {

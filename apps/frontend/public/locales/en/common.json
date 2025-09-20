@@ -120,7 +120,51 @@
     "forceFullSync": "Force Full Sync",
     "resetSyncState": "Reset Sync State",
     "syncAdvanced": "Advanced Sync",
-    "syncAdvancedHelp": "Help with troubleshooting sync issues."
+    "syncAdvancedHelp": "Help with troubleshooting sync issues.",
+    "updatePreferences": "App Updates",
+    "updatePrivacyTitle": "Privacy First",
+    "updatePrivacyMessage": "Update checks only send your current version number. No personal data is transmitted.",
+    "updateModeTitle": "Update Behavior",
+    "updateMode": {
+      "automatic": {
+        "title": "Automatic Updates",
+        "description": "Install updates automatically in the background. Recommended for most users."
+      },
+      "notify": {
+        "title": "Notify Only",
+        "description": "Show notifications for updates but let me decide when to install them."
+      },
+      "manual": {
+        "title": "Manual Only",
+        "description": "Never check for updates automatically. I'll update manually when needed."
+      }
+    },
+    "securityUpdatesNote": "Critical security updates will always be applied automatically regardless of your preference.",
+    "meteredConnection": "Data Usage",
+    "currentConnection": "Current Connection:",
+    "connectionMetered": "Metered",
+    "connectionUnmetered": "Unmetered",
+    "allowMeteredUpdates": "Allow updates on metered connections",
+    "allowMeteredUpdatesDescription": "Updates may use mobile data or count against data limits",
+    "additionalPreferences": "Additional Options",
+    "showChangelog": "Show what's new",
+    "showChangelogDescription": "Display release notes and feature highlights after updates",
+    "securityUpdateRequired": "Security Update Required",
+    "updateBlocked": "Update Blocked",
+    "workoutForceUpdateMessage": "A critical security update is required, but your {{activity}} is currently active. This update must be installed to ensure your safety.",
+    "important": "Important",
+    "securityUpdateCritical": "This security update addresses important vulnerabilities and cannot be delayed.",
+    "workoutProgressWillBeSaved": "Your workout progress will be automatically saved before updating.",
+    "updatingApp": "Updating app...",
+    "completeWorkoutAndUpdate": "Complete Workout & Update",
+    "finishTimerAndUpdate": "Finish Timer & Update",
+    "abandonWorkoutAndUpdate": "Stop Workout & Update",
+    "stopTimerAndUpdate": "Stop Timer & Update",
+    "pleaseWait": "Please wait...",
+    "appWillRestartAfterUpdate": "The app will restart automatically after the update completes.",
+    "tryAgain": "Try Again",
+    "timer": "Timer",
+    "workout": "Workout"
   },
   "timer": {
     "restNext": "Rest Period (Next: {{next}})",
@@ -554,5 +598,110 @@
     "unauthorized": "You can only edit your own exercises",
     "loadFailed": "Failed to load exercise",
     "updateFailed": "Failed to update exercise"
+  },
+  "update": {
+    "force": {
+      "title": "Security Update Required",
+      "action": "Update Now",
+      "applying": "Applying Update...",
+      "inProgress": "Updating Application...",
+      "pleaseWait": "Please do not close or refresh the browser. The app will restart automatically.",
+      "modal": {
+        "title": "Security Update Required",
+        "subtitle": "Critical security patch required immediately",
+        "autoUpdate": "Automatic update in:",
+        "preventLeave": "A security update is required. Please complete the update before closing.",
+        "warning": {
+          "title": "Important Security Update",
+          "message": "This update contains critical security fixes and cannot be postponed. The app will be unavailable until the update is complete."
+        },
+        "footer": "This security update is required to protect your data and ensure app functionality."
+      }
+    },
+    "critical": {
+      "title": "Important Update Available"
+    },
+    "optional": {
+      "title": "New Version Available"
+    },
+    "default": {
+      "title": "Update Available"
+    },
+    "version": "Version: {{version}}",
+    "action": "Update",
+    "postpone": "Later",
+    "dismiss": "Dismiss update notification",
+    "showChangelog": "See what's new",
+    "hideChangelog": "Hide what's new",
+    "estimatedSize": "Est. {{size}}MB",
+    "meteredConnection": {
+      "title": "Metered Connection Detected"
+    },
+    "progress": {
+      "title": "Updating...",
+      "label": "Update progress",
+      "preparing": "Preparing update...",
+      "downloading": "Downloading update...",
+      "installing": "Installing update...",
+      "completing": "Completing update..."
+    },
+    "error": {
+      "title": "Update Failed"
+    },
+    "retry": "Retry Update",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "Active Workout Detected",
+      "message": "You have an active workout. Choose how to handle it before updating:",
+      "save": "Save Workout & Update",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "What's New",
+    "close": "Close changelog",
+    "done": "Done",
+    "empty": {
+      "title": "No Detailed Changes Available",
+      "message": "This update includes various improvements and bug fixes."
+    },
+    "privacy": {
+      "title": "Privacy Changes Detected",
+      "message": "This update includes changes to how we handle your data. Please review the changes above and confirm your understanding.",
+      "acknowledge": "I understand and acknowledge the privacy changes in this update"
+    },
+    "categories": {
+      "newFeatures": "New Features",
+      "improvements": "Improvements",
+      "bugFixes": "Bug Fixes",
+      "securityUpdates": "Security Updates"
+    }
+  },
+  "whatsNew": {
+    "title": "What's New",
+    "close": "Close",
+    "previous": "Previous",
+    "next": "Next",
+    "gotIt": "Got it!",
+    "seeAllChanges": "See all changes",
+    "goToHighlight": "Go to highlight {{number}}",
+    "categories": {
+      "newFeature": "New Feature",
+      "improvement": "Improvement",
+      "security": "Security Update",
+      "update": "Update"
+    }
   }
 }
