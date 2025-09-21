@@ -347,6 +347,8 @@ export interface AppSettings extends SyncMetadata {
   update_mode?: 'automatic' | 'notify' | 'manual'; // how to handle updates
   allow_auto_updates?: boolean; // enable automatic updates
   update_on_metered?: boolean; // allow updates on metered connections
+  // Version tracking
+  app_version?: string; // currently installed app version
 }
 
 // Navigation routes

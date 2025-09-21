@@ -1,5 +1,28 @@
 ## Unreleased
 
+## 2025-09-21 (Simplified Version Management)
+
+### New Features
+- **Simplified PWA Version Management**: 🎉 **IMPLEMENTED** - Streamlined approach to fix broken update system
+  - **App Settings Extension**: Added `app_version` column to `app_settings` table for user version tracking
+  - **Database Migration**: Created migration `20250921-03-add-app-version-to-app-settings.sql` with proper indexing and baseline data
+  - **Singleton Pattern**: Fixed `app_settings` to enforce single record per user in IndexedDB to prevent duplicate records
+  - **Sync Integration**: Updated `sync_v2` edge function (v16 → v40) to include `app_version` in field allowlist for synchronization
+  - **User Analytics**: Enabled tracking of user version distribution for better support and update planning
+  - **Simple Implementation**: Bypasses complex dynamic versioning for immediate functionality and update system repair
+
+### Fixed
+- **Update System Sync Errors**: Resolved critical sync failures that prevented app functionality
+  - **Root Cause**: Previously deployed wrong edge function format that expected simple operations instead of complex batched sync requests
+  - **Edge Function Fix**: Deployed correct `sync_v2` function that maintains proper complex sync format while adding version support
+  - **Client-Server Compatibility**: Restored proper API format compatibility between client sync requests and server responses
+
+### Enhanced
+- **Production Deployment Documentation**: Updated migration tracking documentation
+  - **Sync Checklist**: Added new migration `20250921-03-add-app-version-to-app-settings.sql` to production sync checklist
+  - **Edge Function Versions**: Updated sync_v2 version references from v36 to v40 in deployment documentation
+  - **Version Tracking**: Added description of simplified version management system for production deployment
+
 ## 2025-09-21 (Session Update)
 
 ### Fixed

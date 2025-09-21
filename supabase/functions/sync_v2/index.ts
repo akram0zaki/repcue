@@ -90,6 +90,7 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'default_rest_time',
     'rep_speed_factor',
     'last_selected_exercise_id',
+    'app_version',
     'created_at',
     'updated_at',
     'version',

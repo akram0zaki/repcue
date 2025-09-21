@@ -31,6 +31,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   show_exercise_videos: true, // default opt-in (feature gated)
   reduce_motion: false,
   auto_start_next: false,
+  app_version: APP_VERSION, // Initialize with current build version
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

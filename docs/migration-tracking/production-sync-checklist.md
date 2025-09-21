@@ -30,6 +30,9 @@ supabase/migrations/20250919-04-create-version-audit-table.sql
 -- 4. Reference-Based Sharing System Migration
 supabase/migrations/20250921-01-remove-old-sharing-columns.sql
 supabase/migrations/20250921-02-update-video-policies-for-reference-sharing.sql
+
+-- 5. Simplified PWA Version Management
+supabase/migrations/20250921-03-add-app-version-to-app-settings.sql
 ```
 
 ### Migration Descriptions
@@ -74,6 +77,13 @@ supabase/migrations/20250921-02-update-video-policies-for-reference-sharing.sql
    - Changes policy from `is_shared_copy` checks to `user_favorites` table verification
    - **Required**: Essential for shared exercise video access functionality
 
+#### Simplified PWA Version Management
+9. **20250921-03-add-app-version-to-app-settings.sql**
+   - Adds `app_version` column to `app_settings` table for user version tracking
+   - Creates index for analytics queries on version distribution
+   - Updates existing records with baseline version '0.1.0'
+   - **Purpose**: Enables simplified version management and user analytics
+
 ---
 
 ## ⚡ Edge Functions to Deploy/Update
@@ -89,18 +99,19 @@ supabase/migrations/20250921-02-update-video-policies-for-reference-sharing.sql
 ### Updated Edge Functions
 ```
 ⚠️  UPDATE: save-shared-exercise (v7 → v15)
-⚠️  UPDATE: sync_v2 (v16 → v36) - CRITICAL FOR CATALOG SYSTEM
+⚠️  UPDATE: sync_v2 (v16 → v40) - CRITICAL FOR CATALOG SYSTEM & VERSION TRACKING
 ⚠️  UPDATE: download-shared-video (v1 → v2) - CRITICAL FOR SHARED EXERCISE VIDEOS
 ```
 - **save-shared-exercise (v7 → v15)**:
   - Enhanced with video metadata fields for proper video downloading
   - Critical Fix: Resolves missing videos in saved shared exercises
 
-- **sync_v2 (v16 → v36)**:
+- **sync_v2 (v16 → v40)**:
   - **CRITICAL**: Added complete catalog support infrastructure
   - Added `exercise_catalogs` to SYNC_TABLES array for catalog metadata sync
   - Added `catalog_id` to exercises and activity_logs field allowlists
-  - **Required**: Essential for multi-catalog system and activity log visibility fix
+  - Added `app_version` to app_settings field allowlist for version tracking
+  - **Required**: Essential for multi-catalog system, activity log visibility fix, and version analytics
 
 - **download-shared-video (v1 → v2)**:
   - **CRITICAL**: Updated from copy-based to reference-based sharing verification
@@ -112,7 +123,7 @@ supabase/migrations/20250921-02-update-video-policies-for-reference-sharing.sql
 |----------|------------|-------------|-----------------|
 | check-version | ❌ Missing | ✅ v1 | 🆕 **Deploy New** |
 | save-shared-exercise | ⚠️ v7 | ✅ v15 | 🔄 **Update Critical** |
-| sync_v2 | ⚠️ v16 | ✅ v36 | 🔄 **Update Critical** |
+| sync_v2 | ⚠️ v16 | ✅ v40 | 🔄 **Update Critical** |
 | download-shared-video | ⚠️ v1 | ✅ v2 | 🔄 **Update Critical** |
 | get-shared-exercise | ✅ v19 | ✅ v21 | ⚠️ **Review Optional** |
 
@@ -131,6 +142,7 @@ supabase/migrations/20250921-02-update-video-policies-for-reference-sharing.sql
 6. 20250919-04-create-version-audit-table.sql
 7. 20250921-01-remove-old-sharing-columns.sql
 8. 20250921-02-update-video-policies-for-reference-sharing.sql
+9. 20250921-03-add-app-version-to-app-settings.sql
 ```
 
 ### 2. Edge Function Deployments
@@ -166,7 +178,7 @@ supabase functions deploy save-shared-exercise --project-ref zumzzuvfsuzvvymhpym
 ## ⚠️ Important Notes
 
 ### Version Differences to Review
-- **sync_v2**: Dev v36 vs Prod v16 (significant version gap - review changes)
+- **sync_v2**: Dev v40 vs Prod v16 (significant version gap - review changes)
 - **download-shared-video**: Dev v2 vs Prod v1 (critical update - reference-based sharing)
 - **get-shared-exercise**: Dev v21 vs Prod v19 (minor updates - likely safe)
 

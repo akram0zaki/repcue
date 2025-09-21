@@ -14,10 +14,11 @@ import type {
 import { consentService } from './consentService';
 import { authService } from './authService';
 import { SYNC_DEBUG } from '../config/features';
-import { 
-  prepareUpsert, 
-  prepareSoftDelete, 
-  filterActiveRecords 
+import { APP_VERSION, DEFAULT_APP_SETTINGS } from '../constants';
+import {
+  prepareUpsert,
+  prepareSoftDelete,
+  filterActiveRecords
 } from './syncHelpers';
 import logger from '../utils/logger';
 
@@ -292,6 +293,30 @@ class RepCueDatabase extends Dexie {
       sync_state: 'user_id',
       video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
       exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    });
+
+    // Version 20: Add app_version field to app_settings for dynamic version tracking
+    this.version(20).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(async (trans) => {
+      // Initialize app_version field for existing app_settings records
+      logger.log('[Migration v20] Adding app_version field to existing app_settings');
+
+      await trans.table('app_settings').toCollection().modify((settings: Record<string, unknown>) => {
+        if (!settings.app_version) {
+          settings.app_version = '0.1.0'; // Initialize with current APP_VERSION
+          logger.log('[Migration v20] Setting app_version to 0.1.0 for existing settings');
+        }
+      });
     });
   }
 
@@ -2197,20 +2222,27 @@ export class StorageService {
   }
 
   /**
-   * Save app settings
+   * Save app settings (singleton pattern - only one record per user)
    */
   public async saveAppSettings(settings: AppSettings): Promise<void> {
     if (!this.canStoreData()) {
       throw new Error('Cannot store data without user consent');
     }
 
-  // Ensure UUID id so server accepts row
-  const settingsId = this.isUuid(settings.id) ? settings.id! : crypto.randomUUID();
+    // Get existing settings to preserve the ID for singleton pattern
+    const existingSettings = await this.getAppSettings();
+    const settingsId = existingSettings?.id || settings.id || 'app-settings-singleton';
+
     const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId, this.getCurrentUserId());
 
     try {
-      // Use put() to handle both insert and update operations
-      await this.db.app_settings.put(storedSettings);
+      // For singleton pattern, clear any existing records first, then add the new one
+      await this.db.transaction('rw', this.db.app_settings, async () => {
+        // Clear existing app_settings for this user to maintain singleton
+        await this.db.app_settings.clear();
+        // Add the single settings record
+        await this.db.app_settings.put(storedSettings);
+      });
     } catch (error) {
       logger.warn('Failed to save app settings to IndexedDB:', error);
       this.fallbackStorage.set('app_settings', storedSettings);
@@ -2224,7 +2256,7 @@ export class StorageService {
     // Allow reading app settings even without consent to preserve theme and basic preferences
     // This is acceptable as these are non-personal UI preferences
     const skipConsentCheck = true;
-    
+
     if (!skipConsentCheck && !this.canStoreData()) {
       return null;
     }
@@ -2239,6 +2271,29 @@ export class StorageService {
         return fallback || null;
       }
     );
+  }
+
+  /**
+   * Get current app version from stored settings
+   */
+  public async getCurrentAppVersion(): Promise<string> {
+    const settings = await this.getAppSettings();
+    return settings?.app_version || APP_VERSION; // Fallback to constant if not set
+  }
+
+  /**
+   * Update the app version in settings
+   */
+  public async updateAppVersion(newVersion: string): Promise<void> {
+    const currentSettings = await this.getAppSettings();
+    const updatedSettings: AppSettings = {
+      ...DEFAULT_APP_SETTINGS,
+      ...currentSettings,
+      app_version: newVersion,
+      updated_at: new Date().toISOString()
+    };
+
+    await this.saveAppSettings(updatedSettings);
   }
 
 

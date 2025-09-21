@@ -67,7 +67,7 @@ export class UpdateService {
    */
   private getDefaultUpdateState(): UpdateState {
     return {
-      currentVersion: APP_VERSION,
+      currentVersion: APP_VERSION, // Will be updated asynchronously
       updateAvailable: false,
       isUpdating: false,
       userPreferences: {
@@ -83,6 +83,9 @@ export class UpdateService {
    */
   private async loadUpdateStateAsync(): Promise<void> {
     try {
+      // Load current app version from IndexedDB
+      const currentVersion = await storageService.getCurrentAppVersion();
+
       // Load saved state from localStorage
       const savedStateJson = localStorage.getItem(UPDATE_STATE_KEY);
       if (savedStateJson) {
@@ -91,11 +94,18 @@ export class UpdateService {
           this.updateState = {
             ...this.updateState,
             ...savedState,
+            currentVersion, // Override with version from IndexedDB
             lastCheckTime: savedState.lastCheckTime ? new Date(savedState.lastCheckTime) : undefined
           };
         } catch (parseError) {
           logger.warn('Failed to parse saved update state, using defaults:', parseError);
         }
+      } else {
+        // No saved state, just update the version
+        this.updateState = {
+          ...this.updateState,
+          currentVersion
+        };
       }
 
       // Load preferences from AppSettings
@@ -198,7 +208,7 @@ export class UpdateService {
 
       // Reset to defaults
       this.updateState = {
-        currentVersion: APP_VERSION,
+        currentVersion: APP_VERSION, // Fallback to constant, will be updated by next loadUpdateStateAsync
         updateAvailable: false,
         isUpdating: false,
         userPreferences: {
@@ -593,6 +603,16 @@ export class UpdateService {
       this.updateState.updateAvailable = false;
       this.updateState.isUpdating = false;
       this.updateState.currentVersion = updateInfo.version;
+
+      // Persist the new version to IndexedDB for future version checks
+      try {
+        await storageService.updateAppVersion(updateInfo.version);
+        logger.log(`✅ App version updated in IndexedDB: ${updateInfo.version}`);
+      } catch (error) {
+        logger.warn('Failed to persist app version to IndexedDB:', error);
+        // Non-critical error, continue with update completion
+      }
+
       this.saveUpdateState();
 
       logger.log(`✅ Update completed successfully: ${updateInfo.version}`);
