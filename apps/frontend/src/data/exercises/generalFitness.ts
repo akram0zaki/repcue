@@ -32,7 +32,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Beginner-friendly: 30 seconds (research shows 20-60s range)
     is_favorite: false,
     has_video: true,
-    tags: ['isometric', 'core', 'stability']
+    tags: ['isometric', 'core', 'stability'],
+    benefits: 'Strengthens core muscles (abs, obliques, etc.), helping to protect the spine and improve posture:contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}. Also convenient with no equipment needed:contentReference[oaicite:2]{index=2}, and builds stability for everyday movements.',
+    limitations: 'Isometric holds beyond ~2 minutes yield diminishing returns:contentReference[oaicite:3]{index=3}. Poor form (sagging hips or shoulders) can cause pain:contentReference[oaicite:4]{index=4}. People with high blood pressure should avoid very long plank holds as they can raise blood pressure:contentReference[oaicite:5]{index=5}. Modify if you have wrist or shoulder issues (drop to knees or use an incline).',
+    best_timing: 'Can be done at the end of a workout or as a quick core routine. Planking 2–4 times a week is effective:contentReference[oaicite:6]{index=6}. Also useful as a core activation during warm-ups or even daily during breaks:contentReference[oaicite:7]{index=7}.',
+    suggested_combinations: ['side-plank', 'dead-bug'],
+    notes: 'Maintain a straight line from head to heels (no sagging hips). Breathe steadily and engage your abs and glutes throughout. Start with shorter holds (e.g., 20–30 seconds) and increase gradually.',
+    exercise_references: ['Cleveland Clinic – Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits', 'Harvard Health – Plank Exercise Tips; https://www.health.harvard.edu/blog/straight-talk-on-planking-2019111318304']
   }),
   createExercise({
     id: 'side-plank',
@@ -44,7 +50,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 20, // Harder than regular plank, shorter duration
     is_favorite: false,
     has_video: false,
-    tags: ['isometric', 'core', 'obliques']
+    tags: ['isometric', 'core', 'obliques'],
+    benefits: 'Emphasizes the oblique muscles and lateral core stability:contentReference[oaicite:8]{index=8}. Helps stabilize the spine and address side-to-side muscle imbalances:contentReference[oaicite:9]{index=9}. Also improves shoulder and hip endurance on each side.',
+    limitations: 'Puts more pressure on one shoulder – if you have shoulder pain, start on your knees or avoid:contentReference[oaicite:10]{index=10}. Keep hips from dropping; a weak core may make it hard to hold, so build up gradually. Avoid if you feel sharp shoulder or arm pain.',
+    best_timing: 'Include in core workouts after mastering the basic plank. Often done after regular planks to further engage the obliques. It can be added to a yoga or Pilates routine as well.',
+    suggested_combinations: ['plank', 'dead-bug'],
+    notes: 'Keep body in one line without leaning forward or back. You can drop the bottom knee for a simpler modification. Press the forearm firmly into the floor and don’t let the supporting shoulder collapse.',
+    exercise_references: ['Cleveland Clinic – Side Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits', 'Healthline – Side Plank Safety; https://www.healthline.com/health/side-plank']
   }),
   createExercise({
     id: 'mountain-climbers',
@@ -56,7 +68,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // High intensity cardio movement
     is_favorite: false,
     has_video: false,
-    tags: ['dynamic', 'core', 'cardio']
+    tags: ['dynamic', 'core', 'cardio'],
+    benefits: 'Full-body movement that elevates your heart rate, improving cardiovascular fitness:contentReference[oaicite:11]{index=11}. Strengthens core and shoulders (holding plank position) and legs (due to rapid knee drives). Regular practice can enhance agility and coordination.',
+    limitations: 'High-impact on wrists and toes – use a mat or incline if wrists hurt. Keep back flat; if hips pike up or sag, slow down. Avoid if you have uncontrolled lower back or shoulder pain. Those with knee issues should step instead of jump to reduce impact.',
+    best_timing: 'Great in HIIT or circuit training as a cardio interval:contentReference[oaicite:12]{index=12}. Often used in warm-ups to raise body temperature or as part of a core/conditioning circuit. Try doing them for 20–30 second bursts with short rests.',
+    suggested_combinations: ['burpees', 'jumping-jacks'],
+    notes: 'Maintain a plank-like form while driving knees. Do not bounce your upper body; use your core to pull knees in. Beginners can go slower or do one leg at a time. Breathe continuously rather than holding your breath.',
+    exercise_references: ['Healthline – Mountain Climbers Benefits; https://www.healthline.com/health/fitness/what-do-mountain-climbers-work', 'Verywell Fit – Mountain Climbers Precautions; https://www.verywellfit.com/mountain-climbers-exercise-3966947']
   }),
   createExercise({
     id: 'bicycle-crunches',
@@ -70,7 +88,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 1.1, // Slightly slower controlled reps
-    tags: ['dynamic', 'core', 'obliques']
+    tags: ['dynamic', 'core', 'obliques'],
+    benefits: 'One of the most effective abdominal exercises – it ranks top for activating the rectus abdominis and obliques:contentReference[oaicite:13]{index=13}. Builds core strength and stability, and improves coordination with its cross-body motion. Also helps train the muscles for rotational movements, benefiting functional core use.',
+    limitations: 'Can strain the neck if done improperly (avoid pulling on your neck):contentReference[oaicite:14]{index=14}. Keep lower back pressed to the floor; if it arches, slow down or shorten range. Individuals with lower back issues should proceed with caution or opt for gentler core moves.',
+    best_timing: 'Do in the middle or end of an ab workout. Often paired with static core exercises (like planks) to comprehensively train the core:contentReference[oaicite:15]{index=15}. Because it can be intense, it’s usually done after a warm-up when muscles are ready.',
+    suggested_combinations: ['plank', 'russian-twists'],
+    notes: 'Perform slowly and deliberately for best results – quality over speed. Focus on bringing your shoulder toward the opposite knee (not just elbow), and extend the opposite leg fully each rep. Exhale as you twist to engage deeper abs.',
+    exercise_references: ['Bicycling – Bicycle Crunch Effectiveness; https://www.bicycling.com/training/a60659922/bicycle-crunches/', 'Bicycling – Bicycle Crunch Form Tips; https://www.bicycling.com/training/a60659922/bicycle-crunches/']
   }),
 
   // Strength exercises - Based on fitness industry standards
@@ -86,7 +110,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 2.86,
-    tags: ['upper-body', 'chest', 'arms']
+    tags: ['upper-body', 'chest', 'arms'],
+    benefits: 'Strengthens the chest, shoulders, and triceps, while engaging the core for stability:contentReference[oaicite:16]{index=16}. It’s a foundational upper-body exercise that also improves functional strength for pushing motions. Can even support heart health – higher push-up capacity has been linked to lower cardiac risk:contentReference[oaicite:17]{index=17}.',
+    limitations: 'Doing too many without variation can lead to a plateau in strength gains:contentReference[oaicite:18]{index=18}. Poor form (such as flared elbows or sagging hips) can strain shoulders or lower back:contentReference[oaicite:19]{index=19}. If you experience wrist pain, use push-up bars or do them on your knuckles. Individuals with shoulder injuries should use a reduced range or skip if painful.',
+    best_timing: 'Usually done early in an upper-body workout when your arms are fresh:contentReference[oaicite:20]{index=20}. They can also be done daily in moderation as part of a morning routine or strength circuit, but allow rest days for recovery. Push-ups make a great warm-up for the upper body too, performed with modified intensity.',
+    suggested_combinations: ['squats', 'lunges'],
+    notes: 'Keep your body straight and core engaged throughout. Lower until your chest is near the floor (or as far as comfortable) and press up without locking elbows. Inhale on the way down, exhale as you push up. Start on your knees or against a wall if a full push-up is too challenging.',
+    exercise_references: ['Healthline – Benefits of Push-ups; https://www.healthline.com/health/fitness-exercise/pushups-everyday', 'MedicalNewsToday – Push-up Risks; https://www.medicalnewstoday.com/articles/326149']
   }),
   createExercise({
     id: 'squats',
@@ -100,7 +130,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['lower-body', 'glutes', 'legs']
+    tags: ['lower-body', 'glutes', 'legs'],
+    benefits: 'Engages most major leg muscles (glutes, quadriceps, hamstrings) and core, making it a highly functional exercise:contentReference[oaicite:21]{index=21}:contentReference[oaicite:22]{index=22}. Helps build lower-body strength for daily activities like lifting or climbing stairs. Also improves balance and flexibility when done through a full range of motion, and can boost calorie burn due to using large muscle groups:contentReference[oaicite:23]{index=23}.',
+    limitations: 'Proper form is crucial – knees should track over toes, not cave inward, and heels stay down:contentReference[oaicite:24]{index=24}:contentReference[oaicite:25]{index=25}. Going too heavy or too deep without flexibility can strain knees or back. Those with knee or back issues should squat to a comfortable depth (or use a chair as a guide) and keep the back neutral. If any sharp pain occurs, stop and check your form or consult a trainer.',
+    best_timing: 'Often placed at the beginning of a leg workout since it’s a compound movement requiring full strength. Can be done with just body weight as a warm-up or mobility exercise, or weighted for strength early on. In general fitness routines, squats pair well with upper-body exercises in circuits.',
+    suggested_combinations: ['lunges', 'wall-sit'],
+    notes: 'Keep your chest up and core braced. Aim to squat until thighs are parallel to the ground (or as far as comfortable) while keeping knees behind toes and weight in your heels. Drive through the heels to stand and squeeze your glutes at the top. Ensure you maintain a neutral spine throughout.',
+    exercise_references: ['Healthline – Squat Benefits; https://www.healthline.com/health/fitness-exercise/squats-benefits', 'Healthline – Squat Safety Tips; https://www.healthline.com/health/fitness-exercise/squats-benefits']
   }),
   createExercise({
     id: 'lunges',
@@ -114,7 +150,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['lower-body', 'glutes', 'legs', 'balance']
+    tags: ['lower-body', 'glutes', 'legs', 'balance'],
+    benefits: 'Works all major muscles of the legs (glutes, quads, hamstrings) and improves balance through its unilateral nature:contentReference[oaicite:26]{index=26}:contentReference[oaicite:27]{index=27}. Lunges help correct strength imbalances between legs and enhance hip mobility. They also engage core and stabilizer muscles to keep you upright, benefiting overall stability and coordination.',
+    limitations: 'Ensure your front knee does not extend beyond your toes to protect the joint. People with knee problems might find forward lunges difficult – they can try reverse lunges which are easier on the knees:contentReference[oaicite:28]{index=28}. Keep your torso upright and avoid leaning forward excessively. If balance is an issue, perform lunges next to a wall or hold onto something for support initially.',
+    best_timing: 'Include lunges in leg workouts after heavier lifts like squats, or in circuits. They are also great after a warm-up to activate glutes and legs, or as part of a dynamic warm-up for running. Because they can induce soreness, doing them 2–3 times a week with rest days in between is sufficient for most.',
+    suggested_combinations: ['squats', 'calf-raises'],
+    notes: 'Step far enough so that your front knee stays roughly above the ankle (not too far forward). Lower straight down by bending both knees, and avoid touching the back knee hard on the ground. Push through the heel of the front foot to rise back up. Keep your core engaged and torso vertical for balance.',
+    exercise_references: ['Healthline – Benefits of Lunges; https://www.healthline.com/health/fitness-exercise/lunges-benefits', 'Healthline – Lunge Variations (Reverse Lunge); https://www.healthline.com/health/fitness-exercise/lunges-benefits']
   }),
   createExercise({
     id: 'wall-sit',
@@ -126,7 +168,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Beginner-friendly isometric hold
     is_favorite: false,
     has_video: false,
-    tags: ['isometric', 'lower-body', 'quads']
+    tags: ['isometric', 'lower-body', 'quads'],
+    benefits: 'Isometric exercise that builds endurance in the quadriceps, glutes, and calves. Great for strengthening the legs without movement, and it also engages the core and lower back for stabilization:contentReference[oaicite:29]{index=29}:contentReference[oaicite:30]{index=30}. Wall sits can improve muscular stamina useful for skiing or hiking, and have been shown to help lower blood pressure when practiced regularly:contentReference[oaicite:31]{index=31}.',
+    limitations: 'If you have knee pain, start with a higher “seat” (less bend) or shorter hold. Do not drop below a 90° knee angle, as that increases knee stress. Ensure your lower back is against the wall to avoid strain. People with uncontrolled hypertension should still be cautious (don’t hold your breath) despite long-term benefits; exhale slowly while holding.',
+    best_timing: 'Use as a finisher in leg workouts or during circuit training. For example, after doing dynamic exercises like squats or lunges, a wall sit can safely fatigue the muscles. Can also be done in daily routines (e.g., during a break) to build leg endurance:contentReference[oaicite:32]{index=32}.',
+    suggested_combinations: ['squats', 'lunges'],
+    notes: 'Slide down until your thighs are parallel to the floor and knees are above ankles (knees about 90°). Keep your heels down and weight in them:contentReference[oaicite:33]{index=33}. Do not rest your hands on your thighs (let your legs do the work). Maintain normal breathing – avoid holding breath which can spike blood pressure.',
+    exercise_references: ['Cleveland Clinic – Wall Sit Benefits; https://health.clevelandclinic.org/wall-sits', 'Cleveland Clinic – Wall Sit Form; https://health.clevelandclinic.org/wall-sits']
   }),
   createExercise({
     id: 'burpees',
@@ -140,7 +188,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 4.2, // Slightly longer due to complexity
-    tags: ['full-body', 'cardio', 'explosive']
+    tags: ['full-body', 'cardio', 'explosive'],
+    benefits: 'A vigorous full-body exercise that combines strength and cardio. Burpees work your legs, core, chest, and shoulders, and they rapidly increase heart rate to improve cardiovascular endurance:contentReference[oaicite:34]{index=34}:contentReference[oaicite:35]{index=35}. They burn a lot of calories and can enhance explosive power (through the jump) and overall agility.',
+    limitations: 'Burpees are very intense; beginners should start with fewer reps or step-back variations to avoid injury. They can put stress on wrists, shoulders, and knees due to the quick transitions. Maintain a controlled pace to ensure good form – sloppy burpees can strain the lower back or shoulders. If you have joint issues, consider modifying (e.g., no jump, or step instead of jump back).',
+    best_timing: 'Often done at the end of a workout or in HIIT sessions as a high-intensity interval. Because they are fatiguing, using them in short bursts (like 10-15 reps or 30 seconds) with rest is common. They are also popular in bootcamp or CrossFit-style workouts for conditioning.',
+    suggested_combinations: ['mountain-climbers', 'jumping-jacks'],
+    notes: 'Keep a steady rhythm: squat, kick back to a firm plank, perform a push-up with a tight core, return feet under you, then jump up. Land softly on the jump to protect your knees. Breathing is important – exhale when jumping back and when jumping up. Quality over quantity: it’s better to do fewer burpees with good form than many with poor form.',
+    exercise_references: ['Healthline – Burpee Benefits; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee', 'Healthline – Burpee Safety Tips; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee']
   }),
 
   // Cardio exercises - Time-based with research-backed durations
@@ -155,7 +209,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 1.5,
-    tags: ['cardio', 'full-body', 'coordination']
+    tags: ['cardio', 'full-body', 'coordination'],
+    benefits: 'Simple but effective full-body cardio exercise. Jumping jacks raise your heart rate, burn calories, and can improve aerobic endurance. They engage the legs (calves, thighs) and shoulders, and over time can even help bone density due to the impact from jumping:contentReference[oaicite:36]{index=36}. They also boost coordination by moving arms and legs together.',
+    limitations: 'As a high-impact move, they may aggravate knee or ankle issues if done excessively or on a hard surface:contentReference[oaicite:37]{index=37}. If you have joint pain, do a lower impact version by stepping side to side instead of jumping. Wear supportive shoes and exercise on a shock-absorbing surface to protect your joints. Those with very low fitness should start with short sets since jacks can be surprisingly strenuous.',
+    best_timing: 'Great as a warm-up exercise to get blood flowing or as part of a cardio circuit. They can be done in short bursts (e.g., sets of 30 seconds) between strength exercises to keep heart rate up. Also useful as quick activity breaks during the day to energize yourself.',
+    suggested_combinations: ['high-knees', 'butt-kicks'],
+    notes: 'Stay light on your feet – land on the balls of your feet to reduce impact. Keep your knees slightly bent when you land to act as shock absorbers. Aim for a consistent rhythm and full range of motion (hands touching overhead, feet wide apart on each jump). Breathe steadily; exhale when legs and arms spread apart.',
+    exercise_references: ['Healthline – Benefits of Jumping Jacks; https://www.healthline.com/health/fitness-exercise/jumping-jacks', 'Healthline – Jumping Jacks Risks; https://www.healthline.com/health/fitness-exercise/jumping-jacks']
   }),
   createExercise({
     id: 'high-knees',
@@ -167,7 +227,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // High intensity, shorter duration
     is_favorite: false,
     has_video: false,
-    tags: ['cardio', 'lower-body', 'explosive']
+    tags: ['cardio', 'lower-body', 'explosive'],
+    benefits: 'A quick-paced cardio drill that elevates heart rate and improves lower-body power. High knees engage the hip flexors, quadriceps, hamstrings, calves, and glutes, building muscular endurance and coordination in these areas:contentReference[oaicite:38]{index=38}. They also strengthen the core (keeping you upright) and can enhance running speed and form by training an exaggerated knee lift.',
+    limitations: 'This exercise is high-impact (essentially running in place), so it can strain ankles or shins if done on a very hard surface. Wear supportive footwear and choose softer ground if possible. If you have balance issues or are very new to exercise, start with a marching-in-place to build up:contentReference[oaicite:39]{index=39}. As always, maintain good posture; do not lean back, which could strain the lower back.',
+    best_timing: 'Often used in warm-ups for sports or runs to prime the legs, or inserted as a cardio burst in circuit training:contentReference[oaicite:40]{index=40}. You can perform high knees for set times (e.g., 30 seconds) or distances (if moving forward). They fit well into HIIT workouts (e.g., Tabata intervals) due to the high intensity.',
+    suggested_combinations: ['butt-kicks', 'jumping-jacks'],
+    notes: 'Keep your back straight and core engaged while driving the knees up to waist height or higher each time. Pump your arms in sync with your leg motion (opposite arm to leg):contentReference[oaicite:41]{index=41}. Aim for a springy, quick cadence, landing on the balls of your feet. Start slower and then pick up speed as you get more comfortable.',
+    exercise_references: ['Healthline – High Knees Benefits; https://www.healthline.com/health/fitness/high-knees-benefits', 'Healthline – When to Do High Knees; https://www.healthline.com/health/fitness/high-knees-benefits']
   }),
   createExercise({
     id: 'butt-kicks',
@@ -179,7 +245,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Consistent with other high-intensity cardio
     is_favorite: false,
     has_video: false,
-    tags: ['cardio', 'lower-body', 'hamstrings']
+    tags: ['cardio', 'lower-body', 'hamstrings'],
+    benefits: 'Focuses on the hamstrings by having you kick your heels up. Butt kicks serve as a dynamic stretch for the quadriceps and an activation for the hamstrings, improving their flexibility and strength:contentReference[oaicite:42]{index=42}. Like high knees, it’s also a cardio move that will raise your heart rate and warm up the body. Regular practice can aid running form by encouraging a quicker heel recovery under the body.',
+    limitations: 'Maintain an upright posture; avoid leaning too far forward, which can strain the lower back. If you have knee issues, perform the movement gently (don’t force your heel to hit your butt). People with very tight quads should ease into it to prevent muscle pulls. As a lower-impact drill, it is generally safe, but if balance is a concern, do it marching in place rather than fast jumping.',
+    best_timing: 'Commonly included in warm-up routines for running or sports, after high knees or in alternating sets. It also fits into cardio circuits. For example, you might do 30 seconds of butt kicks between strength exercises to keep your heart rate up. It’s effective to do butt kicks after high knees to target opposite muscle groups.',
+    suggested_combinations: ['high-knees', 'jumping-jacks'],
+    notes: 'Try to kick your heels all the way to your glutes (or as close as flexibility allows) in a smooth motion. Keep knees pointing down toward the ground (not forward) to emphasize the hamstrings. Swing your arms naturally at your sides to help maintain rhythm. Breathe steadily and find a cadence that you can control without stumbling.',
+    exercise_references: ['MasterClass – Butt Kicks Benefits; https://www.masterclass.com/articles/butt-kicks-guide', 'Spotebi – Butt Kicks Warm-Up; https://www.spotebi.com/exercise-guide/butt-kicks/']
   }),
 
   // Flexibility exercises - Time-based holds as per yoga/stretching standards
@@ -193,7 +265,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard yoga pose hold
     is_favorite: false,
     has_video: false,
-    tags: ['yoga', 'stretch', 'shoulders', 'hamstrings']
+    tags: ['yoga', 'stretch', 'shoulders', 'hamstrings'],
+    benefits: 'A staple yoga pose that stretches the entire back side of your body. Downward Dog lengthens the hamstrings and calves, opens the shoulders and chest, and traction on the spine helps relieve back tension:contentReference[oaicite:43]{index=43}. It also builds strength in the arms and shoulders by supporting part of your body weight, and improves blood circulation with the head lowered slightly (mild inversion):contentReference[oaicite:44]{index=44}.',
+    limitations: 'Those with very tight hamstrings or shoulders might find it challenging – it’s okay to bend your knees and elbows slightly to maintain a straight back. If you have wrist issues, you can do the pose on your forearms (Dolphin pose) or prop your hands on blocks. Individuals with uncontrolled high blood pressure or glaucoma should be cautious with any inverted position. Come out of the pose if you feel any dizziness or sharp pain.',
+    best_timing: 'Often used in yoga sequences as a transitional pose or a resting pose between flows. In general fitness, it can be used in cool-down stretching routines to lengthen the posterior chain. It’s beneficial in the morning to stretch out stiffness, or after workouts involving the legs or back.',
+    suggested_combinations: ['child-pose', 'forward-fold'],
+    notes: 'Press your palms firmly into the ground, fingers spread, to distribute weight and relieve wrists. Lift your hips up and back, and try to push your heels toward the floor (it’s okay if they don’t touch). Keep your head between your arms and your spine straight by tilting your pelvis up. Focus on deep, calm breathing while holding the pose.',
+    exercise_references: ['Yoga Journal – Downward Dog Benefits; https://www.yogajournal.com/poses/downward-facing-dog/', 'Yoga15 – Downward Dog Benefits; https://yoga15.com/poses/downward-dog/']
   }),
   createExercise({
     id: 'child-pose',
@@ -205,7 +283,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 45, // Relaxation pose, longer hold
     is_favorite: false,
     has_video: false,
-    tags: ['yoga', 'stretch', 'relaxation', 'back']
+    tags: ['yoga', 'stretch', 'relaxation', 'back'],
+    benefits: 'A gentle, restorative pose that stretches the lower back, hips, thighs, and ankles:contentReference[oaicite:45]{index=45}. It helps to relax both the body and mind by activating the parasympathetic nervous system (promoting stress relief and better sleep):contentReference[oaicite:46]{index=46}. Child’s Pose can alleviate lower back pressure by elongating the spine and is often used as a resting or calming posture in yoga.',
+    limitations: 'If you have knee problems, widen your knees or place a cushion under your hips to reduce pressure. Those with very limited ankle mobility might feel discomfort – a rolled towel under the ankles can help. Pregnant women or people with a large midsection should take a wider stance with the knees to avoid compression on the abdomen. Otherwise, it’s generally safe; just avoid forcing your buttocks all the way to the heels if it causes pain.',
+    best_timing: 'Used frequently as a recovery pose during yoga sessions (e.g., between challenging sequences):contentReference[oaicite:47]{index=47}. Also great after exercise or before bed to relax the back and hips. You can include it at the end of a workout during cooldown or anytime you need to gently stretch and decompress the spine.',
+    suggested_combinations: ['downward-dog', 'cat-cow'],
+    notes: 'Let your forehead rest on the ground (or a cushion) and breathe deeply into your belly. You can extend arms forward for a shoulder stretch or keep them by your sides for a more relaxed position. With each exhale, imagine your torso sinking closer to the floor, releasing tension. Stay in the pose as long as needed – it’s about relaxation, so there is no strict time limit.',
+    exercise_references: ['Cleveland Clinic – Child’s Pose Benefits; https://health.clevelandclinic.org/childs-pose', 'Verywell Health – Child’s Pose for Back Pain; https://www.verywellhealth.com/childs-pose-for-low-back-pain-2564776']
   }),
   createExercise({
     id: 'cat-cow',
@@ -219,7 +303,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['yoga', 'stretch', 'spine', 'mobility']
+    tags: ['yoga', 'stretch', 'spine', 'mobility'],
+    benefits: 'Gently mobilizes the spine, increasing flexibility and relieving tension in the back and neck. Cat-Cow helps you become more aware of spinal movement and can improve posture by training each vertebra to move:contentReference[oaicite:48]{index=48}. It also promotes blood flow to the spinal muscles and engages the core in a mild, controlled way. Often used to ease stiffness in the morning or before more strenuous activity.',
+    limitations: 'This is a very low-risk movement. However, if you have a spinal injury or severe pain, move within a pain-free range only. It’s safe to let the back round fully in Cat and arch in Cow, but do not force any position. People with wrist discomfort can perform it on fists or with wrists slightly ahead of shoulders. Remember to move slowly and breathe; rushing through can reduce the effectiveness of the stretch:contentReference[oaicite:49]{index=49}.',
+    best_timing: 'Excellent as part of a warm-up (to loosen back and neck) or a cool-down to relax. You can do Cat-Cow first thing in the morning to gently get your spine moving, or during breaks from prolonged sitting. It’s also a staple in yoga sequences, usually performed at the beginning to warm up the spine.',
+    suggested_combinations: ['child-pose', 'downward-dog'],
+    notes: 'Coordinate with your breath: typically you inhale during Cow (arching, looking up) and exhale during Cat (rounding, tucking chin). Go slowly and try to articulate each segment of your spine in sequence. Spread your fingers and press through your hands to activate shoulder stabilizers. This exercise is about quality of motion, not intensity, so focus on feeling a nice stretch and flex through your back.',
+    exercise_references: ['Men’s Health – Cat-Cow Benefits; https://www.menshealth.com/fitness/a39438579/cat-cow/', 'Yoga Journal – Cat-Cow Pose; https://www.yogajournal.com/poses/cow-cat/']
   }),
 
   // Balance exercises - Time-based holds for stability training
@@ -233,7 +323,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Per leg
     is_favorite: false,
     has_video: false,
-    tags: ['balance', 'stability', 'proprioception']
+    tags: ['balance', 'stability', 'proprioception'],
+    benefits: 'A fundamental balance exercise that improves proprioception and ankle stability. Regular practice can enhance your overall balance and reduce the risk of falls by strengthening the muscles around the ankles, knees, and hips that keep you upright:contentReference[oaicite:50]{index=50}. It engages the core as well, since you must stabilize your trunk on one leg. There’s even research suggesting that better one-leg balance is correlated with longer life expectancy:contentReference[oaicite:51]{index=51} (likely reflecting overall health).',
+    limitations: 'For safety, stand near a support (wall or chair) when you first try it, in case you lose balance:contentReference[oaicite:52]{index=52}. If you have significant balance issues or neurological conditions affecting balance, consult a professional for guidance. It’s a gentle exercise, but avoid doing it with eyes closed or on unstable surfaces until you have mastered a stable stance. Always practice on both legs to ensure balanced development.',
+    best_timing: 'Can be done daily as part of a balance or rehab routine – for example, while brushing your teeth or waiting for something. In workouts, it can be part of a warm-up (to activate stabilizers) or integrated into circuits. Many physical therapy programs include it for older adults to maintain steadiness.',
+    suggested_combinations: ['tree-pose', 'warrior-3'],
+    notes: 'Focus on a fixed point in front of you (a drishti) to help maintain balance. Keep a slight bend in the standing knee and engage your core. Try not to let your arch collapse; grip the floor slightly with your toes. As you improve, you can progress by balancing for longer, or by moving your free leg/arms around to challenge yourself further.',
+    exercise_references: ['Cleveland Clinic – Balance Exercise Importance; https://health.clevelandclinic.org/balance-exercises', 'PubMed – Single Leg Balance Training Review; https://pubmed.ncbi.nlm.nih.gov/34045951/']
   }),
   createExercise({
     id: 'tree-pose',
@@ -245,7 +341,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard yoga balance pose
     is_favorite: false,
     has_video: false,
-    tags: ['yoga', 'balance', 'stability', 'focus']
+    tags: ['yoga', 'balance', 'stability', 'focus'],
+    benefits: 'Classic yoga balance pose that develops single-leg stability and focus. Tree Pose strengthens the standing leg (ankle, calf, thigh) and the core and hip stabilizers that keep you upright:contentReference[oaicite:53]{index=53}. The lifted leg also opens the hip of that side, improving hip flexibility. Mentally, it builds concentration and a sense of grounding as you practice steadying yourself.',
+    limitations: 'Avoid pressing the foot against the knee joint of the standing leg – place it either below or above the knee to prevent strain:contentReference[oaicite:54]{index=54}. If you have trouble balancing, start with your foot lower (ankle or calf) and/or do it near a wall for support. People with ankle instability should be cautious; they can do a modified version with toes of the raised foot touching the ground. As with any balance pose, step out of it slowly if you start to fall to avoid injury.',
+    best_timing: 'Typically done in the middle of a yoga routine among other standing poses. It’s useful after warming up, when muscles are loose but not too fatigued. You can also use it outside of yoga – say, after a run or leg workout – to work on balance and hip opening as part of a cool-down.',
+    suggested_combinations: ['single-leg-stand', 'warrior-3'],
+    notes: 'Actively press your raised foot into your standing leg and vice versa to create stability. Keep your standing leg straight but not locked. Find a focal point to gaze at. You can place hands at your chest (prayer position) or raise them overhead once stable. Breathe deeply; balance improves when you stay calm and breathe rather than holding your breath.',
+    exercise_references: ['Yoga15 – Tree Pose Benefits; https://yoga15.com/poses/tree-pose/', 'Sri Sri Yoga – Tree Pose Benefits; https://srisrischoolofyoga.org/blog/tree-pose-vrksasana']
   }),
   createExercise({
     id: 'warrior-3',
@@ -257,7 +359,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 20, // More challenging, shorter hold
     is_favorite: false,
     has_video: false,
-    tags: ['yoga', 'balance', 'strength', 'core']
+    tags: ['yoga', 'balance', 'strength', 'core'],
+    benefits: 'Advanced balance pose that strengthens the entire posterior chain (back, glutes, hamstrings) as well as the core and shoulders. Warrior III greatly improves balance and coordination, making you stabilize with one leg and torso parallel to the ground:contentReference[oaicite:55]{index=55}. It stretches the hamstring of the standing leg and requires engagement of the back muscles to keep your chest lifted. Overall, it builds core strength and back-body engagement while honing focus.',
+    limitations: 'This pose is challenging; beginners should use a wall or blocks under the hands for support while learning the balance:contentReference[oaicite:56]{index=56}. Maintain a neutral neck (don’t crane upward) to avoid neck strain. If you have lower back problems, be cautious with the forward-leaning position – ensure you engage your core to avoid sagging. It’s okay to keep a slight bend in the standing knee to ease hamstring tension. Come out of the pose if you feel your form collapsing, as continuing while unstable might lead to a fall.',
+    best_timing: 'Commonly part of yoga flows after poses like Warrior I or II, when the legs are warmed up. It’s best done when you’re not overly fatigued, so perhaps earlier in a session to really challenge your balance while fresh. In a general fitness context, you might include it after some simpler balance moves (like Tree Pose) as a peak balance challenge.',
+    suggested_combinations: ['single-leg-stand', 'tree-pose'],
+    notes: 'Keep your hips level – avoid opening the hip of the lifted leg upward. Point the toes of your raised leg toward the floor and actively reach back through your heel. Extend your arms forward (or keep them by your sides) in line with your torso for balance. Imagine making a straight line from fingertips (or head) to your heel. It’s normal to wobble; just reset and try again, focusing on engaging your core and leg muscles.',
+    exercise_references: ['Yoga Journal – Warrior III Benefits; https://www.yogajournal.com/poses/warrior-iii-pose/', 'Hugger Mugger – Warrior III Core Strength; https://www.huggermugger.com/blog/warrior-iii-balance']
   }),
 
   // Additional popular exercises with proper classification
@@ -273,7 +381,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['core', 'stability', 'coordination']
+    tags: ['core', 'stability', 'coordination'],
+    benefits: 'Highly effective for core stabilization. The dead bug teaches you to keep your ribcage down and lower back flat while moving your arms and legs – strengthening the deep core muscles that protect your spine:contentReference[oaicite:57]{index=57}. It improves coordination between opposite limbs (neuromuscular control) and can help alleviate lower back discomfort by training proper spinal alignment during movement. Overall, it builds a strong, stable core foundation for other exercises.',
+    limitations: 'It’s generally very safe. The main error is letting your lower back arch off the floor – if you can’t keep it down, limit your range of motion or bend your knees more. If you feel neck strain, support your head on a small pillow or towel. People with severe lower back pain should start with caution and perhaps with one limb at a time until the core is stronger.',
+    best_timing: 'Use it early in a core workout or as part of a warm-up to activate the core before heavier exercises. It’s also often included in physical therapy or beginner routines because of its safety and effectiveness. Doing 2-3 sets of dead bugs a few times a week can greatly improve core stability over time.',
+    suggested_combinations: ['plank', 'glute-bridges'],
+    notes: 'Focus on pressing your lower back into the ground throughout the exercise. Move slowly – extend opposite arm and leg outward until just before your back wants to arch, then return to center and switch. Breathe out as you extend to help engage the deep abs. Starting with shorter ranges and gradually increasing as you get stronger will ensure you’re doing it correctly.',
+    exercise_references: ['Healthline – Dead Bug for Core Stability; https://www.healthline.com/health/dead-bug-exercise', 'Nike – Dead Bug Purpose; https://www.nike.com/a/dead-bug-exercise']
   }),
   createExercise({
     id: 'glute-bridges',
@@ -287,7 +401,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['glutes', 'lower-body', 'posterior-chain']
+    tags: ['glutes', 'lower-body', 'posterior-chain'],
+    benefits: 'Isolates and strengthens the gluteal muscles, which are often underused due to sitting. Strong glutes contribute to better pelvic alignment and can help alleviate lower back pain by taking strain off the spine:contentReference[oaicite:58]{index=58}. Glute bridges also engage the hamstrings and core, making them a great posterior-chain exercise. They improve hip extension, which can enhance posture and athletic movements (like jumping and running).',
+    limitations: 'If you hyperextend (arch) your lower back at the top, you may feel discomfort – focus on squeezing the glutes, not arching the spine. People with very tight hip flexors might find it hard to lift hips high; a gentle stretch of hip flexors beforehand can help. Generally low-impact, but those with certain spine conditions should ensure they don’t push through pain. Also, avoid pushing your head into the ground; the force should be through shoulders and feet.',
+    best_timing: 'Often used towards the end of a leg workout or within a core routine. They make a good warm-up for glute-engaged exercises (like squats or running) by activating the glutes. In rehab or beginner workouts, they can be a primary exercise done 3-4 times a week, whereas in strength programs they might appear 1-2 times a week as accessory work.',
+    suggested_combinations: ['dead-bug', 'lunges'],
+    notes: 'Feet placement affects emphasis: closer to butt targets glutes more, further out involves hamstrings more:contentReference[oaicite:59]{index=59}. Keep your knees about hip-width apart and don’t let them flare outward or collapse inward. Pause for a second at the top of the bridge to maximize glute contraction, then lower slowly. Ensure you are pushing through your heels – you can even lift your toes slightly to emphasize heel drive.',
+    exercise_references: ['Elite Chiro Sport – Glute Bridge Benefits; https://elitechirosport.com/home-rehab-glute-bridge', 'Coast Performance – Calf Raises & Posterior Chain; https://coastperformancerehab.com/calf-exercises-save-feet-ankles/']
   }),
 
   // Hand warmup exercises - Time-based for mobility
@@ -301,7 +421,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard mobility/warmup duration
     is_favorite: false,
     has_video: false,
-    tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity']
+    tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity'],
+    benefits: 'Increases flexibility and blood circulation in the fingers and hands. Finger rolls help maintain range of motion in the finger joints and can improve dexterity and coordination of the fingers. Useful for warming up the hands before fine motor tasks or relieving stiffness after long periods of computer use. Over time, such exercises can help keep your hands nimble and may reduce risk of issues like tendonitis by gently working the tendons through their motion.',
+    limitations: 'Virtually no risk when done gently. Avoid aggressive or fast snapping movements – the exercise should be smooth. If you have arthritis or very stiff fingers, do the motion slowly and in warm water to further ease joint movement. Stop if you feel any sharp pain in a particular finger joint.',
+    best_timing: 'Great as a daily routine for hand health – for example, in the morning or during breaks from work. Also perform before activities that need finger flexibility (like typing, playing an instrument, climbing, etc.). It fits well at the start of an upper-body warm-up or at the end of a workout as a cooldown for the hands.',
+    suggested_combinations: [],
+    notes: 'Perform slowly: start with a closed fist, then gradually unfurl one finger at a time until the hand is fully open, stretching the fingers apart, then roll back to a fist. You can change the order of finger extension each time. Breathe normally and try to relax the hand as you move. This is also a good opportunity to practice mindfulness – focus on the sensations in your hand as each finger moves.',
+    exercise_references: ['WebMD – Hand and Finger Exercise Benefits; https://www.webmd.com/osteoarthritis/ss/slideshow-hand-finger-exercises', 'USC Verdugo – Hand Exercises for Flexibility; https://uscvhh.org/5-hand-exercises-to-help-you-maintain-your-dexterity-flexibility/']
   }),
 
   // Additional strength exercises
@@ -317,7 +443,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['upper-body', 'triceps', 'arms', 'bodyweight']
+    tags: ['upper-body', 'triceps', 'arms', 'bodyweight'],
+    benefits: 'Primarily targets the triceps on the back of the upper arm, contributing to stronger, toned arms. Dips also involve the chest and anterior shoulders as secondary muscles:contentReference[oaicite:60]{index=60}. They can help improve upper-body pushing strength and can be done almost anywhere with a sturdy chair or bench. Over time, dips can lead to better arm definition and functional strength for pushing motions (like getting up from a seated position).',
+    limitations: 'Bench dips can put significant stress on the shoulder joints due to the position of the arms behind the body:contentReference[oaicite:61]{index=61}. It’s important not to dip too low – lower until your elbows are about 90 degrees to reduce risk of shoulder injury. If you feel anterior shoulder pain, shorten the range or discontinue. Also keep your shoulders down (do not shrug) and close to your body during the dip. Those with previous shoulder issues should be cautious or opt for a different triceps exercise.',
+    best_timing: 'Often included after compound chest exercises (like push-ups or bench press) to further work the triceps. They can also be part of a bodyweight circuit. Because they can fatigue the arms quickly, doing them earlier in an upper-body workout is common, but ensure you are warmed up. Avoid doing heavy dips after your shoulders are already exhausted to maintain good form.',
+    suggested_combinations: ['push-ups', 'plank'],
+    notes: 'Place your hands on the edge of the bench or chair, fingers forward, and keep your hips close to the bench as you dip (this reduces shoulder strain). Keep your elbows pointing backward (not flared out). Inhale as you lower, exhale as you push up. To make it easier, bend your knees and keep feet closer; to make it harder, straighten your legs or elevate your feet.',
+    exercise_references: ['Verywell Fit – Triceps Dips Precautions; https://www.verywellfit.com/how-to-do-triceps-dips-3498339', 'American Council on Exercise – Triceps Dips Muscles; https://www.acefitness.org/education-and-resources/lifestyle/exercise-library/44/triceps-dips/']
   }),
   createExercise({
     id: 'calf-raises',
@@ -331,7 +463,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['lower-body', 'calves', 'balance']
+    tags: ['lower-body', 'calves', 'balance'],
+    benefits: 'Strengthens the calf muscles (gastrocnemius and soleus) which power plantarflexion (rising on toes). Strong calves improve ankle stability and balance, reducing the risk of ankle sprains:contentReference[oaicite:62]{index=62}. They also contribute to better push-off in walking, running, and jumping. Regular calf raises can enhance muscle endurance in the lower legs and may help prevent Achilles tendon injuries by conditioning the tendon and muscles.',
+    limitations: 'It’s generally a safe low-impact exercise. However, bouncing at the bottom or doing very fast reps might strain the Achilles tendon – perform raises in a controlled manner. People with tight calves should include stretching as well, as strengthening without stretching could increase tightness. If you feel a calf cramp, pause and gently stretch before continuing. Those with Achilles tendonitis should start with caution (maybe focusing on slow eccentric lowers).',
+    best_timing: 'Calf raises can be done at the end of a leg workout or on their own a few times a week. They’re easy to incorporate – for instance, doing sets while holding onto a countertop. Runners or cyclists often do them in cooldowns to strengthen the calves. Doing them every other day is usually fine since calves recover quickly, but adjust frequency if you experience soreness.',
+    suggested_combinations: ['squats', 'lunges'],
+    notes: 'Perform with full range: raise your heels as high as possible, pause briefly at the top, then lower your heels down until you feel a stretch in your calves. Keep the movement smooth – no bouncing at the bottom. For better balance, you can lightly touch a wall or hold a chair back. As you get stronger, you can try single-leg calf raises or hold weights for more resistance.',
+    exercise_references: ['Women’s Health – Calf Raises & Balance; https://www.womenshealthmag.com/fitness/a19985985/calf-raises-benefits/', 'American Sports & Fitness – Calf Raises Benefits; https://www.americansportandfitness.com/blogs/fitness-blog/benefits-of-calf-raises']
   }),
 
   // Additional core exercises
@@ -347,7 +485,13 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
-    tags: ['core', 'obliques', 'rotation']
+    tags: ['core', 'obliques', 'rotation'],
+    benefits: 'Targets the oblique muscles strongly, helping to tone the sides of your abdomen and improve rotational strength:contentReference[oaicite:63]{index=63}. Russian twists also engage the transverse abdominis and lower back to stabilize the spine as you rotate, contributing to a stronger core. Athletes benefit from this exercise due to its sports-specific rotational training (think swinging a bat or golf club). When done with control, it can enhance spinal mobility and core endurance.',
+    limitations: 'Twisting with a rounded lower back or too heavy a weight can strain the lumbar spine or discs:contentReference[oaicite:64]{index=64}. It’s critical to keep your back at a 45° angle and chest up while performing the twist. If you have a history of lower back issues, consider avoiding weighted twists and keep the motion small and slow. Some trainers caution against this move for those with osteoporosis or disc problems due to the rotational stress. Always move deliberately – avoid sudden jerks.',
+    best_timing: 'Include as part of an abdominal workout or circuit, typically after foundational exercises like planks or crunches. Because it involves rotation, it can be done after the core is warmed up. It’s often placed toward the end of a workout as a burnout for the abs. Avoid doing it when your lower back is already very fatigued (like after heavy deadlifts) to maintain proper form.',
+    suggested_combinations: ['bicycle-crunches', 'plank'],
+    notes: 'Keep your core braced and move in a controlled manner – tap hands or a weight from one side to the other without letting momentum take over. For added stability, you can keep your heels on the floor (especially if you’re a beginner). Exhale during each twist. Remember, the quality of movement is key; a slower, controlled Russian twist is more effective and safer than rushing through many reps.',
+    exercise_references: ['Men’s Health – Russian Twist Benefits; https://www.menshealth.com/fitness/a19548239/russian-twist/', 'Les Mills – Russian Twist Caution; https://www.lesmills.com/nordic/fitness-knowledge/are-russian-twists-bad-for-you/']
   }),
   createExercise({
     id: 'bear-crawl',
@@ -358,8 +502,14 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     catalogId: 'general-fitness',
     default_duration: 30, // Full-body stability exercise
     is_favorite: false,
-    has_video: false,
-    tags: ['core', 'full-body', 'stability', 'cardio']
+    has_video: true,
+    tags: ['core', 'full-body', 'stability', 'cardio'],
+    benefits: 'A compound exercise that develops total-body strength and cardio. Bear crawls strengthen the shoulders and arms (as they support your body), core (as you stabilize your trunk in motion), and legs – all while training coordination and agility:contentReference[oaicite:65]{index=65}. It’s essentially a moving plank, forcing your core to work hard to prevent rotation as you move, and it raises your heart rate, improving endurance. It’s also great for building shoulder stability and improving hip and ankle mobility when done with proper form.',
+    limitations: 'Can be tiring quickly – maintain form even when fatigued. If your knees start touching the ground or hips sag, take a break to avoid strain on the lower back. Those with wrist pain might need to crawl on fists or parallel bars to keep wrists neutral. Ensure a flat back; don’t let your head drop (to avoid neck strain). As it involves being bent over, individuals with high blood pressure or glaucoma should monitor for dizziness due to head position (though it’s not a full inversion).',
+    best_timing: 'Often included in high-intensity circuits or functional training sessions. For example, you might do a bear crawl up and back a room as part of a bootcamp workout. It can serve as a cardio/conditioning drill near the end of a workout, or as part of a warm-up to activate multiple muscle groups. It’s versatile – use short distances (e.g., 10-20 meters) or time intervals (20-30 seconds) with rests as needed.',
+    suggested_combinations: ['mountain-climbers', 'burpees'],
+    notes: 'Keep your knees close to the ground (a few inches off) and your back flat. Move opposite arm and opposite leg together, keeping movements controlled. Try not to sway side-to-side – engage your abs to keep the torso stable. Eyes looking slightly forward will help maintain a neutral neck. Breathe continuously; people often hold their breath when crawling, so remind yourself to inhale and exhale regularly.',
+    exercise_references: ['BarBend – Bear Crawl Core Benefits; https://barbend.com/bear-crawl-exercise/', 'Les Mills – Bear Crawl Benefits; https://www.lesmills.com/fit-business/fitness-management/add-bear-crawls-to-training/']
   }),
 
   // Additional flexibility exercises
@@ -373,6 +523,12 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard stretch hold
     is_favorite: false,
     has_video: false,
-    tags: ['yoga', 'hamstrings', 'back', 'stretch']
+    tags: ['yoga', 'hamstrings', 'back', 'stretch'],
+    benefits: 'A soothing stretch for the posterior chain. Standing Forward Fold deeply stretches the hamstrings, calves, and lower back:contentReference[oaicite:66]{index=66}. It gently decompresses the spine and can help relieve tension in the back and neck. Forward bends also have a calming effect on the nervous system – they often reduce stress and anxiety, leaving you feeling grounded and relaxed:contentReference[oaicite:67]{index=67}:contentReference[oaicite:68]{index=68}. Additionally, the slight inversion (head below heart) can improve circulation to the brain and face.',
+    limitations: 'Avoid bouncing in the stretch – a static or slow dynamic approach is safer. People with tight hamstrings should bend their knees slightly to prevent strain or rounding of the lower back. If you have lower back issues or disc problems, hinge at the hips with a flat back until you feel a stretch, rather than fully collapsing forward. Those with very high blood pressure or glaucoma should rise back up slowly to prevent head rush or pressure spikes. Pregnant individuals should widen their stance to make space for the belly and not compress it.',
+    best_timing: 'Excellent at the end of a workout during cooldown to stretch out the back and legs. It’s also useful on rest days or before bed to release tension. In yoga, Uttanasana is often done at the beginning (to assess how the body feels) and end (to relax) of practice. Even a short forward fold break during work can help reset your spine and calm your mind.',
+    suggested_combinations: ['downward-dog', 'child-pose'],
+    notes: 'Relax your neck completely and let your head hang heavy when folded. Distribute weight towards the balls of your feet (not just the heels) to get a better hamstring stretch. You can hold opposite elbows and gently sway side to side to release additional tension. Breathe slowly and deeply; with each exhale see if you can let your torso sink a little closer to your thighs. To come up, engage your core and roll up slowly, one vertebra at a time, to avoid dizziness.',
+    exercise_references: ['Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/', 'YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx']
   })
 ];

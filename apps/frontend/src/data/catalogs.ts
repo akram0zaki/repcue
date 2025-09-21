@@ -19,29 +19,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     displayOrder: 0,
     icon: 'fitness',
     colorTheme: 'blue',
-    pictureUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'tai-chi',
-    nameKey: 'tai-chi.name',
-    descriptionKey: 'tai-chi.description',
-    isDefault: false,
-    isPremium: true,
-    displayOrder: 1,
-    icon: 'tai-chi',
-    colorTheme: 'green',
-    pictureUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'zumba',
-    nameKey: 'zumba.name',
-    descriptionKey: 'zumba.description',
-    isDefault: false,
-    isPremium: true,
-    displayOrder: 2,
-    icon: 'dance',
-    colorTheme: 'purple',
-    pictureUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&h=300&fit=crop'
+    pictureUrl: '/images/general-fitness.svg'
   },
   {
     id: 'women-health',
@@ -49,10 +27,32 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     descriptionKey: 'women-health.description',
     isDefault: false,
     isPremium: true,
-    displayOrder: 3,
+    displayOrder: 1,
     icon: 'woman',
     colorTheme: 'pink',
-    pictureUrl: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop'
+    pictureUrl: '/images/women-health.svg'
+  },
+  {
+    id: 'tai-chi',
+    nameKey: 'tai-chi.name',
+    descriptionKey: 'tai-chi.description',
+    isDefault: false,
+    isPremium: true,
+    displayOrder: 2,
+    icon: 'tai-chi',
+    colorTheme: 'green',
+    pictureUrl: '/images/tai-chi.svg'
+  },
+  {
+    id: 'zumba',
+    nameKey: 'zumba.name',
+    descriptionKey: 'zumba.description',
+    isDefault: false,
+    isPremium: true,
+    displayOrder: 3,
+    icon: 'dance',
+    colorTheme: 'purple',
+    pictureUrl: '/images/zumba.svg'
   }
 ];
 

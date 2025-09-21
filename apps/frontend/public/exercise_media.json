@@ -244,9 +244,7 @@
     "repsPerLoop": 1,
     "fps": 30,
     "video": {
-      "square": "/videos/bear-crawl_v1_1080x1080.webm",
-      "portrait": "/videos/bear-crawl_v1_1080x1920.webm",
-      "landscape": "/videos/bear-crawl_v1_1920x1080.webm"
+      "landscape": "/videos/bear-crawl_v1_848x480.mp4"
     }
   },
   {
