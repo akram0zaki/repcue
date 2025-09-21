@@ -51,16 +51,16 @@ export class UpdateErrorHandler {
    * Create a standardized UpdateError from various error sources
    */
   public createUpdateError(
-    originalError: Error | string | any,
+    originalError: Error | string | unknown,
     context: {
       type?: UpdateErrorType;
       severity?: UpdateErrorSeverity;
-      metadata?: any;
+      metadata?: Record<string, unknown>;
     } = {}
   ): UpdateError {
     const errorMessage = typeof originalError === 'string'
       ? originalError
-      : originalError?.message || 'Unknown error occurred';
+      : (originalError as { message?: string })?.message || 'Unknown error occurred';
 
     const errorType = context.type || this.categorizeError(originalError);
     const severity = context.severity || this.determineSeverity(errorType);
@@ -83,19 +83,27 @@ export class UpdateErrorHandler {
   /**
    * Automatically categorize errors based on their characteristics
    */
-  private categorizeError(error: any): UpdateErrorType {
+  private categorizeError(error: unknown): UpdateErrorType {
     if (!error) return 'unknown_error';
 
-    const message = (error.message || error.toString()).toLowerCase();
-    const statusCode = error.status || error.statusCode;
+    const errorObj = error as { 
+      message?: string; 
+      toString?: () => string; 
+      status?: number; 
+      statusCode?: number; 
+      name?: string; 
+    };
+    
+    const message = (errorObj.message || errorObj.toString?.() || '').toLowerCase();
+    const statusCode = errorObj.status || errorObj.statusCode;
 
     // Network-related errors
     if (
       message.includes('network') ||
       message.includes('fetch') ||
       message.includes('connection') ||
-      statusCode >= 500 ||
-      error.name === 'NetworkError'
+      (statusCode && statusCode >= 500) ||
+      errorObj.name === 'NetworkError'
     ) {
       return 'network_error';
     }
@@ -125,8 +133,8 @@ export class UpdateErrorHandler {
     if (
       message.includes('timeout') ||
       message.includes('abort') ||
-      error.name === 'TimeoutError' ||
-      error.name === 'AbortError'
+      errorObj.name === 'TimeoutError' ||
+      errorObj.name === 'AbortError'
     ) {
       return 'timeout_error';
     }
@@ -146,7 +154,7 @@ export class UpdateErrorHandler {
       message.includes('storage') ||
       message.includes('quota') ||
       message.includes('disk') ||
-      error.name === 'QuotaExceededError'
+      errorObj.name === 'QuotaExceededError'
     ) {
       return 'storage_error';
     }
@@ -155,7 +163,7 @@ export class UpdateErrorHandler {
     if (
       message.includes('service worker') ||
       message.includes('sw.js') ||
-      error.name === 'ServiceWorkerError'
+      errorObj.name === 'ServiceWorkerError'
     ) {
       return 'service_worker_error';
     }
@@ -517,7 +525,7 @@ export class UpdateErrorHandler {
   /**
    * Show emergency error screen for unrecoverable errors
    */
-  private showEmergencyErrorScreen(originalError: UpdateError, rollbackError?: any): void {
+  private showEmergencyErrorScreen(originalError: UpdateError, rollbackError?: unknown): void {
     // Dispatch a custom event that the UI can listen to
     window.dispatchEvent(new CustomEvent('critical-update-error', {
       detail: {

@@ -26,6 +26,10 @@ supabase/migrations/20250919-01-add-catalog-id-to-activity-logs.sql
 supabase/migrations/20250919-02-create-admin-users-table.sql
 supabase/migrations/20250919-03-create-app-versions-table.sql
 supabase/migrations/20250919-04-create-version-audit-table.sql
+
+-- 4. Reference-Based Sharing System Migration
+supabase/migrations/20250921-01-remove-old-sharing-columns.sql
+supabase/migrations/20250921-02-update-video-policies-for-reference-sharing.sql
 ```
 
 ### Migration Descriptions
@@ -59,6 +63,17 @@ supabase/migrations/20250919-04-create-version-audit-table.sql
    - Creates `version_audit` table for tracking version deployment and update events
    - Provides audit trail for version management operations
 
+#### Reference-Based Sharing System
+7. **20250921-01-remove-old-sharing-columns.sql**
+   - **CRITICAL**: Removes obsolete copy-based sharing columns from `exercises` table
+   - Drops `is_shared_copy`, `shared_from_exercise_id`, and related fields
+   - **Required**: Clean up from migration to reference-based sharing system
+
+8. **20250921-02-update-video-policies-for-reference-sharing.sql**
+   - **CRITICAL**: Updates RLS policies for `video_files` table to support reference-based sharing
+   - Changes policy from `is_shared_copy` checks to `user_favorites` table verification
+   - **Required**: Essential for shared exercise video access functionality
+
 ---
 
 ## ⚡ Edge Functions to Deploy/Update
@@ -75,6 +90,7 @@ supabase/migrations/20250919-04-create-version-audit-table.sql
 ```
 ⚠️  UPDATE: save-shared-exercise (v7 → v15)
 ⚠️  UPDATE: sync_v2 (v16 → v36) - CRITICAL FOR CATALOG SYSTEM
+⚠️  UPDATE: download-shared-video (v1 → v2) - CRITICAL FOR SHARED EXERCISE VIDEOS
 ```
 - **save-shared-exercise (v7 → v15)**:
   - Enhanced with video metadata fields for proper video downloading
@@ -86,12 +102,18 @@ supabase/migrations/20250919-04-create-version-audit-table.sql
   - Added `catalog_id` to exercises and activity_logs field allowlists
   - **Required**: Essential for multi-catalog system and activity log visibility fix
 
+- **download-shared-video (v1 → v2)**:
+  - **CRITICAL**: Updated from copy-based to reference-based sharing verification
+  - Changed from checking `exercises.is_shared_copy` to checking `user_favorites` table
+  - **Required**: Essential for shared exercise video access in reference-based system
+
 ### Edge Functions Status Summary
 | Function | Production | Development | Action Required |
 |----------|------------|-------------|-----------------|
 | check-version | ❌ Missing | ✅ v1 | 🆕 **Deploy New** |
 | save-shared-exercise | ⚠️ v7 | ✅ v15 | 🔄 **Update Critical** |
 | sync_v2 | ⚠️ v16 | ✅ v36 | 🔄 **Update Critical** |
+| download-shared-video | ⚠️ v1 | ✅ v2 | 🔄 **Update Critical** |
 | get-shared-exercise | ✅ v19 | ✅ v21 | ⚠️ **Review Optional** |
 
 ---
@@ -107,12 +129,17 @@ supabase/migrations/20250919-04-create-version-audit-table.sql
 4. 20250919-02-create-admin-users-table.sql
 5. 20250919-03-create-app-versions-table.sql
 6. 20250919-04-create-version-audit-table.sql
+7. 20250921-01-remove-old-sharing-columns.sql
+8. 20250921-02-update-video-policies-for-reference-sharing.sql
 ```
 
 ### 2. Edge Function Deployments
 ```bash
 # CRITICAL: Update sync function first (required for catalog system)
 supabase functions deploy sync_v2 --project-ref zumzzuvfsuzvvymhpymk
+
+# CRITICAL: Update shared video access function (required for reference-based sharing)
+supabase functions deploy download-shared-video --project-ref zumzzuvfsuzvvymhpymk
 
 # Deploy new function
 supabase functions deploy check-version --project-ref zumzzuvfsuzvvymhpymk
@@ -123,10 +150,16 @@ supabase functions deploy save-shared-exercise --project-ref zumzzuvfsuzvvymhpym
 
 ### 3. Verification Steps
 - [ ] Verify all migrations applied successfully
+- [ ] **CRITICAL**: Confirm old sharing columns removed from `exercises` table
+- [ ] **CRITICAL**: Verify new video RLS policies work with `user_favorites` table
 - [ ] Test `check-version` function returns proper version data
 - [ ] Test `save-shared-exercise` with video-enabled shared exercises
-- [ ] Confirm video downloading works in saved shared exercises
+- [ ] **CRITICAL**: Test `download-shared-video` function with reference-based verification
+- [ ] Confirm video downloading works in saved shared exercises using `user_favorites` table
+- [ ] Verify shared exercise videos display correctly in recipient's catalog
+- [ ] Test both sync and video resolution use the edge function for shared exercises
 - [ ] Verify no breaking changes to existing functionality
+- [ ] Test that old copy-based sharing references are cleaned up
 
 ---
 
@@ -134,6 +167,7 @@ supabase functions deploy save-shared-exercise --project-ref zumzzuvfsuzvvymhpym
 
 ### Version Differences to Review
 - **sync_v2**: Dev v36 vs Prod v16 (significant version gap - review changes)
+- **download-shared-video**: Dev v2 vs Prod v1 (critical update - reference-based sharing)
 - **get-shared-exercise**: Dev v21 vs Prod v19 (minor updates - likely safe)
 
 ### Pre-Deployment Checklist

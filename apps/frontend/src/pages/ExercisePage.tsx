@@ -24,6 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useAuth } from '../hooks/useAuth';
+import { useSharedExercises } from '../hooks/useSharedExercises';
 import type { AuthUserProfile } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
 import getVideoSources from '../utils/videoSources';
@@ -50,6 +51,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
+  const { isSharedExercise } = useSharedExercises();
 
   // Filter state with persistence
   const FILTER_STORAGE_KEY = 'exercise-page-filters';
@@ -215,11 +217,11 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   // Helper function to check if exercise is shared with current user
-  const isSharedExercise = (exercise: Exercise): boolean => {
+  const isSharedExerciseHelper = (exercise: Exercise): boolean => {
     if (!user?.id) return false;
 
-    // Check if exercise was copied from a share using the tracking fields
-    return exercise.is_shared_copy === true;
+    // Use the hook to check if exercise ID is in shared references
+    return isSharedExercise(exercise.id);
   };
 
   // Filter exercises based on selected criteria
@@ -243,10 +245,25 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
 
       // Apply exercise type filter
+      const isUserCreated = isUserCreatedExercise(exercise);
+      const isShared = isSharedExerciseHelper(exercise);
+
+      // Debug logging for the "Ya 7amada" exercise
+      if (exercise.name === 'Ya 7amada') {
+        logger.log(`[ExercisePage] Filtering "Ya 7amada":`, {
+          exerciseId: exercise.id,
+          exerciseFilter,
+          isUserCreated,
+          isShared,
+          owner_id: exercise.owner_id,
+          userId: user?.id
+        });
+      }
+
       const matchesExerciseFilter = exerciseFilter === 'all' ||
-        (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise) && !isSharedExercise(exercise)) ||
-        (exerciseFilter === 'custom' && isUserCreatedExercise(exercise)) ||
-        (exerciseFilter === 'shared' && isSharedExercise(exercise));
+        (exerciseFilter === 'built-in' && !isUserCreated && !isShared) ||
+        (exerciseFilter === 'custom' && isUserCreated) ||
+        (exerciseFilter === 'shared' && isShared);
 
       return matchesCatalog && matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
     });
@@ -589,6 +606,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         onDelete={handleDeleteExercise}
                         onShowDetails={handleShowExerciseDetails}
                         currentUser={user}
+                        isSharedExercise={isSharedExercise}
                       />
                     ))}
                   </div>
@@ -611,6 +629,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 onDelete={handleDeleteExercise}
                 onShowDetails={handleShowExerciseDetails}
                 currentUser={user}
+                isSharedExercise={isSharedExercise}
               />
             ))}
           </div>
@@ -748,6 +767,7 @@ interface ExerciseCardProps {
   onDelete?: (exercise_id: string) => Promise<void>;
   onShowDetails: (exercise: Exercise) => void;
   currentUser?: AuthUserProfile; // User from auth hook
+  isSharedExercise: (exerciseId: string) => boolean; // Function to check if exercise is shared
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -759,7 +779,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onEdit,
   onDelete,
   onShowDetails,
-  currentUser
+  currentUser,
+  isSharedExercise
 }) => {
   const { t } = useTranslation(['common', 'exercises']);
   const loc = localizeExercise(exercise, t);
@@ -774,10 +795,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const isUserCreated = isUserCreatedExerciseCard(exercise.id) &&
                         currentUser &&
                         (exercise.owner_id === currentUser.id || !exercise.owner_id) &&
-                        !exercise.is_shared_copy; // Don't treat shared copies as user-created
+                        !isSharedExercise(exercise.id); // Don't treat shared exercises as user-created
 
   // Check if exercise is shared using the tracking field
-  const isSharedExerciseCard = exercise.is_shared_copy === true;
+  const isSharedExerciseCard = isSharedExercise(exercise.id);
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${

@@ -37,8 +37,8 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
 
   // Listen for update progress
   useEffect(() => {
-    const handleProgress = (progress: number) => {
-      setUpdateProgress(progress);
+    const handleProgress = (progress: unknown) => {
+      setUpdateProgress(typeof progress === 'number' ? progress : 0);
     };
 
     const handleCompleted = () => {
@@ -47,7 +47,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
       // App will reload automatically
     };
 
-    const handleFailed = (error: any) => {
+    const handleFailed = (error: unknown) => {
       logger.error('❌ Workout force update failed:', error);
       setError(error instanceof Error ? error.message : 'Update failed');
       setIsUpdating(false);

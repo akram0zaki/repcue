@@ -243,6 +243,7 @@
   "sharedBy": "مشارك بواسطة {{name}}",
   "saveToLibrary": "حفظ في مكتبتي",
   "exerciseSaved": "تم حفظ التمرين في مكتبتك!",
+  "exerciseReferenceAdded": "تم إضافة التمرين إلى مكتبتك!",
   "saveFailed": "فشل في حفظ التمرين",
   "tagsLabel": "الوسوم",
   "defaultDurationLabel": "المدة الافتراضية"

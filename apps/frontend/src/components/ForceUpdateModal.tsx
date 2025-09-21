@@ -74,7 +74,8 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
 
   // Enhanced app blocking effects
   useEffect(() => {
-    if (!blockAppUsage) return;
+    // Only block if the modal is open AND blocking is enabled AND there's actually an update
+    if (!blockAppUsage || !isOpen || !updateInfo) return;
 
     // Prevent page navigation/refresh
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -102,7 +103,7 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [blockAppUsage, t]);
+  }, [blockAppUsage, isOpen, updateInfo, t]);
 
   // Focus management for accessibility and security
   useEffect(() => {
@@ -128,8 +129,8 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
         }
       }
 
-      // Prevent escape key if blocking is enabled
-      if (e.key === 'Escape' && blockAppUsage) {
+      // Prevent escape key if blocking is enabled AND modal is open with update info
+      if (e.key === 'Escape' && blockAppUsage && isOpen && updateInfo) {
         e.preventDefault();
         logger.warn('Escape key blocked due to force update');
       }
@@ -137,7 +138,7 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [blockAppUsage]);
+  }, [blockAppUsage, isOpen, updateInfo]);
 
   // Auto-force countdown for critical security updates
   useEffect(() => {

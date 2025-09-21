@@ -75,6 +75,10 @@ export interface Exercise extends SyncMetadata {
   suggested_combinations?: string[]; // IDs of exercises that pair well with this one
   notes?: string; // Additional notes or tips
   exercise_references?: string[]; // Sources, studies, or references
+
+  // Shared exercise reference fields (for reference-based sharing)
+  is_shared_reference?: boolean; // Flag indicating this exercise is accessed via reference
+  shared_at?: string; // ISO timestamp when the exercise was shared with the user
 }
 
 export const ExerciseCategory = {
@@ -587,7 +591,12 @@ export interface UpdateError {
   userActionRequired: boolean;
   metadata?: {
     statusCode?: number;
-    networkInfo?: any;
+    networkInfo?: {
+      online?: boolean;
+      effectiveType?: string;
+      downlink?: number;
+      rtt?: number;
+    };
     updateVersion?: string;
     previousVersion?: string;
     rollbackAvailable?: boolean;

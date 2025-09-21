@@ -130,10 +130,70 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
       logger.log('🎥 [ResolveVideo] Video exists in cloud storage, downloading:', storedVideoFile.storage_path);
 
       try {
-        // Download video from Supabase Storage
-        const { data, error } = await supabase.storage
-          .from('videos')
-          .download(storedVideoFile.storage_path);
+        // Check if this is a shared exercise video by examining the storage path
+        // Shared exercise videos have paths like: {original_owner_id}/{exercise_id}/{filename}
+        // We can detect this by checking if the exercise doesn't belong to the current user
+        const { data: authData } = await supabase.auth.getUser();
+        const currentUserId = authData.user?.id;
+        const isSharedExercise = currentUserId &&
+          !storedVideoFile.storage_path.startsWith(currentUserId);
+
+        let data, error;
+
+        if (isSharedExercise) {
+          logger.log('🎥 [ResolveVideo] Detected shared exercise, using download-shared-video edge function:', {
+            exerciseId,
+            storagePath: storedVideoFile.storage_path,
+            currentUserId
+          });
+
+          // Use the download-shared-video edge function for shared exercises
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) {
+            logger.error('🎥 [ResolveVideo] No valid session for shared video download');
+            return null;
+          }
+
+          // Extract originalOwnerId from storage path: {originalOwnerId}/{exerciseId}/{filename}
+          const pathParts = storedVideoFile.storage_path.split('/');
+          const originalOwnerId = pathParts[0];
+          const originalExerciseId = pathParts[1];
+
+          const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/download-shared-video`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              exerciseId: exerciseId,
+              originalExerciseId: originalExerciseId,
+              originalOwnerId: originalOwnerId
+            })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            logger.error('🎥 [ResolveVideo] Shared video download failed:', {
+              exerciseId,
+              status: response.status,
+              statusText: response.statusText,
+              error: errorText
+            });
+            return null;
+          }
+
+          data = await response.blob();
+          error = null;
+        } else {
+          // Download video from Supabase Storage directly (for user's own exercises)
+          const storageResponse = await supabase.storage
+            .from('videos')
+            .download(storedVideoFile.storage_path);
+
+          data = storageResponse.data;
+          error = storageResponse.error;
+        }
 
         if (error) {
           logger.error('🎥 [ResolveVideo] Failed to download video from storage:', error);

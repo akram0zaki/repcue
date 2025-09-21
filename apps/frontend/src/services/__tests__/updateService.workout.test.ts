@@ -41,7 +41,7 @@ describe('UpdateService - Workout-Aware Functionality', () => {
     vi.clearAllMocks();
 
     // Reset singleton instance for each test
-    // @ts-ignore - accessing private static property for testing
+    // @ts-expect-error - accessing private static property for testing
     updateService.constructor.instance = undefined;
   });
 
@@ -340,7 +340,7 @@ describe('UpdateService - Workout-Aware Functionality', () => {
   describe('Event Emission', () => {
     it('should emit workout-blocked event for force updates during active workouts', async () => {
       const mockEmit = vi.fn();
-      // @ts-ignore - accessing private method for testing
+      // @ts-expect-error - accessing private method for testing
       updateService.emit = mockEmit;
 
       const forceUpdate: UpdateInfo = {
@@ -367,7 +367,7 @@ describe('UpdateService - Workout-Aware Functionality', () => {
 
       // Set a pending update
       const updateState = updateService.getUpdateState();
-      // @ts-ignore - setting private state for testing
+      // @ts-expect-error - setting private state for testing
       updateService.updateState = {
         ...updateState,
         pendingUpdate: forceUpdate
@@ -391,7 +391,7 @@ describe('UpdateService - Workout-Aware Functionality', () => {
 
     it('should emit deferred event for optional updates during workouts', async () => {
       const mockEmit = vi.fn();
-      // @ts-ignore - accessing private method for testing
+      // @ts-expect-error - accessing private method for testing
       updateService.emit = mockEmit;
 
       const optionalUpdate: UpdateInfo = {
@@ -413,7 +413,7 @@ describe('UpdateService - Workout-Aware Functionality', () => {
 
       // Set a pending update
       const updateState = updateService.getUpdateState();
-      // @ts-ignore - setting private state for testing
+      // @ts-expect-error - setting private state for testing
       updateService.updateState = {
         ...updateState,
         pendingUpdate: optionalUpdate

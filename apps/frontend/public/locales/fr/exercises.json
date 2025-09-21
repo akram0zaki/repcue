@@ -87,6 +87,7 @@
   "sharedBy": "Partagé par {{name}}",
   "saveToLibrary": "Enregistrer dans ma bibliothèque",
   "exerciseSaved": "Exercice enregistré dans votre bibliothèque !",
+  "exerciseReferenceAdded": "Exercice ajouté à votre bibliothèque !",
   "saveFailed": "Échec de l'enregistrement de l'exercice",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Durée par défaut"

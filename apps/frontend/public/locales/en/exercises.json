@@ -167,6 +167,7 @@
   "sharedBy": "Shared by {{name}}",
   "saveToLibrary": "Save to My Library",
   "exerciseSaved": "Exercise saved to your library!",
+  "exerciseReferenceAdded": "Exercise added to your library!",
   "saveFailed": "Failed to save exercise",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Default Duration",

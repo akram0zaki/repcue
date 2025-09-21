@@ -213,9 +213,30 @@ When user logs in on another device:
 ```typescript
 1. Full sync pulls exercise + video file records
 2. downloadVideoFileForOfflineAccess() triggered
-3. Authenticated download from Supabase Storage
+3. Dual-path video download:
+   - Own videos: Direct Supabase Storage download
+   - Shared videos: download-shared-video edge function
 4. Store in local IndexedDB
 5. Video available offline on new device
+```
+
+#### 10. Shared Exercise Video Handling
+For shared exercises, special video access logic is used:
+```typescript
+// Detection in downloadVideoFileForOfflineAccess()
+const isSharedExercise = !storagePath.startsWith(user.id);
+
+if (isSharedExercise) {
+  // Use edge function for permission-based access
+  const response = await fetch('/functions/v1/download-shared-video', {
+    method: 'POST',
+    body: JSON.stringify({
+      exerciseId: videoFileRow.exercise_id,
+      originalExerciseId: pathParts[1],
+      originalOwnerId: pathParts[0]
+    })
+  });
+}
 ```
 
 ## Data Transformations

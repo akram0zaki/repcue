@@ -243,6 +243,7 @@
   "sharedBy": "Geteilt von {{name}}",
   "saveToLibrary": "In Meine Bibliothek speichern",
   "exerciseSaved": "Übung in Ihrer Bibliothek gespeichert!",
+  "exerciseReferenceAdded": "Übung zu Ihrer Bibliothek hinzugefügt!",
   "saveFailed": "Fehler beim Speichern der Übung",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standarddauer"

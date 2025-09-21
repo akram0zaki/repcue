@@ -114,12 +114,12 @@ export const useUpdateNotifications = (): [UpdateNotificationState, UpdateNotifi
     refreshState();
 
     // Set up event listeners
-    const handleUpdateAvailable = (updateInfo: UpdateInfo) => {
+    const handleUpdateAvailable = (updateInfo: unknown) => {
       logger.log('Update available event received:', updateInfo);
       refreshState();
     };
 
-    const handleUpdateStarted = (updateInfo: UpdateInfo) => {
+    const handleUpdateStarted = (updateInfo: unknown) => {
       logger.log('Update started event received:', updateInfo);
       setState(prev => ({
         ...prev,
@@ -130,14 +130,14 @@ export const useUpdateNotifications = (): [UpdateNotificationState, UpdateNotifi
       }));
     };
 
-    const handleUpdateProgress = (progress: number) => {
+    const handleUpdateProgress = (progress: unknown) => {
       setState(prev => ({
         ...prev,
-        updateProgress: progress
+        updateProgress: typeof progress === 'number' ? progress : 0
       }));
     };
 
-    const handleUpdateCompleted = (updateInfo: UpdateInfo) => {
+    const handleUpdateCompleted = (updateInfo: unknown) => {
       logger.log('Update completed event received:', updateInfo);
       setState(prev => ({
         ...prev,
@@ -149,52 +149,56 @@ export const useUpdateNotifications = (): [UpdateNotificationState, UpdateNotifi
       }));
     };
 
-    const handleUpdateFailed = (error: Error) => {
+    const handleUpdateFailed = (error: unknown) => {
       logger.error('Update failed event received:', error);
       setState(prev => ({
         ...prev,
         isUpdating: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Update failed',
         updateProgress: 0
       }));
     };
 
-    const handleUpdateErrorDetailed = (data: { error: UpdateError; recoveryState: UpdateRecoveryState; canRetry: boolean }) => {
-      logger.error('Detailed update error received:', data.error);
+    const handleUpdateErrorDetailed = (data: unknown) => {
+      const errorData = data as { error: UpdateError; recoveryState: UpdateRecoveryState; canRetry: boolean };
+      logger.error('Detailed update error received:', errorData.error);
       setState(prev => ({
         ...prev,
         isUpdating: false,
-        currentError: data.error,
-        recoveryState: data.recoveryState,
-        error: data.error.message,
+        currentError: errorData.error,
+        recoveryState: errorData.recoveryState,
+        error: errorData.error.message,
         showErrorRecovery: true,
         updateProgress: 0
       }));
     };
 
-    const handleRecoveryActionCompleted = (data: { actionId: string }) => {
-      logger.log('Recovery action completed:', data.actionId);
+    const handleRecoveryActionCompleted = (data: unknown) => {
+      const actionData = data as { actionId: string };
+      logger.log('Recovery action completed:', actionData.actionId);
       refreshState();
     };
 
-    const handleRecoveryActionFailed = (data: { actionId: string; error: UpdateError }) => {
-      logger.error('Recovery action failed:', data);
+    const handleRecoveryActionFailed = (data: unknown) => {
+      const failureData = data as { actionId: string; error: UpdateError };
+      logger.error('Recovery action failed:', failureData);
       setState(prev => ({
         ...prev,
-        currentError: data.error,
-        error: data.error.message
+        currentError: failureData.error,
+        error: failureData.error.message
       }));
     };
 
-    const handleUpdateBlockedMetered = (data: { updateInfo: UpdateInfo; message: string }) => {
-      logger.warn('Update blocked due to metered connection:', data);
+    const handleUpdateBlockedMetered = (data: unknown) => {
+      const blockedData = data as { updateInfo: UpdateInfo; message: string };
+      logger.warn('Update blocked due to metered connection:', blockedData);
       setState(prev => ({
         ...prev,
-        error: data.message
+        error: blockedData.message
       }));
     };
 
-    const handleUpdateRequiresConfirmation = (updateInfo: UpdateInfo) => {
+    const handleUpdateRequiresConfirmation = (updateInfo: unknown) => {
       logger.log('Update requires confirmation:', updateInfo);
       // Keep banner visible for user to confirm
       setState(prev => ({

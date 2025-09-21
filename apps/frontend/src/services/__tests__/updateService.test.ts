@@ -72,11 +72,7 @@ describe('UpdateService', () => {
 
     // Set default updateErrorHandler mocks
     vi.mocked(updateErrorHandler.retryWithBackoff).mockImplementation(async (operation) => {
-      try {
-        return await operation();
-      } catch (error) {
-        throw error;
-      }
+      return await operation();
     });
     vi.mocked(updateErrorHandler.createUpdateError).mockImplementation((error, options) => ({
       message: typeof error === 'string' ? error : error.message || 'Unknown error',

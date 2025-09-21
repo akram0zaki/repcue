@@ -12,28 +12,31 @@ export interface SWUpdateInfo {
 export interface SWMessage {
   type: 'SW_UPDATED' | 'SW_ACTIVATED' | 'TRIGGER_VERSION_CHECK' | 'UPDATE_NOTIFICATION' | 'VERSION_INFO' | 'GET_VERSION';
   timestamp?: string;
-  data?: any;
+  data?: unknown;
 }
+
+// Event callback types
+type EventCallback = (...args: unknown[]) => void;
 
 // Event emitter for service worker events
 class ServiceWorkerEventEmitter {
-  private listeners: Map<string, Set<Function>> = new Map();
+  private listeners: Map<string, Set<EventCallback>> = new Map();
 
-  on(event: string, callback: Function): void {
+  on(event: string, callback: EventCallback): void {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
     this.listeners.get(event)!.add(callback);
   }
 
-  off(event: string, callback: Function): void {
+  off(event: string, callback: EventCallback): void {
     const listeners = this.listeners.get(event);
     if (listeners) {
       listeners.delete(callback);
     }
   }
 
-  emit(event: string, data?: any): void {
+  emit(event: string, data?: unknown): void {
     const listeners = this.listeners.get(event);
     if (listeners) {
       listeners.forEach(callback => {
@@ -398,7 +401,7 @@ const setupPeriodicUpdateCheck = (registration: ServiceWorkerRegistration): void
 /**
  * Send message to service worker
  */
-export const sendMessageToServiceWorker = async (message: Partial<SWMessage>): Promise<any> => {
+export const sendMessageToServiceWorker = async (message: Partial<SWMessage>): Promise<unknown> => {
   if (!('serviceWorker' in navigator)) {
     throw new Error('Service worker not supported');
   }
@@ -436,7 +439,8 @@ export const sendMessageToServiceWorker = async (message: Partial<SWMessage>): P
 export const getServiceWorkerVersion = async (): Promise<string> => {
   try {
     const response = await sendMessageToServiceWorker({ type: 'GET_VERSION' });
-    return response.version || 'unknown';
+    const versionResponse = response as { version?: string };
+    return versionResponse.version || 'unknown';
   } catch (error) {
     logger.error('❌ Failed to get service worker version:', error);
     return 'unknown';

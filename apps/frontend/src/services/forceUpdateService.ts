@@ -34,7 +34,7 @@ export class ForceUpdateService {
   private static instance: ForceUpdateService;
   private forceUpdateState: ForceUpdateState;
   private timerStateRef: TimerState | null = null;
-  private eventListeners: Map<string, Set<Function>> = new Map();
+  private eventListeners: Map<string, Set<(...args: unknown[]) => void>> = new Map();
   private autoForceTimeout: number | null = null;
 
   private static readonly MAX_RETRY_ATTEMPTS = 3;
@@ -62,31 +62,34 @@ export class ForceUpdateService {
    * Setup listeners for update service events
    */
   private setupUpdateServiceListeners(): void {
-    updateService.on('update-available', (updateInfo: UpdateInfo) => {
-      if (updateInfo.policy === 'force') {
-        this.handleForceUpdateAvailable(updateInfo);
+    updateService.on('update-available', (updateInfo: unknown) => {
+      const info = updateInfo as UpdateInfo;
+      if (info.policy === 'force') {
+        this.handleForceUpdateAvailable(info);
       }
     });
 
-    updateService.on('update-started', (updateInfo: UpdateInfo) => {
-      if (updateInfo.policy === 'force') {
-        this.emit('force-update-started', updateInfo);
+    updateService.on('update-started', (updateInfo: unknown) => {
+      const info = updateInfo as UpdateInfo;
+      if (info.policy === 'force') {
+        this.emit('force-update-started', info);
       }
     });
 
-    updateService.on('update-progress', (progress: number) => {
+    updateService.on('update-progress', (progress: unknown) => {
       if (this.forceUpdateState.isForceUpdateActive) {
-        this.emit('force-update-progress', progress);
+        this.emit('force-update-progress', typeof progress === 'number' ? progress : 0);
       }
     });
 
-    updateService.on('update-completed', (updateInfo: UpdateInfo) => {
+    updateService.on('update-completed', (updateInfo: unknown) => {
+      const info = updateInfo as UpdateInfo;
       if (this.forceUpdateState.isForceUpdateActive) {
-        this.handleForceUpdateCompleted(updateInfo);
+        this.handleForceUpdateCompleted(info);
       }
     });
 
-    updateService.on('update-failed', (error: any) => {
+    updateService.on('update-failed', (error: unknown) => {
       if (this.forceUpdateState.isForceUpdateActive) {
         this.handleForceUpdateFailed(error);
       }
@@ -382,7 +385,7 @@ export class ForceUpdateService {
   /**
    * Handle force update failure
    */
-  private handleForceUpdateFailed(error: any): void {
+  private handleForceUpdateFailed(error: unknown): void {
     logger.error('❌ Force update failed:', error);
 
     this.emit('force-update-failed', {
@@ -461,21 +464,21 @@ export class ForceUpdateService {
   /**
    * Event emitter functionality
    */
-  public on(event: string, callback: Function): void {
+  public on(event: string, callback: (...args: unknown[]) => void): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, new Set());
     }
     this.eventListeners.get(event)!.add(callback);
   }
 
-  public off(event: string, callback: Function): void {
+  public off(event: string, callback: (...args: unknown[]) => void): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.delete(callback);
     }
   }
 
-  private emit(event: string, data?: any): void {
+  private emit(event: string, data?: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach(callback => {

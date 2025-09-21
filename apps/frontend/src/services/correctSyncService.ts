@@ -818,10 +818,65 @@ export class CorrectSyncService {
 
       logger.debug(`[sync:v2] Authenticated user for video download: ${user.id}`);
 
-      // Use authenticated Supabase client instead of public URL
-      const { data, error } = await supabase.storage
-        .from('videos')
-        .download(storagePath);
+      // Check if this is a shared exercise video by examining the storage path
+      // Shared exercise videos have paths like: {original_owner_id}/{exercise_id}/{filename}
+      const isSharedExercise = !storagePath.startsWith(user.id);
+
+      let data, error;
+
+      if (isSharedExercise) {
+        logger.debug(`[sync:v2] Detected shared exercise video, using download-shared-video edge function:`, {
+          exerciseId: videoFileRow.exercise_id,
+          storagePath: storagePath,
+          currentUserId: user.id
+        });
+
+        // Extract originalOwnerId from storage path: {originalOwnerId}/{exerciseId}/{filename}
+        const pathParts = storagePath.split('/');
+        const originalOwnerId = pathParts[0];
+        const originalExerciseId = pathParts[1];
+
+        // Use the download-shared-video edge function for shared exercises
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          throw new Error('No valid session for shared video download');
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/download-shared-video`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            exerciseId: videoFileRow.exercise_id,
+            originalExerciseId: originalExerciseId,
+            originalOwnerId: originalOwnerId
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          logger.error(`[sync:v2] Shared video download failed:`, {
+            exerciseId: videoFileRow.exercise_id,
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          });
+          throw new Error(`Shared video download failed: ${response.status} ${errorText}`);
+        }
+
+        data = await response.blob();
+        error = null;
+      } else {
+        // Use authenticated Supabase client for user's own videos
+        const storageResponse = await supabase.storage
+          .from('videos')
+          .download(storagePath);
+
+        data = storageResponse.data;
+        error = storageResponse.error;
+      }
 
       if (error) {
         logger.error(`[sync:v2] Storage download error details:`, {

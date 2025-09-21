@@ -101,7 +101,8 @@
       "Bash(for lang in fr nl ar ar-EG fy)",
       "Bash(do echo \"Adding update translations to $lang\")",
       "Bash(echo:*)",
-      "Bash(do echo:*)"
+      "Bash(do echo:*)",
+      "Bash(for lang in es fr nl ar ar-EG fy)"
     ],
     "deny": [],
     "ask": []

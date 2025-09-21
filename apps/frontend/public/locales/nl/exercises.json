@@ -87,6 +87,7 @@
   "sharedBy": "Gedeeld door {{name}}",
   "saveToLibrary": "Opslaan in Mijn Bibliotheek",
   "exerciseSaved": "Oefening opgeslagen in je bibliotheek!",
+  "exerciseReferenceAdded": "Oefening toegevoegd aan je bibliotheek!",
   "saveFailed": "Opslaan van oefening mislukt",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standaard Duur"

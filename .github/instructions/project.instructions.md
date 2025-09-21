@@ -5,26 +5,25 @@ This project is an exercise timer and tracker application. It allows users to se
 
 You are an AI coding assistant, your role is to create software based on the provided context and instructions. Follow these guidelines:
 
+# Environment and Tools
 - You are running inside Visual Studio Code on a Windows machine.
-
 - For terminal commands, use the Windows Command Prompt or PowerShell syntax.
-
 - If a terminal command is interactive, pass a parameter to the command to avoid interactive prompts where possible.
-
 - If a terminal command must run in interactive mode, prompt the user for input before executing the command.
-
 - This project is using pnpm as the package manager. Use pnpm and its syntax for running any task related to the project like running unit tests, lint, build, etc
-
 - Supabase database password is stored in environment variable SUPABASE_DB_PASSWORD
-
 - Supabase Personal Access Token is stored in environment variable SUPABASE_ACCESS_TOKEN
+- This application is being developed on a Windows 11 machine and deployed to production on a Raspberry Pi 5 running the default Pi OS where nginx and cloudflare tunnel are set up.
+
+# Change Management
+- The application uses Supabase for backend services, including database and edge functions.
+- **CRITICAL**: Always verify environment synchronization before major changes. Production can lag significantly behind development in both database schema and edge functions. See `.github/instructions/supabase.instructions.md` for comprehensive migration guidance.
 
 - **Supabase Environment Management**: RepCue uses dual Supabase environments:
   - Development: Project `repcue-dev` (xwzrsfkzqxdybjrkkkvh) - accessed via `mcp_supabase_*` tools
   - Production: Project `RepCue` (zumzzuvfsuzvvymhpymk) - accessed via `mcp_supabase-prod_*` tools
   - **CRITICAL**: Always verify environment synchronization before major changes. Production can lag significantly behind development in both database schema and edge functions. See `.github/instructions/supabase.instructions.md` for comprehensive migration guidance.
 
-- This application is being developed on a Windows 11 machine and deployed to production on a Raspberry Pi 5 running the default Pi OS where nginx and cloudflare tunnel are set up.
 
 - Use the provided context and instructions to guide your coding decisions.
 
@@ -45,11 +44,9 @@ You are an AI coding assistant, your role is to create software based on the pro
   4. Deploy any outdated edge functions to production
   5. Verify environment parity before proceeding with new changes
 
-- This goes without saying but obviously you need it because you tend to ignore build errors, when you build the application, make sure to wait until build is complete and read the result on terminal before proceeding to the next step.
-
 - If the prompt is a question, then your answer should be suggestions for how to go about addressing the question and ask for confirmation before proceeding with the implementation.
 
-- When requested to create an implementation plan, save it to the .plan/ directory in markdown (.md) format.
+- When requested to create an implementation plan, save it to the docs\implementation-plans directory in markdown (.md) format.
 
 - After successfully implementing a Module or a number of related tasks in the plan, and fully testing it successfully (by running `pnpm test:ci`), update the progress for this module/tasks in the plan.
 

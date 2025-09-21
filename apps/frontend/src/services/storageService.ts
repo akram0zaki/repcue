@@ -1562,6 +1562,7 @@ export class StorageService {
 
   /**
    * Get all exercises (filtered to exclude deleted records)
+   * Now includes shared exercise references from user_favorites
    */
   public async getExercises(): Promise<Exercise[]> {
     if (!this.canStoreData()) {
@@ -1570,10 +1571,14 @@ export class StorageService {
 
     return await this.safeDatabaseAccess(
       async () => {
-        const [storedExercises, prefs] = await Promise.all([
+        const userId = authService.getCurrentUser()?.id;
+
+        const [storedExercises, prefs, sharedRefs] = await Promise.all([
           this.db.exercises.toArray(),
-          this.getUserPreferences().catch(() => null)
+          this.getUserPreferences().catch(() => null),
+          userId ? this.getSharedExerciseReferences(userId) : Promise.resolve([])
         ]);
+
         const favorites = prefs?.favorite_exercises || [];
         let allExercises = storedExercises
           .map(this.convertStoredExercise)
@@ -1583,10 +1588,34 @@ export class StorageService {
             is_favorite: favorites.includes(ex.id)
           }));
 
-        // Enrich exercises with video URLs for offline-first bidirectional sync
-        allExercises = await this.enrichExercisesWithVideoUrls(allExercises);
+        // Add shared exercises if user is authenticated
+        if (userId && sharedRefs.length > 0) {
+          const sharedExerciseIds = sharedRefs.map(ref => ref.item_id);
+          const sharedExercises = await this.getSharedExerciseData(sharedExerciseIds);
 
-        return filterActiveRecords(allExercises);
+          // Mark shared exercises as favorites and add metadata
+          const enrichedSharedExercises = sharedExercises.map(ex => ({
+            ...ex,
+            is_favorite: true, // All shared exercises are considered favorites
+            is_shared_reference: true, // Flag to indicate this is a reference
+            shared_at: sharedRefs.find(ref => ref.item_id === ex.id)?.created_at
+          }));
+
+          allExercises = [...allExercises, ...enrichedSharedExercises];
+        }
+
+        // Remove duplicates (in case a shared exercise is also owned by the user)
+        const uniqueExercises = allExercises.reduce((acc, exercise) => {
+          if (!acc.some(ex => ex.id === exercise.id)) {
+            acc.push(exercise);
+          }
+          return acc;
+        }, [] as Exercise[]);
+
+        // Enrich exercises with video URLs for offline-first bidirectional sync
+        const enrichedExercises = await this.enrichExercisesWithVideoUrls(uniqueExercises);
+
+        return filterActiveRecords(enrichedExercises);
       },
       () => {
         // Fallback to in-memory storage
@@ -1665,6 +1694,91 @@ export class StorageService {
   return finalCount;
     } catch (error) {
       logger.warn('Failed to seed exercises catalog:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Ensure the exercise catalogs table is seeded with default catalogs.
+   * Returns the number of catalogs after seeding.
+   */
+  public async ensureCatalogsSeeded(): Promise<number> {
+    if (!this.canStoreData()) {
+      logger.warn('[seed] Skipping catalog seeding: consent not granted');
+      return 0;
+    }
+
+    try {
+      const tSeedStart = Date.now();
+      const existingCount = await this.db.exercise_catalogs.count();
+      logger.log(`[seed] exercise_catalogs.count before=${existingCount}`);
+
+      if (existingCount === 0) {
+        // Lazy import to avoid circular dependencies
+        const { EXERCISE_CATALOGS } = await import('../data/catalogs');
+
+        // Prepare clean catalog records
+        const cleanCatalogs = EXERCISE_CATALOGS.map(catalog => ({
+          ...catalog,
+          // Convert interface fields to database fields
+          name_key: catalog.nameKey,
+          description_key: catalog.descriptionKey,
+          is_default: catalog.isDefault,
+          is_premium: catalog.isPremium,
+          display_order: catalog.displayOrder,
+          // Add sync metadata
+          dirty: 0,
+          version: 1,
+          created_at: '2025-01-01T00:00:00.000Z',
+          updated_at: '2025-01-01T00:00:00.000Z',
+          deleted: false,
+          op: 'seed'
+        }));
+
+        // Remove interface-only fields that don't exist in database
+        const dbCatalogs = cleanCatalogs.map(catalog => {
+          const { nameKey: _nameKey, descriptionKey: _descriptionKey, isDefault: _isDefault, isPremium: _isPremium, displayOrder: _displayOrder, ...rest } = catalog;
+          // Map UI fields to database fields
+          return {
+            ...rest,
+            name_key: catalog.nameKey,
+            description_key: catalog.descriptionKey,
+            is_default: catalog.isDefault,
+            is_premium: catalog.isPremium,
+            display_order: catalog.displayOrder
+          };
+        });
+
+        try {
+          await this.db.transaction('rw', this.db.exercise_catalogs, async () => {
+            await this.db.exercise_catalogs.bulkPut(dbCatalogs as any);
+          });
+        } catch (txErr) {
+          // Fallback to individual puts if bulkPut fails
+          logger.warn('bulkPut failed during catalog seeding; falling back to sequential puts', txErr);
+          for (const catalog of cleanCatalogs) {
+            try {
+              await this.db.exercise_catalogs.put(catalog);
+            } catch (putErr) {
+              logger.warn(`Failed to seed catalog ${catalog.id}:`, putErr);
+            }
+          }
+        }
+
+        const finalCount = await this.db.exercise_catalogs.count();
+        const seedMs = Date.now() - tSeedStart;
+        if (seedMs > 1000) {
+          logger.warn(`[seed] catalogs completed in ${seedMs}ms; count after=${finalCount}`);
+        } else {
+          logger.log(`[seed] catalogs completed in ${seedMs}ms; count after=${finalCount}`);
+        }
+        return finalCount;
+      } else {
+        logger.log('[seed] catalogs already seeded, skipping');
+        return existingCount;
+      }
+    } catch (error) {
+      logger.warn('Failed to seed exercise catalogs:', error);
       return 0;
     }
   }
@@ -2831,11 +2945,89 @@ export class StorageService {
         .where('owner_id').equals(userId)
         .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
         .first();
-      
+
       return !!existing;
     } catch (error) {
       logger.warn('Failed to check favorite status:', error);
       return false;
+    }
+  }
+
+  /**
+   * Get shared exercise references for a user
+   * Returns the user_favorites records that represent shared exercises
+   */
+  public async getSharedExerciseReferences(userId: string): Promise<UserFavorite[]> {
+    if (!this.canStoreData()) {
+      logger.warn('[getSharedExerciseReferences] Cannot store data, returning empty array');
+      return [];
+    }
+
+    try {
+      // Debug: Check total user_favorites count
+      const totalFavorites = await this.db.user_favorites.count();
+      logger.log(`[getSharedExerciseReferences] Total user_favorites in IndexedDB: ${totalFavorites}`);
+
+      // Debug: Get all user_favorites for this user
+      const allUserFavorites = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .toArray();
+      logger.log(`[getSharedExerciseReferences] Total favorites for user ${userId}: ${allUserFavorites.length}`);
+
+      const sharedRefs = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .and(favorite =>
+          favorite.item_type === 'exercise' &&
+          favorite.exercise_type === 'shared' &&
+          !favorite.deleted
+        )
+        .toArray();
+
+      logger.log(`[getSharedExerciseReferences] Found ${sharedRefs.length} shared exercise references for user ${userId}`);
+      if (sharedRefs.length > 0) {
+        logger.log('[getSharedExerciseReferences] Shared refs:', sharedRefs);
+      }
+
+      return sharedRefs;
+    } catch (error) {
+      logger.warn('Failed to get shared exercise references:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Fetch original exercise data for shared exercise references
+   * This resolves the references to actual exercise data
+   */
+  public async getSharedExerciseData(exerciseIds: string[]): Promise<Exercise[]> {
+    if (!this.canStoreData() || exerciseIds.length === 0) {
+      return [];
+    }
+
+    try {
+      // Try to find shared exercises in local storage first
+      const localExercises = await this.db.exercises
+        .where('id').anyOf(exerciseIds)
+        .and(ex => !ex.deleted)
+        .toArray();
+
+      const foundLocalIds = localExercises.map(ex => ex.id);
+      const missingIds = exerciseIds.filter(id => !foundLocalIds.includes(id));
+
+      const exercises = localExercises.map(this.convertStoredExercise);
+
+      // For missing exercises, we would need to fetch from server
+      // For now, we'll return what we have locally
+      if (missingIds.length > 0) {
+        logger.debug(`Shared exercises not found locally: ${missingIds.join(', ')}`);
+        // In a full implementation, we would fetch these from the server here
+        // For Phase 2, we'll rely on sync to have already pulled them
+      }
+
+      return exercises;
+    } catch (error) {
+      logger.warn('Failed to get shared exercise data:', error);
+      return [];
     }
   }
 
@@ -3266,6 +3458,7 @@ export class StorageService {
 
   /**
    * Get all exercises (builtin + user-created + shared)
+   * Now includes shared exercise references from user_favorites
    */
   public async getAllExercises(): Promise<Exercise[]> {
     if (!this.canStoreData()) {
@@ -3273,12 +3466,42 @@ export class StorageService {
     }
 
     try {
-      const allExercises = await this.db.exercises
-        .where('deleted')
-        .equals(0) // Only get non-deleted exercises
-        .toArray();
+      const userId = authService.getCurrentUser()?.id;
 
-      return filterActiveRecords(allExercises);
+      const [storedExercises, sharedRefs] = await Promise.all([
+        this.db.exercises
+          .where('deleted')
+          .equals(0) // Only get non-deleted exercises
+          .toArray(),
+        userId ? this.getSharedExerciseReferences(userId) : Promise.resolve([])
+      ]);
+
+      let allExercises = filterActiveRecords(storedExercises);
+
+      // Add shared exercises if user is authenticated
+      if (userId && sharedRefs.length > 0) {
+        const sharedExerciseIds = sharedRefs.map(ref => ref.item_id);
+        const sharedExercises = await this.getSharedExerciseData(sharedExerciseIds);
+
+        // Mark shared exercises with metadata
+        const enrichedSharedExercises = sharedExercises.map(ex => ({
+          ...ex,
+          is_shared_reference: true, // Flag to indicate this is a reference
+          shared_at: sharedRefs.find(ref => ref.item_id === ex.id)?.created_at
+        }));
+
+        allExercises = [...allExercises, ...enrichedSharedExercises];
+      }
+
+      // Remove duplicates (in case a shared exercise is also owned by the user)
+      const uniqueExercises = allExercises.reduce((acc, exercise) => {
+        if (!acc.some(ex => ex.id === exercise.id)) {
+          acc.push(exercise);
+        }
+        return acc;
+      }, [] as Exercise[]);
+
+      return uniqueExercises;
     } catch (error) {
       logger.error('Failed to get all exercises:', error);
       return [];

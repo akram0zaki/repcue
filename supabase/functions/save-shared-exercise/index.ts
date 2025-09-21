@@ -109,32 +109,8 @@ serve(async (req: Request) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Determine target catalog
-    let targetCatalogId = catalogId;
-    if (!catalogId) {
-      // Only use default catalog if none was provided
-      targetCatalogId = 'general-fitness';
-      console.log('No catalog ID provided, using default catalog:', targetCatalogId);
-    } else {
-      // Verify the provided catalog exists
-      const { data: catalog, error: catalogError } = await supabase
-        .from('exercise_catalogs')
-        .select('id')
-        .eq('id', targetCatalogId)
-        .single();
-
-      if (catalogError || !catalog) {
-        console.error('Invalid catalog ID provided:', catalogError);
-        return new Response(
-          JSON.stringify({ error: 'Invalid catalog ID' }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-      console.log('Using provided catalog:', targetCatalogId);
-    }
+    // Note: catalogId is stored for context but not used for constraints
+    // since we're creating references, not copies
 
     // Look up share record and exercise details
     const { data: shareData, error: shareError } = await supabase
@@ -221,22 +197,25 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check if user has already saved this exercise (look for existing copy)
-    const { data: existingExercise } = await supabase
-      .from('exercises')
-      .select('id, name')
+    // Check if user has already saved this exercise (check user_favorites for reference)
+    const { data: existingFavorite } = await supabase
+      .from('user_favorites')
+      .select('id, item_id')
       .eq('owner_id', userId)
-      .eq('shared_from_exercise_id', originalExercise.id)
+      .eq('item_id', originalExercise.id)
+      .eq('item_type', 'exercise')
+      .eq('exercise_type', 'shared')
       .eq('deleted', false)
       .single();
 
-    if (existingExercise) {
+    if (existingFavorite) {
       return new Response(
         JSON.stringify({
           success: true,
           message: 'Exercise already saved to your library',
-          exerciseId: existingExercise.id,
-          exerciseName: existingExercise.name
+          exerciseId: originalExercise.id,
+          exerciseName: originalExercise.name,
+          isReference: true
         }),
         {
           status: 200,
@@ -246,44 +225,29 @@ serve(async (req: Request) => {
     }
 
     const now = new Date().toISOString();
-    const newExerciseId = crypto.randomUUID();
 
-    // Create a copy of the shared exercise for the user
-    const newExercise = {
-      id: newExerciseId,
+    // Create a reference in user_favorites instead of copying the exercise
+    const favoriteRecord = {
       owner_id: userId,
-      name: `${originalExercise.name} (Shared)`,
-      description: originalExercise.description,
-      category: originalExercise.category,
-      exercise_type: originalExercise.exercise_type,
-      difficulty_level: originalExercise.difficulty_level,
-      muscle_groups: originalExercise.muscle_groups,
-      equipment_needed: originalExercise.equipment_needed,
-      rep_duration_seconds: originalExercise.rep_duration_seconds,
-      custom_video_url: originalExercise.custom_video_url,
-      has_video: originalExercise.has_video,
-      instructions: originalExercise.instructions,
-      catalog_id: targetCatalogId,
-      shared_from_exercise_id: originalExercise.id,
-      shared_from_user_id: shareData.owner_id,
-      is_shared_copy: true,
-      copy_count: 0,
+      item_id: originalExercise.id,
+      item_type: 'exercise',
+      exercise_type: 'shared',
       created_at: now,
       updated_at: now,
       deleted: false,
       version: 1
     };
 
-    const { error: exerciseInsertError } = await supabase
-      .from('exercises')
-      .insert(newExercise);
+    const { error: favoriteInsertError } = await supabase
+      .from('user_favorites')
+      .insert(favoriteRecord);
 
-    if (exerciseInsertError) {
-      console.error('Exercise insert error:', exerciseInsertError);
+    if (favoriteInsertError) {
+      console.error('User favorites insert error:', favoriteInsertError);
       return new Response(
         JSON.stringify({
-          error: 'Failed to save exercise to your library',
-          details: exerciseInsertError.message
+          error: 'Failed to save exercise reference to your library',
+          details: favoriteInsertError.message
         }),
         {
           status: 500,
@@ -305,12 +269,14 @@ serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         success: true,
-        exerciseId: newExerciseId,
-        exerciseName: newExercise.name,
+        exerciseId: originalExercise.id, // Return original exercise ID since it's a reference
+        exerciseName: originalExercise.name,
         message: 'Exercise successfully saved to your library',
         hasVideo: originalExercise.has_video || !!originalExercise.custom_video_url,
         sharedFromExerciseId: originalExercise.id,
-        sharedFromUserId: shareData.owner_id
+        sharedFromUserId: shareData.owner_id,
+        isReference: true,
+        catalogId: catalogId || null // Return the catalog context if provided
       }),
       {
         status: 201,

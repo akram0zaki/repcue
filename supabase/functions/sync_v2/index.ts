@@ -411,10 +411,230 @@ function scrubIncoming(table, record) {
   }
   return scrubbed;
 }
+
+// Pull exercises including shared exercises referenced in user_favorites
+async function pullExercisesWithShared(supabase, userId, cursor, limit, correlationId) {
+  try {
+    console.log(`[${correlationId}] Pulling exercises with shared exercises for user ${userId}`);
+
+    // First, get the user's own exercises with normal cursor logic
+    let ownQuery = supabase.from('exercises')
+      .select('*')
+      .eq('owner_id', userId)
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .limit(limit + 1);
+
+    if (cursor && cursor.lastUpdatedAt && cursor.lastId) {
+      ownQuery = ownQuery.or(`updated_at.gt.${cursor.lastUpdatedAt},and(updated_at.eq.${cursor.lastUpdatedAt},id.gt.${cursor.lastId})`);
+    }
+
+    const { data: ownExercises, error: ownError } = await ownQuery;
+    if (ownError) {
+      console.error(`[${correlationId}] Error fetching own exercises:`, ownError);
+      return {
+        records: [],
+        nextCursor: cursor || { lastUpdatedAt: '', lastId: '' },
+        hasMore: false,
+        error: true,
+        errorMessage: ownError.message
+      };
+    }
+
+    // Get shared exercise IDs from user_favorites
+    const { data: sharedRefs, error: sharedError } = await supabase
+      .from('user_favorites')
+      .select('item_id')
+      .eq('owner_id', userId)
+      .eq('item_type', 'exercise')
+      .eq('exercise_type', 'shared')
+      .eq('deleted', false);
+
+    if (sharedError) {
+      console.warn(`[${correlationId}] Error fetching shared exercise references:`, sharedError);
+      // Continue with just own exercises if shared fetch fails
+    }
+
+    let sharedExercises = [];
+    if (sharedRefs && sharedRefs.length > 0) {
+      const sharedIds = sharedRefs.map(ref => ref.item_id);
+      console.log(`[${correlationId}] Found ${sharedIds.length} shared exercise references`);
+
+      // Fetch the shared exercises (without cursor logic for now - they're relatively few)
+      const { data: sharedData, error: sharedDataError } = await supabase
+        .from('exercises')
+        .select('*')
+        .in('id', sharedIds)
+        .eq('deleted', false);
+
+      if (sharedDataError) {
+        console.warn(`[${correlationId}] Error fetching shared exercise data:`, sharedDataError);
+      } else {
+        sharedExercises = sharedData || [];
+        console.log(`[${correlationId}] Fetched ${sharedExercises.length} shared exercises`);
+      }
+    }
+
+    // Combine own and shared exercises
+    const allExercises = [...(ownExercises || []), ...sharedExercises];
+
+    // Sort by updated_at, then id for consistent ordering
+    allExercises.sort((a, b) => {
+      if (a.updated_at !== b.updated_at) {
+        return a.updated_at.localeCompare(b.updated_at);
+      }
+      return a.id.localeCompare(b.id);
+    });
+
+    // Apply pagination
+    const hasMore = allExercises.length > limit;
+    const actualRecords = hasMore ? allExercises.slice(0, limit) : allExercises;
+
+    // Generate next cursor from last record
+    const nextCursor = actualRecords.length > 0 ? {
+      lastUpdatedAt: actualRecords[actualRecords.length - 1].updated_at,
+      lastId: actualRecords[actualRecords.length - 1].id
+    } : cursor || { lastUpdatedAt: '', lastId: '' };
+
+    console.log(`[${correlationId}] Combined exercises: ${actualRecords.length} records (${(ownExercises || []).length} own + ${sharedExercises.length} shared), hasMore: ${hasMore}`);
+
+    return {
+      records: actualRecords,
+      nextCursor,
+      hasMore,
+      error: false
+    };
+  } catch (e) {
+    console.error(`[${correlationId}] Pull exercises with shared failed:`, e);
+    return {
+      records: [],
+      nextCursor: cursor || { lastUpdatedAt: '', lastId: '' },
+      hasMore: false,
+      error: true,
+      errorMessage: e.message
+    };
+  }
+}
+
+// Pull video_files including videos for shared exercises
+async function pullVideoFilesWithShared(supabase, userId, cursor, limit, correlationId) {
+  try {
+    console.log(`[${correlationId}] Pulling video_files with shared exercise videos for user ${userId}`);
+
+    // First, get the user's own video files with normal cursor logic
+    let ownQuery = supabase.from('video_files')
+      .select('*')
+      .eq('owner_id', userId)
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .limit(limit + 1);
+
+    if (cursor && cursor.lastUpdatedAt && cursor.lastId) {
+      ownQuery = ownQuery.or(`updated_at.gt.${cursor.lastUpdatedAt},and(updated_at.eq.${cursor.lastUpdatedAt},id.gt.${cursor.lastId})`);
+    }
+
+    const { data: ownVideoFiles, error: ownError } = await ownQuery;
+    if (ownError) {
+      console.error(`[${correlationId}] Error fetching own video files:`, ownError);
+      return {
+        records: [],
+        nextCursor: cursor || { lastUpdatedAt: '', lastId: '' },
+        hasMore: false,
+        error: true,
+        errorMessage: ownError.message
+      };
+    }
+
+    // Get shared exercise IDs from user_favorites
+    const { data: sharedRefs, error: sharedError } = await supabase
+      .from('user_favorites')
+      .select('item_id')
+      .eq('owner_id', userId)
+      .eq('item_type', 'exercise')
+      .eq('exercise_type', 'shared')
+      .eq('deleted', false);
+
+    if (sharedError) {
+      console.warn(`[${correlationId}] Error fetching shared exercise references for video files:`, sharedError);
+      // Continue with just own video files if shared fetch fails
+    }
+
+    let sharedVideoFiles = [];
+    if (sharedRefs && sharedRefs.length > 0) {
+      const sharedExerciseIds = sharedRefs.map(ref => ref.item_id);
+      console.log(`[${correlationId}] Found ${sharedExerciseIds.length} shared exercises, fetching their video files`);
+
+      // Fetch video files for shared exercises (without cursor logic for now - they're relatively few)
+      const { data: sharedVideoData, error: sharedVideoError } = await supabase
+        .from('video_files')
+        .select('*')
+        .in('exercise_id', sharedExerciseIds)
+        .eq('deleted', false);
+
+      if (sharedVideoError) {
+        console.warn(`[${correlationId}] Error fetching shared exercise video files:`, sharedVideoError);
+      } else {
+        sharedVideoFiles = sharedVideoData || [];
+        console.log(`[${correlationId}] Fetched ${sharedVideoFiles.length} video files for shared exercises`);
+      }
+    }
+
+    // Combine own and shared video files
+    const allVideoFiles = [...(ownVideoFiles || []), ...sharedVideoFiles];
+
+    // Sort by updated_at, then id for consistent ordering
+    allVideoFiles.sort((a, b) => {
+      if (a.updated_at !== b.updated_at) {
+        return a.updated_at.localeCompare(b.updated_at);
+      }
+      return a.id.localeCompare(b.id);
+    });
+
+    // Apply pagination
+    const hasMore = allVideoFiles.length > limit;
+    const actualRecords = hasMore ? allVideoFiles.slice(0, limit) : allVideoFiles;
+
+    // Generate next cursor from last record
+    const nextCursor = actualRecords.length > 0 ? {
+      lastUpdatedAt: actualRecords[actualRecords.length - 1].updated_at,
+      lastId: actualRecords[actualRecords.length - 1].id
+    } : cursor || { lastUpdatedAt: '', lastId: '' };
+
+    console.log(`[${correlationId}] Combined video files: ${actualRecords.length} records (${(ownVideoFiles || []).length} own + ${sharedVideoFiles.length} shared), hasMore: ${hasMore}`);
+
+    return {
+      records: actualRecords,
+      nextCursor,
+      hasMore,
+      error: false
+    };
+  } catch (e) {
+    console.error(`[${correlationId}] Pull video files with shared failed:`, e);
+    return {
+      records: [],
+      nextCursor: cursor || { lastUpdatedAt: '', lastId: '' },
+      hasMore: false,
+      error: true,
+      errorMessage: e.message
+    };
+  }
+}
+
 // Pull changes from a table with cursor-based pagination
 async function pullTablePage(supabase, table, userId, cursor, limit, correlationId) {
   try {
     console.log(`[${correlationId}] Pulling ${table} with cursor:`, cursor, `limit: ${limit}`);
+
+    // Special handling for exercises table to include shared exercises
+    if (table === 'exercises') {
+      return await pullExercisesWithShared(supabase, userId, cursor, limit, correlationId);
+    }
+
+    // Special handling for video_files table to include shared exercise videos
+    if (table === 'video_files') {
+      return await pullVideoFilesWithShared(supabase, userId, cursor, limit, correlationId);
+    }
+
     // Build query - fetch records newer than cursor or all if no cursor
     let query = supabase.from(table).select('*').eq('owner_id', userId).order('updated_at', {
       ascending: true

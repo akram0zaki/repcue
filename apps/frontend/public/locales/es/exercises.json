@@ -244,6 +244,7 @@
   "sharedBy": "Compartido por {{name}}",
   "saveToLibrary": "Guardar en Mi Biblioteca",
   "exerciseSaved": "¡Ejercicio guardado en tu biblioteca!",
+  "exerciseReferenceAdded": "¡Ejercicio añadido a tu biblioteca!",
   "saveFailed": "Error al guardar el ejercicio",
   "tagsLabel": "Etiquetas",
   "defaultDurationLabel": "Duración Predeterminada"

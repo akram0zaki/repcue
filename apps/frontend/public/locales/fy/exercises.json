@@ -246,6 +246,7 @@
   "sharedBy": "Dield troch {{name}}",
   "saveToLibrary": "Bewarje yn myn bibleteek",
   "exerciseSaved": "Oefening bewarre yn jo bibleteek!",
+  "exerciseReferenceAdded": "Oefening tafoege oan jo bibleteek!",
   "saveFailed": "It opslaan fan de oefening is mislearre",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standaard Duur"

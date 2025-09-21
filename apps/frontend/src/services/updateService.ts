@@ -33,10 +33,10 @@ export class UpdateService {
   private updateState: UpdateState;
   private serviceWorkerRegistration: ServiceWorkerRegistration | null = null;
   private updateCheckInterval: number | null = null;
-  private eventListeners: Map<string, Set<Function>> = new Map();
+  private eventListeners: Map<string, Set<(...args: unknown[]) => void>> = new Map();
   private timerStateRef: TimerState | null = null;
   private recoveryState: UpdateRecoveryState;
-  private emergencyCallbacks: Set<Function> = new Set();
+  private emergencyCallbacks: Set<(error: { originalError?: Error; rollbackError?: Error; recoveryActions?: any[] }) => void> = new Set();
   private updateMetrics = {
     totalChecks: 0,
     lastCheckDuration: 0,
@@ -261,21 +261,22 @@ export class UpdateService {
       this.checkForUpdates();
     });
 
-    swEventEmitter.on('sw-updated', (data: any) => {
+    swEventEmitter.on('sw-updated', (data: unknown) => {
       logger.log('✅ Service worker updated successfully');
       this.emit('service-worker-updated', data);
     });
 
-    swEventEmitter.on('sw-activated', (data: any) => {
+    swEventEmitter.on('sw-activated', (data: unknown) => {
       logger.log('🎯 Service worker activated and controlling all tabs');
       this.emit('service-worker-activated', data);
     });
 
     // Listen for background sync triggers
-    swEventEmitter.on('update-notification', (data: any) => {
+    swEventEmitter.on('update-notification', (data: unknown) => {
       logger.log('📬 Received update notification from service worker');
-      if (data.data?.updateInfo) {
-        this.handleExternalUpdateNotification(data.data.updateInfo);
+      const notificationData = data as { data?: { updateInfo?: unknown } };
+      if (notificationData.data?.updateInfo) {
+        this.handleExternalUpdateNotification(notificationData.data.updateInfo as UpdateInfo);
       }
     });
   }
@@ -942,7 +943,7 @@ export class UpdateService {
    */
   public isOnMeteredConnection(): boolean {
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as { connection?: { type?: string; saveData?: boolean; effectiveType?: string } }).connection;
 
       // Check if user has enabled data saver mode
       if (connection?.saveData === true) {
@@ -952,7 +953,7 @@ export class UpdateService {
 
       // Check for slow connections that are typically metered
       const slowConnections = ['slow-2g', '2g', '3g'];
-      if (slowConnections.includes(connection?.effectiveType)) {
+      if (connection?.effectiveType && slowConnections.includes(connection.effectiveType)) {
         logger.log(`🌐 Metered connection detected: ${connection.effectiveType} connection`);
         return true;
       }
@@ -991,7 +992,7 @@ export class UpdateService {
       return defaultInfo;
     }
 
-    const connection = (navigator as any).connection;
+    const connection = (navigator as { connection?: { type?: string; saveData?: boolean; effectiveType?: string; downlink?: number; rtt?: number } }).connection;
 
     return {
       isMetered: this.isOnMeteredConnection(),
@@ -1132,7 +1133,7 @@ export class UpdateService {
    */
   private getPlatformInfo(): string {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                        (window.navigator as any).standalone === true;
+                        (window.navigator as { standalone?: boolean }).standalone === true;
 
     if (isStandalone) {
       return 'pwa';
@@ -1144,21 +1145,21 @@ export class UpdateService {
   /**
    * Event emitter functionality
    */
-  public on(event: string, callback: Function): void {
+  public on(event: string, callback: (...args: unknown[]) => void): void {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, new Set());
     }
     this.eventListeners.get(event)!.add(callback);
   }
 
-  public off(event: string, callback: Function): void {
+  public off(event: string, callback: (...args: unknown[]) => void): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.delete(callback);
     }
   }
 
-  private emit(event: string, data?: any): void {
+  private emit(event: string, data?: unknown): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
       listeners.forEach(callback => {
@@ -1189,7 +1190,7 @@ export class UpdateService {
   /**
    * Broadcast message to other tabs for coordination
    */
-  private broadcastToOtherTabs(message: any): void {
+  private broadcastToOtherTabs(message: unknown): void {
     try {
       if ('BroadcastChannel' in window) {
         if (!this.broadcastChannel) {
@@ -1359,8 +1360,9 @@ export class UpdateService {
    */
   private setupCriticalErrorHandling(): void {
     // Listen for critical update errors from the error handler
-    window.addEventListener('critical-update-error', (event: any) => {
-      const { originalError, rollbackError, recoveryActions } = event.detail;
+    window.addEventListener('critical-update-error', (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { originalError, rollbackError, recoveryActions } = customEvent.detail;
       this.emergencyCallbacks.forEach(callback => {
         try {
           callback({ originalError, rollbackError, recoveryActions });
@@ -1374,8 +1376,9 @@ export class UpdateService {
   /**
    * Categorize update errors for proper handling
    */
-  private categorizeUpdateError(error: any): UpdateErrorType {
-    const message = (error.message || error.toString()).toLowerCase();
+  private categorizeUpdateError(error: unknown): UpdateErrorType {
+    const errorObj = error as { message?: string; toString?: () => string };
+    const message = (errorObj.message || errorObj.toString?.() || 'unknown error').toLowerCase();
 
     if (message.includes('service worker') || message.includes('activate')) {
       return UpdateErrorType.INSTALLATION_ERROR;
@@ -1531,14 +1534,14 @@ export class UpdateService {
   /**
    * Add emergency callback for critical errors
    */
-  public addEmergencyCallback(callback: Function): void {
+  public addEmergencyCallback(callback: (error: { originalError?: Error; rollbackError?: Error; recoveryActions?: any[] }) => void): void {
     this.emergencyCallbacks.add(callback);
   }
 
   /**
    * Remove emergency callback
    */
-  public removeEmergencyCallback(callback: Function): void {
+  public removeEmergencyCallback(callback: (error: { originalError?: Error; rollbackError?: Error; recoveryActions?: any[] }) => void): void {
     this.emergencyCallbacks.delete(callback);
   }
 
