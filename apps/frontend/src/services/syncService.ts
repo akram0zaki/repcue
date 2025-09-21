@@ -61,6 +61,12 @@ class V2SyncService {
 
   onSyncStatusChange(listener: (status: SyncStatus) => void): () => void {
     this.listeners.add(listener);
+    // Call listener immediately with current status
+    try {
+      listener(this.getSyncStatus());
+    } catch (error) {
+      logger.warn('Sync status listener error:', error);
+    }
     return () => this.listeners.delete(listener);
   }
 
@@ -206,9 +212,11 @@ export const syncService: {
   onSyncStatusChange: (listener: (status: SyncStatus) => void) => () => void;
   clearErrors: () => void;
   sync: (force?: boolean) => Promise<SyncResult>;
+  hasChangesToSync: () => Promise<boolean>;
 } = {
   getSyncStatus: () => getSyncServiceInstance().getSyncStatus(),
   onSyncStatusChange: (listener: (status: SyncStatus) => void) => getSyncServiceInstance().onSyncStatusChange(listener),
   clearErrors: () => getSyncServiceInstance().clearErrors(),
-  sync: (force?: boolean) => getSyncServiceInstance().sync(force)
+  sync: (force?: boolean) => getSyncServiceInstance().sync(force),
+  hasChangesToSync: () => Promise.resolve(false) // V2 doesn't track this granularly
 };
