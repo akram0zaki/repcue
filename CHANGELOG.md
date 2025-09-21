@@ -1,5 +1,14 @@
 ## Unreleased
 
+## 2025-09-21 (Sync UX Improvement)
+
+### Enhanced
+- **Sync Status Notifications**: Improved user experience for sync error reporting
+  - **Toast Notifications**: Replaced persistent sync error banners with auto-disappearing toast notifications for better UX
+  - **Error Deduplication**: Implemented error deduplication to prevent showing the same error multiple times
+  - **Extended Duration**: Sync error toasts show for 8 seconds (longer than standard toasts) to ensure visibility
+  - **Cleaner Interface**: Removed visual clutter from persistent error banners while maintaining error visibility
+
 ## 2025-09-21 (Multi-Catalog System Enhancement)
 
 ### New Features

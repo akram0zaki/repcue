@@ -119,7 +119,7 @@ export const WOMEN_HEALTH_EXERCISES: Exercise[] = [
     default_reps: 8, // per side
     rep_duration_seconds: 2,
     is_favorite: false,
-    has_video: false,
+    has_video: true,
     tags: ['core', 'back', 'balance'],
     benefits: 'Improves balance; strengthens back and abs.',
     limitations: 'Avoid with wrist injury.',

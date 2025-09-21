@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { useNetworkSync } from '../hooks/useNetworkSync';
 import { useAuth } from '../hooks/useAuth';
+import { useSnackbar } from './SnackbarProvider';
 import { DEBUG } from '../config/features';
 
 /**
  * SyncStatusBanner component shows connectivity and sync status
- * Extends OfflineBanner with sync capabilities
+ * Uses toasts for error notifications instead of persistent banners
  */
 const SyncStatusBanner: React.FC = () => {
   const { isOffline, isOnline, hasBeenOffline } = useOfflineStatus();
   const { state: syncState, actions: syncActions } = useNetworkSync();
   const { isAuthenticated } = useAuth();
+  const { showSnackbar } = useSnackbar();
+  const lastErrorRef = useRef<string | null>(null);
 
   // Helper to format time ago
   const formatTimeAgo = (timestamp?: number) => {
@@ -24,46 +27,29 @@ const SyncStatusBanner: React.FC = () => {
     return `${Math.floor(hours / 24)}d ago`;
   };
 
-  // Show sync error state (highest priority) - always show errors regardless of DEBUG flag
-  if (isAuthenticated && syncState.errors.length > 0) {
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 z-50 shadow-md" role="alert" data-testid="sync-status-banner">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="flex-shrink-0" aria-hidden="true">
-              ⚠️
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">
-                Sync failed
-              </p>
-              <p className="text-xs mt-1">
-                {syncState.errors[0]} • Last attempt: {formatTimeAgo(syncState.lastSyncAttempt)}
-              </p>
-            </div>
-          </div>
-          <div className="flex space-x-2">
-            <button
-              onClick={syncActions.clearErrors}
-              className="text-xs px-2 py-1 bg-red-200 text-red-800 rounded hover:bg-red-300 transition-colors"
-              aria-label="Dismiss error"
-            >
-              Dismiss
-            </button>
-            {isOnline && (
-              <button
-                onClick={syncActions.retry}
-                className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                aria-label="Retry sync"
-              >
-                Retry
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Show sync errors as toasts instead of persistent banners
+  useEffect(() => {
+    if (isAuthenticated && syncState.errors.length > 0) {
+      const currentError = syncState.errors[0];
+      
+      // Only show toast if this is a new error (different from last one)
+      if (currentError !== lastErrorRef.current) {
+        lastErrorRef.current = currentError;
+        
+        const lastAttemptText = formatTimeAgo(syncState.lastSyncAttempt);
+        showSnackbar(
+          `Sync failed: ${currentError} • Last attempt: ${lastAttemptText}`,
+          { 
+            type: 'error',
+            durationMs: 8000  // Show longer for error messages
+          }
+        );
+      }
+    } else {
+      // Clear reference when no errors
+      lastErrorRef.current = null;
+    }
+  }, [isAuthenticated, syncState.errors, syncState.lastSyncAttempt, showSnackbar]);
 
   // Show sync in progress (for authenticated users)
   if (DEBUG && isAuthenticated && syncState.isSyncing) {

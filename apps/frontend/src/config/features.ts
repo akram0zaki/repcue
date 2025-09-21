@@ -16,6 +16,6 @@ export const SYNC_ENGINE = 'v2' as const;
 
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = true;
+export const DEBUG = false;
 // Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
-export const SYNC_DEBUG = true;
+export const SYNC_DEBUG = false;
