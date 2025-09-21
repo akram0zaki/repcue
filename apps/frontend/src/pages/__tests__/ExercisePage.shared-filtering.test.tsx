@@ -52,6 +52,7 @@ const createMockExercise = (overrides: Partial<Exercise> = {}): Exercise => ({
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
   version: 1,
+  catalogId: 'general-fitness', // Default to general-fitness catalog
   ...overrides
 });
 
@@ -202,7 +203,14 @@ describe('ExercisePage Shared Exercise Filtering', () => {
 
     // Should display shared badge but not custom badge
     expect(screen.getByText('Shared')).toBeInTheDocument();
-    expect(screen.queryByText('Custom')).not.toBeInTheDocument();
+    
+    // Check that there's no Custom badge in the exercise card (filter button will still exist)
+    const exerciseCard = screen.getByText('Shared Exercise').closest('[data-testid="exercise-card"]');
+    expect(exerciseCard).toBeInTheDocument();
+    
+    // The Custom badge should not be in the exercise card
+    const customBadgeInCard = exerciseCard?.querySelector('.bg-blue-100');
+    expect(customBadgeInCard).toBeNull();
   });
 
   it('does not display share button on shared exercises', async () => {
@@ -320,10 +328,12 @@ describe('ExercisePage Shared Exercise Filtering', () => {
     fireEvent.click(sharedFilter);
 
     await waitFor(() => {
-      // Should show empty state
-      expect(screen.getByText(/No exercises found/i)).toBeInTheDocument();
-      expect(screen.getByText(/Clear all filters/i)).toBeInTheDocument();
+      // Should show empty state - look for the clear filters button which is always present
+      expect(screen.getByRole('button', { name: /clear.*filter/i })).toBeInTheDocument();
       expect(screen.getByText(/Showing 0 of 2 exercises/i)).toBeInTheDocument();
+      
+      // Should show the search icon emoji
+      expect(screen.getByText('🔍')).toBeInTheDocument();
     });
   });
 
@@ -332,7 +342,10 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Exercise',
-        owner_id: 'other-user-456'
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456'
       })
     ];
 
@@ -366,14 +379,20 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       createMockExercise({
         id: '22222222-2222-2222-2222-222222222222',
         name: 'Shared Core Exercise',
-        owner_id: 'other-user-456',
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-1',
+        shared_from_user_id: 'other-user-456',
         category: ExerciseCategory.CORE,
         tags: ['core', 'stability']
       }),
       createMockExercise({
         id: '33333333-3333-3333-3333-333333333333',
         name: 'Shared Strength Exercise',
-        owner_id: 'another-user-789',
+        owner_id: 'current-user-123', // Owned by current user after saving from share
+        is_shared_copy: true,
+        shared_from_exercise_id: 'original-exercise-id-2',
+        shared_from_user_id: 'another-user-789',
         category: ExerciseCategory.STRENGTH,
         tags: ['strength', 'upper-body']
       })
@@ -397,9 +416,14 @@ describe('ExercisePage Shared Exercise Filtering', () => {
       expect(screen.getByText('Shared Strength Exercise')).toBeInTheDocument();
     });
 
-    // Filter by Core category as well
-    const coreFilter = screen.getByRole('button', { name: /Core/i });
-    fireEvent.click(coreFilter);
+    // Filter by Core category as well - get the category filter button specifically
+    const categoryFilters = screen.getAllByRole('button', { name: /Core/i });
+    const coreFilter = categoryFilters.find(button => 
+      button.className.includes('px-3 py-2 rounded-lg') && 
+      !button.getAttribute('aria-label')?.includes('Exercise')
+    );
+    expect(coreFilter).toBeDefined();
+    fireEvent.click(coreFilter!);
 
     await waitFor(() => {
       // Should only show the shared core exercise

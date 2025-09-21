@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 2025-01-21 (Latest)
+## 2025-09-21 (Latest)
 
 ### New Features
 - **PWA Update System**: 🎉 **FULLY IMPLEMENTED** - Complete Progressive Web App update notification and management system
@@ -55,7 +55,7 @@
   - Migration checklist and rollback procedures
   - Comprehensive troubleshooting guide
 
-## 2025-01-19
+## 2025-09-19
 
 ### Fixed
 - **Activity Log Visibility Issue**: Resolved critical issue where completed exercises (like "Bicycle Crunches") were not appearing in the activity log table

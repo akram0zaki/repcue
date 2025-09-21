@@ -25,6 +25,12 @@ vi.mock('../../utils/logger', () => ({
   }
 }));
 
+vi.mock('../consentService', () => ({
+  consentService: {
+    hasConsent: vi.fn(),
+  }
+}));
+
 describe('ForceUpdateService', () => {
   let service: ForceUpdateService;
 
@@ -210,6 +216,9 @@ describe('ForceUpdateService', () => {
 
   describe('Workout State Persistence', () => {
     it('saves workout state to storage when active', async () => {
+      const { consentService } = await import('../consentService');
+      vi.mocked(consentService.hasConsent).mockReturnValue(true);
+
       const mockLocalStorage = {
         setItem: vi.fn(),
         getItem: vi.fn(),
@@ -245,23 +254,35 @@ describe('ForceUpdateService', () => {
     });
 
     it('loads and clears workout recovery data', async () => {
-      const { storageService } = await import('../storageService');
       const mockRecoveryData = {
         isWorkoutActive: true,
         currentExercise: 'Push-ups',
-        savedAt: new Date().toISOString()
+        savedAt: '2025-09-20T23:55:03.399Z'
       };
 
-      vi.mocked(storageService.getItem).mockResolvedValue(mockRecoveryData);
+      // Mock localStorage since the method uses it directly
+      const getItemSpy = vi.spyOn(localStorage, 'getItem').mockReturnValue(JSON.stringify(mockRecoveryData));
+      const removeItemSpy = vi.spyOn(localStorage, 'removeItem').mockImplementation(() => {});
+
+      // Mock consentService to return true
+      const { consentService } = await import('../consentService');
+      vi.mocked(consentService.hasConsent).mockReturnValue(true);
 
       const result = await service.loadAndClearWorkoutRecovery();
 
       expect(result).toEqual(mockRecoveryData);
-      expect(storageService.removeItem).toHaveBeenCalledWith('workout_recovery_data');
+      expect(getItemSpy).toHaveBeenCalledWith('repcue_workout_recovery_data');
+      expect(removeItemSpy).toHaveBeenCalledWith('repcue_workout_recovery_data');
+      
+      // Clean up
+      getItemSpy.mockRestore();
+      removeItemSpy.mockRestore();
     });
 
     it('returns null when no recovery data exists', async () => {
       const { storageService } = await import('../storageService');
+      
+      // Re-setup the mock after clearAllMocks
       vi.mocked(storageService.getItem).mockResolvedValue(null);
 
       const result = await service.loadAndClearWorkoutRecovery();

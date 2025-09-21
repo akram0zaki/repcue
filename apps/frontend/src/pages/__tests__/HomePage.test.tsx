@@ -94,9 +94,9 @@ describe('HomePage', () => {
 
   it('displays the main action buttons', () => {
     renderHomePage();
-    
+
     expect(screen.getByRole('button', { name: /start timer/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /browse exercises/i })).toBeInTheDocument();
+    expect(screen.getByTestId('exercises-count-link')).toBeInTheDocument();
   });
 
   it('renders favorite exercises section', () => {

@@ -86,11 +86,14 @@ describe('ProfilePage', () => {
     it('shows loading state initially', async () => {
       renderProfilePage();
 
-      expect(screen.getByRole('status')).toBeInTheDocument(); // Loading spinner
-      
+      // Check for loading spinner by class instead of role
+      const spinner = document.querySelector('.animate-spin');
+      expect(spinner).toBeInTheDocument();
+
       // Wait for loading to finish
       await waitFor(() => {
-        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+        const spinnerAfter = document.querySelector('.animate-spin');
+        expect(spinnerAfter).not.toBeInTheDocument();
       });
     });
 
@@ -99,7 +102,8 @@ describe('ProfilePage', () => {
 
       // Wait for component to load
       await waitFor(() => {
-        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+        const spinner = document.querySelector('.animate-spin');
+        expect(spinner).not.toBeInTheDocument();
       });
 
       // Should show "Profile Not Found" when profile is null
@@ -111,7 +115,8 @@ describe('ProfilePage', () => {
 
       // Wait for component to load
       await waitFor(() => {
-        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+        const spinner = document.querySelector('.animate-spin');
+        expect(spinner).not.toBeInTheDocument();
       });
 
       // Should show "Profile Not Found" when profile is null
@@ -176,7 +181,8 @@ describe('ProfilePage', () => {
 
       // Wait for component to load
       await waitFor(() => {
-        expect(screen.queryByRole('status')).not.toBeInTheDocument();
+        const spinner = document.querySelector('.animate-spin');
+        expect(spinner).not.toBeInTheDocument();
       });
 
       // Should render profile not found message without crashing

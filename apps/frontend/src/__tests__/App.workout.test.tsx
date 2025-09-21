@@ -3,10 +3,16 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../App';
+import { SnackbarProvider } from '../components/SnackbarProvider';
 
 // Mock service workers and storage
 vi.mock('../utils/serviceWorker', () => ({
-  registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false })
+  registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false }),
+  swEventEmitter: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn()
+  }
 }));
 
 
@@ -42,8 +48,12 @@ vi.mock('../services/storageService', () => {
     saveAppSettings: vi.fn().mockResolvedValue(undefined),
     toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
     getWorkouts: vi.fn().mockResolvedValue([]),
+    getWorkoutSessions: vi.fn().mockResolvedValue([]),
+    getActivityLogs: vi.fn().mockResolvedValue([]),
     getDatabase: vi.fn(() => ({})),
-    claimOwnership: vi.fn().mockResolvedValue(true)
+    claimOwnership: vi.fn().mockResolvedValue(true),
+    ready: vi.fn().mockResolvedValue(true),
+    ensureExercisesSeeded: vi.fn().mockResolvedValue(undefined)
   };
   
   return {
@@ -158,7 +168,11 @@ describe('App - Workout Mode Integration', () => {
   });
 
   it('should initialize workout mode when navigated with workout state', async () => {
-    render(<App />);
+    render(
+      <SnackbarProvider>
+        <App />
+      </SnackbarProvider>
+    );
 
     // Wait for app to load
     await waitFor(
