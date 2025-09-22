@@ -528,49 +528,51 @@ const StandaloneSharedExercise: React.FC = () => {
             )}
 
             {/* Benefits */}
-            {exercise.benefits && (
+            {(exercise.benefits || t(`exercises.${exercise.id}.benefits`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('exercises.benefits', { defaultValue: 'Benefits' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {exercise.benefits}
+                  {t(`exercises.${exercise.id}.benefits`, { defaultValue: exercise.benefits || '' })}
                 </p>
               </div>
             )}
 
             {/* Limitations */}
-            {exercise.limitations && (
+            {(exercise.limitations || t(`exercises.${exercise.id}.limitations`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('exercises.limitations', { defaultValue: 'Limitations' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {exercise.limitations}
+                  {t(`exercises.${exercise.id}.limitations`, { defaultValue: exercise.limitations || '' })}
                 </p>
               </div>
             )}
 
             {/* Best Timing */}
-            {exercise.best_timing && (
+            {(exercise.best_timing || t(`exercises.${exercise.id}.best_timing`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('exercises.bestTiming', { defaultValue: 'Best Timing' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {exercise.best_timing}
+                  {t(`exercises.${exercise.id}.best_timing`, { defaultValue: exercise.best_timing || '' })}
                 </p>
               </div>
             )}
 
             {/* Suggested Combinations */}
-            {exercise.suggested_combinations && exercise.suggested_combinations.length > 0 && (
+            {((exercise.suggested_combinations && exercise.suggested_combinations.length > 0) ||
+              (t(`exercises.${exercise.id}.suggested_combinations`, { defaultValue: null }) &&
+               Array.isArray(t(`exercises.${exercise.id}.suggested_combinations`, { defaultValue: [] })))) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('exercises.suggestedCombinations', { defaultValue: 'Suggested Combinations' })}
                 </h4>
                 <ul className="space-y-1">
-                  {exercise.suggested_combinations.map((exerciseId, index) => {
+                  {(t(`exercises.${exercise.id}.suggested_combinations`, { defaultValue: exercise.suggested_combinations || [] }) as unknown as string[]).map((exerciseId, index) => {
                     const referencedExercise = getExerciseById(exerciseId);
                     return (
                       <li key={index} className="flex items-center space-x-2">
@@ -598,25 +600,27 @@ const StandaloneSharedExercise: React.FC = () => {
             )}
 
             {/* Notes */}
-            {exercise.notes && (
+            {(exercise.notes || t(`exercises.${exercise.id}.notes`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('exercises.notes', { defaultValue: 'Notes' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {exercise.notes}
+                  {t(`exercises.${exercise.id}.notes`, { defaultValue: exercise.notes || '' })}
                 </p>
               </div>
             )}
 
             {/* Exercise References */}
-            {exercise.exercise_references && exercise.exercise_references.length > 0 && (
+            {((exercise.exercise_references && exercise.exercise_references.length > 0) ||
+              (t(`exercises.${exercise.id}.exercise_references`, { defaultValue: null }) &&
+               Array.isArray(t(`exercises.${exercise.id}.exercise_references`, { defaultValue: [] })))) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('exercises.references', { defaultValue: 'References' })}
                 </h4>
                 <ul className="list-disc list-inside space-y-1">
-                  {exercise.exercise_references.map((reference, index) => (
+                  {(t(`exercises.${exercise.id}.exercise_references`, { defaultValue: exercise.exercise_references || [] }) as unknown as string[]).map((reference, index) => (
                     <li key={index} className="text-gray-600 dark:text-gray-400">
                       {reference}
                     </li>

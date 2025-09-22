@@ -39,107 +39,263 @@
   },
   "plank": {
     "name": "Plancha",
-    "description": "Mantén el cuerpo en línea recta apoyándote en antebrazos y puntas de los pies"
+    "description": "Mantén el cuerpo en línea recta apoyándote en antebrazos y puntas de los pies",
+    "benefits": "Fortalece los músculos del core (abdominales, oblicuos, etc.), ayudando a proteger la columna y mejorar la postura. También es conveniente al no necesitar equipo, y construye estabilidad para movimientos cotidianos.",
+    "limitations": "Mantener posiciones isométricas más de ~2 minutos produce rendimientos decrecientes. Una mala forma (caderas caídas o hombros) puede causar dolor. Las personas con presión arterial alta deben evitar planchas muy largas ya que pueden elevar la presión arterial. Modifica si tienes problemas de muñeca o hombro (baja a las rodillas o usa una inclinación).",
+    "best_timing": "Se puede hacer al final de un entrenamiento o como rutina rápida de core. Hacer plancha 2–4 veces por semana es efectivo. También útil como activación del core durante calentamientos o incluso diariamente durante descansos.",
+    "suggested_combinations": ["side-plank", "dead-bug"],
+    "notes": "Mantener una línea recta de cabeza a talones (sin caderas caídas). Respirar de manera constante y contraer abdominales y glúteos durante todo el tiempo. Comenzar con tiempos más cortos (ej. 20–30 segundos) y aumentar gradualmente.",
+    "exercise_references": ["Cleveland Clinic – Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Harvard Health – Plank Exercise Tips; https://www.health.harvard.edu/blog/straight-talk-on-planking-2019111318304"]
   },
   "side-plank": {
     "name": "Plancha lateral",
-    "description": "Sostén el cuerpo de lado apoyado en un antebrazo"
+    "description": "Sostén el cuerpo de lado apoyado en un antebrazo",
+    "benefits": "Fortalece específicamente los músculos oblicuos y estabilizadores laterales del core. Mejora el equilibrio y la estabilidad lateral, corrigiendo desequilibrios entre lados del cuerpo. Ayuda a prevenir lesiones de espalda baja y mejora la postura.",
+    "limitations": "Puede ser desafiante para principiantes mantener la alineación correcta. Personas con lesiones de hombro o muñeca deben modificar la posición. Mantener por más de 2 minutos puede no ofrecer beneficios adicionales significativos.",
+    "best_timing": "Ideal después de una plancha regular o como parte de una rutina de core. Efectivo 2-3 veces por semana. Excelente para incluir en calentamientos para activar los estabilizadores laterales.",
+    "suggested_combinations": ["plank", "dead-bug", "glute-bridges"],
+    "notes": "Mantén una línea recta desde la cabeza hasta los pies. No dejes que las caderas se hundan o se eleven. Apoya el peso en el antebrazo y el borde externo del pie. Comienza con tiempos cortos (15-30 segundos) por lado.",
+    "exercise_references": ["ACE Fitness – Side Plank Exercise; https://www.acefitness.org/resources/everyone/exercise-library/35/side-plank/", "Mayo Clinic – Core Exercises; https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/core-strength/sls-20076575"]
   },
   "mountain-climbers": {
     "name": "Escaladores",
-    "description": "Desde plancha, lleva las rodillas al pecho alternando"
+    "description": "Desde plancha, lleva las rodillas al pecho alternando",
+    "benefits": "Ejercicio cardiovascular de alta intensidad que fortalece el core, hombros y piernas. Mejora la coordinación y agilidad. Quema calorías eficientemente y aumenta la frecuencia cardíaca rápidamente.",
+    "limitations": "Puede ser muy intenso para principiantes. La fatiga puede llevar a mala forma y posible lesión. No recomendado para personas con problemas de muñeca o hombro. El impacto puede ser problemático para algunas articulaciones.",
+    "best_timing": "Excelente para calentamientos dinámicos o entrenamientos HIIT. Ideal a mitad del entrenamiento cuando ya estás caliente. Evitar al final cuando estés muy fatigado para mantener buena forma.",
+    "suggested_combinations": ["burpees", "jumping-jacks", "high-knees"],
+    "notes": "Mantén las caderas niveladas y el core activado. Alterna las piernas rápidamente pero con control. Mantén el peso en las manos y los hombros estables sobre las muñecas. Modifica haciendo más lento si es necesario.",
+    "exercise_references": ["Healthline – Mountain Climber Benefits; https://www.healthline.com/health/fitness/mountain-climbers", "WebMD – High-Intensity Exercises; https://www.webmd.com/fitness-exercise/features/high-intensity-interval-training-hiit"]
   },
   "bicycle-crunches": {
     "name": "Abdominales bicicleta",
-    "description": "Codo a rodilla contraria en movimiento alternado"
+    "description": "Codo a rodilla contraria en movimiento alternado",
+    "benefits": "Trabaja todos los músculos abdominales, especialmente los oblicuos. Mejora la coordinación y flexibilidad del core. Uno de los ejercicios más efectivos para activar múltiples grupos musculares del abdomen simultáneamente.",
+    "limitations": "Puede causar tensión en el cuello si se tira de la cabeza. No es efectivo si se hace demasiado rápido sin control. Personas con problemas de espalda baja deben ser cautelosas con la flexión repetitiva.",
+    "best_timing": "Ideal al final de un entrenamiento de core o como parte de un circuito abdominal. Efectivo 3-4 veces por semana. También útil como ejercicio de activación después del calentamiento.",
+    "suggested_combinations": ["plank", "russian-twists", "dead-bug"],
+    "notes": "Mantén la espalda baja pegada al suelo. Muévete con control, no rapidez. Coloca las manos detrás de las orejas, no del cuello. Enfócate en la rotación del torso, no solo en tocar codo con rodilla.",
+    "exercise_references": ["ACE Fitness – Bicycle Crunch Study; https://www.acefitness.org/resources/everyone/exercise-library/1/bicycle-crunch/", "Harvard Health – Abdominal Exercises; https://www.health.harvard.edu/staying-healthy/abdominal-fat-and-what-to-do-about-it"]
   },
   "push-ups": {
     "name": "Flexiones",
-    "description": "Baja y sube el cuerpo usando los brazos en posición prona"
+    "description": "Baja y sube el cuerpo usando los brazos en posición prona",
+    "benefits": "Fortalece el pecho, hombros y tríceps, mientras activa el core para estabilidad. Es un ejercicio fundamental de tren superior que también mejora la fuerza funcional para movimientos de empuje. Incluso puede apoyar la salud cardíaca – mayor capacidad de flexiones se ha relacionado con menor riesgo cardíaco.",
+    "limitations": "Hacer demasiadas sin variación puede llevar a una meseta en las ganancias de fuerza. Mala forma (como codos abiertos o caderas caídas) puede forzar hombros o espalda baja. Si experimentas dolor de muñeca, usa barras de flexión o hazlas sobre los nudillos. Personas con lesiones de hombro deben usar un rango reducido o evitar si es doloroso.",
+    "best_timing": "Usualmente hechas temprano en un entrenamiento de tren superior cuando los brazos están frescos. También se pueden hacer diariamente con moderación como parte de una rutina matutina o circuito de fuerza, pero permitir días de descanso para recuperación. Las flexiones también son un gran calentamiento para el tren superior, realizadas con intensidad modificada.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Mantén tu cuerpo recto y core activado durante todo el movimiento. Baja hasta que tu pecho esté cerca del suelo (o tan lejos como sea cómodo) y empuja sin bloquear los codos. Inhala al bajar, exhala al empujar. Comienza sobre las rodillas o contra una pared si una flexión completa es muy desafiante.",
+    "exercise_references": ["Healthline – Benefits of Push-ups; https://www.healthline.com/health/fitness-exercise/pushups-everyday", "MedicalNewsToday – Push-up Risks; https://www.medicalnewstoday.com/articles/326149"]
   },
   "squats": {
     "name": "Sentadillas",
-    "description": "Flexiona las rodillas para bajar y vuelve a ponerte de pie"
+    "description": "Flexiona las rodillas para bajar y vuelve a ponerte de pie",
+    "benefits": "Fortalece cuádriceps, glúteos, isquiotibiales y core. Mejora la movilidad de cadera y tobillo. Movimiento funcional que ayuda en actividades diarias como levantarse de sillas. Puede ayudar a aumentar la densidad ósea.",
+    "limitations": "Requiere buena movilidad de tobillo y cadera para hacerse correctamente. Personas con lesiones de rodilla deben modificar la profundidad. La mala forma puede causar dolor de rodilla o espalda baja.",
+    "best_timing": "Excelente para calentamientos o como ejercicio principal de piernas. Ideal 2-3 veces por semana con descanso entre sesiones. También efectivo para activación de glúteos antes de otros ejercicios de piernas.",
+    "suggested_combinations": ["lunges", "glute-bridges", "calf-raises"],
+    "notes": "Mantén el pecho erguido y el peso en los talones. Baja como si te fueras a sentar en una silla. Las rodillas deben seguir la dirección de los pies. Comienza con peso corporal antes de agregar resistencia.",
+    "exercise_references": ["Mayo Clinic – Squat Exercise; https://www.mayoclinic.org/healthy-lifestyle/fitness/multimedia/squat/vid-20084642", "ACE Fitness – Squat Technique; https://www.acefitness.org/resources/everyone/exercise-library/135/bodyweight-squat/"]
   },
   "lunges": {
     "name": "Zancadas",
-    "description": "Paso al frente y baja el cuerpo, alternando las piernas"
+    "description": "Paso al frente y baja el cuerpo, alternando las piernas",
+    "benefits": "Fortalece cuádriceps, glúteos e isquiotibiales unilateralmente, corrigiendo desequilibrios. Mejora el equilibrio, coordinación y estabilidad. Movimiento funcional que imita patrones de caminar y subir escaleras.",
+    "limitations": "Puede ser desafiante para el equilibrio en principiantes. Personas con problemas de rodilla deben limitar la profundidad. Requiere espacio suficiente para el paso hacia adelante.",
+    "best_timing": "Ideal después de un calentamiento adecuado como parte del entrenamiento de piernas. Efectivo 2-3 veces por semana. También útil para calentamientos dinámicos antes de deportes.",
+    "suggested_combinations": ["squats", "glute-bridges", "single-leg-stand"],
+    "notes": "Mantén el torso erguido y da un paso lo suficientemente largo. La rodilla trasera debe casi tocar el suelo. La rodilla delantera no debe pasar por encima del pie. Alterna las piernas o completa todas las repeticiones de un lado antes de cambiar.",
+    "exercise_references": ["Healthline – Lunge Benefits; https://www.healthline.com/health/fitness/lunges-muscles-worked", "ACE Fitness – Lunge Variations; https://www.acefitness.org/resources/everyone/exercise-library/47/forward-lunge/"]
   },
   "wall-sit": {
     "name": "Sentadilla en pared",
-    "description": "Deslízate por la pared hasta dejar los muslos paralelos al suelo y mantén"
+    "description": "Deslízate por la pared hasta dejar los muslos paralelos al suelo y mantén",
+    "benefits": "Desarrolla resistencia muscular en cuádriceps y glúteos. Mejora la estabilidad de la rodilla y fortalece el core. Ejercicio isométrico que no requiere equipo y es seguro para la mayoría de personas.",
+    "limitations": "Puede ser muy desafiante para principiantes mantener la posición. Personas con problemas de espalda baja deben ser cautelosas. Mantener por más de 2-3 minutos puede no ofrecer beneficios adicionales.",
+    "best_timing": "Excelente para el final de un entrenamiento de piernas o como desafío isométrico independiente. Efectivo 2-3 veces por semana. También útil durante descansos en la oficina para activar las piernas.",
+    "suggested_combinations": ["squats", "lunges", "calf-raises"],
+    "notes": "Mantén la espalda plana contra la pared y los muslos paralelos al suelo. Los pies deben estar separados al ancho de los hombros. Respira normalmente durante la posición. Comienza con tiempos más cortos (20-30 segundos).",
+    "exercise_references": ["ACE Fitness – Wall Sit Exercise; https://www.acefitness.org/resources/everyone/exercise-library/156/wall-sit/", "WebMD – Isometric Exercises; https://www.webmd.com/fitness-exercise/features/isometric-exercises"]
   },
   "burpees": {
     "name": "Burpees",
-    "description": "Sentadilla, salto a plancha, flexión, regreso y salto vertical"
+    "description": "Sentadilla, salto a plancha, flexión, regreso y salto vertical",
+    "benefits": "Ejercicio de cuerpo completo que combina fuerza y cardio. Mejora la resistencia cardiovascular, fuerza funcional y coordinación. Quema muchas calorías en poco tiempo y mejora la capacidad anaeróbica.",
+    "limitations": "Muy intenso y puede ser abrumador para principiantes. Alto impacto puede ser problemático para articulaciones. La fatiga puede llevar a mala forma y riesgo de lesión. No recomendado para personas con problemas cardíacos sin supervisión médica.",
+    "best_timing": "Ideal para entrenamientos HIIT o como finalizador de entrenamiento. Mejor hacerlos cuando estés bien calentado pero no al final cuando estés muy fatigado. Limitar a 2-3 veces por semana debido a la intensidad.",
+    "suggested_combinations": ["mountain-climbers", "jumping-jacks", "high-knees"],
+    "notes": "Mantén buena forma en cada componente del movimiento. Modifica eliminando el salto o la flexión si es necesario. Enfócate en el control sobre la velocidad. Descansa cuando la forma se deteriore.",
+    "exercise_references": ["Healthline – Burpee Benefits; https://www.healthline.com/health/fitness/burpees-muscles-worked", "Mayo Clinic – High-Intensity Workouts; https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/interval-training/art-20044588"]
   },
   "jumping-jacks": {
     "name": "Saltos de tijera",
-    "description": "Abre y cierra piernas y brazos con saltos"
+    "description": "Separa los pies mientras elevas los brazos y luego vuelve a juntarlos con un salto",
+    "benefits": "Ejercicio cardiovascular sencillo pero eficaz de cuerpo completo. Los jumping jacks elevan la frecuencia cardíaca, queman calorías y pueden mejorar la resistencia aeróbica. Involucran las piernas (gemelos, muslos) y los hombros, y con el tiempo incluso pueden ayudar a la densidad ósea debido al impacto del salto. También mejoran la coordinación al mover brazos y piernas al mismo tiempo.",
+    "limitations": "Al ser un movimiento de alto impacto, puede agravar problemas de rodilla o tobillo si se hace en exceso o sobre una superficie dura. Si tienes dolor articular, realiza una versión de menor impacto dando pasos laterales en lugar de saltar. Usa calzado con buena sujeción y entrena sobre una superficie que absorba impactos para proteger tus articulaciones. Quienes tengan un nivel de condición muy bajo deberían empezar con series cortas, ya que pueden ser más exigentes de lo que parece.",
+    "best_timing": "Ideal como calentamiento para activar la circulación o como parte de un circuito de cardio. Se pueden hacer en ráfagas cortas (p. ej., series de 30 segundos) entre ejercicios de fuerza para mantener alta la frecuencia cardíaca. También útiles como breves pausas activas durante el día para recargar energía.",
+    "suggested_combinations": ["high-knees", "butt-kicks"],
+    "notes": "Aterriza de forma suave sobre las puntas de los pies para reducir el impacto. Mantén las rodillas ligeramente flexionadas al caer para que actúen como amortiguadores. Busca un ritmo constante y un rango completo de movimiento (manos tocándose por encima de la cabeza, pies bien separados en cada salto). Respira de forma regular; exhala cuando se separen brazos y piernas.",
+    "exercise_references": ["Healthline – Benefits of Jumping Jacks; https://www.healthline.com/health/fitness-exercise/jumping-jacks", "Healthline – Jumping Jacks Risks; https://www.healthline.com/health/fitness-exercise/jumping-jacks"]
   },
   "high-knees": {
     "name": "Rodillas altas",
-    "description": "Corre en el sitio elevando las rodillas a la altura de la cadera"
+    "description": "Corre en el sitio elevando las rodillas a la altura de la cadera",
+    "benefits": "Un ejercicio cardiovascular de ritmo rápido que eleva la frecuencia cardíaca y mejora la potencia del tren inferior. Las rodillas altas activan flexores de cadera, cuádriceps, isquiotibiales, gemelos y glúteos, desarrollando resistencia muscular y coordinación. También fortalecen el core (manteniéndote erguido) y pueden mejorar la velocidad y la técnica de carrera al entrenar una elevación de rodilla más marcada.",
+    "limitations": "Es un ejercicio de alto impacto (básicamente correr en el sitio), por lo que puede sobrecargar tobillos o tibias si se hace sobre una superficie muy dura. Usa calzado con buena amortiguación y, si es posible, elige un suelo más blando. Si tienes problemas de equilibrio o eres totalmente principiante, empieza marchando en el sitio para progresar. Mantén siempre una buena postura; no te eches hacia atrás, ya que podría tensar la zona lumbar.",
+    "best_timing": "Se usa a menudo en calentamientos de deportes o carreras para activar las piernas, o como bloque de cardio dentro de un circuito. Puedes hacer rodillas altas por tiempos (p. ej., 30 segundos) o por distancias (si te desplazas). Encajan muy bien en entrenamientos HIIT (p. ej., intervalos Tabata) por su alta intensidad.",
+    "suggested_combinations": ["butt-kicks", "jumping-jacks"],
+    "notes": "Mantén la espalda recta y el core activo mientras elevas las rodillas hasta la altura de la cintura o más. Bombea los brazos en sincronía con las piernas (brazo contrario a pierna). Busca una cadencia rápida y elástica, aterrizando en las puntas de los pies. Empieza más lento y aumenta la velocidad a medida que ganes confianza.",
+    "exercise_references": ["Healthline – High Knees Benefits; https://www.healthline.com/health/fitness/high-knees-benefits", "Healthline – When to Do High Knees; https://www.healthline.com/health/fitness/high-knees-benefits"]
   },
   "butt-kicks": {
     "name": "Talones a glúteos",
-    "description": "Corre en el sitio llevando los talones hacia los glúteos"
+    "description": "Corre en el sitio llevando los talones hacia los glúteos",
+    "benefits": "Se centra en los isquiotibiales al llevar los talones hacia arriba. Los talones a glúteos actúan como estiramiento dinámico de los cuádriceps y activación de los isquiotibiales, mejorando su flexibilidad y fuerza. Como las rodillas altas, también es un movimiento cardiovascular que eleva la frecuencia cardíaca y calienta el cuerpo. La práctica regular puede ayudar a la técnica de carrera al fomentar una recuperación del talón más rápida bajo el cuerpo.",
+    "limitations": "Mantén una postura erguida; evita inclinarte demasiado hacia delante para no tensar la zona lumbar. Si tienes problemas de rodilla, realiza el movimiento con suavidad (no fuerces a que el talón toque el glúteo). Quienes tengan cuádriceps muy tensos deben progresar gradualmente para evitar tirones. Como ejercicio de menor impacto, suele ser seguro, pero si el equilibrio es un problema, hazlo marchando en el sitio en lugar de saltar rápido.",
+    "best_timing": "Se incluye comúnmente en rutinas de calentamiento para correr o deportes, después de rodillas altas o alternándolas. También encaja en circuitos de cardio. Por ejemplo, puedes hacer 30 segundos de talones a glúteos entre ejercicios de fuerza para mantener la frecuencia cardíaca elevada. Es eficaz hacerlos después de rodillas altas para trabajar grupos musculares opuestos.",
+    "suggested_combinations": ["high-knees", "jumping-jacks"],
+    "notes": "Intenta llevar los talones hasta los glúteos (o lo más cerca que permita tu flexibilidad) con un movimiento fluido. Mantén las rodillas apuntando hacia el suelo (no hacia delante) para enfatizar los isquiotibiales. Balancea los brazos de forma natural para mantener el ritmo. Respira de forma constante y encuentra una cadencia que controles sin tropezar.",
+    "exercise_references": ["MasterClass – Butt Kicks Benefits; https://www.masterclass.com/articles/butt-kicks-guide", "Spotebi – Butt Kicks Warm-Up; https://www.spotebi.com/exercise-guide/butt-kicks/"]
   },
   "downward-dog": {
     "name": "Perro boca abajo",
-    "description": "Forma una V invertida con manos y pies en el suelo"
+    "description": "Forma una V invertida con manos y pies en el suelo",
+    "benefits": "Postura básica de yoga que estira toda la cadena posterior. Perro boca abajo alarga isquiotibiales y gemelos, abre hombros y pecho, y la tracción de la columna ayuda a aliviar la tensión de la espalda. También fortalece brazos y hombros al soportar parte del peso corporal, y mejora la circulación al tener la cabeza ligeramente por debajo del corazón (inversión suave).",
+    "limitations": "Quienes tengan isquiotibiales u hombros muy tensos pueden encontrarla exigente; está bien flexionar levemente rodillas y codos para mantener la espalda recta. Si tienes molestias en las muñecas, puedes hacer la postura sobre antebrazos (Delfín) o apoyar las manos en bloques. Las personas con hipertensión no controlada o glaucoma deben ser cautas con las inversiones. Sal de la postura si sientes mareo o dolor agudo.",
+    "best_timing": "Se usa a menudo en secuencias de yoga como postura de transición o de descanso entre flujos. En fitness general, puede incluirse en el enfriamiento para estirar la cadena posterior. Es beneficiosa por la mañana para aliviar rigidez, o después de entrenamientos de piernas o espalda.",
+    "suggested_combinations": ["child-pose", "forward-fold"],
+    "notes": "Presiona firmemente las palmas en el suelo con los dedos abiertos para distribuir el peso y aliviar las muñecas. Eleva las caderas hacia arriba y atrás e intenta acercar los talones al suelo (no pasa nada si no tocan). Mantén la cabeza entre los brazos y la columna larga inclinando la pelvis hacia arriba. Respira profundo y calmado mientras sostienes la postura.",
+    "exercise_references": ["Yoga Journal – Downward Dog Benefits; https://www.yogajournal.com/poses/downward-facing-dog/", "Yoga15 – Downward Dog Benefits; https://yoga15.com/poses/downward-dog/"]
   },
   "child-pose": {
     "name": "Postura del niño",
-    "description": "Arrodíllate, siéntate sobre los talones y estira los brazos hacia delante"
+    "description": "Arrodíllate, siéntate sobre los talones y estira los brazos hacia delante",
+    "benefits": "Postura suave y reparadora que estira la zona lumbar, caderas, muslos y tobillos. Ayuda a relajar cuerpo y mente activando el sistema nervioso parasimpático (fomenta el alivio del estrés y un mejor sueño). Puede aliviar la presión lumbar al alargar la columna y se usa a menudo como postura de descanso o calma en yoga.",
+    "limitations": "Si tienes problemas de rodilla, separa más las rodillas o coloca un cojín bajo las caderas para reducir la presión. Quienes tengan movilidad de tobillos limitada pueden notar molestias; una toalla enrollada bajo los tobillos puede ayudar. Embarazadas o personas con abdomen voluminoso deben separar más las rodillas para evitar compresión. En general es segura; evita forzar los glúteos hasta los talones si causa dolor.",
+    "best_timing": "Se usa con frecuencia como postura de recuperación durante sesiones de yoga (p. ej., entre secuencias exigentes). También es excelente después del ejercicio o antes de dormir para relajar espalda y caderas. Puedes incluirla al final del entrenamiento durante el enfriamiento o cuando necesites estirar y descomprimir suavemente la columna.",
+    "suggested_combinations": ["downward-dog", "cat-cow"],
+    "notes": "Apoya la frente en el suelo (o en un cojín) y respira profundamente hacia el abdomen. Puedes extender brazos hacia delante para estirar hombros o dejarlos a los lados para una posición más relajada. Con cada exhalación, imagina el torso acercándose al suelo, soltando tensión. Mantén la postura el tiempo que necesites: se trata de relajarse, no hay un tiempo fijo.",
+    "exercise_references": ["Cleveland Clinic – Child's Pose Benefits; https://health.clevelandclinic.org/childs-pose", "Verywell Health – Child's Pose for Back Pain; https://www.verywellhealth.com/childs-pose-for-low-back-pain-2564776"]
   },
   "cat-cow": {
     "name": "Gato-vaca",
-    "description": "Arquea y redondea la espalda alternativamente a cuatro apoyos"
+    "description": "Arquea y redondea la espalda alternativamente a cuatro apoyos",
+    "benefits": "Moviliza suavemente la columna, aumentando la flexibilidad y aliviando la tensión en espalda y cuello. Gato-vaca mejora la conciencia del movimiento vertebral y puede mejorar la postura al entrenar cada vértebra. También promueve el flujo sanguíneo a los músculos de la columna y activa el core de forma suave y controlada. Suele usarse para aliviar la rigidez por la mañana o antes de actividades más intensas.",
+    "limitations": "Es un movimiento de muy bajo riesgo. Sin embargo, si tienes lesión espinal o dolor intenso, muévete solo en rangos sin dolor. Está bien redondear la espalda en Gato y arquear en Vaca, pero sin forzar. Quienes tengan molestias en las muñecas pueden hacerlo sobre puños o adelantando un poco las manos. Recuerda moverte despacio y respirar; hacerlo con prisa reduce la efectividad del estiramiento.",
+    "best_timing": "Excelente en el calentamiento (para aflojar espalda y cuello) o en el enfriamiento para relajar. Puedes hacerlo a primera hora para activar suavemente la columna o en pausas de trabajos prolongados sentado. Es un básico en yoga, normalmente al inicio para calentar la columna.",
+    "suggested_combinations": ["child-pose", "downward-dog"],
+    "notes": "Coordina con la respiración: normalmente inspiras en Vaca (arqueando y mirando arriba) y espiras en Gato (redondeando y metiendo la barbilla). Ve despacio e intenta articular cada segmento de la columna en secuencia. Abre los dedos y presiona con las manos para activar los estabilizadores del hombro. Prioriza la calidad del movimiento sobre la intensidad.",
+    "exercise_references": ["Men's Health – Cat-Cow Benefits; https://www.menshealth.com/fitness/a39438579/cat-cow/", "Yoga Journal – Cat-Cow Pose; https://www.yogajournal.com/poses/cow-cat/"]
   },
   "single-leg-stand": {
     "name": "Equilibrio a una pierna",
-    "description": "Manténte de pie sobre una pierna y luego cambia"
+    "description": "Mantente de pie sobre una pierna y luego cambia",
+    "benefits": "Ejercicio fundamental de equilibrio que mejora la propiocepción y la estabilidad del tobillo. La práctica regular puede mejorar el equilibrio general y reducir el riesgo de caídas al fortalecer los músculos alrededor de tobillos, rodillas y caderas que te mantienen erguido. También activa el core, ya que debes estabilizar el tronco sobre una sola pierna. Incluso hay investigaciones que sugieren que un mejor equilibrio a una pierna se correlaciona con mayor esperanza de vida (probablemente reflejando la salud global).",
+    "limitations": "Por seguridad, colócate cerca de un apoyo (pared o silla) al principio por si pierdes el equilibrio. Si tienes problemas importantes de equilibrio o afecciones neurológicas, consulta con un profesional. Es un ejercicio suave, pero evita hacerlo con los ojos cerrados o sobre superficies inestables hasta dominar la postura. Practica siempre con ambas piernas para un desarrollo equilibrado.",
+    "best_timing": "Puede hacerse a diario como parte de una rutina de equilibrio o rehabilitación (por ejemplo, mientras te cepillas los dientes o esperas). En entrenamientos, puede ser parte del calentamiento (para activar estabilizadores) o de circuitos. Muchos programas de fisioterapia lo incluyen para que las personas mayores mantengan la estabilidad.",
+    "suggested_combinations": ["tree-pose", "warrior-3"],
+    "notes": "Fija la vista en un punto al frente (drishti) para ayudar al equilibrio. Mantén una ligera flexión en la rodilla de apoyo y activa el core. Evita que el arco del pie colapse; “agarra” el suelo ligeramente con los dedos. A medida que mejores, progresa manteniendo más tiempo o moviendo la pierna/brazos libres para aumentar el desafío.",
+    "exercise_references": ["Cleveland Clinic – Balance Exercise Importance; https://health.clevelandclinic.org/balance-exercises", "PubMed – Single Leg Balance Training Review; https://pubmed.ncbi.nlm.nih.gov/34045951/"]
   },
   "tree-pose": {
     "name": "Postura del árbol",
-    "description": "De pie en una pierna, coloca el pie contrario en la cara interna del muslo"
+    "description": "De pie en una pierna, coloca el pie contrario en la cara interna del muslo",
+    "benefits": "Postura clásica de equilibrio en yoga que desarrolla la estabilidad sobre una sola pierna y la concentración. Fortalece la pierna de apoyo (tobillo, gemelo, muslo), el core y los estabilizadores de cadera. La pierna elevada abre la cadera de ese lado, mejorando su flexibilidad. A nivel mental, fomenta la concentración y la sensación de enraizamiento.",
+    "limitations": "Evita presionar el pie contra la rodilla de la pierna de apoyo; colócalo por debajo o por encima de la rodilla para no forzarla. Si te cuesta equilibrarte, empieza con el pie más abajo (tobillo o gemelo) y/o practica cerca de una pared. Quienes tengan inestabilidad de tobillo deben ser cautos; pueden hacer una versión modificada con los dedos del pie elevado tocando el suelo. Como en cualquier postura de equilibrio, sal de ella lentamente si empiezas a perderla para evitar caídas.",
+    "best_timing": "Suele realizarse en la parte media de una rutina de yoga entre otras posturas de pie. Es útil cuando ya estás algo caliente pero no fatigado. También puedes usarla fuera del yoga —por ejemplo, tras correr o entrenar piernas— para trabajar el equilibrio y la apertura de caderas durante el enfriamiento.",
+    "suggested_combinations": ["single-leg-stand", "warrior-3"],
+    "notes": "Presiona activamente el pie elevado contra la pierna de apoyo y viceversa para crear estabilidad. Mantén la pierna de apoyo estirada pero sin bloquear. Busca un punto fijo para la mirada. Coloca las manos al pecho (namasté) o elévalas por encima de la cabeza cuando estés estable. Respira profundo; el equilibrio mejora cuando mantienes la calma y respiras.",
+    "exercise_references": ["Yoga15 – Tree Pose Benefits; https://yoga15.com/poses/tree-pose/", "Sri Sri Yoga – Tree Pose Benefits; https://srisrischoolofyoga.org/blog/tree-pose-vrksasana"]
   },
   "warrior-3": {
     "name": "Guerrero III",
-    "description": "Equilíbrate en una pierna con la otra extendida hacia atrás"
+    "description": "Equilíbrate en una pierna con la otra extendida hacia atrás",
+    "benefits": "Postura avanzada de equilibrio que fortalece toda la cadena posterior (espalda, glúteos, isquiotibiales) además del core y los hombros. Guerrero III mejora notablemente el equilibrio y la coordinación al mantener el torso paralelo al suelo sobre una sola pierna. Estira el isquiotibial de la pierna de apoyo y requiere activar la musculatura de la espalda para mantener el pecho elevado. En conjunto, construye fuerza del core y compromiso de la parte posterior a la vez que afina el enfoque.",
+    "limitations": "Es una postura exigente; los principiantes deben usar una pared o bloques bajo las manos para aprender el equilibrio. Mantén el cuello neutro (sin forzarlo hacia arriba) para evitar tensión cervical. Si tienes problemas lumbares, sé prudente con la inclinación hacia delante: activa el core para evitar que el tronco ceda. Está bien mantener una ligera flexión en la rodilla de apoyo para aliviar la tensión del isquiotibial. Sal de la postura si tu forma se colapsa, ya que continuar inestable puede provocar una caída.",
+    "best_timing": "Suele formar parte de flujos de yoga después de posturas como Guerrero I o II, cuando las piernas ya están calientes. Lo mejor es hacerla cuando no estés muy fatigado, quizá al principio de la sesión para desafiar el equilibrio con energía. En fitness general, inclúyela después de posturas más sencillas (como Árbol) como reto máximo de equilibrio.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Mantén las caderas niveladas; evita abrir la cadera de la pierna elevada hacia arriba. Apunta los dedos del pie elevado hacia el suelo y alarga activamente a través del talón. Extiende los brazos al frente (o a los lados) en línea con el torso para equilibrarte. Imagina una línea recta de las puntas de los dedos (o cabeza) al talón. Es normal tambalearse; reinicia y vuelve a intentarlo, enfocándote en activar core y piernas.",
+    "exercise_references": ["Yoga Journal – Warrior III Benefits; https://www.yogajournal.com/poses/warrior-iii-pose/", "Hugger Mugger – Warrior III Core Strength; https://www.huggermugger.com/blog/warrior-iii-balance"]
   },
   "dead-bug": {
     "name": "Bicho muerto",
-    "description": "Boca arriba, extiende brazo y pierna opuestos alternando"
+    "description": "Boca arriba, extiende brazo y pierna opuestos alternando",
+    "benefits": "Muy eficaz para la estabilización del core. El dead bug te enseña a mantener las costillas bajas y la zona lumbar pegada al suelo mientras mueves brazos y piernas, fortaleciendo los músculos profundos que protegen la columna. Mejora la coordinación entre extremidades opuestas (control neuromuscular) y puede aliviar molestias lumbares al entrenar la alineación adecuada durante el movimiento. En general, construye una base sólida y estable para otros ejercicios.",
+    "limitations": "En general es muy seguro. El error principal es permitir que la zona lumbar se despegue del suelo; si no puedes mantenerla abajo, limita el rango de movimiento o flexiona más las rodillas. Si notas tensión en el cuello, apóyalo en una almohadilla o toalla pequeña. Quienes tengan dolor lumbar severo deben empezar con cautela y quizá mover una sola extremidad a la vez hasta fortalecer el core.",
+    "best_timing": "Úsalo al inicio de una rutina de core o como parte del calentamiento para activar el centro antes de ejercicios más pesados. También se incluye a menudo en fisioterapia o rutinas para principiantes por su seguridad y efectividad. Hacer 2–3 series varias veces por semana puede mejorar notablemente la estabilidad del core con el tiempo.",
+    "suggested_combinations": ["plank", "glute-bridges"],
+    "notes": "Concéntrate en presionar la zona lumbar contra el suelo durante todo el ejercicio. Muévete despacio: extiende brazo y pierna contrarios hasta justo antes de que la espalda quiera arquearse, vuelve al centro y cambia. Exhala al extender para ayudar a activar el transverso. Empieza con rangos más cortos y aumenta gradualmente a medida que te hagas más fuerte.",
+    "exercise_references": ["Healthline – Dead Bug for Core Stability; https://www.healthline.com/health/dead-bug-exercise", "Nike – Dead Bug Purpose; https://www.nike.com/a/dead-bug-exercise"]
   },
   "glute-bridges": {
     "name": "Puente de glúteos",
-    "description": "Boca arriba, eleva la cadera contrayendo los glúteos"
+    "description": "Boca arriba, eleva la cadera contrayendo los glúteos",
+    "benefits": "Aísla y fortalece los glúteos, a menudo infrautilizados por pasar mucho tiempo sentado. Unos glúteos fuertes favorecen una mejor alineación pélvica y pueden aliviar dolor lumbar al descargar la columna. El puente de glúteos también activa isquiotibiales y core, siendo un gran ejercicio de la cadena posterior. Mejora la extensión de cadera, lo que beneficia la postura y movimientos atléticos (como saltar y correr).",
+    "limitations": "Si hiperextiendes (arcas) la zona lumbar en la parte alta, puedes sentir molestias; céntrate en contraer glúteos, no en arquear la espalda. Quienes tengan flexores de cadera muy tensos pueden encontrar difícil elevar mucho las caderas; estirarlos suavemente antes puede ayudar. Es de bajo impacto, pero quienes tengan ciertas afecciones de columna deben evitar el dolor. No empujes la cabeza contra el suelo; la fuerza debe ir por hombros y pies.",
+    "best_timing": "A menudo se usa hacia el final de una rutina de piernas o dentro de una de core. Es un buen calentamiento para ejercicios que requieren glúteos activos (como sentadillas o carrera). En rehabilitación o rutinas para principiantes, puede ser un ejercicio principal 3–4 veces por semana; en programas de fuerza, 1–2 veces como accesorio.",
+    "suggested_combinations": ["dead-bug", "lunges"],
+    "notes": "La colocación de los pies cambia el énfasis: más cerca de los glúteos, más trabajo de glúteos; más lejos, más isquiotibiales. Mantén las rodillas al ancho de las caderas y evita que se abran o colapsen. Haz una pausa arriba para maximizar la contracción y baja lentamente. Empuja a través de los talones; incluso puedes levantar ligeramente los dedos para enfatizarlo.",
+    "exercise_references": ["Elite Chiro Sport – Glute Bridge Benefits; https://elitechirosport.com/home-rehab-glute-bridge", "Coast Performance – Calf Raises & Posterior Chain; https://coastperformancerehab.com/calf-exercises-save-feet-ankles/"]
   },
   "finger-roll": {
     "name": "Rodar de dedos",
-    "description": "Rueda los dedos de puño a extensión completa, uno por uno"
+    "description": "Rueda los dedos de puño a extensión completa, uno por uno",
+    "benefits": "Aumenta la flexibilidad y la circulación en dedos y manos. Los “finger rolls” ayudan a mantener el rango de movimiento en las articulaciones de los dedos y pueden mejorar la destreza y la coordinación. Útiles para calentar las manos antes de tareas de motricidad fina o para aliviar rigidez tras largos periodos frente al ordenador. Con el tiempo, pueden mantener las manos ágiles y reducir el riesgo de problemas como la tendinitis al trabajar suavemente los tendones.",
+    "limitations": "Prácticamente sin riesgo si se realiza con suavidad. Evita chasquidos bruscos o movimientos rápidos; el ejercicio debe ser fluido. Si tienes artritis o mucha rigidez, muévete despacio y en agua tibia para facilitar el movimiento articular. Detente si sientes dolor agudo en alguna articulación.",
+    "best_timing": "Excelente como rutina diaria de salud de las manos —por la mañana o en descansos del trabajo—. También antes de actividades que requieran flexibilidad de dedos (teclear, tocar un instrumento, escalada, etc.). Encaja al inicio de un calentamiento de tren superior o al final como enfriamiento para las manos.",
+    "suggested_combinations": [],
+    "notes": "Hazlo despacio: empieza con el puño cerrado, despliega gradualmente un dedo tras otro hasta abrir la mano por completo, separando los dedos, y vuelve a cerrar. Puedes cambiar el orden de extensión cada vez. Respira con normalidad e intenta relajar la mano mientras te mueves. Es una buena oportunidad para practicar atención plena, enfocándote en las sensaciones de cada dedo.",
+    "exercise_references": ["WebMD – Hand and Finger Exercise Benefits; https://www.webmd.com/osteoarthritis/ss/slideshow-hand-finger-exercises", "USC Verdugo – Hand Exercises for Flexibility; https://uscvhh.org/5-hand-exercises-to-help-you-maintain-your-dexterity-flexibility/"]
   },
   "tricep-dips": {
     "name": "Fondos de tríceps",
-    "description": "Baja y sube el cuerpo usando los brazos apoyado en un borde"
+    "description": "Baja y sube el cuerpo usando los brazos apoyado en un borde",
+    "benefits": "Trabajan principalmente los tríceps en la parte posterior del brazo, contribuyendo a unos brazos más fuertes y tonificados. Los fondos también implican el pecho y los hombros anteriores como músculos secundarios. Ayudan a mejorar la fuerza de empuje del tren superior y pueden hacerse casi en cualquier lugar con una silla o banco estable. Con el tiempo, mejoran la definición del brazo y la fuerza funcional para movimientos de empuje (como incorporarse desde sentado).",
+    "limitations": "Los fondos en banco pueden cargar la articulación del hombro por la posición de los brazos detrás del cuerpo. No bajes demasiado; detente cuando los codos estén alrededor de 90° para reducir el riesgo. Si sientes dolor en la parte anterior del hombro, reduce el rango o detén el ejercicio. Mantén los hombros abajo (sin encoger) y cerca del cuerpo. Quienes tengan antecedentes de problemas de hombro deben ser cautos o elegir otro ejercicio de tríceps.",
+    "best_timing": "A menudo se incluyen después de ejercicios compuestos de pecho (flexiones o press) para trabajar más los tríceps. También pueden formar parte de un circuito con peso corporal. Como fatigan rápido los brazos, es común hacerlos temprano en una sesión de tren superior, pero asegúrate de calentar. Evita hacerlos pesados cuando los hombros ya estén exhaustos para mantener la técnica.",
+    "suggested_combinations": ["push-ups", "plank"],
+    "notes": "Coloca las manos en el borde del banco o silla, dedos hacia delante, y mantén las caderas cerca del borde al bajar (reduce la tensión del hombro). Mantén los codos apuntando hacia atrás (sin abrirlos). Inhala al bajar y exhala al subir. Para facilitar, flexiona las rodillas y acerca los pies; para dificultar, estira las piernas o eleva los pies.",
+    "exercise_references": ["Verywell Fit – Triceps Dips Precautions; https://www.verywellfit.com/how-to-do-triceps-dips-3498339", "American Council on Exercise – Triceps Dips Muscles; https://www.acefitness.org/education-and-resources/lifestyle/exercise-library/44/triceps-dips/"]
   },
   "calf-raises": {
     "name": "Elevaciones de pantorrilla",
-    "description": "Súbete a las puntas de los pies, mantén y baja"
+    "description": "Súbete a las puntas de los pies, mantén y baja",
+    "benefits": "Fortalece los músculos de la pantorrilla (gastrocnemio y sóleo), responsables de la flexión plantar. Unas pantorrillas fuertes mejoran la estabilidad del tobillo y el equilibrio, reduciendo el riesgo de esguinces. También aportan mejor impulso al caminar, correr y saltar. Las elevaciones regulares aumentan la resistencia muscular en la parte inferior de las piernas y pueden ayudar a prevenir lesiones del tendón de Aquiles al acondicionarlo junto con los músculos.",
+    "limitations": "Por lo general es un ejercicio seguro y de bajo impacto. Sin embargo, rebotar abajo o hacer repeticiones muy rápidas puede tensionar el tendón de Aquiles; realiza el movimiento de forma controlada. Quienes tengan pantorrillas muy tensas deben incluir estiramientos, ya que fortalecer sin estirar puede aumentar la rigidez. Si aparece un calambre, detente y estira suavemente antes de continuar. Personas con tendinopatía aquílea deberían empezar con cautela (por ejemplo, enfatizando bajadas excéntricas lentas).",
+    "best_timing": "Pueden hacerse al final de una rutina de piernas o de forma independiente varias veces por semana. Son fáciles de integrar —por ejemplo, haciendo series sujetándote a una encimera—. Corredores o ciclistas suelen incluirlas en el enfriamiento para fortalecer las pantorrillas. Hacerlas día sí, día no suele ser adecuado, ajustando la frecuencia si notas mucha fatiga.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Recorre todo el rango: eleva los talones lo más alto posible, haz una breve pausa arriba y baja hasta sentir estiramiento en los gemelos. Movimiento fluido, sin rebotes. Para mejorar el equilibrio, puedes tocar ligeramente una pared o sujetarte a una silla. Al progresar, prueba con una sola pierna o añade peso.",
+    "exercise_references": ["Women's Health – Calf Raises & Balance; https://www.womenshealthmag.com/fitness/a19985985/calf-raises-benefits/", "American Sports & Fitness – Calf Raises Benefits; https://www.americansportandfitness.com/blogs/fitness-blog/benefits-of-calf-raises"]
   },
   "russian-twists": {
     "name": "Giros rusos",
-    "description": "Sentado con pies elevados, rota el torso de lado a lado"
+    "description": "Sentado con pies elevados, rota el torso de lado a lado",
+    "benefits": "Trabaja con intensidad los oblicuos, ayudando a tonificar los laterales del abdomen y mejorar la fuerza rotacional. Los giros rusos también activan el transverso y la parte baja de la espalda para estabilizar la columna al rotar, contribuyendo a un core más fuerte. Son útiles para deportistas por su transferencia a gestos rotacionales (como golpear con un bate o un palo de golf). Hechos con control, pueden mejorar la movilidad de la columna y la resistencia del core.",
+    "limitations": "Rotar con la zona lumbar redondeada o con demasiado peso puede tensionar la columna o los discos. Mantén la espalda a ~45° y el pecho alto durante el giro. Si tienes antecedentes de problemas lumbares, evita añadir peso y mantén el movimiento pequeño y lento. Algunos entrenadores desaconsejan este ejercicio en caso de osteoporosis o problemas discales por el estrés rotacional. Muévete siempre de forma deliberada, sin tirones.",
+    "best_timing": "Inclúyelos en una rutina abdominal o circuito, normalmente después de ejercicios base como planchas o crunches. Al implicar rotación, conviene hacerlos cuando el core ya está caliente. Suelen ir al final del entrenamiento como “quemador” del abdomen. Evítalos cuando tu zona lumbar esté muy fatigada (por ejemplo, tras peso muerto pesado) para mantener la técnica.",
+    "suggested_combinations": ["bicycle-crunches", "plank"],
+    "notes": "Mantén el core firme y muévete con control —toca con las manos o un peso a cada lado sin dejar que la inercia domine—. Para más estabilidad, puedes apoyar los talones (especialmente si eres principiante). Exhala en cada giro. Recuerda: prima la calidad del movimiento; mejor pocos giros lentos y controlados que muchas repeticiones rápidas.",
+    "exercise_references": ["Men's Health – Russian Twist Benefits; https://www.menshealth.com/fitness/a19548239/russian-twist/", "Les Mills – Russian Twist Caution; https://www.lesmills.com/nordic/fitness-knowledge/are-russian-twists-bad-for-you/"]
   },
   "bear-crawl": {
     "name": "Gateo del oso",
-    "description": "Avanza en manos y pies con las rodillas sin tocar el suelo"
+    "description": "Avanza en manos y pies con las rodillas sin tocar el suelo",
+    "benefits": "Ejercicio compuesto que desarrolla fuerza de todo el cuerpo y capacidad cardiovascular. El gateo del oso fortalece hombros y brazos (al soportar el cuerpo), el core (al estabilizar el tronco en movimiento) y las piernas, a la vez que entrena coordinación y agilidad. Es como una plancha en movimiento, exigiendo al core que evite la rotación mientras te desplazas, y eleva la frecuencia cardíaca, mejorando la resistencia. También es excelente para la estabilidad del hombro y la movilidad de cadera y tobillo cuando se realiza con buena técnica.",
+    "limitations": "Puede fatigar rápido; mantén la técnica incluso cansado. Si las rodillas empiezan a tocar el suelo o las caderas se hunden, descansa para evitar tensión lumbar. Quienes tengan dolor en las muñecas pueden gatear sobre puños o en paralelas para mantenerlas neutras. Asegura una espalda plana; no dejes caer la cabeza (para evitar tensión cervical). Al ir inclinado, personas con hipertensión o glaucoma deben vigilar si aparece mareo por la posición de la cabeza (aunque no es una inversión completa).",
+    "best_timing": "Se incluye a menudo en circuitos de alta intensidad o entrenamientos funcionales. Por ejemplo, puedes gatear de ida y vuelta en una sala como parte de un bootcamp. Sirve como bloque de cardio/condicionamiento al final del entrenamiento o en el calentamiento para activar varios grupos musculares. Es versátil: usa distancias cortas (10–20 m) o intervalos de tiempo (20–30 s) con descansos según necesites.",
+    "suggested_combinations": ["mountain-climbers", "burpees"],
+    "notes": "Mantén las rodillas cerca del suelo (unos centímetros) y la espalda plana. Mueve brazo y pierna opuestos a la vez, con control. Evita el balanceo lateral; activa los abdominales para estabilizar el torso. Mira ligeramente hacia delante para mantener el cuello neutro. Respira de forma continua; mucha gente contiene la respiración al gatear, así que recuérdate inhalar y exhalar regularmente.",
+    "exercise_references": ["BarBend – Bear Crawl Core Benefits; https://barbend.com/bear-crawl-exercise/", "Les Mills – Bear Crawl Benefits; https://www.lesmills.com/fit-business/fitness-management/add-bear-crawls-to-training/"]
   },
   "forward-fold": {
     "name": "Flexión hacia adelante",
-    "description": "De pie, inclínate hacia delante y alcanza los dedos de los pies"
+    "description": "De pie, inclínate hacia delante y alcanza los dedos de los pies",
+    "benefits": "Estiramiento calmante para la cadena posterior. La flexión de pie estira profundamente isquiotibiales, gemelos y zona lumbar. Descomprime suavemente la columna y puede aliviar la tensión en espalda y cuello. Las flexiones hacia delante tienen un efecto tranquilizador sobre el sistema nervioso: reducen el estrés y la ansiedad, dejando una sensación de arraigo y relajación. Además, la ligera inversión (cabeza por debajo del corazón) puede mejorar la circulación hacia el cerebro y el rostro.",
+    "limitations": "Evita rebotar; es más seguro mantener la postura o moverse de forma dinámica y lenta. Quienes tengan isquiotibiales tensos deben flexionar ligeramente las rodillas para evitar tensión o redondeo lumbar. Si tienes problemas de espalda o discos, inclínate desde la cadera con la espalda plana hasta notar estiramiento, en lugar de colapsar completamente hacia delante. Personas con hipertensión muy alta o glaucoma deben incorporarse lentamente para evitar mareos o picos de presión. Embarazadas deben ampliar la base para dar espacio al abdomen y no comprimirlo.",
+    "best_timing": "Excelente al final del entrenamiento durante el enfriamiento para estirar espalda y piernas. También útil en días de descanso o antes de dormir para liberar tensión. En yoga (Uttanasana), suele hacerse al principio (para evaluar sensaciones) y al final (para relajar) de la práctica. Incluso una breve pausa de flexión durante el trabajo puede ayudar a “resetear” la columna y calmar la mente.",
+    "suggested_combinations": ["downward-dog", "child-pose"],
+    "notes": "Relaja por completo el cuello y deja caer la cabeza al inclinarte. Distribuye el peso hacia las puntas de los pies (no solo en los talones) para un mejor estiramiento de isquiotibiales. Puedes agarrar codos opuestos y balancearte suavemente de lado a lado para liberar tensión extra. Respira lento y profundo; con cada exhalación, deja que el torso se acerque un poco más a los muslos. Para subir, activa el core y desenróllate despacio, vértebra a vértebra, para evitar mareos.",
+    "exercise_references": ["Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/", "YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx"]
   },
   "timeBased": {
     "name": "Basado en tiempo"

@@ -8,7 +8,8 @@ import type {
   VersionCheckResponse,
   TimerState,
   UpdateError,
-  UpdateRecoveryState
+  UpdateRecoveryState,
+  RecoveryAction
 } from '../types';
 import { UpdateErrorType } from '../types';
 import { consentService } from './consentService';
@@ -36,7 +37,7 @@ export class UpdateService {
   private eventListeners: Map<string, Set<(...args: unknown[]) => void>> = new Map();
   private timerStateRef: TimerState | null = null;
   private recoveryState: UpdateRecoveryState;
-  private emergencyCallbacks: Set<(error: { originalError?: Error; rollbackError?: Error; recoveryActions?: any[] }) => void> = new Set();
+  private emergencyCallbacks: Set<(error: { originalError?: Error; rollbackError?: Error; recoveryActions?: RecoveryAction[] }) => void> = new Set();
   private updateMetrics = {
     totalChecks: 0,
     lastCheckDuration: 0,
@@ -1554,14 +1555,14 @@ export class UpdateService {
   /**
    * Add emergency callback for critical errors
    */
-  public addEmergencyCallback(callback: (error: { originalError?: Error; rollbackError?: Error; recoveryActions?: any[] }) => void): void {
+  public addEmergencyCallback(callback: (error: { originalError?: Error; rollbackError?: Error; recoveryActions?: RecoveryAction[] }) => void): void {
     this.emergencyCallbacks.add(callback);
   }
 
   /**
    * Remove emergency callback
    */
-  public removeEmergencyCallback(callback: (error: { originalError?: Error; rollbackError?: Error; recoveryActions?: any[] }) => void): void {
+  public removeEmergencyCallback(callback: (error: { originalError?: Error; rollbackError?: Error; recoveryActions?: RecoveryAction[] }) => void): void {
     this.emergencyCallbacks.delete(callback);
   }
 

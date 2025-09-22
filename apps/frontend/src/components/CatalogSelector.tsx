@@ -125,7 +125,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                     src={catalog.pictureUrl}
                     alt={t(catalog.nameKey, { ns: 'catalogs' })}
                     className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
+                    loading="eager"
                     onError={() => handleImageError(catalog.id)}
                   />
                 ) : (
@@ -142,18 +142,18 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                 
                 {/* Content */}
                 <div className="relative z-10 p-2 sm:p-3 h-full flex flex-col justify-between">
-                  {/* Premium Badge */}
-                  {catalog.isPremium && (
-                    <div className="flex justify-end">
+                  {/* Premium Badge - Always reserve space */}
+                  <div className="flex justify-end">
+                    {catalog.isPremium && (
                       <span className="text-xs bg-yellow-400 text-black px-1.5 py-0.5 rounded-full font-semibold shadow-sm">
                         {t('common.premium', { defaultValue: 'PRO' })}
                       </span>
-                    </div>
-                  )}
-                  
+                    )}
+                  </div>
+
                   {/* Title */}
                   <div className="text-white">
-                    <h3 className={`font-semibold leading-tight ${isSelected ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'}`}>
+                    <h3 className={`font-semibold leading-tight text-center ${isSelected ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} ${!isSelected ? 'h-8 flex items-center justify-center' : ''}`}>
                       {t(catalog.nameKey, { ns: 'catalogs' })}
                     </h3>
                   </div>

@@ -1,5 +1,29 @@
 ## Unreleased
 
+## 2025-09-22 (UI/UX Improvements & Database Cleanup)
+
+### Fixed
+- **Translation System Regression**: Fixed critical issue where exercise detail section headers reverted to English instead of displaying in selected language
+  - **Root Cause**: Translation calls were using wrong namespace (`'exercises'` instead of `'exercise'`)
+  - **Resolution**: Corrected namespace usage for section headers (benefits, limitations, bestTiming, suggestedCombinations, notes, references)
+  - **Tags Error**: Fixed "key 'tags (ar)' returned an object instead of string" error by using correct translation namespace
+  - **Affected Components**: `ExerciseDetailContent.tsx` - updated translation hook to include `'exercise'` namespace
+
+- **Catalog Selector UI Consistency**: Fixed inconsistent card heights and text alignment in exercise catalog selection
+  - **Height Consistency**: Reserved space for premium badges on all catalog cards to ensure uniform heights
+  - **Text Alignment**: Standardized all catalog titles to be centered for consistent visual presentation
+  - **Issue**: "General Fitness" card was shorter than premium catalogs, text alignment varied between centered and left-aligned
+
+- **Database Corruption Cleanup**: Resolved video file data corruption causing console errors
+  - **Cleaned Records**: Removed 259 corrupted video file records with NULL file_data
+  - **Updated Exercises**: Fixed exercises with corrupted `blob-pending-sync://` URLs by removing invalid video references
+  - **Console Errors**: Eliminated "No video files with file_data found" and related video resolution errors
+
+### Enhanced
+- **Image Loading Optimization**: Improved catalog image loading behavior
+  - **Loading Strategy**: Changed catalog images from lazy loading to eager loading for immediate visibility
+  - **Browser Compatibility**: Reduced Microsoft Edge intervention messages about deferred image loading
+
 ## 2025-09-21 (Sync UX Improvement)
 
 ### Enhanced

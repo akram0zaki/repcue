@@ -41,107 +41,263 @@
   },
   "plank": {
     "name": "Plank",
-    "description": "Hâld jo lijf yn in rjochte line, stipe troch ûnderearms en tean"
+    "description": "Hâld jo lijf yn in rjochte line, stipe troch ûnderearms en tean",
+    "benefits": "Fersterket kearnmuskels (abs, obliques, ensfh.), wat helpt de rêchbonke te beskermjen en hâlding te ferbetterjen. Ek handich om't der gjin apparatuer foar nedich is, en it bouwt stabiliteit op foar deistige bewegings.",
+    "limitations": "Isometryske hâlden langer as ~2 minuten jouwe minder en minder resultaat. Ferkearde foarm (trochsakjende heupen of skouders) kin pine feroarsaakje. Minsken mei hege bloeddruk moatte tige lange planken mije, om't se de bloeddruk ferheegje kinne. Pas it oan as jo pols- of skouderklachten hawwe (gean op knibbels of brûk in helling).",
+    "best_timing": "Kin dien wurde oan 'e ein fan in workout of as in flugge kearnroutine. 2-4 kear yn 'e wike planken is effektyf. Ek nuttich as kearnaktivaasje by opwaarmings of sels deistich yn puzes.",
+    "suggested_combinations": ["side-plank", "dead-bug"],
+    "notes": "Hâld in rjochte line fan holle oant hakken (gjin trochsakjende heupen). Adem stadich troch en span jo buik- en bilspieren de hiele tiid oan. Begjin mei koartere hâlden (bygelyks 20-30 sekonden) en ferheegje stadichoan.",
+    "exercise_references": ["Cleveland Clinic – Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Harvard Health – Plank Exercise Tips; https://www.health.harvard.edu/blog/straight-talk-on-planking-2019111318304"]
   },
   "side-plank": {
     "name": "Side Plank",
-    "description": "Hâld jo lijf op 'e kant, stipe troch ien ûnderarm"
+    "description": "Hâld jo lijf op 'e kant, stipe troch ien ûnderarm",
+    "benefits": "Lêst op de oblique spieren en laterale kearnstabiliteit. Helpt de rêchbonke te stabilisearjen en spierûnbalâns fan kant nei kant oan te pakken. Ferbetteret ek it úthâldingsfermogen fan de skouders en heupen oan elke kant.",
+    "limitations": "Jout mear druk op ien skouder – as jo skouderpine hawwe, begjin dan op 'e knibbels of mije it. Soargje dat de heupen net sakje; in swakke kearn kin it lestich meitsje om fêst te hâlden, dus bou it stadichoan op. Mije it as jo skerpe pine yn jo skouder of earm fiele.",
+    "best_timing": "Nim it op yn kearnworkouts nei't jo de basisplank behearskje. Faak dien nei reguliere planken om de obliques fierder oan te spannen. Kin ek tafoege wurde oan in yoga- of Pilates-routine.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Hâld it lichem yn ien line sûnder nei foaren of efteren te hingjen. Jo kinne de ûnderste knibbel delsette foar in ienfâldiger oanpassing. Druk de ûnderearm stevich yn 'e flier en lit it stypjende skouder net ynklappe.",
+    "exercise_references": ["Cleveland Clinic – Side Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Healthline – Side Plank Safety; https://www.healthline.com/health/side-plank"]
   },
   "mountain-climbers": {
     "name": "Mountain Climbers",
-    "description": "Wikselje tusken it bringen fan knibbens nei boarst yn plankposysje"
+    "description": "Wikselje tusken it bringen fan knibbens nei boarst yn plankposysje",
+    "benefits": "In folsleine-lichaamsbeweging dy't jo hertslach ferheget, en sadwaande de kardiovaskulêre kondysje ferbetteret. Fersterket de kearn en skouders (troch de plankposysje te hâlden) en de skonken (troch de rappe knibbelbewegings). Troch regelmjittich te oefenjen kin it de behendichheid en koördinaasje ferbetterje.",
+    "limitations": "Hege ympakt op polsen en teannen – brûk in mat of helling as jo lêst hawwe fan 'e polsen. Hâld de rêch plat; as de heupen omheech geane of sakje, gean dan stadiger. Mije it as jo net-kontrolearre pine yn 'e ûnderrêch of skouder hawwe. Minsken mei knibbelproblemen moatte stappe yn stee fan springe om de ympakt te ferminderjen.",
+    "best_timing": "Geweldich yn HIIT- of sirkeltraining as in cardio-ynterval. Faak brûkt by opwaarmings om de lichemstemperatuer te ferheegjen of as ûnderdiel fan in kearn-/kondysjesirkel. Besykje se 20-30 sekonden út te fieren mei koarte rêstperioden.",
+    "suggested_combinations": ["burpees", "jumping-jacks"],
+    "notes": "Behâld in plank-eftige foarm wylst jo de knibbels ynlûke. Lit jo boppelichem net op en del wippe; brûk jo kearn om de knibbels yn te lûken. Begjinners kinne stadiger gean of ien skonk tagelyk dwaan. Adem troch sûnder jo azem yn te hâlden.",
+    "exercise_references": ["Healthline – Mountain Climbers Benefits; https://www.healthline.com/health/fitness/what-do-mountain-climbers-work", "Verywell Fit – Mountain Climbers Precautions; https://www.verywellfit.com/mountain-climbers-exercise-3966947"]
   },
   "bicycle-crunches": {
     "name": "Bicycle Crunches",
-    "description": "Wikselje elleboog nei oars knibbe yn fytsbeweging"
+    "description": "Wikselje elleboog nei oars knibbe yn fytsbeweging",
+    "benefits": "Ien fan de meast effektive buikspieroefeningen – it stiet boppe-oan foar it aktivearjen fan de rectus abdominis en obliques. Bouwt kearnkrêft en stabiliteit op, en ferbetteret koördinaasje mei syn cross-body beweging. Helpt ek de spieren te trainen foar draaiende bewegingen, wat gunstich is foar funksjoneel kearngebruik.",
+    "limitations": "Kin de nekke oanspanne as it ferkeard dien wurdt (foarkom it lûken oan jo nekke). Hâld de ûnderrêch tsjin 'e flier; as it hol stiet, gean dan stadiger of koarter de beweging yn. Minsken mei ûnderrêchklachten moatte foarsichtich wêze of kieze foar sêftere kearnmoves.",
+    "best_timing": "Doch yn 'e midden of oan' e ein fan in buikspierworkout. Faak kombinearre mei statyske kearnoefeningen (lykas planken) om de kearn folslein te trainen. Om't it yntinsyf wêze kin, wurdt it meast dien nei in opwaarming as de spieren der klear foar binne.",
+    "suggested_combinations": ["plank", "russian-twists"],
+    "notes": "Fier it stadich en doelbewust út foar it bêste resultaat – kwaliteit boppe snelheid. Fokus op it bringen fan jo skouder nei de tsjinoerstelde knibbel (net allinich de elleboog), en strek de tsjinoerstelde skonk folslein út by elke rep. Adem út as jo draaie om djippere buikspieren oan te spannen.",
+    "exercise_references": ["Bicycling – Bicycle Crunch Effectiveness; https://www.bicycling.com/training/a60659922/bicycle-crunches/", "Bicycling – Bicycle Crunch Form Tips; https://www.bicycling.com/training/a60659922/bicycle-crunches/"]
   },
   "push-ups": {
     "name": "Push-ups",
-    "description": "Ûnderlizze en opheffe fan lijf mei earms yn liggjende posysje"
+    "description": "Ûnderlizze en opheffe fan lijf mei earms yn liggjende posysje",
+    "benefits": "Fersterket de boarst, skouders en triceps, wylst it de kearn aktivearret foar stabiliteit. Is in fûnemintele oefening foar it boppelichem dy't ek funksjonele krêft ferbetteret foar duwen-bewegingen. Kin sels hertgesondheid stypje – in hegere push-up kapasiteit is keppele oan in leger hertrisiko.",
+    "limitations": "Te folle dwaan sûnder fariaasje kin liede ta in plateau yn krêftwinsten. Ferkearde foarm (lykas útsteande earms of trochsakkende heupen) kin skouders of ûnderrêch bestreekje. As jo pine hawwe yn 'e hannen, brûk dan push-up bars of doch se op knokkels. Persoanen mei skouderblessueres moatte beheinde bewegingsbaan brûke of it oerslaan as it sear docht.",
+    "best_timing": "Meastentiids ier dien yn in boppeliif-training as de earms fris binne. Kinne ek deistich dien wurde mei matiging as ûnderdiel fan in rûtine of krêftsirkel, mar lit rêstdagen ta foar herstel. Push-ups binne ek in prachtige opwaarming foar it boppelichem, útfierd mei oanpaste yntensiteit.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Hâld jo lichem rjocht en de kearn oanspand de hiele beweging troch. Gean omleech oant jo boarst tichtby de grûn komt (of sa fier as noflik) en druk omheech sûnder de earms te blokkearjen. Ynhale by it omleechgean, útademje by it opduwen. Begjin op knibbels of tsjin in muorre as in folsleine push-up te dreech is.",
+    "exercise_references": ["Healthline – Benefits of Push-ups; https://www.healthline.com/health/fitness-exercise/pushups-everyday", "MedicalNewsToday – Push-up Risks; https://www.medicalnewstoday.com/articles/326149"]
   },
   "squats": {
     "name": "Squats",
-    "description": "Ûnderlijf ûnderlizze troch knibbens te bûgjen, dan werom nei steande posysje"
+    "description": "Ûnderlijf ûnderlizze troch knibbens te bûgjen, dan werom nei steande posysje",
+    "benefits": "Aktivearret de measte grutte skonkspieren (bilspieren, quadriceps, hamstrings) en kearn, wat it in heul funksjonele oefening makket. Helpt legere-lichaamskrêft op te bouwen foar deistige aktiviteiten lykas optillen of treppen klimmen. Ferbetteret ek lykwicht en fleksibiliteit as it dien wurdt mei in folsleine bewegingsbaan, en kin de kalorieferbrâning ferheegje troch it brûken fan grutte spiergroepen.",
+    "limitations": "Korrekte foarm is krúsjaal – knibbels moatte oer de teannen folgje, net nei binnen knappe, en hakken bliuwe op 'e grûn. Te swier gean of te djip sûnder fleksibiliteit kin de knibbels of rêch belêstje. Minsken mei knibbel- of rêchklachten moatte nei in noflike djipte sakje (of in stoel as gids brûke) en de rêch neutraal hâlde. As der skerpe pine optreedt, stopje dan en kontrolearje jo foarm of rieplachtsje in trainer.",
+    "best_timing": "Faak pleatst oan it begjin fan in skonkworkout om't it in gearstalde beweging is dy't folsleine krêft freget. Kin dien wurde mei allinich it lichemsgewicht as opwaarming of mobiliteitoefening, of mei gewicht foar krêfttraining. Yn algemiene fitnessrûtines passe squats goed by oefeningen foar it boppelichem yn sirkels.",
+    "suggested_combinations": ["lunges", "wall-sit"],
+    "notes": "Hâld jo boarst op en de kearn oanspand. Besykje te squatten oant de dijen parallel binne oan 'e grûn (of sa fier as noflik) wylst de knibbels efter de teannen bliuwe en it gewicht yn jo hakken is. Druk troch de hakken om oerein te kommen en span de bilspieren oan oan 'e boppekant. Soargje dat jo in neutrale rêchbonke behâlde de hiele tiid.",
+    "exercise_references": ["Healthline – Squat Benefits; https://www.healthline.com/health/fitness-exercise/squats-benefits", "Healthline – Squat Safety Tips; https://www.healthline.com/health/fitness-exercise/squats-benefits"]
   },
   "lunges": {
     "name": "Lunges",
-    "description": "Stap nei foaren en ûnderlizze lijf, wikselende skonken"
+    "description": "Stap nei foaren en ûnderlizze lijf, wikselende skonken",
+    "benefits": "Wurket alle grutte spieren fan de skonken (bilspieren, quads, hamstrings) en ferbetteret lykwicht troch syn iensidige aard. Lunges helpe spierûnbalâns tusken de skonken te korrigearjen en de beweeglikheid fan de heupen te ferbetterjen. Se aktivearje ek de kearn en stabilisatorspieren om jo rjochtop te hâlden, wat gunstich is foar algemiene stabiliteit en koördinaasje.",
+    "limitations": "Soargje dat jo foarste knibbel net foarby jo teannen komt om it gewricht te beskermjen. Minsken mei knibbelproblemen kinne foarút-lunges dreech fine – se kinne omkearde lunges probearje dy't makliker binne foar de knibbels. Hâld jo romp rjochtop en foarkom tefolle nei foaren te hingjen. As lykwicht in probleem is, fier dan lunges út neist in muorre of hâld earst wat fêst foar stipe.",
+    "best_timing": "Nim lunges op yn skonkworkouts nei swierdere lifts lykas squats, of yn sirkels. Se binne ek geweldich nei in opwaarming om bilspieren en skonken te aktivearjen, of as ûnderdiel fan in dynamyske opwaarming foar it rinnen. Om't se spierpijn feroarsaakje kinne, is it genôch foar de measten om se 2-3 kear yn 'e wike te dwaan mei rêstdagen der tuskenyn.",
+    "suggested_combinations": ["squats", "calf-raises"],
+    "notes": "Stap fier genôch sadat jo foarste knibbel rûchwei boppe de ankel bliuwt (net te fier nei foaren). Sakje rjocht nei ûnderen troch beide knibbels te bûgen, en foarkom it hurd oanreitsjen fan de efterste knibbel op de grûn. Druk troch de hak fan de foarste foet om wer omheech te kommen. Hâld jo kearn oanspand en de romp fertikaal foar lykwicht.",
+    "exercise_references": ["Healthline – Benefits of Lunges; https://www.healthline.com/health/fitness-exercise/lunges-benefits", "Healthline – Lunge Variations (Reverse Lunge); https://www.healthline.com/health/fitness-exercise/lunges-benefits"]
   },
   "wall-sit": {
     "name": "Wall Sit",
-    "description": "Glije omleech tsjin muorre oant dijen parallel binne, posysje hâlde"
+    "description": "Glije omleech tsjin muorre oant dijen parallel binne, posysje hâlde",
+    "benefits": "Isometryske oefening dy't úthâldingsfermogen opbout yn de quadriceps, bilspieren en kealspieren. Geweldich foar it fersterkjen fan de skonken sûnder beweging, en it aktivearret ek de kearn en ûnderrêch foar stabilisaasje. Wall sits kinne it spierúthâldingsfermogen ferbetterje dat nuttich is foar skyen of kuierjen, en is oantoand dat it helpt om de bloeddruk te ferleegjen as it geregeldwei beoefene wurdt.",
+    "limitations": "As jo knibbelpine hawwe, begjin dan mei in hegere 'sit' (minder bûging) of in koartere hâlding. Sakje net ûnder in 90° knibbelhoeke, om't dat de druk op de knibbel ferheget. Soargje derfoar dat jo ûnderrêch tsjin de muorre is om spanning te foarkommen. Minsken mei net-kontrolearre hege bloeddruk moatte noch altyd foarsichtich wêze (hâld de azem net yn) nettsjinsteande de foardielen op lange termyn; adem stadich út wylst jo de hâlding fêsthâlde.",
+    "best_timing": "Brûk as in 'finisher' yn skonkworkouts of by sirkeltraining. Bygelyks, nei it dwaan fan dynamyske oefeningen lykas squats of lunges, kin in wall sit de spieren feilich útputte. Kin ek yn deistige rûtines dien wurde (bygelyks yn in pauze) om it úthâldingsfermogen fan de skonken op te bouwen.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Glydzje nei ûnderen oant jo dijen parallel binne oan 'e flier en knibbels boppe de ankels binne (knibbels om 90°). Hâld jo hakken op 'e grûn en it gewicht yn harren. Rêst jo hannen net op jo dijen (lit jo skonken it wurk dwaan). Behâld normale azem – foarkom it ynhâlden fan de azem, wat de bloeddruk opfiere kin.",
+    "exercise_references": ["Cleveland Clinic – Wall Sit Benefits; https://health.clevelandclinic.org/wall-sits", "Cleveland Clinic – Wall Sit Form; https://health.clevelandclinic.org/wall-sits"]
   },
   "burpees": {
     "name": "Burpees",
-    "description": "Squat, springe werom nei plank, push-up, fuotten werom springe, omheech springe"
+    "description": "Squat, springe werom nei plank, push-up, fuotten werom springe, omheech springe",
+    "benefits": "In krêftige folsleine-lichaamsoefening dy't krêft en cardio kombinearret. Burpees wurkje jo skonken, kearn, boarst, en skouders, en se ferheegje de hertslach rap om it kardiovaskulêre úthâldingsfermogen te ferbetterjen. Se ferbrâne in protte kaloaren en kinne eksplosive krêft (troch de sprong) en algemiene behendichheid ferbetterje.",
+    "limitations": "Burpees binne tige yntinsyf; begjinners moatte begjinne mei minder reps of step-back fariaasjes om blessueres te foarkommen. Se kinne stress op polsen, skouders en knibbels sette troch de flugge oergongen. Behâld in kontrolearre tempo om in goede foarm te garandearjen – slordige burpees kinne de ûnderrêch of skouders belêstje. As jo gewrichtsproblemen hawwe, beskôgje dan oanpassingen (bygelyks gjin sprong, of stap yn stee fan werom springe).",
+    "best_timing": "Faak dien oan 'e ein fan in workout of yn HIIT-sesjes as in hege-yntensiteit ynterval. Om't se útputtend binne, is it gewoan om se yn koarte bursts (lykas 10-15 reps of 30 sekonden) mei rêst te brûken. Se binne ek populêr yn bootcamp- of CrossFit-styl workouts foar kondysje.",
+    "suggested_combinations": ["mountain-climbers", "jumping-jacks"],
+    "notes": "Hâld in fêst ritme: squat, skop werom nei in fêste plank, fier in push-up út mei in strakke kearn, bring fuotten wer ûnder jo, spring dan op. Land sêft op de sprong om jo knibbels te beskermjen. Ademhaling is wichtich – adem út by it werom springen en by it op springen. Kwaliteit boppe kwantiteit: it is better om minder burpees te dwaan mei goede foarm as in protte mei minne foarm.",
+    "exercise_references": ["Healthline – Burpee Benefits; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee", "Healthline – Burpee Safety Tips; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee"]
   },
   "jumping-jacks": {
     "name": "Jumping Jacks",
-    "description": "Fuotten út elkoar springe wylst earms opheffe, dan werom byinoar springe"
+    "description": "Fuotten út elkoar springe wylst earms opheffe, dan werom byinoar springe",
+    "benefits": "Ienfâldige mar effektive cardio-oefening foar it folsleine lichem. Jumping jacks ferheegje jo hertslach, ferbrâne kaloaren en kinne it aerobyske úthâldingsfermogen ferbetterje. Se aktivearje de skonken (kealspieren, dijen) en skouders, en mei de tiid kinne se sels bonketichtens helpe fanwege de ympakt fan it springen. Se ferheegje ek koördinaasje troch earms en skonken tagelyk te bewegen.",
+    "limitations": "As in hege-ympakt beweging kinne se knibbel- of ankelklachten fergrutsje as it tefolle of op in hurde ûndergrûn dien wurdt. As jo gewrichtspine hawwe, doch dan in legere ympaktferzje troch side-to-side te stappen yn stee fan te springen. Draach stypjende skuon en oefenje op in skok-absorbearjende ûndergrûn om jo gewrichten te beskermjen. Minsken mei in tige lege kondysje moatte begjinne mei koarte sets, om't jacks ferrassend útputtend wêze kinne.",
+    "best_timing": "Geweldich as in opwaarmingsoefening om it bloed te streamen of as ûnderdiel fan in cardio-sirkel. Se kinne dien wurde yn koarte bursts (bygelyks sets fan 30 sekonden) tusken krêftoefeningen om de hertslach op peil te hâlden. Ek nuttich as flugge aktiviteitspauzes oerdei om josels te fersterkjen.",
+    "suggested_combinations": ["high-knees", "butt-kicks"],
+    "notes": "Bliuw ljocht op jo fuotten – lân op de ballen fan jo fuotten om ympakt te ferminderjen. Hâld jo knibbels in bytsje bûgd as jo lânje om te fungearjen as skokbrekers. Rjochtsje op in konsekwint ritme en folsleine bewegingsbaan (hannen reitsje boppe de holle, fuotten wiid útinoar by elke sprong). Adem stadich troch; adem út as de skonken en earms útinoar gean.",
+    "exercise_references": ["Healthline – Benefits of Jumping Jacks; https://www.healthline.com/health/fitness-exercise/jumping-jacks", "Healthline – Jumping Jacks Risks; https://www.healthline.com/health/fitness-exercise/jumping-jacks"]
   },
   "high-knees": {
     "name": "High Knees",
-    "description": "Op plak rinne mei knibbens omheech nei boarstnivo"
+    "description": "Op plak rinne mei knibbels omheech nei boarstnivo",
+    "benefits": "In fluch tempo cardio-oefening dy't de hertslach ferheget en legere-lichaamskrêft ferbetteret. High knees aktivearje de heupfleksors, quadriceps, hamstrings, kealspieren, en bilspieren, wat spierúthâldingsfermogen en koördinaasje yn dizze gebieten opbout. Se fersterkje ek de kearn (hâlde jo rjochtop) en kinne rinnende snelheid en foarm ferbetterje troch in oerdreaune knibbellift te trainen.",
+    "limitations": "Dizze oefening is hege-ympakt (yn prinsipe rinnen op plak), sadat it ankels of skinnen kin belêstje as it dien wurdt op in tige hurde ûndergrûn. Draach stypjend fuotguod en kies sêftere grûn as mooglik. As jo problemen mei lykwicht hawwe of tige nij binne mei oefening, begjin dan mei 'marcheren' op plak om op te bouwen. Behâld altyd in goede hâlding; hingje net nei efteren, wat de ûnderrêch belêstje kin.",
+    "best_timing": "Faak brûkt yn opwaarmings foar sport of rinnen om de skonken te primen, of ynfoege as in cardio-burst yn sirkeltraining. Jo kinne high knees dwaan foar in bepaalde tiid (bygelyks 30 sekonden) of ôfstân (as jo foarút bewege). Se passe goed yn HIIT-workouts (bygelyks Tabata-yntervallen) fanwege de hege yntensiteit.",
+    "suggested_combinations": ["butt-kicks", "jumping-jacks"],
+    "notes": "Hâld jo rêch rjocht en de kearn oanspand wylst jo de knibbels opheffe nei heuphichte of heger elke kear. Swingje jo earms yn syngroan mei jo skonkebeweging (tsjinoerstelde earm nei skonk). Rjochtsje op in springjende, flugge kadens, en lân op 'e ballen fan jo fuotten. Begjin stadiger en pak dan de snelheid op as jo mear noflik wurde.",
+    "exercise_references": ["Healthline – High Knees Benefits; https://www.healthline.com/health/fitness/high-knees-benefits", "Healthline – When to Do High Knees; https://www.healthline.com/health/fitness/high-knees-benefits"]
   },
   "butt-kicks": {
     "name": "Butt Kicks",
-    "description": "Op plak rinne mei hakken nei bilspieren sparke"
+    "description": "Op plak rinne mei hakken nei bilspieren sparke",
+    "benefits": "Fokuset op de hamstrings troch jo hakken omheech te skoppen. Butt kicks tsjinje as in dynamyske stretch foar de quadriceps en in aktivaasje foar de hamstrings, wat har fleksibiliteit en krêft ferbetteret. Lykas high knees, is it ek in cardio-move dy't jo hertslach ferheget en it lichem opwaarmet. Regelmjittige oefening kin de rinfarm helpe troch in fluggere heel weromheljen ûnder it lichem te stimulearjen.",
+    "limitations": "Behâld in rjochte hâlding; foarkom te fier nei foaren te hingjen, wat de ûnderrêch belêstje kin. As jo knibbelproblemen hawwe, fier de beweging dan sêft út (twang jo hak net om jo bil te reitsjen). Minsken mei tige strakke quads moatte it rêstich oanpakke om spierlûkingen te foarkommen. As in legere-ympakt oefening is it oer it algemien feilich, mar as lykwicht in soarch is, doch it dan 'marcherjend' op plak yn stee fan fluch springen.",
+    "best_timing": "Gewoanwei opnommen yn opwaarmingsrûtines foar rinnen of sport, nei high knees of yn ôfwikseljende sets. It past ek yn cardio-sirkels. Bygelyks, jo kinne 30 sekonden butt kicks dwaan tusken krêftoefeningen om jo hertslach op peil te hâlden. It is effektyf om butt kicks nei high knees te dwaan om tsjinoerstelde spiergroepen oan te pakken.",
+    "suggested_combinations": ["high-knees", "jumping-jacks"],
+    "notes": "Besykje jo hakken hielendal nei jo bilspieren te skoppen (of sa tichtby as fleksibiliteit it talit) yn in soepele beweging. Hâld knibbels nei ûnderen rjochte (net nei foaren) om de hamstrings te beklamjen. Swing jo earms natuerlik oan jo siden om it ritme te behâlden. Adem stadich troch en fyn in kadens dy't jo kinne kontrolearje sûnder te stroffeljen.",
+    "exercise_references": ["MasterClass – Butt Kicks Benefits; https://www.masterclass.com/articles/butt-kicks-guide", "Spotebi – Butt Kicks Warm-Up; https://www.spotebi.com/exercise-guide/butt-kicks/"]
   },
   "downward-dog": {
     "name": "Downward Dog",
-    "description": "Meitsje in omkearde V-foarm mei hannen en fuotten op grûn"
+    "description": "Meitsje in omkearde V-foarm mei hannen en fuotten op grûn",
+    "benefits": "In basis yoga-posysje dy't de hiele efterkant fan jo lichem stretcht. Downward Dog ferlingt de hamstrings en kealspieren, iepenet de skouders en boarst, en de traksje op 'e rêchbonke helpt rêchspanning te ferlichtsjen. It bouwt ek krêft op yn 'e earms en skouders troch in diel fan jo lichemsgewicht te stypjen, en ferbetteret de bloedsirkulaasje mei de holle wat leger (mylde ynversje).",
+    "limitations": "Minsken mei tige strakke hamstrings of skouders kinne it in útdaging fine – it is goed om jo knibbels en ellebogen in bytsje te bûgen om in rjochte rêch te behâlden. As jo polsklachten hawwe, kinne jo de posysje op jo ûnderearms dwaan (Dolphin pose) of jo hannen op blokken sette. Minsken mei net-kontrolearre hege bloeddruk of glaukoom moatte foarsichtich wêze mei elke omkearde posysje. Kom út de posysje as jo dizigens of skerpe pine fiele.",
+    "best_timing": "Faak brûkt yn yoga-sekwinsjes as in oergongsposysje of in rêstposysje tusken flows. Yn algemiene fitness, kin it brûkt wurde yn cool-down stretching rûtines om de efterste keten te ferlingjen. It is geunstich yn 'e moarn om stivens út te strekken, of nei workouts dy't de skonken of rêch belûke.",
+    "suggested_combinations": ["child-pose", "forward-fold"],
+    "notes": "Druk jo hânpalmen stevich yn 'e grûn, fingers wiid útinoar, om it gewicht te fersprieden en de polsen te ûntlêsten. Til jo heupen omheech en nei efteren, en besykje jo hakken nei de flier te triuwen (it is goed as se it net reitsje). Hâld jo holle tusken jo earms en jo rêchbonke rjocht troch jo bekken omheech te kanteljen. Fokus op djippe, kalme azem wylst jo de posysje fêsthâlde.",
+    "exercise_references": ["Yoga Journal – Downward Dog Benefits; https://www.yogajournal.com/poses/downward-facing-dog/", "Yoga15 – Downward Dog Benefits; https://yoga15.com/poses/downward-dog/"]
   },
   "child-pose": {
     "name": "Child's Pose",
-    "description": "Knije en sit werom op hakken, earms nei foaren útstrekke op grûn"
+    "description": "Knije en sit werom op hakken, earms nei foaren útstrekke op grûn",
+    "benefits": "In sêfte, restorative posysje dy't de ûnderrêch, heupen, dijen en enkels stretcht. It helpt om it lichem en de geast te ûntspannen troch it parasympatyske senuwstelsel te aktivearjen (befoardert stressferljochting en bettere sliep). Child's Pose kin druk op 'e ûnderrêch ferlichtsje troch de rêchbonke te ferlingjen en wurdt faak brûkt as in rêst- of kalmearjende posysje yn yoga.",
+    "limitations": "As jo knibbelproblemen hawwe, meitsje jo knibbels dan breder of plak in kessen ûnder jo heupen om de druk te ferminderjen. Minsken mei tige beheinde ankelmobiliteit kinne ûngemak fiele – in oprôle hanteken ûnder de enkels kin helpe. Swiere froulju of minsken mei in grutte middenseksje moatte in bredere hâlding mei de knibbels oannimme om kompresje op 'e buik te foarkommen. Oars is it oer it algemien feilich; twing jo billen net hielendal nei de hakken as it pine feroarsaket.",
+    "best_timing": "Faak brûkt as in herstelposysje tidens yoga-sesjes (bygelyks tusken útdaagjende sekwinsjes). Ek geweldich nei oefening of foar it sliepen gean om de rêch en heupen te ûntspannen. Jo kinne it oan 'e ein fan in workout opnimme tidens it 'cooldown' of op elk momint dat jo de rêchbonke sêft stretchje en dekomprimearje moatte.",
+    "suggested_combinations": ["downward-dog", "cat-cow"],
+    "notes": "Lit jo foarholle op 'e grûn rêste (of op in kessen) en adem djip yn jo buik. Jo kinne earms nei foaren útstrekke foar in skouderstretch of se oan jo siden hâlde foar in mear ûntspannen posysje. Mei elke útademing, stel jo foar dat jo romp tichter by de flier sakket, spanning loslittend. Bliuw yn 'e posysje sa lang as nedich – it giet om ûntspanning, dus der is gjin strange tiidslimyt.",
+    "exercise_references": ["Cleveland Clinic – Child's Pose Benefits; https://health.clevelandclinic.org/childs-pose", "Verywell Health – Child's Pose for Back Pain; https://www.verywellhealth.com/childs-pose-for-low-back-pain-2564776"]
   },
   "cat-cow": {
     "name": "Cat-Cow Stretch",
-    "description": "Wikselje tusken bôgjen en rûnje fan rêchbonke op hannen en knibbens"
+    "description": "Wikselje tusken bôgjen en rûnje fan rêchbonke op hannen en knibbens",
+    "benefits": "Mobilisearret de rêchbonke sêft, ferheget fleksibiliteit en ferlichtet spanning yn 'e rêch en nekke. Cat-Cow helpt jo mear bewust te wurden fan rêchbonkebeweging en kin de hâlding ferbetterje troch elke wervel te trainen om te bewegen. It befoarderet ek bloedstream nei de rêchspieren en aktivearret de kearn op in mylde, kontrolearre wize. Faak brûkt om stivens yn 'e moarn te ferlichtsjen of foar mear yntinsive aktiviteit.",
+    "limitations": "Dit is in beweging mei tige leech risiko. As jo lykwols in rêchbonkeblessuere of slimme pine hawwe, bewege dan allinich binnen in pine-frije bewegingsbaan. It is feilich om de rêch folslein rûn te litten yn Cat en hol yn Cow, mar twing gjin posysje. Minsken mei polsongemak kinne it op fûsten útfiere of mei polsen in bytsje foar de skouders. Unthâld om stadich te bewegen en te ademen; it hastigjen kin de effektiviteit fan 'e stretch ferminderje.",
+    "best_timing": "Uitstekend as ûnderdiel fan in opwaarming (om rêch en nekke los te meitsjen) of in cool-down om te ûntspannen. Jo kinne Cat-Cow as earste ding yn 'e moarn dwaan om jo rêchbonke sêft yn beweging te krijen, of yn pauzes fan lang sittend. It is ek in basis yn yoga-sekwinsjes, meastentiids útfierd oan it begjin om de rêchbonke op te waarmjen.",
+    "suggested_combinations": ["child-pose", "downward-dog"],
+    "notes": "Koördinearje mei jo azem: meastal ynhale jo tidens Cow (bôgjen, omheech sjen) en útademje tidens Cat (rûn meitsje, kin ynstekke). Gean stadich en besykje elk segmint fan jo rêchbonke yn folchoarder te artikulearjen. Spried jo fingers en druk troch jo hannen om skouderstabilisators te aktivearjen. Dizze oefening giet oer de kwaliteit fan de beweging, net de yntinsiteit, dus fokusje op it fielen fan in moaie stretch en fleks troch jo rêch.",
+    "exercise_references": ["Men's Health – Cat-Cow Benefits; https://www.menshealth.com/fitness/a39438579/cat-cow/", "Yoga Journal – Cat-Cow Pose; https://www.yogajournal.com/poses/cow-cat/"]
   },
   "single-leg-stand": {
     "name": "Single Leg Stand",
-    "description": "Stean op ien skonk, hâld foar tiid, dan wikselje"
+    "description": "Stean op ien skonk, hâld foar tiid, dan wikselje",
+    "benefits": "In fûnemintele lykwichtsoefening dy't proprioception en ankelstabiliteit ferbetteret. Regelmjittige oefening kin jo algemiene lykwicht ferbetterje en it risiko op fallen ferminderje troch it fersterkjen fan de spieren om de enkels, knibbels en heupen dy't jo rjochtop hâlde. It aktivearret ek de kearn, om't jo jo romp op ien skonk stabilisearje moatte. Der is sels ûndersyk dat suggerearret dat in better lykwicht op ien skonk keppele is oan in langere libbensferwachting (wierskynlik as wjerspegeling fan algemiene sûnens).",
+    "limitations": "Foar feiligens, stean tichtby in stipe (muorre of stoel) as jo it foar it earst besykje, foar it gefal dat jo lykwicht ferlieze. As jo wichtige lykwichtsproblemen hawwe of neurologyske omstannichheden dy't it lykwicht beynfloedzje, rieplachtsje dan in profesjoneel foar begelieding. It is in sêfte oefening, mar foarkom it dwaan mei de eagen ticht of op ynstabile ûndergrûnen oant jo in stabile hâlding behearskje. Oefenje altyd op beide skonken om in lykwichtige ûntwikkeling te garandearjen.",
+    "best_timing": "Kin deistich dien wurde as ûnderdiel fan in lykwichts- of rehabrûtine – bygelyks wylst jo jo tosken poetsen of op wat wachtsje. Yn workouts kin it diel útmeitsje fan in opwaarming (om stabilisators te aktivearjen) of yntegrearre wurde yn sirkels. In protte fysioterapyprogramma's befetsje it foar âldere folwoeksenen om stabiliteit te behâlden.",
+    "suggested_combinations": ["tree-pose", "warrior-3"],
+    "notes": "Fokus op in fêst punt foar jo (in drishti) om it lykwicht te behâlden. Hâld in lichte bûging yn de steande knibbel en aktivearje jo kearn. Besykje jo foetbôge net yn te sakjen; gryp de flier in bytsje mei jo teannen. As jo ferbetterje, kinne jo trochgroeie troch langer te balansearjen, of troch jo frije skonk/earms te bewegen om josels fierder út te daagjen.",
+    "exercise_references": ["Cleveland Clinic – Balance Exercise Importance; https://health.clevelandclinic.org/balance-exercises", "PubMed – Single Leg Balance Training Review; https://pubmed.ncbi.nlm.nih.gov/34045951/"]
   },
   "tree-pose": {
     "name": "Tree Pose",
-    "description": "Stean op ien skonk mei oare foet op binnenkant dij"
+    "description": "Stean op ien skonk mei oare foet op binnenkant dij",
+    "benefits": "Klassike yoga-lykwichtposysje dy't stabiliteit op ien skonk en fokus ûntwikkelet. Tree Pose fersterket de steande skonk (ankel, keals, dij) en de kearn- en heupstabilisators dy't jo rjochtop hâlde. De optilde skonk iepenet ek de heup fan dy kant, wat de heupfleksibiliteit ferbetteret. Mentally bout it konsintraasje en in gefoel fan grûn op as jo oefenje om josels te stabilisearjen.",
+    "limitations": "Foarkom it drukken fan de foet tsjin it knibbelgewricht fan de steande skonk – pleats it of ûnder of boppe de knibbel om spanning te foarkommen. As jo muoite hawwe mei balansearjen, begjin dan mei jo foet leger (ankel of keals) en/of doch it tichtby in muorre foar stipe. Minsken mei ankelinstabiliteit moatte foarsichtich wêze; se kinne in oanpaste ferzje dwaan mei teannen fan de optilde foet dy't de grûn reitsje. Lykas by elke lykwichtposysje, stap der dan stadich út as jo begjinne te fallen om blessueres te foarkommen.",
+    "best_timing": "Faak dien yn 'e midden fan in yoga-routine ûnder oare steande posysjes. It is nuttich nei opwaarming, as spieren los binne mar net te wurch. Jo kinne it ek bûten yoga brûke – bygelyks nei in run of skonkworkout – om oan lykwicht en heupiepening te wurkjen as ûnderdiel fan in cool-down.",
+    "suggested_combinations": ["single-leg-stand", "warrior-3"],
+    "notes": "Druk jo optilde foet aktyf yn jo steande skonk en oarsom om stabiliteit te kreëarjen. Hâld jo steande skonk rjocht mar net op slot. Fyn in fokaalpunt om nei te sjen. Jo kinne hannen by jo boarst pleatse (gebedsposysje) of se boppe de holle opheffe as jo ienris stabyl binne. Adem djip; lykwicht ferbetteret as jo kalm bliuwe en ademje yn stee fan jo azem yn te hâlden.",
+    "exercise_references": ["Yoga15 – Tree Pose Benefits; https://yoga15.com/poses/tree-pose/", "Sri Sri Yoga – Tree Pose Benefits; https://srisrischoolofyoga.org/blog/tree-pose-vrksasana"]
   },
   "warrior-3": {
     "name": "Warrior III",
-    "description": "Lykwicht op ien skonk mei oare skonk nei efter útstrutsen"
+    "description": "Lykwicht op ien skonk mei oare skonk nei efter útstrutsen",
+    "benefits": "Avansearre lykwichtposysje dy't de hiele efterste keten (rêch, bilspieren, hamstrings) en ek de kearn en skouders fersterket. Warrior III ferbetteret it lykwicht en de koördinaasje sterk, wêrtroch jo stabilisearje mei ien skonk en romp parallel oan 'e grûn. It stretcht de hamstring fan de steande skonk en fereasket it aktivearjen fan de rêchspieren om jo boarst op te hâlden. Yn 't gehiel bout it kearnkrêft en rêch-lichem aktivearring op, wylst it de fokus ferbetteret.",
+    "limitations": "Dizze posysje is in útdaging; begjinners moatte in muorre of blokken ûnder de hannen brûke foar stipe wylst se it lykwicht leare. Behâld in neutrale nekke (net omheech stretchje) om nekspanning te foarkommen. As jo problemen hawwe mei de ûnderrêch, wês dan foarsichtich mei de foarút-leanje posysje – soargje derfoar dat jo jo kearn aktivearje om it ynzakken te foarkommen. It is goed om in lichte bûging yn de steande knibbel te hâlden om de hamstringspanning te ferlichtsjen. Kom út 'e posysje as jo fiele dat jo foarm ynstoart, om't trochgean wylst jo ynstabyl binne, kin liede ta in fal.",
+    "best_timing": "Gewoanwei ûnderdiel fan yoga-flows nei posysjes lykas Warrior I of II, as de skonken opwaarme binne. It is it bêste om te dwaan as jo net te wurch binne, dus miskien earder yn in sesje om jo lykwicht echt út te daagjen wylst jo fris binne. Yn in algemiene fitnesskontekst, soene jo it opnimme kinne nei guon ienfâldiger lykwichtsbewegings (lykas Tree Pose) as in peak lykwichtsútdaging.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Hâld jo heupen gelyk – foarkom it iepenjen fan 'e heup fan de optilde skonk nei boppen. Wize de teannen fan jo optilde skonk nei de flier en reitsje aktyf nei efteren troch jo hak. Strek jo earms nei foaren út (of hâld se oan jo siden) yn ien line mei jo romp foar lykwicht. Stel jo foar dat jo in rjochte line meitsje fan fingers (of holle) nei jo hak. It is normaal om te wankeljen; reset gewoan en besykje it opnij, fokusje op it aktivearjen fan jo kearn- en skonkspieren.",
+    "exercise_references": ["Yoga Journal – Warrior III Benefits; https://www.yogajournal.com/poses/warrior-iii-pose/", "Hugger Mugger – Warrior III Core Strength; https://www.huggermugger.com/blog/warrior-iii-balance"]
   },
   "dead-bug": {
     "name": "Dead Bug",
-    "description": "Lizze op rêch, wikselje tusken útstrekken fan oarske earm en skonk"
+    "description": "Lizze op rêch, wikselje tusken útstrekken fan oarske earm en skonk",
+    "benefits": "Tige effektyf foar kearnstabilisaasje. De dead bug leart jo om jo boarstkoer nei ûnderen te hâlden en de ûnderrêch plat wylst jo jo earms en skonken bewege – wat de djippe kearnmuskels fersterket dy't jo rêchbonke beskermje. It ferbetteret koördinaasje tusken tsjinoerstelde ledematen (neuromuskulêre kontrôle) en kin ûnderrêchklachten ferhelpe troch it trainen fan korrekte rêchbonkestân tidens beweging. Yn 't gehiel bout it in sterke, stabile kearnfundaasje foar oare oefeningen.",
+    "limitations": "It is oer it algemien tige feilich. De wichtichste flater is it opheffen fan de ûnderrêch fan 'e flier – as jo it net del hâlde kinne, beheine dan jo bewegingsomfang of bûch jo knibbels mear. As jo nekspanning fiele, stypje dan jo holle op in lyts kessen of handoek. Minsken mei slimme ûnderrêchpine moatte foarsichtich begjinne en miskien mei ien ledemaat tagelyk oant de kearn sterker is.",
+    "best_timing": "Brûk it ier yn in kearnworkout of as ûnderdiel fan in opwaarming om de kearn te aktivearjen foar swierdere oefeningen. It wurdt ek faak opnommen yn fysioterapy- of begjinnersrûtines fanwege syn feiligens en effektiviteit. It dwaan fan 2-3 sets dead bugs in pear kear yn 'e wike kin de kearnstabiliteit oer de tiid flink ferbetterje.",
+    "suggested_combinations": ["plank", "glute-bridges"],
+    "notes": "Fokus op it drukken fan jo ûnderrêch tsjin de grûn de hiele oefening troch. Bewege stadich – strek tsjinoerstelde earm en skonk nei bûten oant krekt foardat jo rêch omheech wol, gean dan werom nei it sintrum en wikselje. Adem út as jo útstrekke om de djippe buikspieren te aktivearjen. Begjinne mei koartere bewegingsbanen en stadich fergrutsje as jo sterker wurde, sil derfoar soargje dat jo it korrekt dogge.",
+    "exercise_references": ["Healthline – Dead Bug for Core Stability; https://www.healthline.com/health/dead-bug-exercise", "Nike – Dead Bug Purpose; https://www.nike.com/a/dead-bug-exercise"]
   },
   "glute-bridges": {
     "name": "Glute Bridges",
-    "description": "Lizze op rêch, heupen opheffe troch bilspieren oan te spannen"
+    "description": "Lizze op rêch, heupen opheffe troch bilspieren oan te spannen",
+    "benefits": "Isolesearret en fersterket de bilspieren, dy't faak te min brûkt wurde fanwege it sitten. Sterke bilspieren drage by oan in bettere bekkenútlijning en kinne ûnderrêchpine ferhelpe troch spanning fan 'e rêchbonke ôf te nimmen. Glute bridges aktivearje ek de hamstrings en kearn, wat se in geweldige posterior-keten oefening makket. Se ferbetterje de heupútwreiding, wat de hâlding en atletyske bewegingen (lykas springen en rinnen) fersterkje kin.",
+    "limitations": "As jo de ûnderrêch tefolle strekke (hol meitsje) oan 'e boppekant, kinne jo ûngemak fiele – fokus op it knipen fan 'e bilspieren, net it hollich meitsjen fan de rêchbonke. Minsken mei tige strakke heupfleksors kinne it dreech fine om heupen heech op te tillen; in sêfte stretch fan 'e heupfleksors foarôf kin helpe. Oer it algemien is it in lege-ympakt oefening, mar minsken mei bepaalde rêchbonkeomstannichheden moatte derfoar soargje dat se net troch de pine hinne drukke. Foarkom ek it drukken fan jo holle yn 'e grûn; de krêft moat troch skouders en fuotten wêze.",
+    "best_timing": "Faak brûkt oan 'e ein fan in skonkworkout of binnen in kearnroutine. Se meitsje in goede opwaarming foar oefeningen dy't de bilspieren aktivearje (lykas squats of rinnen). Yn rehabilitaasje- of begjinnersworkouts kinne se in primêre oefening wêze dy't 3-4 kear yn 'e wike dien wurdt, wylst se yn krêftprogramma's miskien 1-2 kear yn 'e wike ferskine as oanfoljend wurk.",
+    "suggested_combinations": ["dead-bug", "lunges"],
+    "notes": "De posysje fan de fuotten beynfloedet de beklamming: tichter by de billen rjochtet him mear op de bilspieren, fierder fuort giet it mear om de hamstrings. Hâld jo knibbels sawat op heupbreedte útinoar en lit se net nei bûten of nei binnen knappe. Pauzearje in sekonde oan 'e boppekant fan 'e brêge om de bilspierkontraksje te maksimalisearjen, en sakje dan stadich. Soargje derfoar dat jo troch jo hakken drukke – jo kinne sels jo teannen in bytsje optille om de hakdruk te beklamjen.",
+    "exercise_references": ["Elite Chiro Sport – Glute Bridge Benefits; https://elitechirosport.com/home-rehab-glute-bridge", "Coast Performance – Calf Raises & Posterior Chain; https://coastperformancerehab.com/calf-exercises-save-feet-ankles/"]
   },
   "finger-roll": {
     "name": "Finger Roll",
-    "description": "Rol fingers fan fûst nei folsleine útstrekking, wurkje elke finger yndividueel"
+    "description": "Rol fingers fan fûst nei folsleine útstrekking, wurkje elke finger yndividueel",
+    "benefits": "Fergruttet de fleksibiliteit en bloedsirkulaasje yn 'e fingers en hannen. Finger rolls helpe om de bewegingsomfang yn 'e fingergewrichten te behâlden en kinne behendigheid en koördinaasje fan 'e fingers ferbetterje. Nuttich foar it opwaarmjen fan de hannen foar fine motorike taken of it ferlichtsjen fan stivens nei lange perioaden fan kompjûtergebrûk. Mei de tiid kinne sokke oefeningen helpe om jo hannen soepel te hâlden en it risiko op problemen lykas tendonitis te ferminderjen troch de sehnen sêft te wurkjen troch har beweging.",
+    "limitations": "Sa goed as gjin risiko as it sêft dien wurdt. Foarkom agressive of rappe, snappende bewegingen – de oefening moat soepel wêze. As jo artritis of tige stive fingers hawwe, doch de beweging dan stadich en yn waarm wetter om de gewrichtsbeweging fierder te ferlichtsjen. Stopje as jo skerpe pine fiele yn in bepaald fingergewricht.",
+    "best_timing": "Geweldich as deistige routine foar hânûnderhâld – bygelyks yn 'e moarn of yn pauzes fan it wurk. Fier it ek út foar aktiviteiten dy't fingerfleksibiliteit nedich binne (lykas typen, in ynstrumint spylje, klimmen, ensfh.). It past goed oan it begjin fan in boppeliif-opwaarming of oan 'e ein fan in workout as in cool-down foar de hannen.",
+    "suggested_combinations": [],
+    "notes": "Fier it stadich út: begjin mei in tichte fûst, en rôl dan stadichoan ien finger tagelyk út oant de hân folslein iepen is, de fingers útinoar stretchjend, rôl dan werom nei in fûst. Jo kinne de folchoarder fan de fingerútstrekking elke kear feroarje. Adem normaal en besykje de hân te ûntspannen as jo bewege. Dit is ek in goede kâns om mindfulness te oefenjen – fokusje op de sensaasjes yn jo hân as elke finger beweecht.",
+    "exercise_references": ["WebMD – Hand and Finger Exercise Benefits; https://www.webmd.com/osteoarthritis/ss/slideshow-hand-finger-exercises", "USC Verdugo – Hand Exercises for Flexibility; https://uscvhh.org/5-hand-exercises-to-help-you-maintain-your-dexterity-flexibility/"]
   },
   "tricep-dips": {
     "name": "Tricep Dips",
-    "description": "Ûnderlizze en opheffe fan lijf mei earmkrêft wylst sitte op râne"
+    "description": "Ûnderlizze en opheffe fan lijf mei earmkrêft wylst sitte op râne",
+    "benefits": "Rjochtet him primêr op de triceps oan 'e efterkant fan 'e boppearm, wat bydraacht oan sterkere, tonere earms. Dips belûke ek de boarst en foarste skouders as sekundêre spieren. Se kinne helpe om de boppeliif-dûwkrêft te ferbetterjen en kinne hast oeral dien wurde mei in stevige stoel of bankje. Mei de tiid kinne dips liede ta bettere earmdefinysje en funksjonele krêft foar dûw-bewegingen (lykas oerein komme fan in sittende posysje).",
+    "limitations": "Bankdips kinne signifikante stress op 'e skoudergewrichten sette fanwege de posysje fan 'e earms efter it lichem. It is wichtich om net te leech te dippen – sakje oant jo ellebogen sawat 90 graden binne om it risiko op skouderblessueres te ferminderjen. As jo pine yn 'e foarste skouder fiele, koart de bewegingsbaan dan yn of stopje dermei. Hâld ek jo skouders del (net oplûke) en tichtby jo lichem tidens de dip. Minsken mei eardere skouderklachten moatte foarsichtich wêze of kieze foar in oare triceps-oefening.",
+    "best_timing": "Faak opnommen nei gearstalde boarstoefeningen (lykas push-ups of bankdrukken) om de triceps fierder te wurkjen. Se kinne ek ûnderdiel wêze fan in sirkel mei lichemsgewicht. Om't se de earms fluch útputte kinne, is it gewoan om se earder yn in boppeliif-workout te dwaan, mar soargje derfoar dat jo opwaarme binne. Foarkom it dwaan fan swiere dips nei't jo skouders al útput binne om in goede foarm te behâlden.",
+    "suggested_combinations": ["push-ups", "plank"],
+    "notes": "Pleats jo hannen op 'e râne fan 'e bank of stoel, fingers nei foaren, en hâld jo heupen tichtby de bank as jo dippe (dit ferminderet skouderspanning). Hâld jo ellebogen nei efteren wize (net nei bûten). Ynhale as jo sakje, útademje as jo opdrukke. Om it makliker te meitsjen, bûch jo knibbels en hâld fuotten tichterby; om it hurder te meitsjen, strek jo skonken of ferhef jo fuotten.",
+    "exercise_references": ["Verywell Fit – Triceps Dips Precautions; https://www.verywellfit.com/how-to-do-triceps-dips-3498339", "American Council on Exercise – Triceps Dips Muscles; https://www.acefitness.org/education-and-resources/lifestyle/exercise-library/44/triceps-dips/"]
   },
   "calf-raises": {
     "name": "Calf Raises",
-    "description": "Kom omheech op tean, hâld koart, dan werom omleech"
+    "description": "Kom omheech op tean, hâld koart, dan werom omleech",
+    "benefits": "Fersterket de kealspieren (gastrocnemius en soleus) dy't plantarflexie oandriuwe (op 'e teannen stean). Sterke kealspieren ferbetterje de ankelstabiliteit en it lykwicht, wat it risiko op ankelferstuikingen ferminderet. Se drage ek by oan in bettere ôfset by rinnen, springen en rinnen. Regelmjittige calf raises kinne spierúthâldingsfermogen yn 'e ûnderskonken fersterkje en kinne Achilles-tendon-blessueres helpe foarkomme troch it betingstjen fan 'e tendon en spieren.",
+    "limitations": "It is oer it algemien in feilige lege-ympakt oefening. Lykwols, it wippen oan 'e ûnderkant of it dwaan fan tige rappe reps kin de Achilles-tendon belêstje – fier de raises op in kontrolearre manier út. Minsken mei strakke kealspieren moatte ek stretching opnimme, om't it fersterkjen sûnder stretching de stivens fergrutsje kin. As jo in kealspierkramp fiele, pauzearje dan en stretch sêft foardat jo trochgeane. Minsken mei Achilles-tendonitis moatte foarsichtich begjinne (miskien fokusje op stadige eksintryske sakjen).",
+    "best_timing": "Calf raises kinne dien wurde oan 'e ein fan in skonkworkout of allinich in pear kear yn 'e wike. Se binne maklik yn te bouwen – bygelyks, it dwaan fan sets wylst jo in oanrjocht fêsthâlde. Runners of fytsers dogge se faak yn cool-downs om de kealspieren te fersterkjen. It dwaan fan se om de oare dei is meastal goed om't kealspieren fluch herstelle, mar pas de frekwinsje oan as jo spierpine ûnderfine.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Fier it út mei in folsleine bewegingsbaan: til jo hakken sa heech mooglik, pauzearje koart oan 'e boppekant, en sakje dan jo hakken oant jo in stretch yn jo kealspieren fiele. Hâld de beweging soepel – gjin wippen oan 'e ûnderkant. Foar better lykwicht kinne jo in muorre licht oanreitsje of in stoel rêch fêsthâlde. As jo sterker wurde, kinne jo single-leg calf raises besykje of gewichten fêsthâlde foar mear ferset.",
+    "exercise_references": ["Women's Health – Calf Raises & Balance; https://www.womenshealthmag.com/fitness/a19985985/calf-raises-benefits/", "American Sports & Fitness – Calf Raises Benefits; https://www.americansportandfitness.com/blogs/fitness-blog/benefits-of-calf-raises"]
   },
   "russian-twists": {
     "name": "Russian Twists",
-    "description": "Sit mei fuotten omheech, rotearje torso fan kant nei kant"
+    "description": "Sit mei fuotten omheech, rotearje torso fan kant nei kant",
+    "benefits": "Rjochtet him sterk op de obliquespieren, wat helpt om de siden fan jo buik te toanen en de draaikrêft te ferbetterjen. Russian twists aktivearje ek de transverse abdominis en ûnderrêch om de rêchbonke te stabilisearjen as jo rotearje, wat bydraacht oan in sterkere kearn. Atleten profitearje fan dizze oefening fanwege syn sports-spesifike draaitraining (tink oan it swaaien fan in slachme of golfklup). As it mei kontrôle dien wurdt, kin it de rêchbonkemobiliteit en kearnûthâldingsfermogen ferbetterje.",
+    "limitations": "It draaien mei in rûne ûnderrêch of te swier gewicht kin de lumbale rêchbonke of disks belêstje. It is kritysk om jo rêch yn in 45° hoeke te hâlden en de boarst omheech wylst jo de draai útfiere. As jo in skiednis fan ûnderrêchproblemen hawwe, oerwaget dan om gewichtige draaien te mieden en hâld de beweging lyts en stadich. Guon trainers warskôgje tsjin dizze beweging foar minsken mei osteoporose of diskproblemen fanwege de rotaasjonele stress. Bewege altyd doelbewust – foarkom ynienen skokken.",
+    "best_timing": "Nim it op as ûnderdiel fan in buikspierworkout of sirkel, typysk nei fûnemintele oefeningen lykas planken of crunches. Om't it draaien omfettet, kin it dien wurde nei't de kearn opwaarme is. It wurdt faak pleatst tsjin 'e ein fan in workout as in 'burnout' foar de buikspieren. Foarkom it dwaan as jo ûnderrêch al tige útput is (lykas nei swiere deadlifts) om in goede foarm te behâlden.",
+    "suggested_combinations": ["bicycle-crunches", "plank"],
+    "notes": "Hâld jo kearn oanspand en bewege op in kontrolearre manier – tikje hannen of in gewicht fan de iene kant nei de oare sûnder dat momentum it oernimt. Foar tafoege stabiliteit kinne jo jo hakken op 'e flier hâlde (benammen as jo in begjinner binne). Adem út tidens elke draai. Unthâld, de kwaliteit fan 'e beweging is de kaai; in stadiger, kontrolearre Russian twist is effektiver en feiliger as it hastich út te fieren fan in protte reps.",
+    "exercise_references": ["Men's Health – Russian Twist Benefits; https://www.menshealth.com/fitness/a19548239/russian-twist/", "Les Mills – Russian Twist Caution; https://www.lesmills.com/nordic/fitness-knowledge/are-russian-twists-bad-for-you/"]
   },
   "bear-crawl": {
     "name": "Bear Crawl",
-    "description": "Krûp nei foaren op hannen en fuotten, knibbens fan grûn ôf hâlde"
+    "description": "Krûp nei foaren op hannen en fuotten, knibbens fan grûn ôf hâlde",
+    "benefits": "In gearstalde oefening dy't totale-lichemkrêft en cardio ûntwikkelt. Bear crawls fersterkje de skouders en earms (om't se jo lichem stypje), kearn (om't jo jo romp yn beweging stabilisearje), en skonken – allegearre wylst koördinaasje en behendigheid traind wurde. It is yn prinsipe in bewegende plank, wat jo kearn twingt om hurd te wurkjen om rotaasje te foarkommen as jo bewege, en it ferheget jo hertslach, wat it úthâldingsfermogen ferbetteret. It is ek geweldich foar it opbouwen fan skouderstabiliteit en it ferbetterjen fan heup- en ankelmobiliteit as it dien wurdt mei in juste foarm.",
+    "limitations": "Kin fluch wurch meitsje – behâld foarm sels as jo wurch binne. As jo knibbels de grûn reitsje of heupen sakje, nim dan in pauze om spanning op 'e ûnderrêch te foarkommen. Minsken mei polspine moatte miskien op fûsten of parallelle bars krûpe om polsen neutraal te hâlden. Soargje foar in platte rêch; lit jo holle net sakje (om nekspanning te foarkommen). Om't it om bûgjen giet, moatte persoanen mei hege bloeddruk of glaukoom de holle yn 'e gaten hâlde foar dizigens (hoewol it gjin folsleine omkearing is).",
+    "best_timing": "Faak opnommen yn hege-yntensiteit sirkels of funksjonele trainingssesjes. Bygelyks, jo soene in bear crawl op en del in keamer dwaan kinne as ûnderdiel fan in bootcamp-workout. It kin tsjinje as in cardio-/kondysjeoefening tsjin it ein fan in workout, of as ûnderdiel fan in opwaarming om meardere spiergroepen te aktivearjen. It is alsidich – brûk koarte ôfstannen (bygelyks 10-20 meter) of tiidsyntervallen (20-30 sekonden) mei rêst as nedich.",
+    "suggested_combinations": ["mountain-climbers", "burpees"],
+    "notes": "Hâld jo knibbels tichtby de grûn (in pear sintimeter derfan) en jo rêch plat. Bewege tsjinoerstelde earm en tsjinoerstelde skonk tegearre, hâld bewegingen kontrolearre. Besykje net fan side nei side te wankeljen – span jo buikspieren oan om de romp stabyl te hâlden. Eagen dy't wat nei foaren sjogge sille helpe om in neutrale nekke te behâlden. Adem trochgeand; minsken hâlde faak de azem yn as se krûpe, dus tink josels derom om geregeldwei yn en út te ademen.",
+    "exercise_references": ["BarBend – Bear Crawl Core Benefits; https://barbend.com/bear-crawl-exercise/", "Les Mills – Bear Crawl Benefits; https://www.lesmills.com/fit-business/fitness-management/add-bear-crawls-to-training/"]
   },
   "forward-fold": {
     "name": "Forward Fold",
-    "description": "Stean en bûgje nei foaren, nei tean reitsje"
+    "description": "Stean en bûgje nei foaren, nei tean reitsje",
+    "benefits": "In ferhelderende stretch foar de efterste keten. Steande Forward Fold stretcht de hamstrings, kealspieren en ûnderrêch djip. It dekomprimearret de rêchbonke sêft en kin spanning yn 'e rêch en nekke ferhelpe. Foarút bûgingen hawwe ek in kalmerend effekt op it senuwstelsel – se ferminderje faak stress en eangst, wêrtroch jo jo grûn en ûntspannen fiele. Derneist kin de lichte omkearing (holle ûnder it hert) de sirkulaasje nei de harsens en it gesicht ferbetterje.",
+    "limitations": "Foarkom it wippen yn 'e stretch – in statyske of stadige dynamyske oanpak is feiliger. Minsken mei strakke hamstrings moatte har knibbels in bytsje bûge om spanning of it rûn meitsjen fan 'e ûnderrêch te foarkommen. As jo problemen hawwe mei de ûnderrêch of diskproblemen, skarnier dan by de heupen mei in platte rêch oant jo in stretch fiele, yn stee fan folslein nei foaren yn te klappen. Minsken mei tige hege bloeddruk of glaukoom moatte stadich wer oerein komme om duizeligheid of drukpieken te foarkommen. Swiere froulju moatte har hâlding ferbreedzje om romte te meitsjen foar de buik en it net te komprimearjen.",
+    "best_timing": "Uitstekend oan 'e ein fan in workout tidens in cool-down om de rêch en skonken út te strekken. It is ek nuttich op rêstdagen of foar it sliepen gean om spanning los te litten. Yn yoga wurdt Uttanasana faak dien oan it begjin (om te beoardieljen hoe't it lichem fielt) en oan 'e ein (om te ûntspannen) fan 'e oefening. Sels in koarte forward fold pauze tidens it wurk kin helpe om jo rêchbonke te resetten en jo geast te kalmearjen.",
+    "suggested_combinations": ["downward-dog", "child-pose"],
+    "notes": "Untspan jo nekke folslein en lit jo holle swier hingje as jo bûge binne. Ferspried it gewicht nei de ballen fan jo fuotten (net allinich de hakken) om in bettere hamstringstretch te krijen. Jo kinne tsjinoerstelde ellebogen fêsthâlde en sêft fan side nei side swaaie om ekstra spanning los te litten. Adem stadich en djip; mei elke útademing sjoch dan oft jo jo romp wat tichter by jo dijen sakje litte kinne. Om oerein te kommen, span jo kearn oan en rôlje stadich op, ien wervel tagelyk, om dizigens te foarkommen.",
+    "exercise_references": ["Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/", "YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx"]
   },
   "timeBased": {
     "name": "Tiidbasearre"

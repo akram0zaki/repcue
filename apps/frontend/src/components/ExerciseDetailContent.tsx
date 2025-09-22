@@ -39,7 +39,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
   showActions = true,
   className = ''
 }) => {
-  const { t } = useTranslation(['common', 'exercise', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'exercise']);
   const navigate = useNavigate();
 
   const loc = localizeExercise(exercise, t);
@@ -58,7 +58,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
   };
 
   const formatDuration = (seconds?: number): string => {
-    if (!seconds) return t('exercises.variable', { defaultValue: 'Variable' });
+    if (!seconds) return t('variable', { ns: 'exercises', defaultValue: 'Variable' });
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     if (minutes > 0) {
@@ -146,14 +146,14 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {t('exercises.types.time_based', { defaultValue: 'Time Based' })}
+                {t('types.time_based', { ns: 'exercises', defaultValue: 'Time Based' })}
               </>
             ) : (
               <>
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                {t('exercises.types.repetition_based', { defaultValue: 'Repetition Based' })}
+                {t('types.repetition_based', { ns: 'exercises', defaultValue: 'Repetition Based' })}
               </>
             )}
           </span>
@@ -191,8 +191,8 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               )}
             </svg>
             {exercise.is_public
-              ? t('exercises.public', { defaultValue: 'Public' })
-              : t('exercises.private', { defaultValue: 'Private' })
+              ? t('public', { ns: 'exercises', defaultValue: 'Public' })
+              : t('private', { ns: 'exercises', defaultValue: 'Private' })
             }
           </span>
         </div>
@@ -205,7 +205,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <PlayIcon className="h-5 w-5" />
-              <span>{t('exercises.startTimer', { defaultValue: 'Start Timer' })}</span>
+              <span>{t('startTimer', { ns: 'exercises', defaultValue: 'Start Timer' })}</span>
             </button>
 
             {!isOwner && (
@@ -223,13 +223,13 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {/* Default Values */}
       <div className="mb-6">
         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          {t('exercises.defaultSettings', { defaultValue: 'Default Settings' })}
+          {t('defaultSettings', { ns: 'exercises', defaultValue: 'Default Settings' })}
         </h4>
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
           {exercise.exercise_type === 'time_based' ? (
             <div>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('exercises.duration', { defaultValue: 'Duration' })}:
+                {t('duration', { ns: 'exercises', defaultValue: 'Duration' })}:
               </span>
               <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                 {formatDuration(exercise.default_duration)}
@@ -239,7 +239,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
             <div className="space-y-2">
               <div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('exercises.sets', { defaultValue: 'Sets' })}:
+                  {t('sets', { ns: 'exercises', defaultValue: 'Sets' })}:
                 </span>
                 <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                   {exercise.default_sets || 1}
@@ -247,7 +247,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               </div>
               <div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('exercises.reps', { defaultValue: 'Reps' })}:
+                  {t('reps', { ns: 'exercises', defaultValue: 'Reps' })}:
                 </span>
                 <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                   {exercise.default_reps || 1}
@@ -256,7 +256,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               {exercise.rep_duration_seconds && (
                 <div>
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {t('exercises.repDuration', { defaultValue: 'Rep Duration' })}:
+                    {t('repDuration', { ns: 'exercises', defaultValue: 'Rep Duration' })}:
                   </span>
                   <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                     {formatDuration(exercise.rep_duration_seconds)}
@@ -271,14 +271,14 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {/* Exercise Metadata */}
       <div className="mb-6">
         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          {t('exercises.exerciseInfo', { defaultValue: 'Exercise Information' })}
+          {t('exerciseInfo', { ns: 'exercises', defaultValue: 'Exercise Information' })}
         </h4>
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
           {/* Difficulty Level */}
           {exercise.difficulty_level && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('exercises.difficultyLevel', { defaultValue: 'Difficulty' })}:
+                {t('difficultyLevel', { ns: 'exercises', defaultValue: 'Difficulty' })}:
               </span>
               <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                 exercise.difficulty_level === 'beginner'
@@ -295,12 +295,12 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           {/* Exercise Type Detail */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {t('exercises.type', { defaultValue: 'Type' })}:
+              {t('type', { ns: 'exercises', defaultValue: 'Type' })}:
             </span>
             <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
               {exercise.exercise_type === 'time_based'
-                ? t('exercises.types.time_based', { defaultValue: 'Time Based' })
-                : t('exercises.types.repetition_based', { defaultValue: 'Repetition Based' })
+                ? t('types.time_based', { ns: 'exercises', defaultValue: 'Time Based' })
+                : t('types.repetition_based', { ns: 'exercises', defaultValue: 'Repetition Based' })
               }
             </span>
           </div>
@@ -308,7 +308,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           {/* Sharing Status */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {t('exercises.visibility', { defaultValue: 'Visibility' })}:
+              {t('visibility', { ns: 'exercises', defaultValue: 'Visibility' })}:
             </span>
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
               exercise.is_public
@@ -316,8 +316,8 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
             }`}>
               {exercise.is_public
-                ? t('exercises.public', { defaultValue: 'Public' })
-                : t('exercises.private', { defaultValue: 'Private' })
+                ? t('public', { ns: 'exercises', defaultValue: 'Public' })
+                : t('private', { ns: 'exercises', defaultValue: 'Private' })
               }
             </span>
           </div>
@@ -325,7 +325,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           {/* Video Status */}
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {t('exercises.hasVideo', { defaultValue: 'Video Demo' })}:
+              {t('hasVideo', { ns: 'exercises', defaultValue: 'Video Demo' })}:
             </span>
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
               (exercise.has_video || exercise.custom_video_url)
@@ -333,8 +333,8 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
             }`}>
               {(exercise.has_video || exercise.custom_video_url)
-                ? t('exercises.hasVideoDemo', { defaultValue: 'Available' })
-                : t('exercises.noVideoDemo', { defaultValue: 'Not Available' })
+                ? t('hasVideoDemo', { ns: 'exercises', defaultValue: 'Available' })
+                : t('noVideoDemo', { ns: 'exercises', defaultValue: 'Not Available' })
               }
             </span>
           </div>
@@ -343,10 +343,10 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           {exercise.custom_video_url && (
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('exercises.videoSource', { defaultValue: 'Video Source' })}:
+                {t('videoSource', { ns: 'exercises', defaultValue: 'Video Source' })}:
               </span>
               <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded-full">
-                {t('exercises.customVideo', { defaultValue: 'Custom Upload' })}
+                {t('customVideo', { ns: 'exercises', defaultValue: 'Custom Upload' })}
               </span>
             </div>
           )}
@@ -357,7 +357,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {loc.description && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.description', { defaultValue: 'Description' })}
+            {t('description', { ns: 'exercises', defaultValue: 'Description' })}
           </h4>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
             {loc.description}
@@ -369,7 +369,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {exercise.instructions && exercise.instructions.length > 0 && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.instructions', { defaultValue: 'Instructions' })}
+            {t('instructions', { ns: 'exercises', defaultValue: 'Instructions' })}
           </h4>
           <ol className="list-decimal list-inside space-y-2">
             {exercise.instructions.map((instruction, index) => (
@@ -385,7 +385,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {exercise.tags && exercise.tags.length > 0 && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.tags', { defaultValue: 'Tags' })}
+            {t('tags', { ns: 'exercise', defaultValue: 'Tags' })}
           </h4>
           <div className="flex flex-wrap gap-2">
             {exercise.tags.map((tag) => (
@@ -404,7 +404,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {exercise.equipment_needed && exercise.equipment_needed.length > 0 && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.equipment', { defaultValue: 'Equipment' })}
+            {t('equipment', { ns: 'exercises', defaultValue: 'Equipment' })}
           </h4>
           <ul className="list-disc list-inside space-y-1">
             {exercise.equipment_needed.map((item, index) => (
@@ -417,49 +417,51 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       )}
 
       {/* Benefits */}
-      {exercise.benefits && (
+      {(exercise.benefits || t(`${exercise.id}.benefits`, { ns: 'exercises', defaultValue: null })) && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.benefits', { defaultValue: 'Benefits' })}
+            {t('benefits', { ns: 'exercise', defaultValue: 'Benefits' })}
           </h4>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            {exercise.benefits}
+            {t(`${exercise.id}.benefits`, { ns: 'exercises', defaultValue: exercise.benefits || '' })}
           </p>
         </div>
       )}
 
       {/* Limitations */}
-      {exercise.limitations && (
+      {(exercise.limitations || t(`${exercise.id}.limitations`, { ns: 'exercises', defaultValue: null })) && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.limitations', { defaultValue: 'Limitations' })}
+            {t('limitations', { ns: 'exercise', defaultValue: 'Limitations' })}
           </h4>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            {exercise.limitations}
+            {t(`${exercise.id}.limitations`, { ns: 'exercises', defaultValue: exercise.limitations || '' })}
           </p>
         </div>
       )}
 
       {/* Best Timing */}
-      {exercise.best_timing && (
+      {(exercise.best_timing || t(`${exercise.id}.best_timing`, { ns: 'exercises', defaultValue: null })) && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.bestTiming', { defaultValue: 'Best Timing' })}
+            {t('bestTiming', { ns: 'exercise', defaultValue: 'Best Timing' })}
           </h4>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            {exercise.best_timing}
+            {t(`${exercise.id}.best_timing`, { ns: 'exercises', defaultValue: exercise.best_timing || '' })}
           </p>
         </div>
       )}
 
       {/* Suggested Combinations */}
-      {exercise.suggested_combinations && exercise.suggested_combinations.length > 0 && (
+      {((exercise.suggested_combinations && exercise.suggested_combinations.length > 0) ||
+        (t(`${exercise.id}.suggested_combinations`, { ns: 'exercises', defaultValue: null }) &&
+         Array.isArray(t(`${exercise.id}.suggested_combinations`, { ns: 'exercises', defaultValue: [] })))) && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.suggestedCombinations', { defaultValue: 'Suggested Combinations' })}
+            {t('suggestedCombinations', { ns: 'exercise', defaultValue: 'Suggested Combinations' })}
           </h4>
           <ul className="space-y-1">
-            {exercise.suggested_combinations.map((exerciseId, index) => {
+            {(exercise.suggested_combinations || []).map((exerciseId, index) => {
               const referencedExercise = getExerciseById(exerciseId);
               return (
                 <li key={index} className="flex items-center space-x-2">
@@ -475,7 +477,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
                       }}
                       className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors text-left"
                     >
-                      {referencedExercise.name}
+                      {t(`${exerciseId}.name`, { ns: 'exercises', defaultValue: referencedExercise.name })}
                     </button>
                   ) : (
                     <span className="text-gray-500 dark:text-gray-400 italic text-sm">
@@ -490,25 +492,27 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       )}
 
       {/* Notes */}
-      {exercise.notes && (
+      {(exercise.notes || t(`${exercise.id}.notes`, { ns: 'exercises', defaultValue: null })) && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.notes', { defaultValue: 'Notes' })}
+            {t('notes', { ns: 'exercise', defaultValue: 'Notes' })}
           </h4>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-            {exercise.notes}
+            {t(`${exercise.id}.notes`, { ns: 'exercises', defaultValue: exercise.notes || '' })}
           </p>
         </div>
       )}
 
       {/* Exercise References */}
-      {exercise.exercise_references && exercise.exercise_references.length > 0 && (
+      {((exercise.exercise_references && exercise.exercise_references.length > 0) ||
+        (t(`${exercise.id}.exercise_references`, { ns: 'exercises', defaultValue: null }) &&
+         Array.isArray(t(`${exercise.id}.exercise_references`, { ns: 'exercises', defaultValue: [] })))) && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.references', { defaultValue: 'References' })}
+            {t('references', { ns: 'exercise', defaultValue: 'References' })}
           </h4>
           <ul className="list-disc list-inside space-y-1">
-            {exercise.exercise_references.map((reference, index) => (
+            {(exercise.exercise_references || []).map((reference, index) => (
               <li key={index} className="text-gray-600 dark:text-gray-400">
                 {reference}
               </li>
@@ -521,7 +525,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {exercise.muscle_groups && exercise.muscle_groups.length > 0 && (
         <div className="mb-6">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-            {t('exercises.muscleGroups', { defaultValue: 'Muscle Groups' })}
+            {t('muscleGroups', { ns: 'exercises', defaultValue: 'Muscle Groups' })}
           </h4>
           <div className="flex flex-wrap gap-2">
             {exercise.muscle_groups.map((muscle) => (
@@ -539,7 +543,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
       {/* Ratings & Reviews */}
       <div className="mb-6">
         <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          {t('exercises.ratingsAndReviews', { defaultValue: 'Ratings & Reviews' })}
+          {t('ratingsAndReviews', { ns: 'exercises', defaultValue: 'Ratings & Reviews' })}
         </h4>
         <ExerciseRating
           exerciseId={exercise.id}

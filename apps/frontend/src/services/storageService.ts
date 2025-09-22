@@ -1760,23 +1760,9 @@ export class StorageService {
           op: 'seed'
         }));
 
-        // Remove interface-only fields that don't exist in database
-        const dbCatalogs = cleanCatalogs.map(catalog => {
-          const { nameKey: _nameKey, descriptionKey: _descriptionKey, isDefault: _isDefault, isPremium: _isPremium, displayOrder: _displayOrder, ...rest } = catalog;
-          // Map UI fields to database fields
-          return {
-            ...rest,
-            name_key: catalog.nameKey,
-            description_key: catalog.descriptionKey,
-            is_default: catalog.isDefault,
-            is_premium: catalog.isPremium,
-            display_order: catalog.displayOrder
-          };
-        });
-
         try {
           await this.db.transaction('rw', this.db.exercise_catalogs, async () => {
-            await this.db.exercise_catalogs.bulkPut(dbCatalogs as any);
+            await this.db.exercise_catalogs.bulkPut(cleanCatalogs);
           });
         } catch (txErr) {
           // Fallback to individual puts if bulkPut fails
