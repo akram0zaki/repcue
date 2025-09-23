@@ -535,13 +535,13 @@ if (!(videoBlob instanceof Blob)) {
 - Video playback functionality testing
 - Cross-browser compatibility verification
 
-### Resolution Confirmation
-The fix was verified through:
-- ✅ Exact file size match (1,467,342 bytes expected and received)
-- ✅ Proper MIME type (`video/mp4`)
-- ✅ Successful video loading and playback
-- ✅ No `MEDIA_ERR_SRC_NOT_SUPPORTED` errors
-- ✅ Singleton video file enforcement working correctly
+### Resolution Status
+The video corruption issue has been resolved in production:
+- ✅ Direct `fetch()` API used instead of `supabase.functions.invoke()`
+- ✅ Binary video data preserved without corruption
+- ✅ File size integrity maintained
+- ✅ Successful video loading and playback across all sharing scenarios
+- ✅ No remaining `MEDIA_ERR_SRC_NOT_SUPPORTED` errors
 
 ## Current Status & Architecture Changes
 

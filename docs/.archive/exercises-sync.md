@@ -262,13 +262,22 @@ const dirtyBuiltIn = await db.exercises.filter(ex => ex.dirty === 1 && !isUserCr
 const dirtyUserCreated = await db.exercises.filter(ex => ex.dirty === 1 && isUserCreatedExercise(ex.id)).count();
 ```
 
+## Sync Engine Integration
+
+The exercise management system integrates with RepCue's v2 sync architecture:
+
+1. **Sync Service**: Uses `CorrectSyncService` with per-table cursor pagination
+2. **Table Order**: `exercise_catalogs` syncs before `exercises` due to foreign key dependencies
+3. **Built-in Exclusion**: Built-in exercises filtered out during `SYNC_ORDER` processing
+4. **Shared Exercise Sync**: Special handling via `pullExercisesWithShared()` function
+
 ## Migration Considerations
 
 When updating this system:
 
 1. **ID Format Changes**: Would require data migration - avoid if possible
 2. **Catalog Structure**: Changes to `INITIAL_EXERCISES` automatically propagate
-3. **Sync Logic**: Changes to sync filtering require thorough testing
+3. **Sync Logic**: Changes to sync filtering require thorough testing with v2 engine
 4. **Database Schema**: IndexedDB schema changes need migration strategy
 
-This architecture ensures clear separation of concerns while maintaining data integrity and proper sync behavior for both exercise types.
+This architecture ensures clear separation of concerns while maintaining data integrity and proper sync behavior for all exercise types.
