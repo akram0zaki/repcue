@@ -55,10 +55,6 @@ export const CreateExercisePage: React.FC = () => {
         is_public: exerciseData.is_public || false,
         // System fields
         is_favorite: false,
-        is_verified: false,
-        rating_average: 0,
-        rating_count: 0,
-        copy_count: 0,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         deleted: false,

@@ -113,6 +113,12 @@ export class ForceUpdateService {
       userAcknowledged: false
     };
 
+    logger.debug('Force update state set:', {
+      isActive: this.forceUpdateState.isForceUpdateActive,
+      version: this.forceUpdateState.updateInfo?.version,
+      hasWorkoutData: !!this.forceUpdateState.workoutData
+    });
+
     // Start auto-force countdown
     this.startAutoForceCountdown();
 
@@ -214,7 +220,32 @@ export class ForceUpdateService {
    * User chooses to apply force update immediately
    */
   public async applyForceUpdate(): Promise<void> {
+    logger.debug('applyForceUpdate called, current state:', {
+      isForceUpdateActive: this.forceUpdateState.isForceUpdateActive,
+      hasUpdateInfo: !!this.forceUpdateState.updateInfo,
+      userAcknowledged: this.forceUpdateState.userAcknowledged
+    });
+
     if (!this.forceUpdateState.isForceUpdateActive || !this.forceUpdateState.updateInfo) {
+      logger.error('No active force update to apply - state dump:', {
+        forceUpdateState: this.forceUpdateState,
+        isActive: this.forceUpdateState.isForceUpdateActive,
+        hasInfo: !!this.forceUpdateState.updateInfo
+      });
+
+      // Try to check with updateService if there's actually an update available
+      try {
+        const updateInfo = await updateService.checkForUpdates();
+        if (updateInfo && updateInfo.policy === 'force') {
+          logger.warn('Found force update info from updateService, reinitializing force update state');
+          this.handleForceUpdateAvailable(updateInfo);
+          // Retry the apply after reinitializing
+          return this.forceUpdate();
+        }
+      } catch (error) {
+        logger.error('Failed to check for updates during recovery:', error);
+      }
+
       throw new Error('No active force update to apply');
     }
 
@@ -239,8 +270,35 @@ export class ForceUpdateService {
         await this.saveWorkoutState();
       }
 
-      // Apply the update using the update service
-      await updateService.applyUpdate(true); // Force override all checks
+      // Check if we're in PWA mode vs dev mode
+      const isPWAMode = !('serviceWorker' in navigator) ||
+                       !import.meta.env.DEV ||
+                       window.matchMedia('(display-mode: standalone)').matches;
+
+      logger.debug('Force update context:', {
+        isPWAMode,
+        hasServiceWorker: 'serviceWorker' in navigator,
+        isDev: import.meta.env.DEV,
+        isStandalone: window.matchMedia('(display-mode: standalone)').matches
+      });
+
+      if (isPWAMode) {
+        // In PWA mode, try the update service first, but have fallback
+        try {
+          await updateService.applyUpdate(true); // Force override all checks
+          logger.log('✅ PWA update service succeeded');
+        } catch (updateError) {
+          logger.warn('PWA update service failed, falling back to force reload:', updateError);
+          // Fallback to force reload in PWA mode
+          this.forceReload();
+          return;
+        }
+      } else {
+        // In dev mode, just reload
+        logger.log('🔄 Dev mode detected, performing force reload');
+        this.forceReload();
+        return;
+      }
 
       // Update completed - this will trigger page reload
       this.handleForceUpdateCompleted(this.forceUpdateState.updateInfo);
@@ -305,10 +363,26 @@ export class ForceUpdateService {
 
     this.emit('force-reload-initiated');
 
-    // Small delay to allow event to be processed
+    // Mark force update as completed before reload to prevent state issues
+    if (this.forceUpdateState.updateInfo) {
+      this.handleForceUpdateCompleted(this.forceUpdateState.updateInfo);
+    }
+
+    // Clear any cached data that might be causing issues
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName);
+        });
+      }).catch(error => {
+        logger.debug('Failed to clear caches:', error);
+      });
+    }
+
+    // Small delay to allow event to be processed and caches to be cleared
     setTimeout(() => {
       window.location.reload();
-    }, 100);
+    }, 200);
   }
 
   /**
@@ -376,6 +450,11 @@ export class ForceUpdateService {
   private handleForceUpdateCompleted(updateInfo: UpdateInfo): void {
     logger.log('✅ Force update completed successfully');
 
+    logger.debug('Clearing force update state (completion):', {
+      previousState: this.forceUpdateState.isForceUpdateActive,
+      version: updateInfo.version
+    });
+
     this.forceUpdateState.isForceUpdateActive = false;
     this.clearAutoForceTimeout();
 
@@ -425,6 +504,25 @@ export class ForceUpdateService {
   }
 
   /**
+   * Debug method to check if there's actually an update available
+   */
+  public async debugCheckForUpdates(): Promise<void> {
+    try {
+      logger.debug('🔍 Checking for updates (debug)...');
+      const updateInfo = await updateService.checkForUpdates();
+      logger.debug('Update check result:', {
+        hasUpdate: !!updateInfo,
+        version: updateInfo?.version,
+        policy: updateInfo?.policy,
+        forceUpdate: updateInfo?.forceUpdate,
+        currentForceState: this.forceUpdateState.isForceUpdateActive
+      });
+    } catch (error) {
+      logger.debug('Update check failed:', error);
+    }
+  }
+
+  /**
    * Check if workout is currently interrupted by force update
    */
   public isWorkoutInterrupted(): boolean {
@@ -451,6 +549,11 @@ export class ForceUpdateService {
     if (!this.forceUpdateState.userAcknowledged) {
       return false;
     }
+
+    logger.debug('Clearing force update state (cancellation):', {
+      previousState: this.forceUpdateState.isForceUpdateActive,
+      userAcknowledged: this.forceUpdateState.userAcknowledged
+    });
 
     this.forceUpdateState.isForceUpdateActive = false;
     this.clearAutoForceTimeout();

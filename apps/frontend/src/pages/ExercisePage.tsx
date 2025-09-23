@@ -198,7 +198,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
 
     // Exclude shared copies from being considered user-created
-    if (exercise.is_shared_copy === true) {
+    if (isSharedExercise(exercise.id)) {
       return false;
     }
 

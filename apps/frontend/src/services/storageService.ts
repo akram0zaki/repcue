@@ -318,6 +318,32 @@ class RepCueDatabase extends Dexie {
         }
       });
     });
+
+    // Version 21: Remove old sharing columns for reference-based sharing system
+    this.version(21).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(async (trans) => {
+      // Clean up old sharing-related fields from exercises
+      logger.log('[Migration v21] Removing old sharing columns from exercises for reference-based sharing');
+
+      await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+        // Remove old sharing fields that are no longer used
+        delete exercise.shared_from_exercise_id;
+        delete exercise.shared_from_user_id;
+        delete exercise.is_shared_copy;
+        
+        logger.log(`[Migration v21] Cleaned up sharing fields for exercise ${exercise.id}`);
+      });
+    });
   }
 
   /**
@@ -3069,6 +3095,50 @@ export class StorageService {
     } catch (error) {
       logger.warn('Failed to get shared exercise data:', error);
       return [];
+    }
+  }
+
+  /**
+   * Delete a shared exercise reference from user_favorites
+   * This removes the exercise from the user's library without deleting the original exercise
+   */
+  public async deleteSharedExerciseReference(userId: string, exerciseId: string): Promise<boolean> {
+    if (!this.canStoreData()) {
+      logger.warn('[deleteSharedExerciseReference] Cannot store data');
+      return false;
+    }
+
+    try {
+      // Find the shared exercise reference
+      const sharedRef = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .and(favorite =>
+          favorite.item_id === exerciseId &&
+          favorite.item_type === 'exercise' &&
+          favorite.exercise_type === 'shared' &&
+          !favorite.deleted
+        )
+        .first();
+
+      if (!sharedRef) {
+        logger.warn(`[deleteSharedExerciseReference] No shared reference found for exercise ${exerciseId}`);
+        return false;
+      }
+
+      // Soft delete the reference
+      const now = new Date().toISOString();
+      await this.db.user_favorites.update(sharedRef.id, {
+        deleted: true,
+        updated_at: now,
+        version: (sharedRef.version || 0) + 1,
+        dirty: 1 // Mark for sync
+      });
+
+      logger.log(`[deleteSharedExerciseReference] Soft deleted shared exercise reference: ${exerciseId}`);
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete shared exercise reference:', error);
+      return false;
     }
   }
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PlayIcon } from '../components/icons/NavigationIcons';
+import { useSharedExercises } from '../hooks/useSharedExercises';
 import { ExercisePlaceholder } from './ExercisePlaceholder';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
@@ -37,6 +38,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   className = ''
 }) => {
   const { t } = useTranslation('exercises');
+  const { isSharedExercise } = useSharedExercises();
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -59,7 +61,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
             exerciseId: exercise.id,
             customVideoUrl: exercise.custom_video_url,
-            isSharedCopy: exercise.is_shared_copy
+            isSharedCopy: isSharedExercise(exercise.id)
           });
           url = await resolveVideoUrl(exercise.custom_video_url);
           logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
@@ -83,7 +85,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
         if (url) {
           // Additional blob URL validation for shared exercises
-          if (url.startsWith('blob:') && exercise.is_shared_copy) {
+          if (url.startsWith('blob:') && isSharedExercise(exercise.id)) {
             logger.log('🎥 [VideoThumbnail] Validating blob URL for shared exercise:', {
               exerciseId: exercise.id,
               blobUrl: url,
@@ -135,7 +137,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         videoSrc: video.src,
         videoUrl: videoUrl,
         isCustomVideo: !!exercise.custom_video_url,
-        isSharedCopy: exercise.is_shared_copy,
+        isSharedCopy: isSharedExercise(exercise.id),
         originalVideoUrl: exercise.custom_video_url,
         error: e,
         videoError: {
@@ -158,7 +160,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           exerciseId: exercise.id,
           blobUrl: videoUrl,
           videoSrc: video.src,
-          isSharedExercise: exercise.is_shared_copy,
+          isSharedExercise: isSharedExercise(exercise.id),
           possibleCauses: [
             'Corrupted MP4 metadata',
             'Invalid file format',
@@ -168,7 +170,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         });
 
         // For shared exercises with corrupted videos, try to clear cache and reload
-        if (exercise.is_shared_copy && videoUrl?.startsWith('blob:')) {
+        if (isSharedExercise(exercise.id) && videoUrl?.startsWith('blob:')) {
           logger.warn('🎥 [VideoThumbnail] Attempting to clear corrupted shared video cache');
 
           // Clear the video cache for this exercise (non-blocking)

@@ -11,7 +11,7 @@ import { DEBUG } from '../config/features';
  */
 const SyncStatusBanner: React.FC = () => {
   const { isOffline, isOnline, hasBeenOffline } = useOfflineStatus();
-  const { state: syncState, actions: syncActions } = useNetworkSync();
+  const { state: syncState } = useNetworkSync();
   const { isAuthenticated } = useAuth();
   const { showSnackbar } = useSnackbar();
   const lastErrorRef = useRef<string | null>(null);
@@ -51,117 +51,72 @@ const SyncStatusBanner: React.FC = () => {
     }
   }, [isAuthenticated, syncState.errors, syncState.lastSyncAttempt, showSnackbar]);
 
-  // Show sync in progress (for authenticated users)
-  if (DEBUG && isAuthenticated && syncState.isSyncing) {
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-3 z-50 shadow-md" role="status" data-testid="sync-status-banner">
-        <div className="flex items-center">
-          <div className="flex-shrink-0" aria-hidden="true">
-            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium">
-              Syncing data...
-            </p>
-            <p className="text-xs mt-1">
-              Backing up your progress to the cloud
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Show sync in progress (for authenticated users) - as toast
+  useEffect(() => {
+    if (DEBUG && isAuthenticated && syncState.isSyncing) {
+      showSnackbar('Syncing data... Backing up your progress to the cloud', {
+        type: 'info',
+        durationMs: 3000
+      });
+    }
+  }, [DEBUG, isAuthenticated, syncState.isSyncing, showSnackbar]);
 
-  // Show offline message (highest priority for non-authenticated users)
-  if (isOffline) {
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-3 z-50 shadow-md" role="alert" data-testid="sync-status-banner">
-        <div className="flex items-center">
-          <div className="flex-shrink-0" aria-hidden="true">
-            📴
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium">
-              You're offline
-            </p>
-            <p className="text-xs mt-1">
-              {isAuthenticated
-                ? "All features work normally. You'll reconnect automatically."
-                : "All features work normally. Your data is saved locally."
-              }
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Show offline message (highest priority for non-authenticated users) - as toast
+  const offlineMessageRef = useRef(false);
+  useEffect(() => {
+    if (isOffline && !offlineMessageRef.current) {
+      offlineMessageRef.current = true;
+      const message = isAuthenticated
+        ? "You're offline. All features work normally. You'll reconnect automatically."
+        : "You're offline. All features work normally. Your data is saved locally.";
+      showSnackbar(message, {
+        type: 'warning',
+        durationMs: 5000
+      });
+    } else if (!isOffline) {
+      offlineMessageRef.current = false;
+    }
+  }, [isOffline, isAuthenticated, showSnackbar]);
 
-  // Show reconnection message briefly (for all users)
-  if (isOnline && hasBeenOffline) {
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-green-100 border-l-4 border-green-500 text-green-700 p-3 z-50 shadow-md" role="alert" data-testid="sync-status-banner">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="flex-shrink-0" aria-hidden="true">
-              🌐
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">
-                Connection restored
-              </p>
-              <p className="text-xs mt-1">
-                {isAuthenticated
-                  ? (DEBUG ? "Back online! Data will sync automatically." : "Back online! All features available.")
-                  : "Back online! All features available."
-                }
-              </p>
-            </div>
-          </div>
-          {DEBUG && isAuthenticated && syncState.hasChangesToSync && (
-            <button
-              onClick={syncActions.triggerSync}
-              className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors ml-3"
-              aria-label="Sync now"
-            >
-              Sync Now
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // Show reconnection message briefly (for all users) - as toast
+  const reconnectionMessageRef = useRef(false);
+  useEffect(() => {
+    if (isOnline && hasBeenOffline && !reconnectionMessageRef.current) {
+      reconnectionMessageRef.current = true;
+      const message = isAuthenticated
+        ? (DEBUG ? "Connection restored! Data will sync automatically." : "Connection restored! All features available.")
+        : "Connection restored! All features available.";
+      showSnackbar(message, {
+        type: 'success',
+        durationMs: 4000
+      });
 
-  // Show pending changes indicator (for authenticated users only)
-  if (DEBUG && isAuthenticated && isOnline && syncState.hasChangesToSync && !syncState.isSyncing) {
-    const lastSyncText = formatTimeAgo(syncState.lastSuccessfulSync);
+      // Reset the flag after a delay to allow for future reconnections
+      setTimeout(() => {
+        reconnectionMessageRef.current = false;
+      }, 10000);
+    }
+  }, [isOnline, hasBeenOffline, isAuthenticated, DEBUG, showSnackbar]);
 
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-3 z-50 shadow-md" role="status" data-testid="sync-status-banner">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="flex-shrink-0" aria-hidden="true">
-              🔄
-            </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium">
-                Changes ready to sync
-              </p>
-              <p className="text-xs mt-1">
-                Last synced: {lastSyncText}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={syncActions.triggerSync}
-            className="text-xs px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
-            aria-label="Sync changes now"
-          >
-            Sync
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Show pending changes indicator (for authenticated users only) - as toast
+  const pendingChangesRef = useRef(false);
+  useEffect(() => {
+    if (DEBUG && isAuthenticated && isOnline && syncState.hasChangesToSync && !syncState.isSyncing && !pendingChangesRef.current) {
+      pendingChangesRef.current = true;
+      const lastSyncText = formatTimeAgo(syncState.lastSuccessfulSync);
+      showSnackbar(`Changes ready to sync. Last synced: ${lastSyncText}`, {
+        type: 'info',
+        durationMs: 6000
+      });
+
+      // Reset flag when changes are no longer pending
+      setTimeout(() => {
+        pendingChangesRef.current = false;
+      }, 30000);
+    } else if (!syncState.hasChangesToSync) {
+      pendingChangesRef.current = false;
+    }
+  }, [DEBUG, isAuthenticated, isOnline, syncState.hasChangesToSync, syncState.isSyncing, syncState.lastSuccessfulSync, showSnackbar]);
 
   // No banner when online and no sync issues
   return null;

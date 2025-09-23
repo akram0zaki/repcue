@@ -11,6 +11,7 @@ import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
+import { useSharedExercises } from './hooks/useSharedExercises';
 import { useSnackbar } from './components/SnackbarProvider';
 import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
@@ -158,13 +159,23 @@ const setupSyncTriggers = () => {
     logger.log('⏰ Periodic sync re-enabled');
   };
 
+  // Trigger sync when coming back online
+  const handleOnline = () => {
+    logger.log('🌐 Connection restored - triggering sync');
+    syncService.sync(true).catch(error => {
+      logger.warn('Online sync failed:', error);
+    });
+  };
+
   // Setup event listeners
   document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('online', handleOnline);
   setupPeriodicSync();
 
   // Cleanup function
   return () => {
     document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('online', handleOnline);
     if (syncInterval.current) {
       clearInterval(syncInterval.current);
     }
@@ -186,6 +197,7 @@ function App() {
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
   const { user } = useAuth();
+  const { isSharedExercise } = useSharedExercises();
   const { showSnackbar } = useSnackbar();
   const { t } = useTranslation(['common', 'exercises']);
 
@@ -2255,11 +2267,13 @@ useEffect(() => {
         throw new Error('Exercise not found');
       }
 
-      if (exercise.is_shared_copy) {
-        // For shared exercises, delete from local storage only
-        // The sync will handle removing it from the user's data
-        await storageService.deleteCustomExercise(exercise_id);
-        logger.log('Deleted shared exercise from local storage:', exercise.name);
+      if (isSharedExercise(exercise_id)) {
+        // For shared exercises, remove the reference from user_favorites
+        // This preserves the original exercise but removes it from user's library
+        if (user?.id) {
+          await storageService.deleteSharedExerciseReference(user.id, exercise_id);
+          logger.log('Removed shared exercise reference:', exercise.name);
+        }
       } else {
         // For user-created exercises, delete normally
         await storageService.deleteCustomExercise(exercise_id);

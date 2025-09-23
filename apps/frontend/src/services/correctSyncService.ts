@@ -60,6 +60,17 @@ interface EdgeSyncResponseV2 {
   correlation_id?: string;
   server_time: string;
   tables: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[]; nextCursor?: TableCursor; more?: boolean }>;
+  sync_metadata?: {
+    push_successes: number;
+    push_errors: number;
+    pull_successes: number;
+    pull_errors: number;
+    total_successes: number;
+    total_errors: number;
+    detailed_errors: Array<{ table: string; record_id: string; operation: string; error: string }>;
+  };
+  status?: string;
+  message?: string;
 }
 
 export class CorrectSyncService {
@@ -310,9 +321,9 @@ export class CorrectSyncService {
         sentAtLeastOnce = true;
         if (response.correlation_id) result.correlationId = response.correlation_id;
 
-        // Mark only what we sent as clean
+        // Mark only what we sent as clean (but only if successful)
         if (hasPush) {
-          await this.markPushedClean(batchPayload);
+          await this.markPushedClean(batchPayload, response);
           // Update pushed count for reporting
           for (const d of Object.values(batchPayload)) {
             result.pushed += d.upserts.length + d.deletes.length;
@@ -428,6 +439,9 @@ export class CorrectSyncService {
             mappedRecord = this.storage.convertAppSettingsForSync(clean as unknown as AppSettings);
           } else if (tableName === 'user_favorites' && this.storage) {
             mappedRecord = this.storage.convertUserFavoritesForSync(clean as unknown as UserFavorite);
+          } else if (tableName === 'exercises') {
+            // Apply exercises field mapping (catalogId → catalog_id)
+            mappedRecord = this.mapExerciseFieldsToServer(this.filterUndefinedValues(clean));
           } else if (tableName === 'video_files') {
             // Special handling for video_files: convert File to serializable format
             mappedRecord = await this.convertVideoFileForSync(clean);
@@ -508,20 +522,49 @@ export class CorrectSyncService {
     }
   }
 
-  private async markPushedClean(payload: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>) {
+  private async markPushedClean(payload: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>, response: EdgeSyncResponseV2) {
     if (!this.storage) return;
     const db = this.storage.getDatabase();
     const nowIso = new Date().toISOString();
+
+    // Extract failed record IDs from detailed errors if available
+    const failedRecordIds = new Set<string>();
+    if (response.sync_metadata?.detailed_errors) {
+      for (const error of response.sync_metadata.detailed_errors) {
+        if (error.record_id) {
+          failedRecordIds.add(`${error.table}:${error.record_id}`);
+        }
+      }
+    }
+
     for (const [table, data] of Object.entries(payload)) {
       const coll = (db as unknown as Record<string, unknown>)[table] as { update: (id: string, changes: Record<string, unknown>) => Promise<number> } | undefined;
       if (!coll) continue;
-      // Mark upserts
+
+      // Mark upserts as clean only if they didn't fail
       for (const rec of data.upserts) {
-        try { await coll.update(rec.id as string, { dirty: 0, op: undefined, synced_at: nowIso }); } catch {}
+        const recordKey = `${table}:${rec.id}`;
+        if (!failedRecordIds.has(recordKey)) {
+          try {
+            await coll.update(rec.id as string, { dirty: 0, op: undefined, synced_at: nowIso });
+            if (SYNC_DEBUG) logger.debug(`[sync:v2] marked ${recordKey} as clean (success)`);
+          } catch {}
+        } else {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] keeping ${recordKey} dirty (failed)`);
+        }
       }
-      // Mark deletes
+
+      // Mark deletes as clean only if they didn't fail
       for (const id of data.deletes) {
-        try { await coll.update(id, { dirty: 0, op: undefined, synced_at: nowIso }); } catch {}
+        const recordKey = `${table}:${id}`;
+        if (!failedRecordIds.has(recordKey)) {
+          try {
+            await coll.update(id, { dirty: 0, op: undefined, synced_at: nowIso });
+            if (SYNC_DEBUG) logger.debug(`[sync:v2] marked ${recordKey} as clean (success)`);
+          } catch {}
+        } else {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] keeping ${recordKey} dirty (failed)`);
+        }
       }
     }
   }
@@ -617,6 +660,22 @@ export class CorrectSyncService {
     if ('catalog_id' in mapped) {
       mapped.catalogId = mapped.catalog_id;
       delete mapped.catalog_id;
+    }
+
+    return mapped;
+  }
+
+  /**
+   * Maps exercise field names from client format to server format
+   * Handles field name differences between frontend and Supabase edge functions
+   */
+  private mapExerciseFieldsToServer(row: Record<string, unknown>): Record<string, unknown> {
+    const mapped = { ...row };
+
+    // Map catalogId (client) to catalog_id (server)
+    if ('catalogId' in mapped) {
+      mapped.catalog_id = mapped.catalogId;
+      delete mapped.catalogId;
     }
 
     return mapped;

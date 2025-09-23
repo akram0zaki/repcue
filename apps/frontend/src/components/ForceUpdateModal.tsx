@@ -179,6 +179,21 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
     setShowWorkoutOptions(isWorkoutActive && !!workoutData);
   }, [isWorkoutActive, workoutData]);
 
+  // Reset processing state when modal closes or error occurs
+  useEffect(() => {
+    if (!isOpen) {
+      setIsProcessing(false);
+      setRetryAttempts(0);
+    }
+  }, [isOpen]);
+
+  // Reset processing state when there's an error
+  useEffect(() => {
+    if (error && isProcessing) {
+      setIsProcessing(false);
+    }
+  }, [error, isProcessing]);
+
   const handleApplyUpdate = async () => {
     if (isProcessing) return;
 
@@ -186,8 +201,10 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
       setIsProcessing(true);
       logger.log('Force update initiated by user');
       await onApplyUpdate();
+      // If we reach here and no error was thrown, the update was successful
+      // The processing state should remain true until the modal closes via force-update-completed event
     } catch (error) {
-      logger.error('Failed to apply force update:', error);
+      logger.error('Failed to apply force update from modal:', error);
       setRetryAttempts(prev => prev + 1);
       setIsProcessing(false);
       // Error handling will be done by the parent component

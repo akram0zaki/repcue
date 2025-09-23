@@ -243,6 +243,10 @@ Not all exercises have videos so if the exercise doesn't have a video we should 
 
 - Since this is a PWA it is difficult to force-push new updates to users because pages are cached. I want to introduce a version system maintained in the database and a force-update mechanism linked to the version system. When the PWA comes online during initialization or sync or whatever applicable touchpoint, it would look up the version system in the database, compare the last published version against its local record, and prompt the user for a new version and if it is a mandatory upgrade, it only continues working if the user upgrades.
 
+- Go over the documentation @docs\implementation-plans\sharing-fix-implementation-plan.md @docs\exercises-sync.md @docs\exercise-sharing.md @docs\video-sync.md @docs\sync.md to understand how the sync system works. If there are contradictions in the documentation it is because each document was written at a different stage of the project, in which case you refer to the implementation to see what the real implementation is and update wrong documentation accordingly.
+
+
+
 - We don't need real migration:
 
 // Type for database records during migration - supports both user_id and owner_id

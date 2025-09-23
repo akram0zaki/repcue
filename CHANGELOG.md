@@ -1,5 +1,95 @@
 ## Unreleased
 
+## 2025-09-23 (Sync System Enhancement & PWA Force Update Fix)
+
+### Fixed
+- **PWA Force Update Modal Hanging Issue**: Resolved critical issue where force update modal would get stuck on "Applying Update..." in PWA mode
+  - **Root Cause**: Force update system was using development-mode logic in PWA environment, causing service worker update failures
+  - **Context Detection**: Added intelligent detection to differentiate between PWA mode and development server
+  - **Dual Update Paths**: Implemented separate update strategies for PWA (service worker) vs dev mode (direct reload)
+  - **Fallback Protection**: Added automatic fallback to force reload when service worker update fails
+  - **State Recovery**: Enhanced state management with auto-recovery when force update state gets corrupted
+  - **Cache Clearing**: Implemented PWA cache clearing before reload to ensure fresh content
+  - **Enhanced Debugging**: Added comprehensive logging for PWA context detection and update flow troubleshooting
+
+- **Sync Service Detailed Error Reporting**: Enhanced sync error visibility with comprehensive table-level status reporting
+  - **Log Level Classification**: Implemented smart logging based on sync status (debug for success, info for partial success, error for failure)
+  - **Per-Table Breakdown**: Added detailed reporting of which tables succeeded/failed during sync operations
+  - **Success/Error Counts**: Display exact counts of push/pull successes and errors per table
+  - **Detailed Error Information**: Surface specific error messages and operation details from edge function
+  - **Correlation ID Tracking**: Enhanced request tracing with correlation IDs for debugging sync issues
+  - **Improved UX**: Users now get clear visibility into exactly what succeeded/failed during sync operations
+
+### Enhanced
+- **Force Update Service Robustness**: Improved reliability and error handling for PWA force updates
+  - **Context-Aware Updates**: Automatically adapts update strategy based on PWA vs development environment
+  - **State Preservation**: Enhanced workout state saving and recovery across force updates
+  - **Modal State Management**: Fixed processing state handling to prevent permanent modal hanging
+  - **Recovery Mechanisms**: Added multiple fallback strategies when primary update methods fail
+  - **Debug Utilities**: Added `debugCheckForUpdates()` method for troubleshooting update availability
+
+- **Sync Toast Positioning Enhancement**: Improved sync notification user experience
+  - **Centered Display**: Moved sync toast notifications from bottom (covering menu) to center screen
+  - **Reduced Duration**: Shortened toast display time by 1 second for less intrusive notifications
+  - **Better Accessibility**: Improved visibility and reduced interference with navigation elements
+
+### Technical Infrastructure
+- **Edge Function Sync Enhancements**: Deployed comprehensive sync_v2 edge function improvements to production
+  - **Enhanced Error Reporting**: Implemented detailed per-table sync status tracking and error reporting
+  - **Comprehensive Field Allowlists**: Verified and corrected all table field allowlists to match database schema
+  - **Video Upload Processing**: Enhanced video file handling with proper storage bucket management
+  - **Correlation ID System**: Added request tracking for better debugging and monitoring
+  - **Production Deployment**: Successfully deployed version 23 to production with all enhancements
+
+### Developer Experience
+- **Enhanced Debugging**: Added comprehensive logging and state tracking for force update and sync systems
+  - **PWA Context Detection**: Log environment detection and update strategy selection
+  - **State Dump Logging**: Full state information when errors occur for easier troubleshooting
+  - **Update Flow Tracking**: Detailed logging of update process steps and decision points
+  - **Error Recovery Paths**: Clear logging of fallback mechanisms and recovery attempts
+
+## 2025-09-23 (Sync Optimization & Error Resolution)
+
+### Fixed
+- **Online Event Listener for Immediate Sync**: Added network connectivity-based sync triggering for faster data synchronization
+  - **Online Event Handler**: Added `online` event listener to `App.tsx` setupSyncTriggers function that triggers sync immediately when reconnecting to internet
+  - **Improved User Experience**: Exercises now sync automatically upon network reconnection instead of waiting for periodic sync intervals
+  - **Enhanced Logging**: Added connection restoration debug logging to track sync trigger events
+
+- **Exercise Creation Social Engagement Field Cleanup**: Resolved sync failures caused by inappropriate social engagement placeholders
+  - **Root Cause**: Social engagement fields (`is_verified`, `rating_average`, `rating_count`, `copy_count`) were incorrectly added to user exercise creation form
+  - **Solution**: Removed these calculated/system fields from `CreateExercisePage.tsx` as they are database-computed values, not user inputs
+  - **Edge Function Fix**: Updated sync_v2 allowlist to exclude social engagement fields from exercise sync operations
+  - **Result**: Custom exercise creation now syncs successfully without field validation errors
+
+- **Sync Status Banner to Toast Conversion**: Improved user experience by replacing persistent sync banners with auto-disappearing toast notifications
+  - **UX Enhancement**: Converted all sync status banners in `SyncStatusBanner.tsx` to toast notifications for cleaner interface
+  - **Maintained Functionality**: Preserved all original sync status conditions (DEBUG flags, authentication checks, error states) while changing output to toasts
+  - **Smart Deduplication**: Added ref-based debouncing to prevent duplicate notifications for same sync events
+  - **Extended Duration**: Sync error toasts display for 8 seconds (longer than standard) to ensure visibility
+  - **DEBUG Compatibility**: Maintained DEBUG flag functionality while providing toast-based feedback instead of persistent banners
+
+- **Video Upload Storage Bucket Fix**: Resolved "Bucket not found" errors preventing video uploads in production
+  - **Root Cause**: Edge function was attempting to use non-existent 'exercise-media' bucket instead of existing 'videos' bucket
+  - **Investigation**: Verified both development and production environments only have 'videos' and 'exercise-videos' buckets
+  - **Solution**: Updated sync_v2 edge function to use correct 'videos' bucket for video file uploads
+  - **Enhanced Error Handling**: Improved video upload error reporting with correlation IDs for better debugging
+  - **Cross-Environment Consistency**: Ensured edge function behavior matches between development and production environments
+
+### Enhanced
+- **Edge Function Video File Processing**: Improved binary video file handling for reliable sync operations
+  - **Byte Array Support**: Enhanced edge function to properly handle Array.isArray(fileData) for video uploads sent as byte arrays
+  - **Base64 Fallback Removal**: Removed incorrect base64 decoding logic that was causing video corruption errors
+  - **MIME Type Support**: Added proper content-type handling for uploaded video files
+  - **Storage Path Organization**: Maintained secure user-folder structure for video file organization
+
+### Technical Infrastructure
+- **Edge Function Deployments**: Updated sync_v2 edge function to production version 22 with comprehensive fixes
+  - **Field Allowlist Cleanup**: Removed inappropriate social engagement fields from exercise sync allowlist
+  - **Video Upload Pipeline**: Fixed storage bucket references and byte array handling
+  - **Enhanced Logging**: Added correlation IDs and detailed error reporting for debugging sync issues
+  - **Workspace Synchronization**: Updated workspace edge function file to match deployed production version
+
 ## 2025-09-22 (UI/UX Improvements & Database Cleanup)
 
 ### Fixed
