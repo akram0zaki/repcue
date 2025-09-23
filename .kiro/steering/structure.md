@@ -123,3 +123,24 @@ docs/
 - **Service imports**: Always use singleton instances
 - **Type imports**: Use `import type` for type-only imports
 - **Component imports**: Lazy loading for routes, direct imports for shared components
+
+## Change Management
+- When requested to create an implementation plan, save it to the docs\implementation-plans directory in markdown (.md) format.
+- The application uses Supabase for backend services, including database and edge functions.
+- **CRITICAL**: If changes to Supabase are needed (schema, policies, edge functions), you must always write the changes first in the workspace before applying them to supabase. NEVER make changes directly in Supabase without first applying them in the workspace. Must also keep track of all changes in a dedicated tracker file in the docs\migration-tracking\supabase-changes_yyyyMMdd.md file. 
+- **Supabase Environment Management**: RepCue uses dual Supabase environments:
+  - Development: Project `repcue-dev` (xwzrsfkzqxdybjrkkkvh) - accessed via `mcp_supabase_*` tools
+  - Production: Project `RepCue` (zumzzuvfsuzvvymhpymk) - accessed via `mcp_supabase-prod_*` tools
+  - **CRITICAL**: Always verify environment synchronization before major changes. Production can lag significantly behind development in both database schema and edge functions. See `.github/instructions/supabase.instructions.md` for comprehensive migration guidance.
+
+## Architecture Highlights
+
+- Offline-first: IndexedDB primary, sync augments UX
+- Security: Allow-listed tables, field scrubbing, ownership validation
+- Performance: Batch limits (≤5 push, 50 pull), exponential backoff
+- Reliability: Correlation IDs, comprehensive error handling
+
+## Exercise Types & Sync Behavior
+1. Built-in: Local-only, never synced, managed from exercises.ts
+2. User-created: Full CRUD sync with ownership validation
+3. Shared: Reference-based via user_favorites table
