@@ -4,6 +4,7 @@ import { ConsentService } from './consentService';
 import { SYNC_ENABLED, SYNC_DEBUG } from '../config/features';
 import logger from '../utils/logger';
 import type { AppSettings, UserFavorite } from '../types';
+import { isBuiltin, isBuiltinCatalog } from '../utils/syncFilters';
 
 // v2 Sync core constants
 const PUSH_BATCH_SIZE = 5; // Per spec
@@ -17,7 +18,6 @@ const SYNC_TIMEOUT_MS = 8_000; // Overall sync timeout per invocation (reduced t
 const SYNC_ORDER: readonly string[] = [
   'user_preferences',
   'app_settings',
-  'exercise_catalogs',  // NEW: Must sync before exercises due to foreign key
   'exercises',
   'user_favorites',
   'workouts',
@@ -248,7 +248,34 @@ export class CorrectSyncService {
       for (const table of tableList) {
         const dirty = await this.collectDirtyBatch(table, PUSH_BATCH_SIZE, userId);
         if (dirty.upserts.length || dirty.deletes.length) {
-          queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
+          // Deduplicate video_files by (exercise_id, file_name) keeping the most recent one
+          if (table === 'video_files' && dirty.upserts.length > 1) {
+            const dedupMap = new Map<string, Record<string, unknown>>();
+            for (const rec of dirty.upserts) {
+              const key = `${rec.exercise_id as string}|${rec.file_name as string}`;
+              const existing = dedupMap.get(key);
+              if (!existing) {
+                dedupMap.set(key, rec);
+              } else {
+                // Prefer larger version, then newer updated_at
+                const existingVersion = (existing as { version?: number }).version ?? 0;
+                const recVersion = (rec as { version?: number }).version ?? 0;
+                if (recVersion > existingVersion) {
+                  dedupMap.set(key, rec);
+                } else if (recVersion === existingVersion) {
+                  const existingUpdated = new Date((existing as { updated_at?: string }).updated_at || 0).getTime();
+                  const recUpdated = new Date((rec as { updated_at?: string }).updated_at || 0).getTime();
+                  if (recUpdated > existingUpdated) dedupMap.set(key, rec);
+                }
+              }
+            }
+            if (dirty.upserts.length !== dedupMap.size) {
+              if (SYNC_DEBUG) logger.debug(`[sync:v2] Deduplicated video_files upserts ${dirty.upserts.length} -> ${dedupMap.size}`);
+            }
+            queues[table] = { upserts: [...dedupMap.values()], deletes: [...dirty.deletes] };
+          } else {
+            queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
+          }
         }
       }
   if (SYNC_DEBUG) logger.debug(`[sync:v2] collectDirty done in ${(performance.now()-collectStart).toFixed(0)}ms queues=${Object.entries(queues).map(([k,v])=>`${k}:${(v.upserts?.length||0)+(v.deletes?.length||0)}`).join(' ')}`);
@@ -414,8 +441,24 @@ export class CorrectSyncService {
       const deletes: string[] = [];
       for (const rec of dirty) {
         const recordOwnerId = (rec as { owner_id?: string }).owner_id;
-        const shouldSkip = recordOwnerId && recordOwnerId !== userId && tableName !== 'exercises';
-        
+        const recordId = rec.id as string;
+        let shouldSkip = recordOwnerId && recordOwnerId !== userId && tableName !== 'exercises';
+
+        // NEW: Filter out built-in exercises and catalogs from sync
+        if (tableName === 'exercises' && isBuiltin(recordId)) {
+          if (SYNC_DEBUG) {
+            logger.debug(`[sync:v2] Skipping built-in exercise from sync: ${recordId}`);
+          }
+          shouldSkip = true;
+        }
+
+        if (tableName === 'exercise_catalogs' && isBuiltinCatalog(recordId)) {
+          if (SYNC_DEBUG) {
+            logger.debug(`[sync:v2] Skipping built-in catalog from sync: ${recordId}`);
+          }
+          shouldSkip = true;
+        }
+
         if (SYNC_DEBUG && tableName === 'user_preferences') {
           logger.debug(`[sync:v2] collectDirtyBatch user_preferences record:`, {
             id: rec.id,
@@ -427,8 +470,8 @@ export class CorrectSyncService {
             favorite_exercises: (rec as { favorite_exercises?: string[] }).favorite_exercises
           });
         }
-        
-        if (shouldSkip) continue; // skip foreign-owned
+
+        if (shouldSkip) continue; // skip foreign-owned or built-in
         if ((rec as { deleted?: boolean; op?: string }).deleted || (rec as { op?: string }).op === 'delete') {
           deletes.push(rec.id as string);
         } else {
@@ -780,6 +823,14 @@ export class CorrectSyncService {
     // Apply upserts with conflict resolution
     for (const row of upserts) {
       try {
+        // Enforce rule: only UUID (custom) exercises are ever applied from server.
+        if (table === 'exercises') {
+          const id = row.id as string | undefined;
+            if (!id || isBuiltin(id)) {
+              if (SYNC_DEBUG) logger.debug(`[sync:v2] Skipping non-UUID exercise from server pull: ${id}`);
+              continue;
+            }
+        }
         // Skip records that we just pushed in this sync cycle to avoid race conditions
         const recordKey = `${table}:${row.id}`;
         const wasPushed = pushedRecords?.has(recordKey);
@@ -991,15 +1042,38 @@ export class CorrectSyncService {
     try {
       const exercise = await exerciseColl.get(exerciseId);
       if (exercise) {
-        const blobPendingSyncUrl = `blob-pending-sync://${exerciseId}/${fileName}`;
+        // Determine if there's a confirmed (non-pending) video file for this exercise
+        let scheme = 'blob-pending-sync';
+        // Lightweight local type for video file records
+        interface VideoFileRecord { id: string; exercise_id?: string; file_name?: string; upload_pending?: boolean; deleted?: boolean; [key: string]: unknown; }
+        try {
+          const dbVideo = this.storage.getDatabase() as unknown as Record<string, unknown>;
+          const videoTable = dbVideo['video_files'] as {
+            where: (field: string) => {
+              equals: (val: string) => {
+                and: (predicate: (v: VideoFileRecord) => boolean) => { toArray: () => Promise<VideoFileRecord[]> };
+              };
+            };
+          };
+          const videoFiles: VideoFileRecord[] = await videoTable
+            .where('exercise_id')
+            .equals(exerciseId)
+            .and((v: VideoFileRecord) => !v.deleted)
+            .toArray();
+          const confirmed = videoFiles.find((v: VideoFileRecord) => v.file_name === fileName && v.upload_pending === false);
+          if (confirmed) scheme = 'blob-video';
+        } catch (e) {
+          if (SYNC_DEBUG) logger.debug('[sync:v2] Unable to inspect video_files for scheme selection', e);
+        }
+        const localUrl = `${scheme}://${exerciseId}/${fileName}`;
         await exerciseColl.update(exerciseId, {
-          custom_video_url: blobPendingSyncUrl,
-          has_video: true, // Set to true since the exercise now has a custom video
-          dirty: 1, // Mark as dirty to sync the updated video URL to server
+          custom_video_url: localUrl,
+          has_video: true,
+          dirty: 1,
           op: 'upsert',
           updated_at: new Date().toISOString()
         });
-        logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${blobPendingSyncUrl}`);
+        logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${localUrl}`);
       }
     } catch (error) {
       logger.warn(`[sync:v2] Failed to update exercise video URL for ${exerciseId}:`, error);

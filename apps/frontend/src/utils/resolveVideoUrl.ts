@@ -3,16 +3,21 @@ import { supabase } from '../config/supabase';
 import logger from './logger';
 
 /**
- * Resolves video URLs, handling both regular URLs, blob-pending-sync:// URLs, and shared-video:// URLs
- * For blob-pending-sync URLs, fetches the actual video data from IndexedDB and creates a blob URL
- * For shared-video URLs, fetches video data from the original exercise's video files
- * If video data is missing locally but exists in cloud storage, downloads it first
+ * Resolves video URLs, handling:
+ *  - Regular (http/https/blob) URLs: returned directly
+ *  - blob-pending-sync://{exerciseId}/{filename}: local file stored, upload still pending
+ *  - blob-video://{exerciseId}/{filename}: local file stored & cloud-confirmed (stable scheme)
+ *  - shared-video://{originalExerciseId}/{originalOwnerId}: reuse another exercise's video
+ *
+ * For blob-* schemes we look up IndexedDB (via storageService) and materialize a runtime blob: URL.
+ * If the binary is missing but a storage_path exists we attempt a download (covers recovery cases).
+ * For shared videos we reference the original exercise's stored video file.
  */
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
 
   // For regular URLs (http, https, blob, etc.), return them directly
-  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('shared-video://')) {
+  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('blob-video://') && !videoUrl.startsWith('shared-video://')) {
     return videoUrl;
   }
 
@@ -83,15 +88,27 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
   }
 
   try {
-    // Extract exercise ID from blob-pending-sync URL format: blob-pending-sync://{exerciseId}/{filename}
-    const match = videoUrl.match(/^blob-pending-sync:\/\/([^/]+)\//);
+    // Handle both blob-pending-sync:// and blob-video:// (stable) schemes
+    const isPendingScheme = videoUrl.startsWith('blob-pending-sync://');
+    const isStableScheme = videoUrl.startsWith('blob-video://');
+
+    if (!isPendingScheme && !isStableScheme) {
+      // Not a blob-* scheme (shared handled earlier)
+      return null;
+    }
+
+    const match = videoUrl.match(/^blob-(?:pending-sync|video):\/\/([^/]+)\//);
     if (!match) {
-      logger.warn('🎥 [ResolveVideo] Invalid blob-pending-sync URL format:', videoUrl);
+      logger.warn('🎥 [ResolveVideo] Invalid blob video URL format:', videoUrl);
       return null;
     }
 
     const exerciseId = match[1];
-    logger.log('🎥 [ResolveVideo] Resolving blob-pending-sync URL for exercise:', exerciseId);
+    logger.log('🎥 [ResolveVideo] Resolving', {
+      exerciseId,
+      scheme: isPendingScheme ? 'blob-pending-sync' : 'blob-video',
+      videoUrl
+    });
 
     // Get the stored video file from IndexedDB
     const storedVideoFile = await storageService.getVideoFile(exerciseId);
@@ -267,7 +284,7 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     logger.warn('🎥 [ResolveVideo] No video file data found locally or in cloud storage for exercise:', exerciseId);
     return null;
   } catch (error) {
-    logger.error('🎥 [ResolveVideo] Failed to resolve blob-pending-sync URL:', error);
+    logger.error('🎥 [ResolveVideo] Failed to resolve blob video URL:', error);
     return null;
   }
 }

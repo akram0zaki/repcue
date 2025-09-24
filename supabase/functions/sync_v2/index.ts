@@ -40,11 +40,10 @@ async function validateJWT(jwt: string): Promise<string | null> {
   }
 }
 
-// Allow-list of tables (keeping comprehensive set from development)
+// Allow-list of tables (exercise_catalogs removed - built-in reference data only)
 const SYNC_TABLES = [
   'user_preferences',
   'app_settings',
-  'exercise_catalogs',
   'exercises',
   'user_favorites',
   'workouts',
@@ -52,6 +51,9 @@ const SYNC_TABLES = [
   'workout_sessions',
   'video_files'
 ];
+
+// Shared UUID validation pattern (defense-in-depth: prevents any slug / built-in IDs from being processed server-side)
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Singleton tables that have one record per user
 const SINGLETON_TABLES = [
@@ -82,10 +84,6 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'custom_video_url', 'has_video', 'default_duration', 'default_sets', 'default_reps',
     'catalog_id', 'benefits', 'limitations', 'best_timing', 'suggested_combinations',
     'notes', 'exercise_references'
-  ]),
-  exercise_catalogs: new Set([
-    'id', 'name_key', 'description_key', 'is_default', 'is_premium',
-    'display_order', 'icon', 'color_theme', 'created_at', 'updated_at', 'picture_url'
   ]),
   user_favorites: new Set([
     'id', 'owner_id', 'item_id', 'item_type', 'exercise_type',
@@ -182,38 +180,23 @@ async function processVideoFileUpload(supabase: any, record: any, userId: string
     // Generate storage path
     const storagePath = `${userId}/${exercise_id}/${file_name}`;
 
-    // Try 'exercise-videos' bucket first (current standard), fallback to 'videos' if needed
+    // Upload to exercise-videos bucket only
     let uploadResult;
-    let actualBucket = 'videos';
+    let actualBucket = 'exercise-videos';
 
     try {
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('videos')
+        .from('exercise-videos')
         .upload(storagePath, uint8Array, {
           contentType: mime_type,
           upsert: true
         });
 
       if (uploadError) {
-        logWithContext(correlationId, 'WARN', 'Videos bucket upload failed, trying exercise-media bucket', { error: uploadError.message });
-
-        // Try exercise-media bucket as fallback
-        const { data: fallbackData, error: fallbackError } = await supabase.storage
-          .from('exercise-media')
-          .upload(storagePath, uint8Array, {
-            contentType: mime_type,
-            upsert: true
-          });
-
-        if (fallbackError) {
-          throw new Error(`Both storage buckets failed: exercise-videos: ${uploadError.message}, videos: ${fallbackError.message}`);
-        }
-
-        uploadResult = fallbackData;
-        actualBucket = 'exercise-media';
-      } else {
-        uploadResult = uploadData;
+        throw new Error(`Video upload failed: ${uploadError.message}`);
       }
+
+      uploadResult = uploadData;
     } catch (e) {
       throw new Error(`Storage upload failed: ${e.message}`);
     }
@@ -293,20 +276,18 @@ async function enforceVideoFileSingleton(supabase: any, userId: string, exercise
       try {
         // Delete from storage if storage_path exists
         if (video.storage_path) {
-          // Try both buckets for cleanup
-          for (const bucket of ['exercise-videos', 'videos']) {
-            try {
-              const { error: storageError } = await supabase.storage
-                .from(bucket)
-                .remove([video.storage_path]);
+          try {
+            const { error: storageError } = await supabase.storage
+              .from('exercise-videos')
+              .remove([video.storage_path]);
 
-              if (!storageError) {
-                logWithContext(correlationId, 'INFO', `Deleted storage file from ${bucket}: ${video.storage_path}`);
-                break; // Success, don't try other bucket
-              }
-            } catch (e) {
-              // Continue to next bucket
+            if (!storageError) {
+              logWithContext(correlationId, 'INFO', `Deleted storage file: ${video.storage_path}`);
+            } else {
+              logWithContext(correlationId, 'WARN', `Failed to delete storage file: ${video.storage_path}`, { error: storageError.message });
             }
+          } catch (e) {
+            logWithContext(correlationId, 'WARN', `Exception deleting storage file: ${video.storage_path}`, { error: e.message });
           }
         }
 
@@ -421,8 +402,16 @@ async function pullExercisesWithShared(supabase: any, userId: string, cursor: an
     }
 
     // Combine and return
-    const allExercises = [...(ownExercises || []), ...sharedExercises];
-    logWithContext(correlationId, 'INFO', `Total exercises: ${allExercises.length} (${ownExercises?.length || 0} own + ${sharedExercises.length} shared)`);
+    let allExercises = [...(ownExercises || []), ...sharedExercises];
+
+    // Defense-in-depth: filter any non-UUID IDs (should never occur because built-ins are not stored server-side)
+    const preFilterCount = allExercises.length;
+    allExercises = allExercises.filter(ex => ex?.id && UUID_PATTERN.test(ex.id));
+    if (allExercises.length !== preFilterCount) {
+      logWithContext(correlationId, 'WARN', `Filtered ${preFilterCount - allExercises.length} non-UUID exercise records from pull response`);
+    }
+
+    logWithContext(correlationId, 'INFO', `Total exercises: ${allExercises.length} (${ownExercises?.length || 0} own + ${sharedExercises.length} shared after filtering)`);
 
     return {
       records: allExercises,
@@ -604,6 +593,11 @@ serve(async (req) => {
       // Process deletes (soft delete with tombstone)
       for (const id of deletes) {
         try {
+          // Reject delete attempts for non-UUID exercise IDs (built-ins) silently (not counted as error)
+          if (table === 'exercises' && (!id || !UUID_PATTERN.test(id))) {
+            logWithContext(correlationId, 'WARN', `Skipping delete for non-UUID exercise id (built-in / invalid): ${id}`);
+            continue;
+          }
           logWithContext(correlationId, 'INFO', `Soft-deleting ${table}:${id}`);
 
           const deleteQuery = `UPDATE ${table} SET deleted = true, updated_at = NOW() WHERE id = $1 AND owner_id = $2`;
@@ -650,6 +644,21 @@ serve(async (req) => {
           const id = record.id;
           if (!id) {
             logWithContext(correlationId, 'WARN', `Skipping record without ID in ${table}`);
+            continue;
+          }
+
+          // Server-side validation: Reject built-in exercises (string IDs)
+          if (table === 'exercises' && !UUID_PATTERN.test(id)) {
+            logWithContext(correlationId, 'WARN', `Rejecting built-in exercise with string ID: ${id}`);
+            detailedErrors.push({
+              table,
+              record_id: id,
+              operation: 'upsert',
+              error: 'Built-in exercises with string IDs cannot be synced to server'
+            });
+            tableStatus.push_errors++;
+            tableStatus.error_messages.push(`Reject ${id}: Built-in exercise`);
+            pushErrors++;
             continue;
           }
 
@@ -731,6 +740,16 @@ serve(async (req) => {
               // Update existing singleton
               const existingId = existing[0].id;
               logWithContext(correlationId, 'INFO', `Updating existing singleton ${table}:${existingId}`);
+              // Ensure we do NOT attempt to overwrite primary key with client placeholder (e.g. 'default-app-settings')
+              if (filteredRecord.id && filteredRecord.id !== existingId) {
+                if (!UUID_PATTERN.test(filteredRecord.id)) {
+                  // Remove non-UUID client placeholder id to avoid PK mutation attempt
+                  delete filteredRecord.id;
+                } else if (filteredRecord.id !== existingId) {
+                  // UUID differs (client drift) – prefer existingId, drop incoming id
+                  delete filteredRecord.id;
+                }
+              }
 
               const { error: updateError } = await supabase
                 .from(table)
@@ -757,7 +776,10 @@ serve(async (req) => {
             } else {
               // Insert new singleton
               logWithContext(correlationId, 'INFO', `Inserting new singleton ${table}:${id}`);
-
+              // If client supplied a non-UUID id (placeholder) remove it so DB default / generated uuid is used
+              if (filteredRecord.id && !UUID_PATTERN.test(filteredRecord.id)) {
+                delete filteredRecord.id;
+              }
               const { error: insertError } = await supabase
                 .from(table)
                 .insert(filteredRecord);
@@ -849,6 +871,14 @@ serve(async (req) => {
           tableStatus.error_messages.push(`Pull: ${pullResult.errorMessage}`);
           pullErrors++;
 
+          // Add to detailed errors array for client visibility
+          detailedErrors.push({
+            table,
+            record_id: 'unknown',
+            operation: 'pull',
+            error: pullResult.errorMessage
+          });
+
           // Continue with empty result for this table
           response.tables[table] = {
             upserts: [],
@@ -874,6 +904,14 @@ serve(async (req) => {
         tableStatus.pull_errors++;
         tableStatus.error_messages.push(`Pull exception: ${e.message}`);
         pullErrors++;
+
+        // Add to detailed errors array for client visibility
+        detailedErrors.push({
+          table,
+          record_id: 'unknown',
+          operation: 'pull',
+          error: e.message
+        });
 
         response.tables[table] = {
           upserts: [],

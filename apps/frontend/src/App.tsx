@@ -29,6 +29,7 @@ import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type Timer
 import { computeWorkoutDurations } from './utils/workoutDuration';
 import i18n from './i18n';
 import logger from './utils/logger';
+import { isCustom } from './utils/syncFilters';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -2258,8 +2259,8 @@ useEffect(() => {
     if (!hasConsent) return;
 
     try {
-      // Detect exercise type: UUID = user-created, slug = built-in
-      const isUserCreated = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise_id);
+  // Use helper: only UUIDs (custom) go to user_favorites, slugs remain in preferences
+  const isUserCreated = isCustom(exercise_id);
       
       if (isUserCreated) {
         // User-created exercise: use StorageService and user_favorites table

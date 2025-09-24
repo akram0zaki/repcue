@@ -176,8 +176,9 @@ serve(async (req: Request) => {
 
       if (videoFile?.storage_path) {
         // Check if file actually exists in storage by trying to download it
+        // NOTE: Bucket name updated from 'videos' to 'exercise-videos' to match upload path in sync_v2
         const { data: fileData, error: fileError } = await supabase.storage
-          .from('videos')
+          .from('exercise-videos')
           .download(videoFile.storage_path);
 
         console.log(`Checking file existence for: ${videoFile.storage_path}`, !!fileData, fileError?.message);
@@ -185,7 +186,7 @@ serve(async (req: Request) => {
         if (fileData && !fileError) {
           // Generate signed URL for anonymous access (valid for 1 hour)
           const { data: signedUrl, error: signedUrlError } = await supabase.storage
-            .from('videos')
+            .from('exercise-videos')
             .createSignedUrl(videoFile.storage_path, 3600); // 1 hour expiry
 
           if (signedUrl && !signedUrlError) {

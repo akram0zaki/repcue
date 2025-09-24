@@ -5,6 +5,7 @@ import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useSnackbar } from './SnackbarProvider';
 import { supabase, supabaseFunctionBaseUrl } from '../config/supabase';
 import logger from '../utils/logger';
+import { syncService } from '../services/syncService';
 
 interface ShareButtonProps {
   exerciseId: string;
@@ -45,12 +46,52 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
     logger.info('🔗 [ShareButton] Starting share link generation', { exerciseId, exerciseName, shareWithEmail });
     setIsGeneratingUrl(true);
     try {
+      // Quick offline guard
+      if (!navigator.onLine) {
+        throw new Error('offline');
+      }
+
       logger.info('🔗 [ShareButton] Getting authentication session...');
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('No authentication token');
       }
       logger.info('🔗 [ShareButton] Authentication successful, user ID:', session.user?.id);
+
+      // Preflight: ensure exercise exists remotely; if not, attempt a force sync
+      const ensureExerciseRemote = async (): Promise<boolean> => {
+        try {
+          const { data, error } = await supabase
+            .from('exercises')
+            .select('id')
+            .eq('id', exerciseId)
+            .eq('deleted', false)
+            .maybeSingle();
+          if (error) {
+            logger.warn('🔗 [ShareButton] Preflight remote lookup error (will attempt sync if not found):', error.message);
+          }
+          return !!data?.id;
+        } catch (err) {
+          logger.warn('🔗 [ShareButton] Preflight remote lookup exception:', err);
+          return false;
+        }
+      };
+
+      let existsRemote = await ensureExerciseRemote();
+      if (!existsRemote) {
+        logger.info('🔗 [ShareButton] Exercise not found remotely, triggering force sync...');
+        try {
+          await syncService.sync(true);
+        } catch (syncErr) {
+          logger.warn('🔗 [ShareButton] Force sync threw (continuing to re-check):', syncErr);
+        }
+        existsRemote = await ensureExerciseRemote();
+      }
+
+      if (!existsRemote) {
+        logger.error('🔗 [ShareButton] Exercise still not present on server after sync attempt');
+        throw new Error('not_synced');
+      }
 
       const requestPayload = {
         exerciseId: exerciseId,
@@ -96,10 +137,17 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
         type: 'success'
       });
     } catch (error) {
+      const errMessage = error instanceof Error ? error.message : String(error);
+      if (errMessage === 'offline') {
+        showSnackbar(t('exercises.shareErrorOffline', 'You are offline. Connect to the internet to generate a share link.'), { type: 'error' });
+      } else if (errMessage === 'not_synced') {
+        showSnackbar(t('exercises.shareErrorNotSynced', 'Exercise not yet synced to the cloud. Please wait a moment and try again.'), { type: 'warning' });
+      } else if (errMessage === 'No authentication token') {
+        showSnackbar(t('exercises.shareErrorAuth', 'You must be signed in to share an exercise.'), { type: 'error' });
+      } else {
+        showSnackbar(t('exercises.shareError', 'Failed to generate share link'), { type: 'error' });
+      }
       logger.error('🔗 [ShareButton] Failed to generate share link:', error);
-      showSnackbar(t('exercises.shareError', 'Failed to generate share link'), {
-        type: 'error'
-      });
     } finally {
       setIsGeneratingUrl(false);
       logger.info('🔗 [ShareButton] Share generation process completed');

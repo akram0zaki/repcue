@@ -1,5 +1,53 @@
 ## Unreleased
 
+### 2025-09-25 (Type Safety & Lint Hardening, Favorites Persistence, Sync v2 Enhancements)
+#### Changed
+- Removed all remaining `any` usages in targeted frontend files (`ExerciseForm.tsx`, `correctSyncService.ts`) by introducing narrowly scoped interfaces (`VideoUploadedEventDetail`, `VideoFileRecord`) improving static analysis and preventing silent runtime shape drift.
+- Replaced `@ts-ignore` with explicit `@ts-expect-error` in `updateService.coalescing.test.ts` to ensure deliberate test access to private members is audited by TypeScript.
+- Strengthened custom DOM event typing for `video:uploaded` flow, reducing risk of malformed `detail` payloads.
+
+#### Fixed
+- Favorite persistence regression for user-created exercises: `getExercises()` now merges favorites from `user_favorites` for `exercise_type='exercise'` and shared references without unintentionally un-favoriting custom entries on subsequent favorite toggles.
+- Dexie predicate misuse (`.notEqual`) replaced with safe in-memory filtering to restore production build (Vite/tsc) compatibility.
+
+#### Added
+- Partial success (HTTP 207) handling path in sync v2 consumer logic documented & validated with improved logging (correlation IDs, per-table status) enabling resilient incremental data convergence instead of fail-fast behavior.
+- Migration tracking entries `supabase-changes_20250924.md` & `supabase-changes_20250925.md` capturing reference-model preservation and UUID enforcement measures.
+
+#### Security / Integrity
+- Enforced UUID exercise ID constraints end-to-end (client + edge) to mitigate catalog poisoning or slug injection; singleton tables guarded against PK mutation attempts.
+
+#### Developer Experience
+- Codebase now lint-clean (0 errors) under strict ESLint + TypeScript rules, reducing noise for future PR reviews.
+
+### 2025-09-25 (Shared Exercise Save Fix – Preserve Reference Model)
+#### Fixed
+- Corrected `save-shared-exercise` edge function regression risk: ensured it uses the reference-based sharing model (`user_favorites` with `item_id` + `exercise_type='shared'`) instead of attempting to rely on a non-existent `exercise_id` column that caused HTTP 500 errors on recipients. Normalizes any legacy favorites missing `exercise_type='shared'` rather than inserting duplicates.
+- Updated `download-shared-video` edge function to validate access via `item_id` + `exercise_type='shared'` and switched storage bucket usage to unified `exercise-videos` bucket.
+
+#### Notes
+- No database migration required; existing unique index `(owner_id, item_id, item_type)` already supports the normalized query path.
+- Added defensive normalization path upgrading legacy favorite rows to `exercise_type='shared'` in-place to prevent duplicate reference creation.
+
+### 2025-09-24 (Sync Filtering Hardening)
+#### Added
+- Helper `isSharedWithMe(exercise, sharedExerciseIds)` to support consistent shared exercise detection (reference-based) without ad-hoc logic.
+ - Server-side UUID enforcement in `sync_v2` edge function (reject non-UUID exercise upserts, skip non-UUID deletes, filter pull responses) for defense-in-depth.
+ - Singleton ID normalization: `sync_v2` now strips non-UUID placeholder `id` values for singleton tables (`app_settings`, `user_preferences`) to prevent PK mutation attempts and push errors.
+
+#### Changed
+- Enforced UUID-only exercise synchronization: client now refuses to apply server-pulled exercises whose IDs are not valid UUIDs (extra defense in `applyServerTableChanges`).
+- Replaced inline UUID regex in `App.tsx` favorite toggle with `isCustom` helper for single source of truth.
+- Strengthened dirty batch filtering (built-ins already excluded on push; mirrored rule on pull) for data integrity.
+
+#### Security / Integrity
+- Prevents accidental or malicious introduction of slug (built-in) IDs via sync responses; reduces catalog poisoning risk.
+ - Edge function now mirrors client rule set (UUID-only) eliminating remaining attack surface for slug injection.
+ - Prevents malformed / placeholder singleton IDs (e.g. `default-app-settings`) from causing failed updates or unintended primary key rewrites.
+
+#### Migration
+- No database schema changes required; documented in `docs/migration-tracking/supabase-changes_20250924.md`.
+
 ## 2025-09-24 (Video Storage Consolidation & Clean Slate)
 
 ### Fixed

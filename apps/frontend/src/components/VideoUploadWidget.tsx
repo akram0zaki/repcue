@@ -30,7 +30,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   // Effect to restore blob URL from IndexedDB when component mounts or video URL changes
   useEffect(() => {
     const restoreBlobUrl = async () => {
-      if (!currentVideoUrl || !currentVideoUrl.startsWith('blob-pending-sync://')) {
+  if (!currentVideoUrl || (!currentVideoUrl.startsWith('blob-pending-sync://') && !currentVideoUrl.startsWith('blob-video://'))) {
         // For regular URLs (http, https, etc), use them directly
         setActualVideoUrl(currentVideoUrl || null);
         return;
@@ -177,6 +177,10 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       
       // Return the blob URL for immediate use
       onVideoUploaded(localVideoUrl);
+      // Fire a custom event so parent contexts / forms can flip has_video immediately
+      try {
+        window.dispatchEvent(new CustomEvent('video:uploaded', { detail: { exerciseId, localVideoUrl } }));
+      } catch {}
       
       logger.log('🎥 [VideoUpload] Video ready for offline use, sync will handle cloud upload when online');
 
@@ -322,8 +326,8 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       {currentVideoUrl && !currentVideoUrl.startsWith('placeholder://') ? (
         <div className="current-video bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
           {(() => {
-            // Check if this is a local blob video pending sync
-            const isLocalBlob = currentVideoUrl.startsWith('blob-pending-sync://');
+            // Check if this is a local blob video (pending or stable scheme)
+            const isLocalBlob = currentVideoUrl.startsWith('blob-pending-sync://') || currentVideoUrl.startsWith('blob-video://');
             
             return !videoLoadError && actualVideoUrl ? (
               <>
@@ -366,6 +370,9 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                 if (currentVideoUrl.startsWith('blob-pending-sync://')) {
                   return t('video.localVideo', 'Local video (offline-ready)');
                 }
+                if (currentVideoUrl.startsWith('blob-video://')) {
+                  return t('video.localVideoConfirmed', 'Local video (synced)');
+                }
                 return t('video.currentVideo');
               })()}
             </span>
@@ -392,10 +399,21 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
           {uploading ? (
             <div className="upload-progress space-y-3">
               <div className="progress-bar bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="progress-fill bg-blue-600 h-full transition-all duration-300"
-                  style={{ width: `${uploadProgress}%` }}
-                />
+                {(() => {
+                  // Map progress to nearest 5% step to avoid inline styles (20 buckets)
+                  const step = Math.min(100, Math.max(0, Math.round(uploadProgress / 5) * 5));
+                  const widthClass = {
+                    0: 'w-0', 5: 'w-[5%]', 10: 'w-[10%]', 15: 'w-[15%]', 20: 'w-[20%]', 25: 'w-[25%]', 30: 'w-[30%]',
+                    35: 'w-[35%]', 40: 'w-[40%]', 45: 'w-[45%]', 50: 'w-[50%]', 55: 'w-[55%]', 60: 'w-[60%]',
+                    65: 'w-[65%]', 70: 'w-[70%]', 75: 'w-[75%]', 80: 'w-[80%]', 85: 'w-[85%]', 90: 'w-[90%]',
+                    95: 'w-[95%]', 100: 'w-full'
+                  } as Record<number, string>;
+                  return (
+                    <div className={`progress-fill bg-blue-600 h-full transition-all duration-300 ${widthClass[step]}`}
+                      data-progress={uploadProgress}
+                      aria-label={`Upload progress ${uploadProgress}%`} />
+                  );
+                })()}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {uploadProgress}% {t('video.uploaded')}

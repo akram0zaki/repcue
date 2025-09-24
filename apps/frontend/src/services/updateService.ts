@@ -45,6 +45,11 @@ export class UpdateService {
     successfulUpdates: 0,
     failedUpdates: 0
   };
+  // Concurrency + scheduling guards
+  private inFlightCheck: Promise<UpdateInfo | null> | null = null;
+  private isChecking = false;
+  private scheduledCheck: number | null = null;
+  private lastErrorSig?: { sig: string; ts: number };
 
   private constructor() {
     this.updateState = this.getDefaultUpdateState();
@@ -275,7 +280,7 @@ export class UpdateService {
 
     swEventEmitter.on('trigger-version-check', () => {
       logger.log('🔍 Service worker triggered version check');
-      this.checkForUpdates();
+      this.requestUpdateCheck('sw-trigger');
     });
 
     swEventEmitter.on('sw-updated', (data: unknown) => {
@@ -305,14 +310,33 @@ export class UpdateService {
     // Check for updates when app becomes visible (user returns to tab)
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        this.checkForUpdates();
+        this.requestUpdateCheck('visibility');
       }
     });
 
     // Check for updates on focus
     window.addEventListener('focus', () => {
-      this.checkForUpdates();
+      this.requestUpdateCheck('focus');
     });
+  }
+
+  /**
+   * Debounced external request funnel for update checks.
+   * Coalesces rapid successive triggers (focus, visibility, SW) into one check.
+   */
+  private requestUpdateCheck(source: string, opts?: { force?: boolean }): void {
+    // If a check is already in flight, we don't need to schedule another; callers will piggyback.
+    if (this.isChecking) {
+      logger.debug(`Coalescing update check (already running) from ${source}`);
+      return;
+    }
+    if (this.scheduledCheck) {
+      return; // Already scheduled in debounce window
+    }
+    this.scheduledCheck = window.setTimeout(() => {
+      this.scheduledCheck = null;
+      this.checkForUpdates(opts).catch(() => { /* error handled internally */ });
+    }, 150); // 150ms debounce window
   }
 
   /**
@@ -326,7 +350,7 @@ export class UpdateService {
       : UPDATE_CHECK_INTERVAL;
 
     this.updateCheckInterval = window.setInterval(() => {
-      this.checkForUpdates();
+      this.requestUpdateCheck('periodic');
     }, interval);
   }
 
@@ -412,27 +436,40 @@ export class UpdateService {
   /**
    * Check for updates from the edge function with comprehensive error handling and retry logic
    */
-  public async checkForUpdates(): Promise<UpdateInfo | null> {
+  public async checkForUpdates(opts?: { force?: boolean }): Promise<UpdateInfo | null> {
+    // Single-flight guard: if a check is executing, return the existing promise.
+    if (this.isChecking && this.inFlightCheck) {
+      logger.debug('Returning in-flight update check promise');
+      return this.inFlightCheck;
+    }
+    this.isChecking = true;
     this.updateMetrics.totalChecks++;
+    // Early version readiness gate (prevents pointless retries for unknown version)
+    const versionRegex = /^\d+\.\d+\.\d+$/;
+    if (!this.updateState.currentVersion || this.updateState.currentVersion === 'unknown' || !versionRegex.test(this.updateState.currentVersion)) {
+      if (!opts?.force) {
+        logger.debug('Aborting update check - version not initialized');
+        this.isChecking = false;
+        return null;
+      }
+    }
 
     const operation = async (): Promise<UpdateInfo | null> => {
       const startTime = Date.now();
       logger.log('Checking for updates...');
-
-      // Skip update checks if version is invalid (null installations or uninitialized)
-      const currentVersion = this.updateState.currentVersion;
-      const versionRegex = /^\d+\.\d+\.\d+$/;
-      if (!currentVersion || currentVersion === 'unknown' || !versionRegex.test(currentVersion)) {
-        logger.log(`Skipping update check - invalid version: ${currentVersion}`);
+      if (!navigator.onLine) {
+        logger.debug('Skipping update check - offline');
         return null;
       }
+
+      // (Version validity already preflighted; kept minimal here)
 
       // Don't check too frequently unless it's a force update
       const now = new Date();
       const lastCheck = this.updateState.lastCheckTime;
       const minInterval = this.updateState.updatePolicy === 'force' ? 5 * 60 * 1000 : 30 * 60 * 1000; // 5 min for force, 30 min for others
 
-      if (lastCheck && (now.getTime() - lastCheck.getTime()) < minInterval) {
+      if (!opts?.force && lastCheck && (now.getTime() - lastCheck.getTime()) < minInterval) {
         logger.log('Skipping update check - too recent');
         return this.updateState.pendingUpdate || null;
       }
@@ -469,38 +506,44 @@ export class UpdateService {
       return updateInfo;
     };
 
-    try {
-      return await updateErrorHandler.retryWithBackoff(operation,
-        updateErrorHandler.createUpdateError('Initial update check', { type: 'network_error' })
-      );
-    } catch (error) {
-      logger.error('Update check failed after retries:', error);
-
-      const updateError = updateErrorHandler.createUpdateError(error, {
-        type: 'network_error',
-        metadata: {
-          operation: 'checkForUpdates',
-          fallbackAvailable: true
-        }
-      });
-
-      this.handleUpdateError(updateError);
-
-      // Fall back to service worker update detection
+    this.inFlightCheck = (async () => {
       try {
-        return await this.checkServiceWorkerUpdate();
-      } catch (fallbackError) {
-        const fallbackUpdateError = updateErrorHandler.createUpdateError(fallbackError, {
-          type: 'service_worker_error',
+        return await updateErrorHandler.retryWithBackoff(operation,
+          updateErrorHandler.createUpdateError('Initial update check', { type: 'network_error' })
+        );
+      } catch (error) {
+        const updateError = updateErrorHandler.createUpdateError(error, {
+          type: 'network_error',
           metadata: {
-            operation: 'fallback-check',
-            originalError: updateError
+            operation: 'checkForUpdates',
+            fallbackAvailable: true
           }
         });
 
-        this.handleUpdateError(fallbackUpdateError);
-        return null;
+        // Error dedupe (2s window)
+        this.handleUpdateErrorDedup(updateError); // Single consolidated error log
+
+        // Fall back to service worker update detection
+        try {
+          return await this.checkServiceWorkerUpdate();
+        } catch (fallbackError) {
+          const fallbackUpdateError = updateErrorHandler.createUpdateError(fallbackError, {
+            type: 'service_worker_error',
+            metadata: {
+              operation: 'fallback-check',
+              originalError: updateError
+            }
+          });
+          this.handleUpdateErrorDedup(fallbackUpdateError);
+          return null;
+        }
       }
+    })();
+    try {
+      return await this.inFlightCheck;
+    } finally {
+      this.isChecking = false;
+      this.inFlightCheck = null;
     }
   }
 
@@ -1375,8 +1418,8 @@ export class UpdateService {
           break;
 
         case 'version-check':
-          // Another tab is requesting a version check
-          this.checkForUpdates();
+          // Another tab is requesting a version check (debounced)
+            this.requestUpdateCheck('broadcast');
           break;
       }
     });
@@ -1554,6 +1597,16 @@ export class UpdateService {
       recoveryState: this.recoveryState,
       canRetry: error.retryable && this.recoveryState.retryAttempts < 3
     });
+  }
+
+  private handleUpdateErrorDedup(error: UpdateError): void {
+    const sig = `${error.type}|${error.message}`;
+    if (this.lastErrorSig && this.lastErrorSig.sig === sig && Date.now() - this.lastErrorSig.ts < 2000) {
+      logger.debug('Suppressed duplicate update error (global handler)');
+      return;
+    }
+    this.lastErrorSig = { sig, ts: Date.now() };
+    this.handleUpdateError(error);
   }
 
   /**

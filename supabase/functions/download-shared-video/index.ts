@@ -68,17 +68,17 @@ serve(async (req) => {
       });
     }
 
-    // NEW: Verify user has access via user_favorites (reference-based sharing)
+    // Verify user has access via user_favorites (reference-based sharing)
     console.log('Verifying user has shared exercise reference...');
     const { data: favoriteRecord, error: verifyError } = await supabaseService
       .from('user_favorites')
-      .select('id, item_id, item_type, exercise_type')
+      .select('id, item_id')
       .eq('owner_id', user.id)
-      .eq('item_id', originalExerciseId)
       .eq('item_type', 'exercise')
+      .eq('item_id', originalExerciseId)
       .eq('exercise_type', 'shared')
       .eq('deleted', false)
-      .single();
+      .maybeSingle();
 
     if (verifyError || !favoriteRecord) {
       console.error('User does not have access to this shared exercise via favorites:', verifyError);
@@ -133,7 +133,7 @@ serve(async (req) => {
     // Download the video file using service role access
     console.log('Downloading video file from storage...');
     const { data: videoBlob, error: downloadError } = await supabaseService.storage
-      .from('videos')
+      .from('exercise-videos')
       .download(videoFileRecord.storage_path);
 
     if (downloadError || !videoBlob) {
@@ -165,9 +165,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('=== UNEXPECTED ERROR ===');
     console.error('Error:', error);
+    const errMsg = (error && typeof error === 'object' && 'message' in error) ? (error as any).message : 'Unknown error';
     return new Response(JSON.stringify({
       error: 'Internal server error',
-      details: error.message
+      details: errMsg
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

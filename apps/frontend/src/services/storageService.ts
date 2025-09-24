@@ -1339,10 +1339,14 @@ export class StorageService {
         const videoFile = videoFileMap.get(exercise.id);
         if (videoFile) {
           logger.log('💾 [EnrichVideo] Enriching exercise with video:', exercise.name, videoFile.file_name);
+          // Choose a more accurate scheme name once upload is confirmed
+          const isConfirmed = !videoFile.upload_pending;
+          const scheme = isConfirmed ? 'blob-video' : 'blob-pending-sync';
           return {
             ...exercise,
-            custom_video_url: `blob-pending-sync://${exercise.id}/${videoFile.file_name}`,
-            has_video: false // Keep as false since this is custom video, not built-in
+            custom_video_url: `${scheme}://${exercise.id}/${videoFile.file_name}`,
+            // Mark as having a video; downstream UI / filters rely on this
+            has_video: true
           };
         }
         return exercise;
@@ -1355,6 +1359,67 @@ export class StorageService {
     } catch (error) {
       logger.error('💾 [EnrichVideo] Failed to enrich exercises with video URLs:', error);
       return exercises; // Return original exercises if enrichment fails
+    }
+  }
+
+  /**
+   * Reconcile has_video flags for exercises that have an associated (non-deleted) video_file
+   * but were previously persisted with has_video = false (legacy behavior).
+   * This runs client-side only and marks affected exercises dirty so the corrected flag
+   * is propagated on the next sync. Errors are swallowed to avoid blocking getExercises().
+   */
+  private async reconcileHasVideoFlags(exercises: Exercise[]): Promise<Exercise[]> {
+    try {
+      if (!this.db.video_files) return exercises;
+
+      // Build a quick set of exercise IDs that have active video files
+      // Dexie typings (IndexableType) don't include boolean; querying on a boolean index
+      // with .notEqual(true) triggers TS errors. Instead, fetch all and filter in memory.
+      // Volume of video_files is expected to be very small (singleton per exercise), so
+      // this is acceptable and avoids brittle type coercions.
+      const activeVideoFiles = await this.db.video_files
+        .toArray()
+        .then(all => all.filter(v => !(v as { deleted?: boolean }).deleted))
+        .catch(async () => {
+          // If even the base query fails, fall back to empty list
+          return [] as StoredVideoFile[];
+        });
+
+      const videoExerciseIds = new Set<string>();
+      for (const vf of activeVideoFiles) {
+        videoExerciseIds.add((vf as { exercise_id: string }).exercise_id);
+      }
+
+      const dbExercises = this.db.exercises; // for updates
+      const updated: Exercise[] = [];
+      for (const ex of exercises) {
+        if (videoExerciseIds.has(ex.id) && !ex.has_video) {
+          try {
+            // Update local record & mark dirty so it syncs outward
+            await dbExercises.update(ex.id, {
+              has_video: true,
+              dirty: 1,
+              op: 'upsert',
+              updated_at: new Date().toISOString()
+            });
+            updated.push({ ...ex, has_video: true });
+          } catch (e) {
+            logger.warn('💾 [VideoReconcile] Failed to update has_video for exercise', ex.id, e);
+            updated.push(ex); // keep original
+          }
+        } else {
+          updated.push(ex);
+        }
+      }
+
+      if (updated.some(e => e.has_video && !exercises.find(o => o.id === e.id)?.has_video)) {
+        logger.log('💾 [VideoReconcile] Applied has_video corrections to exercises');
+      }
+
+      return updated;
+    } catch (error) {
+      logger.warn('💾 [VideoReconcile] Reconciliation failed', error);
+      return exercises;
     }
   }
 
@@ -1624,19 +1689,27 @@ export class StorageService {
       async () => {
         const userId = authService.getCurrentUser()?.id;
 
-        const [storedExercises, prefs, sharedRefs] = await Promise.all([
+        const [storedExercises, prefs, sharedRefs, userCreatedFavorites] = await Promise.all([
           this.db.exercises.toArray(),
           this.getUserPreferences().catch(() => null),
-          userId ? this.getSharedExerciseReferences(userId) : Promise.resolve([])
+          userId ? this.getSharedExerciseReferences(userId) : Promise.resolve([]),
+          // Fetch user-created exercise favorites (distinct from built-in favorites stored in preferences)
+          userId ? this.db.user_favorites
+            .where('owner_id').equals(userId)
+            .and(f => f.item_type === 'exercise' && f.exercise_type === 'user_created' && !f.deleted)
+            .toArray() : Promise.resolve([])
         ]);
 
         const favorites = prefs?.favorite_exercises || [];
+        const userCreatedFavoriteIds = new Set(userCreatedFavorites.map(f => f.item_id));
         let allExercises = storedExercises
           .map(this.convertStoredExercise)
           .map(ex => ({
             ...ex,
-            // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
-            is_favorite: favorites.includes(ex.id)
+            // Mark as favorite if either:
+            // 1) In legacy/ built-in favorites list (user_preferences.favorite_exercises)
+            // 2) There is a user_favorites entry marking this user-created exercise as favorite
+            is_favorite: favorites.includes(ex.id) || userCreatedFavoriteIds.has(ex.id)
           }));
 
         // Add shared exercises if user is authenticated
@@ -1666,7 +1739,14 @@ export class StorageService {
         // Enrich exercises with video URLs for offline-first bidirectional sync
         const enrichedExercises = await this.enrichExercisesWithVideoUrls(uniqueExercises);
 
-        return filterActiveRecords(enrichedExercises);
+        // Reconcile has_video flag consistency (in case legacy records still have false)
+        try {
+          const reconciled = await this.reconcileHasVideoFlags(enrichedExercises);
+          return filterActiveRecords(reconciled);
+        } catch (err) {
+          logger.warn('💾 [VideoReconcile] Failed to reconcile has_video flags – returning enriched list only', err);
+          return filterActiveRecords(enrichedExercises);
+        }
       },
       () => {
         // Fallback to in-memory storage

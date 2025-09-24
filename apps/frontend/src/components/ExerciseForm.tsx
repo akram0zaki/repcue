@@ -27,6 +27,15 @@ interface InstructionItemProps {
   canMoveDown: boolean;
 }
 
+// Detail payload dispatched by the custom 'video:uploaded' event
+// Additional keys may exist (size, mimeType, etc.) so we allow an index signature.
+interface VideoUploadedEventDetail {
+  exerciseId: string;
+  localVideoUrl?: string;
+  // Future metadata fields are allowed (kept flexible but still typed above)
+  [key: string]: unknown;
+}
+
 const InstructionItem: React.FC<InstructionItemProps> = ({
   instruction,
   index,
@@ -201,6 +210,34 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       setCustomVideoUrl(exercise.custom_video_url || '');
     }
   }, [exercise, isEditing]);
+
+  // Listen for global video:uploaded events to immediately reflect has_video & custom_video_url updates
+  useEffect(() => {
+    if (!canUploadVideos) return; // Feature gated
+    if (!isEditing || !exercise?.id) return; // Only relevant when editing an existing exercise
+
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<VideoUploadedEventDetail>).detail;
+      if (!detail || typeof detail.exerciseId !== 'string') return;
+      if (detail.exerciseId !== exercise.id) return; // Not our exercise
+
+      const { localVideoUrl } = detail as VideoUploadedEventDetail;
+      if (localVideoUrl && typeof localVideoUrl === 'string') {
+        // Avoid unnecessary state churn
+        setCustomVideoUrl(prev => {
+          if (prev === localVideoUrl) return prev;
+          logger.log('🎥 [ExerciseForm] video:uploaded event updating customVideoUrl optimistically', {
+            exerciseId: exercise.id,
+            newUrl: localVideoUrl
+          });
+          return localVideoUrl;
+        });
+      }
+    };
+
+    window.addEventListener('video:uploaded', handler as EventListener);
+    return () => window.removeEventListener('video:uploaded', handler as EventListener);
+  }, [canUploadVideos, isEditing, exercise?.id]);
 
   // Restore form state on component mount
   useEffect(() => {
@@ -678,6 +715,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   onClick={() => handleAddArrayItem('equipment', newEquipment)}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={loading || !newEquipment.trim()}
+                  aria-label={t('exercises.addEquipment', 'Add equipment items')} 
+                  title={t('exercises.addEquipment', 'Add equipment items')}
                 >
                   <PlusIcon className="w-4 h-4" />
                 </button>
@@ -693,6 +732,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                         onClick={() => handleRemoveArrayItem('equipment', index)}
                         className="ml-1 inline-flex items-center p-0.5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
                         disabled={loading}
+                        aria-label={t('exercises.removeEquipment', 'Remove equipment item')}
+                        title={t('exercises.removeEquipment', 'Remove equipment item')}
                       >
                         <MinusIcon className="w-3 h-3" />
                       </button>
@@ -734,6 +775,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   onClick={() => handleAddArrayItem('muscleGroups', newMuscleGroup)}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={loading || !newMuscleGroup.trim()}
+                  aria-label={t('exercises.addMuscleGroup', 'Add muscle group items')} 
+                  title={t('exercises.addMuscleGroup', 'Add muscle group items')}
                 >
                   <PlusIcon className="w-4 h-4" />
                 </button>
@@ -749,6 +792,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                         onClick={() => handleRemoveArrayItem('muscleGroups', index)}
                         className="ml-1 inline-flex items-center p-0.5 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200"
                         disabled={loading}
+                        aria-label={t('exercises.removeMuscleGroup', 'Remove muscle group')}
+                        title={t('exercises.removeMuscleGroup', 'Remove muscle group')}
                       >
                         <MinusIcon className="w-3 h-3" />
                       </button>
@@ -790,6 +835,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   onClick={() => handleAddArrayItem('tags', newTag)}
                   className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={loading || !newTag.trim()}
+                  aria-label={t('exercises.addTag', 'Add tag items')} 
+                  title={t('exercises.addTag', 'Add tag items')}
                 >
                   <PlusIcon className="w-4 h-4" />
                 </button>
@@ -805,6 +852,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                         onClick={() => handleRemoveArrayItem('tags', index)}
                         className="ml-1 inline-flex items-center p-0.5 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200"
                         disabled={loading}
+                        aria-label={t('exercises.removeTag', 'Remove tag')}
+                        title={t('exercises.removeTag', 'Remove tag')}
                       >
                         <MinusIcon className="w-3 h-3" />
                       </button>
