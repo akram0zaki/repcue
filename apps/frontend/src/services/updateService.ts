@@ -14,7 +14,7 @@ import type {
 import { UpdateErrorType } from '../types';
 import { consentService } from './consentService';
 import { storageService } from './storageService';
-import { APP_VERSION } from '../constants';
+// APP_VERSION removed - using server-based versioning
 import { swEventEmitter, updateServiceWorkerCoordinated } from '../utils/serviceWorker';
 import { updateErrorHandler } from '../utils/updateErrorHandler';
 import logger from '../utils/logger';
@@ -68,7 +68,7 @@ export class UpdateService {
    */
   private getDefaultUpdateState(): UpdateState {
     return {
-      currentVersion: APP_VERSION, // Will be updated asynchronously
+      currentVersion: 'unknown', // Will be updated asynchronously from IndexedDB
       updateAvailable: false,
       isUpdating: false,
       userPreferences: {
@@ -87,6 +87,12 @@ export class UpdateService {
       // Load current app version from IndexedDB
       const currentVersion = await storageService.getCurrentAppVersion();
 
+      // Skip update checks if version is null (new installation)
+      if (currentVersion === null) {
+        logger.log('Skipping update state loading - app_version is null (new installation)');
+        return;
+      }
+
       // Load saved state from localStorage
       const savedStateJson = localStorage.getItem(UPDATE_STATE_KEY);
       if (savedStateJson) {
@@ -95,7 +101,7 @@ export class UpdateService {
           this.updateState = {
             ...this.updateState,
             ...savedState,
-            currentVersion, // Override with version from IndexedDB
+            currentVersion: currentVersion as string, // Safe: null check above
             lastCheckTime: savedState.lastCheckTime ? new Date(savedState.lastCheckTime) : undefined
           };
         } catch (parseError) {
@@ -105,7 +111,7 @@ export class UpdateService {
         // No saved state, just update the version
         this.updateState = {
           ...this.updateState,
-          currentVersion
+          currentVersion: currentVersion as string // Safe: null check above
         };
       }
 
@@ -209,7 +215,7 @@ export class UpdateService {
 
       // Reset to defaults
       this.updateState = {
-        currentVersion: APP_VERSION, // Fallback to constant, will be updated by next loadUpdateStateAsync
+        currentVersion: 'unknown', // Will be updated by next loadUpdateStateAsync
         updateAvailable: false,
         isUpdating: false,
         userPreferences: {
@@ -335,6 +341,75 @@ export class UpdateService {
   }
 
   /**
+   * Check if app version is null and trigger refresh if needed
+   */
+  public async checkAndRefreshIfVersionNull(): Promise<void> {
+    try {
+      const currentVersion = await storageService.getCurrentAppVersion();
+      if (currentVersion === null) {
+        logger.warn('🔄 App version is still null, attempting PWA refresh and version retry...');
+
+        // Try to get version again
+        const statusData = await this.getStatus();
+        if (statusData && statusData.version) {
+          await storageService.updateAppVersion(statusData.version);
+          logger.info(`✅ Version recovered during refresh: ${statusData.version}`);
+        } else {
+          logger.error('❌ Version recovery failed - refreshing PWA cache');
+
+          // Refresh PWA cache if available
+          if ('caches' in window) {
+            try {
+              const cacheNames = await caches.keys();
+              await Promise.all(cacheNames.map(name => caches.delete(name)));
+              logger.info('🗑️ PWA cache cleared');
+            } catch (cacheError) {
+              logger.warn('Failed to clear PWA cache:', cacheError);
+            }
+          }
+
+          // Force page reload after cache clear
+          setTimeout(() => {
+            logger.info('🔄 Force reloading to retry version initialization');
+            window.location.reload();
+          }, 1000);
+        }
+      }
+    } catch (error) {
+      logger.error('Failed to check/refresh version:', error);
+    }
+  }
+
+  /**
+   * Get app status from server (lightweight endpoint for version info)
+   */
+  public async getStatus(): Promise<{ status: string; version: string; timestamp: string } | null> {
+    try {
+      logger.log('Getting app status from server...');
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-status`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Status check failed: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      logger.log(`Status received: ${data.status}, version: ${data.version}`);
+
+      return data;
+    } catch (error) {
+      logger.error('Failed to get app status:', error);
+      return null;
+    }
+  }
+
+  /**
    * Check for updates from the edge function with comprehensive error handling and retry logic
    */
   public async checkForUpdates(): Promise<UpdateInfo | null> {
@@ -343,6 +418,14 @@ export class UpdateService {
     const operation = async (): Promise<UpdateInfo | null> => {
       const startTime = Date.now();
       logger.log('Checking for updates...');
+
+      // Skip update checks if version is invalid (null installations or uninitialized)
+      const currentVersion = this.updateState.currentVersion;
+      const versionRegex = /^\d+\.\d+\.\d+$/;
+      if (!currentVersion || currentVersion === 'unknown' || !versionRegex.test(currentVersion)) {
+        logger.log(`Skipping update check - invalid version: ${currentVersion}`);
+        return null;
+      }
 
       // Don't check too frequently unless it's a force update
       const now = new Date();
@@ -370,7 +453,7 @@ export class UpdateService {
         this.startPeriodicChecks();
 
         this.emit('update-available', updateInfo);
-        logger.log(`Update available: ${updateInfo.version} (${updateInfo.policy})`);
+        logger.info(`📦 Update available: ${this.updateState.currentVersion} → ${updateInfo.version} (${updateInfo.policy})`);
       } else {
         this.updateState.updateAvailable = false;
         this.updateState.pendingUpdate = undefined;
@@ -569,10 +652,25 @@ export class UpdateService {
       this.updateState.updateProgress = 0;
       this.saveUpdateState();
 
+      // Get current version before update for logging
+      const oldVersion = this.updateState.currentVersion;
+
       // Enable rollback capability by storing current version
       updateErrorHandler.enableRollback(this.updateState.currentVersion);
 
-      logger.log(`🚀 Starting ${updateInfo.policy} update: ${updateInfo.version}`);
+      // Update version immediately to prevent update loops
+      // This must happen BEFORE service worker operations to ensure the new version is persisted
+      try {
+        await storageService.updateAppVersion(updateInfo.version);
+        this.updateState.currentVersion = updateInfo.version;
+        logger.info(`🔄 App version updated: ${oldVersion} → ${updateInfo.version}`);
+      } catch (error) {
+        logger.error('Failed to update app version in IndexedDB:', error);
+        // This is a critical error - if we can't update the version, we'll get stuck in update loops
+        throw new Error(`Critical error: Could not update app version - ${error}`);
+      }
+
+      logger.info(`🚀 Starting ${updateInfo.policy} update: ${oldVersion} → ${updateInfo.version}`);
       this.emit('update-started', updateInfo);
 
       // Coordinate update across all tabs
@@ -603,16 +701,7 @@ export class UpdateService {
       this.updateState.pendingUpdate = undefined;
       this.updateState.updateAvailable = false;
       this.updateState.isUpdating = false;
-      this.updateState.currentVersion = updateInfo.version;
-
-      // Persist the new version to IndexedDB for future version checks
-      try {
-        await storageService.updateAppVersion(updateInfo.version);
-        logger.log(`✅ App version updated in IndexedDB: ${updateInfo.version}`);
-      } catch (error) {
-        logger.warn('Failed to persist app version to IndexedDB:', error);
-        // Non-critical error, continue with update completion
-      }
+      // currentVersion was already updated earlier to prevent update loops
 
       this.saveUpdateState();
 
@@ -625,10 +714,40 @@ export class UpdateService {
         version: updateInfo.version
       });
 
-      // Slight delay to ensure broadcast is sent
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      // Verify the version was actually persisted before reloading
+      // This is critical to prevent version update from being lost on page reload
+      logger.info(`⏳ Verifying version persistence before reload...`);
+
+      // Slight delay then verify version was actually saved
+      setTimeout(async () => {
+        try {
+          const persistedVersion = await storageService.getCurrentAppVersion();
+          if (persistedVersion === updateInfo.version) {
+            logger.info(`✅ Version verified in IndexedDB: ${persistedVersion}`);
+            logger.info(`🔄 RELOADING NOW with confirmed version: ${updateInfo.version}`);
+            // Add a tiny delay to ensure the log message appears before reload
+            setTimeout(() => window.location.reload(), 50);
+          } else {
+            logger.error(`❌ Version verification failed! Expected: ${updateInfo.version}, Got: ${persistedVersion}`);
+            logger.error(`🚨 Retrying version update to prevent update loops...`);
+
+            // Retry the version update
+            await storageService.updateAppVersion(updateInfo.version);
+
+            // Wait a bit more and verify again
+            setTimeout(async () => {
+              const retryVersion = await storageService.getCurrentAppVersion();
+              logger.info(`🔄 Retry verification: ${retryVersion}`);
+              window.location.reload();
+            }, 300);
+          }
+        } catch (error) {
+          logger.error('Failed to verify version before reload:', error);
+          // Reload anyway to prevent hanging
+          logger.info(`🔄 Reloading despite verification error...`);
+          window.location.reload();
+        }
+      }, 200);
 
     } catch (error) {
       logger.error('Failed to apply update:', error);
@@ -1602,6 +1721,28 @@ export class UpdateService {
       this.handleUpdateError(recoveryError);
       this.emit('recovery-action-failed', { actionId, error: recoveryError });
       throw recoveryError;
+    }
+  }
+
+  /**
+   * Debug method to log current version information
+   * Can be called manually for troubleshooting: updateService.debugVersionInfo()
+   */
+  public async debugVersionInfo(): Promise<void> {
+    try {
+      const indexedDBVersion = await storageService.getCurrentAppVersion();
+      const updateStateVersion = this.updateState.currentVersion;
+      logger.info('🔍 Version Debug Information:');
+      logger.info(`  - IndexedDB app_settings.app_version: ${indexedDBVersion}`);
+      logger.info(`  - UpdateService.currentVersion: ${updateStateVersion}`);
+      logger.info(`  - Update available: ${this.updateState.updateAvailable}`);
+      logger.info(`  - Latest version: ${this.updateState.latestVersion || 'N/A'}`);
+      logger.info(`  - Is updating: ${this.updateState.isUpdating}`);
+      logger.info(`  - Last check: ${this.updateState.lastCheckTime?.toISOString() || 'Never'}`);
+
+      return;
+    } catch (error) {
+      logger.error('Failed to get version debug information:', error);
     }
   }
 

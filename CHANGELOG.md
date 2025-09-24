@@ -1,5 +1,18 @@
 ## Unreleased
 
+## 2025-09-24 (Video Storage Consolidation & Clean Slate)
+
+### Fixed
+- **Complete Video Storage Cleanup**: Eliminated dual-bucket complex*9+
+ity by implementing single `exercise-videos` bucket architecture
+  - **Root Cause**: System was using two buckets (`videos` and `exercise-videos`) causing download failures and complexity
+  - **Complete Data Cleanup**: Removed all videos, video_files records, and user exercises from both dev and prod environments
+  - **Edge Function Update**: Modified sync_v2 edge function to upload videos only to `exercise-videos` bucket
+  - **Client-Side Simplification**: Removed all multi-bucket fallback logic in video download services
+  - **Clean Slate Architecture**: Fresh start with simplified, consistent video storage using only `exercise-videos` bucket
+  - **Documentation Update**: Updated sync system documentation to reflect single-bucket architecture
+  - **Simplified Codebase**: Eliminated complex fallback mechanisms and dual-bucket maintenance overhead
+
 ## 2025-09-23 (Sync System Enhancement & PWA Force Update Fix)
 
 ### Fixed

@@ -1773,6 +1773,31 @@ function App() {
             clearTimeout(watchdog);
             return; // Exit early with built-in exercises only
           }
+          // Handle version initialization for new and existing users
+          try {
+            const currentVersion = await storageService.getCurrentAppVersion();
+
+            if (currentVersion === null) {
+              // New user - get version from server
+              logger.info('[init] 🆕 New installation detected, fetching version from server...');
+
+              const statusData = await updateService.getStatus();
+              if (statusData && statusData.version) {
+                await storageService.updateAppVersion(statusData.version);
+                logger.info(`[init] 🚀 RepCue Application Started - Version: ${statusData.version} (from server)`);
+              } else {
+                logger.warn('[init] ⚠️ Could not fetch version from server, app_version remains null');
+                logger.info(`[init] 🚀 RepCue Application Started - Version: unknown (server unreachable)`);
+              }
+            } else {
+              // Existing user
+              logger.info(`[init] 🚀 RepCue Application Started - Version: ${currentVersion}`);
+            }
+          } catch (versionError) {
+            logger.warn('[init] Could not handle version initialization:', versionError);
+            logger.info(`[init] 🚀 RepCue Application Started - Version: unknown`);
+          }
+
           // Quick DB snapshot for diagnostics (counts only)
           try {
             const snap = await storageService.debugSnapshot();
@@ -1897,6 +1922,15 @@ function App() {
   };
 
   initializeApp();
+
+  // Delayed check for version recovery (edge case handling)
+  setTimeout(async () => {
+    try {
+      await updateService.checkAndRefreshIfVersionNull();
+    } catch (error) {
+      logger.warn('Version recovery check failed:', error);
+    }
+  }, 5000); // Check after 5 seconds
   }, [hasConsent, isPublicShareRoute]);
 
   // Handle shared exercise save from redirect

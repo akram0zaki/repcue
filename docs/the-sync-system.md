@@ -311,6 +311,8 @@ const canEdit = !isSharedExercise(exercise.id) && exercise.owner_id === user.id;
 
 RepCue implements **offline-first video handling** that allows immediate local access while syncing to cloud storage in the background.
 
+**Storage Configuration**: All videos are stored exclusively in the `exercise-videos` bucket for simplified architecture and consistent management. The system underwent a complete cleanup in September 2025, removing all legacy data from both buckets and eliminating the dual-bucket complexity that previously existed.
+
 ### Video Flow Overview
 
 ```
@@ -366,7 +368,7 @@ if (isSharedExercise) {
   const videoBlob = await response.blob();
 } else {
   // Direct storage access for own videos
-  const { data } = await supabase.storage.from('videos').download(storagePath);
+  const { data } = await supabase.storage.from('exercise-videos').download(storagePath);
 }
 ```
 
@@ -660,7 +662,7 @@ CREATE POLICY "Users can view video files for shared exercises" ON video_files
 -- Users can only access their own video folders
 CREATE POLICY "Users can download their own videos" ON storage.objects
   FOR SELECT TO authenticated
-  USING (bucket_id = 'videos' AND auth.uid()::text = foldername(name)[1]);
+  USING (bucket_id = 'exercise-videos' AND auth.uid()::text = foldername(name)[1]);
 
 -- No anonymous access to storage - requires signed URLs
 ```

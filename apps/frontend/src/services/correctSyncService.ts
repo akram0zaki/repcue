@@ -929,8 +929,9 @@ export class CorrectSyncService {
         error = null;
       } else {
         // Use authenticated Supabase client for user's own videos
+        // All videos are stored in exercise-videos bucket only
         const storageResponse = await supabase.storage
-          .from('videos')
+          .from('exercise-videos')
           .download(storagePath);
 
         data = storageResponse.data;
@@ -942,7 +943,7 @@ export class CorrectSyncService {
           error: error,
           message: error.message,
           storagePath: storagePath,
-          bucketName: 'videos',
+          bucketName: 'exercise-videos',
           errorString: JSON.stringify(error)
         });
         throw new Error(`Failed to download video: ${error.message || JSON.stringify(error)}`);

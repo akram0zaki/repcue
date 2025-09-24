@@ -14,7 +14,7 @@ import type {
 import { consentService } from './consentService';
 import { authService } from './authService';
 import { SYNC_DEBUG } from '../config/features';
-import { APP_VERSION, DEFAULT_APP_SETTINGS } from '../constants';
+import { DEFAULT_APP_SETTINGS } from '../constants';
 import {
   prepareUpsert,
   prepareSoftDelete,
@@ -313,8 +313,8 @@ class RepCueDatabase extends Dexie {
 
       await trans.table('app_settings').toCollection().modify((settings: Record<string, unknown>) => {
         if (!settings.app_version) {
-          settings.app_version = '0.1.0'; // Initialize with current APP_VERSION
-          logger.log('[Migration v20] Setting app_version to 0.1.0 for existing settings');
+          settings.app_version = null; // Will be fetched from server on next startup
+          logger.log('[Migration v20] Setting app_version to null - will be fetched from server');
         }
       });
     });
@@ -2288,9 +2288,9 @@ export class StorageService {
   /**
    * Get current app version from stored settings
    */
-  public async getCurrentAppVersion(): Promise<string> {
+  public async getCurrentAppVersion(): Promise<string | null> {
     const settings = await this.getAppSettings();
-    return settings?.app_version || APP_VERSION; // Fallback to constant if not set
+    return settings?.app_version ?? null; // Return null for new installations
   }
 
   /**

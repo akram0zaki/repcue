@@ -187,8 +187,9 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
           error = null;
         } else {
           // Download video from Supabase Storage directly (for user's own exercises)
+          // All videos are stored in exercise-videos bucket only
           const storageResponse = await supabase.storage
-            .from('videos')
+            .from('exercise-videos')
             .download(storedVideoFile.storage_path);
 
           data = storageResponse.data;

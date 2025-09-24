@@ -343,7 +343,7 @@ export interface AppSettings extends SyncMetadata {
   allow_auto_updates?: boolean; // enable automatic updates
   update_on_metered?: boolean; // allow updates on metered connections
   // Version tracking
-  app_version?: string; // currently installed app version
+  app_version?: string | null; // currently installed app version, null for new installations
 }
 
 // Navigation routes
