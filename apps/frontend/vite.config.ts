@@ -14,9 +14,17 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'favicon.svg', 'splash/**/*', 'manifest.json'],
+      devOptions: {
+        enabled: false // Disable in development to avoid conflicts
+      },
+      strategies: 'injectManifest',
+      srcDir: 'public',
+      filename: 'sw-custom.js',
       workbox: {
+        skipWaiting: false, // Let our updateService handle this
+        clientsClaim: false, // Let our updateService handle this
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'splash/*.{png,svg}', 'locales/**/*.json', 'manifest.json'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],

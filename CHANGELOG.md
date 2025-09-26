@@ -1,5 +1,442 @@
 ## Unreleased
 
+### 2025-09-26 (Offline Exercise Creation & Editing Support)
+#### Added
+- **Offline exercise creation**: Users can now create and edit custom exercises without logging in, supporting true offline-first workflow
+- **Orphaned exercise support**: Exercises created offline (`owner_id: null`) are automatically claimed when user logs in via existing `claimOwnership()` mechanism
+- **Enhanced Custom filter**: Exercise page Custom filter now includes orphaned exercises even when logged out, providing seamless offline user experience
+- **Offline video upload support**: Video upload section now available when editing exercises offline (feature flag updated to `target_audience: 'all'`)
+
+#### Fixed
+- **Production storage bucket cleanup**: Removed incorrect `videos` bucket from production, standardized on `exercise-videos` bucket as per architecture
+- **Exercise ownership logic**: Updated edit permissions to allow editing orphaned exercises (`owner_id: null`) both logged in and logged out
+- **Filter consistency**: Fixed `isUserCreatedExercise` logic to properly identify user exercises across logged in/out states
+- **EditExercisePage authentication blocks**: Removed dual authentication checks that prevented editing offline-created exercises
+- **Video upload feature gate**: Changed `custom_video_upload` flag from `authenticated` to `all` users to support offline video uploads
+
+#### Changed
+- Removed authentication requirement from `CreateExercisePage` for offline exercise creation
+- Updated `EditExercisePage` to support editing orphaned exercises with automatic ownership claiming in both `useEffect` (loading) and `handleSubmit` (saving)
+- Enhanced exercise card UI to show edit/delete actions for orphaned exercises even when logged out
+- Modified `FeatureFlagService` fallback flags to enable video uploads for all users (not just authenticated)
+
+### 2025-09-25 (Type Safety & Lint Hardening, Favorites Persistence, Sync v2 Enhancements)
+#### Changed
+- Removed all remaining `any` usages in targeted frontend files (`ExerciseForm.tsx`, `correctSyncService.ts`) by introducing narrowly scoped interfaces (`VideoUploadedEventDetail`, `VideoFileRecord`) improving static analysis and preventing silent runtime shape drift.
+- Replaced `@ts-ignore` with explicit `@ts-expect-error` in `updateService.coalescing.test.ts` to ensure deliberate test access to private members is audited by TypeScript.
+- Strengthened custom DOM event typing for `video:uploaded` flow, reducing risk of malformed `detail` payloads.
+
+#### Fixed
+- Favorite persistence regression for user-created exercises: `getExercises()` now merges favorites from `user_favorites` for `exercise_type='exercise'` and shared references without unintentionally un-favoriting custom entries on subsequent favorite toggles.
+- Dexie predicate misuse (`.notEqual`) replaced with safe in-memory filtering to restore production build (Vite/tsc) compatibility.
+
+#### Added
+- Partial success (HTTP 207) handling path in sync v2 consumer logic documented & validated with improved logging (correlation IDs, per-table status) enabling resilient incremental data convergence instead of fail-fast behavior.
+- Migration tracking entries `supabase-changes_20250924.md` & `supabase-changes_20250925.md` capturing reference-model preservation and UUID enforcement measures.
+
+#### Security / Integrity
+- Enforced UUID exercise ID constraints end-to-end (client + edge) to mitigate catalog poisoning or slug injection; singleton tables guarded against PK mutation attempts.
+
+#### Developer Experience
+- Codebase now lint-clean (0 errors) under strict ESLint + TypeScript rules, reducing noise for future PR reviews.
+
+### 2025-09-25 (Shared Exercise Save Fix – Preserve Reference Model)
+#### Fixed
+- Corrected `save-shared-exercise` edge function regression risk: ensured it uses the reference-based sharing model (`user_favorites` with `item_id` + `exercise_type='shared'`) instead of attempting to rely on a non-existent `exercise_id` column that caused HTTP 500 errors on recipients. Normalizes any legacy favorites missing `exercise_type='shared'` rather than inserting duplicates.
+- Updated `download-shared-video` edge function to validate access via `item_id` + `exercise_type='shared'` and switched storage bucket usage to unified `exercise-videos` bucket.
+
+#### Notes
+- No database migration required; existing unique index `(owner_id, item_id, item_type)` already supports the normalized query path.
+- Added defensive normalization path upgrading legacy favorite rows to `exercise_type='shared'` in-place to prevent duplicate reference creation.
+
+### 2025-09-24 (Sync Filtering Hardening)
+#### Added
+- Helper `isSharedWithMe(exercise, sharedExerciseIds)` to support consistent shared exercise detection (reference-based) without ad-hoc logic.
+ - Server-side UUID enforcement in `sync_v2` edge function (reject non-UUID exercise upserts, skip non-UUID deletes, filter pull responses) for defense-in-depth.
+ - Singleton ID normalization: `sync_v2` now strips non-UUID placeholder `id` values for singleton tables (`app_settings`, `user_preferences`) to prevent PK mutation attempts and push errors.
+
+#### Changed
+- Enforced UUID-only exercise synchronization: client now refuses to apply server-pulled exercises whose IDs are not valid UUIDs (extra defense in `applyServerTableChanges`).
+- Replaced inline UUID regex in `App.tsx` favorite toggle with `isCustom` helper for single source of truth.
+- Strengthened dirty batch filtering (built-ins already excluded on push; mirrored rule on pull) for data integrity.
+
+#### Security / Integrity
+- Prevents accidental or malicious introduction of slug (built-in) IDs via sync responses; reduces catalog poisoning risk.
+ - Edge function now mirrors client rule set (UUID-only) eliminating remaining attack surface for slug injection.
+ - Prevents malformed / placeholder singleton IDs (e.g. `default-app-settings`) from causing failed updates or unintended primary key rewrites.
+
+#### Migration
+- No database schema changes required; documented in `docs/migration-tracking/supabase-changes_20250924.md`.
+
+## 2025-09-24 (Video Storage Consolidation & Clean Slate)
+
+### Fixed
+- **Complete Video Storage Cleanup**: Eliminated dual-bucket complex*9+
+ity by implementing single `exercise-videos` bucket architecture
+  - **Root Cause**: System was using two buckets (`videos` and `exercise-videos`) causing download failures and complexity
+  - **Complete Data Cleanup**: Removed all videos, video_files records, and user exercises from both dev and prod environments
+  - **Edge Function Update**: Modified sync_v2 edge function to upload videos only to `exercise-videos` bucket
+  - **Client-Side Simplification**: Removed all multi-bucket fallback logic in video download services
+  - **Clean Slate Architecture**: Fresh start with simplified, consistent video storage using only `exercise-videos` bucket
+  - **Documentation Update**: Updated sync system documentation to reflect single-bucket architecture
+  - **Simplified Codebase**: Eliminated complex fallback mechanisms and dual-bucket maintenance overhead
+
+## 2025-09-23 (Sync System Enhancement & PWA Force Update Fix)
+
+### Fixed
+- **PWA Force Update Modal Hanging Issue**: Resolved critical issue where force update modal would get stuck on "Applying Update..." in PWA mode
+  - **Root Cause**: Force update system was using development-mode logic in PWA environment, causing service worker update failures
+  - **Context Detection**: Added intelligent detection to differentiate between PWA mode and development server
+  - **Dual Update Paths**: Implemented separate update strategies for PWA (service worker) vs dev mode (direct reload)
+  - **Fallback Protection**: Added automatic fallback to force reload when service worker update fails
+  - **State Recovery**: Enhanced state management with auto-recovery when force update state gets corrupted
+  - **Cache Clearing**: Implemented PWA cache clearing before reload to ensure fresh content
+  - **Enhanced Debugging**: Added comprehensive logging for PWA context detection and update flow troubleshooting
+
+- **Sync Service Detailed Error Reporting**: Enhanced sync error visibility with comprehensive table-level status reporting
+  - **Log Level Classification**: Implemented smart logging based on sync status (debug for success, info for partial success, error for failure)
+  - **Per-Table Breakdown**: Added detailed reporting of which tables succeeded/failed during sync operations
+  - **Success/Error Counts**: Display exact counts of push/pull successes and errors per table
+  - **Detailed Error Information**: Surface specific error messages and operation details from edge function
+  - **Correlation ID Tracking**: Enhanced request tracing with correlation IDs for debugging sync issues
+  - **Improved UX**: Users now get clear visibility into exactly what succeeded/failed during sync operations
+
+### Enhanced
+- **Force Update Service Robustness**: Improved reliability and error handling for PWA force updates
+  - **Context-Aware Updates**: Automatically adapts update strategy based on PWA vs development environment
+  - **State Preservation**: Enhanced workout state saving and recovery across force updates
+  - **Modal State Management**: Fixed processing state handling to prevent permanent modal hanging
+  - **Recovery Mechanisms**: Added multiple fallback strategies when primary update methods fail
+  - **Debug Utilities**: Added `debugCheckForUpdates()` method for troubleshooting update availability
+
+- **Sync Toast Positioning Enhancement**: Improved sync notification user experience
+  - **Centered Display**: Moved sync toast notifications from bottom (covering menu) to center screen
+  - **Reduced Duration**: Shortened toast display time by 1 second for less intrusive notifications
+  - **Better Accessibility**: Improved visibility and reduced interference with navigation elements
+
+### Technical Infrastructure
+- **Edge Function Sync Enhancements**: Deployed comprehensive sync_v2 edge function improvements to production
+  - **Enhanced Error Reporting**: Implemented detailed per-table sync status tracking and error reporting
+  - **Comprehensive Field Allowlists**: Verified and corrected all table field allowlists to match database schema
+  - **Video Upload Processing**: Enhanced video file handling with proper storage bucket management
+  - **Correlation ID System**: Added request tracking for better debugging and monitoring
+  - **Production Deployment**: Successfully deployed version 23 to production with all enhancements
+
+### Developer Experience
+- **Enhanced Debugging**: Added comprehensive logging and state tracking for force update and sync systems
+  - **PWA Context Detection**: Log environment detection and update strategy selection
+  - **State Dump Logging**: Full state information when errors occur for easier troubleshooting
+  - **Update Flow Tracking**: Detailed logging of update process steps and decision points
+  - **Error Recovery Paths**: Clear logging of fallback mechanisms and recovery attempts
+
+## 2025-09-23 (Sync Optimization & Error Resolution)
+
+### Fixed
+- **Online Event Listener for Immediate Sync**: Added network connectivity-based sync triggering for faster data synchronization
+  - **Online Event Handler**: Added `online` event listener to `App.tsx` setupSyncTriggers function that triggers sync immediately when reconnecting to internet
+  - **Improved User Experience**: Exercises now sync automatically upon network reconnection instead of waiting for periodic sync intervals
+  - **Enhanced Logging**: Added connection restoration debug logging to track sync trigger events
+
+- **Exercise Creation Social Engagement Field Cleanup**: Resolved sync failures caused by inappropriate social engagement placeholders
+  - **Root Cause**: Social engagement fields (`is_verified`, `rating_average`, `rating_count`, `copy_count`) were incorrectly added to user exercise creation form
+  - **Solution**: Removed these calculated/system fields from `CreateExercisePage.tsx` as they are database-computed values, not user inputs
+  - **Edge Function Fix**: Updated sync_v2 allowlist to exclude social engagement fields from exercise sync operations
+  - **Result**: Custom exercise creation now syncs successfully without field validation errors
+
+- **Sync Status Banner to Toast Conversion**: Improved user experience by replacing persistent sync banners with auto-disappearing toast notifications
+  - **UX Enhancement**: Converted all sync status banners in `SyncStatusBanner.tsx` to toast notifications for cleaner interface
+  - **Maintained Functionality**: Preserved all original sync status conditions (DEBUG flags, authentication checks, error states) while changing output to toasts
+  - **Smart Deduplication**: Added ref-based debouncing to prevent duplicate notifications for same sync events
+  - **Extended Duration**: Sync error toasts display for 8 seconds (longer than standard) to ensure visibility
+  - **DEBUG Compatibility**: Maintained DEBUG flag functionality while providing toast-based feedback instead of persistent banners
+
+- **Video Upload Storage Bucket Fix**: Resolved "Bucket not found" errors preventing video uploads in production
+  - **Root Cause**: Edge function was attempting to use non-existent 'exercise-media' bucket instead of existing 'videos' bucket
+  - **Investigation**: Verified both development and production environments only have 'videos' and 'exercise-videos' buckets
+  - **Solution**: Updated sync_v2 edge function to use correct 'videos' bucket for video file uploads
+  - **Enhanced Error Handling**: Improved video upload error reporting with correlation IDs for better debugging
+  - **Cross-Environment Consistency**: Ensured edge function behavior matches between development and production environments
+
+### Enhanced
+- **Edge Function Video File Processing**: Improved binary video file handling for reliable sync operations
+  - **Byte Array Support**: Enhanced edge function to properly handle Array.isArray(fileData) for video uploads sent as byte arrays
+  - **Base64 Fallback Removal**: Removed incorrect base64 decoding logic that was causing video corruption errors
+  - **MIME Type Support**: Added proper content-type handling for uploaded video files
+  - **Storage Path Organization**: Maintained secure user-folder structure for video file organization
+
+### Technical Infrastructure
+- **Edge Function Deployments**: Updated sync_v2 edge function to production version 22 with comprehensive fixes
+  - **Field Allowlist Cleanup**: Removed inappropriate social engagement fields from exercise sync allowlist
+  - **Video Upload Pipeline**: Fixed storage bucket references and byte array handling
+  - **Enhanced Logging**: Added correlation IDs and detailed error reporting for debugging sync issues
+  - **Workspace Synchronization**: Updated workspace edge function file to match deployed production version
+
+## 2025-09-22 (UI/UX Improvements & Database Cleanup)
+
+### Fixed
+- **Translation System Regression**: Fixed critical issue where exercise detail section headers reverted to English instead of displaying in selected language
+  - **Root Cause**: Translation calls were using wrong namespace (`'exercises'` instead of `'exercise'`)
+  - **Resolution**: Corrected namespace usage for section headers (benefits, limitations, bestTiming, suggestedCombinations, notes, references)
+  - **Tags Error**: Fixed "key 'tags (ar)' returned an object instead of string" error by using correct translation namespace
+  - **Affected Components**: `ExerciseDetailContent.tsx` - updated translation hook to include `'exercise'` namespace
+
+- **Catalog Selector UI Consistency**: Fixed inconsistent card heights and text alignment in exercise catalog selection
+  - **Height Consistency**: Reserved space for premium badges on all catalog cards to ensure uniform heights
+  - **Text Alignment**: Standardized all catalog titles to be centered for consistent visual presentation
+  - **Issue**: "General Fitness" card was shorter than premium catalogs, text alignment varied between centered and left-aligned
+
+- **Database Corruption Cleanup**: Resolved video file data corruption causing console errors
+  - **Cleaned Records**: Removed 259 corrupted video file records with NULL file_data
+  - **Updated Exercises**: Fixed exercises with corrupted `blob-pending-sync://` URLs by removing invalid video references
+  - **Console Errors**: Eliminated "No video files with file_data found" and related video resolution errors
+
+### Enhanced
+- **Image Loading Optimization**: Improved catalog image loading behavior
+  - **Loading Strategy**: Changed catalog images from lazy loading to eager loading for immediate visibility
+  - **Browser Compatibility**: Reduced Microsoft Edge intervention messages about deferred image loading
+
+## 2025-09-21 (Sync UX Improvement)
+
+### Enhanced
+- **Sync Status Notifications**: Improved user experience for sync error reporting
+  - **Toast Notifications**: Replaced persistent sync error banners with auto-disappearing toast notifications for better UX
+  - **Error Deduplication**: Implemented error deduplication to prevent showing the same error multiple times
+  - **Extended Duration**: Sync error toasts show for 8 seconds (longer than standard toasts) to ensure visibility
+  - **Cleaner Interface**: Removed visual clutter from persistent error banners while maintaining error visibility
+
+## 2025-09-21 (Multi-Catalog System Enhancement)
+
+### New Features
+- **Enhanced Multi-Catalog System**: 🎉 **EXPANDED** - Significantly improved exercise catalog organization and content
+  - **Women's Health Catalog**: Added new specialized catalog for women's fitness with dedicated icon and theme
+  - **Catalog Reordering**: Reorganized catalog display order for better user experience (General Fitness → Women's Health → Tai Chi → Zumba)
+  - **Local Asset Integration**: Migrated from external Unsplash images to local SVG assets for better performance and offline support
+  - **Improved CatalogSelector**: Enhanced UI component with better visual design and catalog management capabilities
+
+### Enhanced
+- **Exercise Content Library**: Comprehensive enhancement of exercise data and educational content
+  - **Exercise Benefits**: Added detailed benefits descriptions for all exercises explaining physiological and functional advantages
+  - **Limitations & Safety**: Added comprehensive limitations and safety warnings for each exercise to prevent injury
+  - **Optimal Timing**: Added guidance on when to perform each exercise for maximum effectiveness
+  - **Exercise Combinations**: Added suggested exercise pairings for better workout planning
+  - **Professional References**: Added evidence-based references and authoritative sources for each exercise
+  - **Form & Technique Notes**: Enhanced detailed form cues and technique guidance for proper execution
+  - **Video Asset Updates**: Updated bear crawl exercise video assets to use available MP4 format
+
+### Technical Infrastructure
+- **Production Deployment Documentation**: Updated comprehensive migration tracking and deployment procedures
+  - **Sync Tracking**: Enhanced production sync tracker template with detailed migration status and procedures
+  - **Environment Management**: Improved documentation for managing dual Supabase environment synchronization
+  - **Deployment Checklists**: Added comprehensive checklists for production deployment verification
+
+## 2025-09-21 (Simplified Version Management)
+
+### New Features
+- **Simplified PWA Version Management**: 🎉 **IMPLEMENTED** - Streamlined approach to fix broken update system
+  - **App Settings Extension**: Added `app_version` column to `app_settings` table for user version tracking
+  - **Database Migration**: Created migration `20250921-03-add-app-version-to-app-settings.sql` with proper indexing and baseline data
+  - **Singleton Pattern**: Fixed `app_settings` to enforce single record per user in IndexedDB to prevent duplicate records
+  - **Sync Integration**: Updated `sync_v2` edge function (v16 → v40) to include `app_version` in field allowlist for synchronization
+  - **User Analytics**: Enabled tracking of user version distribution for better support and update planning
+  - **Simple Implementation**: Bypasses complex dynamic versioning for immediate functionality and update system repair
+
+### Fixed
+- **Update System Sync Errors**: Resolved critical sync failures that prevented app functionality
+  - **Root Cause**: Previously deployed wrong edge function format that expected simple operations instead of complex batched sync requests
+  - **Edge Function Fix**: Deployed correct `sync_v2` function that maintains proper complex sync format while adding version support
+  - **Client-Server Compatibility**: Restored proper API format compatibility between client sync requests and server responses
+
+### Enhanced
+- **Production Deployment Documentation**: Updated migration tracking documentation
+  - **Sync Checklist**: Added new migration `20250921-03-add-app-version-to-app-settings.sql` to production sync checklist
+  - **Edge Function Versions**: Updated sync_v2 version references from v36 to v40 in deployment documentation
+  - **Version Tracking**: Added description of simplified version management system for production deployment
+
+## 2025-09-21 (Session Update)
+
+### Fixed
+- **Reference-Based Shared Exercise Videos**: 🎉 **RESOLVED** - Completed implementation of reference-based shared exercise video system
+  - **Video Access Fix**: Updated `download-shared-video` edge function (v1 → v2) to support reference-based sharing verification
+  - **Dual-Path Resolution**: Implemented smart video resolution logic that uses edge functions for shared exercises and direct storage for owned exercises
+  - **Sharing System Migration**: Transitioned from copy-based to reference-based sharing using `user_favorites` table for permission verification
+  - **Video Download Pipeline**: Enhanced sync service with dual-path video downloading that respects exercise ownership
+  - **RLS Policy Updates**: Updated video file policies to work with reference-based sharing system instead of deprecated copy flags
+
+### Enhanced
+- **TypeScript Build System**: Fixed all compilation errors for production deployment
+  - **Type Safety**: Resolved null/undefined type conflicts in modal components and update service callbacks
+  - **Catalog Mapping**: Fixed storageService catalog field mapping to properly handle UI ↔ database field conversions
+  - **Emergency Callbacks**: Updated updateService emergency callback type signatures for proper error handling
+  - **Build Success**: All TypeScript compilation now passes without errors for production builds
+
+### Technical Infrastructure
+- **Documentation Updates**: Comprehensive documentation refresh to reflect current system architecture
+  - **Exercise Sharing**: Updated `docs/exercise-sharing.md` to accurately describe reference-based sharing vs old copy-based system
+  - **Sync Documentation**: Enhanced `docs/exercises-sync.md` with shared exercise sync flows and multi-catalog integration
+  - **Video Sync**: Updated `docs/video-sync.md` with shared exercise video handling and cross-device sync procedures
+  - **Production Checklist**: Added missing migrations and edge function updates to `docs/migration-tracking/production-sync-checklist.md`
+
+### New Implementation Plans
+- **PWA Dynamic Versioning**: Created comprehensive implementation plan (`docs/implementation-plans/pwa-dynamic-versioning.md`)
+  - **7-Phase Implementation**: Detailed plan to replace static version constants with dynamic build-time injection
+  - **Offline-First Design**: Version state management that respects offline-first architecture and user consent
+  - **Build Integration**: CI/CD integration with git tag versioning and environment variable injection
+  - **Version Persistence**: Post-update version tracking that survives app reloads and enables proper update detection
+
+## 2025-09-21 (PWA Update System)
+
+### New Features
+- **PWA Update System**: 🎉 **FULLY IMPLEMENTED** - Complete Progressive Web App update notification and management system
+  - **Update Detection**: Automatic background update checking with configurable intervals and privacy-respecting version queries
+  - **User Preferences**: Comprehensive update preferences panel with automatic/notify/manual update modes
+  - **Force Updates**: Critical security update enforcement with workout-aware interruption handling
+  - **Update Notifications**: Smart notification banner with "What's New" changelog display and 24-hour deferral options
+  - **Workout Protection**: Update notifications deferred during active workout sessions with graceful interruption handling
+  - **Error Recovery**: Comprehensive error handling with automatic retry logic and user-friendly recovery options
+  - **Privacy First**: Update checks transmit only version numbers, no personal data, with user consent integration
+  - **Offline Support**: Robust offline fallback mechanisms when update services are unavailable
+  - **Accessibility**: Full WCAG 2.1 AA compliance with screen reader support and keyboard navigation
+
+### Fixed
+- **Shared Exercise Video Downloads**: Resolved critical issue where videos were missing from saved shared exercises
+  - **Root Cause**: Missing video metadata fields in save-shared-exercise edge function response
+  - **Edge Function Fix**: Updated edge function to return `hasVideo`, `sharedFromExerciseId`, and `sharedFromUserId` fields
+  - **Field Mapping**: Added automatic field name mapping in sync service to convert `catalog_id` (server) to `catalogId` (client)
+  - **Video Pipeline**: Complete video download pipeline now triggers automatically when saving shared exercises with videos
+  - **Offline Access**: Downloaded videos stored locally in IndexedDB for offline playback
+
+### Enhanced
+- **Sync Service Improvements**: Enhanced correctSyncService.ts with automatic field name mapping for exercises table
+  - **Field Normalization**: Automatic conversion of server field names to client-expected camelCase format
+  - **Catalog Integration**: Proper catalogId field mapping ensures shared exercises appear in correct catalog filters
+  - **Backward Compatibility**: Maintains compatibility with existing data while fixing field name mismatches
+
+### Technical Infrastructure
+- **Database Schema**:
+  - Added complete app version management system with `admin_users`, `app_versions`, and `version_audit` tables
+  - Enhanced exercise sharing system with proper video metadata tracking
+- **Edge Functions**:
+  - New `check-version` function for privacy-respecting update checks with build metadata and update policy support
+  - Updated `save-shared-exercise` function with complete video sharing capabilities
+- **Service Architecture**:
+  - New `updateService.ts` with singleton pattern following RepCue's service architecture
+  - New `forceUpdateService.ts` for critical security update enforcement
+  - Enhanced `correctSyncService.ts` with field mapping capabilities
+- **Component Library**:
+  - 8 new React components for update management UI with comprehensive accessibility support
+  - Complete test suite with 150+ test cases covering all update scenarios
+- **Build System**:
+  - Automated version management scripts with git integration and metadata capture
+  - Enhanced PWA configuration with custom service worker update handling
+
+### Updated Documentation
+- **Implementation Plans**:
+  - Complete PWA update system implementation plan with 15 phases
+  - Shared exercise fix implementation plan with reference-based architecture proposal
+- **Technical Documentation**:
+  - PWA update system deployment guide
+  - Migration checklist and rollback procedures
+  - Comprehensive troubleshooting guide
+
+## 2025-09-19
+
+### Fixed
+- **Activity Log Visibility Issue**: Resolved critical issue where completed exercises (like "Bicycle Crunches") were not appearing in the activity log table
+  - **Root Cause**: Missing `catalog_id` field in activity logs sync infrastructure causing sync failures
+  - **Database Schema**: Added `catalog_id` column to `activity_logs` table via migration `20250919-01-add-catalog-id-to-activity-logs.sql`
+  - **Sync Infrastructure**: Updated sync_v2 edge function (v36) with complete catalog support including:
+    - Added `exercise_catalogs` to SYNC_TABLES array for proper catalog metadata synchronization
+    - Added `catalog_id` to exercises MUTABLE_FIELD_ALLOWLIST for exercise catalog assignment sync
+    - Added `catalog_id` to activity_logs MUTABLE_FIELD_ALLOWLIST for activity log catalog tracking
+    - Added complete `exercise_catalogs` field allowlist for catalog metadata sync
+  - **Application Logic**: Fixed all 4 activity log creation instances in App.tsx to include proper `catalog_id` field
+  - **IndexedDB Schema**: Updated to version 19 to include `catalog_id` field in activity_logs table
+  - **Testing**: Comprehensive test coverage for catalog_id database schema and sync functionality
+
+### Completed
+- **Multi-Catalog System Implementation**: 🎉 **FULLY COMPLETED** - All 4 phases of the multi-catalog exercise system successfully implemented
+  - **Phase 3 - Localization & Content** (✅ Completed):
+    - Created comprehensive `catalogs.json` translations for all 8 supported locales (en, de, es, fr, nl, ar, ar-EG, fy)
+    - Implemented complete Tai Chi exercise catalog with traditional flowing movements
+    - Implemented complete Zumba exercise catalog with dance-based fitness routines
+    - All new exercises fully translated across all supported languages with proper metadata
+  - **Phase 4 - Testing & Schema Validation** (✅ Completed):
+    - Complete database layer validation across all Supabase CRUD operations
+    - Comprehensive StorageService testing with catalog_id field integration
+    - Full sync layer validation including CorrectSyncService catalog table sync
+    - Edge function sync_v2 validation with catalog queries and field allowlists
+    - TypeScript compilation verification with updated interfaces
+    - RLS policies testing for catalog access control scenarios
+    - Foreign key integrity testing for catalog referential constraints
+    - Exercise sharing functionality protection verified (no regressions)
+
+### Technical Details
+- **Complete Sync Infrastructure**: Activity logs now properly sync with catalog context between IndexedDB and Supabase
+- **Database Migrations**: Applied to both development (xwzrsfkzqxdybjrkkkvh) and production (zumzzuvfsuzvvymhpymk) environments
+- **Edge Function Deployment**: sync_v2 version 36 successfully deployed with complete catalog support
+- **Schema Consistency**: Resolved field naming consistency between database (`catalog_id`) and TypeScript interfaces (`catalogId`)
+- **Foreign Key Integrity**: Proper sync ordering ensures catalogs sync before exercises and activity logs
+- **Type Safety**: Zero TypeScript compilation errors across the entire codebase
+- **Backward Compatibility**: Zero breaking changes to existing functionality during implementation
+
+### Updated Documentation
+- **Implementation Plan**: Updated `docs/implementation-plans/multi-catalog-implementation-plan.md` with complete status tracking
+- **Progress Tracking**: All phases marked as completed with detailed implementation notes
+- **Critical Issues Resolution**: Documented root cause analysis and solutions for activity log visibility issue
+
+## 2025-09-19
+
+### Fixed
+- **Exercise Detail Page Layout and Translation Issues**: Completely redesigned ExerciseDetailPage to match ExerciseDetailModal for consistent user experience
+  - **Layout Transformation**: Converted from wide 3-column grid layout to compact single-column modal-style design for better mobile experience
+  - **Translation Keys Resolution**: Fixed unresolved translation keys by adding proper namespace configuration (`['common', 'exercise', 'exercises']`)
+  - **Content Organization**: Reorganized all exercise information sections to follow modal's logical flow and styling patterns
+  - **New Exercise Attributes Display**: Properly integrated benefits, limitations, best_timing, suggested_combinations, notes, and exercise_references fields
+  - **Suggested Combinations**: Converted from static text to clickable navigation links between related exercises
+  - **Visual Consistency**: Applied modal's typography patterns (`h4` headings, consistent spacing, background styling) throughout the page
+  - **Responsive Design**: Single-column layout provides optimal viewing experience across all device sizes
+  - **TypeScript Cleanup**: Removed unused variables and imports to eliminate build warnings
+
+### Technical Details
+- **Component Architecture**: ExerciseDetailPage now mirrors ExerciseDetailModal structure while maintaining full-page functionality
+- **Translation Namespace**: Unified translation key structure across exercise display components
+- **Navigation Integration**: Suggested combinations use React Router navigation for seamless exercise browsing
+- **Code Quality**: Eliminated 10+ TypeScript compilation errors related to unused variables and imports
+
+## 2025-09-19
+
+### Added
+- **Multi-Catalog System Implementation**: Completed Phase 1 and Phase 2 of the multi-catalog exercise system, introducing categorized exercise libraries for specialized fitness programs
+  - **Phase 1 - Database Architecture** (✅ Completed):
+    - Created `exercise_catalogs` table with comprehensive metadata (name, description, premium status, themes, icons)
+    - Added `catalog_id` foreign key to exercises table with proper indexing and constraints
+    - Implemented Row Level Security (RLS) policies for catalog access control
+    - Created four default catalogs: General Fitness, Tai Chi, Zumba, and Women's Health
+    - Added extended exercise fields: benefits, limitations, best timing, suggested combinations, notes, and references
+    - Applied database migrations to development environment with full verification
+  - **Phase 2 - User Interface** (✅ Completed):
+    - Built `CatalogSelector` component with themed buttons, premium badges, and responsive design
+    - Integrated catalog filtering into `ExercisePage` with real-time exercise filtering by catalog
+    - Implemented catalog state persistence using localStorage for consistent user experience
+    - Added comprehensive translation support for all catalog-related UI elements
+    - Created scalable translation architecture supporting unlimited catalogs without code changes
+  - **Multi-Language Support**: Complete internationalization for catalog system
+    - English, German, Spanish, French, Dutch, Arabic (Standard + Egyptian), and Frisian translations
+    - Catalog names, descriptions, and UI elements fully localized across all supported languages
+    - Translation keys structured for easy addition of new catalogs without developer intervention
+  - **Technical Architecture**:
+    - Database Version 18 migration ensuring consistent field naming (`catalogId` vs `catalog_id`)
+    - Updated sync service to handle catalog data across all devices
+    - Enhanced exercise data management with catalog-aware filtering and search
+    - Proper timestamp correction for migration files (20250917 format)
+
+### Technical Details
+- **Database Schema**: Added `exercise_catalogs` table with fields for metadata, theming, and premium status
+- **Client Architecture**: Integrated catalog selection with existing exercise filtering and search functionality
+- **Sync Compatibility**: Updated edge functions to include catalog data in sync operations
+- **Migration Tracking**: Comprehensive documentation of all changes applied to development environment
+- **Future-Ready**: Architecture supports easy addition of new catalogs through database configuration only
+
 ### Fixed
 - **Critical Video Corruption in Shared Exercise Downloads**: Resolved data corruption bug causing shared exercise videos to become unplayable after download
   - **Root Cause**: `supabase.functions.invoke()` was incorrectly parsing binary video data as UTF-8 text, causing byte-level corruption during transfer

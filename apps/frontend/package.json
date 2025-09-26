@@ -31,7 +31,16 @@
     "i18n:report": "node scripts/i18n-scan.mjs || exit 0",
     "generate-favicons": "node scripts/generate-favicons.js",
     "generate-favicons:full": "node scripts/generate-favicons.js --full",
-    "generate-splash": "node scripts/generate-splash.mjs"
+    "generate-splash": "node scripts/generate-splash.mjs",
+    "version:create": "node scripts/version-management.mjs create",
+    "version:validate": "node scripts/version-management.mjs validate",
+    "version:list": "node scripts/version-management.mjs list",
+    "version:build-info": "node scripts/version-management.mjs build-info",
+    "release:create": "node scripts/dev-workflow.mjs release",
+    "release:hotfix": "node scripts/dev-workflow.mjs hotfix",
+    "release:prepare": "node scripts/dev-workflow.mjs prepare-release",
+    "release:status": "node scripts/dev-workflow.mjs status",
+    "release:bump": "node scripts/dev-workflow.mjs bump"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.2",

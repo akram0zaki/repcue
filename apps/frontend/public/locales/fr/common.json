@@ -11,6 +11,10 @@
     "close": "Fermer",
     "dismiss": "Ignorer",
     "retry": "Réessayer",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "et",
     "loading": "Chargement...",
     "optional": "optionnel",
@@ -54,7 +58,8 @@
     "confirmClearForm":"Êtes-vous sûr de vouloir effacer le formulaire ? Cela supprimera votre brouillon.",
     "noVideo": "Pas de vidéo",
     "pauseVideo": "Mettre en pause la vidéo",
-    "playVideo": "Lire la vidéo"
+    "playVideo": "Lire la vidéo",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Accueil",
@@ -119,7 +124,35 @@
     "forceFullSync": "Forcer la synchronisation complète",
     "resetSyncState": "Réinitialiser l'état de synchronisation",
     "syncAdvanced": "Synchronisation avancée",
-    "syncAdvancedHelp": "Aide pour résoudre les problèmes de synchronisation."
+    "syncAdvancedHelp": "Aide pour résoudre les problèmes de synchronisation.",
+    "updatePreferences": "Mises à jour de l'App",
+    "updatePrivacyTitle": "Confidentialité d'abord",
+    "updatePrivacyMessage": "Les vérifications de mise à jour n'envoient que votre numéro de version actuel. Aucune donnée personnelle n'est transmise.",
+    "updateModeTitle": "Comportement des mises à jour",
+    "updateMode": {
+      "automatic": {
+        "title": "Mises à jour automatiques",
+        "description": "Installer les mises à jour automatiquement en arrière-plan. Recommandé pour la plupart des utilisateurs."
+      },
+      "notify": {
+        "title": "Notification seulement",
+        "description": "Afficher les notifications pour les mises à jour mais me laisser décider quand les installer."
+      },
+      "manual": {
+        "title": "Manuel seulement",
+        "description": "Ne jamais vérifier automatiquement les mises à jour. Je mettrai à jour manuellement si nécessaire."
+      }
+    },
+    "securityUpdatesNote": "Les mises à jour critiques de sécurité seront toujours appliquées automatiquement, quelle que soit votre préférence.",
+    "meteredConnection": "Utilisation des données",
+    "currentConnection": "Connexion actuelle :",
+    "connectionMetered": "Mesurée",
+    "connectionUnmetered": "Non mesurée",
+    "allowMeteredUpdates": "Autoriser les mises à jour sur connexions mesurées",
+    "allowMeteredUpdatesDescription": "Les mises à jour peuvent utiliser les données mobiles ou compter contre les limites de données",
+    "additionalPreferences": "Options supplémentaires",
+    "showChangelog": "Afficher les nouveautés",
+    "showChangelogDescription": "Afficher les notes de version et les points forts des fonctionnalités après les mises à jour"
   },
   "timer": {
     "restNext": "Période de repos (Suivant : {{next}})",
@@ -243,6 +276,12 @@
     "moveDownAria": "Déplacer vers le bas",
     "removeExerciseAria": "Supprimer l'exercice",
     "durationSeconds": "Durée (secondes)",
+    "benefits": "Avantages",
+    "limitations": "Limitations",
+    "bestTiming": "Meilleur Moment",
+    "suggestedCombinations": "Combinaisons Suggérées",
+    "notes": "Notes",
+    "references": "Références",
     "sets": "Séries",
     "reps": "Répétitions",
     "restSeconds": "Temps de repos (secondes)",
@@ -264,6 +303,10 @@
     "errorLoadingTitle": "Erreur lors du chargement de l'entraînement",
     "backToWorkouts": "Retour aux entraînements",
     "retry": "Réessayer",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "Sauvegarder l'entraînement"
   },
   "activity": {
@@ -315,6 +358,7 @@
     },
     "favoritesOnly": "Favoris uniquement",
     "showingCount": "Affichage de {{count}} sur {{total}}",
+    "showingCountInCatalog": "Affichage de {{count}} sur {{total}} exercices dans {{catalog}}",
     "emptyTitle": "Aucun résultat",
     "emptyBody": "Aucun exercice ne correspond à vos filtres. Essayez d'effacer les filtres.",
     "clearFilters": "Effacer les filtres",
@@ -423,6 +467,12 @@
     "sharedWithUser": "Partagé avec l'utilisateur",
     "stepDuration": "Durée de l'Étape (secondes)",
     "durationSeconds": "Durée (secondes)",
+    "benefits": "Avantages",
+    "limitations": "Limitations",
+    "bestTiming": "Meilleur Moment",
+    "suggestedCombinations": "Combinaisons Suggérées",
+    "notes": "Notes",
+    "references": "Références",
     "types": {
       "repetition_based": "Basé sur les Répétitions",
       "time_based": "Basé sur le Temps"
@@ -542,5 +592,83 @@
     "unknownUser": "Utilisateur Inconnu",
     "connectedSince": "Connecté depuis {{date}}",
     "pending": "En attente"
+  },
+  "update": {
+    "force": {
+      "title": "Mise à jour de sécurité requise",
+      "action": "Mettre à jour maintenant",
+      "modal": {
+        "title": "Mise à jour de sécurité requise",
+        "warning": {
+          "title": "Mise à jour de sécurité importante",
+          "message": "Cette mise à jour contient des corrections de sécurité critiques et ne peut pas être reportée. L'application sera indisponible jusqu'à ce que la mise à jour soit terminée."
+        },
+        "footer": "Cette mise à jour de sécurité est requise pour protéger vos données et garantir le bon fonctionnement de l'application."
+      }
+    },
+    "critical": {
+      "title": "Mise à jour importante disponible"
+    },
+    "optional": {
+      "title": "Nouvelle version disponible"
+    },
+    "default": {
+      "title": "Mise à jour disponible"
+    },
+    "version": "Version: {{version}}",
+    "action": "Mettre à jour",
+    "postpone": "Plus tard",
+    "dismiss": "Ignorer la notification de mise à jour",
+    "showChangelog": "Voir les nouveautés",
+    "hideChangelog": "Masquer les nouveautés",
+    "estimatedSize": "Est. {{size}}MB",
+    "meteredConnection": {
+      "title": "Connexion mesurée détectée"
+    },
+    "progress": {
+      "title": "Mise à jour en cours...",
+      "label": "Progression de la mise à jour",
+      "preparing": "Préparation de la mise à jour...",
+      "downloading": "Téléchargement de la mise à jour...",
+      "installing": "Installation de la mise à jour...",
+      "completing": "Finalisation de la mise à jour..."
+    },
+    "error": {
+      "title": "Échec de la mise à jour"
+    },
+    "retry": "Réessayer la mise à jour",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "Entraînement actif détecté",
+      "message": "Vous avez un entraînement actif. Choisissez comment le gérer avant de mettre à jour :",
+      "save": "Enregistrer l'entraînement et mettre à jour",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "Quoi de neuf",
+    "close": "Fermer le changelog",
+    "done": "Terminé",
+    "empty": {
+      "title": "Aucun changement détaillé disponible",
+      "message": "Cette mise à jour comprend diverses améliorations et corrections de bogues."
+    },
+    "privacy": {
+      "title": "Changements de confidentialité détectés",
+      "message": "Cette mise à jour comprend des modifications concernant la manière dont nous gérons vos données. Veuillez examiner les changements ci-dessus et confirmer votre compréhension.",
+      "acknowledge": "Je comprends et reconnais les changements de confidentialité dans cette mise à jour"
+    }
   }
 }

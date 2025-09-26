@@ -11,6 +11,10 @@
     "close": "Schließen",
     "dismiss": "Ausblenden",
     "retry": "Erneut versuchen",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "und",
     "loading": "Lädt...",
     "optional": "optional",
@@ -54,7 +58,8 @@
     "confirmClearForm":"Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht.",
     "noVideo": "Kein Video",
     "pauseVideo": "Video pausieren",
-    "playVideo": "Video abspielen"
+    "playVideo": "Video abspielen",
+    "premium": "PRO"
   },
   "navigation": {
     "home": "Startseite",
@@ -119,7 +124,35 @@
     "forceFullSync": "Vollständige Synchronisierung erzwingen",
     "resetSyncState": "Synchronisierungsstatus zurücksetzen",
     "syncAdvanced": "Erweiterte Synchronisierung",
-    "syncAdvancedHelp": "Hilfe bei der Fehlersuche von Synchronisierungsproblemen."
+    "syncAdvancedHelp": "Hilfe bei der Fehlersuche von Synchronisierungsproblemen.",
+    "updatePreferences": "App-Updates",
+    "updatePrivacyTitle": "Datenschutz steht an erster Stelle",
+    "updatePrivacyMessage": "Update-Prüfungen senden nur Ihre aktuelle Versionsnummer. Es werden keine persönlichen Daten übertragen.",
+    "updateModeTitle": "Update-Verhalten",
+    "updateMode": {
+      "automatic": {
+        "title": "Automatische Updates",
+        "description": "Updates automatisch im Hintergrund installieren. Für die meisten Benutzer empfohlen."
+      },
+      "notify": {
+        "title": "Nur Benachrichtigen",
+        "description": "Benachrichtigungen für Updates anzeigen, aber ich entscheide, wann sie installiert werden."
+      },
+      "manual": {
+        "title": "Nur Manuell",
+        "description": "Niemals automatisch nach Updates suchen. Ich werde manuell aktualisieren, wenn nötig."
+      }
+    },
+    "securityUpdatesNote": "Kritische Sicherheitsupdates werden immer automatisch angewendet, unabhängig von Ihrer Präferenz.",
+    "meteredConnection": "Datenverbrauch",
+    "currentConnection": "Aktuelle Verbindung:",
+    "connectionMetered": "Getaktet",
+    "connectionUnmetered": "Ungetaktet",
+    "allowMeteredUpdates": "Updates bei getakteten Verbindungen erlauben",
+    "allowMeteredUpdatesDescription": "Updates können mobile Daten verwenden oder gegen Datenlimits zählen",
+    "additionalPreferences": "Zusätzliche Optionen",
+    "showChangelog": "Neuerungen anzeigen",
+    "showChangelogDescription": "Versionshinweise und Feature-Highlights nach Updates anzeigen"
   },
   "timer": {
     "restNext": "Ruhepause (Nächste: {{next}})",
@@ -243,6 +276,12 @@
     "moveDownAria": "Nach unten bewegen",
     "removeExerciseAria": "Übung entfernen",
     "durationSeconds": "Dauer (Sekunden)",
+    "benefits": "Vorteile",
+    "limitations": "Einschränkungen",
+    "bestTiming": "Beste Zeit",
+    "suggestedCombinations": "Empfohlene Kombinationen",
+    "notes": "Notizen",
+    "references": "Referenzen",
     "sets": "Sätze",
     "reps": "Wiederholungen",
     "restSeconds": "Ruhezeit (Sekunden)",
@@ -264,6 +303,10 @@
     "errorLoadingTitle": "Fehler beim Laden des Workouts",
     "backToWorkouts": "Zurück zu Workouts",
     "retry": "Wiederholen",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "Workout speichern"
   },
   "activity": {
@@ -315,6 +358,7 @@
     },
     "favoritesOnly": "Nur Favoriten",
     "showingCount": "Zeige {{count}} von {{total}}",
+    "showingCountInCatalog": "Zeige {{count}} von {{total}} Übungen in {{catalog}}",
     "emptyTitle": "Keine Ergebnisse",
     "emptyBody": "Keine Übungen entsprechen Ihren Filtern. Versuchen Sie, Filter zu löschen.",
     "clearFilters": "Filter löschen",
@@ -373,6 +417,12 @@
     "tags": "Tags",
     "tagPlaceholder": "Tags durch Kommas getrennt hinzufügen...",
     "durationSeconds": "Dauer (Sekunden)",
+    "benefits": "Vorteile",
+    "limitations": "Einschränkungen",
+    "bestTiming": "Beste Zeit",
+    "suggestedCombinations": "Empfohlene Kombinationen",
+    "notes": "Notizen",
+    "references": "Referenzen",
     "instructions": "Anweisungen",
     "instructionPlaceholder": "Schritt-Anweisungen...",
     "validation": {
@@ -479,5 +529,83 @@
     "unknownUser": "Unbekannter Benutzer",
     "connectedSince": "Verbunden seit {{date}}",
     "pending": "Ausstehend"
+  },
+  "update": {
+    "force": {
+      "title": "Sicherheitsupdate erforderlich",
+      "action": "Jetzt aktualisieren",
+      "modal": {
+        "title": "Sicherheitsupdate erforderlich",
+        "warning": {
+          "title": "Wichtiges Sicherheitsupdate",
+          "message": "Dieses Update enthält kritische Sicherheitsfixes und kann nicht verschoben werden. Die App ist bis zum Abschluss des Updates nicht verfügbar."
+        },
+        "footer": "Dieses Sicherheitsupdate ist erforderlich, um Ihre Daten zu schützen und die Funktionalität der App sicherzustellen."
+      }
+    },
+    "critical": {
+      "title": "Wichtiges Update Verfügbar"
+    },
+    "optional": {
+      "title": "Neue Version Verfügbar"
+    },
+    "default": {
+      "title": "Update Verfügbar"
+    },
+    "version": "Version: {{version}}",
+    "action": "Update",
+    "postpone": "Später",
+    "dismiss": "Update-Benachrichtigung schließen",
+    "showChangelog": "Neuigkeiten anzeigen",
+    "hideChangelog": "Neuigkeiten ausblenden",
+    "estimatedSize": "Geschätzt: {{size}}MB",
+    "meteredConnection": {
+      "title": "Begrenzte Verbindung erkannt"
+    },
+    "progress": {
+      "title": "Aktualisierung...",
+      "label": "Aktualisierungsfortschritt",
+      "preparing": "Aktualisierung vorbereiten...",
+      "downloading": "Aktualisierung herunterladen...",
+      "installing": "Aktualisierung installieren...",
+      "completing": "Aktualisierung abschließen..."
+    },
+    "error": {
+      "title": "Update fehlgeschlagen"
+    },
+    "retry": "Update erneut versuchen",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "Aktives Workout erkannt",
+      "message": "Sie haben ein aktives Workout. Wählen Sie aus, wie Sie damit umgehen möchten, bevor Sie aktualisieren:",
+      "save": "Workout speichern & aktualisieren",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "Neuigkeiten",
+    "close": "CChangelog schließen",
+    "done": "Fertig",
+    "empty": {
+      "title": "Keine detaillierten Änderungen verfügbar",
+      "message": "Dieses Update enthält verschiedene Verbesserungen und Fehlerbehebungen."
+    },
+    "privacy": {
+      "title": "Änderungen der Datenschutzbestimmungen erkannt",
+      "message": "Dieses Update enthält Änderungen daran, wie wir Ihre Daten behandeln. Bitte überprüfen Sie die oben genannten Änderungen und bestätigen Sie Ihr Verständnis.",
+      "acknowledge": "Ich verstehe und erkenne die Änderungen der Datenschutzbestimmungen in diesem Update an"
+    }
   }
 }

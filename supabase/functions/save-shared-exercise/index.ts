@@ -11,7 +11,7 @@ const corsHeaders = {
 };
 
 // JWT validation function
-async function validateJWT(jwt: string): Promise<string | null> {
+async function validateJWT(jwt) {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -19,15 +19,12 @@ async function validateJWT(jwt: string): Promise<string | null> {
       console.error('Missing Supabase environment variables');
       return null;
     }
-
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
     const { data: { user }, error } = await supabase.auth.getUser(jwt);
-
     if (error || !user) {
       console.log('JWT validation failed:', error?.message || 'No user');
       return null;
     }
-
     return user.id;
   } catch (e) {
     console.log('JWT validation error:', e.message);
@@ -35,84 +32,86 @@ async function validateJWT(jwt: string): Promise<string | null> {
   }
 }
 
-serve(async (req: Request) => {
+serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, {
+      headers: corsHeaders
+    });
   }
-
   if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
-      {
-        status: 405,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({
+      error: 'Method not allowed'
+    }), {
+      status: 405,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
       }
-    );
+    });
   }
-
   try {
     // Extract JWT token
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return new Response(
-        JSON.stringify({ error: 'Missing or invalid authorization header' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Missing or invalid authorization header'
+      }), {
+        status: 401,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     const jwt = authHeader.slice(7); // Remove 'Bearer ' prefix
     const userId = await validateJWT(jwt);
-
     if (!userId) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid authentication token' }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Invalid authentication token'
+      }), {
+        status: 401,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     // Parse request body
     const body = await req.json();
-    const { shareToken } = body;
-
+    const { shareToken, catalogId } = body;
     // Validate required fields
     if (!shareToken) {
-      return new Response(
-        JSON.stringify({ error: 'shareToken is required' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'shareToken is required'
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     // Initialize Supabase client with service role for database operations
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error('Missing Supabase environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Internal server error' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Internal server error'
+      }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
+    // Note: catalogId is stored for context but not used for constraints
+    // since we're creating references, not copies
     // Look up share record and exercise details
-    const { data: shareData, error: shareError } = await supabase
-      .from('exercise_shares')
-      .select(`
+    const { data: shareData, error: shareError } = await supabase.from('exercise_shares').select(`
         id,
         exercise_id,
         owner_id,
@@ -122,212 +121,177 @@ serve(async (req: Request) => {
           id,
           name,
           description,
-          muscle_group,
-          primary_muscles,
-          secondary_muscles,
-          equipment,
-          type,
-          difficulty,
+          category,
+          exercise_type,
+          difficulty_level,
+          muscle_groups,
+          equipment_needed,
           rep_duration_seconds,
           custom_video_url,
-          video_file_id,
-          custom_instructions,
+          has_video,
+          instructions,
+          copy_count,
           created_at,
           updated_at
         )
-      `)
-      .eq('share_token', shareToken)
-      .eq('deleted', false)
-      .single();
-
+      `).eq('share_token', shareToken).eq('deleted', false).single();
     if (shareError || !shareData) {
       if (shareError?.code === 'PGRST116') {
-        return new Response(
-          JSON.stringify({ error: 'Share token not found or has expired' }),
-          {
-            status: 404,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        return new Response(JSON.stringify({
+          error: 'Share token not found or has expired'
+        }), {
+          status: 404,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
           }
-        );
+        });
       }
-
       console.error('Share lookup error:', shareError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to retrieve shared exercise' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Failed to retrieve shared exercise'
+      }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     // Check if share has expired
     if (shareData.expires_at && new Date(shareData.expires_at) < new Date()) {
-      return new Response(
-        JSON.stringify({ error: 'Share token has expired' }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Share token has expired'
+      }), {
+        status: 404,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     // Check if user is trying to save their own exercise
     if (shareData.owner_id === userId) {
-      return new Response(
-        JSON.stringify({ error: 'Cannot save your own shared exercise' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Cannot save your own shared exercise'
+      }), {
+        status: 400,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
     const originalExercise = shareData.exercises;
     if (!originalExercise) {
-      return new Response(
-        JSON.stringify({ error: 'Exercise not found' }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(JSON.stringify({
+        error: 'Exercise not found'
+      }), {
+        status: 404,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
-    // Check if user has already saved this exercise
-    const { data: existingFavorite } = await supabase
+    // Check if user has already saved this exercise (reference-based sharing)
+    // NOTE: The current schema uses item_id (NOT exercise_id) to reference the exercise.
+    // We also scope by exercise_type='shared' to avoid colliding with future local favorites.
+    let { data: existingFavorite } = await supabase
       .from('user_favorites')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('exercise_id', shareData.exercise_id)
-      .eq('exercise_type', 'shared')
-      .single();
+      .select('id, item_id, exercise_type')
+      .eq('owner_id', userId)
+      .eq('item_type', 'exercise')
+      .eq('item_id', originalExercise.id)
+      .eq('deleted', false)
+      .maybeSingle();
 
-    if (existingFavorite) {
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Exercise already saved to your library',
-          exerciseId: shareData.exercise_id
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Generate new UUID for the copied exercise
-    const { data: newUuidData, error: uuidError } = await supabase.rpc('gen_random_uuid');
-
-    if (uuidError || !newUuidData) {
-      console.error('UUID generation error:', uuidError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to generate new exercise ID' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    const newExerciseId = newUuidData;
     const now = new Date().toISOString();
 
-    // Create copy of exercise for the user
-    const newExercise = {
-      id: newExerciseId,
+    // If an older record exists with a legacy/default exercise_type, normalize it
+    if (existingFavorite && existingFavorite.exercise_type !== 'shared') {
+      const { error: normalizeError } = await supabase
+        .from('user_favorites')
+        .update({ exercise_type: 'shared', updated_at: now })
+        .eq('id', existingFavorite.id);
+      if (!normalizeError) {
+        existingFavorite.exercise_type = 'shared';
+      }
+    }
+    if (existingFavorite) {
+      return new Response(JSON.stringify({
+        success: true,
+        message: 'Exercise already saved to your library',
+        exerciseId: originalExercise.id,
+        exerciseName: originalExercise.name,
+        isReference: true
+      }), {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+    // Create a reference in user_favorites instead of copying the exercise
+    // Schema fields: id (generated), owner_id, item_id, item_type, exercise_type, timestamps, deleted, version
+    const favoriteRecord = {
       owner_id: userId,
-      name: `${originalExercise.name} (Shared)`,
-      description: originalExercise.description,
-      muscle_group: originalExercise.muscle_group,
-      primary_muscles: originalExercise.primary_muscles,
-      secondary_muscles: originalExercise.secondary_muscles,
-      equipment: originalExercise.equipment,
-      type: originalExercise.type,
-      difficulty: originalExercise.difficulty,
-      rep_duration_seconds: originalExercise.rep_duration_seconds,
-      custom_video_url: originalExercise.custom_video_url,
-      video_file_id: originalExercise.video_file_id,
-      custom_instructions: originalExercise.custom_instructions,
+      item_type: 'exercise',
+      item_id: originalExercise.id,
+      exercise_type: 'shared',
       created_at: now,
       updated_at: now,
       deleted: false,
-      version: 1,
-      // Sync metadata
-      dirty: true,
-      op: 'INSERT',
-      synced_at: null
+      version: 1
     };
-
-    // Insert the copied exercise
-    const { error: exerciseInsertError } = await supabase
-      .from('exercises')
-      .insert(newExercise);
-
-    if (exerciseInsertError) {
-      console.error('Exercise insert error:', exerciseInsertError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to save exercise to your library' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Add entry to user_favorites with exercise_type = 'shared'
-    const favoriteEntry = {
-      id: crypto.randomUUID(),
-      user_id: userId,
-      exercise_id: newExerciseId,
-      exercise_type: 'shared',
-      created_at: now
-    };
-
-    const { error: favoriteInsertError } = await supabase
-      .from('user_favorites')
-      .insert(favoriteEntry);
-
+    const { error: favoriteInsertError } = await supabase.from('user_favorites').insert(favoriteRecord);
     if (favoriteInsertError) {
-      console.error('Favorite insert error:', favoriteInsertError);
-      // If favorite insert fails, clean up the exercise
-      await supabase
-        .from('exercises')
-        .delete()
-        .eq('id', newExerciseId);
-
-      return new Response(
-        JSON.stringify({ error: 'Failed to add exercise to favorites' }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      console.error('User favorites insert error:', favoriteInsertError);
+      return new Response(JSON.stringify({
+        error: 'Failed to save exercise reference to your library',
+        details: favoriteInsertError.message
+      }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
         }
-      );
+      });
     }
-
+    // Increment copy_count on the original exercise
+    await supabase.from('exercises').update({
+      copy_count: originalExercise.copy_count ? originalExercise.copy_count + 1 : 1,
+      updated_at: now
+    }).eq('id', originalExercise.id);
     // Return success response
-    return new Response(
-      JSON.stringify({
-        success: true,
-        exerciseId: newExerciseId,
-        exerciseName: newExercise.name,
-        message: 'Exercise successfully saved to your library'
-      }),
-      {
-        status: 201,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({
+      success: true,
+      exerciseId: originalExercise.id,
+      exerciseName: originalExercise.name,
+      message: 'Exercise successfully saved to your library',
+      hasVideo: originalExercise.has_video || !!originalExercise.custom_video_url,
+      sharedFromExerciseId: originalExercise.id,
+      sharedFromUserId: shareData.owner_id,
+      isReference: true,
+      catalogId: catalogId || null // Return the catalog context if provided
+    }), {
+      status: 201,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
       }
-    );
-
+    });
   } catch (error) {
     console.error('Unexpected error in save-shared-exercise function:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({
+      error: 'Internal server error'
+    }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
       }
-    );
+    });
   }
 });

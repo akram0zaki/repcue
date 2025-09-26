@@ -14,10 +14,11 @@ import { correctSyncService } from '../services/correctSyncService';
 import DataExportButton from '../components/security/DataExportButton';
 import DeleteAccountModal from '../components/security/DeleteAccountModal';
 import { ProfileSection } from '../components/ProfileSection';
-import { 
-  forceRefreshFromServer, 
-  clearPWACaches, 
-  forceUpdateServiceWorker 
+import { UpdatePreferencesPanel } from '../components/UpdatePreferencesPanel';
+import {
+  forceRefreshFromServer,
+  clearPWACaches,
+  forceUpdateServiceWorker
 } from '../utils/serviceWorker';
 import logger from '../utils/logger';
 
@@ -594,6 +595,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </p>
           </div>
         </div>
+
+        {/* Update Preferences */}
+        <UpdatePreferencesPanel />
 
         {/* Security & Privacy Settings */}
         {isAuthenticated && (

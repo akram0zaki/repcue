@@ -5,16 +5,22 @@ import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
 import { authService } from './services/authService';
+import { forceUpdateService } from './services/forceUpdateService';
+import { updateService } from './services/updateService';
 import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
+import { useSharedExercises } from './hooks/useSharedExercises';
 import { useSnackbar } from './components/SnackbarProvider';
 import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import { AuthModal } from './components/auth/AuthModal';
+import { ForceUpdateModal } from './components/ForceUpdateModal';
+import type { UpdateInfo, UpdateError } from './types';
+import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
@@ -23,6 +29,7 @@ import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type Timer
 import { computeWorkoutDurations } from './utils/workoutDuration';
 import i18n from './i18n';
 import logger from './utils/logger';
+import { isCustom } from './utils/syncFilters';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -153,13 +160,23 @@ const setupSyncTriggers = () => {
     logger.log('⏰ Periodic sync re-enabled');
   };
 
+  // Trigger sync when coming back online
+  const handleOnline = () => {
+    logger.log('🌐 Connection restored - triggering sync');
+    syncService.sync(true).catch(error => {
+      logger.warn('Online sync failed:', error);
+    });
+  };
+
   // Setup event listeners
   document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('online', handleOnline);
   setupPeriodicSync();
 
   // Cleanup function
   return () => {
     document.removeEventListener('visibilitychange', handleVisibilityChange);
+    window.removeEventListener('online', handleOnline);
     if (syncInterval.current) {
       clearInterval(syncInterval.current);
     }
@@ -173,10 +190,15 @@ function App() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showForceUpdateModal, setShowForceUpdateModal] = useState(false);
+  const [forceUpdateData, setForceUpdateData] = useState<UpdateInfo | null>(null);
+  const [showWorkoutForceUpdateModal, setShowWorkoutForceUpdateModal] = useState(false);
+  const [workoutForceUpdateData, setWorkoutForceUpdateData] = useState<UpdateInfo | null>(null);
   
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
   const { user } = useAuth();
+  const { isSharedExercise } = useSharedExercises();
   const { showSnackbar } = useSnackbar();
   const { t } = useTranslation(['common', 'exercises']);
 
@@ -211,6 +233,71 @@ function App() {
     isResting: false,
     restTimeRemaining: undefined
   });
+
+  // Helper function to check if we're on a shared exercise route that doesn't require consent
+  const isPublicShareRoute = useCallback(() => {
+    if (typeof window !== 'undefined' && window.location) {
+      return window.location.pathname.startsWith('/share/');
+    }
+    return false;
+  }, []);
+
+  // Force Update Service Integration
+  useEffect(() => {
+    // Set timer state reference for workout interruption handling
+    forceUpdateService.setTimerStateRef(timerState);
+    updateService.setTimerStateRef(timerState);
+  }, [timerState]);
+
+  // Force Update Event Handlers
+  useEffect(() => {
+    const handleForceUpdateAvailable = (data: unknown) => {
+      const updateInfo = data as UpdateInfo;
+      logger.log('🚨 Force update available in App:', updateInfo);
+      setShowForceUpdateModal(true);
+      setForceUpdateData(updateInfo);
+    };
+
+    const handleForceUpdateCompleted = () => {
+      logger.log('✅ Force update completed in App');
+      setShowForceUpdateModal(false);
+      setForceUpdateData(null);
+      setShowWorkoutForceUpdateModal(false);
+      setWorkoutForceUpdateData(null);
+    };
+
+    const handleForceUpdateFailed = (errorData: unknown) => {
+      const error = errorData as UpdateError;
+      logger.error('❌ Force update failed in App:', error);
+      // Keep modal open to allow retry
+    };
+
+    // Handle workout-blocked force updates
+    const handleUpdateBlockedWorkoutForce = (data: unknown) => {
+      const updateInfo = data as UpdateInfo;
+      logger.log('🚨 Force update blocked by active workout:', updateInfo);
+      setShowForceUpdateModal(false); // Hide regular force update modal
+      setShowWorkoutForceUpdateModal(true);
+      setWorkoutForceUpdateData(updateInfo);
+    };
+
+    // Register force update event listeners
+    forceUpdateService.on('force-update-available', handleForceUpdateAvailable);
+    forceUpdateService.on('force-update-completed', handleForceUpdateCompleted);
+    forceUpdateService.on('force-update-failed', handleForceUpdateFailed);
+
+    // Register update service workout-aware events
+    updateService.on('update-blocked-workout-force', handleUpdateBlockedWorkoutForce);
+
+    return () => {
+      forceUpdateService.off('force-update-available', handleForceUpdateAvailable);
+      forceUpdateService.off('force-update-completed', handleForceUpdateCompleted);
+      forceUpdateService.off('force-update-failed', handleForceUpdateFailed);
+      updateService.off('update-blocked-workout-force', handleUpdateBlockedWorkoutForce);
+    };
+  }, []);
+
+
 
   // Timer UI State
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -450,6 +537,7 @@ function App() {
         id: crypto.randomUUID(),
         exercise_id: currentExercise.id,
         exercise_name: currentExercise.name,
+        catalog_id: currentExercise.catalogId,
         duration: Math.round(currentTime), // Round to avoid floating-point precision issues
         timestamp: new Date().toISOString(),
         notes: `Stopped after ${Math.round(currentTime)}s`,
@@ -521,6 +609,60 @@ function App() {
       }
     }
   }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.rep_speed_factor]);
+
+  // Workout Force Update Event Handlers
+  useEffect(() => {
+    const handleForceUpdateCompleteWorkout = async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      logger.log('🔄 Force update requesting workout completion:', customEvent.detail);
+      try {
+        // If there's an active workout, save it and stop the timer
+        if (timerState.workoutMode && timerState.isRunning) {
+          await stopTimer(true); // true = completion
+        } else if (timerState.isRunning) {
+          // Single exercise timer - just stop it
+          await stopTimer(true);
+        }
+        logger.log('✅ Workout completed for force update');
+      } catch (error) {
+        logger.error('❌ Failed to complete workout for force update:', error);
+      }
+    };
+
+    const handleForceUpdateAbandonWorkout = async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      logger.log('🔄 Force update requesting workout abandonment:', customEvent.detail);
+      try {
+        // Stop timer without saving/completion
+        if (timerState.isRunning) {
+          await resetTimer(); // Reset clears everything
+        }
+        // Clear workout mode
+        setTimerState(prev => ({
+          ...prev,
+          workoutMode: undefined,
+          isResting: false,
+          restTimeRemaining: undefined,
+          currentSet: undefined,
+          totalSets: undefined,
+          currentRep: undefined,
+          totalReps: undefined
+        }));
+        logger.log('✅ Workout abandoned for force update');
+      } catch (error) {
+        logger.error('❌ Failed to abandon workout for force update:', error);
+      }
+    };
+
+    // Add global event listeners for force update workout handling
+    window.addEventListener('force-update-complete-workout', handleForceUpdateCompleteWorkout as EventListener);
+    window.addEventListener('force-update-abandon-workout', handleForceUpdateAbandonWorkout as EventListener);
+
+    return () => {
+      window.removeEventListener('force-update-complete-workout', handleForceUpdateCompleteWorkout as EventListener);
+      window.removeEventListener('force-update-abandon-workout', handleForceUpdateAbandonWorkout as EventListener);
+    };
+  }, [timerState, stopTimer, resetTimer]);
 
   // Start workout-guided timer mode
   const startWorkoutMode = useCallback(async (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => {
@@ -848,7 +990,7 @@ function App() {
         }
       }
     }
-  }, [timerState, selectedExercise?.name, exercises, appSettings.sound_enabled, appSettings.rep_speed_factor, resetTimer]);
+  }, [timerState, selectedExercise?.name, exercises, appSettings, resetTimer]);
 
   // Handle timer completion
   useEffect(() => {
@@ -1260,6 +1402,7 @@ function App() {
                     id: crypto.randomUUID(),
                     exercise_id: currentExercise.id,
                     exercise_name: currentExercise.name,
+                    catalog_id: currentExercise.catalogId,
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                     timestamp: new Date().toISOString(),
                     notes: `Completed ${totalSets} sets of ${totalReps} reps`,
@@ -1378,6 +1521,7 @@ function App() {
                 id: crypto.randomUUID(),
                 exercise_id: currentExercise.id,
                 exercise_name: currentExercise.name,
+                catalog_id: currentExercise.catalogId,
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                 timestamp: new Date().toISOString(),
                 notes: `Completed ${totalSets} sets of ${totalReps} reps`,
@@ -1402,6 +1546,7 @@ function App() {
               id: crypto.randomUUID(),
               exercise_id: currentExercise.id,
               exercise_name: currentExercise.name,
+              catalog_id: currentExercise.catalogId,
               duration: targetTime,
               timestamp: new Date().toISOString(),
               notes: `Completed ${targetTime}s interval timer`,
@@ -1629,12 +1774,38 @@ function App() {
             clearTimeout(watchdog);
             return; // Exit early with built-in exercises only
           }
+          // Handle version initialization for new and existing users
+          try {
+            const currentVersion = await storageService.getCurrentAppVersion();
+
+            if (currentVersion === null) {
+              // New user - get version from server
+              logger.info('[init] 🆕 New installation detected, fetching version from server...');
+
+              const statusData = await updateService.getStatus();
+              if (statusData && statusData.version) {
+                await storageService.updateAppVersion(statusData.version);
+                logger.info(`[init] 🚀 RepCue Application Started - Version: ${statusData.version} (from server)`);
+              } else {
+                logger.warn('[init] ⚠️ Could not fetch version from server, app_version remains null');
+                logger.info(`[init] 🚀 RepCue Application Started - Version: unknown (server unreachable)`);
+              }
+            } else {
+              // Existing user
+              logger.info(`[init] 🚀 RepCue Application Started - Version: ${currentVersion}`);
+            }
+          } catch (versionError) {
+            logger.warn('[init] Could not handle version initialization:', versionError);
+            logger.info(`[init] 🚀 RepCue Application Started - Version: unknown`);
+          }
+
           // Quick DB snapshot for diagnostics (counts only)
           try {
             const snap = await storageService.debugSnapshot();
             logger.log('[init] DB snapshot:', snap);
           } catch {}
-          // logger.log('[init] Ensuring exercise catalog is seeded');
+          // logger.log('[init] Ensuring exercise catalogs and exercises are seeded');
+          await storageService.ensureCatalogsSeeded();
           await storageService.ensureExercisesSeeded();
           const seedMs = Date.now() - tSeedStart;
           if (seedMs > 1000) logger.warn(`[init] seeding took ${seedMs}ms`); else logger.log(`[init] seeding took ${seedMs}ms`);
@@ -1752,7 +1923,16 @@ function App() {
   };
 
   initializeApp();
-  }, [hasConsent]);
+
+  // Delayed check for version recovery (edge case handling)
+  setTimeout(async () => {
+    try {
+      await updateService.checkAndRefreshIfVersionNull();
+    } catch (error) {
+      logger.warn('Version recovery check failed:', error);
+    }
+  }, 5000); // Check after 5 seconds
+  }, [hasConsent, isPublicShareRoute]);
 
   // Handle shared exercise save from redirect
   useEffect(() => {
@@ -1789,7 +1969,7 @@ function App() {
           sessionStorage.setItem('pendingShareToken', shareToken);
 
           showSnackbar(
-            t('exercises.loginRequired', 'Please sign in to save this exercise to your library'),
+            t('exercises:loginRequired', 'Please sign in to save this exercise to your library'),
             { type: 'info', durationMs: 8000 }
           );
 
@@ -1827,35 +2007,35 @@ function App() {
         const result = await response.json();
 
         // If the shared exercise has a video, download it for offline access
-        if (result.hasVideo && result.sharedFromExerciseId && result.sharedFromUserId) {
+        // For reference-based sharing, we download the video for the original exercise ID
+        if (result.hasVideo && result.exerciseId) {
           try {
+            // For references, exerciseId is the original exercise ID
+            const originalExerciseId = result.exerciseId;
 
             // Query the video_files table directly to get the storage path
             // This avoids RLS issues with storage listing permissions
             const { data: videoFileRecords, error: queryError } = await supabase
               .from('video_files')
               .select('file_name, storage_path, file_size, mime_type')
-              .eq('exercise_id', result.sharedFromExerciseId)
+              .eq('exercise_id', originalExerciseId)
               .not('storage_path', 'is', null)
               .order('created_at', { ascending: false })
               .limit(1);
-
 
             if (queryError) {
               throw new Error(`Failed to query video files: ${queryError.message || JSON.stringify(queryError)}`);
             }
 
             if (!videoFileRecords || videoFileRecords.length === 0) {
-              throw new Error(`No video file records found in database for exercise ${result.sharedFromExerciseId}`);
+              throw new Error(`No video file records found in database for exercise ${originalExerciseId}`);
             }
 
             // Get the most recent video file record
             const videoFileRecord = videoFileRecords[0];
             if (!videoFileRecord.storage_path) {
-              throw new Error(`Video file record found but storage_path is null for exercise ${result.sharedFromExerciseId}`);
+              throw new Error(`Video file record found but storage_path is null for exercise ${originalExerciseId}`);
             }
-
-
 
             // Download the video using the dedicated edge function with service role access
             const { data: { session } } = await supabase.auth.getSession();
@@ -1876,12 +2056,11 @@ function App() {
                 'apikey': supabaseAnonKey
               },
               body: JSON.stringify({
-                exerciseId: result.exerciseId,
-                originalExerciseId: result.sharedFromExerciseId,
+                exerciseId: originalExerciseId,
+                originalExerciseId: originalExerciseId,
                 originalOwnerId: result.sharedFromUserId
               })
             });
-
 
             if (!downloadResponse.ok) {
               const errorText = await downloadResponse.text();
@@ -1890,7 +2069,6 @@ function App() {
 
             // Get the video as a Blob from the response
             const videoBlob = await downloadResponse.blob();
-
 
             // Convert blob to File object with proper MIME type
             // Use the MIME type from the database record, or infer from file extension
@@ -1904,15 +2082,9 @@ function App() {
               type: mimeType
             });
 
-
-            // Save the video to User's IndexedDB using the storage service
-            await storageService.saveVideoFile(result.exerciseId, downloadedVideoFile);
-            // Store the blob URL for updating after sync
-            const blobPendingSyncUrl = `blob-pending-sync://${result.exerciseId}/${videoFileRecord.file_name}`;
-
-            // Store this for later use after sync
-            result.blobPendingSyncUrl = blobPendingSyncUrl;
-            result.videoFileName = videoFileRecord.file_name;
+            // Save the video to User's IndexedDB using the original exercise ID
+            await storageService.saveVideoFile(originalExerciseId, downloadedVideoFile);
+            logger.log(`🎥 [App] Video downloaded and saved for shared exercise reference: ${originalExerciseId}`);
           } catch (videoError) {
             const errorDetails = videoError instanceof Error ? {
               message: videoError.message,
@@ -1928,34 +2100,37 @@ function App() {
               error: videoError,
               ...errorDetails,
               exerciseId: result.exerciseId,
-              originalExerciseId: result.sharedFromExerciseId,
+              originalExerciseId: result.exerciseId, // Same for references
               originalOwnerId: result.sharedFromUserId
             });
             // Don't block the save operation if video download fails
           }
         }
 
-        // Show success message
-        showSnackbar(result.message || t('exercises.exerciseSaved', 'Exercise saved to your library!'), {
+        // Show success message with reference-aware text
+        const successMessage = result.isReference
+          ? (result.message || t('exercises:exerciseReferenceAdded', 'Exercise added to your library!'))
+          : (result.message || t('exercises:exerciseSaved', 'Exercise saved to your library!'));
+
+        showSnackbar(successMessage, {
           type: 'success'
         });
 
-        // Trigger a sync to get the newly saved exercise
-        logger.log('[init] Triggering sync after shared exercise save');
+        // Trigger a sync to get the newly saved reference
+        logger.log('[init] Triggering sync after shared exercise reference save');
         try {
           await syncService.sync();
-          logger.log('[init] Sync completed after shared exercise save');
+          logger.log('[init] Sync completed after shared exercise reference save');
 
-          // Now update the exercise's custom_video_url if we have a pending video
-          if (result.blobPendingSyncUrl && result.exerciseId) {
+          // For reference-based sharing, refresh exercise list to show the shared exercise
+          if (result.isReference) {
+            logger.log('[init] Reference-based save complete, refreshing exercise list');
             try {
-              await storageService.updateCustomExercise(result.exerciseId, {
-                custom_video_url: result.blobPendingSyncUrl
-              });
-
-            } catch (updateError) {
-              logger.error('🎥 [App] Failed to update exercise URL after sync:', updateError);
-              // Don't fail the whole operation for this
+              const updatedExercises = await storageService.getExercises();
+              setExercises(updatedExercises);
+              logger.log(`[init] Exercise list refreshed, now showing ${updatedExercises.length} exercises`);
+            } catch (refreshError) {
+              logger.warn('[init] Failed to refresh exercise list after reference save:', refreshError);
             }
           }
         } catch (syncError) {
@@ -1966,7 +2141,7 @@ function App() {
       } catch (error) {
         logger.error('[init] Failed to save shared exercise:', error);
         showSnackbar(
-          error instanceof Error ? error.message : t('exercises.saveFailed', 'Failed to save exercise'),
+          error instanceof Error ? error.message : t('exercises:saveFailed', 'Failed to save exercise'),
           { type: 'error' }
         );
       }
@@ -1991,13 +2166,6 @@ useEffect(() => {
     }
   }, [hasConsent, isLoading]);
 
-  // Helper function to check if we're on a shared exercise route that doesn't require consent
-  const isPublicShareRoute = useCallback(() => {
-    if (typeof window !== 'undefined' && window.location) {
-      return window.location.pathname.startsWith('/share/');
-    }
-    return false;
-  }, []);
 
   // Safety rehydrate: if UI has zero exercises after init, but DB has data, retry-load a few times
   useEffect(() => {
@@ -2091,8 +2259,8 @@ useEffect(() => {
     if (!hasConsent) return;
 
     try {
-      // Detect exercise type: UUID = user-created, slug = built-in
-      const isUserCreated = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise_id);
+  // Use helper: only UUIDs (custom) go to user_favorites, slugs remain in preferences
+  const isUserCreated = isCustom(exercise_id);
       
       if (isUserCreated) {
         // User-created exercise: use StorageService and user_favorites table
@@ -2134,11 +2302,13 @@ useEffect(() => {
         throw new Error('Exercise not found');
       }
 
-      if (exercise.is_shared_copy) {
-        // For shared exercises, delete from local storage only
-        // The sync will handle removing it from the user's data
-        await storageService.deleteCustomExercise(exercise_id);
-        logger.log('Deleted shared exercise from local storage:', exercise.name);
+      if (isSharedExercise(exercise_id)) {
+        // For shared exercises, remove the reference from user_favorites
+        // This preserves the original exercise but removes it from user's library
+        if (user?.id) {
+          await storageService.deleteSharedExerciseReference(user.id, exercise_id);
+          logger.log('Removed shared exercise reference:', exercise.name);
+        }
       } else {
         // For user-created exercises, delete normally
         await storageService.deleteCustomExercise(exercise_id);
@@ -2440,6 +2610,47 @@ useEffect(() => {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         initialMode="signin"
+      />
+
+      <ForceUpdateModal
+        isOpen={showForceUpdateModal}
+        updateInfo={forceUpdateData || undefined}
+        onApplyUpdate={async () => {
+          try {
+            await forceUpdateService.applyForceUpdate();
+          } catch (error) {
+            logger.error('Failed to apply force update from modal:', error);
+            showSnackbar('Failed to apply update. Please try again.', { type: 'error' });
+          }
+        }}
+        onRetry={async () => {
+          try {
+            await forceUpdateService.retryForceUpdate();
+          } catch (error) {
+            logger.error('Failed to retry force update:', error);
+            showSnackbar('Retry failed. Please try again.', { type: 'error' });
+          }
+        }}
+        onForceReload={() => {
+          forceUpdateService.forceReload();
+        }}
+        blockAppUsage={true}
+      />
+
+      <WorkoutForceUpdateModal
+        isOpen={showWorkoutForceUpdateModal}
+        updateInfo={workoutForceUpdateData!}
+        workoutInfo={{
+          isActive: timerState.isRunning,
+          isRunning: timerState.isRunning,
+          isWorkoutMode: !!timerState.workoutMode,
+          workoutName: timerState.workoutMode?.workoutName,
+          canInterrupt: true
+        }}
+        onClose={() => {
+          setShowWorkoutForceUpdateModal(false);
+          setWorkoutForceUpdateData(null);
+        }}
       />
     </>
   );

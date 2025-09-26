@@ -4,10 +4,11 @@ This document explains how RepCue differentiates between built-in and user-creat
 
 ## Exercise Types Overview
 
-RepCue has two distinct types of exercises:
+RepCue has three distinct types of exercises:
 
 1. **Built-in Exercises**: System-provided exercises that come with the app
 2. **User-created Exercises**: Custom exercises created by users
+3. **Shared Exercises**: Exercises shared by other users (reference-based system)
 
 These are differentiated at all layers of the application to ensure proper data management and sync behavior.
 
@@ -18,10 +19,15 @@ These are differentiated at all layers of the application to ensure proper data 
 - **Pattern**: Human-readable strings without dashes or underscores in most cases
 - **Detection**: Any ID that does NOT match the UUID v4 pattern
 
-### User-created Exercises  
+### User-created Exercises
 - **ID Format**: UUID v4 (e.g., `"550e8400-e29b-41d4-a716-446655440000"`)
 - **Pattern**: `^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$` (case-insensitive)
 - **Generation**: Created using `crypto.randomUUID()`
+
+### Shared Exercises
+- **ID Format**: UUID v4 (same as user-created, since they reference original exercises)
+- **Detection**: Identified via `user_favorites` table with `exercise_type: 'shared'`
+- **Ownership**: Remain owned by original creator, accessed via reference
 
 ```typescript
 // Detection logic in code:
@@ -86,6 +92,13 @@ Both exercise types are stored in the same `exercises` table but with different 
 - **Soft deletes**: `deleted: true` creates tombstone records
 - **Version control**: `version` field tracks changes
 
+### Shared Exercises
+- **Reference-based**: No duplication, stored in `user_favorites` table
+- **Special sync handling**: `pullExercisesWithShared()` and `pullVideoFilesWithShared()` functions
+- **Dual sync**: Syncs both user's own exercises AND shared exercise references
+- **Video access**: Uses `download-shared-video` edge function for permission-based video access
+- **UI integration**: `useSharedExercises` hook provides shared exercise detection
+
 ## Sync Flow
 
 ```mermaid
@@ -93,11 +106,15 @@ graph TD
     A[User Action] --> B{Exercise Type?}
     B -->|Built-in| C[Update IndexedDB only]
     B -->|User-created| D[Update IndexedDB + Mark dirty]
-    D --> E[Sync Service picks up dirty records]
-    E --> F[Filter by owner_id]
-    F --> G[Batch upload to Supabase]
-    G --> H[Mark records clean in IndexedDB]
-    C --> I[No sync needed]
+    B -->|Shared| E[Reference in user_favorites]
+    D --> F[Sync Service picks up dirty records]
+    F --> G[Filter by owner_id]
+    G --> H[Batch upload to Supabase]
+    H --> I[Mark records clean in IndexedDB]
+    E --> J[Sync with pullExercisesWithShared]
+    J --> K[Pull original exercise + video files]
+    K --> L[Store locally with reference detection]
+    C --> M[No sync needed]
 ```
 
 ## Built-in Exercise Management
@@ -109,20 +126,38 @@ Built-in exercises are defined in: `apps/frontend/src/data/exercises.ts`
 export const INITIAL_EXERCISES: Exercise[] = [
   {
     id: "pushups",
-    name: "Push-ups", 
+    name: "Push-ups",
     category: "strength",
+    catalog_id: "general-fitness", // Multi-catalog system
     // ... other properties
   },
   // ... more exercises
 ];
+
+export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
+  {
+    id: "general-fitness",
+    nameKey: "catalog.generalFitness.name",
+    descriptionKey: "catalog.generalFitness.description",
+    // ... catalog properties
+  },
+  // ... more catalogs
+];
 ```
 
 ### Catalog Synchronization
-The `StorageService.cleanBuiltInExercises()` method runs during app initialization to:
+The system now uses a multi-catalog approach with the following synchronization:
 
+#### Exercise Catalogs (`StorageService.ensureCatalogsSeeded()`)
+1. **Seed catalogs**: Ensure all exercise catalogs from `EXERCISE_CATALOGS` are in IndexedDB
+2. **Update metadata**: Sync catalog names, descriptions, and i18n keys
+3. **Clean obsolete**: Remove catalogs no longer in the system
+
+#### Built-in Exercises (`StorageService.cleanBuiltInExercises()`)
 1. **Clean existing**: Reset any dirty built-in exercises to clean state
 2. **Remove obsolete**: Delete built-in exercises no longer in catalog
 3. **Add new**: Insert new built-in exercises from catalog
+4. **Catalog assignment**: Ensure all exercises have proper `catalog_id` references
 
 ### Adding Built-in Exercises
 
@@ -227,13 +262,22 @@ const dirtyBuiltIn = await db.exercises.filter(ex => ex.dirty === 1 && !isUserCr
 const dirtyUserCreated = await db.exercises.filter(ex => ex.dirty === 1 && isUserCreatedExercise(ex.id)).count();
 ```
 
+## Sync Engine Integration
+
+The exercise management system integrates with RepCue's v2 sync architecture:
+
+1. **Sync Service**: Uses `CorrectSyncService` with per-table cursor pagination
+2. **Table Order**: `exercise_catalogs` syncs before `exercises` due to foreign key dependencies
+3. **Built-in Exclusion**: Built-in exercises filtered out during `SYNC_ORDER` processing
+4. **Shared Exercise Sync**: Special handling via `pullExercisesWithShared()` function
+
 ## Migration Considerations
 
 When updating this system:
 
 1. **ID Format Changes**: Would require data migration - avoid if possible
 2. **Catalog Structure**: Changes to `INITIAL_EXERCISES` automatically propagate
-3. **Sync Logic**: Changes to sync filtering require thorough testing
+3. **Sync Logic**: Changes to sync filtering require thorough testing with v2 engine
 4. **Database Schema**: IndexedDB schema changes need migration strategy
 
-This architecture ensures clear separation of concerns while maintaining data integrity and proper sync behavior for both exercise types.
+This architecture ensures clear separation of concerns while maintaining data integrity and proper sync behavior for all exercise types.

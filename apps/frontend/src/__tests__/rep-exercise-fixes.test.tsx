@@ -88,7 +88,12 @@ vi.mock('../services/audioService', () => ({
 
 // Avoid PWA registration side-effects in tests
 vi.mock('../utils/serviceWorker', () => ({
-  registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false })
+  registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false }),
+  swEventEmitter: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn()
+  }
 }));
 
 // Now import modules under test and constants after mocks
@@ -96,6 +101,7 @@ import App from '../App';
 import { DEFAULT_APP_SETTINGS } from '../constants';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { SnackbarProvider } from '../components/SnackbarProvider';
 
 // Mock hook implementations
 vi.mock('../hooks/useWakeLock', () => ({
@@ -198,7 +204,11 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should save activity log when rep-based exercise completes all sets', async () => {
   const user = userEvent.setup();
-  const { container } = render(<App />);
+  const { container } = render(
+    <SnackbarProvider>
+      <App />
+    </SnackbarProvider>
+  );
     await ensureTimerPageVisible(user);
 
     // Open exercise selector and choose our mock exercise
@@ -226,7 +236,11 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should display completed sets correctly in set progress text', async () => {
   const user2 = userEvent.setup();
-  render(<App />);
+  render(
+    <SnackbarProvider>
+      <App />
+    </SnackbarProvider>
+  );
     await ensureTimerPageVisible(user2);
 
     // Select the rep-based exercise first
@@ -249,7 +263,11 @@ describe('Rep-based Exercise Fixes', () => {
 
   it('should have consistent progress bar and text for set completion', async () => {
   const user3 = userEvent.setup();
-  render(<App />);
+  render(
+    <SnackbarProvider>
+      <App />
+    </SnackbarProvider>
+  );
     await ensureTimerPageVisible(user3);
 
     // Select the rep-based exercise first

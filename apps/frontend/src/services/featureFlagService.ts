@@ -109,7 +109,7 @@ export class FeatureFlagService {
         flag_name: 'custom_video_upload',
         is_enabled: true,
         description: 'Allow users to upload custom exercise videos (fallback)',
-        target_audience: 'authenticated',
+        target_audience: 'all', // Allow offline video upload for exercises created offline
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       },

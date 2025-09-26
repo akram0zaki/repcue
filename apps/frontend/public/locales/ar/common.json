@@ -11,6 +11,10 @@
     "close": "إغلاق",
     "dismiss": "تجاهل",
     "retry": "إعادة المحاولة",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "و",
     "loading": "تحميل...",
     "optional": "اختياري",
@@ -54,7 +58,8 @@
     "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
-    "playVideo": "تشغيل الفيديو"
+    "playVideo": "تشغيل الفيديو",
+    "premium": "مميز"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -119,7 +124,35 @@
     "forceFullSync": "فرض مزامنة كاملة",
     "resetSyncState": "إعادة تعيين حالة المزامنة",
     "syncAdvanced": "مزامنة متقدمة",
-    "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة."
+    "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة.",
+    "updatePreferences": "تحديثات التطبيق",
+    "updatePrivacyTitle": "الخصوصية أولاً",
+    "updatePrivacyMessage": "فحص التحديثات يرسل فقط رقم إصدارك الحالي. لا يتم نقل أي بيانات شخصية.",
+    "updateModeTitle": "سلوك التحديث",
+    "updateMode": {
+      "automatic": {
+        "title": "التحديثات التلقائية",
+        "description": "تثبيت التحديثات تلقائياً في الخلفية. موصى به لمعظم المستخدمين."
+      },
+      "notify": {
+        "title": "الإشعار فقط",
+        "description": "عرض إشعارات للتحديثات ولكن دعني أقرر متى أثبتها."
+      },
+      "manual": {
+        "title": "يدوي فقط",
+        "description": "لا تفحص التحديثات تلقائياً أبداً. سأحدث يدوياً عند الحاجة."
+      }
+    },
+    "securityUpdatesNote": "سيتم تطبيق تحديثات الأمان الحرجة تلقائياً دائماً بغض النظر عن تفضيلك.",
+    "meteredConnection": "استخدام البيانات",
+    "currentConnection": "الاتصال الحالي:",
+    "connectionMetered": "مقنن",
+    "connectionUnmetered": "غير مقنن",
+    "allowMeteredUpdates": "السماح بالتحديثات على الاتصالات المقننة",
+    "allowMeteredUpdatesDescription": "قد تستخدم التحديثات بيانات الهاتف المحمول أو تحتسب ضد حدود البيانات",
+    "additionalPreferences": "خيارات إضافية",
+    "showChangelog": "عرض الجديد",
+    "showChangelogDescription": "عرض ملاحظات الإصدار وأبرز المميزات بعد التحديثات"
   },
   "timer": {
     "restNext": "فترة راحة (التالي: {{next}})",
@@ -251,6 +284,12 @@
     "moveDownAria": "تحريك لأسفل",
     "removeExerciseAria": "إزالة التمرين",
     "durationSeconds": "المدة (ثواني)",
+    "benefits": "الفوائد",
+    "limitations": "القيود",
+    "bestTiming": "أفضل توقيت",
+    "suggestedCombinations": "التركيبات المقترحة",
+    "notes": "ملاحظات",
+    "references": "المراجع",
     "sets": "المجموعات",
     "reps": "التكرارات",
     "restSeconds": "وقت الراحة (ثواني)",
@@ -272,6 +311,10 @@
     "errorLoadingTitle": "خطأ في تحميل البرنامج",
     "backToWorkouts": "العودة إلى البرامج",
     "retry": "إعادة المحاولة",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "حفظ البرنامج"
   },
   "activity": {
@@ -327,6 +370,7 @@
     },
     "favoritesOnly": "المفضلة فقط",
     "showingCount": "عرض {{count}} من {{total}}",
+    "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}",
     "emptyTitle": "لا توجد نتائج",
     "emptyBody": "لا توجد تمارين تطابق فلاترك. جرب مسح الفلاتر.",
     "clearFilters": "مسح الفلاتر",
@@ -385,6 +429,12 @@
     "tags": "العلامات",
     "tagPlaceholder": "أضف علامات مفصولة بفاصلات...",
     "durationSeconds": "المدة (بالثواني)",
+    "benefits": "الفوائد",
+    "limitations": "القيود",
+    "bestTiming": "أفضل توقيت",
+    "suggestedCombinations": "التركيبات المقترحة",
+    "notes": "ملاحظات",
+    "references": "المراجع",
     "instructions": "التعليمات",
     "instructionPlaceholder": "تعليمات الخطوة...",
     "validation": {
@@ -499,5 +549,83 @@
     "unknownUser": "مستخدم غير معروف",
     "connectedSince": "متصل منذ {{date}}",
     "pending": "معلق"
+  },
+  "update": {
+    "force": {
+      "title": "مطلوب تحديث أمني",
+      "action": "حدِّث الآن",
+      "modal": {
+        "title": "مطلوب تحديث أمني",
+        "warning": {
+          "title": "تحديث أمني هام",
+          "message": "هذا التحديث يتضمن إصلاحات أمنية حرجة ولا يمكن تأجيله. لن يكون التطبيق متاحًا حتى يكتمل التحديث."
+        },
+        "footer": "هذا التحديث الأمني ضروري لحماية بياناتك وضمان عمل التطبيق بشكل صحيح."
+      }
+    },
+    "critical": {
+      "title": "تحديث هام متاح"
+    },
+    "optional": {
+      "title": "إصدار جديد متاح"
+    },
+    "default": {
+      "title": "تحديث متاح"
+    },
+    "version": "الإصدار: {{version}}",
+    "action": "تحديث",
+    "postpone": "لاحقًا",
+    "dismiss": "إغلاق إشعار التحديث",
+    "showChangelog": "شاهد ما هو جديد",
+    "hideChangelog": "إخفاء ما هو جديد",
+    "estimatedSize": "تقريبًا {{size}}MB",
+    "meteredConnection": {
+      "title": "تم اكتشاف اتصال محدود"
+    },
+    "progress": {
+      "title": "جارٍ التحديث...",
+      "label": "تقدُّم التحديث",
+      "preparing": "جارٍ تحضير التحديث...",
+      "downloading": "جارٍ تنزيل التحديث...",
+      "installing": "جارٍ تثبيت التحديث...",
+      "completing": "جارٍ إكمال التحديث..."
+    },
+    "error": {
+      "title": "فشل التحديث"
+    },
+    "retry": "إعادة محاولة التحديث",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "تم اكتشاف تمرين نشط",
+      "message": "لديك تمرين نشط حاليًا. اختر كيفية التعامل معه قبل التحديث:",
+      "save": "حفظ التمرين ومتابعة التحديث",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "ما الجديد",
+    "close": "إغلاق سجل التغييرات",
+    "done": "تم",
+    "empty": {
+      "title": "لا توجد تغييرات مفصلة متاحة",
+      "message": "يتضمن هذا التحديث تحسينات متنوعة وإصلاحات للأخطاء."
+    },
+    "privacy": {
+      "title": "تم اكتشاف تغييرات في الخصوصية",
+      "message": "يتضمن هذا التحديث تغييرات في كيفية تعاملنا مع بياناتك. يرجى مراجعة التغييرات أعلاه وتأكيد فهمك.",
+      "acknowledge": "أفهم وأقر بالتغييرات المتعلقة بالخصوصية في هذا التحديث"
+    }
   }
 }

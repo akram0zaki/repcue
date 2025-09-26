@@ -1,0 +1,22 @@
+{
+  "catalogs": {
+    "selectCatalog": "Oefencatalogus",
+    "selectDescription": "Kies een oefencatalogus om oefeningen te bekijken",
+    "general-fitness": {
+      "name": "Algemene Fitness",
+      "description": "Kern­oefeningen voor algehele fitheid en krachttraining"
+    },
+    "tai-chi": {
+      "name": "Tai Chi",
+      "description": "Zachte, vloeiende bewegingen voor balans, flexibiliteit en mindfulness"
+    },
+    "zumba": {
+      "name": "Zumba",
+      "description": "Energieke dansgebaseerde cardio-oefeningen voor plezierige fitness"
+    },
+    "women-health": {
+      "name": "Vrouwen­gezondheid",
+      "description": "Gespecialiseerde oefeningen voor de gezondheid en het welzijn van vrouwen"
+    }
+  }
+}

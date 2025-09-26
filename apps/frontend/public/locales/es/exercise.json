@@ -21,5 +21,11 @@
   "startTimer": "Iniciar Temporizador",
   "stats": "Estadísticas",
   "tags": "Etiquetas",
-  "type": "Tipo"
+  "type": "Tipo",
+  "benefits": "Beneficios",
+  "limitations": "Limitaciones",
+  "bestTiming": "Mejor Momento",
+  "suggestedCombinations": "Combinaciones Sugeridas",
+  "notes": "Notas",
+  "references": "Referencias"
 }

@@ -1,0 +1,20 @@
+{
+  "selectCatalog": "Übungsauswahl",
+  "selectDescription": "Wählen Sie einen Übungskatalog aus, um Übungen anzuzeigen",
+  "general-fitness": {
+    "name": "Allgemeine Fitness",
+    "description": "Grundübungen für allgemeine Fitness und Krafttraining"
+  },
+  "tai-chi": {
+    "name": "Tai Chi",
+    "description": "Sanfte, fließende Bewegungen für Balance, Flexibilität und Achtsamkeit"
+  },
+  "zumba": {
+    "name": "Zumba",
+    "description": "Energiegeladene tanzbasierte Cardio-Übungen für spaßige Fitness"
+  },
+  "women-health": {
+    "name": "Frauengesundheit",
+    "description": "Spezialisierte Übungen für Frauengesundheit und Wohlbefinden"
+  }
+}

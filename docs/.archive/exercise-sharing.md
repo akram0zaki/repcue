@@ -23,6 +23,7 @@ RepCue's exercise sharing system allows users to share their custom exercises th
 - **exercise_shares** - Share records and permissions
 - **exercises** - Exercise data
 - **video_files** - Associated video content
+- **user_favorites** - References to shared exercises (reference-based sharing)
 - **profiles** - User display names
 
 ## Sharing Flow Overview
@@ -48,7 +49,7 @@ RepCue's exercise sharing system allows users to share their custom exercises th
 
 3. OPTIONAL: SAVE TO LIBRARY (if authenticated)
    ↓
-   save-shared-exercise → Duplicate exercise with new owner
+   save-shared-exercise → Create reference in user_favorites table (reference-based system)
 ```
 
 ## Detailed Step-by-Step Flow
@@ -179,9 +180,15 @@ useEffect(() => {
 
 #### Edge Function: `save-shared-exercise`
 - Validates share token and user authentication
-- Creates duplicate exercise with new owner
-- Sets up video file references for the new owner
-- Returns success status and new exercise ID
+- Creates reference record in `user_favorites` table with `exercise_type: 'shared'`
+- Links user to original exercise (no duplication)
+- Returns success status and reference ID
+
+#### Current Implementation: Reference-Based Sharing
+- **No exercise duplication**: Shared exercises remain owned by original creator
+- **Reference system**: Recipients get entries in `user_favorites` table
+- **Sync integration**: `sync_v2` pulls both owned exercises AND shared references
+- **Video access**: Uses `download-shared-video` edge function for permission-based access
 
 ## Database Schema Deep Dive
 
@@ -203,6 +210,23 @@ CREATE TABLE exercise_shares (
 ```
 
 **Note**: The actual schema differs from complex documentation - no email field, simpler structure, version field added.
+
+### `user_favorites` Table (Reference-Based Sharing)
+```sql
+CREATE TABLE user_favorites (
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id              UUID REFERENCES profiles(id) ON DELETE CASCADE,  -- Recipient user
+  item_id               UUID,                                             -- Original exercise ID
+  item_type             VARCHAR DEFAULT 'exercise',                      -- Type of shared item
+  exercise_type         VARCHAR,                                          -- 'shared' for shared exercises
+  created_at            TIMESTAMPTZ DEFAULT NOW(),
+  updated_at            TIMESTAMPTZ DEFAULT NOW(),
+  deleted               BOOLEAN DEFAULT false,
+  version               BIGINT DEFAULT 1
+);
+```
+
+**Purpose**: Links recipients to original exercises without duplication. Recipients see shared exercises in their catalog while creators retain ownership.
 
 ### Row Level Security (RLS) Policies
 
@@ -236,19 +260,21 @@ CREATE POLICY "Public read access for shared exercises" ON exercises
 
 #### Video Files Table
 ```sql
--- No direct anonymous access - uses service role bypass
+-- Users can view their own video files
 CREATE POLICY "Users can view their own video files" ON video_files
   FOR SELECT TO public
   USING (auth.uid() = owner_id);
 
--- Shared exercise video access (for saved copies)
+-- Shared exercise video access (reference-based system)
 CREATE POLICY "Users can view video files for shared exercises" ON video_files
   FOR SELECT TO public
   USING (EXISTS (
-    SELECT 1 FROM exercises e
-    WHERE e.owner_id = auth.uid()
-    AND e.is_shared_copy = true
-    AND e.shared_from_exercise_id = video_files.exercise_id
+    SELECT 1 FROM user_favorites uf
+    WHERE uf.owner_id = auth.uid()
+    AND uf.item_id = video_files.exercise_id
+    AND uf.item_type = 'exercise'
+    AND uf.exercise_type = 'shared'
+    AND uf.deleted = false
   ));
 ```
 
@@ -276,7 +302,38 @@ CREATE POLICY "Users can download their own videos" ON storage.objects
 ### Video Sharing
 - Original videos stored as `blob-pending-sync://` URLs
 - Anonymous access uses 1-hour signed URLs from Supabase Storage
+- **Shared exercise videos**: Use `download-shared-video` edge function for permission-based access
 - Video recovery system marks missing files for re-sync
+
+#### Video Access for Shared Exercises
+The current implementation uses a dual-path approach for video resolution:
+
+```typescript
+// In resolveVideoUrl.ts and correctSyncService.ts
+const isSharedExercise = currentUserId &&
+  !storedVideoFile.storage_path.startsWith(currentUserId);
+
+if (isSharedExercise) {
+  // Use download-shared-video edge function
+  const response = await fetch('/functions/v1/download-shared-video', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${session.access_token}` },
+    body: JSON.stringify({
+      exerciseId: exerciseId,
+      originalExerciseId: pathParts[1],
+      originalOwnerId: pathParts[0]
+    })
+  });
+} else {
+  // Direct storage access for own videos
+  const { data } = await supabase.storage.from('videos').download(storagePath);
+}
+```
+
+**Why this approach?**
+- **Permission enforcement**: Edge function validates `user_favorites` access
+- **RLS bypass**: Service role key allows access to creator's storage
+- **Unified experience**: Both sync and video resolution use same logic
 
 ### RLS Policy Workarounds
 
@@ -478,15 +535,15 @@ if (!(videoBlob instanceof Blob)) {
 - Video playback functionality testing
 - Cross-browser compatibility verification
 
-### Resolution Confirmation
-The fix was verified through:
-- ✅ Exact file size match (1,467,342 bytes expected and received)
-- ✅ Proper MIME type (`video/mp4`)
-- ✅ Successful video loading and playback
-- ✅ No `MEDIA_ERR_SRC_NOT_SUPPORTED` errors
-- ✅ Singleton video file enforcement working correctly
+### Resolution Status
+The video corruption issue has been resolved in production:
+- ✅ Direct `fetch()` API used instead of `supabase.functions.invoke()`
+- ✅ Binary video data preserved without corruption
+- ✅ File size integrity maintained
+- ✅ Successful video loading and playback across all sharing scenarios
+- ✅ No remaining `MEDIA_ERR_SRC_NOT_SUPPORTED` errors
 
-## Current Status
+## Current Status & Architecture Changes
 
 ### Implemented Features
 - Basic share creation and link generation
@@ -494,7 +551,27 @@ The fix was verified through:
 - Token-based security with expiration support
 - Video recovery system for missing files
 - Edge function architecture for scalability
+- **Reference-based sharing system** (no exercise duplication)
+- **Dual-path video access** (direct storage vs edge function)
+- **Enhanced sync system** for shared exercise handling
 - **Fixed video corruption in shared exercise downloads**
+
+### Key Architecture Changes
+#### From Copy-Based to Reference-Based Sharing
+- **Old system**: Duplicated exercises with `is_shared_copy` flags
+- **New system**: References in `user_favorites` table, no duplication
+- **Benefits**: Reduced storage, real-time updates from creators, simpler sync
+
+#### Video Access Evolution
+- **Anonymous users**: 1-hour signed URLs (unchanged)
+- **Authenticated users**: Dual-path resolution based on ownership
+- **Permission enforcement**: Edge function validates `user_favorites` access
+- **Unified approach**: Both `resolveVideoUrl.ts` and `correctSyncService.ts` use same logic
+
+#### Sync System Enhancements
+- **Enhanced `sync_v2`**: Pulls both owned and shared exercises
+- **Special functions**: `pullExercisesWithShared()` and `pullVideoFilesWithShared()`
+- **Frontend integration**: `useSharedExercises` hook for UI detection
 
 ### Known Limitations
 - Save to library functionality exists but not exposed in UI
@@ -508,3 +585,4 @@ The fix was verified through:
 - Videos accessed via 1-hour signed URLs for anonymous users
 - Robust error handling and recovery mechanisms
 - **Direct fetch() API used for binary video downloads to prevent corruption**
+- **Reference-based system maintains data integrity and creator ownership**

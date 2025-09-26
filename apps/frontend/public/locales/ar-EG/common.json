@@ -11,6 +11,10 @@
     "close": "اقفل",
     "dismiss": "شيل الرسالة",
     "retry": "جرّب تاني",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "and": "و",
     "loading": "بيحمّل...",
     "optional": "اختياري",
@@ -54,7 +58,8 @@
     "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
-    "playVideo": "تشغيل الفيديو"
+    "playVideo": "تشغيل الفيديو",
+    "premium": "مميز"
   },
   "navigation": {
     "home": "البيت",
@@ -119,7 +124,35 @@
     "forceFullSync": "فرض مزامنة كاملة",
     "resetSyncState": "إعادة تعيين حالة المزامنة",
     "syncAdvanced": "مزامنة متقدمة",
-    "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة."
+    "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة.",
+    "updatePreferences": "تحديثات البرنامج",
+    "updatePrivacyTitle": "البرايفسي الأول",
+    "updatePrivacyMessage": "فحص التحديثات بيبعت بس رقم إصدارك الحالي. مش بنبعت أي بيانات شخصية.",
+    "updateModeTitle": "طريقة التحديث",
+    "updateMode": {
+      "automatic": {
+        "title": "التحديثات الأوتوماتيك",
+        "description": "نزّل التحديثات لوحدها ورا الكواليس. مناسب لمعظم الناس."
+      },
+      "notify": {
+        "title": "إشعار بس",
+        "description": "ورّيلي إشعار للتحديثات بس سيبني أقرر امتى أنزلها."
+      },
+      "manual": {
+        "title": "يدوي بس",
+        "description": "متدورش على تحديثات لوحدك خالص. أنا هحدث بإيدي لما أحتاج."
+      }
+    },
+    "securityUpdatesNote": "تحديثات الأمان المهمة هتتطبق أوتوماتيك على طول مهما كان اختيارك.",
+    "meteredConnection": "استخدام النت",
+    "currentConnection": "الاتصال الحالي:",
+    "connectionMetered": "محدود",
+    "connectionUnmetered": "مفتوح",
+    "allowMeteredUpdates": "سيب التحديثات على النت المحدود",
+    "allowMeteredUpdatesDescription": "التحديثات ممكن تستخدم بيانات الموبايل أو تحسب من حدود النت بتاعك",
+    "additionalPreferences": "خيارات تانية",
+    "showChangelog": "ورّي الجديد",
+    "showChangelogDescription": "ورّي ملاحظات الإصدار والحاجات الجديدة بعد التحديثات"
   },
   "timer": {
     "restNext": "استراحة (الجاي: {{next}})",
@@ -251,6 +284,12 @@
     "moveDownAria": "حرّك تحت",
     "removeExerciseAria": "شيل التمرين",
     "durationSeconds": "المدة (ثواني)",
+    "benefits": "الفوايد",
+    "limitations": "الحدود",
+    "bestTiming": "أحسن وقت",
+    "suggestedCombinations": "التركيبات المقترحة",
+    "notes": "ملاحظات",
+    "references": "المراجع",
     "sets": "السيتات",
     "reps": "العدات",
     "restSeconds": "وقت الراحة (ثواني)",
@@ -272,6 +311,10 @@
     "errorLoadingTitle": "خطأ في تحميل البرنامج",
     "backToWorkouts": "ارجع للبرامج",
     "retry": "جرب تاني",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
     "saveWorkout": "احفظ البرنامج"
   },
   "activity": {
@@ -327,6 +370,7 @@
     },
     "favoritesOnly": "المفضلة بس",
     "showingCount": "بيعرض {{count}} من {{total}}",
+    "showingCountInCatalog": "بيعرض {{count}} من {{total}} تمرين في {{catalog}}",
     "emptyTitle": "مافيش نتائج",
     "emptyBody": "مافيش تمارين تطابق الفلاتر بتاعتك. جرب تمسح الفلاتر.",
     "clearFilters": "امسح الفلاتر",
@@ -385,6 +429,12 @@
     "tags": "التاجز",
     "tagPlaceholder": "ضيف تاجز مقسومة بفواصل...",
     "durationSeconds": "المدة (بالثواني)",
+    "benefits": "الفوايد",
+    "limitations": "الحدود",
+    "bestTiming": "أحسن وقت",
+    "suggestedCombinations": "التركيبات المقترحة",
+    "notes": "ملاحظات",
+    "references": "المراجع",
     "instructions": "التعليمات",
     "instructionPlaceholder": "تعليمات الخطوة...",
     "validation": {
@@ -499,5 +549,83 @@
     "unknownUser": "يوزر مش معروف",
     "connectedSince": "متصل من {{date}}",
     "pending": "مستنى"
+  },
+  "update": {
+    "force": {
+      "title": "لازم تحديث أمني",
+      "action": "حدّث دلوقتي",
+      "modal": {
+        "title": "لازم تحديث أمني",
+        "warning": {
+          "title": "تحديث أمني مهم",
+          "message": "التحديث ده فيه إصلاحات أمان ضرورية ومينفعش يتأجل. البرنامج مش هيشتغل غير بعد ما التحديث يخلص."
+        },
+        "footer": "التحديث الأمني ده ضروري عشان يحمي بياناتك ويخلي البرنامج شغال مظبوط."
+      }
+    },
+    "critical": {
+      "title": "فيه تحديث مهم متاح"
+    },
+    "optional": {
+      "title": "فيه نسخة جديدة"
+    },
+    "default": {
+      "title": "فيه تحديث"
+    },
+    "version": "النسخة: {{version}}",
+    "action": "تحديث",
+    "postpone": "بعدين",
+    "dismiss": "اقفل إشعار التحديث",
+    "showChangelog": "شوف الجديد",
+    "hideChangelog": "خبي الجديد",
+    "estimatedSize": "حوالي {{size}}MB",
+    "meteredConnection": {
+      "title": "اتصال محدود متشاف"
+    },
+    "progress": {
+      "title": "بيحدّث...",
+      "label": "تقدُّم التحديث",
+      "preparing": "بيجهّز التحديث...",
+      "downloading": "بينزل التحديث...",
+      "installing": "بيسطّب التحديث...",
+      "completing": "بيكمّل التحديث..."
+    },
+    "error": {
+      "title": "التحديث فشل"
+    },
+    "retry": "جرّب التحديث تاني",
+    "attemptsLeft": "{{attempts}} attempt(s) remaining",
+    "forceReload": "Force Reload",
+    "maxRetries": "Maximum retry attempts reached",
+    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "workout": {
+      "title": "فيه تمرينة شغالة",
+      "message": "إنت عندك تمرينة شغالة. اختار هتعمل إيه قبل ما نحدّث:",
+      "save": "احفظ التمرينة وحدّث",
+      "abandon": "Abandon Workout & Update",
+      "abandoning": "Abandoning workout...",
+      "active": {
+        "title": "Active Workout in Progress"
+      },
+      "currentExercise": "Current: {{exercise}}",
+      "elapsed": "Elapsed: {{time}}",
+      "progress": "{{current}} of {{total}} exercises",
+      "saving": "Saving workout progress...",
+      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+    }
+  },
+  "changelog": {
+    "title": "إيه الجديد",
+    "close": "اقفل التغييرات",
+    "done": "تمام",
+    "empty": {
+      "title": "مفيش تغييرات مفصلة",
+      "message": "التحديث ده فيه تحسينات وحل لمشاكل."
+    },
+    "privacy": {
+      "title": "فيه تغييرات في الخصوصية",
+      "message": "التحديث ده غيّر في طريقة تعاملنا مع بياناتك. راجع التغييرات فوق وأكد إنك فاهم.",
+      "acknowledge": "أنا فاهم و موافق على تغييرات الخصوصية في التحديث ده"
+    }
   }
 }

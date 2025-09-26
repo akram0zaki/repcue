@@ -1,22 +1,24 @@
 import Dexie from 'dexie';
 import type { Table, Transaction } from 'dexie';
-import type { 
-  Exercise, 
-  ActivityLog, 
-  UserPreferences, 
+import type {
+  Exercise,
+  ActivityLog,
+  UserPreferences,
   AppSettings,
   Workout,
   WorkoutSession,
   UserFavorite,
-  SyncMetadata
+  SyncMetadata,
+  ExerciseCatalog
 } from '../types';
 import { consentService } from './consentService';
 import { authService } from './authService';
 import { SYNC_DEBUG } from '../config/features';
-import { 
-  prepareUpsert, 
-  prepareSoftDelete, 
-  filterActiveRecords 
+import { DEFAULT_APP_SETTINGS } from '../constants';
+import {
+  prepareUpsert,
+  prepareSoftDelete,
+  filterActiveRecords
 } from './syncHelpers';
 import logger from '../utils/logger';
 
@@ -62,6 +64,7 @@ class RepCueDatabase extends Dexie {
   workouts!: Table<StoredWorkout>;
   workout_sessions!: Table<StoredWorkoutSession>;
   video_files!: Table<StoredVideoFile>;
+  exercise_catalogs!: Table<ExerciseCatalog>;
 
   constructor() {
     super('RepCueDB');
@@ -229,6 +232,117 @@ class RepCueDatabase extends Dexie {
       workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
       sync_state: 'user_id',
       video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty'
+    });
+
+    // Version 16: Add catalog support and extended exercise metadata fields
+    this.version(16).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      // NEW: Exercise catalogs table with full sync support
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(trans => {
+      // Migrate existing exercises to add catalogId field
+      return trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+        if (!exercise.catalogId) {
+          exercise.catalogId = 'general-fitness'; // All existing exercises go to general fitness
+        }
+      });
+    });
+
+    // Version 18: Force database refresh to fix catalog assignments
+    this.version(18).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(async (trans) => {
+      // Version 18: Force complete database refresh
+      logger.log('[Migration v18] Clearing all exercises for fresh start with proper catalog assignments');
+
+      // Clear all exercises to force fresh seeding
+      await trans.table('exercises').clear();
+
+      // Clear exercise catalogs to force fresh seeding
+      await trans.table('exercise_catalogs').clear();
+
+      logger.log('[Migration v18] Database cleared, will trigger fresh seeding on next access');
+    });
+
+    // Version 19: Add catalog_id field to activity_logs table
+    this.version(19).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    });
+
+    // Version 20: Add app_version field to app_settings for dynamic version tracking
+    this.version(20).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty, shared_from_exercise_id, shared_from_user_id, is_shared_copy',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(async (trans) => {
+      // Initialize app_version field for existing app_settings records
+      logger.log('[Migration v20] Adding app_version field to existing app_settings');
+
+      await trans.table('app_settings').toCollection().modify((settings: Record<string, unknown>) => {
+        if (!settings.app_version) {
+          settings.app_version = null; // Will be fetched from server on next startup
+          logger.log('[Migration v20] Setting app_version to null - will be fetched from server');
+        }
+      });
+    });
+
+    // Version 21: Remove old sharing columns for reference-based sharing system
+    this.version(21).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    }).upgrade(async (trans) => {
+      // Clean up old sharing-related fields from exercises
+      logger.log('[Migration v21] Removing old sharing columns from exercises for reference-based sharing');
+
+      await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+        // Remove old sharing fields that are no longer used
+        delete exercise.shared_from_exercise_id;
+        delete exercise.shared_from_user_id;
+        delete exercise.is_shared_copy;
+        
+        logger.log(`[Migration v21] Cleaned up sharing fields for exercise ${exercise.id}`);
+      });
     });
   }
 
@@ -1225,10 +1339,14 @@ export class StorageService {
         const videoFile = videoFileMap.get(exercise.id);
         if (videoFile) {
           logger.log('💾 [EnrichVideo] Enriching exercise with video:', exercise.name, videoFile.file_name);
+          // Choose a more accurate scheme name once upload is confirmed
+          const isConfirmed = !videoFile.upload_pending;
+          const scheme = isConfirmed ? 'blob-video' : 'blob-pending-sync';
           return {
             ...exercise,
-            custom_video_url: `blob-pending-sync://${exercise.id}/${videoFile.file_name}`,
-            has_video: false // Keep as false since this is custom video, not built-in
+            custom_video_url: `${scheme}://${exercise.id}/${videoFile.file_name}`,
+            // Mark as having a video; downstream UI / filters rely on this
+            has_video: true
           };
         }
         return exercise;
@@ -1241,6 +1359,67 @@ export class StorageService {
     } catch (error) {
       logger.error('💾 [EnrichVideo] Failed to enrich exercises with video URLs:', error);
       return exercises; // Return original exercises if enrichment fails
+    }
+  }
+
+  /**
+   * Reconcile has_video flags for exercises that have an associated (non-deleted) video_file
+   * but were previously persisted with has_video = false (legacy behavior).
+   * This runs client-side only and marks affected exercises dirty so the corrected flag
+   * is propagated on the next sync. Errors are swallowed to avoid blocking getExercises().
+   */
+  private async reconcileHasVideoFlags(exercises: Exercise[]): Promise<Exercise[]> {
+    try {
+      if (!this.db.video_files) return exercises;
+
+      // Build a quick set of exercise IDs that have active video files
+      // Dexie typings (IndexableType) don't include boolean; querying on a boolean index
+      // with .notEqual(true) triggers TS errors. Instead, fetch all and filter in memory.
+      // Volume of video_files is expected to be very small (singleton per exercise), so
+      // this is acceptable and avoids brittle type coercions.
+      const activeVideoFiles = await this.db.video_files
+        .toArray()
+        .then(all => all.filter(v => !(v as { deleted?: boolean }).deleted))
+        .catch(async () => {
+          // If even the base query fails, fall back to empty list
+          return [] as StoredVideoFile[];
+        });
+
+      const videoExerciseIds = new Set<string>();
+      for (const vf of activeVideoFiles) {
+        videoExerciseIds.add((vf as { exercise_id: string }).exercise_id);
+      }
+
+      const dbExercises = this.db.exercises; // for updates
+      const updated: Exercise[] = [];
+      for (const ex of exercises) {
+        if (videoExerciseIds.has(ex.id) && !ex.has_video) {
+          try {
+            // Update local record & mark dirty so it syncs outward
+            await dbExercises.update(ex.id, {
+              has_video: true,
+              dirty: 1,
+              op: 'upsert',
+              updated_at: new Date().toISOString()
+            });
+            updated.push({ ...ex, has_video: true });
+          } catch (e) {
+            logger.warn('💾 [VideoReconcile] Failed to update has_video for exercise', ex.id, e);
+            updated.push(ex); // keep original
+          }
+        } else {
+          updated.push(ex);
+        }
+      }
+
+      if (updated.some(e => e.has_video && !exercises.find(o => o.id === e.id)?.has_video)) {
+        logger.log('💾 [VideoReconcile] Applied has_video corrections to exercises');
+      }
+
+      return updated;
+    } catch (error) {
+      logger.warn('💾 [VideoReconcile] Reconciliation failed', error);
+      return exercises;
     }
   }
 
@@ -1499,6 +1678,7 @@ export class StorageService {
 
   /**
    * Get all exercises (filtered to exclude deleted records)
+   * Now includes shared exercise references from user_favorites
    */
   public async getExercises(): Promise<Exercise[]> {
     if (!this.canStoreData()) {
@@ -1507,23 +1687,66 @@ export class StorageService {
 
     return await this.safeDatabaseAccess(
       async () => {
-        const [storedExercises, prefs] = await Promise.all([
+        const userId = authService.getCurrentUser()?.id;
+
+        const [storedExercises, prefs, sharedRefs, userCreatedFavorites] = await Promise.all([
           this.db.exercises.toArray(),
-          this.getUserPreferences().catch(() => null)
+          this.getUserPreferences().catch(() => null),
+          userId ? this.getSharedExerciseReferences(userId) : Promise.resolve([]),
+          // Fetch user-created exercise favorites (distinct from built-in favorites stored in preferences)
+          userId ? this.db.user_favorites
+            .where('owner_id').equals(userId)
+            .and(f => f.item_type === 'exercise' && f.exercise_type === 'user_created' && !f.deleted)
+            .toArray() : Promise.resolve([])
         ]);
+
         const favorites = prefs?.favorite_exercises || [];
+        const userCreatedFavoriteIds = new Set(userCreatedFavorites.map(f => f.item_id));
         let allExercises = storedExercises
           .map(this.convertStoredExercise)
           .map(ex => ({
             ...ex,
-            // Source of truth for favorites is user_preferences.favorite_exercises (slug/id)
-            is_favorite: favorites.includes(ex.id)
+            // Mark as favorite if either:
+            // 1) In legacy/ built-in favorites list (user_preferences.favorite_exercises)
+            // 2) There is a user_favorites entry marking this user-created exercise as favorite
+            is_favorite: favorites.includes(ex.id) || userCreatedFavoriteIds.has(ex.id)
           }));
 
-        // Enrich exercises with video URLs for offline-first bidirectional sync
-        allExercises = await this.enrichExercisesWithVideoUrls(allExercises);
+        // Add shared exercises if user is authenticated
+        if (userId && sharedRefs.length > 0) {
+          const sharedExerciseIds = sharedRefs.map(ref => ref.item_id);
+          const sharedExercises = await this.getSharedExerciseData(sharedExerciseIds);
 
-        return filterActiveRecords(allExercises);
+          // Mark shared exercises as favorites and add metadata
+          const enrichedSharedExercises = sharedExercises.map(ex => ({
+            ...ex,
+            is_favorite: true, // All shared exercises are considered favorites
+            is_shared_reference: true, // Flag to indicate this is a reference
+            shared_at: sharedRefs.find(ref => ref.item_id === ex.id)?.created_at
+          }));
+
+          allExercises = [...allExercises, ...enrichedSharedExercises];
+        }
+
+        // Remove duplicates (in case a shared exercise is also owned by the user)
+        const uniqueExercises = allExercises.reduce((acc, exercise) => {
+          if (!acc.some(ex => ex.id === exercise.id)) {
+            acc.push(exercise);
+          }
+          return acc;
+        }, [] as Exercise[]);
+
+        // Enrich exercises with video URLs for offline-first bidirectional sync
+        const enrichedExercises = await this.enrichExercisesWithVideoUrls(uniqueExercises);
+
+        // Reconcile has_video flag consistency (in case legacy records still have false)
+        try {
+          const reconciled = await this.reconcileHasVideoFlags(enrichedExercises);
+          return filterActiveRecords(reconciled);
+        } catch (err) {
+          logger.warn('💾 [VideoReconcile] Failed to reconcile has_video flags – returning enriched list only', err);
+          return filterActiveRecords(enrichedExercises);
+        }
       },
       () => {
         // Fallback to in-memory storage
@@ -1556,10 +1779,13 @@ export class StorageService {
   const tSeedStart = Date.now();
   const existingCount = await this.db.exercises.count();
   logger.log(`[seed] exercises.count before=${existingCount}`);
-  if (existingCount > 0) return existingCount;
+  // Force seeding after Version 18 migration
+  logger.log(`[seed] Forcing seeding due to Version 18 migration`);
 
       // Lazy import to avoid upfront bundle cost and circular deps
       const { INITIAL_EXERCISES } = await import('../data/exercises');
+
+
       // Prepare clean seed records and insert in a single transaction using bulkPut for speed
       const cleanSeeds: StoredExercise[] = INITIAL_EXERCISES.map(exercise => ({
         ...exercise,
@@ -1604,6 +1830,77 @@ export class StorageService {
   }
 
   /**
+   * Ensure the exercise catalogs table is seeded with default catalogs.
+   * Returns the number of catalogs after seeding.
+   */
+  public async ensureCatalogsSeeded(): Promise<number> {
+    if (!this.canStoreData()) {
+      logger.warn('[seed] Skipping catalog seeding: consent not granted');
+      return 0;
+    }
+
+    try {
+      const tSeedStart = Date.now();
+      const existingCount = await this.db.exercise_catalogs.count();
+      logger.log(`[seed] exercise_catalogs.count before=${existingCount}`);
+
+      if (existingCount === 0) {
+        // Lazy import to avoid circular dependencies
+        const { EXERCISE_CATALOGS } = await import('../data/catalogs');
+
+        // Prepare clean catalog records
+        const cleanCatalogs = EXERCISE_CATALOGS.map(catalog => ({
+          ...catalog,
+          // Convert interface fields to database fields
+          name_key: catalog.nameKey,
+          description_key: catalog.descriptionKey,
+          is_default: catalog.isDefault,
+          is_premium: catalog.isPremium,
+          display_order: catalog.displayOrder,
+          // Add sync metadata
+          dirty: 0,
+          version: 1,
+          created_at: '2025-01-01T00:00:00.000Z',
+          updated_at: '2025-01-01T00:00:00.000Z',
+          deleted: false,
+          op: 'seed'
+        }));
+
+        try {
+          await this.db.transaction('rw', this.db.exercise_catalogs, async () => {
+            await this.db.exercise_catalogs.bulkPut(cleanCatalogs);
+          });
+        } catch (txErr) {
+          // Fallback to individual puts if bulkPut fails
+          logger.warn('bulkPut failed during catalog seeding; falling back to sequential puts', txErr);
+          for (const catalog of cleanCatalogs) {
+            try {
+              await this.db.exercise_catalogs.put(catalog);
+            } catch (putErr) {
+              logger.warn(`Failed to seed catalog ${catalog.id}:`, putErr);
+            }
+          }
+        }
+
+        const finalCount = await this.db.exercise_catalogs.count();
+        const seedMs = Date.now() - tSeedStart;
+        if (seedMs > 1000) {
+          logger.warn(`[seed] catalogs completed in ${seedMs}ms; count after=${finalCount}`);
+        } else {
+          logger.log(`[seed] catalogs completed in ${seedMs}ms; count after=${finalCount}`);
+        }
+        return finalCount;
+      } else {
+        logger.log('[seed] catalogs already seeded, skipping');
+        return existingCount;
+      }
+    } catch (error) {
+      logger.warn('Failed to seed exercise catalogs:', error);
+      return 0;
+    }
+  }
+
+  /**
    * Public method to trigger cleanup of built-in exercises
    */
   public async cleanupBuiltInExercises(): Promise<void> {
@@ -1617,6 +1914,8 @@ export class StorageService {
     try {
       const { INITIAL_EXERCISES } = await import('../data/exercises');
       const currentBuiltInIds = new Set(INITIAL_EXERCISES.map(ex => ex.id));
+
+      // DEBUG: Log source exercise catalog distribution (removed unused sourceCatalogCounts)
       
       // Get all existing built-in exercises (those with slug IDs, not UUIDs)
       const existingBuiltInExercises = await this.db.exercises
@@ -1629,10 +1928,12 @@ export class StorageService {
       // 1. Clean up existing built-in exercises that should remain
       for (const exercise of existingBuiltInExercises) {
         if (currentBuiltInIds.has(exercise.id)) {
-          // This built-in exercise should remain - ensure it's clean
-          if (exercise.dirty === 1 || exercise.owner_id !== null) {
+          // This built-in exercise should remain - update it with latest data from INITIAL_EXERCISES
+          const latestExerciseData = INITIAL_EXERCISES.find(ex => ex.id === exercise.id);
+          if (latestExerciseData) {
+
             const cleanedExercise: StoredExercise = {
-              ...exercise,
+              ...latestExerciseData, // Use latest data from catalog
               dirty: 0,
               version: 1,
               created_at: '2025-01-01T00:00:00.000Z',
@@ -1641,7 +1942,7 @@ export class StorageService {
               owner_id: null,
               op: 'seed'
             } as StoredExercise;
-            
+
             await this.db.exercises.put(cleanedExercise);
           }
         } else {
@@ -2013,20 +2314,27 @@ export class StorageService {
   }
 
   /**
-   * Save app settings
+   * Save app settings (singleton pattern - only one record per user)
    */
   public async saveAppSettings(settings: AppSettings): Promise<void> {
     if (!this.canStoreData()) {
       throw new Error('Cannot store data without user consent');
     }
 
-  // Ensure UUID id so server accepts row
-  const settingsId = this.isUuid(settings.id) ? settings.id! : crypto.randomUUID();
+    // Get existing settings to preserve the ID for singleton pattern
+    const existingSettings = await this.getAppSettings();
+    const settingsId = existingSettings?.id || settings.id || 'app-settings-singleton';
+
     const storedSettings: StoredAppSettings = prepareUpsert(settings, settingsId, this.getCurrentUserId());
 
     try {
-      // Use put() to handle both insert and update operations
-      await this.db.app_settings.put(storedSettings);
+      // For singleton pattern, clear any existing records first, then add the new one
+      await this.db.transaction('rw', this.db.app_settings, async () => {
+        // Clear existing app_settings for this user to maintain singleton
+        await this.db.app_settings.clear();
+        // Add the single settings record
+        await this.db.app_settings.put(storedSettings);
+      });
     } catch (error) {
       logger.warn('Failed to save app settings to IndexedDB:', error);
       this.fallbackStorage.set('app_settings', storedSettings);
@@ -2040,7 +2348,7 @@ export class StorageService {
     // Allow reading app settings even without consent to preserve theme and basic preferences
     // This is acceptable as these are non-personal UI preferences
     const skipConsentCheck = true;
-    
+
     if (!skipConsentCheck && !this.canStoreData()) {
       return null;
     }
@@ -2055,6 +2363,29 @@ export class StorageService {
         return fallback || null;
       }
     );
+  }
+
+  /**
+   * Get current app version from stored settings
+   */
+  public async getCurrentAppVersion(): Promise<string | null> {
+    const settings = await this.getAppSettings();
+    return settings?.app_version ?? null; // Return null for new installations
+  }
+
+  /**
+   * Update the app version in settings
+   */
+  public async updateAppVersion(newVersion: string): Promise<void> {
+    const currentSettings = await this.getAppSettings();
+    const updatedSettings: AppSettings = {
+      ...DEFAULT_APP_SETTINGS,
+      ...currentSettings,
+      app_version: newVersion,
+      updated_at: new Date().toISOString()
+    };
+
+    await this.saveAppSettings(updatedSettings);
   }
 
 
@@ -2761,10 +3092,132 @@ export class StorageService {
         .where('owner_id').equals(userId)
         .and(favorite => favorite.item_id === exerciseId && !favorite.deleted)
         .first();
-      
+
       return !!existing;
     } catch (error) {
       logger.warn('Failed to check favorite status:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get shared exercise references for a user
+   * Returns the user_favorites records that represent shared exercises
+   */
+  public async getSharedExerciseReferences(userId: string): Promise<UserFavorite[]> {
+    if (!this.canStoreData()) {
+      logger.warn('[getSharedExerciseReferences] Cannot store data, returning empty array');
+      return [];
+    }
+
+    try {
+      // Debug: Check total user_favorites count
+      const totalFavorites = await this.db.user_favorites.count();
+      logger.log(`[getSharedExerciseReferences] Total user_favorites in IndexedDB: ${totalFavorites}`);
+
+      // Debug: Get all user_favorites for this user
+      const allUserFavorites = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .toArray();
+      logger.log(`[getSharedExerciseReferences] Total favorites for user ${userId}: ${allUserFavorites.length}`);
+
+      const sharedRefs = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .and(favorite =>
+          favorite.item_type === 'exercise' &&
+          favorite.exercise_type === 'shared' &&
+          !favorite.deleted
+        )
+        .toArray();
+
+      logger.log(`[getSharedExerciseReferences] Found ${sharedRefs.length} shared exercise references for user ${userId}`);
+      if (sharedRefs.length > 0) {
+        logger.log('[getSharedExerciseReferences] Shared refs:', sharedRefs);
+      }
+
+      return sharedRefs;
+    } catch (error) {
+      logger.warn('Failed to get shared exercise references:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Fetch original exercise data for shared exercise references
+   * This resolves the references to actual exercise data
+   */
+  public async getSharedExerciseData(exerciseIds: string[]): Promise<Exercise[]> {
+    if (!this.canStoreData() || exerciseIds.length === 0) {
+      return [];
+    }
+
+    try {
+      // Try to find shared exercises in local storage first
+      const localExercises = await this.db.exercises
+        .where('id').anyOf(exerciseIds)
+        .and(ex => !ex.deleted)
+        .toArray();
+
+      const foundLocalIds = localExercises.map(ex => ex.id);
+      const missingIds = exerciseIds.filter(id => !foundLocalIds.includes(id));
+
+      const exercises = localExercises.map(this.convertStoredExercise);
+
+      // For missing exercises, we would need to fetch from server
+      // For now, we'll return what we have locally
+      if (missingIds.length > 0) {
+        logger.debug(`Shared exercises not found locally: ${missingIds.join(', ')}`);
+        // In a full implementation, we would fetch these from the server here
+        // For Phase 2, we'll rely on sync to have already pulled them
+      }
+
+      return exercises;
+    } catch (error) {
+      logger.warn('Failed to get shared exercise data:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Delete a shared exercise reference from user_favorites
+   * This removes the exercise from the user's library without deleting the original exercise
+   */
+  public async deleteSharedExerciseReference(userId: string, exerciseId: string): Promise<boolean> {
+    if (!this.canStoreData()) {
+      logger.warn('[deleteSharedExerciseReference] Cannot store data');
+      return false;
+    }
+
+    try {
+      // Find the shared exercise reference
+      const sharedRef = await this.db.user_favorites
+        .where('owner_id').equals(userId)
+        .and(favorite =>
+          favorite.item_id === exerciseId &&
+          favorite.item_type === 'exercise' &&
+          favorite.exercise_type === 'shared' &&
+          !favorite.deleted
+        )
+        .first();
+
+      if (!sharedRef) {
+        logger.warn(`[deleteSharedExerciseReference] No shared reference found for exercise ${exerciseId}`);
+        return false;
+      }
+
+      // Soft delete the reference
+      const now = new Date().toISOString();
+      await this.db.user_favorites.update(sharedRef.id, {
+        deleted: true,
+        updated_at: now,
+        version: (sharedRef.version || 0) + 1,
+        dirty: 1 // Mark for sync
+      });
+
+      logger.log(`[deleteSharedExerciseReference] Soft deleted shared exercise reference: ${exerciseId}`);
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete shared exercise reference:', error);
       return false;
     }
   }
@@ -3196,6 +3649,7 @@ export class StorageService {
 
   /**
    * Get all exercises (builtin + user-created + shared)
+   * Now includes shared exercise references from user_favorites
    */
   public async getAllExercises(): Promise<Exercise[]> {
     if (!this.canStoreData()) {
@@ -3203,16 +3657,93 @@ export class StorageService {
     }
 
     try {
-      const allExercises = await this.db.exercises
-        .where('deleted')
-        .equals(0) // Only get non-deleted exercises
-        .toArray();
+      const userId = authService.getCurrentUser()?.id;
 
-      return filterActiveRecords(allExercises);
+      const [storedExercises, sharedRefs] = await Promise.all([
+        this.db.exercises
+          .where('deleted')
+          .equals(0) // Only get non-deleted exercises
+          .toArray(),
+        userId ? this.getSharedExerciseReferences(userId) : Promise.resolve([])
+      ]);
+
+      let allExercises = filterActiveRecords(storedExercises);
+
+      // Add shared exercises if user is authenticated
+      if (userId && sharedRefs.length > 0) {
+        const sharedExerciseIds = sharedRefs.map(ref => ref.item_id);
+        const sharedExercises = await this.getSharedExerciseData(sharedExerciseIds);
+
+        // Mark shared exercises with metadata
+        const enrichedSharedExercises = sharedExercises.map(ex => ({
+          ...ex,
+          is_shared_reference: true, // Flag to indicate this is a reference
+          shared_at: sharedRefs.find(ref => ref.item_id === ex.id)?.created_at
+        }));
+
+        allExercises = [...allExercises, ...enrichedSharedExercises];
+      }
+
+      // Remove duplicates (in case a shared exercise is also owned by the user)
+      const uniqueExercises = allExercises.reduce((acc, exercise) => {
+        if (!acc.some(ex => ex.id === exercise.id)) {
+          acc.push(exercise);
+        }
+        return acc;
+      }, [] as Exercise[]);
+
+      return uniqueExercises;
     } catch (error) {
       logger.error('Failed to get all exercises:', error);
       return [];
     }
+  }
+
+  // Catalog-aware exercise methods
+  /**
+   * Get exercises from a specific catalog
+   */
+  public async getExercisesByCatalog(catalogId: string): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const allExercises = await this.getAllExercises();
+      return allExercises.filter(exercise => exercise.catalogId === catalogId);
+    } catch (error) {
+      logger.error('Failed to get exercises by catalog:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get catalogs - placeholder for future dynamic catalog support
+   * Currently returns static catalog definitions
+   */
+  public async getCatalogs(): Promise<ExerciseCatalog[]> {
+    // Import here to avoid circular dependencies
+    const { getAllCatalogs } = await import('../data/catalogs');
+    return getAllCatalogs();
+  }
+
+  /**
+   * Get available catalogs based on user's premium status
+   * Currently returns static catalog definitions, filtered by premium status
+   */
+  public async getAvailableCatalogs(isPremiumUser: boolean = false): Promise<ExerciseCatalog[]> {
+    // Import here to avoid circular dependencies
+    const { getAvailableCatalogs } = await import('../data/catalogs');
+    return getAvailableCatalogs(isPremiumUser);
+  }
+
+  /**
+   * Get the default catalog (General Fitness)
+   */
+  public async getDefaultCatalog(): Promise<ExerciseCatalog> {
+    // Import here to avoid circular dependencies
+    const { getDefaultCatalog } = await import('../data/catalogs');
+    return getDefaultCatalog();
   }
 }
 

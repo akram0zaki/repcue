@@ -30,9 +30,13 @@ vi.mock('../services/storageService', () => {
     saveExercise: vi.fn().mockResolvedValue(undefined),
     saveExercises: vi.fn().mockResolvedValue(undefined),
     getWorkouts: vi.fn().mockResolvedValue([]),
+    getWorkoutSessions: vi.fn().mockResolvedValue([]),
+    getActivityLogs: vi.fn().mockResolvedValue([]),
     toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
     getDatabase: vi.fn(() => ({})),
-    claimOwnership: vi.fn().mockResolvedValue(true)
+    claimOwnership: vi.fn().mockResolvedValue(true),
+    ready: vi.fn().mockResolvedValue(true),
+    ensureExercisesSeeded: vi.fn().mockResolvedValue(undefined)
   };
 
   return {
@@ -99,11 +103,17 @@ vi.mock('../services/audioService', () => ({
 }));
 
 vi.mock('../utils/serviceWorker', () => ({
-  registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false })
+  registerServiceWorker: vi.fn().mockResolvedValue({ updateAvailable: false }),
+  swEventEmitter: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn()
+  }
 }));
 
 // Import App after mocks are set up
 import App from '../App';
+import { SnackbarProvider } from '../components/SnackbarProvider';
 
 // Mock other browser APIs
 Object.defineProperty(navigator, 'vibrate', { value: vi.fn() });
@@ -123,7 +133,11 @@ describe('App - Rep-based Exercise Timer Duration Fix', () => {
   });
 
   it('should initialize app with rep-based exercise without crashing', async () => {
-    const { container } = render(<App />);
+    const { container } = render(
+      <SnackbarProvider>
+        <App />
+      </SnackbarProvider>
+    );
 
     // Wait for the app to initialize
     await waitFor(() => {

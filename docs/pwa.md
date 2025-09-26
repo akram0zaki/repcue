@@ -64,11 +64,18 @@ Quick access actions from home screen (long-press app icon):
 
 ### 🔄 Update Management
 
-Users can manage app updates through **Settings**:
+RepCue uses a **server-based version management system** that eliminates false update prompts for new users:
 
+**User Controls (Settings):**
 - **Force Refresh App** - Complete cache clear + reload
 - **Clear Caches Only** - Remove cached content
 - **Check for Updates** - Force service worker update
+
+**Automatic Version Management:**
+- **New Installations**: Version fetched automatically from server (`get-status` endpoint)
+- **Existing Users**: Normal update checks against database versions
+- **No False Prompts**: New users never see unnecessary update notifications
+- **Self-Healing**: PWA refresh mechanism retries failed version fetches
 
 ---
 
@@ -239,6 +246,12 @@ VitePWA({
 - `registerServiceWorker()` - SW registration with error handling
 - `updateServiceWorker()` - Update management
 
+**Version Management Utilities:**
+- `getStatus()` - Lightweight server version check
+- `checkAndRefreshIfVersionNull()` - PWA refresh for null versions
+- `getCurrentAppVersion()` - Returns `string | null` for new installations
+- `updateAppVersion()` - Persists version to IndexedDB
+
 **Cache Management:**
 ```typescript
 // Multiple cache strategies
@@ -357,6 +370,20 @@ splash-screens-cache          // iOS splash screens
 3. Follow step-by-step instructions
 4. Check available storage space
 
+**Version Management Issues:**
+1. **Endless Update Prompts**:
+   - Check if `app_version` is null in IndexedDB
+   - Verify `get-status` endpoint is accessible
+   - Clear IndexedDB and reload to trigger fresh version fetch
+2. **Version Shows as "unknown"**:
+   - Server connectivity issue during initialization
+   - Check browser console for `get-status` errors
+   - Use "Force Refresh App" to retry version fetch
+3. **New Users See Update Prompt**:
+   - Indicates regression to hardcoded version system
+   - Verify `DEFAULT_APP_SETTINGS.app_version` is `null`
+   - Check server database has correct active version
+
 ### 🔍 Developer Debugging
 
 **Service Worker Debugging:**
@@ -379,8 +406,23 @@ caches.keys().then(console.log);
 // Clear specific cache
 caches.delete('cache-name');
 
-# Storage usage
+// Storage usage
 navigator.storage.estimate();
+```
+
+**Version System Debugging:**
+```typescript
+// Check current version in IndexedDB
+await window.storageService.getCurrentAppVersion();
+
+// Test get-status endpoint
+await window.updateService.getStatus();
+
+// Debug version information
+await window.updateService.debugVersionInfo();
+
+// Force version recovery
+await window.updateService.checkAndRefreshIfVersionNull();
 ```
 
 ### 📊 Performance Monitoring
@@ -416,19 +458,43 @@ navigator.storage.estimate();
 - Implement proper error boundaries
 - Use Progressive Enhancement principles
 
-### 🔄 Update Management
+### 🔄 Version Management System
+
+RepCue implements a **server-based version management** approach that eliminates version drift issues:
+
+**Architecture:**
+```typescript
+// New installations: app_version = null in IndexedDB
+if (currentVersion === null) {
+  // Fetch version from server's get-status endpoint
+  const statusData = await updateService.getStatus();
+  await storageService.updateAppVersion(statusData.version);
+  // No update prompt shown - user has latest version
+}
+```
+
+**Update Flow:**
+1. **New Users**: `app_version = null` → fetch from server → set to current version → no update prompt
+2. **Existing Users**: `app_version = "1.0.2"` → normal update check → prompt if newer version available
+3. **Version Recovery**: If version remains null after 5s → PWA refresh → retry server fetch → cache clear if needed
+
+**Edge Case Handling:**
+- **Server Unreachable**: Version remains null, retry mechanism activates
+- **Intermittent Issues**: PWA cache refresh and version retry system
+- **Network Recovery**: Automatic status check and version synchronization
 
 **Deployment Strategy:**
-1. Generate new service worker with updated precache
-2. Deploy new version to server
-3. Service worker automatically detects updates
-4. User receives update notification
-5. Apply update on next app launch
+1. Deploy new version to database (`app_versions` table)
+2. Generate new service worker with updated precache
+3. Deploy application updates to hosting platform
+4. Service worker automatically detects updates
+5. Users receive appropriate update notifications based on version state
 
 **Cache Invalidation:**
 - Version-based precaching automatically handles static assets
 - Runtime caches use TTL for dynamic content
 - Manual cache busting available through settings
+- Server-based version eliminates hardcoded version constants
 
 ### 📱 Platform Optimization
 
@@ -456,11 +522,15 @@ navigator.storage.estimate();
 
 RepCue's PWA implementation provides a comprehensive native app experience while maintaining the accessibility and reach of web technologies. The architecture prioritizes user privacy, performance, and accessibility while delivering advanced PWA features across all major platforms.
 
+The **server-based version management system** eliminates common PWA update issues by ensuring new users receive the correct version automatically without false update prompts, while maintaining robust update capabilities for existing users.
+
 For additional technical details, see:
 - [Service Worker Implementation](../apps/frontend/src/utils/serviceWorker.ts)
 - [PWA Configuration](../apps/frontend/vite.config.ts)
 - [Install Management](../apps/frontend/src/hooks/useInstallPrompt.ts)
+- [Version Management](../apps/frontend/src/services/updateService.ts)
+- [Server Status Endpoint](../supabase/functions/get-status/index.ts)
 - [iOS Deep Linking Guide](./ios-pwa-magic-links.md)
 
-**Last Updated:** 2025-09-02
-**Version:** RepCue v1.0+
+**Last Updated:** 2025-09-24
+**Version:** RepCue v1.0+ with Server-Based Versioning

@@ -3,16 +3,21 @@ import { supabase } from '../config/supabase';
 import logger from './logger';
 
 /**
- * Resolves video URLs, handling both regular URLs, blob-pending-sync:// URLs, and shared-video:// URLs
- * For blob-pending-sync URLs, fetches the actual video data from IndexedDB and creates a blob URL
- * For shared-video URLs, fetches video data from the original exercise's video files
- * If video data is missing locally but exists in cloud storage, downloads it first
+ * Resolves video URLs, handling:
+ *  - Regular (http/https/blob) URLs: returned directly
+ *  - blob-pending-sync://{exerciseId}/{filename}: local file stored, upload still pending
+ *  - blob-video://{exerciseId}/{filename}: local file stored & cloud-confirmed (stable scheme)
+ *  - shared-video://{originalExerciseId}/{originalOwnerId}: reuse another exercise's video
+ *
+ * For blob-* schemes we look up IndexedDB (via storageService) and materialize a runtime blob: URL.
+ * If the binary is missing but a storage_path exists we attempt a download (covers recovery cases).
+ * For shared videos we reference the original exercise's stored video file.
  */
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
 
   // For regular URLs (http, https, blob, etc.), return them directly
-  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('shared-video://')) {
+  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('blob-video://') && !videoUrl.startsWith('shared-video://')) {
     return videoUrl;
   }
 
@@ -83,15 +88,27 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
   }
 
   try {
-    // Extract exercise ID from blob-pending-sync URL format: blob-pending-sync://{exerciseId}/{filename}
-    const match = videoUrl.match(/^blob-pending-sync:\/\/([^/]+)\//);
+    // Handle both blob-pending-sync:// and blob-video:// (stable) schemes
+    const isPendingScheme = videoUrl.startsWith('blob-pending-sync://');
+    const isStableScheme = videoUrl.startsWith('blob-video://');
+
+    if (!isPendingScheme && !isStableScheme) {
+      // Not a blob-* scheme (shared handled earlier)
+      return null;
+    }
+
+    const match = videoUrl.match(/^blob-(?:pending-sync|video):\/\/([^/]+)\//);
     if (!match) {
-      logger.warn('🎥 [ResolveVideo] Invalid blob-pending-sync URL format:', videoUrl);
+      logger.warn('🎥 [ResolveVideo] Invalid blob video URL format:', videoUrl);
       return null;
     }
 
     const exerciseId = match[1];
-    logger.log('🎥 [ResolveVideo] Resolving blob-pending-sync URL for exercise:', exerciseId);
+    logger.log('🎥 [ResolveVideo] Resolving', {
+      exerciseId,
+      scheme: isPendingScheme ? 'blob-pending-sync' : 'blob-video',
+      videoUrl
+    });
 
     // Get the stored video file from IndexedDB
     const storedVideoFile = await storageService.getVideoFile(exerciseId);
@@ -130,10 +147,71 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
       logger.log('🎥 [ResolveVideo] Video exists in cloud storage, downloading:', storedVideoFile.storage_path);
 
       try {
-        // Download video from Supabase Storage
-        const { data, error } = await supabase.storage
-          .from('videos')
-          .download(storedVideoFile.storage_path);
+        // Check if this is a shared exercise video by examining the storage path
+        // Shared exercise videos have paths like: {original_owner_id}/{exercise_id}/{filename}
+        // We can detect this by checking if the exercise doesn't belong to the current user
+        const { data: authData } = await supabase.auth.getUser();
+        const currentUserId = authData.user?.id;
+        const isSharedExercise = currentUserId &&
+          !storedVideoFile.storage_path.startsWith(currentUserId);
+
+        let data, error;
+
+        if (isSharedExercise) {
+          logger.log('🎥 [ResolveVideo] Detected shared exercise, using download-shared-video edge function:', {
+            exerciseId,
+            storagePath: storedVideoFile.storage_path,
+            currentUserId
+          });
+
+          // Use the download-shared-video edge function for shared exercises
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) {
+            logger.error('🎥 [ResolveVideo] No valid session for shared video download');
+            return null;
+          }
+
+          // Extract originalOwnerId from storage path: {originalOwnerId}/{exerciseId}/{filename}
+          const pathParts = storedVideoFile.storage_path.split('/');
+          const originalOwnerId = pathParts[0];
+          const originalExerciseId = pathParts[1];
+
+          const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/download-shared-video`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              exerciseId: exerciseId,
+              originalExerciseId: originalExerciseId,
+              originalOwnerId: originalOwnerId
+            })
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            logger.error('🎥 [ResolveVideo] Shared video download failed:', {
+              exerciseId,
+              status: response.status,
+              statusText: response.statusText,
+              error: errorText
+            });
+            return null;
+          }
+
+          data = await response.blob();
+          error = null;
+        } else {
+          // Download video from Supabase Storage directly (for user's own exercises)
+          // All videos are stored in exercise-videos bucket only
+          const storageResponse = await supabase.storage
+            .from('exercise-videos')
+            .download(storedVideoFile.storage_path);
+
+          data = storageResponse.data;
+          error = storageResponse.error;
+        }
 
         if (error) {
           logger.error('🎥 [ResolveVideo] Failed to download video from storage:', error);
@@ -206,7 +284,7 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     logger.warn('🎥 [ResolveVideo] No video file data found locally or in cloud storage for exercise:', exerciseId);
     return null;
   } catch (error) {
-    logger.error('🎥 [ResolveVideo] Failed to resolve blob-pending-sync URL:', error);
+    logger.error('🎥 [ResolveVideo] Failed to resolve blob video URL:', error);
     return null;
   }
 }

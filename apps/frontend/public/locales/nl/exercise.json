@@ -21,5 +21,11 @@
   "startTimer": "Start timer",
   "stats": "Statistieken",
   "tags": "Tags",
-  "type": "Type"
+  "type": "Type",
+  "benefits": "Voordelen",
+  "limitations": "Beperkingen",
+  "bestTiming": "Beste Timing",
+  "suggestedCombinations": "Aanbevolen Combinaties",
+  "notes": "Notities",
+  "references": "Referenties"
 }

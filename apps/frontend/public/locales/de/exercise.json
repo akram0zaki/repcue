@@ -21,5 +21,11 @@
   "startTimer": "Timer starten",
   "stats": "Statistiken",
   "tags": "Tags",
-  "type": "Typ"
+  "type": "Typ",
+  "benefits": "Vorteile",
+  "limitations": "Einschränkungen",
+  "bestTiming": "Beste Zeit",
+  "suggestedCombinations": "Empfohlene Kombinationen",
+  "notes": "Notizen",
+  "references": "Referenzen"
 }

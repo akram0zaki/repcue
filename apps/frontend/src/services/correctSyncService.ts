@@ -4,6 +4,7 @@ import { ConsentService } from './consentService';
 import { SYNC_ENABLED, SYNC_DEBUG } from '../config/features';
 import logger from '../utils/logger';
 import type { AppSettings, UserFavorite } from '../types';
+import { isBuiltin, isBuiltinCatalog } from '../utils/syncFilters';
 
 // v2 Sync core constants
 const PUSH_BATCH_SIZE = 5; // Per spec
@@ -59,6 +60,17 @@ interface EdgeSyncResponseV2 {
   correlation_id?: string;
   server_time: string;
   tables: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[]; nextCursor?: TableCursor; more?: boolean }>;
+  sync_metadata?: {
+    push_successes: number;
+    push_errors: number;
+    pull_successes: number;
+    pull_errors: number;
+    total_successes: number;
+    total_errors: number;
+    detailed_errors: Array<{ table: string; record_id: string; operation: string; error: string }>;
+  };
+  status?: string;
+  message?: string;
 }
 
 export class CorrectSyncService {
@@ -236,7 +248,34 @@ export class CorrectSyncService {
       for (const table of tableList) {
         const dirty = await this.collectDirtyBatch(table, PUSH_BATCH_SIZE, userId);
         if (dirty.upserts.length || dirty.deletes.length) {
-          queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
+          // Deduplicate video_files by (exercise_id, file_name) keeping the most recent one
+          if (table === 'video_files' && dirty.upserts.length > 1) {
+            const dedupMap = new Map<string, Record<string, unknown>>();
+            for (const rec of dirty.upserts) {
+              const key = `${rec.exercise_id as string}|${rec.file_name as string}`;
+              const existing = dedupMap.get(key);
+              if (!existing) {
+                dedupMap.set(key, rec);
+              } else {
+                // Prefer larger version, then newer updated_at
+                const existingVersion = (existing as { version?: number }).version ?? 0;
+                const recVersion = (rec as { version?: number }).version ?? 0;
+                if (recVersion > existingVersion) {
+                  dedupMap.set(key, rec);
+                } else if (recVersion === existingVersion) {
+                  const existingUpdated = new Date((existing as { updated_at?: string }).updated_at || 0).getTime();
+                  const recUpdated = new Date((rec as { updated_at?: string }).updated_at || 0).getTime();
+                  if (recUpdated > existingUpdated) dedupMap.set(key, rec);
+                }
+              }
+            }
+            if (dirty.upserts.length !== dedupMap.size) {
+              if (SYNC_DEBUG) logger.debug(`[sync:v2] Deduplicated video_files upserts ${dirty.upserts.length} -> ${dedupMap.size}`);
+            }
+            queues[table] = { upserts: [...dedupMap.values()], deletes: [...dirty.deletes] };
+          } else {
+            queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
+          }
         }
       }
   if (SYNC_DEBUG) logger.debug(`[sync:v2] collectDirty done in ${(performance.now()-collectStart).toFixed(0)}ms queues=${Object.entries(queues).map(([k,v])=>`${k}:${(v.upserts?.length||0)+(v.deletes?.length||0)}`).join(' ')}`);
@@ -309,9 +348,9 @@ export class CorrectSyncService {
         sentAtLeastOnce = true;
         if (response.correlation_id) result.correlationId = response.correlation_id;
 
-        // Mark only what we sent as clean
+        // Mark only what we sent as clean (but only if successful)
         if (hasPush) {
-          await this.markPushedClean(batchPayload);
+          await this.markPushedClean(batchPayload, response);
           // Update pushed count for reporting
           for (const d of Object.values(batchPayload)) {
             result.pushed += d.upserts.length + d.deletes.length;
@@ -402,8 +441,24 @@ export class CorrectSyncService {
       const deletes: string[] = [];
       for (const rec of dirty) {
         const recordOwnerId = (rec as { owner_id?: string }).owner_id;
-        const shouldSkip = recordOwnerId && recordOwnerId !== userId && tableName !== 'exercises';
-        
+        const recordId = rec.id as string;
+        let shouldSkip = recordOwnerId && recordOwnerId !== userId && tableName !== 'exercises';
+
+        // NEW: Filter out built-in exercises and catalogs from sync
+        if (tableName === 'exercises' && isBuiltin(recordId)) {
+          if (SYNC_DEBUG) {
+            logger.debug(`[sync:v2] Skipping built-in exercise from sync: ${recordId}`);
+          }
+          shouldSkip = true;
+        }
+
+        if (tableName === 'exercise_catalogs' && isBuiltinCatalog(recordId)) {
+          if (SYNC_DEBUG) {
+            logger.debug(`[sync:v2] Skipping built-in catalog from sync: ${recordId}`);
+          }
+          shouldSkip = true;
+        }
+
         if (SYNC_DEBUG && tableName === 'user_preferences') {
           logger.debug(`[sync:v2] collectDirtyBatch user_preferences record:`, {
             id: rec.id,
@@ -415,8 +470,8 @@ export class CorrectSyncService {
             favorite_exercises: (rec as { favorite_exercises?: string[] }).favorite_exercises
           });
         }
-        
-        if (shouldSkip) continue; // skip foreign-owned
+
+        if (shouldSkip) continue; // skip foreign-owned or built-in
         if ((rec as { deleted?: boolean; op?: string }).deleted || (rec as { op?: string }).op === 'delete') {
           deletes.push(rec.id as string);
         } else {
@@ -427,6 +482,9 @@ export class CorrectSyncService {
             mappedRecord = this.storage.convertAppSettingsForSync(clean as unknown as AppSettings);
           } else if (tableName === 'user_favorites' && this.storage) {
             mappedRecord = this.storage.convertUserFavoritesForSync(clean as unknown as UserFavorite);
+          } else if (tableName === 'exercises') {
+            // Apply exercises field mapping (catalogId → catalog_id)
+            mappedRecord = this.mapExerciseFieldsToServer(this.filterUndefinedValues(clean));
           } else if (tableName === 'video_files') {
             // Special handling for video_files: convert File to serializable format
             mappedRecord = await this.convertVideoFileForSync(clean);
@@ -507,20 +565,49 @@ export class CorrectSyncService {
     }
   }
 
-  private async markPushedClean(payload: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>) {
+  private async markPushedClean(payload: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }>, response: EdgeSyncResponseV2) {
     if (!this.storage) return;
     const db = this.storage.getDatabase();
     const nowIso = new Date().toISOString();
+
+    // Extract failed record IDs from detailed errors if available
+    const failedRecordIds = new Set<string>();
+    if (response.sync_metadata?.detailed_errors) {
+      for (const error of response.sync_metadata.detailed_errors) {
+        if (error.record_id) {
+          failedRecordIds.add(`${error.table}:${error.record_id}`);
+        }
+      }
+    }
+
     for (const [table, data] of Object.entries(payload)) {
       const coll = (db as unknown as Record<string, unknown>)[table] as { update: (id: string, changes: Record<string, unknown>) => Promise<number> } | undefined;
       if (!coll) continue;
-      // Mark upserts
+
+      // Mark upserts as clean only if they didn't fail
       for (const rec of data.upserts) {
-        try { await coll.update(rec.id as string, { dirty: 0, op: undefined, synced_at: nowIso }); } catch {}
+        const recordKey = `${table}:${rec.id}`;
+        if (!failedRecordIds.has(recordKey)) {
+          try {
+            await coll.update(rec.id as string, { dirty: 0, op: undefined, synced_at: nowIso });
+            if (SYNC_DEBUG) logger.debug(`[sync:v2] marked ${recordKey} as clean (success)`);
+          } catch {}
+        } else {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] keeping ${recordKey} dirty (failed)`);
+        }
       }
-      // Mark deletes
+
+      // Mark deletes as clean only if they didn't fail
       for (const id of data.deletes) {
-        try { await coll.update(id, { dirty: 0, op: undefined, synced_at: nowIso }); } catch {}
+        const recordKey = `${table}:${id}`;
+        if (!failedRecordIds.has(recordKey)) {
+          try {
+            await coll.update(id, { dirty: 0, op: undefined, synced_at: nowIso });
+            if (SYNC_DEBUG) logger.debug(`[sync:v2] marked ${recordKey} as clean (success)`);
+          } catch {}
+        } else {
+          if (SYNC_DEBUG) logger.debug(`[sync:v2] keeping ${recordKey} dirty (failed)`);
+        }
       }
     }
   }
@@ -603,6 +690,38 @@ export class CorrectSyncService {
     
     // Shape coercion
     return json as EdgeSyncResponseV2;
+  }
+
+  /**
+   * Maps exercise field names from server format to client format
+   * Handles field name differences between Supabase edge functions and frontend
+   */
+  private mapExerciseFieldsFromServer(row: Record<string, unknown>): Record<string, unknown> {
+    const mapped = { ...row };
+
+    // Map catalog_id (server) to catalogId (client)
+    if ('catalog_id' in mapped) {
+      mapped.catalogId = mapped.catalog_id;
+      delete mapped.catalog_id;
+    }
+
+    return mapped;
+  }
+
+  /**
+   * Maps exercise field names from client format to server format
+   * Handles field name differences between frontend and Supabase edge functions
+   */
+  private mapExerciseFieldsToServer(row: Record<string, unknown>): Record<string, unknown> {
+    const mapped = { ...row };
+
+    // Map catalogId (client) to catalog_id (server)
+    if ('catalogId' in mapped) {
+      mapped.catalog_id = mapped.catalogId;
+      delete mapped.catalogId;
+    }
+
+    return mapped;
   }
 
   private ensureDeviceId(): string {
@@ -704,6 +823,14 @@ export class CorrectSyncService {
     // Apply upserts with conflict resolution
     for (const row of upserts) {
       try {
+        // Enforce rule: only UUID (custom) exercises are ever applied from server.
+        if (table === 'exercises') {
+          const id = row.id as string | undefined;
+            if (!id || isBuiltin(id)) {
+              if (SYNC_DEBUG) logger.debug(`[sync:v2] Skipping non-UUID exercise from server pull: ${id}`);
+              continue;
+            }
+        }
         // Skip records that we just pushed in this sync cycle to avoid race conditions
         const recordKey = `${table}:${row.id}`;
         const wasPushed = pushedRecords?.has(recordKey);
@@ -734,7 +861,9 @@ export class CorrectSyncService {
 
         const existing = await coll.get(row.id as string);
         if (!existing) {
-          await coll.put({ ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
+          // Apply field mapping for exercises table to normalize field names
+          const mappedRow = table === 'exercises' ? this.mapExerciseFieldsFromServer(row) : row;
+          await coll.put({ ...mappedRow, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
 
           // If this is a new video file, update the corresponding exercise's custom_video_url
           if (table === 'video_files' && row.exercise_id && row.file_name) {
@@ -753,7 +882,9 @@ export class CorrectSyncService {
           const incomingTime = new Date(incomingUpdated as string | number).getTime();
           if (localTime > incomingTime) continue; // keep local newer timestamp
         }
-        await coll.put({ ...existing, ...row, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
+        // Apply field mapping for exercises table to normalize field names
+        const mappedRow = table === 'exercises' ? this.mapExerciseFieldsFromServer(row) : row;
+        await coll.put({ ...existing, ...mappedRow, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
 
         // If this is an updated video file, update the corresponding exercise's custom_video_url
         if (table === 'video_files' && row.exercise_id && row.file_name) {
@@ -797,17 +928,73 @@ export class CorrectSyncService {
 
       logger.debug(`[sync:v2] Authenticated user for video download: ${user.id}`);
 
-      // Use authenticated Supabase client instead of public URL
-      const { data, error } = await supabase.storage
-        .from('videos')
-        .download(storagePath);
+      // Check if this is a shared exercise video by examining the storage path
+      // Shared exercise videos have paths like: {original_owner_id}/{exercise_id}/{filename}
+      const isSharedExercise = !storagePath.startsWith(user.id);
+
+      let data, error;
+
+      if (isSharedExercise) {
+        logger.debug(`[sync:v2] Detected shared exercise video, using download-shared-video edge function:`, {
+          exerciseId: videoFileRow.exercise_id,
+          storagePath: storagePath,
+          currentUserId: user.id
+        });
+
+        // Extract originalOwnerId from storage path: {originalOwnerId}/{exerciseId}/{filename}
+        const pathParts = storagePath.split('/');
+        const originalOwnerId = pathParts[0];
+        const originalExerciseId = pathParts[1];
+
+        // Use the download-shared-video edge function for shared exercises
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          throw new Error('No valid session for shared video download');
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/download-shared-video`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            exerciseId: videoFileRow.exercise_id,
+            originalExerciseId: originalExerciseId,
+            originalOwnerId: originalOwnerId
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          logger.error(`[sync:v2] Shared video download failed:`, {
+            exerciseId: videoFileRow.exercise_id,
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          });
+          throw new Error(`Shared video download failed: ${response.status} ${errorText}`);
+        }
+
+        data = await response.blob();
+        error = null;
+      } else {
+        // Use authenticated Supabase client for user's own videos
+        // All videos are stored in exercise-videos bucket only
+        const storageResponse = await supabase.storage
+          .from('exercise-videos')
+          .download(storagePath);
+
+        data = storageResponse.data;
+        error = storageResponse.error;
+      }
 
       if (error) {
         logger.error(`[sync:v2] Storage download error details:`, {
           error: error,
           message: error.message,
           storagePath: storagePath,
-          bucketName: 'videos',
+          bucketName: 'exercise-videos',
           errorString: JSON.stringify(error)
         });
         throw new Error(`Failed to download video: ${error.message || JSON.stringify(error)}`);
@@ -855,15 +1042,38 @@ export class CorrectSyncService {
     try {
       const exercise = await exerciseColl.get(exerciseId);
       if (exercise) {
-        const blobPendingSyncUrl = `blob-pending-sync://${exerciseId}/${fileName}`;
+        // Determine if there's a confirmed (non-pending) video file for this exercise
+        let scheme = 'blob-pending-sync';
+        // Lightweight local type for video file records
+        interface VideoFileRecord { id: string; exercise_id?: string; file_name?: string; upload_pending?: boolean; deleted?: boolean; [key: string]: unknown; }
+        try {
+          const dbVideo = this.storage.getDatabase() as unknown as Record<string, unknown>;
+          const videoTable = dbVideo['video_files'] as {
+            where: (field: string) => {
+              equals: (val: string) => {
+                and: (predicate: (v: VideoFileRecord) => boolean) => { toArray: () => Promise<VideoFileRecord[]> };
+              };
+            };
+          };
+          const videoFiles: VideoFileRecord[] = await videoTable
+            .where('exercise_id')
+            .equals(exerciseId)
+            .and((v: VideoFileRecord) => !v.deleted)
+            .toArray();
+          const confirmed = videoFiles.find((v: VideoFileRecord) => v.file_name === fileName && v.upload_pending === false);
+          if (confirmed) scheme = 'blob-video';
+        } catch (e) {
+          if (SYNC_DEBUG) logger.debug('[sync:v2] Unable to inspect video_files for scheme selection', e);
+        }
+        const localUrl = `${scheme}://${exerciseId}/${fileName}`;
         await exerciseColl.update(exerciseId, {
-          custom_video_url: blobPendingSyncUrl,
-          has_video: true, // Set to true since the exercise now has a custom video
-          dirty: 1, // Mark as dirty to sync the updated video URL to server
+          custom_video_url: localUrl,
+          has_video: true,
+          dirty: 1,
           op: 'upsert',
           updated_at: new Date().toISOString()
         });
-        logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${blobPendingSyncUrl}`);
+        logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${localUrl}`);
       }
     } catch (error) {
       logger.warn(`[sync:v2] Failed to update exercise video URL for ${exerciseId}:`, error);

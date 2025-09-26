@@ -124,7 +124,7 @@ Stored in Dexie; cleared via “Reset Sync State”.
 1. Schema: Add table with `version int default 0`, `deleted boolean default false`, `updated_at timestamptz default now()` + `owner_id`.
 2. Indexes: `(owner_id, updated_at DESC, id)`.
 3. Client: Add Dexie table + ensure CRUD sets `dirty=1`, increments `version`, updates `updated_at`.
-4. Service: Append to `SYNC_ORDER` (mind dependency ordering: parent entities earlier than dependents).
+4. Service: Append to `SYNC_ORDER` (mind dependency ordering: parent entities earlier than dependents). Current order: `user_preferences`, `app_settings`, `exercise_catalogs`, `exercises`, `user_favorites`, `workouts`, `activity_logs`, `workout_sessions`, `video_files`.
 5. Edge: Add to allow‑list; implement pull query (owner scope or public logic); enforce batch limit.
 6. Tests: Add unit (conflict matrix), integration (multi-page pull), soft delete propagation.
 7. Docs/CHANGELOG: Note addition.

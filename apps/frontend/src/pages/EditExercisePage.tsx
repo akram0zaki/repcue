@@ -32,15 +32,6 @@ export const EditExercisePage: React.FC = () => {
         return;
       }
 
-      if (!user) {
-        logger.log('🔧 EditExercisePage: User not authenticated, redirecting to exercises');
-        showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
-          type: 'error'
-        });
-        navigate('/exercises');
-        return;
-      }
-
       try {
         logger.log('🔧 EditExercisePage: Fetching exercise from local storage...');
         const exercises = await storageService.getExercises();
@@ -57,16 +48,30 @@ export const EditExercisePage: React.FC = () => {
           return;
         }
 
-        // Verify user ownership
-        logger.log('🔧 EditExercisePage: Exercise owner_id:', foundExercise.owner_id, 'User id:', user.id);
-        
-        if (foundExercise.owner_id !== user.id) {
-          logger.log('🔧 EditExercisePage: User not authorized, redirecting to exercises');
-          showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
-            type: 'error'
-          });
-          navigate('/exercises');
-          return;
+        // Verify user ownership - allow editing orphaned exercises (owner_id: null)
+        logger.log('🔧 EditExercisePage: Exercise owner_id:', foundExercise.owner_id, 'User id:', user?.id);
+
+        // If user is logged in, check ownership constraints
+        if (user) {
+          // Allow editing if user owns the exercise OR it's an orphaned exercise (owner_id is null)
+          if (foundExercise.owner_id !== null && foundExercise.owner_id !== user.id) {
+            logger.log('🔧 EditExercisePage: User not authorized, redirecting to exercises');
+            showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
+              type: 'error'
+            });
+            navigate('/exercises');
+            return;
+          }
+        } else {
+          // If not logged in, only allow editing orphaned exercises (created offline)
+          if (foundExercise.owner_id !== null) {
+            logger.log('🔧 EditExercisePage: User not authenticated and exercise has owner, redirecting to exercises');
+            showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
+              type: 'error'
+            });
+            navigate('/exercises');
+            return;
+          }
         }
 
         logger.log('🔧 EditExercisePage: Successfully loaded exercise, setting state');
@@ -87,18 +92,30 @@ export const EditExercisePage: React.FC = () => {
   }, [exerciseId, navigate, showSnackbar, t, user?.id]);
 
   const handleSubmit = async (exerciseData: Partial<Exercise>) => {
-    if (!user || !exercise) {
-      showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
+    if (!exercise) {
+      showSnackbar(t('errors.exerciseNotFound', 'Exercise not found'), {
         type: 'error'
       });
       return;
     }
 
-    if (exercise.owner_id !== user.id) {
-      showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
-        type: 'error'
-      });
-      return;
+    // If user is logged in, check ownership constraints
+    if (user) {
+      // Allow editing if user owns the exercise OR it's an orphaned exercise (owner_id is null)
+      if (exercise.owner_id !== null && exercise.owner_id !== user.id) {
+        showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
+          type: 'error'
+        });
+        return;
+      }
+    } else {
+      // If not logged in, only allow editing orphaned exercises (created offline)
+      if (exercise.owner_id !== null) {
+        showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
+          type: 'error'
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -109,12 +126,13 @@ export const EditExercisePage: React.FC = () => {
       const updatedExercise: Exercise = {
         // Keep existing required fields
         id: exercise.id,
-        owner_id: exercise.owner_id,
+        owner_id: exercise.owner_id || user?.id || null, // Claim ownership if orphaned and logged in
         created_at: exercise.created_at,
         // Update with new data
         name: exerciseData.name || exercise.name,
         category: exerciseData.category || exercise.category,
         exercise_type: exerciseData.exercise_type || exercise.exercise_type,
+        catalogId: exercise.catalogId || 'general-fitness', // Preserve existing catalogId
         description: exerciseData.description ?? exercise.description,
         instructions: exerciseData.instructions ?? exercise.instructions,
         tags: exerciseData.tags ?? exercise.tags,

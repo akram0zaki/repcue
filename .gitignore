@@ -55,6 +55,7 @@ playwright/.cache/
 .local/*
 .mcp.json
 .vscode/mcp.json
+.kiro/settings/mcp.json
 console.log
 next.md
 docs/findings

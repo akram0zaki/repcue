@@ -61,6 +61,12 @@ class V2SyncService {
 
   onSyncStatusChange(listener: (status: SyncStatus) => void): () => void {
     this.listeners.add(listener);
+    // Call listener immediately with current status
+    try {
+      listener(this.getSyncStatus());
+    } catch (error) {
+      logger.warn('Sync status listener error:', error);
+    }
     return () => this.listeners.delete(listener);
   }
 
@@ -122,12 +128,7 @@ class V2SyncService {
         } as SyncError))
       };
 
-      // Enhanced logging for sync results with correlation ID
-      if (res.correlationId) {
-        logger.info(`[sync:v2] 🔗 Correlation ID: ${res.correlationId}`);
-      }
-
-      // Log detailed sync metadata if available
+      // Enhanced logging based on sync status and detailed metadata
       const resWithMetadata = res as typeof res & {
         sync_metadata?: {
           push_successes: number;
@@ -136,32 +137,111 @@ class V2SyncService {
           pull_errors: number;
           total_successes: number;
           total_errors: number;
+          table_statuses?: Record<string, {
+            table: string;
+            push_attempted: boolean;
+            push_success: boolean;
+            push_errors: number;
+            push_successes: number;
+            pull_attempted: boolean;
+            pull_success: boolean;
+            pull_errors: number;
+            pull_successes: number;
+          }>;
+          detailed_errors?: Array<{
+            table: string;
+            record_id: string;
+            operation: string;
+            error: string;
+          }>;
         };
         status?: string;
         message?: string;
       };
 
-      if (resWithMetadata.sync_metadata) {
-        const metadata = resWithMetadata.sync_metadata;
-        logger.info(`[sync:v2] 📊 Detailed sync results:`, {
+      const metadata = resWithMetadata.sync_metadata;
+      const status = resWithMetadata.status || 'unknown';
+      const totalErrors = metadata?.total_errors || 0;
+      const totalSuccesses = metadata?.total_successes || 0;
+
+      // Determine log level based on sync status
+      const isPartialSuccess = status === 'partial_success' || (totalErrors > 0 && totalSuccesses > 0);
+      const isFailure = status === 'error' || status === 'failure' || (totalErrors > 0 && totalSuccesses === 0);
+
+      // Log correlation ID first
+      if (res.correlationId) {
+        const logLevel = isFailure ? 'error' : isPartialSuccess ? 'info' : 'debug';
+        logger[logLevel](`[sync:v2] 🔗 Correlation ID: ${res.correlationId}`);
+      }
+
+      // Log detailed sync results based on status
+      if (metadata) {
+        const syncSummary = {
           correlationId: res.correlationId,
+          status: status,
+          message: resWithMetadata.message,
           pushSuccesses: metadata.push_successes,
           pushErrors: metadata.push_errors,
           pullSuccesses: metadata.pull_successes,
           pullErrors: metadata.pull_errors,
           totalSuccesses: metadata.total_successes,
-          totalErrors: metadata.total_errors,
-          status: resWithMetadata.status,
-          message: resWithMetadata.message
-        });
+          totalErrors: metadata.total_errors
+        };
 
-        // Log specific error details if there were failures
-        if (metadata.total_errors > 0) {
-          logger.warn(`[sync:v2] ⚠️ Sync completed with ${metadata.total_errors} errors out of ${metadata.total_successes + metadata.total_errors} operations`);
-          if (mappedResult.errors.length > 0) {
-            logger.warn(`[sync:v2] 🔍 Error details:`, mappedResult.errors);
+        if (isFailure) {
+          logger.error(`[sync:v2] ❌ Sync failed:`, syncSummary);
+        } else if (isPartialSuccess) {
+          logger.info(`[sync:v2] ⚠️ Sync partially successful:`, syncSummary);
+        } else {
+          logger.debug(`[sync:v2] ✅ Sync completed successfully:`, syncSummary);
+        }
+
+        // Log per-table status details for partial success and failures
+        if ((isPartialSuccess || isFailure) && metadata.table_statuses) {
+          const tableResults = Object.values(metadata.table_statuses);
+          const tablesWithErrors = tableResults.filter(t => t.push_errors > 0 || t.pull_errors > 0);
+          const tablesWithSuccess = tableResults.filter(t => t.push_successes > 0 || t.pull_successes > 0);
+
+          if (tablesWithSuccess.length > 0) {
+            const logLevel = isFailure ? 'error' : 'info';
+            logger[logLevel](`[sync:v2] 📊 Tables with successful operations:`,
+              tablesWithSuccess.map(t => ({
+                table: t.table,
+                pushSuccesses: t.push_successes,
+                pullSuccesses: t.pull_successes
+              }))
+            );
+          }
+
+          if (tablesWithErrors.length > 0) {
+            const logLevel = isFailure ? 'error' : 'info';
+            logger[logLevel](`[sync:v2] 🚨 Tables with errors:`,
+              tablesWithErrors.map(t => ({
+                table: t.table,
+                pushErrors: t.push_errors,
+                pullErrors: t.pull_errors,
+                pushAttempted: t.push_attempted,
+                pullAttempted: t.pull_attempted
+              }))
+            );
           }
         }
+
+        // Log specific detailed errors if available
+        if (metadata.detailed_errors && metadata.detailed_errors.length > 0) {
+          const logLevel = isFailure ? 'error' : 'info';
+          logger[logLevel](`[sync:v2] 🔍 Detailed error breakdown:`, metadata.detailed_errors);
+        }
+      } else {
+        // Fallback for responses without metadata
+        const logLevel = res.success ? 'debug' : 'error';
+        logger[logLevel](`[sync:v2] ${res.success ? '✅' : '❌'} Sync ${res.success ? 'completed' : 'failed'}:`, {
+          correlationId: res.correlationId,
+          pushed: res.pushed,
+          pulled: res.pulled,
+          tables: res.tables,
+          errors: res.errors
+        });
       }
 
       this.errors = mappedResult.errors;
@@ -206,9 +286,11 @@ export const syncService: {
   onSyncStatusChange: (listener: (status: SyncStatus) => void) => () => void;
   clearErrors: () => void;
   sync: (force?: boolean) => Promise<SyncResult>;
+  hasChangesToSync: () => Promise<boolean>;
 } = {
   getSyncStatus: () => getSyncServiceInstance().getSyncStatus(),
   onSyncStatusChange: (listener: (status: SyncStatus) => void) => getSyncServiceInstance().onSyncStatusChange(listener),
   clearErrors: () => getSyncServiceInstance().clearErrors(),
-  sync: (force?: boolean) => getSyncServiceInstance().sync(force)
+  sync: (force?: boolean) => getSyncServiceInstance().sync(force),
+  hasChangesToSync: () => Promise.resolve(false) // V2 doesn't track this granularly
 };

@@ -31,7 +31,7 @@ const PAGE_CONFIGS: Record<string, PageConfig> = {
     className: 'pb-20',
   },
   '/exercise': {
-    title: 'Exercise Details',
+    title: 'exerciseDetails', // Translation key for titles.exerciseDetails
     hasBackButton: true,
     className: 'pb-20',
   },
@@ -75,25 +75,43 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
   // Get current page configuration
   const getPageConfig = (): PageConfig => {
+    let config: PageConfig;
+
     // Check for exact matches first
     if (PAGE_CONFIGS[location.pathname]) {
-      return PAGE_CONFIGS[location.pathname];
-    }
-    
-    // Check for partial matches (e.g., /exercise/123)
-    const pathSegments = location.pathname.split('/');
-    if (pathSegments.length > 1) {
-      const basePath = `/${pathSegments[1]}`;
-      if (PAGE_CONFIGS[basePath]) {
-        return PAGE_CONFIGS[basePath];
+      config = PAGE_CONFIGS[location.pathname];
+    } else {
+      // Check for partial matches (e.g., /exercise/123)
+      const pathSegments = location.pathname.split('/');
+      if (pathSegments.length > 1) {
+        const basePath = `/${pathSegments[1]}`;
+        if (PAGE_CONFIGS[basePath]) {
+          config = PAGE_CONFIGS[basePath];
+        } else {
+          // Default configuration
+          config = {
+            title: t('titles.app', { ns: 'titles', defaultValue: 'RepCue' }),
+            className: 'pb-20',
+          };
+        }
+      } else {
+        // Default configuration
+        config = {
+          title: t('titles.app', { ns: 'titles', defaultValue: 'RepCue' }),
+          className: 'pb-20',
+        };
       }
     }
-    
-    // Default configuration
-    return {
-      title: t('titles.app', { ns: 'titles', defaultValue: 'RepCue' }),
-      className: 'pb-20',
-    };
+
+    // Translate title if it's a translation key (no spaces, camelCase)
+    if (config.title && !config.title.includes(' ') && config.title !== config.title.toLowerCase()) {
+      return {
+        ...config,
+        title: t(`titles.${config.title}`, { ns: 'titles', defaultValue: config.title })
+      };
+    }
+
+    return config;
   };
 
   const pageConfig = getPageConfig();

@@ -24,6 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
 import { useAuth } from '../hooks/useAuth';
+import { useSharedExercises } from '../hooks/useSharedExercises';
 import type { AuthUserProfile } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
 import getVideoSources from '../utils/videoSources';
@@ -35,6 +36,8 @@ import { useSnackbar } from '../components/SnackbarProvider';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
 import { ShareButton } from '../components/ShareButton';
+import CatalogSelector from '../components/CatalogSelector';
+import { getDefaultCatalog, EXERCISE_CATALOGS } from '../data/catalogs';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -48,6 +51,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
+  const { isSharedExercise } = useSharedExercises();
 
   // Filter state with persistence
   const FILTER_STORAGE_KEY = 'exercise-page-filters';
@@ -59,6 +63,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       if (saved) {
         const parsed = JSON.parse(saved);
         return {
+          selectedCatalogId: parsed.selectedCatalogId || getDefaultCatalog().id,
           selectedCategories: new Set<ExerciseCategory>(parsed.selectedCategories || []),
           searchTerm: parsed.searchTerm || '',
           showFavoritesOnly: parsed.showFavoritesOnly || false,
@@ -70,6 +75,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       logger.warn('[ExercisePage] Failed to load saved filter state:', error);
     }
     return {
+      selectedCatalogId: getDefaultCatalog().id,
       selectedCategories: new Set<ExerciseCategory>(),
       searchTerm: '',
       showFavoritesOnly: false,
@@ -80,6 +86,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
   // Initialize state with saved values
   const savedFilters = loadSavedFilters();
+  const [selectedCatalogId, setSelectedCatalogId] = useState(savedFilters.selectedCatalogId);
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(savedFilters.selectedCategories);
   const [searchTerm, setSearchTerm] = useState(savedFilters.searchTerm);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(savedFilters.showFavoritesOnly);
@@ -103,6 +110,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   useEffect(() => {
     try {
       const filterState = {
+        selectedCatalogId,
         selectedCategories: Array.from(selectedCategories),
         searchTerm,
         showFavoritesOnly,
@@ -110,26 +118,29 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         sortBy
       };
       localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
-      logger.log('[ExercisePage] Filter state saved:', filterState);
     } catch (error) {
       logger.warn('[ExercisePage] Failed to save filter state:', error);
     }
-  }, [selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy]);
+  }, [selectedCatalogId, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy]);
 
-  // Clear all filters and reset to defaults
+  // Clear all filters and reset to defaults (except catalog)
   const clearAllFilters = () => {
     setSelectedCategories(new Set());
     setSearchTerm('');
     setShowFavoritesOnly(false);
     setExerciseFilter('all');
     setSortBy('name');
-    // Clear persisted state
-    try {
-      localStorage.removeItem(FILTER_STORAGE_KEY);
-      logger.log('[ExercisePage] Filter state cleared');
-    } catch (error) {
-      logger.warn('[ExercisePage] Failed to clear filter state:', error);
-    }
+    // Don't reset catalog - let user keep their catalog selection
+  };
+
+  // Handle catalog change with optional filter reset
+  const handleCatalogChange = (catalogId: string) => {
+    setSelectedCatalogId(catalogId);
+    // Clear other filters when switching catalogs to start fresh
+    setSelectedCategories(new Set());
+    setSearchTerm('');
+    setShowFavoritesOnly(false);
+    setExerciseFilter('all');
   };
 
   const closePreview = () => {
@@ -187,36 +198,49 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
 
     // Exclude shared copies from being considered user-created
-    if (exercise.is_shared_copy === true) {
+    if (isSharedExercise(exercise.id)) {
       return false;
     }
 
-    // For UUID exercises (user-created), check if they either have an owner_id or if user is authenticated
-    // This handles the case where exercises were created before proper ownership was set
-    if (isUUIDFormat && user?.id) {
-      // If exercise has owner_id, check it matches current user
-      if (exercise.owner_id) {
-        return exercise.owner_id === user.id;
+    // For UUID exercises (user-created)
+    if (isUUIDFormat) {
+      // If user is logged in
+      if (user?.id) {
+        // If exercise has owner_id, check it matches current user
+        if (exercise.owner_id) {
+          return exercise.owner_id === user.id;
+        }
+        // If exercise has no owner_id but is UUID format, assume it belongs to current user
+        // This handles exercises created before the ownership fix or created offline
+        return true;
+      } else {
+        // If user is not logged in, only show orphaned exercises (created offline)
+        return exercise.owner_id === null;
       }
-      // If exercise has no owner_id but is UUID format, assume it belongs to current user
-      // This handles exercises created before the ownership fix
-      return true;
     }
-    return isUUIDFormat && !!exercise.owner_id;
+
+    return false;
   };
 
   // Helper function to check if exercise is shared with current user
-  const isSharedExercise = (exercise: Exercise): boolean => {
+  const isSharedExerciseHelper = (exercise: Exercise): boolean => {
     if (!user?.id) return false;
 
-    // Check if exercise was copied from a share using the tracking fields
-    return exercise.is_shared_copy === true;
+    // Use the hook to check if exercise ID is in shared references
+    return isSharedExercise(exercise.id);
   };
 
   // Filter exercises based on selected criteria
   const filteredExercises = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
+
+    // Debug: Log exercise catalog distribution (removed unused catalogCounts)
+
+
     const filtered = exercises.filter(exercise => {
+      // Filter by catalog first
+      const matchesCatalog = exercise.catalogId === selectedCatalogId;
+
       const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(exercise.category);
       // Use localized name/description for search while preserving canonical tags
       const loc = localizeExercise(exercise, t);
@@ -225,14 +249,29 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         || (loc.description || '').toLowerCase().includes(term)
         || (exercise.tags || []).some(tag => tag.toLowerCase().includes(term));
       const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
-      
+
       // Apply exercise type filter
+      const isUserCreated = isUserCreatedExercise(exercise);
+      const isShared = isSharedExerciseHelper(exercise);
+
+      // Debug logging for the "Ya 7amada" exercise
+      if (exercise.name === 'Ya 7amada') {
+        logger.log(`[ExercisePage] Filtering "Ya 7amada":`, {
+          exerciseId: exercise.id,
+          exerciseFilter,
+          isUserCreated,
+          isShared,
+          owner_id: exercise.owner_id,
+          userId: user?.id
+        });
+      }
+
       const matchesExerciseFilter = exerciseFilter === 'all' ||
-        (exerciseFilter === 'built-in' && !isUserCreatedExercise(exercise) && !isSharedExercise(exercise)) ||
-        (exerciseFilter === 'custom' && isUserCreatedExercise(exercise)) ||
-        (exerciseFilter === 'shared' && isSharedExercise(exercise));
-      
-      return matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
+        (exerciseFilter === 'built-in' && !isUserCreated && !isShared) ||
+        (exerciseFilter === 'custom' && isUserCreated) ||
+        (exerciseFilter === 'shared' && isShared);
+
+      return matchesCatalog && matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
     });
     
     // Apply sorting
@@ -264,7 +303,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     });
     
     return filtered;
-  }, [exercises, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy, t]);
+  }, [exercises, selectedCatalogId, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy, t]);
 
   // Group exercises by category for better organization
   const exercisesByCategory = useMemo(() => {
@@ -329,8 +368,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   };
 
   const handleEditExercise = (exercise: Exercise) => {
-    logger.log('🔧 Edit button clicked for exercise:', exercise.name, 'ID:', exercise.id);
-    logger.log('🔧 Navigating to:', `/exercises/edit/${exercise.id}`);
     navigate(`/exercises/edit/${exercise.id}`);
   };
 
@@ -386,6 +423,14 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
             {t('exercises.subtitle')}
           </p>
+        </div>
+
+        {/* Catalog Selector */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4">
+          <CatalogSelector
+            selectedCatalogId={selectedCatalogId}
+            onCatalogChange={handleCatalogChange}
+          />
         </div>
 
         {/* Search and Filters */}
@@ -524,7 +569,17 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
           {/* Results Count */}
           <div className="mt-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            {t('exercises.showingCount', { count: filteredExercises.length, total: exercises.length })}
+            {(() => {
+              const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
+              const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { defaultValue: selectedCatalog.id }) : 'Unknown';
+              const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
+              return t('exercises.showingCountInCatalog', {
+                count: filteredExercises.length,
+                total: totalInCatalog,
+                catalog: catalogName,
+                defaultValue: `Showing ${filteredExercises.length} of ${totalInCatalog} exercises in ${catalogName}`
+              });
+            })()}
           </div>
         </div>
 
@@ -557,6 +612,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                         onDelete={handleDeleteExercise}
                         onShowDetails={handleShowExerciseDetails}
                         currentUser={user}
+                        isSharedExercise={isSharedExercise}
                       />
                     ))}
                   </div>
@@ -579,6 +635,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 onDelete={handleDeleteExercise}
                 onShowDetails={handleShowExerciseDetails}
                 currentUser={user}
+                isSharedExercise={isSharedExercise}
               />
             ))}
           </div>
@@ -696,6 +753,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       }}
       getCategoryColor={getCategoryColor}
       formatDuration={formatDuration}
+      onNavigateToExercise={(exerciseId) => {
+        // Navigate to the exercise detail page
+        navigate(`/exercises/${exerciseId}`);
+      }}
     />
     </>
   );
@@ -712,6 +773,7 @@ interface ExerciseCardProps {
   onDelete?: (exercise_id: string) => Promise<void>;
   onShowDetails: (exercise: Exercise) => void;
   currentUser?: AuthUserProfile; // User from auth hook
+  isSharedExercise: (exerciseId: string) => boolean; // Function to check if exercise is shared
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -723,7 +785,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onEdit,
   onDelete,
   onShowDetails,
-  currentUser
+  currentUser,
+  isSharedExercise
 }) => {
   const { t } = useTranslation(['common', 'exercises']);
   const loc = localizeExercise(exercise, t);
@@ -734,14 +797,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   };
   
-  // Only show edit/delete for user-created exercises owned by current user
+  // Only show edit/delete for user-created exercises owned by current user or orphaned exercises
   const isUserCreated = isUserCreatedExerciseCard(exercise.id) &&
-                        currentUser &&
-                        (exercise.owner_id === currentUser.id || !exercise.owner_id) &&
-                        !exercise.is_shared_copy; // Don't treat shared copies as user-created
+                        (currentUser ? (exercise.owner_id === currentUser.id || !exercise.owner_id) : !exercise.owner_id) &&
+                        !isSharedExercise(exercise.id); // Don't treat shared exercises as user-created
 
   // Check if exercise is shared using the tracking field
-  const isSharedExerciseCard = exercise.is_shared_copy === true;
+  const isSharedExerciseCard = isSharedExercise(exercise.id);
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${

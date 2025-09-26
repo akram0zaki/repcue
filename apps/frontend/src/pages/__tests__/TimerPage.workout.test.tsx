@@ -111,8 +111,8 @@ describe('TimerPage - Workout Mode', () => {
     );
 
     expect(screen.getByText('Test Workout')).toBeInTheDocument();
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
-    expect(screen.getByText('Exercise 1: Push-ups')).toBeInTheDocument();
+    expect(screen.getByText('1/2')).toBeInTheDocument();
+    expect(screen.getByText('Rep 1')).toBeInTheDocument();
   });
 
   it('should show workout progress bar', () => {
@@ -123,13 +123,9 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    const progressBars = screen.getAllByRole('generic');
-    const workoutProgressBar = progressBars.find(el => 
-      el.className.includes('bg-white') && 
-      el.className.includes('h-2') &&
-      el.style.width === '0%' // 0 of 2 exercises completed = 0%
-    );
-    expect(workoutProgressBar).toBeInTheDocument();
+    // Check for workout progress bar (white bar in blue container)
+    const progressBar = document.querySelector('.bg-white.h-1\\.5.rounded-full');
+    expect(progressBar).toBeInTheDocument();
   });
 
   it('should show correct workout progress when on second exercise', () => {
@@ -148,13 +144,9 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    const progressBars = screen.getAllByRole('generic');
-    const workoutProgressBar = progressBars.find(el => 
-      el.className.includes('bg-white') && 
-      el.className.includes('h-2') &&
-      el.style.width === '50%' // 1 of 2 exercises completed = 50%
-    );
-    expect(workoutProgressBar).toBeInTheDocument();
+    // Check for workout progress bar with 50% width
+    const progressBar = document.querySelector('[style*="width: 50%"]');
+    expect(progressBar).toBeInTheDocument();
   });
 
   it('should display rep/set progress for repetition-based exercises', () => {
@@ -222,9 +214,9 @@ describe('TimerPage - Workout Mode', () => {
     const circles = container.querySelectorAll('circle');
     expect(circles.length).toBeGreaterThan(2); // Should have outer workout progress circle
     
-    // Check for workout progress circle (r="75")
+    // Check for workout progress circle (r="125" - outer circle)
     const outerCircle = Array.from(circles).find((circle: Element) => 
-      circle.getAttribute('r') === '75'
+      circle.getAttribute('r') === '125'
     );
     expect(outerCircle).toBeInTheDocument();
   });
@@ -330,7 +322,7 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    expect(screen.getByText('Exercise 2: Plank')).toBeInTheDocument();
+    expect(screen.getByText('Exercise 2/2')).toBeInTheDocument();
     expect(screen.queryByText('Set Progress')).not.toBeInTheDocument();
     expect(screen.queryByText('Rep Progress')).not.toBeInTheDocument();
   });

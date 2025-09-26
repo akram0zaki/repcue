@@ -21,5 +21,11 @@
   "startTimer": "Start Tiidklok",
   "stats": "Statistiken",
   "tags": "Labels",
-  "type": "Type"
+  "type": "Type",
+  "benefits": "Foardielen",
+  "limitations": "Beheiningen",
+  "bestTiming": "Bêste Timing",
+  "suggestedCombinations": "Oanrekommandearre Kombinaasjes",
+  "notes": "Opmerkings",
+  "references": "Referinsjes"
 }

@@ -47,7 +47,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
       id: nextId.current++,
       message,
       type: options?.type ?? 'warning',
-      durationMs: options?.durationMs ?? 3000,
+      durationMs: options?.durationMs ?? 2000,
     };
     if (!currentRef.current) {
       setCurrent(item);
@@ -103,7 +103,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
         <div
           role="status"
           aria-live="polite"
-          className={`fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg ${typeClasses(current.type)} z-[1000]`}
+          className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 rounded-lg shadow-lg ${typeClasses(current.type)} z-[1000]`}
         >
           {current.message}
         </div>
