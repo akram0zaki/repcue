@@ -18,23 +18,17 @@ export const CreateExercisePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (exerciseData: Partial<Exercise>) => {
-    if (!user) {
-      showSnackbar(t('errors.notAuthenticated', 'Please log in to create exercises'), {
-        type: 'error'
-      });
-      return;
-    }
-
     setLoading(true);
 
     try {
       // Create exercise via IndexedDB storage service (offline-first)
       // The sync service will handle pushing to server later
+      // If offline (no user), set owner_id to null - sync will update when user logs in
       const exercisePayload: Exercise = {
         // Generate unique ID
         id: crypto.randomUUID(),
         // Set owner and required fields
-        owner_id: user.id,
+        owner_id: user?.id || null, // Allow null for offline creation
         name: exerciseData.name || '',
         category: exerciseData.category || 'core',
         exercise_type: exerciseData.exercise_type || 'repetition_based',

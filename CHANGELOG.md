@@ -1,5 +1,21 @@
 ## Unreleased
 
+### 2025-09-26 (Offline Exercise Creation Support)
+#### Added
+- **Offline exercise creation**: Users can now create and edit custom exercises without logging in, supporting true offline-first workflow
+- **Orphaned exercise support**: Exercises created offline (`owner_id: null`) are automatically claimed when user logs in via existing `claimOwnership()` mechanism
+- **Enhanced Custom filter**: Exercise page Custom filter now includes orphaned exercises even when logged out, providing seamless offline user experience
+
+#### Fixed
+- **Production storage bucket cleanup**: Removed incorrect `videos` bucket from production, standardized on `exercise-videos` bucket as per architecture
+- **Exercise ownership logic**: Updated edit permissions to allow editing orphaned exercises (`owner_id: null`) both logged in and logged out
+- **Filter consistency**: Fixed `isUserCreatedExercise` logic to properly identify user exercises across logged in/out states
+
+#### Changed
+- Removed authentication requirement from `CreateExercisePage` for offline exercise creation
+- Updated `EditExercisePage` to support editing orphaned exercises with automatic ownership claiming
+- Enhanced exercise card UI to show edit/delete actions for orphaned exercises even when logged out
+
 ### 2025-09-25 (Type Safety & Lint Hardening, Favorites Persistence, Sync v2 Enhancements)
 #### Changed
 - Removed all remaining `any` usages in targeted frontend files (`ExerciseForm.tsx`, `correctSyncService.ts`) by introducing narrowly scoped interfaces (`VideoUploadedEventDetail`, `VideoFileRecord`) improving static analysis and preventing silent runtime shape drift.

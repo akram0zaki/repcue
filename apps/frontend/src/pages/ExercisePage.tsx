@@ -202,18 +202,24 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       return false;
     }
 
-    // For UUID exercises (user-created), check if they either have an owner_id or if user is authenticated
-    // This handles the case where exercises were created before proper ownership was set
-    if (isUUIDFormat && user?.id) {
-      // If exercise has owner_id, check it matches current user
-      if (exercise.owner_id) {
-        return exercise.owner_id === user.id;
+    // For UUID exercises (user-created)
+    if (isUUIDFormat) {
+      // If user is logged in
+      if (user?.id) {
+        // If exercise has owner_id, check it matches current user
+        if (exercise.owner_id) {
+          return exercise.owner_id === user.id;
+        }
+        // If exercise has no owner_id but is UUID format, assume it belongs to current user
+        // This handles exercises created before the ownership fix or created offline
+        return true;
+      } else {
+        // If user is not logged in, only show orphaned exercises (created offline)
+        return exercise.owner_id === null;
       }
-      // If exercise has no owner_id but is UUID format, assume it belongs to current user
-      // This handles exercises created before the ownership fix
-      return true;
     }
-    return isUUIDFormat && !!exercise.owner_id;
+
+    return false;
   };
 
   // Helper function to check if exercise is shared with current user
@@ -791,10 +797,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   };
   
-  // Only show edit/delete for user-created exercises owned by current user
+  // Only show edit/delete for user-created exercises owned by current user or orphaned exercises
   const isUserCreated = isUserCreatedExerciseCard(exercise.id) &&
-                        currentUser &&
-                        (exercise.owner_id === currentUser.id || !exercise.owner_id) &&
+                        (currentUser ? (exercise.owner_id === currentUser.id || !exercise.owner_id) : !exercise.owner_id) &&
                         !isSharedExercise(exercise.id); // Don't treat shared exercises as user-created
 
   // Check if exercise is shared using the tracking field

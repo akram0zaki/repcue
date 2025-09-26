@@ -87,18 +87,30 @@ export const EditExercisePage: React.FC = () => {
   }, [exerciseId, navigate, showSnackbar, t, user?.id]);
 
   const handleSubmit = async (exerciseData: Partial<Exercise>) => {
-    if (!user || !exercise) {
-      showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
+    if (!exercise) {
+      showSnackbar(t('errors.exerciseNotFound', 'Exercise not found'), {
         type: 'error'
       });
       return;
     }
 
-    if (exercise.owner_id !== user.id) {
-      showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
-        type: 'error'
-      });
-      return;
+    // If user is logged in, check ownership constraints
+    if (user) {
+      // Allow editing if user owns the exercise OR it's an orphaned exercise (owner_id is null)
+      if (exercise.owner_id !== null && exercise.owner_id !== user.id) {
+        showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
+          type: 'error'
+        });
+        return;
+      }
+    } else {
+      // If not logged in, only allow editing orphaned exercises (created offline)
+      if (exercise.owner_id !== null) {
+        showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
+          type: 'error'
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -109,7 +121,7 @@ export const EditExercisePage: React.FC = () => {
       const updatedExercise: Exercise = {
         // Keep existing required fields
         id: exercise.id,
-        owner_id: exercise.owner_id,
+        owner_id: exercise.owner_id || user?.id || null, // Claim ownership if orphaned and logged in
         created_at: exercise.created_at,
         // Update with new data
         name: exerciseData.name || exercise.name,
