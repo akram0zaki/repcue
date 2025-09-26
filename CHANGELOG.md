@@ -1,20 +1,24 @@
 ## Unreleased
 
-### 2025-09-26 (Offline Exercise Creation Support)
+### 2025-09-26 (Offline Exercise Creation & Editing Support)
 #### Added
 - **Offline exercise creation**: Users can now create and edit custom exercises without logging in, supporting true offline-first workflow
 - **Orphaned exercise support**: Exercises created offline (`owner_id: null`) are automatically claimed when user logs in via existing `claimOwnership()` mechanism
 - **Enhanced Custom filter**: Exercise page Custom filter now includes orphaned exercises even when logged out, providing seamless offline user experience
+- **Offline video upload support**: Video upload section now available when editing exercises offline (feature flag updated to `target_audience: 'all'`)
 
 #### Fixed
 - **Production storage bucket cleanup**: Removed incorrect `videos` bucket from production, standardized on `exercise-videos` bucket as per architecture
 - **Exercise ownership logic**: Updated edit permissions to allow editing orphaned exercises (`owner_id: null`) both logged in and logged out
 - **Filter consistency**: Fixed `isUserCreatedExercise` logic to properly identify user exercises across logged in/out states
+- **EditExercisePage authentication blocks**: Removed dual authentication checks that prevented editing offline-created exercises
+- **Video upload feature gate**: Changed `custom_video_upload` flag from `authenticated` to `all` users to support offline video uploads
 
 #### Changed
 - Removed authentication requirement from `CreateExercisePage` for offline exercise creation
-- Updated `EditExercisePage` to support editing orphaned exercises with automatic ownership claiming
+- Updated `EditExercisePage` to support editing orphaned exercises with automatic ownership claiming in both `useEffect` (loading) and `handleSubmit` (saving)
 - Enhanced exercise card UI to show edit/delete actions for orphaned exercises even when logged out
+- Modified `FeatureFlagService` fallback flags to enable video uploads for all users (not just authenticated)
 
 ### 2025-09-25 (Type Safety & Lint Hardening, Favorites Persistence, Sync v2 Enhancements)
 #### Changed

@@ -32,15 +32,6 @@ export const EditExercisePage: React.FC = () => {
         return;
       }
 
-      if (!user) {
-        logger.log('🔧 EditExercisePage: User not authenticated, redirecting to exercises');
-        showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
-          type: 'error'
-        });
-        navigate('/exercises');
-        return;
-      }
-
       try {
         logger.log('🔧 EditExercisePage: Fetching exercise from local storage...');
         const exercises = await storageService.getExercises();
@@ -57,16 +48,30 @@ export const EditExercisePage: React.FC = () => {
           return;
         }
 
-        // Verify user ownership
-        logger.log('🔧 EditExercisePage: Exercise owner_id:', foundExercise.owner_id, 'User id:', user.id);
-        
-        if (foundExercise.owner_id !== user.id) {
-          logger.log('🔧 EditExercisePage: User not authorized, redirecting to exercises');
-          showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
-            type: 'error'
-          });
-          navigate('/exercises');
-          return;
+        // Verify user ownership - allow editing orphaned exercises (owner_id: null)
+        logger.log('🔧 EditExercisePage: Exercise owner_id:', foundExercise.owner_id, 'User id:', user?.id);
+
+        // If user is logged in, check ownership constraints
+        if (user) {
+          // Allow editing if user owns the exercise OR it's an orphaned exercise (owner_id is null)
+          if (foundExercise.owner_id !== null && foundExercise.owner_id !== user.id) {
+            logger.log('🔧 EditExercisePage: User not authorized, redirecting to exercises');
+            showSnackbar(t('errors.unauthorized', 'You can only edit your own exercises'), {
+              type: 'error'
+            });
+            navigate('/exercises');
+            return;
+          }
+        } else {
+          // If not logged in, only allow editing orphaned exercises (created offline)
+          if (foundExercise.owner_id !== null) {
+            logger.log('🔧 EditExercisePage: User not authenticated and exercise has owner, redirecting to exercises');
+            showSnackbar(t('errors.notAuthenticated', 'Please log in to edit exercises'), {
+              type: 'error'
+            });
+            navigate('/exercises');
+            return;
+          }
         }
 
         logger.log('🔧 EditExercisePage: Successfully loaded exercise, setting state');
