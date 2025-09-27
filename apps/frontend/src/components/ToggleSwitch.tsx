@@ -31,11 +31,15 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   knobOnExtraClass = 'toggle-switch-on',
   knobOffExtraClass = 'toggle-switch-off'
 }) => {
-  const baseTrack = 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-out select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed';
+  // Revised “wide + slim” aesthetic per request:
+  // Track: wider (w-16 ≈ 64px), slimmer (h-5 ≈ 20px)
+  // Knob: smaller (14px) with precise travel distance so it sits flush at both ends.
+  // Geometry math: travel = trackWidth - knobSize - (leftOffset * 2)
+  // => 64 - 14 - (3*2) = 44px ⇒ translate-x-[44px]
+  const baseTrack = 'relative inline-flex h-5 w-16 items-center rounded-full transition-colors duration-200 ease-out select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed group';
   const trackClasses = `${baseTrack} ${checked ? onColorClass : offColorClass} ${className}`.trim();
 
-  const knobTranslate = checked ? `translate-x-6 ${knobOnExtraClass}` : `translate-x-1 ${knobOffExtraClass}`;
-  const knobClasses = `inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200 ease-out will-change-transform ${knobTranslate}`;
+  const knobClasses = `absolute top-[3px] left-[3px] h-[14px] w-[14px] rounded-full bg-white shadow-sm will-change-transform transition-transform duration-200 ease-out pointer-events-none ${checked ? 'translate-x-[44px] '+knobOnExtraClass : 'translate-x-0 '+knobOffExtraClass} group-active:scale-95`;
 
   return (
     <button
