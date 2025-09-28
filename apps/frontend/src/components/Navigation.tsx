@@ -3,19 +3,21 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Routes } from '../types';
-import { 
-  HomeIcon, 
-  ExercisesIcon, 
-  TimerIcon, 
-  LogIcon, 
+import {
+  HomeIcon,
+  ExercisesIcon,
+  TimerIcon,
+  LogIcon,
   ScheduleIcon,
   MoreIcon
 } from './icons/NavigationIcons';
+import { useRTLDetection } from '../hooks/useRTLDetection';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { isRTL } = useRTLDetection();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
@@ -121,7 +123,9 @@ const Navigation: React.FC = () => {
 
           {/* Dropdown menu */}
           {showMoreMenu && (
-            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] max-w-[250px]">
+            <div className={`absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] max-w-[250px] ${
+              isRTL ? 'left-0' : 'right-0'
+            }`}>
               {/* Settings */}
               <button
                 onClick={() => {
