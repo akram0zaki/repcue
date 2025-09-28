@@ -203,6 +203,8 @@
   "minutes_other": "{{count}} minutes",
     "exercises_one": "{{count}} exercise",
     "exercises_other": "{{count}} exercises",
+    "categoriesSelected_one": "{{count}} category selected",
+    "categoriesSelected_other": "{{count}} categories selected",
     "exercisesRemaining_one": "{{count}} exercise remaining",
     "exercisesRemaining_other": "{{count}} exercises remaining",
     "repProgress": "Rep Progress",
