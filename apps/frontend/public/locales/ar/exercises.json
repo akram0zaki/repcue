@@ -125,6 +125,7 @@
   "category": "فئة",
   "selectCategories": "اختر الفئات",
   "clearAll": "مسح الكل",
+  "clearCategories": "مسح الفئات",
   "categoriesSelected_one": "{{count}} فئة محددة",
   "categoriesSelected_other": "{{count}} فئات محددة",
   "createDescription": "إنشاء تمرين جديد لتمارينك",
@@ -167,7 +168,6 @@
     "time_based": "مبني على الوقت"
   },
   "viewOnly": "عرض فقط",
-  "category": "فئة",
   "categoryShort": "فئة",
   "sortBy": "ترتيب حسب:",
   "sortByShort": "ترتيب:",
