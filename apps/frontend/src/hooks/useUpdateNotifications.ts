@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { UpdateInfo, UpdateState, UpdateError, UpdateRecoveryState } from '../types';
 import { updateService } from '../services/updateService';
 import logger from '../utils/logger';
@@ -360,24 +360,37 @@ export const useUpdateNotifications = (): [UpdateNotificationState, UpdateNotifi
     }
   }, [refreshState]);
 
-  return [
-    state,
-    {
-      applyUpdate,
-      applyUpdateWithConfirmation,
-      dismissUpdate,
-      showChangelogModal,
-      hideChangelogModal,
-      showErrorRecoveryModal,
-      hideErrorRecoveryModal,
-      onRecoveryComplete,
-      setWorkoutActive,
-      saveWorkoutAndUpdate,
-      abandonWorkoutAndUpdate,
-      checkForUpdates,
-      refreshState
-    }
-  ];
+  const actions = useMemo(() => ({
+    applyUpdate,
+    applyUpdateWithConfirmation,
+    dismissUpdate,
+    showChangelogModal,
+    hideChangelogModal,
+    showErrorRecoveryModal,
+    hideErrorRecoveryModal,
+    onRecoveryComplete,
+    setWorkoutActive,
+    saveWorkoutAndUpdate,
+    abandonWorkoutAndUpdate,
+    checkForUpdates,
+    refreshState
+  }), [
+    applyUpdate,
+    applyUpdateWithConfirmation,
+    dismissUpdate,
+    showChangelogModal,
+    hideChangelogModal,
+    showErrorRecoveryModal,
+    hideErrorRecoveryModal,
+    onRecoveryComplete,
+    setWorkoutActive,
+    saveWorkoutAndUpdate,
+    abandonWorkoutAndUpdate,
+    checkForUpdates,
+    refreshState
+  ]);
+
+  return [state, actions];
 };
 
 export default useUpdateNotifications;

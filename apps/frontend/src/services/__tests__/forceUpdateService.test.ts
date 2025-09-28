@@ -238,13 +238,13 @@ describe('ForceUpdateService', () => {
 
       service['handleForceUpdateAvailable'](updateInfo);
 
-      // Current implementation fails due to window.matchMedia not being available
-      await expect(service.applyForceUpdate()).rejects.toThrow();
+      // Should succeed with mocked updateService
+      await expect(service.applyForceUpdate()).resolves.toBeUndefined();
     });
 
-    it('throws error when trying to apply without active force update', async () => {
-      // Current implementation fails due to window.matchMedia not being available
-      await expect(service.applyForceUpdate()).rejects.toThrow();
+    it('creates fallback update when trying to apply without active force update', async () => {
+      // Should succeed by creating a fallback update in development mode
+      await expect(service.applyForceUpdate()).resolves.toBeUndefined();
     });
   });
 
@@ -366,8 +366,8 @@ describe('ForceUpdateService', () => {
       // Fast-forward the retry delay
       vi.advanceTimersByTime(10000);
 
-      // Current implementation fails due to window.matchMedia not being available
-      await expect(retryPromise).rejects.toThrow();
+      // Should succeed with mocked updateService and fallback logic
+      await expect(retryPromise).resolves.toBeUndefined();
     });
 
     it('throws error when maximum retries exceeded', async () => {

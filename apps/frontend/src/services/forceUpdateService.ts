@@ -97,6 +97,17 @@ export class ForceUpdateService {
   }
 
   /**
+   * Safely check if the app is running in standalone mode
+   */
+  private isStandaloneMode(): boolean {
+    try {
+      return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Handle force update becoming available
    */
   private handleForceUpdateAvailable(updateInfo: UpdateInfo): void {
@@ -296,15 +307,16 @@ export class ForceUpdateService {
       }
 
       // Check if we're in PWA mode vs dev mode
+      const isStandalone = this.isStandaloneMode();
       const isPWAMode = !('serviceWorker' in navigator) ||
                        !import.meta.env.DEV ||
-                       window.matchMedia('(display-mode: standalone)').matches;
+                       isStandalone;
 
       logger.debug('Force update context:', {
         isPWAMode,
         hasServiceWorker: 'serviceWorker' in navigator,
         isDev: import.meta.env.DEV,
-        isStandalone: window.matchMedia('(display-mode: standalone)').matches
+        isStandalone
       });
 
       if (isPWAMode) {

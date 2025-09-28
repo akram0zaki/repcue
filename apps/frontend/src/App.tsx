@@ -19,6 +19,7 @@ import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
+import { UpdateNotificationManager } from './components/UpdateNotificationManager';
 import type { UpdateInfo, UpdateError } from './types';
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
@@ -2641,6 +2642,23 @@ useEffect(() => {
           forceUpdateService.forceReload();
         }}
         blockAppUsage={true}
+      />
+
+      <UpdateNotificationManager
+        isWorkoutActive={timerState.isRunning && !!timerState.workoutMode}
+        onSaveWorkout={async () => {
+          // Save current workout if needed - this could be extended
+          if (timerState.workoutMode && timerState.isRunning) {
+            await stopTimer(true); // true = completion
+          }
+        }}
+        onAbandonWorkout={async () => {
+          // Abandon current workout
+          if (timerState.isRunning) {
+            await resetTimer();
+          }
+          setTimerState(prev => ({ ...prev, workoutMode: undefined }));
+        }}
       />
 
       <WorkoutForceUpdateModal

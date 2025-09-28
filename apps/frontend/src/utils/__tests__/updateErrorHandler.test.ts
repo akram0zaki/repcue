@@ -375,12 +375,14 @@ describe('UpdateErrorHandler', () => {
       // Enable rollback first
       errorHandler.enableRollback('1.0.0');
 
-      // Mock navigator.serviceWorker
-      Object.defineProperty(navigator, 'serviceWorker', {
-        value: {},
-        writable: true,
-        configurable: true
-      });
+      // Mock navigator.serviceWorker if not already defined
+      if (!('serviceWorker' in navigator)) {
+        Object.defineProperty(navigator, 'serviceWorker', {
+          value: {},
+          writable: true,
+          configurable: true
+        });
+      }
 
       // Mock caches API
       const mockCaches = {
@@ -413,12 +415,14 @@ describe('UpdateErrorHandler', () => {
     it('should handle rollback errors gracefully', async () => {
       errorHandler.enableRollback('1.0.0');
 
-      // Mock navigator.serviceWorker
-      Object.defineProperty(navigator, 'serviceWorker', {
-        value: {},
-        writable: true,
-        configurable: true
-      });
+      // Mock navigator.serviceWorker if not already defined
+      if (!('serviceWorker' in navigator)) {
+        Object.defineProperty(navigator, 'serviceWorker', {
+          value: {},
+          writable: true,
+          configurable: true
+        });
+      }
 
       // Mock caches.keys to throw error
       const mockCaches = {
