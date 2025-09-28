@@ -81,7 +81,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors"
             >
-              {t('common.done', { defaultValue: 'Done' })}
+              {t('done', { ns: 'common', defaultValue: 'Done' })}
             </button>
           </div>
         </div>
@@ -91,6 +91,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           <div className="px-4 pb-2">
             <p className="text-xs text-text-500 dark:text-text-400">
               {t('categoriesSelected', {
+                ns: 'common',
                 count: selectedCategories.size,
                 defaultValue: `${selectedCategories.size} ${selectedCategories.size === 1 ? 'category' : 'categories'} selected`
               })}
