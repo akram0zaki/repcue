@@ -289,7 +289,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         </h3>
                       </button>
                       <button
-                        className="btn-primary px-3 py-1 text-sm flex-shrink-0"
+                        className="btn-primary text-sm flex-shrink-0"
                         onClick={() => handleStartTimer(exercise)}
                       >
                         {t('common.start')}
@@ -348,8 +348,8 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                           >
                             <StarFilledIcon size={16} />
                           </button>
-                          <button 
-                            className="btn-primary px-3 py-1 text-sm"
+                          <button
+                            className="btn-primary text-sm"
                             onClick={() => handleStartTimer(exercise)}
                           >
                             {t('common.start')}

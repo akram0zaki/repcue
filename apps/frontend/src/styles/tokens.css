@@ -138,6 +138,18 @@
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
   border-color: transparent;
+  border-radius: 8px; /* UI specs: 8px rounded corners */
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem; /* 8px 16px - default button padding */
+  font-weight: 500; /* medium weight for buttons */
+  transition: all 0.2s ease-in-out; /* smooth transitions */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
 }
 
 .btn-primary:hover {
@@ -152,6 +164,79 @@
 .btn-primary:disabled {
   background-color: var(--color-primary-disabled);
   color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+/* Secondary button - outline style as per UI specs */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.btn-secondary:focus {
+  background-color: var(--color-primary-focus);
+  color: var(--color-text-inverse);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.btn-secondary:disabled {
+  background-color: transparent;
+  color: var(--color-text-tertiary);
+  border-color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+/* Neutral button style */
+.btn-neutral {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-primary);
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-neutral:hover {
+  background-color: var(--color-surface-tertiary);
+}
+
+.btn-neutral:focus {
+  background-color: var(--color-surface-tertiary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-primary) 30%, transparent);
+}
+
+.btn-neutral:disabled {
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-tertiary);
+  border-color: var(--color-border-secondary);
+  cursor: not-allowed;
 }
 
 .card {
