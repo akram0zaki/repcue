@@ -241,6 +241,10 @@ describe('StorageService', () => {
           return Promise.resolve(appSettingsStorage.length)
         })
       } as any,
+      transaction: vi.fn().mockImplementation((mode, tables, callback) => {
+        // Mock transaction to execute the callback directly
+        return callback()
+      }),
       workouts: {
         toArray: vi.fn().mockResolvedValue([]),
         clear: vi.fn().mockResolvedValue(undefined),

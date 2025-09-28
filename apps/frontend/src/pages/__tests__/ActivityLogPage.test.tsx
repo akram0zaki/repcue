@@ -6,6 +6,7 @@ import { storageService } from '../../services/storageService';
 import type { Exercise, ActivityLog } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
 import { createMockExercise, createMockActivityLog } from '../../test/testUtils';
+import logger from '../../utils/logger';
 
 // Mock the storage service
 vi.mock('../../services/storageService', () => ({
@@ -257,8 +258,8 @@ describe('ActivityLogPage', () => {
   it('handles storage service errors gracefully', async () => {
     vi.mocked(storageService.getActivityLogs).mockRejectedValue(new Error('Storage error'));
     
-    // Mock console.error to avoid error output in tests
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // Mock logger.error to avoid error output in tests
+    const loggerSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
     
     render(<ActivityLogPage exercises={mockExercises} />);
     
@@ -266,9 +267,9 @@ describe('ActivityLogPage', () => {
       expect(screen.getByText('No workouts yet')).toBeInTheDocument();
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to load activity logs:', expect.any(Error));
+    expect(loggerSpy).toHaveBeenCalledWith('Failed to load activity logs:', expect.any(Error));
     
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 
   it('calculates current streak correctly', async () => {

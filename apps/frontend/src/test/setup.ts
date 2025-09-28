@@ -4,6 +4,22 @@ import 'fake-indexeddb/auto'
 import { afterEach, beforeEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
+// Mock window.matchMedia early to prevent issues
+Object.defineProperty(window, 'matchMedia', {
+  value: vi.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+  writable: true,
+  configurable: true,
+})
+
 // Mock localStorage with actual storage behavior (declare early for i18n detector)
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
@@ -335,6 +351,18 @@ Object.defineProperty(navigator, 'vibrate', {
   value: vi.fn(),
   writable: true,
 })
+
+
+// Mock logger to prevent "default.debug is not a function" errors
+vi.mock('../utils/logger', () => ({
+  default: {
+    log: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }
+}))
 
 // (localStorageMock already defined above)
 

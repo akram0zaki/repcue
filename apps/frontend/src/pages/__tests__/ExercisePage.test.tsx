@@ -78,7 +78,7 @@ const mockExercises: Exercise[] = [
     exercise_type: ExerciseType.TIME_BASED,
     default_duration: 60,
     is_favorite: true,
-    catalog_id: 'general-fitness'
+    catalogId: 'general-fitness'
   }),
   createMockExercise({
     id: 'push-ups',
@@ -88,7 +88,7 @@ const mockExercises: Exercise[] = [
     exercise_type: ExerciseType.REPETITION_BASED,
     default_duration: 45,
     is_favorite: false,
-    catalog_id: 'general-fitness'
+    catalogId: 'general-fitness'
   })
 ];
 

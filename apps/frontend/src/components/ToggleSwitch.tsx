@@ -48,6 +48,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       type="button"
       data-testid={dataTestId}
       disabled={disabled}
+      aria-pressed={checked}
       onClick={() => {
         if (!disabled) {
           logger.debug(`toggle ${id} -> ${!checked}`);
