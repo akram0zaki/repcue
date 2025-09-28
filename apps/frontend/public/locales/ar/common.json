@@ -636,6 +636,18 @@
       "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
     }
   },
+  "copy": {
+    "copy": "نسخ",
+    "copying": "جاري النسخ...",
+    "copied": "تم النسخ!",
+    "loginRequired": "سجل الدخول للنسخ",
+    "tooltip": "نسخ {{name}} إلى مكتبتك",
+    "error": "خطأ: {{error}}",
+    "genericError": "فشل في نسخ التمرين",
+    "copyToLibrary": "نسخ إلى المكتبة",
+    "copyExercise": "نسخ التمرين",
+    "copyComplete": "اكتمل النسخ"
+  },
   "changelog": {
     "title": "ما الجديد",
     "close": "إغلاق سجل التغييرات",
