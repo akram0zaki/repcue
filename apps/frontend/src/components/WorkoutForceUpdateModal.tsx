@@ -132,7 +132,8 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
     return null;
   }
 
-  const activityType = workoutInfo.isWorkoutMode ? t('workout') : t('timer');
+  // Use namespaced settings keys for generic labels to avoid root collisions
+  const activityType = workoutInfo.isWorkoutMode ? t('settings.workout') : t('settings.timer');
   const activityName = workoutInfo.workoutName || activityType;
 
   return (
@@ -153,10 +154,10 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
           </div>
           <div>
             <h2 id="workout-force-update-title" className="text-lg font-semibold text-gray-900">
-              {t('securityUpdateRequired')}
+              {t('settings.securityUpdateRequired')}
             </h2>
             <p className="text-sm text-red-600 font-medium">
-              {t('updateBlocked')}
+              {t('settings.updateBlocked')}
             </p>
           </div>
         </div>
@@ -164,7 +165,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
         {/* Content */}
         <div id="workout-force-update-description" className="mb-6">
           <p className="text-gray-700 mb-4">
-            {t('workoutForceUpdateMessage', {
+            {t('settings.workoutForceUpdateMessage', {
               activity: activityName,
               version: updateInfo.version
             })}
@@ -174,7 +175,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
             <div className="flex">
               <div className="ml-3">
                 <p className="text-sm text-yellow-700">
-                  <strong>{t('important')}:</strong> {t('securityUpdateCritical')}
+                  <strong>{t('settings.important')}:</strong> {t('settings.securityUpdateCritical')}
                 </p>
               </div>
             </div>
@@ -183,7 +184,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
           {workoutInfo.isWorkoutMode && (
             <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4">
               <p className="text-sm text-blue-700">
-                {t('workoutProgressWillBeSaved')}
+                {t('settings.workoutProgressWillBeSaved')}
               </p>
             </div>
           )}
@@ -194,7 +195,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-gray-700">
-                {t('updatingApp')}
+                {t('settings.updatingApp')}
               </span>
               <span className="text-sm text-gray-500">
                 {updateProgress}%
@@ -217,7 +218,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
               onClick={handleRetry}
               className="mt-2 text-sm text-red-600 hover:text-red-500 underline"
             >
-              {t('tryAgain')}
+              {t('settings.tryAgain')}
             </button>
           </div>
         )}
@@ -232,8 +233,8 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
                 disabled={isUpdating}
               >
                 {workoutInfo.isWorkoutMode
-                  ? t('completeWorkoutAndUpdate')
-                  : t('finishTimerAndUpdate')
+                  ? t('settings.completeWorkoutAndUpdate')
+                  : t('settings.finishTimerAndUpdate')
                 }
               </button>
 
@@ -243,8 +244,8 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
                 disabled={isUpdating}
               >
                 {workoutInfo.isWorkoutMode
-                  ? t('abandonWorkoutAndUpdate')
-                  : t('stopTimerAndUpdate')
+                  ? t('settings.abandonWorkoutAndUpdate')
+                  : t('settings.stopTimerAndUpdate')
                 }
               </button>
             </>
@@ -257,7 +258,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                {t('pleaseWait')}
+                {t('settings.pleaseWait')}
               </div>
             </div>
           )}
@@ -266,7 +267,7 @@ export const WorkoutForceUpdateModal: React.FC<WorkoutForceUpdateModalProps> = (
         {/* Information Footer */}
         <div className="mt-4 pt-4 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
-            {t('appWillRestartAfterUpdate')}
+            {t('settings.appWillRestartAfterUpdate')}
           </p>
         </div>
       </div>

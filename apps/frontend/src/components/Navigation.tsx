@@ -67,42 +67,48 @@ const Navigation: React.FC = () => {
     },
     {
       path: Routes.ACTIVITY_LOG,
-      label: t('navigation.activityLog'),
+      label: t('navigation.progress'), // Changed from activityLog to progress
       icon: LogIcon,
-  testId: 'nav-activity'
+  testId: 'nav-progress' // Changed from nav-activity to nav-progress
     },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
-      <div className="flex justify-around items-center py-2 px-4 max-w-md mx-auto">
-    {mainNavItems.map((item) => {
-          const IconComponent = item.icon;
-          return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors ${
-                isActive(item.path)
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-              aria-label={`Navigate to ${item.label}`}
-      data-testid={item.testId}
-            >
-              <IconComponent className="mb-1" size={20} />
-              <span className="text-xs font-medium">{item.label}</span>
-            </button>
-          );
-        })}
-        
-        {/* More menu button */}
+      <div className="flex items-center py-2 px-2 max-w-md mx-auto">
+        {/* Main navigation items - 5 tabs with proper spacing */}
+        <div className="flex justify-between items-center flex-1 pr-2">
+          {mainNavItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors min-w-0 ${
+                  isActive(item.path)
+                    ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+                aria-label={`Navigate to ${item.label}`}
+                data-testid={item.testId}
+              >
+                <IconComponent className="mb-1" size={24} />
+                <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Separator between main tabs and More button */}
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-500 mx-1 flex-shrink-0"></div>
+
+        {/* More menu button - compact, positioned on the right */}
         <div className="relative" ref={moreMenuRef}>
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className={`flex items-center justify-center p-2 rounded-lg transition-colors border-l border-gray-200 dark:border-gray-600 ml-2 pl-4 ${
+            className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
               isActive(Routes.SETTINGS)
-                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
             aria-label="More options"
@@ -110,7 +116,7 @@ const Navigation: React.FC = () => {
             aria-haspopup="true"
             data-testid="nav-more"
           >
-            <MoreIcon size={20} />
+            <MoreIcon size={24} />
           </button>
 
           {/* Dropdown menu */}

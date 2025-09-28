@@ -164,7 +164,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         href="#main-content"
         // Hidden for pointer users until they press Tab once; still reachable and announced for keyboard users
         className={showSkipLink
-          ? 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-blue-600 text-white px-4 py-2 rounded-md font-medium'
+          ? 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-primary-500 text-white px-4 py-2 rounded-md font-medium'
           : 'sr-only'}
       >
         {t('a11y.skipToMain', { defaultValue: 'Skip to main content' })}

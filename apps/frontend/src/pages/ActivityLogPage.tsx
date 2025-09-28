@@ -23,7 +23,7 @@ interface StatsData {
 }
 
 const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<'all' | ExerciseCategory>('all');
@@ -67,7 +67,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           const ex = exercises.find(e => e.id === favoriteExerciseId);
           if (!ex) return '';
           const base = `${ex.id}`;
-          return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+          return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
         })()
       : '';
 
@@ -388,7 +388,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
                 }`}
               >
-                {t(`exercises.category.${categoryKey(category)}`, { defaultValue: category.replace('-', ' ') })}
+                {t(`exercises:categories.${categoryKey(category)}`, { defaultValue: category.replace('-', ' ') })}
               </button>
             ))}
           </div>
@@ -405,7 +405,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               {selectedFilter === 'all' 
                 ? t('activity.noWorkoutsYet') 
-                : t('activity.noCategoryWorkoutsYet', { category: t(`exercises.category.${categoryKey(selectedFilter)}`, { defaultValue: selectedFilter.replace('-', ' ') }) })}
+                : t('activity.noCategoryWorkoutsYet', { category: t(`exercises:categories.${categoryKey(selectedFilter)}`, { defaultValue: selectedFilter.replace('-', ' ') }) })}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {t('activity.emptySubtitle')}
@@ -453,7 +453,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                         const ex = exercises.find(e => e.id === log.exercise_id);
                                         if (ex) {
                                           const base = `${ex.id}`;
-                                          const name = t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                          const name = t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                           return `${name} (Workout)`;
                                         }
                                         const fallback = log.exercise_name && typeof log.exercise_name === 'string' ? log.exercise_name : t('activity.workoutBadge');
@@ -512,12 +512,12 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                             const ex = exercises.find(e => e.id === exercise.exercise_id);
                                             if (!ex) return exercise.exercise_name;
                                             const base = `${ex.id}`;
-                                            return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                            return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                           })()}</span>
                                         </div>
                                         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                                           {exercise.sets && exercise.reps && (
-                                            <span>{t('exercises.defaultSetsReps', { sets: exercise.sets, reps: exercise.reps })}</span>
+                                            <span>{t('exercises:defaultSetsReps', { sets: exercise.sets, reps: exercise.reps })}</span>
                                           )}
                                           <span>{formatDuration(exercise.duration)}</span>
                                         </div>
@@ -549,7 +549,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                         const ex = exercises.find(e => e.id === log.exercise_id);
                                         if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
                                         const base = `${ex.id}`;
-                                        return t(`${base}.name`, { ns: 'exercises', defaultValue: ex.name });
+                                        return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                       })()}
                                     </h4>
                                   </div>
@@ -572,7 +572,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                 </div>
                                 
                                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exercise_id)} ${getCategoryTextColor(log.exercise_id)}`}>
-                                  {t(`exercises.category.${(exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', '')}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
+                                  {t(`exercises:categories.${(exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', '')}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
                                 </div>
                               </div>
                               

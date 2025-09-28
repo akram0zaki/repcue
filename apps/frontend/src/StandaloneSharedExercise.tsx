@@ -65,7 +65,7 @@ const SnackbarContext = React.createContext<SnackbarContextType>({
 
 
 const StandaloneSharedExercise: React.FC = () => {
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation(['exercises', 'exerciseDetails']);
 
   // Extract share token from URL path
   const shareToken = window.location.pathname.split('/share/')[1];
@@ -134,7 +134,7 @@ const StandaloneSharedExercise: React.FC = () => {
   };
 
   const formatDuration = (seconds?: number): string => {
-    if (!seconds) return t('exercises:variable', 'Variable');
+  if (!seconds) return t('exercises:variable', 'Variable');
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     if (minutes > 0) {
@@ -164,10 +164,10 @@ const StandaloneSharedExercise: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">❌</div>
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {t('exercises.shareNotFound', 'Exercise Not Found')}
+            {t('exercises:shareNotFound', 'Exercise Not Found')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {error || t('exercises.shareExpired', 'This share link may have expired or is invalid.')}
+            {error || t('exercises:shareExpired', 'This share link may have expired or is invalid.')}
           </p>
           <button
             onClick={goToMainApp}
@@ -189,7 +189,7 @@ const StandaloneSharedExercise: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            {t('exercises.sharedExercise', 'Shared Exercise')}
+            {t('exercises:sharedExercise', 'Shared Exercise')}
           </h1>
         </div>
       </div>
@@ -210,7 +210,7 @@ const StandaloneSharedExercise: React.FC = () => {
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
-                    {t('exercises.sharedBy', { defaultValue: 'Shared by {{name}}', name: shareInfo.sharedBy })}
+                    {t('exercises:sharedBy', { defaultValue: 'Shared by {{name}}', name: shareInfo.sharedBy })}
                   </span>
                 </div>
 
@@ -246,20 +246,20 @@ const StandaloneSharedExercise: React.FC = () => {
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      {t('exercises:timeBased.name')}
+                      {t('exercises:types.time_based', 'Time Based')}
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
-                      {t('exercises:repBased.name')}
+                      {t('exercises:types.repetition_based', 'Repetition Based')}
                     </>
                   )}
                 </span>
 
                 <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full">
-                  {t(`exercises.category.${exercise.category.replace('-', '')}` as const, { defaultValue: exercise.category.replace('-', ' ') })}
+                  {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
                 </span>
 
                 {/* Difficulty Badge */}
@@ -274,7 +274,7 @@ const StandaloneSharedExercise: React.FC = () => {
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    {t(`exercises.difficulties.${exercise.difficulty_level}`, { defaultValue: exercise.difficulty_level })}
+                    {t(`exercises:difficulties.${exercise.difficulty_level}`, { defaultValue: exercise.difficulty_level })}
                   </span>
                 )}
 
@@ -292,8 +292,8 @@ const StandaloneSharedExercise: React.FC = () => {
                     )}
                   </svg>
                   {exercise.is_public
-                    ? t('exercises.public', { defaultValue: 'Public' })
-                    : t('exercises.private', { defaultValue: 'Private' })
+                    ? t('exercises:public', { defaultValue: 'Public' })
+                    : t('exercises:private', { defaultValue: 'Private' })
                   }
                 </span>
               </div>
@@ -307,7 +307,7 @@ const StandaloneSharedExercise: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   <div className="text-sm text-yellow-800 dark:text-yellow-200">
-                    {t('exercises.videoRecovering', { defaultValue: 'Video is being prepared for viewing. The owner will need to sync their device for the video to become available.' })}
+                    {t('exercises:videoRecovering', { defaultValue: 'Video is being prepared for viewing. The owner will need to sync their device for the video to become available.' })}
                   </div>
                 </div>
               </div>
@@ -334,13 +334,13 @@ const StandaloneSharedExercise: React.FC = () => {
             {/* Default Values */}
             <div className="mb-6">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                {t('exercises.defaultSettings', { defaultValue: 'Default Settings' })}
+                {t('exercises:defaultSettings', { defaultValue: 'Default Settings' })}
               </h4>
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 {exercise.exercise_type === 'time_based' ? (
                   <div>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {t('exercises.duration', { defaultValue: 'Duration' })}:
+                      {t('exercises:duration', { defaultValue: 'Duration' })}:
                     </span>
                     <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                       {formatDuration(exercise.default_duration)}
@@ -350,7 +350,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   <div className="space-y-2">
                     <div>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('exercises.sets', { defaultValue: 'Sets' })}:
+                        {t('exercises:sets', { defaultValue: 'Sets' })}:
                       </span>
                       <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                         {exercise.default_sets || 1}
@@ -358,7 +358,7 @@ const StandaloneSharedExercise: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('exercises.reps', { defaultValue: 'Reps' })}:
+                        {t('exercises:reps', { defaultValue: 'Reps' })}:
                       </span>
                       <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                         {exercise.default_reps || 1}
@@ -367,7 +367,7 @@ const StandaloneSharedExercise: React.FC = () => {
                     {exercise.rep_duration_seconds && (
                       <div>
                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {t('exercises.repDuration', { defaultValue: 'Rep Duration' })}:
+                          {t('exercises:repDuration', { defaultValue: 'Rep Duration' })}:
                         </span>
                         <span className="ml-2 text-base font-medium text-gray-900 dark:text-gray-100">
                           {formatDuration(exercise.rep_duration_seconds)}
@@ -382,14 +382,14 @@ const StandaloneSharedExercise: React.FC = () => {
             {/* Exercise Metadata */}
             <div className="mb-6">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                {t('exercises.exerciseInfo', { defaultValue: 'Exercise Information' })}
+                {t('exercises:exerciseInfo', { defaultValue: 'Exercise Information' })}
               </h4>
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
                 {/* Difficulty Level */}
                 {exercise.difficulty_level && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {t('exercises.difficultyLevel', { defaultValue: 'Difficulty' })}:
+                      {t('exercises:difficultyLevel', { defaultValue: 'Difficulty' })}:
                     </span>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                       exercise.difficulty_level === 'beginner'
@@ -398,7 +398,7 @@ const StandaloneSharedExercise: React.FC = () => {
                         ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                         : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                     }`}>
-                      {t(`exercises.difficulties.${exercise.difficulty_level}`, { defaultValue: exercise.difficulty_level })}
+                      {t(`exercises:difficulties.${exercise.difficulty_level}`, { defaultValue: exercise.difficulty_level })}
                     </span>
                   </div>
                 )}
@@ -406,12 +406,12 @@ const StandaloneSharedExercise: React.FC = () => {
                 {/* Exercise Type Detail */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {t('exercises.type', { defaultValue: 'Type' })}:
+                    {t('exercises:type', { defaultValue: 'Type' })}:
                   </span>
                   <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                     {exercise.exercise_type === 'time_based'
-                      ? t('exercises.types.time_based', { defaultValue: 'Time Based' })
-                      : t('exercises.types.repetition_based', { defaultValue: 'Repetition Based' })
+                      ? t('exercises:types.time_based', { defaultValue: 'Time Based' })
+                      : t('exercises:types.repetition_based', { defaultValue: 'Repetition Based' })
                     }
                   </span>
                 </div>
@@ -419,7 +419,7 @@ const StandaloneSharedExercise: React.FC = () => {
                 {/* Sharing Status */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {t('exercises.visibility', { defaultValue: 'Visibility' })}:
+                    {t('exercises:visibility', { defaultValue: 'Visibility' })}:
                   </span>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     exercise.is_public
@@ -427,8 +427,8 @@ const StandaloneSharedExercise: React.FC = () => {
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                   }`}>
                     {exercise.is_public
-                      ? t('exercises.public', { defaultValue: 'Public' })
-                      : t('exercises.private', { defaultValue: 'Private' })
+                      ? t('exercises:public', { defaultValue: 'Public' })
+                      : t('exercises:private', { defaultValue: 'Private' })
                     }
                   </span>
                 </div>
@@ -436,7 +436,7 @@ const StandaloneSharedExercise: React.FC = () => {
                 {/* Video Status */}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {t('exercises.hasVideo', { defaultValue: 'Video Demo' })}:
+                    {t('exercises:hasVideo', { defaultValue: 'Video Demo' })}:
                   </span>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     (exercise.has_video || exercise.custom_video_url)
@@ -444,8 +444,8 @@ const StandaloneSharedExercise: React.FC = () => {
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                   }`}>
                     {(exercise.has_video || exercise.custom_video_url)
-                      ? t('exercises.hasVideoDemo', { defaultValue: 'Available' })
-                      : t('exercises.noVideoDemo', { defaultValue: 'Not Available' })
+                      ? t('exercises:hasVideoDemo', { defaultValue: 'Available' })
+                      : t('exercises:noVideoDemo', { defaultValue: 'Not Available' })
                     }
                   </span>
                 </div>
@@ -454,10 +454,10 @@ const StandaloneSharedExercise: React.FC = () => {
                 {exercise.custom_video_url && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {t('exercises.videoSource', { defaultValue: 'Video Source' })}:
+                      {t('exercises:videoSource', { defaultValue: 'Video Source' })}:
                     </span>
                     <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded-full">
-                      {t('exercises.customVideo', { defaultValue: 'Custom Upload' })}
+                      {t('exercises:customVideo', { defaultValue: 'Custom Upload' })}
                     </span>
                   </div>
                 )}
@@ -468,7 +468,7 @@ const StandaloneSharedExercise: React.FC = () => {
             {loc.description && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.description', { defaultValue: 'Description' })}
+                  {t('exercises:description', { defaultValue: 'Description' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                   {loc.description}
@@ -480,7 +480,7 @@ const StandaloneSharedExercise: React.FC = () => {
             {exercise.instructions && exercise.instructions.length > 0 && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.instructions', { defaultValue: 'Instructions' })}
+                  {t('exercises:instructions', { defaultValue: 'Instructions' })}
                 </h4>
                 <ol className="list-decimal list-inside space-y-2">
                   {exercise.instructions.map((instruction, index) => (
@@ -496,7 +496,7 @@ const StandaloneSharedExercise: React.FC = () => {
             {exercise.tags && exercise.tags.length > 0 && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.tags', { defaultValue: 'Tags' })}
+                  {t('exercises:tagsHeading', { defaultValue: 'Tags' })}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {exercise.tags.map((tag) => (
@@ -504,7 +504,7 @@ const StandaloneSharedExercise: React.FC = () => {
                       key={tag}
                       className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
                     >
-                      {t(`tags.${tag}`, { ns: 'exercises', defaultValue: tag })}
+                      {t(`exercises:tags.${tag}`, { defaultValue: tag })}
                     </span>
                   ))}
                 </div>
@@ -515,7 +515,7 @@ const StandaloneSharedExercise: React.FC = () => {
             {exercise.equipment_needed && exercise.equipment_needed.length > 0 && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.equipment', { defaultValue: 'Equipment' })}
+                  {t('exercises:equipment', { defaultValue: 'Equipment' })}
                 </h4>
                 <ul className="list-disc list-inside space-y-1">
                   {exercise.equipment_needed.map((item, index) => (
@@ -528,51 +528,51 @@ const StandaloneSharedExercise: React.FC = () => {
             )}
 
             {/* Benefits */}
-            {(exercise.benefits || t(`exercises.${exercise.id}.benefits`, { defaultValue: null })) && (
+            {(exercise.benefits || t(`exerciseDetails:${exercise.id}.benefits`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.benefits', { defaultValue: 'Benefits' })}
+                  {t('exercises:benefits', { defaultValue: 'Benefits' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {t(`exercises.${exercise.id}.benefits`, { defaultValue: exercise.benefits || '' })}
+                  {t(`exerciseDetails:${exercise.id}.benefits`, { defaultValue: exercise.benefits || '' })}
                 </p>
               </div>
             )}
 
             {/* Limitations */}
-            {(exercise.limitations || t(`exercises.${exercise.id}.limitations`, { defaultValue: null })) && (
+            {(exercise.limitations || t(`exerciseDetails:${exercise.id}.limitations`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.limitations', { defaultValue: 'Limitations' })}
+                  {t('exercises:limitations', { defaultValue: 'Limitations' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {t(`exercises.${exercise.id}.limitations`, { defaultValue: exercise.limitations || '' })}
+                  {t(`exerciseDetails:${exercise.id}.limitations`, { defaultValue: exercise.limitations || '' })}
                 </p>
               </div>
             )}
 
             {/* Best Timing */}
-            {(exercise.best_timing || t(`exercises.${exercise.id}.best_timing`, { defaultValue: null })) && (
+            {(exercise.best_timing || t(`exerciseDetails:${exercise.id}.best_timing`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.bestTiming', { defaultValue: 'Best Timing' })}
+                  {t('exercises:bestTiming', { defaultValue: 'Best Timing' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {t(`exercises.${exercise.id}.best_timing`, { defaultValue: exercise.best_timing || '' })}
+                  {t(`exerciseDetails:${exercise.id}.best_timing`, { defaultValue: exercise.best_timing || '' })}
                 </p>
               </div>
             )}
 
             {/* Suggested Combinations */}
             {((exercise.suggested_combinations && exercise.suggested_combinations.length > 0) ||
-              (t(`exercises.${exercise.id}.suggested_combinations`, { defaultValue: null }) &&
-               Array.isArray(t(`exercises.${exercise.id}.suggested_combinations`, { defaultValue: [] })))) && (
+              (t(`exerciseDetails:${exercise.id}.suggested_combinations`, { defaultValue: null }) &&
+               Array.isArray(t(`exerciseDetails:${exercise.id}.suggested_combinations`, { defaultValue: [] })))) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.suggestedCombinations', { defaultValue: 'Suggested Combinations' })}
+                  {t('exercises:suggestedCombinations', { defaultValue: 'Suggested Combinations' })}
                 </h4>
                 <ul className="space-y-1">
-                  {(t(`exercises.${exercise.id}.suggested_combinations`, { defaultValue: exercise.suggested_combinations || [] }) as unknown as string[]).map((exerciseId, index) => {
+                  {(t(`exerciseDetails:${exercise.id}.suggested_combinations`, { defaultValue: exercise.suggested_combinations || [] }) as unknown as string[]).map((exerciseId, index) => {
                     const referencedExercise = getExerciseById(exerciseId);
                     return (
                       <li key={index} className="flex items-center space-x-2">
@@ -600,27 +600,27 @@ const StandaloneSharedExercise: React.FC = () => {
             )}
 
             {/* Notes */}
-            {(exercise.notes || t(`exercises.${exercise.id}.notes`, { defaultValue: null })) && (
+            {(exercise.notes || t(`exerciseDetails:${exercise.id}.notes`, { defaultValue: null })) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.notes', { defaultValue: 'Notes' })}
+                  {t('exercises:notes', { defaultValue: 'Notes' })}
                 </h4>
                 <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {t(`exercises.${exercise.id}.notes`, { defaultValue: exercise.notes || '' })}
+                  {t(`exerciseDetails:${exercise.id}.notes`, { defaultValue: exercise.notes || '' })}
                 </p>
               </div>
             )}
 
             {/* Exercise References */}
             {((exercise.exercise_references && exercise.exercise_references.length > 0) ||
-              (t(`exercises.${exercise.id}.exercise_references`, { defaultValue: null }) &&
-               Array.isArray(t(`exercises.${exercise.id}.exercise_references`, { defaultValue: [] })))) && (
+              (t(`exerciseDetails:${exercise.id}.exercise_references`, { defaultValue: null }) &&
+               Array.isArray(t(`exerciseDetails:${exercise.id}.exercise_references`, { defaultValue: [] })))) && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.references', { defaultValue: 'References' })}
+                  {t('exercises:references', { defaultValue: 'References' })}
                 </h4>
                 <ul className="list-disc list-inside space-y-1">
-                  {(t(`exercises.${exercise.id}.exercise_references`, { defaultValue: exercise.exercise_references || [] }) as unknown as string[]).map((reference, index) => (
+                  {(t(`exerciseDetails:${exercise.id}.exercise_references`, { defaultValue: exercise.exercise_references || [] }) as unknown as string[]).map((reference, index) => (
                     <li key={index} className="text-gray-600 dark:text-gray-400">
                       {reference}
                     </li>
@@ -633,7 +633,7 @@ const StandaloneSharedExercise: React.FC = () => {
             {exercise.muscle_groups && exercise.muscle_groups.length > 0 && (
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises.muscleGroups', { defaultValue: 'Muscle Groups' })}
+                  {t('exercises:muscleGroups', { defaultValue: 'Muscle Groups' })}
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {exercise.muscle_groups.map((muscle) => (
@@ -660,7 +660,7 @@ const StandaloneSharedExercise: React.FC = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
-              {t('exercises.saveToLibrary', { defaultValue: 'Save to My Library' })}
+              {t('exercises:saveToLibrary', { defaultValue: 'Save to My Library' })}
             </>
           </button>
 
@@ -679,7 +679,7 @@ const StandaloneSharedExercise: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {exercise.name} - {t('exercises.demonstrationVideo', { defaultValue: 'Demonstration Video' })}
+                {exercise.name} - {t('exercises:demonstrationVideo', { defaultValue: 'Demonstration Video' })}
               </h3>
               <button
                 onClick={() => setShowVideo(false)}
@@ -698,7 +698,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   autoPlay
                   className="w-full h-auto max-h-[60vh] rounded"
                 >
-                  {t('exercises.videoNotSupported', { defaultValue: 'Your browser does not support the video tag.' })}
+                  {t('exercises:videoNotSupported', { defaultValue: 'Your browser does not support the video tag.' })}
                 </video>
               ) : (
                 <div className="text-center py-8">
@@ -707,10 +707,10 @@ const StandaloneSharedExercise: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V3a1 1 0 011 1v1M7 4V3a1 1 0 011-1v0M7 4H5a2 2 0 00-2 2v11a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" />
                     </svg>
                     <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                      {t('exercises.videoBeingPrepared', { defaultValue: 'Video Being Prepared' })}
+                      {t('exercises:videoBeingPrepared', { defaultValue: 'Video Being Prepared' })}
                     </h4>
                     <p className="text-sm">
-                      {t('exercises.videoRecoveryInProgress', { defaultValue: 'The video is being prepared for viewing. Please check back shortly or ask the owner to sync their device.' })}
+                      {t('exercises:videoRecoveryInProgress', { defaultValue: 'The video is being prepared for viewing. Please check back shortly or ask the owner to sync their device.' })}
                     </p>
                   </div>
                 </div>

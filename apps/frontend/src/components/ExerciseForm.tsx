@@ -51,7 +51,7 @@ const InstructionItem: React.FC<InstructionItemProps> = ({
   return (
     <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-dark-disabled dark:text-primary-300">
           Step {instruction.step}
         </span>
         <div className="flex space-x-1">
@@ -90,7 +90,7 @@ const InstructionItem: React.FC<InstructionItemProps> = ({
           onChange={(e) => onUpdate(index, { ...instruction, text: e.target.value })}
           placeholder={t('exercises.instructionPlaceholder', 'Describe this step...')}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
           required
         />
         
@@ -107,7 +107,7 @@ const InstructionItem: React.FC<InstructionItemProps> = ({
               ...instruction,
               duration_seconds: e.target.value ? parseInt(e.target.value, 10) : undefined
             })}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
             placeholder={t('common.optional')}
           />
         </div>
@@ -497,7 +497,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                 placeholder={t('exercises.namePlaceholder', 'Enter exercise name')}
                 required
                 disabled={loading}
@@ -512,7 +512,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 id="exercise-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                 rows={3}
                 placeholder={t('exercises.descriptionPlaceholder', 'Brief description of the exercise')}
                 disabled={loading}
@@ -528,7 +528,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   id="exercise-category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value as ExerciseCategory)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   required
                   disabled={loading}
                 >
@@ -548,7 +548,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   id="exercise-type"
                   value={exerciseType}
                   onChange={(e) => setExerciseType(e.target.value as ExerciseType)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   required
                   disabled={loading}
                 >
@@ -570,7 +570,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 id="exercise-difficulty"
                 value={difficultyLevel}
                 onChange={(e) => setDifficultyLevel(e.target.value as 'beginner' | 'intermediate' | 'advanced')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                 disabled={loading}
               >
                 <option value="beginner">{t('exercises.difficulties.beginner', 'Beginner')}</option>
@@ -595,7 +595,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   step="0.1"
                   value={defaultDuration}
                   onChange={(e) => setDefaultDuration(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   placeholder="30"
                   disabled={loading}
                 />
@@ -612,7 +612,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     min="1"
                     value={defaultSets}
                     onChange={(e) => setDefaultSets(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                     placeholder="3"
                     disabled={loading}
                   />
@@ -627,7 +627,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     min="1"
                     value={defaultReps}
                     onChange={(e) => setDefaultReps(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                     placeholder="10"
                     disabled={loading}
                   />
@@ -643,7 +643,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     step="0.1"
                     value={repDurationSeconds}
                     onChange={(e) => setRepDurationSeconds(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                     placeholder="2"
                     disabled={loading}
                   />
@@ -659,7 +659,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               <button
                 type="button"
                 onClick={handleAddInstruction}
-                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 disabled={loading}
               >
                 <PlusIcon className="w-4 h-4 mr-1" />
@@ -694,7 +694,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   type="text"
                   value={newEquipment}
                   onChange={(e) => setNewEquipment(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   placeholder={t('exercises.equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat (comma-separated)')}
                   disabled={loading}
                   onKeyDown={(e) => {
@@ -713,7 +713,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 <button
                   type="button"
                   onClick={() => handleAddArrayItem('equipment', newEquipment)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   disabled={loading || !newEquipment.trim()}
                   aria-label={t('exercises.addEquipment', 'Add equipment items')} 
                   title={t('exercises.addEquipment', 'Add equipment items')}
@@ -725,12 +725,12 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               {equipmentNeeded.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {equipmentNeeded.map((item, index) => (
-                    <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-sm bg-primary-100 text-primary-800 dark:bg-primary-dark-disabled dark:text-primary-300">
                       {item}
                       <button
                         type="button"
                         onClick={() => handleRemoveArrayItem('equipment', index)}
-                        className="ml-1 inline-flex items-center p-0.5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                        className="ml-1 inline-flex items-center p-0.5 text-primary-600 dark:text-primary-dark-600 hover:text-primary-700 dark:hover:text-primary-dark-700"
                         disabled={loading}
                         aria-label={t('exercises.removeEquipment', 'Remove equipment item')}
                         title={t('exercises.removeEquipment', 'Remove equipment item')}
@@ -754,7 +754,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   type="text"
                   value={newMuscleGroup}
                   onChange={(e) => setNewMuscleGroup(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   placeholder={t('exercises.muscleGroupPlaceholder', 'e.g., Arms, Core, Legs (comma-separated)')}
                   disabled={loading}
                   onKeyDown={(e) => {
@@ -773,7 +773,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 <button
                   type="button"
                   onClick={() => handleAddArrayItem('muscleGroups', newMuscleGroup)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   disabled={loading || !newMuscleGroup.trim()}
                   aria-label={t('exercises.addMuscleGroup', 'Add muscle group items')} 
                   title={t('exercises.addMuscleGroup', 'Add muscle group items')}
@@ -814,7 +814,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   type="text"
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                   placeholder={t('exercises.tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
                   disabled={loading}
                   onKeyDown={(e) => {
@@ -833,7 +833,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 <button
                   type="button"
                   onClick={() => handleAddArrayItem('tags', newTag)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   disabled={loading || !newTag.trim()}
                   aria-label={t('exercises.addTag', 'Add tag items')} 
                   title={t('exercises.addTag', 'Add tag items')}
@@ -875,8 +875,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   onVideoUploaded={setCustomVideoUrl}
                 />
               ) : (
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                <div className="p-4 bg-primary-50 dark:bg-primary-dark-disabled border border-primary-200 dark:border-primary-dark-600 rounded-lg">
+                  <p className="text-sm text-primary-700 dark:text-primary-300">
                     {t('common.videoUploadAfterSave', 'Video upload will be available after saving the exercise.')}
                   </p>
                 </div>
@@ -895,7 +895,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   checked={isPublic}
                   onChange={(e) => setIsPublic(e.target.checked)}
                   disabled={loading}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                   {t('exercises.makePublic', 'Make this exercise publicly available')}
@@ -925,7 +925,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 disabled={loading}
               >
                 {t('common.cancel', 'Cancel')}
@@ -933,7 +933,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             
               <button
                 type="submit"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading || !name.trim()}
               >
                 {loading 

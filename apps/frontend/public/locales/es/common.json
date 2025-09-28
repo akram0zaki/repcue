@@ -67,6 +67,7 @@
     "exercises": "Ejercicios",
     "timer": "Cronómetro",
     "activityLog": "Registro",
+    "progress": "Progreso",
     "settings": "Configuración"
   },
   "settings": {
@@ -82,6 +83,10 @@
     "darkMode": "Modo oscuro",
     "showExerciseVideos": "Mostrar videos de demostración",
     "showExerciseVideosHelp": "Experimental: reproducir videos de demostración silenciosos dentro del cronómetro cuando estén disponibles.",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Toggle between circular timer with rings or rectangular timer with border progress.",
     "language": "🌐 Idioma",
     "selectLanguage": "Seleccionar idioma",
     "languageHelp": "Elige tu idioma preferido. La aplicación recordará tu selección.",
@@ -92,7 +97,9 @@
     "disabled": "Desactivado",
     "dataStoredLocally": "Tus datos de entrenamiento se almacenan localmente en este dispositivo.",
     "pleaseAcceptConsent": "Por favor acepta el consentimiento de almacenamiento de datos para habilitar las funciones de exportación/borrado.",
-    "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
+  "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
+  "consentStatusLabel": "Estado del consentimiento",
+  "consentVersion": "Versión de consentimiento",
     "exportData": "Exportar datos",
     "exportDataHelp": "Descarga tus datos de entrenamiento como archivo JSON",
     "exportInProgress": "Exportando...",
@@ -236,7 +243,9 @@
     "removeFromFavoritesAria": "Quitar {{name}} de favoritos",
     "noFavorites": "Aún no hay ejercicios favoritos. ¡Marca algunos ejercicios como favoritos para verlos aquí!",
     "availableExercises": "Ejercicios disponibles",
-    "changeLanguage": "Cambiar idioma"
+    "changeLanguage": "Cambiar idioma",
+    "popularExercises": "Ejercicios populares",
+    "noPopularExercises": "No hay ejercicios populares con videos disponibles."
   },
   "workouts": {
     "title": "Entrenamientos",

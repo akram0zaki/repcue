@@ -92,6 +92,22 @@ const mockExercises: Exercise[] = [
   })
 ];
 
+// Mock AppSettings
+const mockAppSettings = {
+  horizontal_exercise_layout: false,
+  dark_mode: false,
+  reduce_motion: false,
+  vibration_enabled: true,
+  auto_start_next: false,
+  default_rest_time: 10,
+  interval_duration: 45,
+  sound_enabled: true,
+  beep_volume: 0.5,
+  pre_timer_countdown: true,
+  show_exercise_videos: true,
+  auto_save: true
+};
+
 describe('ExercisePage', () => {
   const mockOnToggleFavorite = vi.fn();
 
@@ -107,6 +123,7 @@ describe('ExercisePage', () => {
         <SnackbarProvider>
           <ExercisePage
             exercises={exercises}
+            appSettings={mockAppSettings}
             onToggleFavorite={mockOnToggleFavorite}
           />
         </SnackbarProvider>

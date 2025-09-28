@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
 import { EXERCISE_CATALOGS } from '../data/catalogs';
@@ -16,11 +16,57 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
 }) => {
   const { t } = useTranslation(['common', 'catalogs']);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   // Handle image loading errors
   const handleImageError = (catalogId: string) => {
     setImageErrors(prev => new Set(prev).add(catalogId));
   };
+
+  // Check scroll state
+  const checkScrollState = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  // Scroll functions
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: -200,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({
+        left: 200,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Initialize scroll state check
+  React.useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      checkScrollState();
+      container.addEventListener('scroll', checkScrollState);
+      window.addEventListener('resize', checkScrollState);
+
+      return () => {
+        container.removeEventListener('scroll', checkScrollState);
+        window.removeEventListener('resize', checkScrollState);
+      };
+    }
+  }, []);
 
   // Get fallback icon for catalog when image fails
   const getFallbackIcon = (catalog: ExerciseCatalog) => {
@@ -42,7 +88,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   const getFallbackBackground = (catalog: ExerciseCatalog) => {
     switch (catalog.colorTheme) {
       case 'blue':
-        return 'bg-blue-600';
+        return 'bg-primary-500';
       case 'green':
         return 'bg-green-600';
       case 'purple':
@@ -50,20 +96,20 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
       case 'pink':
         return 'bg-pink-600';
       default:
-        return 'bg-blue-600';
+        return 'bg-primary-500';
     }
   };
 
-  // Get catalog thumbnail classes with size variations
+  // Get catalog thumbnail classes with consistent sizing for horizontal navigation
   const getThumbnailClasses = (catalog: ExerciseCatalog, isSelected: boolean) => {
-    const baseClasses = 'relative rounded-xl overflow-hidden transition-all duration-300 ease-in-out cursor-pointer group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500';
-    
+    const baseClasses = 'relative rounded-xl overflow-hidden transition-all duration-300 ease-in-out cursor-pointer group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex-shrink-0';
+
     if (isSelected) {
-      // Selected catalog is larger
-      return `${baseClasses} w-32 h-24 sm:w-40 sm:h-28 ring-2 ring-offset-2 ${getRingColor(catalog)} shadow-lg`;
+      // Selected catalog with ring indicator
+      return `${baseClasses} w-28 h-20 sm:w-32 sm:h-24 ring-2 ring-offset-2 ${getRingColor(catalog)} shadow-lg`;
     } else {
-      // Unselected catalogs are smaller
-      return `${baseClasses} w-24 h-18 sm:w-28 sm:h-20 opacity-80 hover:opacity-100`;
+      // Unselected catalogs with consistent size
+      return `${baseClasses} w-28 h-20 sm:w-32 sm:h-24 opacity-80 hover:opacity-100`;
     }
   };
 
@@ -108,8 +154,40 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           {t('selectCatalog', { ns: 'catalogs', defaultValue: 'Exercise Catalog' })}
         </label>
-        <div className="flex flex-wrap gap-3 items-end">
-          {sortedCatalogs.map((catalog) => {
+        <div className="relative">
+          {/* Left Navigation Button */}
+          {canScrollLeft && (
+            <button
+              onClick={scrollLeft}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              aria-label="Scroll left"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Right Navigation Button */}
+          {canScrollRight && (
+            <button
+              onClick={scrollRight}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              aria-label="Scroll right"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Catalog Container */}
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-3 items-center overflow-x-auto pb-2 scrollbar-hide px-10"
+            onScroll={checkScrollState}
+          >
+            {sortedCatalogs.map((catalog) => {
             const isSelected = catalog.id === selectedCatalogId;
             return (
               <button
@@ -153,7 +231,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
 
                   {/* Title */}
                   <div className="text-white">
-                    <h3 className={`font-semibold leading-tight text-center ${isSelected ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} ${!isSelected ? 'h-8 flex items-center justify-center' : ''}`}>
+                    <h3 className="font-semibold leading-tight text-center text-xs sm:text-sm">
                       {t(catalog.nameKey, { ns: 'catalogs' })}
                     </h3>
                   </div>
@@ -162,12 +240,13 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                 {/* Selection Indicator */}
                 {isSelected && (
                   <div className="absolute top-2 left-2 w-3 h-3 bg-white rounded-full shadow-lg flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
                   </div>
                 )}
               </button>
             );
           })}
+          </div>
         </div>
       </div>
 

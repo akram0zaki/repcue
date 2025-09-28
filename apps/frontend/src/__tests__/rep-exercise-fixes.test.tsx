@@ -8,29 +8,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// Mock services with explicit factories (more reliable than post-assign)
-vi.mock('../services/storageService', () => {
-  const api = {
-    getExercises: vi.fn(),
-    getWorkouts: vi.fn().mockResolvedValue([]),
-    getWorkoutSessions: vi.fn().mockResolvedValue([]),
-    getActivityLogs: vi.fn().mockResolvedValue([]),
-    getAppSettings: vi.fn(),
-    saveExercise: vi.fn().mockResolvedValue(undefined),
-    saveExercises: vi.fn().mockResolvedValue(undefined),
-    saveActivityLog: vi.fn(),
-    saveAppSettings: vi.fn().mockResolvedValue(undefined),
-    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
-    getDatabase: vi.fn(() => ({})),
-    claimOwnership: vi.fn().mockResolvedValue(true)
-  };
-  return { 
-    StorageService: {
-      getInstance: vi.fn(() => api)
-    },
-    storageService: api 
-  };
-});
+// Mock services with comprehensive storage service mock
+import { createStorageServiceModuleMock } from '../test/storageServiceMock';
+
+vi.mock('../services/storageService', () => createStorageServiceModuleMock());
 
 
 
@@ -117,7 +98,13 @@ vi.mock('../hooks/useOfflineStatus', () => ({
 }));
 
 vi.mock('../hooks/useNetworkSync', () => ({
-  useNetworkSync: () => ({})
+  useNetworkSync: () => ({
+    state: {
+      errors: [],
+      isSyncing: false,
+      lastSyncAttempt: null
+    }
+  })
 }));
 
 vi.mock('../hooks/useOnboarding', () => ({
@@ -167,8 +154,35 @@ if (!navigator.vibrate) {
 
 describe('Rep-based Exercise Fixes', () => {
   async function ensureTimerPageVisible(user: ReturnType<typeof userEvent.setup>) {
-    // Since we start directly on the timer page, just wait for it to load
-    await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+    // First wait for the app to load
+    await waitFor(() => {
+      expect(document.body).toBeInTheDocument();
+    }, { timeout: 5000 });
+
+    // Try to navigate to timer page if not already there
+    try {
+      await screen.findByTestId('timer-page', {}, { timeout: 2000 });
+    } catch (error) {
+      // If timer page not found, try to navigate to it
+      const timerNavButton = screen.queryByTestId('nav-timer');
+      if (timerNavButton) {
+        await user.click(timerNavButton);
+        await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+      } else {
+        // Check if we need to navigate through other means
+        const exercisesNavButton = screen.queryByTestId('nav-exercises');
+        if (exercisesNavButton) {
+          await user.click(exercisesNavButton);
+          // Look for any exercise to start the timer
+          const exerciseButtons = await screen.findAllByRole('button');
+          const timerButton = exerciseButtons.find(btn => btn.textContent?.includes('Start Timer') || btn.getAttribute('aria-label')?.includes('timer'));
+          if (timerButton) {
+            await user.click(timerButton);
+            await screen.findByTestId('timer-page', {}, { timeout: 5000 });
+          }
+        }
+      }
+    }
   }
   const mockRepExercise = {
     id: 'test-rep-exercise',

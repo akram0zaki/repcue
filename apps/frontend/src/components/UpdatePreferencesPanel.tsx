@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { UpdatePreferences, UpdateMode } from '../types';
 import { updateService } from '../services/updateService';
 import logger from '../utils/logger';
+import ToggleSwitch from './ToggleSwitch';
 
 interface UpdatePreferencesPanelProps {
   className?: string;
@@ -101,7 +102,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4 ${className}`}>
+  <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6 ${className}`}>
       {/* Header */}
       <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
         <svg
@@ -252,7 +253,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
         </div>
 
         {/* Metered Connection Settings */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
           <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">
             {t('settings.meteredConnection', 'Data Usage')}
           </h3>
@@ -286,36 +287,26 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
           {/* Allow Metered Updates Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <label htmlFor="allow-metered-updates" className="text-gray-700 dark:text-gray-300 font-medium">
+              <label htmlFor="allow-metered-updates" className="label-text">
                 {t('settings.allowMeteredUpdates', 'Allow updates on metered connections')}
               </label>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {t('settings.allowMeteredUpdatesDescription', 'Updates may use mobile data or count against data limits')}
               </p>
             </div>
-            <button
+            <ToggleSwitch
               id="allow-metered-updates"
-              onClick={() => handleMeteredUpdatesChange(!preferences.allowMeteredUpdates)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4 ${
-                preferences.allowMeteredUpdates
-                  ? 'bg-blue-600'
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-              aria-pressed={preferences.allowMeteredUpdates}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  preferences.allowMeteredUpdates
-                    ? 'translate-x-6'
-                    : 'translate-x-1'
-                }`}
-              />
-            </button>
+              checked={preferences.allowMeteredUpdates}
+              onChange={() => handleMeteredUpdatesChange(!preferences.allowMeteredUpdates)}
+              dataTestId="toggle-allow-metered-updates"
+              label={t('settings.allowMeteredUpdates', 'Allow updates on metered connections')}
+              className="ml-4"
+            />
           </div>
         </div>
 
         {/* Additional Preferences */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+  <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
           <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">
             {t('settings.additionalPreferences', 'Additional Options')}
           </h3>
@@ -323,31 +314,21 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
           {/* Show Changelog Toggle */}
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <label htmlFor="show-changelog" className="text-gray-700 dark:text-gray-300 font-medium">
+              <label htmlFor="show-changelog" className="label-text">
                 {t('settings.showChangelog', 'Show what\'s new')}
               </label>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {t('settings.showChangelogDescription', 'Display release notes and feature highlights after updates')}
               </p>
             </div>
-            <button
+            <ToggleSwitch
               id="show-changelog"
-              onClick={() => handleShowChangelogChange(!preferences.showChangelog)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ml-4 ${
-                preferences.showChangelog
-                  ? 'bg-blue-600'
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-              aria-pressed={preferences.showChangelog}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  preferences.showChangelog
-                    ? 'translate-x-6'
-                    : 'translate-x-1'
-                }`}
-              />
-            </button>
+              checked={preferences.showChangelog}
+              onChange={() => handleShowChangelogChange(!preferences.showChangelog)}
+              dataTestId="toggle-show-changelog"
+              label={t('settings.showChangelog', 'Show what\'s new')}
+              className="ml-4"
+            />
           </div>
         </div>
       </div>

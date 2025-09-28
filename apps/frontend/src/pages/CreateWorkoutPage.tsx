@@ -18,7 +18,7 @@ interface SelectedExercise extends Exercise {
 }
 
 const CreateWorkoutPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'exerciseDetails']);
   const navigate = useNavigate();
   const [hasConsent, setHasConsent] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -352,7 +352,7 @@ const CreateWorkoutPage: React.FC = () => {
                   id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                   disabled={saving}
                 />
                 <label htmlFor="isActive" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -392,7 +392,7 @@ const CreateWorkoutPage: React.FC = () => {
                         }}
                         className={`p-2 text-xs font-medium rounded-lg border transition-colors ${
                           isSelected
-                            ? 'bg-blue-600 text-white border-blue-600'
+                            ? 'bg-primary-500 text-white border-primary-500'
                             : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                         disabled={saving || !isActive}
@@ -431,7 +431,7 @@ const CreateWorkoutPage: React.FC = () => {
                 <p className="text-gray-500 dark:text-gray-400 mb-4">{t('workouts.noneSelectedTitle')}</p>
                 <button
                   onClick={() => setShowExercisePicker(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
                   disabled={saving}
                 >
                   {t('workouts.addFirstExercise')}
@@ -665,7 +665,7 @@ const CreateWorkoutPage: React.FC = () => {
                           {localizeExercise(exercise, t).name}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises.timeBased.name') : t('exercises.repBased.name')}
+                          {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises:timeBased.name') : t('exercises:repBased.name')}
                           {exercise.exercise_type === 'time_based' 
                             ? ` • ${exercise.default_duration}s` 
                             : ` • ${exercise.default_sets}×${exercise.default_reps}`}

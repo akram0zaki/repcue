@@ -131,18 +131,18 @@ const WorkoutsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+      <div className="min-h-screen bg-background-50 dark:bg-background-950 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('workouts.title')}</h1>
-            <div className="w-24 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <h1 className="text-2xl font-bold text-text-900 dark:text-text-50">{t('workouts.title')}</h1>
+            <div className="w-24 h-10 bg-surface-200 dark:bg-surface-700 rounded animate-pulse"></div>
           </div>
           <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow animate-pulse">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+              <div key={index} className="bg-surface-0 dark:bg-surface-800 rounded-lg p-4 shadow animate-pulse">
+                <div className="h-6 bg-surface-200 dark:bg-surface-700 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-surface-200 dark:bg-surface-700 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-surface-200 dark:bg-surface-700 rounded w-1/3"></div>
               </div>
             ))}
           </div>
@@ -153,9 +153,9 @@ const WorkoutsPage: React.FC = () => {
 
   if (!hasConsent) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+      <div className="min-h-screen bg-background-50 dark:bg-background-950 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('workouts.title')}</h1>
+          <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-6">{t('workouts.title')}</h1>
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
@@ -187,15 +187,15 @@ const WorkoutsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+    <div className="min-h-screen bg-background-50 dark:bg-background-950 pt-16 pb-20">
       <div className="p-6 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-text-900 dark:text-text-50">
             {t('workouts.title')}
           </h1>
           <button
             onClick={handleCreateWorkout}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             {t('workouts.createWorkout')}
           </button>
@@ -203,20 +203,20 @@ const WorkoutsPage: React.FC = () => {
 
         {workouts.length === 0 ? (
           <div className="text-center py-12">
-            <div className="mx-auto w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-6">
+            <div className="mx-auto w-16 h-16 bg-surface-200 dark:bg-surface-700 rounded-full flex items-center justify-center mb-6">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-medium text-text-900 dark:text-text-50 mb-2">
               {t('workouts.emptyTitle')}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">
+            <p className="text-text-500 dark:text-text-400 mb-6">
               {t('workouts.emptyBody')}
             </p>
             <button
               onClick={handleCreateWorkout}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
               {t('workouts.createFirstWorkout')}
             </button>
@@ -226,23 +226,23 @@ const WorkoutsPage: React.FC = () => {
             {workouts.map((workout) => (
               <div
                 key={workout.id}
-                className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm"
+                className="bg-surface-0 dark:bg-surface-800 rounded-lg p-4 border border-surface-200 dark:border-surface-700 shadow-sm"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                      <h3 className="text-lg font-semibold text-text-900 dark:text-text-50 truncate">
                         {workout.name}
                       </h3>
                       {!workout.is_active && (
-                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                        <span className="px-2 py-1 text-xs font-medium bg-surface-100 dark:bg-surface-700 text-text-600 dark:text-text-400 rounded">
                           {t('workouts.paused')}
                         </span>
                       )}
                     </div>
                     
                     {workout.description && (
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
+                      <p className="text-text-600 dark:text-text-400 text-sm mb-2 line-clamp-2">
                         {workout.description}
                       </p>
                     )}
@@ -252,7 +252,7 @@ const WorkoutsPage: React.FC = () => {
                     <button
                       onClick={() => handleStartWorkout(workout)}
                       disabled={!workout.is_active}
-                      className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
+                      className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
                       title={workout.is_active ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
                     >
                       <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +262,7 @@ const WorkoutsPage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleEditWorkout(workout.id)}
-                      className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+                      className="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-dark-disabled rounded-md transition-colors"
                       title={t('workouts.editWorkout')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,7 +281,7 @@ const WorkoutsPage: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center justify-between text-sm text-text-600 dark:text-text-400">
                   <div className="flex items-center space-x-4">
                     <span className="flex items-center">
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +316,7 @@ const WorkoutsPage: React.FC = () => {
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(null)}
-                        className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm font-medium rounded transition-colors"
+                        className="px-3 py-1.5 bg-surface-200 hover:bg-surface-300 dark:bg-surface-700 dark:hover:bg-surface-600 text-text-800 dark:text-text-200 text-sm font-medium rounded transition-colors"
                       >
                         {t('common.cancel')}
                       </button>

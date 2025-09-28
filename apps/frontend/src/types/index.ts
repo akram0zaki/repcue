@@ -338,6 +338,8 @@ export interface AppSettings extends SyncMetadata {
   show_exercise_videos?: boolean; // feature flag preference for video demos
   reduce_motion?: boolean;
   auto_start_next?: boolean;
+  horizontal_exercise_layout?: boolean; // enable horizontal category listing with Netflix-style scrolling
+  ring_timer?: boolean; // true for circular timer with rings, false for rectangular timer with border progress
   // Update preferences
   update_mode?: 'automatic' | 'notify' | 'manual'; // how to handle updates
   allow_auto_updates?: boolean; // enable automatic updates

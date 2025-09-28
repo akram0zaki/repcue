@@ -67,6 +67,7 @@
     "exercises": "Oefeningen",
     "timer": "Timer",
     "activityLog": "Lochboek",
+    "progress": "Foardering",
     "settings": "Ynstellingen"
   },
   "settings": {
@@ -82,6 +83,10 @@
     "darkMode": "Tsjustere modus",
     "showExerciseVideos": "Oefeningdemovideo's toane",
     "showExerciseVideosHelp": "Eksperimenteel: loop stille demovideo's yn timer as beskikber.",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Toggle between circular timer with rings or rectangular timer with border progress.",
     "language": "🌐 Taal",
     "selectLanguage": "Taal selektearje",
     "languageHelp": "Kies jo foarkar taal. De app ûnthâldt jo seleksje.",
@@ -92,7 +97,9 @@
     "disabled": "Utskeakele",
     "dataStoredLocally": "Jo traininggegevens wurde lokaal op dit apparaat bewarre.",
     "pleaseAcceptConsent": "Akseptearje asjebleaft gegevensopslachtoestemming om eksport/wiskfunksjes yn te skeakeljen.",
-    "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
+  "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
+  "consentStatusLabel": "Tastimmingsstatus",
+  "consentVersion": "Tastimmingsferzje",
     "exportData": "Gegevens eksportearje",
     "exportDataHelp": "Laad jo traininggegevens yn as JSON-bestân",
     "exportInProgress": "Exportearje...",
@@ -236,7 +243,9 @@
     "removeFromFavoritesAria": "{{name}} út favoriten fuortsmite",
     "noFavorites": "Noch gjin favorite oefeningen. Markearje wat oefeningen as favoriten om se hjir te sjen!",
     "availableExercises": "Beskikbere oefeningen",
-    "changeLanguage": "Taal feroarje"
+    "changeLanguage": "Taal feroarje",
+    "popularExercises": "Populêre Oefeningen",
+    "noPopularExercises": "Gjin populêre oefeningen mei fideo's beskikber."
   },
   "workouts": {
     "title": "Trainingen",

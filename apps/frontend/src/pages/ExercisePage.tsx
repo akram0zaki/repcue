@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: page already uses t() for user-visible text; remaining literals are units, icons, or fallback defaults */
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Exercise, ExerciseCategory } from '../types';
+import type { Exercise, ExerciseCategory, AppSettings } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
 import { 
@@ -18,8 +18,7 @@ import {
   PlayIcon,
   PlusIcon,
   EditIcon,
-  DeleteIcon,
-  InfoIcon
+  DeleteIcon
 } from '../components/icons/NavigationIcons';
 import { useTranslation } from 'react-i18next';
 import { useFeatureFlags } from '../hooks/useFeatureFlags';
@@ -30,24 +29,25 @@ import { localizeExercise } from '../utils/localizeExercise';
 import getVideoSources from '../utils/videoSources';
 import { VideoThumbnail } from '../components/VideoThumbnail';
 import { ExercisePlaceholder } from '../components/ExercisePlaceholder';
-import { ExerciseDetailModal } from '../components/ExerciseDetailModal';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
 import { ShareButton } from '../components/ShareButton';
 import CatalogSelector from '../components/CatalogSelector';
+import CategorySelector from '../components/CategorySelector';
 import { getDefaultCatalog, EXERCISE_CATALOGS } from '../data/catalogs';
 
 interface ExercisePageProps {
   exercises: Exercise[];
+  appSettings: AppSettings;
   onToggleFavorite: (exercise_id: string) => void;
   onDeleteExercise?: (exercise_id: string) => Promise<void>;
 }
 
-const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite, onDeleteExercise }) => {
+const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
@@ -96,15 +96,35 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Category selector state
+  const [categorySelectorOpen, setCategorySelectorOpen] = useState(false);
+
+  // Refs for horizontal scrolling navigation
+  const categoryScrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Scroll functions for horizontal navigation
+  const scrollCategory = useCallback((category: string, direction: 'left' | 'right') => {
+    const scrollContainer = categoryScrollRefs.current[category];
+    if (!scrollContainer) return;
+
+    const scrollAmount = 280; // Slightly more than card width (256px + gap)
+    const currentScroll = scrollContainer.scrollLeft;
+    const newScroll = direction === 'left'
+      ? currentScroll - scrollAmount
+      : currentScroll + scrollAmount;
+
+    scrollContainer.scrollTo({
+      left: newScroll,
+      behavior: 'smooth'
+    });
+  }, []);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   
   // Delete confirmation modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
 
-  // Exercise detail modal state
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [exerciseToShow, setExerciseToShow] = useState<Exercise | null>(null);
 
   // Save filter state whenever it changes
   useEffect(() => {
@@ -131,6 +151,21 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     setExerciseFilter('all');
     setSortBy('name');
     // Don't reset catalog - let user keep their catalog selection
+  };
+
+  // Category selector handlers
+  const handleCategoryToggle = (category: ExerciseCategory) => {
+    const newSelected = new Set(selectedCategories);
+    if (newSelected.has(category)) {
+      newSelected.delete(category);
+    } else {
+      newSelected.add(category);
+    }
+    setSelectedCategories(newSelected);
+  };
+
+  const handleClearCategories = () => {
+    setSelectedCategories(new Set());
   };
 
   // Handle catalog change with optional filter reset
@@ -160,7 +195,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     }
     setPreviewUrl(null);
     showSnackbar(
-      t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
+      t('exercises:previewUnavailable', { defaultValue: 'Video is not available at this time' }),
       { type: 'warning', durationMs: 1200 }
     );
     setPreviewOpen(false);
@@ -181,7 +216,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       }
       setPreviewUrl(null);
       showSnackbar(
-        t('exercises.previewUnavailable', { defaultValue: 'Video is not available at this time' }),
+        t('exercises:previewUnavailable', { defaultValue: 'Video is not available at this time' }),
         { type: 'warning', durationMs: 1200 }
       );
       // Auto-close preview on error to avoid intrusive duplicate messaging
@@ -324,13 +359,23 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   }, [filteredExercises]);
 
   const formatDuration = (seconds?: number): string => {
-    if (!seconds) return t('exercises.variable');
+    if (!seconds) return t('exercises:variable');
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     if (minutes > 0) {
       return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
     }
     return `${seconds}s`;
+  };
+
+  const formatSimplifiedDetails = (exercise: Exercise): string => {
+    if (exercise.exercise_type === 'time_based') {
+      return formatDuration(exercise.default_duration);
+    } else {
+      const sets = exercise.default_sets || 1;
+      const reps = exercise.default_reps || 1;
+      return `${sets}x${reps}`;
+    }
   };
 
   const getCategoryIcon = (category: ExerciseCategory) => {
@@ -349,7 +394,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
   const getCategoryColor = (category: ExerciseCategory): string => {
     switch (category) {
       case Categories.CORE: return 'bg-red-500';
-      case Categories.STRENGTH: return 'bg-blue-500';
+      case Categories.STRENGTH: return 'bg-primary-500';
       case Categories.CARDIO: return 'bg-green-500';
       case Categories.FLEXIBILITY: return 'bg-purple-500';
       case Categories.BALANCE: return 'bg-yellow-500';
@@ -377,19 +422,18 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
     setDeleteModalOpen(true);
   };
 
-  const handleShowExerciseDetails = (exercise: Exercise) => {
-    setExerciseToShow(exercise);
-    setDetailModalOpen(true);
+  const handleNavigateToExercise = (exerciseId: string) => {
+    navigate(`/exercises/${exerciseId}`);
   };
 
   const handleConfirmDelete = async () => {
     if (exerciseToDelete && onDeleteExercise) {
       try {
         await onDeleteExercise(exerciseToDelete);
-        showSnackbar(t('exercises.deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), { type: 'success' });
+        showSnackbar(t('exercises:deleteSuccess', { defaultValue: 'Exercise deleted successfully' }), { type: 'success' });
       } catch (error) {
         logger.error('Failed to delete exercise:', error);
-        showSnackbar(t('exercises.deleteError', { defaultValue: 'Failed to delete exercise' }), { type: 'error' });
+        showSnackbar(t('exercises:deleteError', { defaultValue: 'Failed to delete exercise' }), { type: 'error' });
       } finally {
         setExerciseToDelete(null);
       }
@@ -398,35 +442,35 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
   return (
     <>
-    <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+    <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-4xl">
         {/* Header */}
         <div className="mb-4 sm:mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <WorkoutIcon size={24} className="text-blue-600 dark:text-blue-400" />
-              {t('exercises.title')}
+            <h1 className="text-xl sm:text-2xl font-bold text-text-900 dark:text-text-50 flex items-center gap-2">
+              <WorkoutIcon size={24} className="text-primary-600 dark:text-primary-400" />
+              {t('exercises:title')}
             </h1>
             {flags.canCreateExercises && (
               <button
                 onClick={() => navigate('/exercises/create')}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
-                aria-label={t('exercises.createNew', 'Create New Exercise')}
+                className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
+                aria-label={t('exercises:createNew', 'Create New Exercise')}
               >
                 <PlusIcon size={20} />
-                <span className="hidden sm:inline">{t('exercises.createNew', 'Create New Exercise')}</span>
+                <span className="hidden sm:inline">{t('exercises:createNew', 'Create New Exercise')}</span>
                 <span className="sm:hidden">{t('common.create', 'Create')}</span>
               </button>
             )}
           </div>
           
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
-            {t('exercises.subtitle')}
+          <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mt-2">
+            {t('exercises:subtitle')}
           </p>
         </div>
 
         {/* Catalog Selector */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4">
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4">
           <CatalogSelector
             selectedCatalogId={selectedCatalogId}
             onCatalogChange={handleCatalogChange}
@@ -434,10 +478,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4 mb-4 sm:mb-6">
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-3 mb-4 sm:mb-6">
           {/* Search Bar */}
-          <div className="mb-3 sm:mb-4">
-            <label htmlFor="search" className="sr-only">{t('exercises.searchLabel')}</label>
+          <div className="mb-2 sm:mb-3">
+            <label htmlFor="search" className="sr-only">{t('exercises:searchLabel')}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -447,133 +491,152 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
               <input
                 id="search"
                 type="text"
-                placeholder={t('exercises.searchPlaceholder')}
+                placeholder={t('exercises:searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-9 sm:pl-10 pr-3 py-2.5 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full pl-14 sm:pl-16 pr-10 sm:pr-12 py-2.5 sm:py-2 border border-surface-300 dark:border-surface-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
-            </div>
-          </div>
-
-          {/* Category Filter Tags */}
-          <div className="mb-3 sm:mb-4">
-            <div className="flex flex-wrap gap-2">
-              {Object.values(Categories).map(category => (
+              {searchTerm && (
                 <button
-                  key={category}
-                  onClick={() => {
-                    const newSelected = new Set(selectedCategories);
-                    if (newSelected.has(category)) {
-                      newSelected.delete(category);
-                    } else {
-                      newSelected.add(category);
-                    }
-                    setSelectedCategories(newSelected);
-                  }}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCategories.has(category)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
+                  onClick={() => setSearchTerm('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  aria-label="Clear search"
                 >
-                  {t(`exercises.category.${category.replace('-', '')}` as const, { defaultValue: category.replace('-', ' ') })}
-                </button>
-              ))}
-              {selectedCategories.size > 0 && (
-                <button
-                  onClick={clearAllFilters}
-                  className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                >
-                  {t('exercises.clearFilters')}
+                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               )}
             </div>
           </div>
 
+          {/* Category Filter Selector and Sort */}
+          <div className="mb-2 sm:mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 flex-1">
+                <label className="text-sm font-medium text-text-700 dark:text-text-300 flex-shrink-0">
+                  <span className="hidden sm:inline">{t('exercises:category', { defaultValue: 'Category' })}</span>
+                  <span className="sm:hidden">{t('exercises:categoryShort', { defaultValue: 'Cat' })}</span>
+                </label>
+                <button
+                  onClick={() => setCategorySelectorOpen(true)}
+                  className="px-2.5 py-1.5 text-sm font-medium bg-surface-0 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors flex items-center gap-2"
+                >
+                  {selectedCategories.size > 0 ? (
+                    <span className="text-primary-600 dark:text-primary-400">
+                      {t('exercises:categoriesSelected', {
+                        count: selectedCategories.size,
+                        defaultValue: `${selectedCategories.size} selected`
+                      })}
+                    </span>
+                  ) : (
+                    <span className="text-text-500 dark:text-text-400">
+                      {t('exercises:selectCategories', { defaultValue: 'Select' })}
+                    </span>
+                  )}
+                  <svg className="w-4 h-4 text-text-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {selectedCategories.size > 0 && (
+                  <button
+                    onClick={handleClearCategories}
+                    className="px-2.5 py-1.5 text-sm font-medium text-text-500 dark:text-text-400 hover:text-text-700 dark:hover:text-text-200 transition-colors"
+                  >
+                    {t('exercises:clearCategories', { defaultValue: 'Clear' })}
+                  </button>
+                )}
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <label htmlFor="sort-select" className="text-sm font-medium sort-label-text flex-shrink-0">
+                  <span className="hidden sm:inline">{t('exercises:sortBy', { defaultValue: 'Sort by:' })}</span>
+                  <span className="sm:hidden">{t('exercises:sortByShort', { defaultValue: 'Sort:' })}</span>
+                </label>
+                <select
+                  id="sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
+                  className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px]"
+                >
+                  <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
+                  <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>
+                  <option value="recently-added">{t('exercises:sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* Filter and Sort Controls */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-wrap">
             {/* Exercise Type Filter */}
             <div className="flex gap-1">
               <button
                 onClick={() => setExerciseFilter('all')}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                   exerciseFilter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                 }`}
               >
-                {t('exercises.filterAll', { defaultValue: 'All' })}
+                {t('exercises:filterAll', { defaultValue: 'All' })}
               </button>
               <button
                 onClick={() => setExerciseFilter('built-in')}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                   exerciseFilter === 'built-in'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                 }`}
               >
-                {t('exercises.filterBuiltIn', { defaultValue: 'Built-in' })}
+                {t('exercises:filterBuiltIn', { defaultValue: 'Built-in' })}
               </button>
               <button
                 onClick={() => setExerciseFilter('custom')}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                   exerciseFilter === 'custom'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                 }`}
               >
-                {t('exercises.filterCustom', { defaultValue: 'Custom' })}
+                {t('exercises:filterCustom', { defaultValue: 'Custom' })}
               </button>
               <button
                 onClick={() => setExerciseFilter('shared')}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                   exerciseFilter === 'shared'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                 }`}
               >
-                {t('exercises.filterShared', { defaultValue: 'Shared with me' })}
+                {t('exercises:filterShared', { defaultValue: 'Shared with me' })}
               </button>
             </div>
-            
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
-              <label htmlFor="sort-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('exercises.sortBy', { defaultValue: 'Sort by:' })}
-              </label>
-              <select
-                id="sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[44px]"
-              >
-                <option value="name">{t('exercises.sortName', { defaultValue: 'Name' })}</option>
-                <option value="type">{t('exercises.sortType', { defaultValue: 'Type' })}</option>
-                <option value="recently-added">{t('exercises.sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
-              </select>
-            </div>
-            
+
             {/* Favorites Toggle */}
-            <button
-              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors min-h-[44px] ${
-                showFavoritesOnly 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              <StarIcon size={16} />
-              <span className="text-sm font-medium">{t('exercises.favoritesOnly')}</span>
-            </button>
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
+                  showFavoritesOnly
+                    ? 'bg-yellow-500 text-white'
+                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
+                }`}
+              >
+                <StarIcon size={16} />
+                <span>{t('exercises:favoritesOnly')}</span>
+              </button>
+            </div>
           </div>
 
           {/* Results Count */}
-          <div className="mt-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-2 text-xs sm:text-sm summary-text">
             {(() => {
               const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
               const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { defaultValue: selectedCatalog.id }) : 'Unknown';
               const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
-              return t('exercises.showingCountInCatalog', {
+              return t('exercises:showingCountInCatalog', {
                 count: filteredExercises.length,
                 total: totalInCatalog,
                 catalog: catalogName,
@@ -586,40 +649,118 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         {/* Exercise Grid */}
         {selectedCategories.size === 0 ? (
           // Show by category when viewing all
-          <div className="space-y-6 sm:space-y-8">
-            {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
-              if (categoryExercises.length === 0) return null;
-              
-              return (
-                <div key={category}>
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 flex items-center gap-2">
-                    <span>{getCategoryIcon(category as ExerciseCategory)}</span>
-                    <span className="capitalize">{t(`exercises.category.${String(category).replace('-', '')}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
-                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                      ({categoryExercises.length})
-                    </span>
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        {categoryExercises.map((exercise) => (
-                      <ExerciseCard
-                        key={exercise.id}
-                        exercise={exercise}
-                        onToggleFavorite={onToggleFavorite}
-                        onStartTimer={handleStartTimer}
-                        getCategoryColor={getCategoryColor}
-                        formatDuration={formatDuration}
-                        onEdit={handleEditExercise}
-                        onDelete={handleDeleteExercise}
-                        onShowDetails={handleShowExerciseDetails}
-                        currentUser={user}
-                        isSharedExercise={isSharedExercise}
-                      />
-                    ))}
+          appSettings.horizontal_exercise_layout ? (
+            // Netflix-style horizontal category layout
+            <div className="space-y-6 sm:space-y-8">
+              {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
+                if (categoryExercises.length === 0) return null;
+
+                return (
+                  <div key={category}>
+                    <h2 className="text-lg sm:text-xl font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4 flex items-center gap-2">
+                      <span>{getCategoryIcon(category as ExerciseCategory)}</span>
+                      <span className="capitalize">{t(`exercises:categories.${String(category).replace('-', '')}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
+                      <span className="text-sm font-normal text-text-500 dark:text-text-400">
+                        ({categoryExercises.length})
+                      </span>
+                    </h2>
+                    {/* Horizontal scrollable container with navigation */}
+                    <div className="relative group -mx-3 sm:-mx-4">
+                      {/* Left navigation button */}
+                      {categoryExercises.length > 1 && (
+                        <button
+                          onClick={() => scrollCategory(category, 'left')}
+                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                          aria-label="Scroll left"
+                        >
+                          <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                      )}
+
+                      {/* Right navigation button */}
+                      {categoryExercises.length > 1 && (
+                        <button
+                          onClick={() => scrollCategory(category, 'right')}
+                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                          aria-label="Scroll right"
+                        >
+                          <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      )}
+
+                      <div
+                        ref={(el) => {
+                          categoryScrollRefs.current[category] = el;
+                        }}
+                        className="overflow-x-auto scrollbar-hide px-3 sm:px-4"
+                      >
+                        <div className="flex gap-3 sm:gap-4 pb-2" style={{ width: 'max-content' }}>
+                          {categoryExercises.map((exercise) => (
+                            <div key={exercise.id} className="flex-none w-64 sm:w-72">
+                              <ExerciseCard
+                                exercise={exercise}
+                                onToggleFavorite={onToggleFavorite}
+                                onStartTimer={handleStartTimer}
+                                getCategoryColor={getCategoryColor}
+                                formatDuration={formatDuration}
+                                formatSimplifiedDetails={formatSimplifiedDetails}
+                                onEdit={handleEditExercise}
+                                onDelete={handleDeleteExercise}
+                                onNavigateToExercise={handleNavigateToExercise}
+                                currentUser={user}
+                                isSharedExercise={isSharedExercise}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            // Traditional grid layout
+            <div className="space-y-6 sm:space-y-8">
+              {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
+                if (categoryExercises.length === 0) return null;
+
+                return (
+                  <div key={category}>
+                    <h2 className="text-lg sm:text-xl font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4 flex items-center gap-2">
+                      <span>{getCategoryIcon(category as ExerciseCategory)}</span>
+                      <span className="capitalize">{t(`exercises:categories.${String(category).replace('-', '')}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
+                      <span className="text-sm font-normal text-text-500 dark:text-text-400">
+                        ({categoryExercises.length})
+                      </span>
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                      {categoryExercises.map((exercise) => (
+                        <ExerciseCard
+                          key={exercise.id}
+                          exercise={exercise}
+                          onToggleFavorite={onToggleFavorite}
+                          onStartTimer={handleStartTimer}
+                          getCategoryColor={getCategoryColor}
+                          formatDuration={formatDuration}
+                          formatSimplifiedDetails={formatSimplifiedDetails}
+                          onEdit={handleEditExercise}
+                          onDelete={handleDeleteExercise}
+                          onNavigateToExercise={handleNavigateToExercise}
+                          currentUser={user}
+                          isSharedExercise={isSharedExercise}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
         ) : (
           // Show flat grid when filtering by category or search
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -631,9 +772,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                 onStartTimer={handleStartTimer}
                 getCategoryColor={getCategoryColor}
                 formatDuration={formatDuration}
+                formatSimplifiedDetails={formatSimplifiedDetails}
                 onEdit={handleEditExercise}
                 onDelete={handleDeleteExercise}
-                onShowDetails={handleShowExerciseDetails}
+                onNavigateToExercise={handleNavigateToExercise}
                 currentUser={user}
                 isSharedExercise={isSharedExercise}
               />
@@ -643,19 +785,19 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
 
         {/* Empty State */}
   {filteredExercises.length === 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
+          <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              {t('exercises.emptyTitle')}
+            <h3 className="text-base sm:text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
+              {t('exercises:emptyTitle')}
             </h3>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4">
-              {t('exercises.emptyBody')}
+            <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mb-4">
+              {t('exercises:emptyBody')}
             </p>
             <button
               onClick={clearAllFilters}
-              className="px-4 py-2.5 bg-blue-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-blue-600 transition-colors min-h-[44px]"
+              className="px-4 py-2.5 bg-primary-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-primary-600 transition-colors min-h-[44px]"
             >
-              {t('exercises.clearFilters')}
+              {t('exercises:clearFilters')}
             </button>
           </div>
         )}
@@ -675,10 +817,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
           aria-labelledby="exercise-preview-title"
           className="absolute inset-0 flex items-center justify-center p-4"
         >
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md sm:max-w-lg overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-              <h2 id="exercise-preview-title" className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {previewExercise ? localizeExercise(previewExercise, t).name : t('exercises.preview', { defaultValue: 'Preview' })}
+          <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-xl w-full max-w-md sm:max-w-lg overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-surface-200 dark:border-surface-700">
+              <h2 id="exercise-preview-title" className="text-base sm:text-lg font-semibold text-text-900 dark:text-text-50">
+                {previewExercise ? localizeExercise(previewExercise, t).name : t('exercises:preview', { defaultValue: 'Preview' })}
               </h2>
               <button
                 onClick={closePreview}
@@ -709,7 +851,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
                   ))}
                 </video>
               ) : (
-                <div className="w-full h-40 rounded-md bg-gray-200 dark:bg-gray-700 animate-pulse" data-testid="preview-loading" />
+                <div className="w-full h-40 rounded-md bg-surface-200 dark:bg-surface-700 animate-pulse" data-testid="preview-loading" />
               )}
             </div>
           </div>
@@ -725,10 +867,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
         setExerciseToDelete(null);
       }}
       onConfirm={handleConfirmDelete}
-      title={t('exercises.deleteExerciseTitle', { defaultValue: 'Delete Exercise' })}
+      title={t('exercises:deleteExerciseTitle', { defaultValue: 'Delete Exercise' })}
       message={
         exerciseToDelete 
-          ? t('exercises.deleteConfirm', { 
+          ? t('exercises:deleteConfirm', { 
               name: exercises.find(ex => ex.id === exerciseToDelete) 
                 ? localizeExercise(exercises.find(ex => ex.id === exerciseToDelete)!, t).name 
                 : 'this exercise',
@@ -743,21 +885,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, onToggleFavorite
       variant="danger"
     />
 
-    {/* Exercise Detail Modal */}
-    <ExerciseDetailModal
-      exercise={exerciseToShow}
-      isOpen={detailModalOpen}
-      onClose={() => {
-        setDetailModalOpen(false);
-        setExerciseToShow(null);
-      }}
-      getCategoryColor={getCategoryColor}
-      formatDuration={formatDuration}
-      onNavigateToExercise={(exerciseId) => {
-        // Navigate to the exercise detail page
-        navigate(`/exercises/${exerciseId}`);
-      }}
-    />
+    {/* Category Selector Overlay */}
+    {categorySelectorOpen && (
+      <CategorySelector
+        selectedCategories={selectedCategories}
+        onCategoryToggle={handleCategoryToggle}
+        onClose={() => setCategorySelectorOpen(false)}
+        onClearAll={handleClearCategories}
+      />
+    )}
+
     </>
   );
 };
@@ -769,9 +906,10 @@ interface ExerciseCardProps {
   onStartTimer: (exercise: Exercise) => void;
   getCategoryColor: (category: ExerciseCategory) => string;
   formatDuration: (seconds?: number) => string;
+  formatSimplifiedDetails: (exercise: Exercise) => string;
   onEdit?: (exercise: Exercise) => void;
   onDelete?: (exercise_id: string) => Promise<void>;
-  onShowDetails: (exercise: Exercise) => void;
+  onNavigateToExercise: (exerciseId: string) => void;
   currentUser?: AuthUserProfile; // User from auth hook
   isSharedExercise: (exerciseId: string) => boolean; // Function to check if exercise is shared
 }
@@ -780,15 +918,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   onToggleFavorite,
   onStartTimer,
-  getCategoryColor,
-  formatDuration,
+  formatSimplifiedDetails,
   onEdit,
   onDelete,
-  onShowDetails,
+  onNavigateToExercise,
   currentUser,
   isSharedExercise
 }) => {
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const loc = localizeExercise(exercise, t);
   
   // Check if the exercise is user-created and belongs to the current user
@@ -806,52 +943,47 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const isSharedExerciseCard = isSharedExercise(exercise.id);
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
-      isUserCreated 
-        ? 'border-2 border-blue-300 dark:border-blue-600' 
-        : 'border border-gray-200 dark:border-gray-700'
+    <div className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+      isUserCreated
+        ? 'border-2 border-primary-300 dark:border-primary-600'
+        : 'border border-surface-200 dark:border-surface-700'
     }`} data-testid="exercise-card">
-      {/* Category Header */}
-      <div className={`${getCategoryColor(exercise.category)} h-2`}></div>
-      
-      <div className="p-3 sm:p-4">
-        {/* Top Row - Custom Tags (Left) and Action Buttons (Right) */}
-        <div className="mb-2">
+
+      <div className="p-2 sm:p-3">
+        {/* Top Row - Exercise Details (Left) and Action Buttons (Right) */}
+        <div className="mb-1">
           <div className="flex items-center justify-between">
-            {/* Left Side - Custom/Shared Tags */}
+            {/* Left Side - Exercise Details and Tags */}
             <div className="flex items-center gap-2">
-              {isUserCreated && (
-                <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full">
-                  {t('exercises.custom', { defaultValue: 'Custom' })}
-                </span>
-              )}
-              {currentUser && isSharedExerciseCard && (
-                <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
-                  {t('exercises.shared', { defaultValue: 'Shared' })}
-                </span>
-              )}
+              {/* Exercise Details - Left-aligned */}
+              <span className="text-sm font-medium text-text-600 dark:text-text-400">
+                {formatSimplifiedDetails(exercise)}
+              </span>
+              {/* Custom/Shared Tags */}
+              <div className="flex items-center gap-1">
+                {isUserCreated && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-dark-disabled text-primary-800 dark:text-primary-300 rounded-full">
+                    {t('exercises:custom', { defaultValue: 'Custom' })}
+                  </span>
+                )}
+                {currentUser && isSharedExerciseCard && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
+                    {t('exercises:shared', { defaultValue: 'Shared' })}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Right Side - Action Buttons */}
             <div className="flex items-center gap-1">
 
-              {/* Info Button - Always visible */}
-              <button
-                onClick={() => onShowDetails(exercise)}
-                className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-                title={t('exercises.viewDetails', { defaultValue: 'View details' })}
-                aria-label={t('exercises.viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
-              >
-                <InfoIcon size={18} className="sm:!w-5 sm:!h-5" />
-              </button>
-
               {/* Edit Button - Only for user-created */}
               {isUserCreated && onEdit && (
                 <button
                   onClick={() => onEdit(exercise)}
-                  className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-                  title={t('exercises.editExercise', { defaultValue: 'Edit exercise' })}
-                  aria-label={t('exercises.editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
+                  className="flex-shrink-0 text-text-600 dark:text-text-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  title={t('exercises:editExercise', { defaultValue: 'Edit exercise' })}
+                  aria-label={t('exercises:editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
                 >
                   <EditIcon size={18} className="sm:!w-5 sm:!h-5" />
                 </button>
@@ -861,9 +993,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               {(isUserCreated || isSharedExerciseCard) && onDelete && (
                 <button
                   onClick={() => onDelete(exercise.id)}
-                  className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
-                  title={t('exercises.deleteExercise', { defaultValue: 'Delete exercise' })}
-                  aria-label={t('exercises.deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
+                  className="flex-shrink-0 text-text-600 dark:text-text-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  title={t('exercises:deleteExercise', { defaultValue: 'Delete exercise' })}
+                  aria-label={t('exercises:deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
                 >
                   <DeleteIcon size={18} className="sm:!w-5 sm:!h-5" />
                 </button>
@@ -875,7 +1007,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   exerciseId={exercise.id}
                   exerciseName={loc.name}
                   ownerId={exercise.owner_id}
-                  className="flex-shrink-0 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  className="flex-shrink-0 text-text-600 dark:text-text-400 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                 />
               )}
 
@@ -883,8 +1015,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               <button
                 onClick={() => onToggleFavorite(exercise.id)}
                 className="flex-shrink-0 text-lg sm:text-xl hover:scale-110 transition-transform p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center text-yellow-500 hover:text-yellow-600"
-                title={exercise.is_favorite ? t('exercises.removeFromFavorites') : t('exercises.addToFavorites')}
-                aria-label={exercise.is_favorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises.addToFavoritesAria', { name: loc.name })}
+                title={exercise.is_favorite ? t('exercises:removeFromFavorites') : t('exercises:addToFavorites')}
+                aria-label={exercise.is_favorite ? t('home.removeFromFavoritesAria', { name: loc.name }) : t('exercises:addToFavoritesAria', { name: loc.name })}
               >
                 {exercise.is_favorite ? <StarFilledIcon size={18} className="sm:!w-5 sm:!h-5" /> : <StarIcon size={18} className="sm:!w-5 sm:!h-5" />}
               </button>
@@ -892,15 +1024,19 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         </div>
 
-        {/* Exercise Name - Lines 2-3 (Fixed height) */}
-        <div className="mb-3">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight line-clamp-2 h-12">
+        {/* Exercise Name - Clickable Link to Details */}
+        <div className="mb-2">
+          <button
+            onClick={() => onNavigateToExercise(exercise.id)}
+            className="text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            aria-label={t('exercises:viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
+          >
             {loc.name}
-          </h3>
+          </button>
         </div>
 
         {/* Video/Image Area */}
-        <div className="mb-3">
+        <div className="mb-2">
           {(exercise.has_video || exercise.custom_video_url) ? (
             <VideoThumbnail
               exercise={exercise}
@@ -913,59 +1049,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           )}
         </div>
 
-        {/* Exercise Type and Default Values */}
-        <div className="mb-3">
-          <div className="flex items-center gap-2 mb-2">
-            {/* Exercise Type Badge */}
-            <span
-              className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                exercise.exercise_type === 'time_based'
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                  : 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
-              }`}
-            >
-              {exercise.exercise_type === 'time_based' ? (
-                <>
-                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {t('exercises:timeBased.name')}
-                </>
-              ) : (
-                <>
-                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  {t('exercises:repBased.name')}
-                </>
-              )}
-            </span>
-            
-            {/* Default Values */}
-            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              {exercise.exercise_type === 'time_based' ? (
-                t('exercises.defaultDuration', { duration: formatDuration(exercise.default_duration) })
-              ) : (
-                t('exercises.defaultSetsReps', { sets: exercise.default_sets || 1, reps: exercise.default_reps || 1 })
-              )}
-            </span>
-          </div>
-        </div>
-
-        {/* Description - Lines 4-5 (Fixed 2 lines with truncation) */}
-        <div className="mb-4">
-          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 leading-relaxed min-h-[32px]">
-            {loc.description}
-          </p>
-        </div>
-
         {/* Start Timer Button - Full Width */}
         <button
           onClick={() => onStartTimer(exercise)}
-          className="w-full px-4 py-3 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors min-h-[44px] flex items-center justify-center gap-2"
+          className="w-full px-3 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors min-h-[36px] flex items-center justify-center gap-1.5"
           data-testid="start-exercise-timer"
         >
-          <PlayIcon size={18} />
+          <PlayIcon size={16} />
           {t('home.startTimer')}
         </button>
       </div>

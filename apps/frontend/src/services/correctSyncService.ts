@@ -641,6 +641,26 @@ export class CorrectSyncService {
       logger.debug(`[sync:v2] callEdge URL: ${functionUrl}`);
       logger.debug(`[sync:v2] callEdge payload:`, reqBody);
       logger.debug(`[sync:v2] callEdge auth token: ${tokenToUse ? `${tokenToUse.substring(0, 20)}...` : 'MISSING'}`);
+
+      // Enhanced auth debugging
+      if (tokenToUse) {
+        try {
+          const tokenParts = tokenToUse.split('.');
+          if (tokenParts.length === 3) {
+            const payload = JSON.parse(atob(tokenParts[1]));
+            const exp = payload.exp ? new Date(payload.exp * 1000) : null;
+            const now = new Date();
+            logger.debug(`[sync:v2] JWT info:`, {
+              expired: exp ? exp < now : 'unknown',
+              expiresAt: exp ? exp.toISOString() : 'unknown',
+              issuer: payload.iss,
+              audience: payload.aud
+            });
+          }
+        } catch (e) {
+          logger.debug(`[sync:v2] Failed to parse JWT:`, e instanceof Error ? e.message : String(e));
+        }
+      }
     }
     
     const controller = new AbortController();
@@ -679,6 +699,16 @@ export class CorrectSyncService {
       const t = await resp.text();
       if (SYNC_DEBUG) {
         logger.debug(`[sync:v2] callEdge error response body:`, t);
+
+        // Enhanced debugging for 401 errors
+        if (resp.status === 401) {
+          logger.debug(`[sync:v2] 401 Unauthorized - Potential causes:`, {
+            tokenProvided: !!tokenToUse,
+            tokenLength: tokenToUse ? tokenToUse.length : 0,
+            functionUrl: functionUrl,
+            wasTokenRefreshed: tokenToUse !== accessToken
+          });
+        }
       }
       throw new Error(`edge error ${resp.status}: ${t}`);
     }
@@ -720,6 +750,31 @@ export class CorrectSyncService {
       mapped.catalog_id = mapped.catalogId;
       delete mapped.catalogId;
     }
+
+    return mapped;
+  }
+
+  /**
+   * Maps app_settings field names from server format to client format
+   * Handles field name differences between Supabase and frontend
+   */
+  private mapAppSettingsFromServer(row: Record<string, unknown>): Record<string, unknown> {
+    const mapped = { ...row };
+
+    // Map server field names back to client field names
+    if ('beep_interval_seconds' in mapped) {
+      mapped.interval_duration = mapped.beep_interval_seconds;
+      delete mapped.beep_interval_seconds;
+    }
+    if ('beep_sound_enabled' in mapped) {
+      mapped.sound_enabled = mapped.beep_sound_enabled;
+      delete mapped.beep_sound_enabled;
+    }
+    if ('data_auto_save' in mapped) {
+      mapped.auto_save = mapped.data_auto_save;
+      delete mapped.data_auto_save;
+    }
+    // horizontal_exercise_layout doesn't need mapping - same name in both client and server
 
     return mapped;
   }
@@ -861,8 +916,13 @@ export class CorrectSyncService {
 
         const existing = await coll.get(row.id as string);
         if (!existing) {
-          // Apply field mapping for exercises table to normalize field names
-          const mappedRow = table === 'exercises' ? this.mapExerciseFieldsFromServer(row) : row;
+          // Apply field mapping to normalize field names
+          let mappedRow = row;
+          if (table === 'exercises') {
+            mappedRow = this.mapExerciseFieldsFromServer(row);
+          } else if (table === 'app_settings') {
+            mappedRow = this.mapAppSettingsFromServer(row);
+          }
           await coll.put({ ...mappedRow, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
 
           // If this is a new video file, update the corresponding exercise's custom_video_url
@@ -882,8 +942,13 @@ export class CorrectSyncService {
           const incomingTime = new Date(incomingUpdated as string | number).getTime();
           if (localTime > incomingTime) continue; // keep local newer timestamp
         }
-        // Apply field mapping for exercises table to normalize field names
-        const mappedRow = table === 'exercises' ? this.mapExerciseFieldsFromServer(row) : row;
+        // Apply field mapping to normalize field names
+        let mappedRow = row;
+        if (table === 'exercises') {
+          mappedRow = this.mapExerciseFieldsFromServer(row);
+        } else if (table === 'app_settings') {
+          mappedRow = this.mapAppSettingsFromServer(row);
+        }
         await coll.put({ ...existing, ...mappedRow, dirty: 0, op: undefined, synced_at: new Date().toISOString() });
 
         // If this is an updated video file, update the corresponding exercise's custom_video_url

@@ -67,6 +67,7 @@
     "exercises": "التمارين",
     "timer": "المؤقت",
     "activityLog": "السجل",
+    "progress": "التقدم",
     "settings": "الإعدادات"
   },
   "settings": {
@@ -82,6 +83,10 @@
     "darkMode": "الوضع المظلم",
     "showExerciseVideos": "عرض فيديو التمارين التوضيحية",
     "showExerciseVideosHelp": "تجريبي: تشغيل فيديوهات توضيحية صامتة داخل المؤقت عند توفرها.",
+    "horizontalExerciseLayout": "التصنيف الأفقي للفئات",
+    "horizontalExerciseLayoutHelp": "عرض التمارين في قوائم أفقية قابلة للتمرير مجمعة حسب الفئة، مشابه لتصفح نتفليكس.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Toggle between circular timer with rings or rectangular timer with border progress.",
     "language": "🌐 اللغة",
     "selectLanguage": "اختر اللغة",
     "languageHelp": "اختر لغتك المفضلة. سيتذكر التطبيق اختيارك.",
@@ -92,7 +97,9 @@
     "disabled": "معطل",
     "dataStoredLocally": "يتم تخزين بيانات التمرين محلياً على هذا الجهاز.",
     "pleaseAcceptConsent": "يرجى قبول موافقة تخزين البيانات لتفعيل ميزات التصدير/المسح.",
-    "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
+  "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
+  "consentStatusLabel": "حالة الموافقة",
+  "consentVersion": "إصدار الموافقة",
     "exportData": "تصدير البيانات",
     "exportDataHelp": "تحميل بيانات التمرين كملف JSON",
     "exportInProgress": "جارٍ التصدير...",
@@ -236,7 +243,9 @@
     "removeFromFavoritesAria": "إزالة {{name}} من المفضلة",
     "noFavorites": "لا توجد تمارين مفضلة بعد. ضع علامة على بعض التمارين كمفضلة لرؤيتها هنا!",
     "availableExercises": "التمارين المتاحة",
-    "changeLanguage": "تغيير اللغة"
+    "changeLanguage": "تغيير اللغة",
+    "popularExercises": "التمارين الشعبية",
+    "noPopularExercises": "لا توجد تمارين شعبية مع فيديوهات متاحة."
   },
   "workouts": {
     "title": "البرامج",

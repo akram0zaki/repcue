@@ -20,7 +20,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
   onClose,
   onNavigateToExercise
 }) => {
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation();
 
   if (!isOpen || !exercise) return null;
 
@@ -30,7 +30,7 @@ export const ExerciseDetailModal: React.FC<ExerciseDetailModalProps> = ({
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            {t('exerciseDetails', { ns: 'exercises', defaultValue: 'Exercise Details' })}
+            {t('exercises.exerciseDetails', 'Exercise Details')}
           </h2>
           <button
             onClick={onClose}

@@ -67,6 +67,7 @@
     "exercises": "Oefeningen",
     "timer": "Timer",
     "activityLog": "Logboek",
+    "progress": "Voortgang",
     "settings": "Instellingen"
   },
   "settings": {
@@ -82,6 +83,10 @@
     "darkMode": "Donkere Modus",
     "showExerciseVideos": "Toon Oefening Demo Video's",
     "showExerciseVideosHelp": "Experimenteel: loop stille demo video's binnen timer wanneer beschikbaar.",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Toggle between circular timer with rings or rectangular timer with border progress.",
     "language": "🌐 Taal",
     "selectLanguage": "Selecteer Taal",
     "languageHelp": "Kies uw voorkeurstaal. De app onthoudt uw keuze.",
@@ -92,7 +97,9 @@
     "disabled": "Uitgeschakeld",
     "dataStoredLocally": "Uw trainingsgegevens worden lokaal op dit apparaat opgeslagen.",
     "pleaseAcceptConsent": "Accepteer gegevensopslag toestemming om export/wis functies in te schakelen.",
-    "consentMigrationWarning": "⚠️ Toestemmingsgegevens worden gemigreerd naar de nieuwste versie bij volgende app start.",
+  "consentMigrationWarning": "⚠️ Toestemmingsgegevens worden gemigreerd naar de nieuwste versie bij volgende app start.",
+  "consentStatusLabel": "Toestemmingsstatus",
+  "consentVersion": "Toestemmingsversie",
     "exportData": "Gegevens Exporteren",
     "exportDataHelp": "Download uw trainingsgegevens als een JSON-bestand",
     "exportInProgress": "Exporteren...",
@@ -236,7 +243,9 @@
     "removeFromFavoritesAria": "{{name}} uit favorieten verwijderen",
     "noFavorites": "Nog geen favoriete oefeningen. Markeer enkele oefeningen als favoriet om ze hier te zien!",
     "availableExercises": "Beschikbare Oefeningen",
-    "changeLanguage": "Taal wijzigen"
+    "changeLanguage": "Taal wijzigen",
+    "popularExercises": "Populaire Oefeningen",
+    "noPopularExercises": "Geen populaire oefeningen met video's beschikbaar."
   },
   "workouts": {
     "title": "Trainingen",

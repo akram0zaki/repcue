@@ -1,5 +1,57 @@
 ## Unreleased
 
+### 2025-09-28 (UI Redesign Implementation & Test Infrastructure Hardening)
+#### Added
+- **Design System Foundation**: Added centralized design tokens (`src/constants/designTokens.ts`) with teal-based color system, 8pt grid spacing, and comprehensive typography scale
+- **Dark Mode Text Standards**: Created `docs/ui-ux/dark-mode-text-standards.md` defining consistent text color hierarchy for dark mode across all UI components
+- **New UI Components**:
+  - `CategorySelector.tsx` for improved exercise filtering
+  - Enhanced accessibility hooks (`useAccessibility.ts`, `useKeyboardNavigation.ts`)
+  - RTL language detection (`useRTLDetection.ts`)
+  - Dark mode toggle hook (`useDarkMode.ts`)
+- **Rectangular Timer Support**: Added ring timer toggle setting with database migration for circular vs rectangular timer display modes
+- **Exercise Detail Localization**: Created `exerciseDetails.json` locale files across all supported languages for enhanced exercise information display
+- **Comprehensive Test Infrastructure**: Added `storageServiceMock.ts` providing 50+ mocked methods to eliminate storage service test failures
+- **i18n Enhancement Script**: Added `i18n-exercises-report.mjs` for automated locale analysis and reporting
+
+#### Changed
+- **UI Redesign Implementation**: Updated all major components with new design system
+  - Navigation with teal color scheme and improved spacing
+  - Settings page with enhanced typography and dark mode support
+  - Exercise pages with consistent component styling
+  - Timer page with ring/rectangular timer option
+  - Toggle switches aligned with production styling (64x20 track, 14px knob)
+- **Locale File Refactoring**:
+  - Removed deprecated `exercise.json` files across all languages
+  - Consolidated exercise translations into `exercises.json` with expanded categories, types, and metadata
+  - Added comprehensive filter, sharing, and catalog translation strings
+  - Standardized structure across all locale files
+- **Component Architecture**: Migrated to centralized styling with design tokens and consistent Tailwind utility patterns
+- **App Shell Updates**: Enhanced AppShell with better dark mode support and accessibility features
+
+#### Fixed
+- **Test Infrastructure**: Eliminated widespread storage service test failures by providing comprehensive service mocking
+  - Fixed "storageService.getCurrentAppVersion is not a function" errors
+  - Applied comprehensive mocks to App.workout.test.tsx, SettingsPage.test.tsx, rep-exercise-fixes.test.tsx
+  - Ensured 50+ storage service methods properly mocked for test stability
+- **ToggleSwitch Component**: Refined styling to match production dark mode toggle patterns with proper dimensions and transitions
+- **Locale Consistency**: Fixed missing translation strings and structural inconsistencies across language files
+- **Dark Mode Implementation**: Applied consistent dark mode text color standards throughout the application
+
+#### Developer Experience
+- **Documentation**: Added comprehensive UI redesign implementation plan tracking progress across design system phases
+- **Migration Tracking**: Documented database schema changes for rectangular timer support in `supabase-changes_20250927.md`
+- **Test Reliability**: Significantly improved test suite stability by eliminating storage service mocking issues
+
+### 2025-09-28 (Frisian Locale Refresh & i18n Handbook)
+#### Added
+- Authored `docs/i18n-guide.md`, consolidating localisation must-knows, workflows, tooling, troubleshooting, and security/UX guidance for quick onboarding and day-to-day reference.
+- Localised new media playback UI strings ("No Video", "Pause Video", "Not Supported", "Low") across all supported `common.json` files so the refreshed video controls ship fully translated.
+
+#### Changed
+- Rebuilt `apps/frontend/public/locales/fy/exercises.json` from the canonical template, removing corrupted multi-root content, preserving Frisian translations, and flagging missing strings with `TODO_` placeholders to unblock follow-up localisation work.
+- Synced the canonical English exercise locale (`apps/frontend/public/locales/en/exercises.json`) with the same templated structure used for Frisian to keep translators aligned on field order and metadata.
+
 ### 2025-09-26 (Offline Exercise Creation & Editing Support)
 #### Added
 - **Offline exercise creation**: Users can now create and edit custom exercises without logging in, supporting true offline-first workflow

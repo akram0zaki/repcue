@@ -67,6 +67,7 @@
     "exercises": "Übungen",
     "timer": "Timer",
     "activityLog": "Protokoll",
+    "progress": "Fortschritt",
     "settings": "Einstellungen"
   },
   "settings": {
@@ -82,6 +83,10 @@
     "darkMode": "Dunkler Modus",
     "showExerciseVideos": "Übungs-Demo-Videos anzeigen",
     "showExerciseVideosHelp": "Experimentell: Stumme Demo-Videos im Timer abspielen, falls verfügbar.",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Toggle between circular timer with rings or rectangular timer with border progress.",
     "language": "🌐 Sprache",
     "selectLanguage": "Sprache auswählen",
     "languageHelp": "Wählen Sie Ihre bevorzugte Sprache. Die App merkt sich Ihre Auswahl.",
@@ -92,7 +97,9 @@
     "disabled": "Deaktiviert",
     "dataStoredLocally": "Ihre Trainingsdaten werden lokal auf diesem Gerät gespeichert.",
     "pleaseAcceptConsent": "Bitte akzeptieren Sie die Datenspeicher-Einwilligung, um Export-/Lösch-Funktionen zu aktivieren.",
-    "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
+  "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
+  "consentStatusLabel": "Einwilligungsstatus",
+  "consentVersion": "Einwilligungsversion",
     "exportData": "Daten exportieren",
     "exportDataHelp": "Laden Sie Ihre Trainingsdaten als JSON-Datei herunter",
     "exportInProgress": "Export wird durchgeführt...",
@@ -236,7 +243,9 @@
     "removeFromFavoritesAria": "{{name}} aus Favoriten entfernen",
     "noFavorites": "Noch keine Lieblings-Übungen. Markieren Sie einige Übungen als Favoriten, um sie hier zu sehen!",
     "availableExercises": "Verfügbare Übungen",
-    "changeLanguage": "Sprache ändern"
+    "changeLanguage": "Sprache ändern",
+    "popularExercises": "Beliebte Übungen",
+    "noPopularExercises": "Keine beliebten Übungen mit Videos verfügbar."
   },
   "workouts": {
     "title": "Workouts",

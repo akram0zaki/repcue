@@ -1,0 +1,263 @@
+{
+  "_meta": "Vertalingen voor ingebouwde oefeningen",
+  "plank": {
+    "name": "Plank",
+    "description": "Houd je lichaam recht, steunend op onderarmen en tenen",
+    "benefits": "Versterkt de rompspieren (buikspieren, schuine buikspieren, enz.), helpt de wervelkolom te beschermen en de houding te verbeteren. Ook handig omdat er geen apparatuur nodig is, en bouwt stabiliteit op voor dagelijkse bewegingen.",
+    "limitations": "Isometrische houdingen langer dan ~2 minuten leveren afnemende opbrengsten op. Slechte vorm (hangende heupen of schouders) kan pijn veroorzaken. Mensen met hoge bloeddruk moeten zeer lange planks vermijden omdat ze de bloeddruk kunnen verhogen. Pas aan bij pols- of schouderproblemen (ga op de knieën of gebruik een helling).",
+    "best_timing": "Kan aan het einde van een training of als snelle romproutine worden gedaan. Planken 2–4 keer per week is effectief. Ook nuttig als rompactivering tijdens opwarming of zelfs dagelijks tijdens pauzes.",
+    "suggested_combinations": ["side-plank", "dead-bug"],
+    "notes": "Houd een rechte lijn van hoofd tot hielen (geen hangende heupen). Adem gestaag en span je buik- en bilspieren de hele tijd aan. Begin met kortere houdingen (bijv. 20–30 seconden) en bouw geleidelijk op.",
+    "exercise_references": ["Cleveland Clinic – Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Harvard Health – Plank Exercise Tips; https://www.health.harvard.edu/blog/straight-talk-on-planking-2019111318304"]
+  },
+  "side-plank": {
+    "name": "Zijplank",
+    "description": "Houd je lichaam zijwaarts, steunend op één onderarm",
+    "benefits": "Benadrukt de schuine buikspieren en zijwaartse rompstabiliteit. Helpt de wervelkolom te stabiliseren en zijwaartse spieronbalans aan te pakken. Verbetert ook schouder- en heupuithoudingsvermogen aan elke kant.",
+    "limitations": "Oefent meer druk uit op één schouder – bij schouderpijn op knieën beginnen of vermijden. Voorkom dat heupen zakken; een zwakke romp kan het vasthouden moeilijk maken, dus langzaam opbouwen. Vermijd bij scherpe schouder- of armpijn.",
+    "best_timing": "Opnemen in romptrainingen na het beheersen van de normale plank. Vaak gedaan na gewone planks om de schuine buikspieren verder te activeren. Kan ook worden toegevoegd aan een yoga- of pilates routine.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Houd het lichaam in één lijn zonder naar voren of achteren te leunen. Je kunt de onderste knie laten zakken voor een eenvoudigere aanpassing. Druk de onderarm stevig in de vloer en laat de ondersteunende schouder niet inklappen.",
+    "exercise_references": ["Cleveland Clinic – Side Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Healthline – Side Plank Safety; https://www.healthline.com/health/side-plank"]
+  },
+  "mountain-climbers": {
+    "name": "Bergklimmers",
+    "description": "Breng in plankpositie afwisselend de knieën naar de borst",
+    "benefits": "Verhoogt snel de hartslag voor cardioconditioning en werkt aan rompstabiliteit. Mountain climbers zijn een tijdefficiënte oefening die beenspieren (vooral quads en bilspieren) activeert en verbeteren coördinatie tussen over- en onderlichaam. Ze verbranden calorieën en bouwen aan cardiovasculair uithoudingsvermogen.",
+    "limitations": "Kunnen intensief zijn voor beginners – start met langzamere tempo en werk op naar snelheid. Kan polsen belasten door gewichtsdragend plankpositie; bij ongemak korte pauzes nemen of op vuisten. Goede plankhouding is cruciaal – als heupen beginnen te zakken, pauzeer om vorm te herstellen. Vermijd bij acute schouder- of polsproblemen.",
+    "best_timing": "Uitstekend voor cardio-intervals of aan het einde van een training voor een laatste cardio-boost. Vaak gebruikt in HIIT-workouts of bootcamp-stijl training. Goed voor opwarming als uitgevoerd op gematigd tempo om hart en spieren voor te bereiden voor intensievere oefening.",
+    "suggested_combinations": ["burpees", "jumping-jacks"],
+    "notes": "Houd een stevige plankpositie met handen onder schouders en romp strak. Breng afwisselend knieën naar borst zonder heupen te laten stijgen of zakken. Begin langzaam om vorm te perfectioneren voor snelheid. Adem ritmisch – vermijd ademhouden tijdens snelle beweging.",
+    "exercise_references": ["Healthline – Mountain Climber Benefits; https://www.healthline.com/health/mountain-climbers", "MedicalNewsToday – Mountain Climber Exercise; https://www.medicalnewstoday.com/articles/326594"]
+  },
+  "bicycle-crunches": {
+    "name": "Fiets-crunches",
+    "description": "Elleboog naar tegenovergestelde knie in wisselend tempo",
+    "benefits": "Benadrukt de schuine buikspieren effectiever dan gewone crunches door de rotatiebeweging. Helpt rompkracht en stabiliteit te ontwikkelen, wat dagelijkse activiteiten kan verbeteren die draaien en buigen vereisen. Activeert ook de rectus abdominis (de 'sixpack'-spieren) en helpt bij algehele rompconditioning.",
+    "limitations": "Snelle, slordig uitgevoerde bicycle crunches kunnen nekspanning veroorzaken – controleer dat de beweging uit de romp komt, niet uit het trekken van de nek. Mensen met rugproblemen moeten voorzichtig zijn met de draaibeweging; begin langzaam en stop bij ongemak. Teveel doen kan spieronbalans veroorzaken als niet gecombineerd met andere rompoefeningen.",
+    "best_timing": "Gewoonlijk opgenomen in rompspecifieke trainingen of aan het einde van algemene workouts. Kunnen dagelijks worden gedaan met gematigde volumes. Werken goed in circuits met andere rompoefeningen zoals planks of dead bugs voor complete rompactivering.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Houd het hoofd in neutrale positie met handen licht achter de oren (niet achter de nek). Focus op het bewegen van elleboog naar knie door romp te draaien, niet door nek te trekken. Houd de tegenovergestelde elleboog aan de grond. Beweeg gecontroleerd – kwaliteit gaat boven snelheid.",
+    "exercise_references": ["Healthline – Bicycle Crunch Benefits; https://www.healthline.com/health/fitness-exercise/bicycle-crunch", "ACE Fitness – Bicycle Exercise; https://www.acefitness.org/education-and-resources/lifestyle/exercise-library/41/bicycle/"]
+  },
+  "push-ups": {
+    "name": "Opdrukken",
+    "description": "Laat je lichaam zakken en duw weer omhoog met je armen",
+    "benefits": "Versterkt de borst, schouders en triceps, terwijl de romp wordt geactiveerd voor stabiliteit. Het is een fundamentele oefening voor het bovenlichaam die ook de functionele kracht voor duwbewegingen verbetert. Kan zelfs de hartgezondheid ondersteunen – hogere push-up capaciteit is gekoppeld aan lager hartrisico.",
+    "limitations": "Te veel doen zonder variatie kan leiden tot een plateau in krachtwinst. Slechte vorm (zoals uitstaande ellebogen of hangende heupen) kan schouders of onderrug belasten. Bij polspijn push-up bars gebruiken of op knokkels doen. Personen met schouderblessures moeten een beperkt bereik gebruiken of overslaan bij pijn.",
+    "best_timing": "Meestal vroeg in een bovenlichaam training gedaan wanneer de armen fris zijn. Kunnen ook dagelijks met mate worden gedaan als onderdeel van een ochtendroutine of krachtcircuit, maar sta rustdagen toe voor herstel. Push-ups zijn ook een geweldige opwarming voor het bovenlichaam, uitgevoerd met aangepaste intensiteit.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Houd je lichaam recht en romp aangespannen gedurende de hele oefening. Zak tot je borst bijna de grond raakt (of zo ver als comfortabel) en duw omhoog zonder de ellebogen te blokkeren. Inademen bij zakken, uitademen bij omhoogduwen. Begin op de knieën of tegen een muur als een volledige push-up te uitdagend is.",
+    "exercise_references": ["Healthline – Benefits of Push-ups; https://www.healthline.com/health/fitness-exercise/pushups-everyday", "MedicalNewsToday – Push-up Risks; https://www.medicalnewstoday.com/articles/326149"]
+  },
+  "squats": {
+    "name": "Squats",
+    "description": "Buig de knieën om te zakken en kom weer overeind",
+    "benefits": "Activeert de meeste grote beenspieren (bilspieren, quadriceps, hamstrings) en romp, waardoor het een zeer functionele oefening is. Helpt onderlichaamkracht op te bouwen voor dagelijkse activiteiten zoals tillen of trappen lopen. Verbetert ook balans en flexibiliteit wanneer uitgevoerd door volledige bewegingsbereik, en kan calorieverbranding stimuleren door gebruik van grote spiergroepen.",
+    "limitations": "Juiste vorm is cruciaal – knieën moeten over tenen bewegen, niet naar binnen vallen, en hielen blijven beneden. Te zwaar gaan of te diep zonder flexibiliteit kan knieën of rug belasten. Mensen met knie- of rugproblemen moeten tot comfortabele diepte squatten (of stoel als gids gebruiken) en rug neutraal houden. Bij scherpe pijn stoppen en vorm controleren of trainer raadplegen.",
+    "best_timing": "Vaak aan het begin van een beentraining geplaatst omdat het een samengestelde beweging is die volledige kracht vereist. Kan met alleen lichaamsgewicht worden gedaan als opwarming of mobiliteitsoefening, of gewogen voor kracht vroeg aan. In algemene fitness routines passen squats goed bij bovenlichaamoefeningen in circuits.",
+    "suggested_combinations": ["lunges", "wall-sit"],
+    "notes": "Houd je borst omhoog en romp gespannen. Probeer te squatten tot bovenbenen evenwijdig aan de grond (of zo ver als comfortabel) terwijl knieën achter tenen blijven en gewicht in hielen. Duw door hielen om te staan en knijp bilspieren bovenaan samen. Zorg ervoor dat je een neutrale wervelkolom behoudt.",
+    "exercise_references": ["Healthline – Squat Benefits; https://www.healthline.com/health/fitness-exercise/squats-benefits", "Healthline – Squat Safety Tips; https://www.healthline.com/health/fitness-exercise/squats-benefits"]
+  },
+  "lunges": {
+    "name": "Lunges",
+    "description": "Stap naar voren en zak door, afwisselend per been",
+    "benefits": "Werkt alle grote beenspieren (bilspieren, quads, hamstrings) en verbetert balans door zijn unilaterale karakter. Lunges helpen krachtongelijkheden tussen benen corrigeren en heupbeweeglijkheid verbeteren. Ze activeren ook romp- en stabiliserende spieren om je rechtop te houden, wat algemene stabiliteit en coördinatie ten goede komt.",
+    "limitations": "Zorg ervoor dat je voorste knie niet verder reikt dan je tenen om het gewricht te beschermen. Mensen met knieproblemen vinden voorwaartse lunges misschien moeilijk – ze kunnen achterwaartse lunges proberen die gemakkelijker zijn voor de knieën. Houd je romp rechtop en vermijd overmatig naar voren leunen. Bij balansproblémen lunges naast een muur uitvoeren of iets vasthouden voor ondersteuning.",
+    "best_timing": "Lunges opnemen in beentrainingen na zwaardere lifts zoals squats, of in circuits. Ze zijn ook geweldig na een opwarming om bilspieren en benen te activeren, of als onderdeel van een dynamische opwarming voor hardlopen. Omdat ze spierpijn kunnen veroorzaken, is 2–3 keer per week met rustdagen ertussen voldoende voor de meesten.",
+    "suggested_combinations": ["squats", "calf-raises"],
+    "notes": "Stap ver genoeg zodat je voorste knie ongeveer boven de enkel blijft (niet te ver naar voren). Zak recht naar beneden door beide knieën te buigen, en vermijd het harde raken van de achterste knie op de grond. Duw door de hiel van de voorste voet om weer omhoog te komen. Houd je romp geactiveerd en romp verticaal voor balans.",
+    "exercise_references": ["Healthline – Benefits of Lunges; https://www.healthline.com/health/fitness-exercise/lunges-benefits", "Healthline – Lunge Variations (Reverse Lunge); https://www.healthline.com/health/fitness-exercise/lunges-benefits"]
+  },
+  "wall-sit": {
+    "name": "Muurzit",
+    "description": "Zak langs de muur tot de bovenbenen horizontaal zijn en houd vast",
+    "benefits": "Bouwt uithoudingsvermogen en kracht in de quadriceps, bilspieren en kuiten op. Wall sits zijn een isometrische oefening die spieren onder constante spanning zet, wat anders is dan dynamische bewegingen. Ze verbeteren onderlichaamkracht en kunnen helpen bij knie stabiliteit. Ook handig omdat ze minimale ruimte vereisen.",
+    "limitations": "Kan uitdagend zijn voor beginners – begin met kortere houdingen en bouw geleidelijk op. Mensen met knieproblemen moeten voorzichtig zijn; stop bij scherpe pijn. Te lang vasthouden kan spiervermoeidheid veroorzaken zonder extra voordeel. Zorg ervoor dat de muur schoon en stevig is voor veilige ondersteuning.",
+    "best_timing": "Vaak opgenomen in beentrainingen als uithoudings-uitdaging of burnout aan het einde. Kunnen worden gebruikt in circuits of als snelle been activering voor sporten. Ook nuttig als isometrische versterking op rustdagen van zwaardere gewichtheffen.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Ga met je rug tegen een gladde muur staan en schuif naar beneden tot je bovenbenen evenwijdig zijn aan de grond (of zo ver als comfortabel). Houd knieën boven enkels, niet uitstekend. Houd gewicht gelijkmatig verdeeld over beide voeten en adem gestadig. Begin met 20-30 seconden en verhoog geleidelijk.",
+    "exercise_references": ["Healthline – Wall Sit Benefits; https://www.healthline.com/health/fitness-exercise/wall-sit", "Healthline – Wall Sit Safety; https://www.healthline.com/health/fitness-exercise/wall-sit"]
+  },
+  "burpees": {
+    "name": "Burpees",
+    "description": "Squat, sprong naar plank, push-up, terug en sprong omhoog",
+    "benefits": "Een krachtige totale lichaamsoefening die kracht en cardio combineert. Burpees werken je benen, romp, borst en schouders, en verhogen snel de hartslag om cardiovasculair uithoudingsvermogen te verbeteren. Ze verbranden veel calorieën en kunnen explosieve kracht verbeteren (door de sprong) en algehele behendigheid.",
+    "limitations": "Burpees zijn zeer intensief; beginners moeten beginnen met minder herhalingen of step-back variaties om blessures te voorkomen. Ze kunnen stress uitoefenen op polsen, schouders en knieën door snelle overgangen. Houd een gecontroleerd tempo aan om goede vorm te garanderen – slordig burpees kunnen onderrug of schouders belasten. Bij gewrichtsproblemen overwegen aanpassen (bijv. geen sprong, of stappen in plaats van springen).",
+    "best_timing": "Vaak aan het einde van een training gedaan of in HIIT-sessies als hoge-intensiteit interval. Omdat ze vermoeiend zijn, is het gebruiken in korte uitbarstingen (zoals 10-15 herhalingen of 30 seconden) met rust gebruikelijk. Ze zijn ook populair in bootcamp- of CrossFit-stijl trainingen voor conditionering.",
+    "suggested_combinations": ["mountain-climbers", "jumping-jacks"],
+    "notes": "Houd een gestaag ritme: squat, schop terug naar stevige plank, voer push-up uit met strakke romp, breng voeten terug onder je, spring dan omhoog. Land zacht bij sprong om knieën te beschermen. Ademhaling is belangrijk – uitademen bij terugspringen en bij omhoogspringen. Kwaliteit boven kwantiteit: het is beter om minder burpees met goede vorm te doen dan veel met slechte vorm.",
+    "exercise_references": ["Healthline – Burpee Benefits; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee", "Healthline – Burpee Safety Tips; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee"]
+  },
+  "jumping-jacks": {
+    "name": "Spreidsprongen",
+    "description": "Open en sluit benen en armen terwijl je springt",
+    "benefits": "Een eenvoudige maar effectieve cardio oefening die snel de hartslag verhoogt. Jumping jacks verbeteren coördinatie tussen over- en onderlichaam en activeren meerdere spiergroepen tegelijk. Ze zijn uitstekend voor opwarming, verbranden calorieën en verbeteren cardiovasculair uithoudingsvermogen. Kunnen overal worden gedaan zonder apparatuur.",
+    "limitations": "Het springen kan impact hebben op knieën en enkels – mensen met gewrichtsproblemen kunnen stepping jacks overwegen in plaats daarvan. De arm beweging kan ongemakkelijk zijn voor mensen met schouderproblemen; in dat geval alleen de benen gebruiken. Op harde oppervlakken kunnen ze lawaaierig zijn voor buren.",
+    "best_timing": "Perfect voor opwarming voor elke workout om lichaam voor te bereiden op intensievere oefening. Ook populair in cardio-circuits, HIIT-workouts, of als snelle energie-boost tijdens de dag. Kunnen worden gebruikt als actieve rust tussen krachttraining sets.",
+    "suggested_combinations": ["high-knees", "butt-kicks"],
+    "notes": "Begin met voeten samen en armen langs de zij. Spring terwijl je benen spreidt naar schouderwijdte en armen boven het hoofd brengt. Spring terug naar startpositie. Land zacht op de ballen van je voeten om impact te verminderen. Houd een gestaag ritme en adem ritmisch.",
+    "exercise_references": ["Healthline – Jumping Jack Benefits; https://www.healthline.com/health/jumping-jacks", "MedicalNewsToday – Jumping Jack Exercise; https://www.medicalnewstoday.com/articles/324739"]
+  },
+  "high-knees": {
+    "name": "Hoge knieën",
+    "description": "Ren op de plaats en breng de knieën tot heuphoogte",
+    "benefits": "Verhoogt snel de hartslag en verbetert been kracht en coördinatie. High knees activeren heupflexoren, quadriceps en kuiten terwijl ze cardiovasculair uithoudingsvermogen opbouwen. Ze zijn uitstekend voor het verbeteren van hardloopvorm en beensnelheid, en kunnen helpen met beweeglijkheid en flexibiliteit.",
+    "limitations": "Kunnen intensief zijn voor beginners – begin met lager tempo en bouw geleidelijk op. Mensen met knie- of heupproblemen moeten voorzichtig zijn met de hoge lifting beweging. Kan vermoeiend zijn voor de heupflexoren, dus luister naar je lichaam en pauzeer indien nodig. Vermijd oververhitting in warme omgevingen.",
+    "best_timing": "Perfect als opwarming voor hardlopen of sporten om benen en heupen voor te bereiden. Vaak gebruikt in cardio circuits, interval training, of als quick energy burst. Ook nuttig voor sporters die beensnelheid en wendbaarheid willen verbeteren.",
+    "suggested_combinations": ["butt-kicks", "jumping-jacks"],
+    "notes": "Ren op de plaats terwijl je afwisselend elke knie tot heuphoogte (of zo hoog als comfortabel) brengt. Houd je romp rechtop en gebruik je armen natuurlijk zoals bij hardlopen. Focus op snelle voetbewegingen en land op de ballen van je voeten. Houd een gestaag ritme en adem regelmatig.",
+    "exercise_references": ["Healthline – High Knees Exercise; https://www.healthline.com/health/fitness-exercise/high-knees", "Verywell Fit – High Knees; https://www.verywellfit.com/how-to-do-high-knees-4686709"]
+  },
+  "butt-kicks": {
+    "name": "Hiel naar bil",
+    "description": "Ren op de plaats en tik met de hielen richting billen",
+    "benefits": "Activeert en rekt hamstrings terwijl het cardiovasculair uithoudingsvermogen verbetert. Butt kicks helpen flexibiliteit in de quadriceps te ontwikkelen en kunnen de hardloopvorm verbeteren door juiste hiel-to-glute actie te oefenen. Ze verhogen ook de hartslag voor cardio conditioning.",
+    "limitations": "Mensen met knieproblemen moeten voorzichtig zijn met de buigbeweging en misschien niet volledig naar billen reiken. Kan quadriceps spanning veroorzaken als te agressief uitgevoerd – begin langzaam. Vermijd forceren van hiel tot bil contact als niet comfortabel; werk geleidelijk aan flexibiliteit.",
+    "best_timing": "Uitstekend voor hardloop opwarming om hamstrings en quadriceps voor te bereiden. Vaak gekoppeld aan high knees in cardiovasculaire circuits. Goed voor dynamische opwarming voor sporten die beenflexibiliteit vereisen.",
+    "suggested_combinations": ["high-knees", "jumping-jacks"],
+    "notes": "Ren licht op de plaats terwijl je afwisselend hielen naar billen brengt. Houd romp rechtop en gebruik armen natuurlijk. Focus op het activeren van hamstrings om hielen op te tillen in plaats van alleen knieën te buigen. Begin langzaam om flexibiliteit op te bouwen en vermijd geforceerde bewegingen.",
+    "exercise_references": ["Healthline – Butt Kicks Exercise; https://www.healthline.com/health/fitness-exercise/butt-kicks", "Verywell Fit – Butt Kicks; https://www.verywellfit.com/how-to-do-butt-kicks-4707207"]
+  },
+  "downward-dog": {
+    "name": "Neerwaartse hond",
+    "description": "Vorm een omgekeerde V met handen en voeten op de grond",
+    "benefits": "Rekt meerdere spiergroepen tegelijk, vooral hamstrings, kuiten en schouders. Downward dog versterkt armen en schouders terwijl het de wervelkolom lengt en kan rugspanning verlichten. Het verbetert ook doorbloedbevelen door milde inversie en kan stress verminderen door zijn rustgevende aard.",
+    "limitations": "Kan ongemakkelijk zijn voor mensen met polsproblemen – gebruik blokken onder handen of ga op vuisten indien nodig. Mensen met hoge bloeddruk of hoofdpijn moeten voorzichtig zijn met de omgekeerde positie. Strakke hamstrings maken de houding moeilijker; knieën buigen is prima tijdens opbouw van flexibiliteit.",
+    "best_timing": "Populair in yoga sequenties als overgangshouding. Uitstekend voor stretching na training of als onderdeel van cool-down routine. Kan ook worden gebruikt als korte stretch tijdens werkpauzes om lichaamshouding te verbeteren en spanning te verlichten.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Begin op handen en knieën, til heupen op terwijl je benen strekt om een omgekeerde V vorm te maken. Houd handen schouderwijdte apart, vingers gespreid voor stabiliteit. Probeer hielen naar grond te duwen maar geen zorgen als ze niet raken. Houd de positie en adem diep.",
+    "exercise_references": ["Yoga Journal – Downward Dog Benefits; https://www.yogajournal.com/poses/downward-facing-dog/", "Healthline – Downward Dog; https://www.healthline.com/health/fitness-exercise/downward-dog"]
+  },
+  "child-pose": {
+    "name": "Kindhouding",
+    "description": "Kniel, ga op de hielen zitten en strek de armen naar voren",
+    "benefits": "Een rustgevende houding die stress vermindert en ontspanning bevordert. Child's pose rekt zachtjes de heupen, bovenbenen en enkels terwijl het de wervelkolom lengt. Het kan helpen bij het kalmeren van het zenuwstelsel en is uitstekend voor het verlichten van rugspanning en hoofdpijn.",
+    "limitations": "Mensen met knieproblemen kunnen ongemak ervaren – plaats een kussen tussen kuiten en bovenbenen voor ondersteuning. Zwangere vrouwen moeten knieën wijder uit elkaar spreiden. Vermijd als je diarree hebt of knieblessures. Mensen met hoge bloeddruk moeten voorzichtig zijn.",
+    "best_timing": "Perfect als rustpositie tijdens yoga beoefening wanneer je een pauze nodig hebt. Vaak gebruikt aan het einde van workouts voor cool-down en ontspanning. Ook nuttig voor meditatie of wanneer je stress voelt en een moment van kalmte nodig hebt.",
+    "suggested_combinations": ["downward-dog", "cat-cow"],
+    "notes": "Kniel op de grond met grote tenen raked en knieën heupwijdte (of wijder voor comfort). Zit terug op je hielen en buig voorover, strek armen naar voren of langs lichaam. Rust voorhoofd op de grond. Adem diep en laat lichaam zwaar worden.",
+    "exercise_references": ["Yoga Journal – Child's Pose; https://www.yogajournal.com/poses/child-s-pose/", "Healthline – Child's Pose Benefits; https://www.healthline.com/health/fitness-exercise/childs-pose"]
+  },
+  "cat-cow": {
+    "name": "Kat-koe",
+    "description": "Maak afwisselend een bolle en holle rug op handen en knieën",
+    "benefits": "Verbetert wervelkolom flexibiliteit en mobiliteit door zachte beweging door alle segmenten. Cat-cow helpt rugspanning te verlichten, houding te verbeteren en kan rugpijn verminderen. Het warmt ook de wervelkolom op voor andere activiteiten en bevordert ontspanning door ritmische beweging.",
+    "limitations": "Mensen met ernstige rugblessures moeten medisch advies zoeken voor het uitvoeren. Ga langzaam en vermijd geforceerde bewegingen. Polspijn kan voorkomen door gewicht op handen – modificeer door op vuisten te gaan of polssteun te gebruiken. Stop bij scherpe pijn in de rug.",
+    "best_timing": "Perfect voor ochtend stretching om de wervelkolom voor de dag op te warmen. Vaak gebruikt aan het begin van yoga beoefening of als opwarming voor workouts die rugflexibiliteit vereisen. Ook nuttig tijdens werkpauzes om stijfheid van zitten tegen te gaan.",
+    "suggested_combinations": ["child-pose", "downward-dog"],
+    "notes": "Begin op handen en knieën in tafelhouding. Voor 'kat': rond rug naar plafond terwijl je kin naar borst brengt. Voor 'koe': laat buik zakken terwijl je borst lift en naar plafond kijkt. Beweeg langzaam en vloeiend tussen posities, adem op beweging.",
+    "exercise_references": ["Yoga Journal – Cat-Cow Pose; https://www.yogajournal.com/poses/cat-cow-pose/", "Healthline – Cat-Cow Benefits; https://www.healthline.com/health/cat-cow-pose"]
+  },
+  "single-leg-stand": {
+    "name": "Eenbenige stand",
+    "description": "Sta op één been en wissel daarna",
+    "benefits": "Verbetert balans, stabiliteit en proprioceptie (lichaamsbewustzijn). Single leg stands versterken de kleine stabiliserende spieren rond enkels, knieën en heupen. Ze kunnen helpen valrisico te verminderen en prestaties te verbeteren in sporten die balans vereisen.",
+    "limitations": "Kan uitdagend zijn voor beginners – begin bij een muur of stoel voor ondersteuning. Mensen met evenwichtsproblemen of duizeligheid moeten voorzichtig zijn. Stop als je je onzeker voelt. Mensen met enkelblessures moeten geleidelijk opbouwen.",
+    "best_timing": "Kan dagelijks worden gedaan als korte balansoefening. Nuttig als opwarming voor sporten of activiteiten die stabiliteit vereisen. Ook good voor ouderen als onderdeel van valpreventie routine.",
+    "suggested_combinations": ["tree-pose", "warrior-3"],
+    "notes": "Sta op één voet en til de andere licht van de grond. Focus op een punt voor je om balans te behouden. Houd 10-30 seconden en wissel dan van been. Begin met ondersteuning indien nodig en werk geleidelijk naar vrije balans. Hou romp rechtop en gespannen.",
+    "exercise_references": ["Healthline – Balance Exercises; https://www.healthline.com/health/fitness-exercise/balance-exercises", "Harvard Health – Why Balance Matters; https://www.health.harvard.edu/staying-healthy/why-good-balance-matters"]
+  },
+  "tree-pose": {
+    "name": "Boomhouding",
+    "description": "Sta op één been en plaats de andere voet aan de binnenkant van het bovenbeen",
+    "benefits": "Verbetert balans, focus en concentratie terwijl het beenstabiliteit opbouwt. Tree pose versterkt het standbeen en rekt de heupflexoren van het opgeklapte been. Het bevordert ook kalmte en kan helpen bij stress vermindering door de focus die vereist is.",
+    "limitations": "Vermijd het plaatsen van de voet aan de zijkant van de knie vanwege potentiële gewrichtsstress. Mensen met ernstige balansproblemen moeten bij een muur oefenen. Begin met voet lager (enkel of kuit) als bovenbeen plaatsing te uitdagend is.",
+    "best_timing": "Populair in yoga sessies voor balans en mindfulness. Kan worden gebruikt als korte mentale pauze tijdens de dag om focus te herwinnen. Ook nuttig als onderdeel van opwarming voor activiteiten die balans vereisen.",
+    "suggested_combinations": ["single-leg-stand", "warrior-3"],
+    "notes": "Sta op één voet en plaats de andere voet tegen binnen bovenbeen, kuit of enkel (niet zijkant knie). Breng handen naar hartcentrum of boven hoofd. Focus op een punt voor je en adem rustig. Houd 30 seconden tot 1 minuut per zijde.",
+    "exercise_references": ["Yoga Journal – Tree Pose; https://www.yogajournal.com/poses/tree-pose/", "Healthline – Tree Pose Benefits; https://www.healthline.com/health/fitness-exercise/tree-pose"]
+  },
+  "warrior-3": {
+    "name": "Krijger III",
+    "description": "Balans op één been met het andere been naar achteren gestrekt",
+    "benefits": "Bouwt serieuze balans, beenkracht en rompstabiliteit op. Warrior III versterkt het standbeen, rekt de heupflexoren en activeert de gehele achterste keten. Het verbetert ook focus, concentratie en lichaamsbewustzijn door de uitdagende balans vereiste.",
+    "limitations": "Een gevorderde balanshouding – beginners moeten bij een muur oefenen of handen op een blok/stoel voor ondersteuning. Mensen met rugproblemen moeten voorzichtig zijn met de vooroverbuiging. Stop bij duizeligheid of als balans onveilig wordt.",
+    "best_timing": "Gebruikelijk in yoga flows nadat andere balanshoudings zijn opgewarmd. Kan worden toegevoegd aan functionele fitness routines voor atleten. Best gedaan wanneer je fris bent en kan concentreren op vorm en balans.",
+    "suggested_combinations": ["tree-pose", "single-leg-stand"],
+    "notes": "Begin staand, til één been achterwaarts terwijl je voorover kantelt tot lichaam een 'T' vorm maakt. Houd heupen vierkant en vermijd roteren. Arms kunnen uitgestrekt worden of in gebed positie. Focus op lengthening door crown en achterste hiel. Adem gestaag.",
+    "exercise_references": ["Yoga Journal – Warrior III; https://www.yogajournal.com/poses/warrior-pose-iii/", "DoYogaWithMe – Warrior III Tips; https://www.doyogawithme.com/content/warrior-iii"]
+  },
+  "dead-bug": {
+    "name": "Dode kever",
+    "description": "Lig op je rug en strek afwisselend tegenovergestelde arm en been",
+    "benefits": "Uitstekend voor rompstabiliteit en coördinatie. Dead bugs leren de romp stabiel te houden terwijl ledematen bewegen, wat cruciaal is voor dagelijkse activiteiten. Ze helpen rugpijn te voorkomen door diepe rompspieren te versterken en verbeteren algemene rompcontrole.",
+    "limitations": "Vereist goede lichaamsbewustzijn om correct uit te voeren – begin langzaam en focus op vorm. Mensen met nekproblemen moeten hoofd op een kussen steunen. Als onderrug van de grond komt, verminder het bewegingsbereik of buig knieën meer.",
+    "best_timing": "Perfect voor rompgerichte trainingen of als opwarming om stabiliserende spieren te activeren. Ook nuttig bij revalidatie voor rugproblemen. Kan dagelijks worden gedaan als onderdeel van lichaamsbeheersing routine.",
+    "suggested_combinations": ["plank", "bicycle-crunches"],
+    "notes": "Lig op rug met knieën gebogen en armen naar plafond. Houd onderrug tegen grond gedrukt. Strek langzaam tegenovergestelde arm en been uit terwijl je romp stabiel houdt. Keer terug naar start en herhaal andere kant. Adem uit bij extensie.",
+    "exercise_references": ["Healthline – Dead Bug Exercise; https://www.healthline.com/health/dead-bug-exercise", "Verywell Fit – Dead Bug Benefits; https://www.verywellfit.com/how-to-do-the-dead-bug-exercise-4685500"]
+  },
+  "glute-bridges": {
+    "name": "Heupbrug",
+    "description": "Lig op je rug en til de heupen op door de bilspieren aan te spannen",
+    "benefits": "Versterkt bilspieren, hamstrings en onderrug terwijl heupflexoren worden gerekt. Glute bridges helpen houding te verbeteren door heupmobiliteit te verhogen en kunnen rugpijn verlichten veroorzaakt door strakke heupflexoren van veel zitten. Ze activeren ook de achterste keten effectief.",
+    "limitations": "Mensen met knieproblemen moeten voorzichtig zijn met de kniebuiging – begin met kleinere bewegingsbereik. Vermijd overstreken (te hoge lift) wat onderrugspanning kan veroorzaken. Als nek ongemakkelijk is, gebruik een dun kussen onder hoofd.",
+    "best_timing": "Uitstekend als activatie oefening voor de bilspieren voor krachttraining of hardlopen. Ook effectief aan het einde van workouts voor bilspierontwikkeling. Nuttig voor mensen met bureaubanen als dagelijkse heupmobiliteit oefening.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Lig op rug met knieën gebogen en voeten plat op grond. Span bilspieren aan en duw heupen omhoog tot rechte lijn van knieën tot schouders. Knijp bilspieren bovenaan en laat langzaam zakken. Vermijd duwen met onderrug; focus op bilspieren.",
+    "exercise_references": ["Healthline – Glute Bridge Benefits; https://www.healthline.com/health/exercise-fitness/glute-bridge", "Verywell Fit – Glute Bridge Exercise; https://www.verywellfit.com/how-to-do-glute-bridge-exercise-4589819"]
+  },
+  "finger-roll": {
+    "name": "Vingerrol",
+    "description": "Rol de vingers van vuist naar volledige strekking, één voor één",
+    "benefits": "Verbetert vinger behendigheid, hand coördinatie en kan stijfheid in handen verminderen. Finger rolls zijn nuttig voor mensen die veel typen, muzikanten, of iedereen die fijne motoriek wil behouden. Ze kunnen ook helpen bij artritis gerelateerde stijfheid.",
+    "limitations": "Mensen met ernstige artritis of handpijn moeten voorzichtig zijn en niet forceren. Stop bij scherpe pijn. Begin langzaam en verhoog geleidelijk bereik van beweging. Niet geschikt tijdens acute handletsel of ontsteking.",
+    "best_timing": "Nuttig als handopwarming voor activiteiten die vinger behendigheid vereisen. Kan gedaan worden tijdens werkpauzes voor mensen die veel typen. Ook goed als onderdeel van cool-down na activiteiten die handgebruik vereisen.",
+    "suggested_combinations": ["cat-cow", "forward-fold"],
+    "notes": "Begin met dichte vuist en rol langzaam elke vinger uit, beginnend met pink naar duim (of omgekeerd). Probeer elke vinger onafhankelijk te bewegen. Herhaal meerdere keren en wissel dan van hand. Houd bewegingen langzaam en gecontroleerd.",
+    "exercise_references": ["Healthline – Hand Exercises; https://www.healthline.com/health/hand-exercises", "Arthritis Foundation – Hand Exercises; https://www.arthritis.org/health-wellness/healthy-living/physical-activity/other-activities/hand-exercises"]
+  },
+  "tricep-dips": {
+    "name": "Tricep dips",
+    "description": "Laat je lichaam zakken en duw omhoog met ondersteuning achter je",
+    "benefits": "Benadrukt triceps ontwikkeling terwijl ook schouders en borstspieren werken. Tricep dips zijn effectief voor bovenarm kracht en kunnen helpen bij andere duwbewegingen. Ze vereisen geen apparatuur en kunnen bijna overal worden gedaan met een bank, stoel of rand.",
+    "limitations": "Kan stress uitoefenen op schouders, vooral bij mensen met schouderproblemen – beperk bereik van beweging indien nodig. Polsen kunnen ook ongemak ervaren door de hoek; stop bij pijn. Te diep gaan kan schouder impingement veroorzaken. Begin conservatief met bereik.",
+    "best_timing": "Goed opgenomen in bovenlichaam of tricep gerichte trainingen. Kunnen ook worden gebruikt in circuits met andere lichaamsgewicht oefeningen. Nuttig als accessoire oefening na hoofdlifts zoals push-ups of krachttraining.",
+    "suggested_combinations": ["push-ups", "plank"],
+    "notes": "Zit op rand van stabiele bank/stoel, plaats handen naast heupen. Schuif van rand terwijl je gewicht op handen houdt. Laat lichaam zakken tot ellebogen ongeveer 90 graden, duw dan terug omhoog. Houd voeten plat en ellebogen dicht bij lichaam.",
+    "exercise_references": ["Healthline – Tricep Dip Benefits; https://www.healthline.com/health/fitness-exercise/tricep-dips", "Verywell Fit – Tricep Dips; https://www.verywellfit.com/how-to-do-triceps-dips-3498683"]
+  },
+  "calf-raises": {
+    "name": "Kuitheffing",
+    "description": "Kom op de tenen staan, kort vasthouden en weer laten zakken",
+    "benefits": "Versterkt kuitspieren en verbetert enkelmobiliteit en stabiliteit. Calf raises kunnen helpen bij hardloopprestaties, springen en algehele beensterkte. Ze ondersteunen ook balans en kunnen helpen bij het voorkomen van enkelblessures door verbeterde proprioceptie.",
+    "limitations": "Mensen met achillespeesblessures moeten voorzichtig zijn en beginnen met beperkt bereik. Vermijd te snel bewegen wat peesstress kan veroorzaken. Bij balansproblemen een muur of stoel voor ondersteuning gebruiken. Begin conservatief bij strakke kuiten.",
+    "best_timing": "Nuttig als opwarming voor activiteiten die springen of hardlopen vereisen. Kunnen dagelijks worden gedaan voor kuitsterkte. Ook good als cool-down oefening of als onderdeel van been-gecentreerde workouts.",
+    "suggested_combinations": ["lunges", "squats"],
+    "notes": "Sta met voeten heupwijdte uit elkaar. Kom langzaam omhoog op tenen zo hoog mogelijk, houd kort vast, laat dan langzaam zakken. Focus op gecontroleerde beweging omhoog en omlaag. Voor extra uitdaging, ga op een step staan voor groter bewegingsbereik.",
+    "exercise_references": ["Healthline – Calf Raise Benefits; https://www.healthline.com/health/fitness-exercise/calf-raises", "Verywell Fit – Calf Raises; https://www.verywellfit.com/how-to-do-calf-raises-4687615"]
+  },
+  "russian-twists": {
+    "name": "Russische draaioefeningen",
+    "description": "Zittend met voeten omhoog, romp naar links en rechts draaien",
+    "benefits": "Benadrukt schuine buikspieren en rompkracht door rotationele beweging. Russian twists verbeteren rompstabiliteit en kunnen helpen bij sporten die draaibewegingen vereisen. Ze versterken ook de diepe rompspieren die belangrijk zijn voor rugondersteuning.",
+    "limitations": "Mensen met rugproblemen moeten voorzichtig zijn met de draaibeweging – begin langzaam en met kleinere rotatie. Vermijd als je acute rugpijn hebt. Houd voeten op grond als het tillen te uitdagend is. Te snel draaien kan nekspanning veroorzaken.",
+    "best_timing": "Goed opgenomen in rompgerichte workouts of aan het einde van algemene trainingen. Kunnen worden gebruikt in circuits met andere rompoefeningen. Ook nuttig voor sporters die rotationele kracht voor hun sport nodig hebben.",
+    "suggested_combinations": ["bicycle-crunches", "plank"],
+    "notes": "Zit met knieën gebogen, lean licht achterover en til voeten van grond (of houd op grond voor aanpassing). Draai romp naar links en rechts terwijl je balans behoudt. Houd bewegingen gecontroleerd en adem regelmatig. Focus op rompbewegingen, niet nek.",
+    "exercise_references": ["Healthline – Russian Twist Benefits; https://www.healthline.com/health/fitness-exercise/russian-twist", "Verywell Fit – Russian Twists; https://www.verywellfit.com/russian-twist-abs-exercise-3498700"]
+  },
+  "bear-crawl": {
+    "name": "Berenkruipen",
+    "description": "Kruip vooruit op handen en voeten met knieën van de grond",
+    "benefits": "Een totale lichaamsoefening die kracht en coördinatie uitdaagt. Bear crawls versterken schouders, romp en benen terwijl ze cardiovasculair uithoudingsvermogen verbeteren. Ze verbeteren ook lichaamsbewustzijn en functionele bewegingspatronen die relevant zijn voor dagelijkse activiteiten.",
+    "limitations": "Kan intensief zijn voor polsen en schouders – begin met korte afstanden. Mensen met pols- of schouderproblemen moeten voorzichtig zijn of vermijden. Ook uitdagend voor de romp; stop als vorm begint te lijden. Kan vermoeiend zijn, dus bouw geleidelijk op.",
+    "best_timing": "Uitstekend voor functionele fitness routines of als onderdeel van HIIT circuits. Kunnen gebruikt worden als opwarming om meerdere spiergroepen te activeren. Ook populair in bootcamp stijl workouts voor conditionering.",
+    "suggested_combinations": ["mountain-climbers", "burpees"],
+    "notes": "Begin op handen en knieën, til knieën net van de grond. Kruip vooruit door tegenovergestelde hand en voet te bewegen terwijl knieën zwevend blijven. Houd romp strak en rugrecht. Begin met korte afstanden en verhoog geleidelijk.",
+    "exercise_references": ["Healthline – Bear Crawl Exercise; https://www.healthline.com/health/fitness-exercise/bear-crawl", "Men's Health – Bear Crawl Benefits; https://www.menshealth.com/fitness/a19536146/bear-crawl-exercise/"]
+  },
+  "forward-fold": {
+    "name": "Vooroverbuiging",
+    "description": "Buig voorover vanuit stand en reik naar de tenen",
+    "benefits": "Rekt de hamstrings, kuiten en rug terwijl het zachte inversie biedt die kan helpen bij ontspanning. Forward folds kunnen rugspanning verlichten, flexibiliteit verbeteren en stress verminderen. Ze stimuleren ook de parasympathische zenuwstelsel voor kalmering.",
+    "limitations": "Mensen met rugblessures moeten voorzichtig zijn en niet forceren in de stretch. Hoge bloeddruk kan contra-indicatie zijn voor de inversie. Bij strakke hamstrings knieën licht buigen om rugdruk te verminderen. Vermijd bounce bewegingen.",
+    "best_timing": "Perfect voor cool-down na workouts of als onderdeel van flexibiliteits routine. Goed voor stress relief aan het einde van de dag. Kan gebruikt worden als pauze stretch tijdens lang zitten om rugspanning te verlichten.",
+    "suggested_combinations": ["downward-dog", "child-pose"],
+    "notes": "Sta met voeten heupwijdte uit elkaar. Scharnier bij heupen en buig langzaam voorover, laat armen naar grond hangen. Buig knieën licht als hamstrings strak zijn. Houd 30 seconden tot 1 minuut en rol langzaam terug omhoog. Adem diep.",
+    "exercise_references": ["Yoga Journal – Forward Fold; https://www.yogajournal.com/poses/standing-forward-bend/", "Healthline – Forward Fold Benefits; https://www.healthline.com/health/fitness-exercise/forward-fold"]
+  }
+}

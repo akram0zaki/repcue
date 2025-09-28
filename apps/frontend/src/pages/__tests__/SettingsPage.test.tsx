@@ -26,21 +26,9 @@ vi.mock('../../services/consentService', () => {
   };
 });
 
-vi.mock('../../services/storageService', () => {
-  const mockStorageService = {
-    exportAllData: vi.fn(),
-    clearAllData: vi.fn(),
-    getExercises: vi.fn(),
-    saveExercise: vi.fn()
-  };
-  
-  const MockStorageService = vi.fn().mockImplementation(() => mockStorageService);
-  MockStorageService.getInstance = vi.fn(() => mockStorageService);
-  
-  return {
-    StorageService: MockStorageService,
-    storageService: mockStorageService
-  };
+vi.mock('../../services/storageService', async () => {
+  const { createStorageServiceModuleMock } = await import('../../test/storageServiceMock.js');
+  return createStorageServiceModuleMock();
 });
 
 // Mock the dynamic import for exercises data
@@ -115,6 +103,11 @@ describe('SettingsPage', () => {
       },
       requiresUpdate: false
     });
+
+    // Configure storage service mock behaviors needed for this test
+    vi.mocked(storageService.exportAllData).mockResolvedValue('{"exercises": []}');
+    vi.mocked(storageService.clearAllData).mockResolvedValue(undefined);
+    vi.mocked(storageService.getExercises).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -229,18 +222,7 @@ describe('SettingsPage', () => {
     });
   });
 
-  it('calls onUpdateSettings when auto-save is toggled', async () => {
-    renderSettingsPage();
-    
-    const autoSaveButton = screen.getByLabelText(/auto save/i);
-    fireEvent.click(autoSaveButton);
-
-    await waitFor(() => {
-      expect(mockOnUpdateSettings).toHaveBeenCalledWith({
-        auto_save: false
-      });
-    });
-  });
+  // Removed auto-save toggle test (auto-save setting removed from UI)
 
   it('exports data when export button is clicked', async () => {
     const mockExportData = {

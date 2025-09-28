@@ -5,14 +5,17 @@ import { supabase } from '../config/supabase';
 import type { Exercise } from '../types';
 import { Routes as AppRoutes } from '../types';
 import { ExerciseDetailContent } from '../components/ExerciseDetailContent';
-import { favoritesService } from '../services/favoritesService';
+import { storageService } from '../services/storageService';
 import { getExerciseById } from '../data/exercises';
+import { VideoThumbnail } from '../components/VideoThumbnail';
+import { useAuth } from '../hooks/useAuth';
 import logger from '../utils/logger';
 
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'exercise', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
+  const { user } = useAuth();
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,12 +24,67 @@ const ExerciseDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (!id) {
-      setError(t('exercise.notFound'));
+  setError(t('exercises:notFound'));
       setLoading(false);
       return;
     }
 
     loadExerciseDetails();
+  }, [id]);
+
+  useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Refresh favorite status when page regains focus or becomes visible
+  useEffect(() => {
+    const refreshFavoriteStatus = async () => {
+      if (!id) return;
+
+      try {
+        const isUUID = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+        let favoriteStatus = false;
+
+        if (isUUID) {
+          if (user?.id) {
+            favoriteStatus = await storageService.isUserCreatedExerciseFavorited(id, user.id);
+          }
+        } else {
+          const prefs = await storageService.getUserPreferences();
+          favoriteStatus = prefs?.favorite_exercises.includes(id) || false;
+        }
+
+        setIsFavorite(favoriteStatus);
+      } catch (err) {
+        logger.error('Error refreshing favorite status:', err);
+      }
+    };
+
+    const handleFocus = () => refreshFavoriteStatus();
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshFavoriteStatus();
+      }
+    };
+
+    // Listen for page focus and visibility changes
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Listen for favorite changes from other parts of the app
+    const handleFavoriteUpdate = (event: CustomEvent) => {
+      if (event.detail?.exerciseId === id) {
+        refreshFavoriteStatus();
+      }
+    };
+    window.addEventListener('exercise-favorite-updated', handleFavoriteUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('exercise-favorite-updated', handleFavoriteUpdate as EventListener);
+    };
   }, [id]);
 
   const loadExerciseDetails = async () => {
@@ -91,12 +149,22 @@ const ExerciseDetailPage: React.FC = () => {
       setExercise(transformedExercise);
 
       // Check favorite status
-      const favoriteStatus = await favoritesService.isFavorite(id);
+      let favoriteStatus = false;
+      if (isUUID) {
+        // For user-created exercises, check user_favorites table
+        if (user?.id) {
+          favoriteStatus = await storageService.isUserCreatedExerciseFavorited(id, user.id);
+        }
+      } else {
+        // For built-in exercises, check user preferences
+        const prefs = await storageService.getUserPreferences();
+        favoriteStatus = prefs?.favorite_exercises.includes(id) || false;
+      }
       setIsFavorite(favoriteStatus);
 
     } catch (err) {
       logger.error('Error loading exercise details:', err);
-      setError(t('exercise.loadError'));
+  setError(t('exercises:loadError'));
     } finally {
       setLoading(false);
     }
@@ -106,12 +174,28 @@ const ExerciseDetailPage: React.FC = () => {
     if (!exercise) return;
 
     try {
-      const newStatus = await favoritesService.toggleFavorite(
-        exercise.id,
-        'exercise',
-        'user_created'
-      );
-      setIsFavorite(newStatus);
+      const isUUID = exercise.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+
+      if (isUUID) {
+        // For user-created exercises, use toggleUserCreatedExerciseFavorite
+        if (user?.id) {
+          const newStatus = await storageService.toggleUserCreatedExerciseFavorite(exercise.id, user.id);
+          setIsFavorite(newStatus);
+        }
+      } else {
+        // For built-in exercises, use toggleExerciseFavorite (returns void)
+        await storageService.toggleExerciseFavorite(exercise.id);
+
+        // Check the new status from preferences
+        const prefs = await storageService.getUserPreferences();
+        const newStatus = prefs?.favorite_exercises.includes(exercise.id) || false;
+        setIsFavorite(newStatus);
+      }
+
+      // Notify other components of the favorite update
+      window.dispatchEvent(new CustomEvent('exercise-favorite-updated', {
+        detail: { exerciseId: exercise.id }
+      }));
     } catch (err) {
       logger.error('Error toggling favorite:', err);
     }
@@ -145,8 +229,8 @@ const ExerciseDetailPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+          <p className="text-text-500 dark:text-text-400">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -157,16 +241,16 @@ const ExerciseDetailPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
-            {t('exercise.error')}
+            {t('exercises:loadError')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {error || t('exercise.notFound')}
+          <p className="text-text-500 dark:text-text-400 mb-6">
+            {error || t('exercises:notFound')}
           </p>
           <button
-            onClick={() => navigate(AppRoutes.EXERCISES)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
           >
-            {t('exercise.backToExercises')}
+            {t('common.back', 'Back')}
           </button>
         </div>
       </div>
@@ -178,21 +262,34 @@ const ExerciseDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Back Button */}
-      <div className="mb-6">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      {/* Hero Video/Image Section */}
+      <div className="relative h-[480px] rounded-b-3xl overflow-hidden">
+        {/* Back Button Overlay */}
         <button
-          onClick={() => navigate(AppRoutes.EXERCISES)}
-          className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+          onClick={() => navigate(-1)}
+          className="absolute top-6 left-6 z-20 p-2 bg-black/20 rounded-full text-white hover:bg-black/30 transition-colors"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span>{t('exercise.backToExercises', { defaultValue: 'Back to Exercises' })}</span>
         </button>
+
+        {/* Exercise Video Thumbnail */}
+        <div className="w-full h-full">
+          <VideoThumbnail
+            exercise={exercise}
+            className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:object-cover [&>div]:h-full [&>div]:aspect-auto"
+            onVideoLoad={() => logger.log('Hero video loaded for exercise:', exercise.id)}
+            onVideoError={() => logger.warn('Hero video failed to load for exercise:', exercise.id)}
+          />
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full overflow-hidden">
+      {/* Content Section with reference-style layout but keeping all existing functionality */}
+      <div className="px-6 py-6 bg-white dark:bg-gray-800 rounded-t-3xl -mt-6 relative z-10 min-h-screen">
+
+        {/* Use the existing ExerciseDetailContent component to preserve all functionality */}
         <ExerciseDetailContent
           exercise={exercise}
           isFavorite={isFavorite}
@@ -202,7 +299,7 @@ const ExerciseDetailPage: React.FC = () => {
           onStartTimer={handleStartTimer}
           onEdit={handleEdit}
           showActions={true}
-          className="p-6"
+          className=""
         />
       </div>
     </div>

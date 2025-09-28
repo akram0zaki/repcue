@@ -15,53 +15,37 @@ vi.mock('../utils/serviceWorker', () => ({
   }
 }));
 
+vi.mock('../services/storageService', async () => {
+  // Dynamic import to avoid hoisting issues
+  const { createStorageServiceModuleMock } = await import('../test/storageServiceMock.js');
+  const moduleMock = createStorageServiceModuleMock();
 
+  // Override specific methods for this test's needs
+  (moduleMock.storageService.getExercises as any).mockResolvedValue([
+    {
+      id: 'ex1',
+      name: 'Push-ups',
+      description: 'Classic push-up exercise',
+      category: 'strength',
+      exerciseType: 'repetition-based',
+      defaultSets: 3,
+      defaultReps: 12,
+      isFavorite: false,
+      tags: []
+    }
+  ]);
 
-vi.mock('../services/storageService', () => {
-  const mockStorageInstance = {
-    getExercises: vi.fn().mockResolvedValue([
-      {
-        id: 'ex1',
-        name: 'Push-ups',
-        description: 'Classic push-up exercise',
-        category: 'strength',
-        exerciseType: 'repetition-based',
-        defaultSets: 3,
-        defaultReps: 12,
-        isFavorite: false,
-        tags: []
-      }
-    ]),
-    getAppSettings: vi.fn().mockResolvedValue({
-      intervalDuration: 30,
-      soundEnabled: true,
-      vibrationEnabled: true,
-      preTimerCountdown: 3,
-      darkMode: false,
-      beepVolume: 0.5,
-      autoSaveEnabled: true
-    }),
-    saveWorkoutSession: vi.fn().mockResolvedValue(undefined),
-    saveActivityLog: vi.fn().mockResolvedValue(undefined),
-    saveExercises: vi.fn().mockResolvedValue(undefined),
-    saveExercise: vi.fn().mockResolvedValue(undefined),
-    saveAppSettings: vi.fn().mockResolvedValue(undefined),
-    toggleExerciseFavorite: vi.fn().mockResolvedValue(undefined),
-    getWorkouts: vi.fn().mockResolvedValue([]),
-    getWorkoutSessions: vi.fn().mockResolvedValue([]),
-    getActivityLogs: vi.fn().mockResolvedValue([]),
-    getDatabase: vi.fn(() => ({})),
-    claimOwnership: vi.fn().mockResolvedValue(true),
-    ready: vi.fn().mockResolvedValue(true),
-    ensureExercisesSeeded: vi.fn().mockResolvedValue(undefined)
-  };
-  
-  return {
-    StorageService: {
-      getInstance: vi.fn(() => mockStorageInstance)
-    },
-    storageService: mockStorageInstance
-  };
+  (moduleMock.storageService.getAppSettings as any).mockResolvedValue({
+    intervalDuration: 30,
+    soundEnabled: true,
+    vibrationEnabled: true,
+    preTimerCountdown: 3,
+    darkMode: false,
+    beepVolume: 0.5,
+    autoSaveEnabled: true
+  });
+
+  return moduleMock;
 });
 
 

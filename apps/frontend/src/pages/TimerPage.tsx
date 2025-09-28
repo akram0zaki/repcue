@@ -47,7 +47,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onStopTimer,
   onResetTimer
 }) => {
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   // ---------------- Video Demo Integration (Phase 2) ----------------
   // Calculate display values
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
@@ -379,19 +379,18 @@ const TimerPage: React.FC<TimerPageProps> = ({
         <div className="mb-2">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.duration')}</p>
           <div className="grid grid-cols-3 gap-2">
-            {TIMER_PRESETS.map(duration => (
-              <button
-                key={duration}
-                onClick={() => onSetSelectedDuration(duration)}
-                className={`py-2 px-3 text-sm font-medium rounded-md transition-colors ${
-                  selectedDuration === duration
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {duration < 60 ? `${duration}s` : `${Math.floor(duration / 60)}m`}
-              </button>
-            ))}
+            {TIMER_PRESETS.map(duration => {
+              const active = selectedDuration === duration;
+              return (
+                <button
+                  key={duration}
+                  onClick={() => onSetSelectedDuration(duration)}
+                  className={`duration-option ${active ? 'duration-option-active' : ''}`}
+                >
+                  {duration < 60 ? `${duration}s` : `${Math.floor(duration / 60)}m`}
+                </button>
+              );
+            })}
           </div>
         </div>
         )}
@@ -602,12 +601,11 @@ const TimerPage: React.FC<TimerPageProps> = ({
           ) : (
             /* Rectangular Timer with Border Progress */
             <div
-              className={`relative mb-3 ${repPulse ? 'transition-transform' : ''}`}
+              className={`relative mb-3 mx-auto ${repPulse ? 'transition-transform' : ''}`}
               style={{
-                width: '380px',
-                height: '240px',
-                margin: '0 auto',
-                display: 'block'
+                width: '560px',
+                height: '320px',
+                maxWidth: '100%'
               }}
               aria-live="off"
             >
@@ -650,61 +648,61 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 </div>
               )}
               <svg
-                className="pointer-events-none absolute inset-0 z-0"
-                style={{ width: '380px', height: '240px' }}
-                viewBox="0 0 380 240"
+                className="pointer-events-none absolute inset-0 z-0 w-full h-full"
+                viewBox="0 0 480 280"
+                preserveAspectRatio="none"
               >
                 {/* For repetition-based exercises: show nested rectangles */}
                 {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets ? (
                   <>
-                    {/* Outer rectangle for set progress - tight around container */}
+                    {/* Outer rectangle for set progress - exactly matching container */}
                     <rect
-                      x="1"
-                      y="1"
-                      width="378"
-                      height="238"
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="3"
                       fill="none"
                       rx="12"
                       className="text-gray-200 dark:text-gray-700"
                     />
                     {/* Set progress border */}
                     <rect
-                      x="1"
-                      y="1"
-                      width="378"
-                      height="238"
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
                       stroke="currentColor"
-                      strokeWidth="2"
+                      strokeWidth="3"
                       fill="none"
                       rx="12"
                       className={`text-green-500 transition-all duration-300 ${repPulse ? 'animate-pulse' : ''}`}
-                      strokeDasharray={`${2 * (378 + 238)}`}
-                      strokeDashoffset={`${2 * (378 + 238) * (1 - setProgress / 100)}`}
+                      strokeDasharray={`${2 * (480 + 280)}`}
+                      strokeDashoffset={`${2 * (480 + 280) * (1 - setProgress / 100)}`}
                     />
 
-                    {/* Inner rectangle for individual rep progress - close to outer border */}
+                    {/* Inner rectangle for individual rep progress */}
                     <rect
-                      x="6"
-                      y="6"
-                      width="368"
-                      height="228"
+                      x="8"
+                      y="8"
+                      width="464"
+                      height="264"
                       stroke="currentColor"
                       strokeWidth="4"
                       fill="none"
-                      rx="10"
+                      rx="8"
                       className="text-gray-200 dark:text-gray-700"
                     />
                     <rect
-                      x="6"
-                      y="6"
-                      width="368"
-                      height="228"
+                      x="8"
+                      y="8"
+                      width="464"
+                      height="264"
                       stroke="currentColor"
                       strokeWidth="4"
                       fill="none"
-                      rx="10"
+                      rx="8"
                       className={`transition-all duration-300 ${
                         isCountdown
                           ? 'text-orange-500'
@@ -712,33 +710,33 @@ const TimerPage: React.FC<TimerPageProps> = ({
                             ? 'text-purple-500'  // Purple for rest progress
                             : 'text-blue-500'    // Blue for rep progress
                       }`}
-                      strokeDasharray={`${2 * (368 + 228)}`}
-                      strokeDashoffset={`${2 * (368 + 228) * (1 - finalDisplayProgress / 100)}`}
+                      strokeDasharray={`${2 * (464 + 264)}`}
+                      strokeDashoffset={`${2 * (464 + 264) * (1 - finalDisplayProgress / 100)}`}
                     />
                   </>
                 ) : (
                   <>
-                    {/* Standard timer display for time-based exercises - single rectangle tight around video */}
+                    {/* Standard timer display for time-based exercises - single rectangle matching container */}
                     <rect
-                      x="6"
-                      y="6"
-                      width="368"
-                      height="228"
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
                       stroke="currentColor"
                       strokeWidth="4"
                       fill="none"
-                      rx="10"
+                      rx="12"
                       className="text-gray-200 dark:text-gray-700"
                     />
                     <rect
-                      x="6"
-                      y="6"
-                      width="368"
-                      height="228"
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
                       stroke="currentColor"
                       strokeWidth="4"
                       fill="none"
-                      rx="10"
+                      rx="12"
                       className={`transition-all duration-300 ${
                         isCountdown
                           ? 'text-orange-500'
@@ -746,8 +744,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                             ? 'text-purple-500'  // Purple for rest progress
                             : 'text-blue-500'    // Blue for rep progress
                       }`}
-                      strokeDasharray={`${2 * (368 + 228)}`}
-                      strokeDashoffset={`${2 * (368 + 228) * (1 - finalDisplayProgress / 100)}`}
+                      strokeDasharray={`${2 * (480 + 280)}`}
+                      strokeDashoffset={`${2 * (480 + 280) * (1 - finalDisplayProgress / 100)}`}
                     />
                   </>
                 )}
@@ -808,7 +806,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <button
                 onClick={onStartTimer}
                 disabled={!selectedExercise}
-                className="btn-primary px-4 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="start-timer"
               >
                 {t('common.start')}
@@ -825,7 +823,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
             <button
               onClick={onResetTimer}
-              className="btn-ghost px-3 py-2 text-sm"
+              className="btn-ghost"
               data-testid="reset-timer"
             >
               {t('common.reset')}
@@ -886,7 +884,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                           {localizeExercise(exercise, t).name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
+                          {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
                         </p>
                       </div>
                       {exercise.is_favorite && (

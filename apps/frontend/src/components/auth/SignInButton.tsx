@@ -23,12 +23,12 @@ export const SignInButton: React.FC<SignInButtonProps> = ({
   // Don't show if already authenticated
   if (isAuthenticated) return null;
 
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors';
+  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors';
   
   const variantClasses = {
-    primary: 'text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600',
-    secondary: 'text-blue-600 bg-blue-100 hover:bg-blue-200 dark:text-blue-400 dark:bg-blue-900/20 dark:hover:bg-blue-900/30',
-    minimal: 'text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline'
+    primary: 'text-white bg-primary-500 hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-500',
+    secondary: 'text-primary-600 bg-primary-100 hover:bg-primary-200 dark:text-primary-400 dark:bg-primary-dark-disabled dark:hover:bg-primary-dark-600',
+    minimal: 'text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 underline'
   };
 
   const sizeClasses = {

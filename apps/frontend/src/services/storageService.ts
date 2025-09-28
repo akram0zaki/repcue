@@ -3262,6 +3262,8 @@ export class StorageService {
       show_exercise_videos: settings.show_exercise_videos,
       data_auto_save: settings.auto_save,
       default_rest_time: settings.default_rest_time,
+      horizontal_exercise_layout: settings.horizontal_exercise_layout,
+      ring_timer: settings.ring_timer,
       // Include all sync metadata (filtering happens below)
       owner_id: settings.owner_id,
       created_at: settings.created_at,
@@ -3308,6 +3310,7 @@ export class StorageService {
       show_exercise_videos: (serverData.show_exercise_videos as boolean) ?? true,
       auto_save: (serverData.data_auto_save as boolean) ?? true,
       default_rest_time: (serverData.default_rest_time as number) || 60,
+      ring_timer: (serverData.ring_timer as boolean) ?? true,
       rep_speed_factor: 1.0, // This stays client-side only for now
       last_selected_exercise_id: null, // This stays client-side only for now
       // Include sync metadata

@@ -21,7 +21,7 @@ const EditWorkoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const workoutId = searchParams.get('id');
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'exerciseDetails']);
 
   const [hasConsent, setHasConsent] = useState(false);
   const [loading, setLoading] = useState(true);

@@ -47,9 +47,10 @@
   - Main: Near Black (#121212)
   - Secondary: Dark Gray (#1E1E1E)
 - **Text Colors**:
-  - Primary Text: Near White (#F8F9FA)
-  - Secondary Text: Medium Gray (#A0A4A8)
-  - Disabled Text: #6C757D
+  - **Primary Text**: Near White (#F8F9FA / #f9fafb) - Use `text-text-900 dark:text-text-50` or `text-gray-900 dark:text-gray-100`
+  - **Secondary Text/Labels**: Light Gray (#d1d5db) - Use `text-text-800 dark:text-text-100` or `text-gray-800 dark:text-gray-100`
+  - **Description/Help Text**: Medium Gray (#9ca3af) - Use `text-text-500 dark:text-text-400` or `text-gray-500 dark:text-gray-400`
+  - **Disabled Text**: #6C757D - Use `text-text-400 dark:text-text-600`
 - **Neutral Buttons**:
   - Default: #2C2C2C
   - Hover: #3A3A3A
@@ -61,6 +62,60 @@
 - **Error/Negative**: Bright Red (#FF5C66)
   - Hover: #FF737A
   - Focus: #FF8A91
+
+### Dark Mode Text Color Hierarchy
+
+**CRITICAL**: Ensure proper contrast and readability in dark mode:
+
+1. **Headings/Titles**: `text-text-900 dark:text-text-50` (bright white)
+2. **Primary Labels/Form Labels**: `text-text-800 dark:text-text-100` (very light gray)
+3. **Body Text**: `text-text-700 dark:text-text-200` (light gray)
+4. **Secondary/Muted Text**: `text-text-600 dark:text-text-300` (medium gray)
+5. **Help/Description Text**: `text-text-500 dark:text-text-400` (readable gray)
+6. **Disabled Text**: `text-text-400 dark:text-text-600` (dim gray)
+
+**⚠️ AVOID**: `text-text-700 dark:text-text-300` for labels - too faint and low contrast in dark mode.
+
+### Badge and Tag Styling for Dark Mode
+
+**CRITICAL**: Badges and tags require special attention in dark mode to ensure text visibility:
+
+**Recommended Pattern**:
+- Light Mode: `bg-gray-100 text-gray-800`
+- Dark Mode: `dark:bg-gray-200 dark:text-gray-900`
+
+**Examples**:
+```css
+/* Category/Tags badges */
+bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900
+
+/* Difficulty badges */
+bg-green-100 dark:bg-green-200 text-green-800 dark:text-green-900
+bg-yellow-100 dark:bg-yellow-200 text-yellow-800 dark:text-yellow-900
+bg-red-100 dark:bg-red-200 text-red-800 dark:text-red-900
+
+/* Status badges */
+bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900
+```
+
+**⚠️ AVOID**: Semi-transparent backgrounds like `dark:bg-gray-700` or `dark:bg-green-900/30` as they often result in poor contrast with text colors.
+
+### Standard CSS Classes for Text
+
+To ensure consistency, use these predefined CSS classes instead of inline Tailwind classes:
+
+```css
+.heading-text        /* Section headers, page titles */
+.label-text          /* Form labels, toggle labels */
+.filter-button-text  /* Category filters, type filters */
+.sort-label-text     /* Sort labels, control labels */
+.duration-button-text /* Timer duration buttons */
+.secondary-label-text /* Subtitles, counts */
+.summary-text        /* Results count, status text */
+.help-text           /* Helper text, descriptions */
+```
+
+**Benefits**: Centralized control, consistent styling, easier maintenance.
 
 ### Typography
 
