@@ -298,7 +298,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                     <div className="flex items-center gap-3">
                       <VideoThumbnail
                         exercise={exercise}
-                        className="w-16 h-12 rounded-md overflow-hidden flex-shrink-0"
+                        className="w-24 h-20 rounded-md overflow-hidden flex-shrink-0"
                       />
                       <button
                         onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}

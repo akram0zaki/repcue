@@ -1043,7 +1043,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               exercise={exercise}
               onVideoLoad={() => {}}
               onVideoError={() => {}}
-              className="w-full"
+              className="w-full aspect-square"
             />
           ) : (
             <ExercisePlaceholder size="md" />

@@ -247,7 +247,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         key={videoUrl} // Force re-render when URL changes
         ref={videoRef}
         src={videoUrl || undefined}
-        className="w-full aspect-square object-cover rounded-lg bg-gray-100 dark:bg-gray-800"
+        className="w-full h-full object-cover rounded-lg bg-gray-100 dark:bg-gray-800"
         preload="auto" // Changed from metadata to auto to ensure video loads
         muted
         loop // Videos will loop automatically when playing
@@ -263,20 +263,25 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       )}
 
       {/* Play/Pause Overlay */}
-      <div 
-        className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-lg transition-opacity duration-200 ${
+      <div
+        className={`absolute inset-0 flex items-center justify-center rounded-lg transition-opacity duration-200 ${
           showControls || !isPlaying ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={handlePlayPause}
       >
+        {/* Gradient backdrop only when hovering or paused */}
+        <div className={`absolute inset-0 rounded-lg transition-opacity duration-200 ${
+          showControls || !isPlaying ? 'bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-100' : 'opacity-0'
+        }`} />
+
         <button
-          className="flex items-center justify-center w-16 h-16 bg-black bg-opacity-50 rounded-full text-white hover:bg-opacity-70 transition-all duration-200 transform hover:scale-110"
+          className="relative flex items-center justify-center w-12 h-12 text-white hover:scale-105 transition-all duration-200 transform"
           aria-label={isPlaying ? t('common.pauseVideo', { defaultValue: 'Pause video' }) : t('common.playVideo', { defaultValue: 'Play video' })} // i18n-exempt: default value provided for accessibility
         >
           {isPlaying ? (
-            <PauseIcon size={24} />
+            <PauseIcon size={16} />
           ) : (
-            <PlayIcon size={24} className="ml-1" />
+            <PlayIcon size={16} className="ml-0.5" />
           )}
         </button>
       </div>

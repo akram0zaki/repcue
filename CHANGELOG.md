@@ -1,5 +1,23 @@
 ## Unreleased
 
+### 2025-09-28 (Video Thumbnail Improvements & UI Enhancements)
+#### Fixed
+- **Video Thumbnail Sizing Consistency**: Fixed video thumbnails having inconsistent dimensions across different pages
+  - Updated ExercisePage to use `aspect-square` for consistent square thumbnails matching original design
+  - Updated ExercisePlaceholder to use `aspect-square` for md/lg sizes to match video thumbnails
+  - Ensured consistent box dimensions across all exercise cards in exercise listings
+
+#### Changed
+- **Video Thumbnail UI Design**: Enhanced video thumbnail controls for better user experience
+  - **HomePage**: Increased video thumbnail size from 64x48px (w-16 h-12) to 96x80px (w-24 h-20) for better visibility
+  - **Play/Pause Controls**: Redesigned overlay with gradient background and cleaner icon-only buttons
+    - Removed prominent circular background from play/pause buttons for more subtle appearance
+    - Added gradient overlay (`bg-gradient-to-t from-black/20`) that appears only on hover or when paused
+    - Reduced button size from 64x64px to 48x48px for less visual interference
+  - **VideoThumbnail Component**: Improved responsiveness and visual hierarchy
+    - Maintained aspect-square ratio for consistent grid layouts
+    - Enhanced hover states with smooth opacity transitions
+
 ### 2025-09-28 (RTL Layout Improvements & CatalogSelector Navigation Fix)
 #### Fixed
 - **CatalogSelector Navigation**: Fixed horizontal navigation buttons (`<` and `>`) not working properly
