@@ -171,7 +171,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           <div className="flex items-center gap-4">
             <button
               onClick={handleStartTimer}
-              className="flex items-center space-x-2 px-3 py-2 text-sm bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
+              className="btn-primary flex items-center space-x-2 text-sm"
             >
               <PlayIcon className="h-4 w-4" />
               <span>{t('exercises:startTimer', 'Start Timer')}</span>

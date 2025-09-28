@@ -239,6 +239,40 @@
   cursor: not-allowed;
 }
 
+/* Danger button style for destructive actions */
+.btn-danger {
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
+  border-color: transparent;
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-danger:hover {
+  background-color: var(--color-error-hover);
+}
+
+.btn-danger:focus {
+  background-color: var(--color-error-hover);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 20%, transparent);
+}
+
+.btn-danger:disabled {
+  background-color: var(--color-error-background);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
 .card {
   background-color: var(--color-surface-primary);
   border-color: var(--color-border-primary);

@@ -25,6 +25,18 @@
     - Improved PWA compatibility with error-resistant mode detection
     - Enhanced reliability across different browser environments
   - **Performance Optimization**: Added `useMemo` optimization to `useUpdateNotifications` hook to prevent unnecessary re-renders
+- **Centralized Button System**: Implemented comprehensive centralized button styling system for consistent UI across the application
+  - **New Centralized Classes**: Added `btn-primary`, `btn-secondary`, `btn-neutral`, and `btn-danger` classes in `tokens.css`
+    - All buttons now follow 8px rounded corners per UI specifications
+    - Automatic dark mode support with semantic color tokens
+    - Proper hover, focus, and disabled states for all button variants
+  - **Component Migration**: Updated multiple components to use centralized button classes
+    - **ExerciseDetailContent**: Start Timer button now uses `btn-primary`
+    - **Authentication Forms**: SignInForm and SignUpForm migrated to use `btn-primary` for submit and `btn-secondary` for OAuth/Magic Link
+    - **InstallPrompt**: "Got it!" button migrated to `btn-primary`
+    - **ConfirmationModal**: Enhanced with dynamic button classes (`btn-danger` for destructive actions, `btn-primary` for normal confirms, `btn-secondary` for cancel)
+  - **Benefits**: Single point of control for button styling, automatic UI spec compliance, reduced CSS duplication
+  - **Documentation**: Updated ui-specs.md with comprehensive button system documentation and usage examples
 
 ### 2025-09-28 (RTL Layout Improvements & CatalogSelector Navigation Fix)
 #### Fixed

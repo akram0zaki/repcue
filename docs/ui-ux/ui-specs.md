@@ -144,10 +144,36 @@ To ensure consistency, use these predefined CSS classes instead of inline Tailwi
 
 -   **Grid System**: 8pt spacing system for margins, paddings, and gaps
 -   **Card Design**: Rounded corners (8px), subtle shadow for elevation
--   **Buttons**:
-    -   Primary: Filled with accent color, white text
-    -   Secondary: Outline style with accent border
-    -   Disabled: Light gray background, dark gray text at 40% opacity
+
+### Centralized Button System
+
+**CRITICAL**: Use centralized button classes from `src/styles/tokens.css` for consistency.
+
+-   **Primary Buttons** (`.btn-primary`):
+    -   Filled with accent color, white text
+    -   8px rounded corners, consistent padding (0.5rem 1rem)
+    -   Smooth transitions, proper focus states
+    -   Usage: `<button className="btn-primary">Start</button>`
+
+-   **Secondary Buttons** (`.btn-secondary`):
+    -   Outline style with accent border
+    -   Transparent background, primary color text
+    -   Hover: filled with primary color
+    -   Usage: `<button className="btn-secondary">Cancel</button>`
+
+-   **Neutral Buttons** (`.btn-neutral`):
+    -   Light gray background, dark text
+    -   For utility actions that don't need emphasis
+    -   Usage: `<button className="btn-neutral">Filter</button>`
+
+-   **Danger Buttons** (`.btn-danger`):
+    -   Red background, white text
+    -   For destructive actions (delete, remove, etc.)
+    -   Usage: `<button className="btn-danger">Delete</button>`
+
+-   **Disabled State**: All buttons include proper disabled styling with reduced opacity and not-allowed cursor
+
+**Benefits**: Single point of control for button styling, automatic UI spec compliance, reduced CSS duplication
 
 ------------------------------------------------------------------------
 
