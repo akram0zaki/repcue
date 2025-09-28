@@ -143,5 +143,7 @@
   "videoSource": "Video Source",
   "viewDetails": "View Details",
   "viewDetailsAria": "View exercise details",
-  "visibility": "Visibility"
+  "visibility": "Visibility",
+  "searchPlaceholder": "Search by name, description, or tag...",
+  "favoritesOnly": "Favorites Only"
 }
