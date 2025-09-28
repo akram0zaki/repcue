@@ -43,6 +43,7 @@ apps/frontend/public/locales/
     common.json
     titles.json
     a11y.json
+    exerciseDetails.json
     exercises.json
     auth.json
     catalogs.json
@@ -66,6 +67,7 @@ apps/frontend/public/locales/
 | `common` | Reusable UI primitives (`common.start`, `common.cancel`, etc.) | Prefer this namespace for shared terms across screens. |
 | `titles` | Page titles / route-level headings | Keeps document titles and large headings discoverable. |
 | `a11y` | Screen-reader text, `aria-label`s, visually-hidden helpers | Required for WCAG compliance; keep descriptive and short. |
+| `exerciseDetails` | The translations of all built-in exercises attributes and details | Includes exercise detail strings. |
 | `exercises` | Exercise catalog metadata and supporting UI copy | Includes exercise detail strings, filters, tags. |
 | `auth` | Authentication flow (magic links, errors, CTA text) | Keep security messaging consistent across locales. |
 | `catalogs` | Shared workout/exercise catalog UI (filters, sorting) | Used by listing and discovery pages. |
