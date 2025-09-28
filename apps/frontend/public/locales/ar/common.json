@@ -194,6 +194,8 @@
     "minutes_other": "{{count}} دقائق",
     "exercises_one": "{{count}} تمرين",
     "exercises_other": "{{count}} تمارين",
+    "categoriesSelected_one": "{{count}} فئة محددة",
+    "categoriesSelected_other": "{{count}} فئات محددة",
     "exercisesRemaining_one": "{{count}} تمرين متبقي",
     "exercisesRemaining_other": "{{count}} تمارين متبقية",
     "repProgress": "تقدم التكرار",

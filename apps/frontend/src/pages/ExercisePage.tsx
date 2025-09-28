@@ -524,7 +524,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 >
                   {selectedCategories.size > 0 ? (
                     <span className="text-primary-600 dark:text-primary-400">
-                      {t('exercises:categoriesSelected', {
+                      {t('categoriesSelected', {
                         count: selectedCategories.size,
                         defaultValue: `${selectedCategories.size} selected`
                       })}

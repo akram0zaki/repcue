@@ -185,6 +185,8 @@
     "minutes_other": "{{count}} دقيقة",
     "exercises_one": "{{count}} تمرين",
     "exercises_other": "{{count}} تمرين",
+    "categoriesSelected_one": "{{count}} فئة مختارة",
+    "categoriesSelected_other": "{{count}} فئات مختارة",
     "exercisesRemaining_one": "باقي {{count}} تمرين",
     "exercisesRemaining_other": "باقي {{count}} تمرين",
     "repProgress": "تقدم العدات",

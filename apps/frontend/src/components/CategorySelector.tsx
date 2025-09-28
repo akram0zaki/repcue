@@ -90,7 +90,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
         {selectedCategories.size > 0 && (
           <div className="px-4 pb-2">
             <p className="text-xs text-text-500 dark:text-text-400">
-              {t('exercises:categoriesSelected', {
+              {t('categoriesSelected', {
                 count: selectedCategories.size,
                 defaultValue: `${selectedCategories.size} ${selectedCategories.size === 1 ? 'category' : 'categories'} selected`
               })}
