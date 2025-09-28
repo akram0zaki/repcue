@@ -257,8 +257,8 @@
     "noFavorites": "لا توجد تمارين مفضلة بعد. ضع علامة على بعض التمارين كمفضلة لرؤيتها هنا!",
     "availableExercises": "التمارين المتاحة",
     "changeLanguage": "تغيير اللغة",
-    "popularExercises": "التمارين الشعبية",
-    "noPopularExercises": "لا توجد تمارين شعبية مع فيديوهات متاحة."
+    "popularExercises": "تمارين مشهورة",
+    "noPopularExercises": "لا توجد تمارين مشهورة مع فيديوهات متاحة."
   },
   "workouts": {
     "title": "البرامج",
