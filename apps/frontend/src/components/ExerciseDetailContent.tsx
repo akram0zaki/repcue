@@ -94,7 +94,8 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors"
+            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors break-all hyphens-auto"
+            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
           >
             {part}
           </a>
@@ -218,7 +219,11 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
             <span className="text-sm">
               {t('exercises:type', 'Type')}:
             </span>
-            <span className="text-sm font-medium text-text-700 dark:text-text-300">
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+              exercise.exercise_type === 'time_based'
+                ? 'bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900'
+                : 'bg-purple-100 dark:bg-purple-200 text-purple-800 dark:text-purple-900'
+            }`}>
               {exercise.exercise_type === 'time_based'
                 ? `${t('exercises:types.time_based', 'Time Based')} - ${formatDuration(exercise.default_duration)}`
                 : `${t('exercises:types.repetition_based', 'Repetition Based')} - ${exercise.default_sets || 1}x${exercise.default_reps || 1}`

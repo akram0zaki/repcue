@@ -59,7 +59,16 @@
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
-    "premium": "مميز"
+    "premium": "مميز",
+    "done": "تم"
+  },
+  "categories": {
+    "core": "الجذع",
+    "strength": "القوة",
+    "cardio": "كارديو",
+    "flexibility": "المرونة",
+    "balance": "التوازن",
+    "hand-warmup": "إحماء اليد"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -228,11 +237,13 @@
     "sunday": "أحد"
   },
   "home": {
+    "heroTitle": "ابق ثابتاً، ابق قوياً.",
+    "heroSubtitle": "تمارينك، بطريقتك.",
     "upcomingWorkout": "التمرين القادم",
     "tagline": "مؤقت التمارين الشخصي",
     "signInMessage": "يمكنك ",
     "signInLink": "تسجيل الدخول",
-    "signInSuffix": " لتتبع تقدمك من أجهزة مختلفة.",
+    "signInSuffix": " لتتبع نشاطك ومشاركة تقدمك.",
     "startNow": "ابدأ الآن",
     "noScheduleTitle": "لا يوجد جدول محدد",
     "noScheduleBody": "أنشئ جدول تمرين لرؤية تمارينك القادمة هنا",

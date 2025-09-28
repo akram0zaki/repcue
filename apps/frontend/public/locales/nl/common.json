@@ -228,11 +228,13 @@
     "sunday": "Zo"
   },
   "home": {
+    "heroTitle": "Blijf consistent, blijf sterk.",
+    "heroSubtitle": "Uw trainingen, op uw manier.",
     "upcomingWorkout": "Aankomende Training",
     "tagline": "Uw persoonlijke oefeningentimer",
     "signInMessage": "Je kunt ",
     "signInLink": "inloggen",
-    "signInSuffix": " om je vooruitgang bij te houden vanaf verschillende apparaten.",
+    "signInSuffix": " om je voortgang te volgen en te delen.",
     "startNow": "Nu Starten",
     "noScheduleTitle": "Geen Schema Ingesteld",
     "noScheduleBody": "Maak een trainingsschema om uw aankomende trainingen hier te zien",

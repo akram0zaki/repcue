@@ -228,11 +228,13 @@
     "sunday": "So"
   },
   "home": {
+    "heroTitle": "Bleiben Sie konsequent, bleiben Sie stark.",
+    "heroSubtitle": "Ihre Workouts, auf Ihre Art.",
     "upcomingWorkout": "Anstehendes Workout",
     "tagline": "Ihr persönlicher Übungstimer",
     "signInMessage": "Sie können sich ",
     "signInLink": "anmelden",
-    "signInSuffix": ", um Ihren Fortschritt auf verschiedenen Geräten zu verfolgen.",
+    "signInSuffix": " um Ihren Fortschritt zu verfolgen und zu teilen.",
     "startNow": "Jetzt starten",
     "noScheduleTitle": "Kein Zeitplan gesetzt",
     "noScheduleBody": "Erstellen Sie einen Workout-Zeitplan, um Ihre anstehenden Workouts hier zu sehen",

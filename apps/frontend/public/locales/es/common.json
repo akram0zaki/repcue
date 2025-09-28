@@ -228,11 +228,13 @@
     "sunday": "Dom"
   },
   "home": {
+    "heroTitle": "Mantente constante, mantente fuerte.",
+    "heroSubtitle": "Tus entrenamientos, a tu manera.",
     "upcomingWorkout": "Próximo entrenamiento",
     "tagline": "Tu temporizador personal de ejercicios",
     "signInMessage": "Puedes ",
     "signInLink": "iniciar sesión",
-    "signInSuffix": " para hacer seguimiento de tu progreso desde diferentes dispositivos.",
+    "signInSuffix": " para hacer seguimiento de tu progreso y compartirlo.",
     "startNow": "Comenzar ahora",
     "noScheduleTitle": "Sin horario establecido",
     "noScheduleBody": "Crea un horario de entrenamiento para ver tus próximos entrenamientos aquí",

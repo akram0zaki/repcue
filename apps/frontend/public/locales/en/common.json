@@ -246,11 +246,13 @@
     "sunday": "Sun"
   },
   "home": {
+    "heroTitle": "Stay consistent, stay strong.",
+    "heroSubtitle": "Your workouts, your way.",
     "upcomingWorkout": "Upcoming Workout",
     "tagline": "Your personal exercise timer",
     "signInMessage": "You can ",
     "signInLink": "sign-in",
-    "signInSuffix": " to track your progress from different devices.",
+    "signInSuffix": " to track your and share your progress.",
     "startNow": "Start Now",
     "noScheduleTitle": "No Schedule Set",
     "noScheduleBody": "Create a workout schedule to see your upcoming workouts here",

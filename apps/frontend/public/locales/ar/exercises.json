@@ -119,9 +119,14 @@
     "cardio": "كارديو",
     "core": "جذع",
     "flexibility": "مرونة",
-    "strength": "قوة"
+    "strength": "قوة",
+    "handwarmup": "إحماء اليد"
   },
   "category": "فئة",
+  "selectCategories": "اختر الفئات",
+  "clearAll": "مسح الكل",
+  "categoriesSelected_one": "{{count}} فئة محددة",
+  "categoriesSelected_other": "{{count}} فئات محددة",
   "createDescription": "إنشاء تمرين جديد لتمارينك",
   "createError": "فشل في إنشاء التمرين. يرجى المحاولة مرة أخرى.",
   "createExercise": "إنشاء تمرين",
@@ -161,5 +166,16 @@
     "repetition_based": "مبني على التكرارات",
     "time_based": "مبني على الوقت"
   },
-  "viewOnly": "عرض فقط"
+  "viewOnly": "عرض فقط",
+  "category": "فئة",
+  "categoryShort": "فئة",
+  "sortBy": "ترتيب حسب:",
+  "sortByShort": "ترتيب:",
+  "sortType": "النوع",
+  "filterAll": "الكل",
+  "filterBuiltIn": "مدمج",
+  "filterCustom": "مخصص",
+  "favoritesOnly": "المفضلة فقط",
+  "searchPlaceholder": "ابحث بالاسم أو الوصف أو العلامة...",
+  "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}"
 }

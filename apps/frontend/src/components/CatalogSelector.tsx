@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
 import { EXERCISE_CATALOGS } from '../data/catalogs';
+import { useRTLDetection } from '../hooks/useRTLDetection';
 
 interface CatalogSelectorProps {
   selectedCatalogId: string;
@@ -15,41 +16,52 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   className = ''
 }) => {
   const { t } = useTranslation(['common', 'catalogs']);
+  const { isRTL } = useRTLDetection();
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  // Sort catalogs by display order
+  const sortedCatalogs = [...EXERCISE_CATALOGS].sort((a, b) => a.displayOrder - b.displayOrder);
 
   // Handle image loading errors
   const handleImageError = (catalogId: string) => {
     setImageErrors(prev => new Set(prev).add(catalogId));
   };
 
-  // Check scroll state
+  // Check scroll state (kept for scroll event listener, but state management removed)
   const checkScrollState = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
-    }
+    // Function kept for onScroll event listener compatibility
+    // Scroll state detection is no longer needed since we use hover-based navigation
   };
 
-  // Scroll functions
+  // Scroll functions - simplified to match ExercisePage pattern
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: -200,
+      const scrollAmount = 200;
+      const currentScroll = scrollContainerRef.current.scrollLeft;
+      const newScroll = currentScroll - scrollAmount;
+
+      scrollContainerRef.current.scrollTo({
+        left: newScroll,
         behavior: 'smooth'
       });
+      // Re-check scroll state after animation
+      setTimeout(() => checkScrollState(), 300);
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: 200,
+      const scrollAmount = 200;
+      const currentScroll = scrollContainerRef.current.scrollLeft;
+      const newScroll = currentScroll + scrollAmount;
+
+      scrollContainerRef.current.scrollTo({
+        left: newScroll,
         behavior: 'smooth'
       });
+      // Re-check scroll state after animation
+      setTimeout(() => checkScrollState(), 300);
     }
   };
 
@@ -57,16 +69,31 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   React.useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
+      // Use a timeout to ensure DOM is fully rendered
+      const timeoutId = setTimeout(() => {
+        checkScrollState();
+      }, 100);
+
       checkScrollState();
       container.addEventListener('scroll', checkScrollState);
       window.addEventListener('resize', checkScrollState);
 
       return () => {
+        clearTimeout(timeoutId);
         container.removeEventListener('scroll', checkScrollState);
         window.removeEventListener('resize', checkScrollState);
       };
     }
-  }, []);
+  }, [isRTL]);
+
+  // Re-check scroll state when catalogs, selection, or RTL changes
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkScrollState();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedCatalogId, sortedCatalogs.length, isRTL]);
 
   // Get fallback icon for catalog when image fails
   const getFallbackIcon = (catalog: ExerciseCatalog) => {
@@ -100,16 +127,16 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
     }
   };
 
-  // Get catalog thumbnail classes with consistent sizing for horizontal navigation
+  // Get catalog thumbnail classes with different sizing for selected vs unselected
   const getThumbnailClasses = (catalog: ExerciseCatalog, isSelected: boolean) => {
     const baseClasses = 'relative rounded-xl overflow-hidden transition-all duration-300 ease-in-out cursor-pointer group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex-shrink-0';
 
     if (isSelected) {
-      // Selected catalog with ring indicator
-      return `${baseClasses} w-28 h-20 sm:w-32 sm:h-24 ring-2 ring-offset-2 ${getRingColor(catalog)} shadow-lg`;
+      // Selected catalog - bigger with ring indicator
+      return `${baseClasses} w-40 h-32 sm:w-44 sm:h-36 ring-2 ${getRingColor(catalog)} shadow-lg`;
     } else {
-      // Unselected catalogs with consistent size
-      return `${baseClasses} w-28 h-20 sm:w-32 sm:h-24 opacity-80 hover:opacity-100`;
+      // Unselected catalogs - smaller
+      return `${baseClasses} w-32 h-24 sm:w-36 sm:h-28 opacity-80 hover:opacity-100`;
     }
   };
 
@@ -129,53 +156,34 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
     }
   };
 
-  // Get overlay gradient based on catalog theme
-  const getOverlayGradient = (catalog: ExerciseCatalog) => {
-    switch (catalog.colorTheme) {
-      case 'blue':
-        return 'from-blue-600/70 to-blue-800/90';
-      case 'green':
-        return 'from-green-600/70 to-green-800/90';
-      case 'purple':
-        return 'from-purple-600/70 to-purple-800/90';
-      case 'pink':
-        return 'from-pink-600/70 to-pink-800/90';
-      default:
-        return 'from-blue-600/70 to-blue-800/90';
-    }
-  };
-
-  // Sort catalogs by display order
-  const sortedCatalogs = [...EXERCISE_CATALOGS].sort((a, b) => a.displayOrder - b.displayOrder);
-
   return (
     <div className={`catalog-selector ${className}`}>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           {t('selectCatalog', { ns: 'catalogs', defaultValue: 'Exercise Catalog' })}
         </label>
-        <div className="relative">
+        <div className="relative group">
           {/* Left Navigation Button */}
-          {canScrollLeft && (
+          {sortedCatalogs.length > 1 && (
             <button
               onClick={scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
               aria-label="Scroll left"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
           )}
 
           {/* Right Navigation Button */}
-          {canScrollRight && (
+          {sortedCatalogs.length > 1 && (
             <button
               onClick={scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white dark:bg-gray-800 shadow-lg rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
               aria-label="Scroll right"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -184,7 +192,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
           {/* Catalog Container */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-3 items-center overflow-x-auto pb-2 scrollbar-hide px-10"
+            className="flex gap-3 items-center overflow-x-auto pb-2 scrollbar-hide px-3 py-1"
             onScroll={checkScrollState}
           >
             {sortedCatalogs.map((catalog) => {
@@ -215,8 +223,8 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                   </div>
                 )}
                 
-                {/* Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t ${getOverlayGradient(catalog)}`} />
+                {/* Light overlay for text readability */}
+                <div className="absolute inset-0 bg-black/20" />
                 
                 {/* Content */}
                 <div className="relative z-10 p-2 sm:p-3 h-full flex flex-col justify-between">

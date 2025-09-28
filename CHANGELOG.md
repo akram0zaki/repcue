@@ -1,5 +1,27 @@
 ## Unreleased
 
+### 2025-09-28 (RTL Layout Improvements & CatalogSelector Navigation Fix)
+#### Fixed
+- **CatalogSelector Navigation**: Fixed horizontal navigation buttons (`<` and `>`) not working properly
+  - Resolved "Cannot access 'sortedCatalogs' before initialization" error by moving variable declaration before usage
+  - Simplified RTL scroll logic to match proven ExercisePage pattern
+  - Changed from complex scroll state detection to simple item count check (`sortedCatalogs.length > 1`)
+  - Added hover-based button reveal (`opacity-0 group-hover:opacity-100`) consistent with ExercisePage
+  - Updated scroll functions to use `scrollTo` instead of `scrollBy` for more reliable behavior
+- **RTL Spacing Issues on HomePage**: Fixed Arabic text touching icons and thumbnails
+  - **Workout Schedule Component**: Changed `space-x-4` to `gap-4` for proper RTL spacing between calendar icon and text
+  - **Popular Exercises Section**: Replaced `mr-3` and `ml-3` with `gap-3` for consistent spacing between video thumbnails and text
+  - **Favorites Section**: Updated spacing from `ml-3` to `gap-3` for proper button and text separation
+  - All changes ensure proper white space in both LTR (English) and RTL (Arabic) layouts
+
+#### Changed
+- **CatalogSelector Architecture**: Adopted ExercisePage navigation pattern for consistency
+  - Navigation buttons now use hover reveal instead of scroll state detection
+  - Simplified scroll logic works reliably across browsers and RTL modes
+- **HomePage Layout**: Migrated from directional margins to gap-based spacing
+  - Replaced `ml-*`, `mr-*`, and `space-x-*` with `gap-*` for RTL compatibility
+  - Improved maintainability with single spacing property handling both directions
+
 ### 2025-01-27 (Test Suite Stabilization & Accessibility Improvements)
 #### Fixed
 - **Test Suite Stabilization**: Fixed 19 major test categories, improving test success rate from ~40-50% to 86% (895/1041 tests passing)

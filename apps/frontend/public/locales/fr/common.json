@@ -228,11 +228,13 @@
     "sunday": "Dim"
   },
   "home": {
+    "heroTitle": "Restez constant, restez fort.",
+    "heroSubtitle": "Vos entraînements, à votre façon.",
     "upcomingWorkout": "Entraînement à venir",
     "tagline": "Votre minuteur d'exercices personnel",
     "signInMessage": "Vous pouvez vous ",
     "signInLink": "connecter",
-    "signInSuffix": " pour suivre vos progrès depuis différents appareils.",
+    "signInSuffix": " pour suivre vos progrès et les partager.",
     "startNow": "Commencer maintenant",
     "noScheduleTitle": "Aucun planning défini",
     "noScheduleBody": "Créez un planning d'entraînement pour voir vos entraînements à venir ici",

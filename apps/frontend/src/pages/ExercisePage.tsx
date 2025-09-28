@@ -47,7 +47,7 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
+  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails', 'catalogs']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
@@ -449,7 +449,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-text-900 dark:text-text-50 flex items-center gap-2">
               <WorkoutIcon size={24} className="text-primary-600 dark:text-primary-400" />
-              {t('exercises:title')}
+              {t('common:exercises.title')}
             </h1>
             {flags.canCreateExercises && (
               <button
@@ -465,7 +465,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           </div>
           
           <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mt-2">
-            {t('exercises:subtitle')}
+            {t('common:exercises.subtitle')}
           </p>
         </div>
 
@@ -634,7 +634,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="mt-2 text-xs sm:text-sm summary-text">
             {(() => {
               const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
-              const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { defaultValue: selectedCatalog.id }) : 'Unknown';
+              const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { ns: 'catalogs', defaultValue: selectedCatalog.id }) : 'Unknown';
               const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
               return t('exercises:showingCountInCatalog', {
                 count: filteredExercises.length,
@@ -659,7 +659,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   <div key={category}>
                     <h2 className="text-lg sm:text-xl font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4 flex items-center gap-2">
                       <span>{getCategoryIcon(category as ExerciseCategory)}</span>
-                      <span className="capitalize">{t(`exercises:categories.${String(category).replace('-', '')}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
+                      <span className="capitalize">{t(`common:categories.${String(category)}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
                       <span className="text-sm font-normal text-text-500 dark:text-text-400">
                         ({categoryExercises.length})
                       </span>
@@ -733,7 +733,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   <div key={category}>
                     <h2 className="text-lg sm:text-xl font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4 flex items-center gap-2">
                       <span>{getCategoryIcon(category as ExerciseCategory)}</span>
-                      <span className="capitalize">{t(`exercises:categories.${String(category).replace('-', '')}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
+                      <span className="capitalize">{t(`common:categories.${String(category)}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
                       <span className="text-sm font-normal text-text-500 dark:text-text-400">
                         ({categoryExercises.length})
                       </span>
@@ -788,16 +788,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-base sm:text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
-              {t('exercises:emptyTitle')}
+              {t('common:exercises.emptyTitle')}
             </h3>
             <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mb-4">
-              {t('exercises:emptyBody')}
+              {t('common:exercises.emptyBody')}
             </p>
             <button
               onClick={clearAllFilters}
               className="px-4 py-2.5 bg-primary-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-primary-600 transition-colors min-h-[44px]"
             >
-              {t('exercises:clearFilters')}
+              {t('common:exercises.clearFilters')}
             </button>
           </div>
         )}

@@ -19,7 +19,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     displayOrder: 0,
     icon: 'fitness',
     colorTheme: 'blue',
-    pictureUrl: '/images/general-fitness.svg'
+    pictureUrl: '/images/catalogs/general-fitness-square.png'
   },
   {
     id: 'women-health',
@@ -30,7 +30,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     displayOrder: 1,
     icon: 'woman',
     colorTheme: 'pink',
-    pictureUrl: '/images/women-health.svg'
+    pictureUrl: '/images/catalogs/women-health-square.png'
   },
   {
     id: 'tai-chi',
@@ -41,7 +41,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     displayOrder: 2,
     icon: 'tai-chi',
     colorTheme: 'green',
-    pictureUrl: '/images/tai-chi.svg'
+    pictureUrl: '/images/catalogs/tai-chi-square.png'
   },
   {
     id: 'zumba',
@@ -52,7 +52,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     displayOrder: 3,
     icon: 'dance',
     colorTheme: 'purple',
-    pictureUrl: '/images/zumba.svg'
+    pictureUrl: '/images/catalogs/zumba-square.png'
   }
 ];
 

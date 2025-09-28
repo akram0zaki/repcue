@@ -40,7 +40,9 @@
     "mobility": "Mobility",
     "yoga": "Yoga",
     "cardio": "Cardio",
-    "strength": "Strength"
+    "strength": "Strength",
+    "flexibility": "Flexibility",
+    "handwarmup": "Hand Warmup"
   },
   "difficulties": {
     "beginner": "Beginner",

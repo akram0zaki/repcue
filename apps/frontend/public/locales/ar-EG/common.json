@@ -228,11 +228,13 @@
     "sunday": "حد"
   },
   "home": {
+    "heroTitle": "خليك ثابت، خليك قوي.",
+    "heroSubtitle": "تمارينك، على طريقتك.",
     "upcomingWorkout": "التمرين الجاي",
     "tagline": "مؤقت التمارين بتاعك",
     "signInMessage": "تقدر ",
     "signInLink": "تسجل دخولك",
-    "signInSuffix": " عشان تتابع تقدمك من أجهزة مختلفة.",
+    "signInSuffix": " علشان تتابع نشاطك وتشارك تقدّمك.",
     "startNow": "ابدأ دلوقتي",
     "noScheduleTitle": "مافيش جدول اتحط",
     "noScheduleBody": "اعمل جدول تمرين عشان تشوف تمارينك الجاية هنا",
