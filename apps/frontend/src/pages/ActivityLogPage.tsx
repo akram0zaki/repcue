@@ -218,8 +218,6 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     const locale = i18n.resolvedLanguage || i18n.language || undefined;
     return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   };
-  const categoryKey = (cat: string): string => cat.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-
 
   // Get exercise category color
   const getCategoryColor = (exercise_id: string): string => {
@@ -388,7 +386,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
                 }`}
               >
-                {t(`exercises:categories.${categoryKey(category)}`, { defaultValue: category.replace('-', ' ') })}
+                {t(`common:categories.${String(category)}`, { defaultValue: category.replace('-', ' ') })}
               </button>
             ))}
           </div>
@@ -405,7 +403,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               {selectedFilter === 'all' 
                 ? t('activity.noWorkoutsYet') 
-                : t('activity.noCategoryWorkoutsYet', { category: t(`exercises:categories.${categoryKey(selectedFilter)}`, { defaultValue: selectedFilter.replace('-', ' ') }) })}
+                : t('activity.noCategoryWorkoutsYet', { category: t(`common:categories.${String(selectedFilter)}`, { defaultValue: selectedFilter.replace('-', ' ') }) })}
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {t('activity.emptySubtitle')}
@@ -572,7 +570,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                 </div>
                                 
                                 <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exercise_id)} ${getCategoryTextColor(log.exercise_id)}`}>
-                                  {t(`exercises:categories.${(exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', '')}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
+                                  {t(`common:categories.${exercises.find(ex => ex.id === log.exercise_id)?.category || ''}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
                                 </div>
                               </div>
                               
