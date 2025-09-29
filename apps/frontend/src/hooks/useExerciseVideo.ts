@@ -35,7 +35,15 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
   const [error, setError] = useState<Error | null>(null);
   const loopHandlersRef = useRef<Set<() => void>>(new Set());
   const lastTimeRef = useRef(0);
-  const reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reducedMotion = (() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const mediaQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+      return mediaQuery ? mediaQuery.matches : false;
+    } catch {
+      return false;
+    }
+  })();
 
   const onLoop = useCallback((handler: () => void) => {
     loopHandlersRef.current.add(handler);

@@ -19,7 +19,12 @@ export const useDarkMode = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Initialize based on current preference
     if (preference === 'system') {
-      return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+      try {
+        const mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+        return mediaQuery?.matches ?? false;
+      } catch {
+        return false;
+      }
     }
     return preference === 'dark';
   });
@@ -30,7 +35,12 @@ export const useDarkMode = () => {
       let shouldBeDark: boolean;
 
       if (preference === 'system') {
-        shouldBeDark = prefersDark ?? window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+        try {
+          const mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+          shouldBeDark = prefersDark ?? mediaQuery?.matches ?? false;
+        } catch {
+          shouldBeDark = prefersDark ?? false;
+        }
       } else {
         shouldBeDark = preference === 'dark';
       }
@@ -62,7 +72,13 @@ export const useDarkMode = () => {
     };
 
     // System preference change listener
-    const mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+    let mediaQuery: MediaQueryList | undefined;
+    try {
+      mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+    } catch {
+      mediaQuery = undefined;
+    }
+
     const handleSystemChange = (e: MediaQueryListEvent) => {
       if (preference === 'system') {
         updateDarkMode(e.matches);
@@ -100,7 +116,13 @@ export const useDarkMode = () => {
   };
 
   // Get current system preference
-  const systemPrefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+  let systemPrefersDark = false;
+  try {
+    const mediaQuery = window.matchMedia?.('(prefers-color-scheme: dark)');
+    systemPrefersDark = mediaQuery?.matches ?? false;
+  } catch {
+    systemPrefersDark = false;
+  }
 
   return {
     isDarkMode,

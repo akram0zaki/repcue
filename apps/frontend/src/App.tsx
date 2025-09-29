@@ -2395,7 +2395,13 @@ useEffect(() => {
   // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {
     // Check system preference for initial theme
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let prefersDark = false;
+    try {
+      const mediaQuery = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      prefersDark = mediaQuery ? mediaQuery.matches : false;
+    } catch {
+      prefersDark = false;
+    }
     if (prefersDark) {
       document.documentElement.classList.add('dark');
     } else {

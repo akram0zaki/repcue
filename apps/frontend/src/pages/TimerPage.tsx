@@ -59,7 +59,15 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
-  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prefersReducedMotion = (() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const mediaQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+      return mediaQuery ? mediaQuery.matches : false;
+    } catch {
+      return false;
+    }
+  })();
   const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && (appSettings.show_exercise_videos ?? true) && !prefersReducedMotion;
 
   useEffect(() => {

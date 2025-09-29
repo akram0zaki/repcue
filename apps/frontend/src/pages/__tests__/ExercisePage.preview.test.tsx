@@ -50,12 +50,31 @@ describe('ExercisePage - video preview', () => {
     is_favorite: false,
   } as any;
 
+  const mockAppSettings = {
+    interval_duration: 30,
+    sound_enabled: true,
+    vibration_enabled: true,
+    beep_volume: 0.5,
+    dark_mode: false,
+    auto_save: true,
+    pre_timer_countdown: 3,
+    default_rest_time: 30,
+    rep_speed_factor: 1.0,
+    show_exercise_videos: true,
+    horizontal_exercise_layout: false,
+    ring_timer: false,
+    created_at: '2024-01-01T00:00:00.000Z',
+    updated_at: '2024-01-01T00:00:00.000Z',
+    id: 'test-settings',
+  };
+
   const renderPage = () =>
     render(
       <MemoryRouter>
         <SnackbarProvider>
           <ExercisePage
             exercises={[baseExercise]}
+            appSettings={mockAppSettings}
             onToggleFavorite={vi.fn()}
           />
         </SnackbarProvider>

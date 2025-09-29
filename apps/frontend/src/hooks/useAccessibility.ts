@@ -12,19 +12,39 @@ export interface AccessibilityPreferences {
  * Supports WCAG 2.1 AA guidelines and system preferences
  */
 export const useAccessibility = () => {
-  const [preferences, setPreferences] = useState<AccessibilityPreferences>(() => ({
-    prefersReducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
-    prefersHighContrast: window.matchMedia?.('(prefers-contrast: high)').matches ?? false,
-    prefersReducedData: window.matchMedia?.('(prefers-reduced-data: reduce)').matches ?? false,
-    prefersReducedTransparency: window.matchMedia?.('(prefers-reduced-transparency: reduce)').matches ?? false,
-  }));
+  const [preferences, setPreferences] = useState<AccessibilityPreferences>(() => {
+    try {
+      return {
+        prefersReducedMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false,
+        prefersHighContrast: window.matchMedia?.('(prefers-contrast: high)')?.matches ?? false,
+        prefersReducedData: window.matchMedia?.('(prefers-reduced-data: reduce)')?.matches ?? false,
+        prefersReducedTransparency: window.matchMedia?.('(prefers-reduced-transparency: reduce)')?.matches ?? false,
+      };
+    } catch {
+      return {
+        prefersReducedMotion: false,
+        prefersHighContrast: false,
+        prefersReducedData: false,
+        prefersReducedTransparency: false,
+      };
+    }
+  });
 
   useEffect(() => {
     // Media queries for accessibility preferences
-    const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    const highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
-    const reducedDataQuery = window.matchMedia?.('(prefers-reduced-data: reduce)');
-    const reducedTransparencyQuery = window.matchMedia?.('(prefers-reduced-transparency: reduce)');
+    let reducedMotionQuery, highContrastQuery, reducedDataQuery, reducedTransparencyQuery;
+    try {
+      reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+      highContrastQuery = window.matchMedia?.('(prefers-contrast: high)');
+      reducedDataQuery = window.matchMedia?.('(prefers-reduced-data: reduce)');
+      reducedTransparencyQuery = window.matchMedia?.('(prefers-reduced-transparency: reduce)');
+    } catch {
+      // Gracefully handle environments where matchMedia is not available
+      reducedMotionQuery = undefined;
+      highContrastQuery = undefined;
+      reducedDataQuery = undefined;
+      reducedTransparencyQuery = undefined;
+    }
 
     const updatePreferences = () => {
       setPreferences({
