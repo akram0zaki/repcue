@@ -111,8 +111,8 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
                   />
                 </div>
                 
-                {/* Period label */}
-                <div className="text-xs text-gray-500 dark:text-gray-400 text-center leading-tight">
+                {/* Period label - Fixed height to prevent bar misalignment */}
+                <div className="h-8 text-xs text-gray-500 dark:text-gray-400 text-center leading-tight flex items-center justify-center">
                   {unit === 'period' && groupSize > 1 
                     ? formatPeriodRange(week.weekStart, week.weekEnd, locale)
                     : formatWeekRange(week.weekStart, locale)
