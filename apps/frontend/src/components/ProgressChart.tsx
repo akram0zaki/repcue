@@ -69,9 +69,9 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-text-900 dark:text-text-50">
+      {/* Header - Title on separate line */}
+      <div className="mb-4">
+        <h3 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3">
           {chartTitle}
         </h3>
         
@@ -96,14 +96,14 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
       {/* Chart */}
       {chartData.length > 0 ? (
         <div className="space-y-4">
-          {/* Chart area */}
-          <div className="h-48 flex items-end justify-between gap-1 px-2">
+          {/* Chart area - Optimized for 8 bars */}
+          <div className="h-48 flex items-end px-1" style={{ gap: '2px' }}>
             {chartData.map((week, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center group relative">
+              <div key={index} className="flex flex-col items-center group relative flex-1 min-w-0">
                 {/* Bar */}
                 <div className="w-full flex justify-center mb-1">
                   <div
-                    className={`w-6 rounded-t-sm transition-all duration-300 ${getBarHeight(week.workoutCount)} ${
+                    className={`w-4/5 rounded-t-sm transition-all duration-300 ${getBarHeight(week.workoutCount)} ${
                       week.workoutCount > 0
                         ? 'bg-primary-500 hover:bg-primary-600'
                         : 'bg-gray-200 dark:bg-gray-600'
@@ -148,7 +148,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
           </div>
 
           {/* Y-axis labels */}
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 px-2">
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
             <span>0</span>
             <span className="text-primary-600 dark:text-primary-400 font-medium">
               {t('common:activity.charts.maxWorkouts', { 
