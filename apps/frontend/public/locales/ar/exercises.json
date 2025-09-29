@@ -180,5 +180,6 @@
   "favoritesOnly": "المفضلة فقط",
   "searchPlaceholder": "ابحث بالاسم أو الوصف أو العلامة...",
   "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}",
-  "ratingsAndReviews": "التقييمات والمراجعات"
+  "ratingsAndReviews": "التقييمات والمراجعات",
+  "filtersAndSearch": "التصفية والبحث"
 }

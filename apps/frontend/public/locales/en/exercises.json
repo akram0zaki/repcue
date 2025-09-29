@@ -146,5 +146,6 @@
   "visibility": "Visibility",
   "searchPlaceholder": "Search by name, description, or tag...",
   "favoritesOnly": "Favorites Only",
-  "ratingsAndReviews": "Ratings & Reviews"
+  "ratingsAndReviews": "Ratings & Reviews",
+  "filtersAndSearch": "Filters & Search"
 }
