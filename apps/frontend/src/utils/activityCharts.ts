@@ -1,6 +1,26 @@
 import type { ActivityLog } from '../types';
 
 /**
+ * Get the ISO week number for a given date
+ */
+export const getISOWeekNumber = (date: Date): number => {
+  const tempDate = new Date(date.getTime());
+  
+  // Set to nearest Thursday (current date + 4 - current day of week)
+  // Make Sunday's day of week 7 instead of 0
+  const dayOfWeek = tempDate.getDay() || 7;
+  tempDate.setDate(tempDate.getDate() + 4 - dayOfWeek);
+  
+  // Get first day of year
+  const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+  
+  // Calculate full weeks to nearest Thursday
+  const weekNumber = Math.ceil((((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  
+  return weekNumber;
+};
+
+/**
  * Utility functions for processing activity data for charts and visualizations
  */
 

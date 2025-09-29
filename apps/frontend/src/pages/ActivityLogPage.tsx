@@ -237,20 +237,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
 
         {/* Charts Section */}
         {activityLogs.length > 0 && (
-          <div className="space-y-6 mb-6">
+          <div className="space-y-4 mb-6">
             {/* Weekly Streak Calendar */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-              <WeeklyStreakCalendar 
-                logs={activityLogs} 
-                currentWeek={currentWeek}
-                onWeekChange={setCurrentWeek}
-              />
-            </div>
+            <WeeklyStreakCalendar 
+              logs={activityLogs} 
+              currentWeek={currentWeek}
+              onWeekChange={setCurrentWeek}
+            />
 
             {/* Progress Chart */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-              <ProgressChart logs={activityLogs} />
-            </div>
+            <ProgressChart logs={activityLogs} />
           </div>
         )}
 

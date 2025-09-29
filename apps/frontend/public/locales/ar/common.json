@@ -383,7 +383,8 @@
       "streakDays": "{{count}} أيام",
       "streakDay": "{{count}} يوم",
       "averageWorkouts": "{{count}} متوسط تمارين/أسبوع",
-      "totalInPeriod": "{{count}} إجمالي التمارين"
+      "totalInPeriod": "{{count}} إجمالي التمارين",
+      "weekNumber": "الأسبوع {{week}}"
     }
   },
   "exercises": {

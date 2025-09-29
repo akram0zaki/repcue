@@ -369,7 +369,8 @@
       "streakDays": "{{count}} days",
       "streakDay": "{{count}} day",
       "averageWorkouts": "{{count}} avg. workouts/week",
-      "totalInPeriod": "{{count}} total workouts"
+      "totalInPeriod": "{{count}} total workouts",
+      "weekNumber": "Week {{week}}"
     }
   },
   "exercises": {
