@@ -234,10 +234,10 @@ const CreateWorkoutPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+            <div className="h-8 bg-surface-200 dark:bg-surface-700 rounded mb-6"></div>
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div key={i} className="h-16 bg-surface-200 dark:bg-surface-700 rounded"></div>
               ))}
             </div>
           </div>
@@ -310,11 +310,11 @@ const CreateWorkoutPage: React.FC = () => {
                   setValidationErrors(newErrors);
                 }
               }}
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 transition-colors ${
                 validationErrors.workoutName
                   ? 'border-red-300 dark:border-red-600'
-                  : 'border-gray-300 dark:border-gray-600'
-              } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  : 'border-border-300 dark:border-border-600'
+              } focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
               placeholder={t('workouts.namePlaceholder')}
               disabled={saving}
             />
@@ -333,7 +333,7 @@ const CreateWorkoutPage: React.FC = () => {
               value={workoutDescription}
               onChange={(e) => setWorkoutDescription(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-border-300 dark:border-border-600 rounded-lg bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder={t('workouts.descriptionPlaceholder')}
               disabled={saving}
             />
@@ -355,7 +355,7 @@ const CreateWorkoutPage: React.FC = () => {
                   className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                   disabled={saving}
                 />
-                <label htmlFor="isActive" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="isActive" className="ms-2 text-sm text-gray-700 dark:text-gray-300">
                   {t('workouts.isActiveLabel')}
                 </label>
               </div>
@@ -393,7 +393,7 @@ const CreateWorkoutPage: React.FC = () => {
                         className={`px-1 py-2 text-xs font-medium rounded-lg border transition-colors min-w-0 text-center ${
                           isSelected
                             ? 'bg-primary-500 text-white border-primary-500'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            : 'bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 border-border-300 dark:border-border-600 hover:bg-surface-100 dark:hover:bg-surface-700'
                         }`}
                         disabled={saving || !isActive}
                       >
@@ -440,7 +440,7 @@ const CreateWorkoutPage: React.FC = () => {
             ) : (
               <div className="space-y-3">
                 {selectedExercises.map((exercise, index) => (
-                  <div key={`${exercise.id}_${index}`} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div key={`${exercise.id}_${index}`} className="bg-surface-50 dark:bg-surface-800 border border-border-200 dark:border-border-700 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900 dark:text-white">
@@ -501,10 +501,10 @@ const CreateWorkoutPage: React.FC = () => {
                             min="1"
                             value={exercise.custom_duration || ''}
                             onChange={(e) => updateExerciseValue(index, 'custom_duration', parseInt(e.target.value) || 0)}
-                            className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                            className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                               validationErrors[`exercise_${index}_duration`]
                                 ? 'border-red-300 dark:border-red-600'
-                                : 'border-gray-300 dark:border-gray-600'
+                                : 'border-border-300 dark:border-border-600'
                             }`}
                             disabled={saving}
                           />
@@ -526,10 +526,10 @@ const CreateWorkoutPage: React.FC = () => {
                               min="1"
                               value={exercise.custom_sets || ''}
                               onChange={(e) => updateExerciseValue(index, 'custom_sets', parseInt(e.target.value) || 0)}
-                              className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                              className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                                 validationErrors[`exercise_${index}_sets`]
                                   ? 'border-red-300 dark:border-red-600'
-                                  : 'border-gray-300 dark:border-gray-600'
+                                  : 'border-border-300 dark:border-border-600'
                               }`}
                               disabled={saving}
                             />
@@ -549,10 +549,10 @@ const CreateWorkoutPage: React.FC = () => {
                               min="1"
                               value={exercise.custom_reps || ''}
                               onChange={(e) => updateExerciseValue(index, 'custom_reps', parseInt(e.target.value) || 0)}
-                              className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                              className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                                 validationErrors[`exercise_${index}_reps`]
                                   ? 'border-red-300 dark:border-red-600'
-                                  : 'border-gray-300 dark:border-gray-600'
+                                  : 'border-border-300 dark:border-border-600'
                               }`}
                               disabled={saving}
                             />
@@ -575,10 +575,10 @@ const CreateWorkoutPage: React.FC = () => {
                           min="0"
                           value={exercise.custom_rest_time || ''}
                           onChange={(e) => updateExerciseValue(index, 'custom_rest_time', parseInt(e.target.value) || 0)}
-                          className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                          className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                             validationErrors[`exercise_${index}_rest`]
                               ? 'border-red-300 dark:border-red-600'
-                              : 'border-gray-300 dark:border-gray-600'
+                              : 'border-border-300 dark:border-border-600'
                           }`}
                           disabled={saving}
                         />
@@ -604,18 +604,18 @@ const CreateWorkoutPage: React.FC = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex space-x-3 pt-6">
+          <div className="flex gap-3 pt-6">
             <button
               onClick={handleCancel}
               disabled={saving}
-              className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+              className="btn-neutral flex-1"
             >
               {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={saving || selectedExercises.length === 0}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="btn-primary flex-1"
             >
               {saving ? (
                 <>
