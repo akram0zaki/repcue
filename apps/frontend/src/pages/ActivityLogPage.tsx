@@ -230,7 +230,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           <h1 className="text-h2 font-bold text-text-900 dark:text-text-50 mb-2">
             {t('activity.title')}
           </h1>
-          <p className="text-text-600 dark:text-text-400 text-caption">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             {t('activity.subtitle')}
           </p>
         </div>
