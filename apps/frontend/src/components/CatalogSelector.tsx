@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
 import { EXERCISE_CATALOGS } from '../data/catalogs';
 import { useRTLDetection } from '../hooks/useRTLDetection';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons/NavigationIcons';
 
 interface CatalogSelectorProps {
   selectedCatalogId: string;
@@ -169,10 +170,9 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
               onClick={scrollLeft}
               className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
               aria-label="Scroll left"
+              style={{ direction: 'ltr' }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <ChevronLeftIcon size={20} />
             </button>
           )}
 
@@ -182,10 +182,9 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
               onClick={scrollRight}
               className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
               aria-label="Scroll right"
+              style={{ direction: 'ltr' }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRightIcon size={20} />
             </button>
           )}
 
@@ -202,7 +201,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                 key={catalog.id}
                 onClick={() => onCatalogChange(catalog.id)}
                 className={getThumbnailClasses(catalog, isSelected)}
-                aria-pressed={isSelected ? 'true' : 'false'}
+                aria-pressed={isSelected}
                 title={t(catalog.descriptionKey, { ns: 'catalogs' })}
               >
                 {/* Background Image or Fallback */}

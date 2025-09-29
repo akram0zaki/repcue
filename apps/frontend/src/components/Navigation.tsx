@@ -77,16 +77,16 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
-      <div className="flex items-center py-2 px-2 max-w-md mx-auto">
-        {/* Main navigation items - 5 tabs with proper spacing */}
-        <div className="flex justify-between items-center flex-1 pr-2">
+      <div className="nav-container flex items-center max-w-md mx-auto">
+        {/* Main navigation items - 5 tabs with optimized spacing */}
+        <div className="flex justify-between items-center flex-1">
           {mainNavItems.map((item) => {
             const IconComponent = item.icon;
             return (
               <button
                 key={item.path}
                 onClick={() => navigate(item.path)}
-                className={`flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors min-w-0 ${
+                className={`nav-item flex flex-col items-center justify-center rounded-lg transition-colors min-w-0 touch-target ${
                   isActive(item.path)
                     ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -94,7 +94,7 @@ const Navigation: React.FC = () => {
                 aria-label={`Navigate to ${item.label}`}
                 data-testid={item.testId}
               >
-                <IconComponent className="mb-1" size={24} />
+                <IconComponent className="mb-1" size={18} />
                 <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
               </button>
             );
@@ -102,13 +102,13 @@ const Navigation: React.FC = () => {
         </div>
 
         {/* Separator between main tabs and More button */}
-        <div className="w-px h-6 bg-gray-300 dark:bg-gray-500 mx-1 flex-shrink-0"></div>
+        <div className="nav-separator w-px h-5 bg-gray-300 dark:bg-gray-500"></div>
 
-        {/* More menu button - compact, positioned on the right */}
-        <div className="relative" ref={moreMenuRef}>
+        {/* More menu button - ensure visibility */}
+        <div className="relative flex-shrink-0" ref={moreMenuRef}>
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
+            className={`nav-more-button flex items-center justify-center rounded-lg transition-colors ${
               isActive(Routes.SETTINGS)
                 ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -117,8 +117,9 @@ const Navigation: React.FC = () => {
             aria-expanded={showMoreMenu}
             aria-haspopup="true"
             data-testid="nav-more"
+            style={{ direction: 'ltr' }}
           >
-            <MoreIcon size={24} />
+            <MoreIcon size={20} />
           </button>
 
           {/* Dropdown menu */}

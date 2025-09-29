@@ -1,7 +1,12 @@
 # RTL Strategy (Phase 1)
-Updated: 2025-08-17
+Updated: 2025-09-29
 
 Goal: Ensure the UI renders correctly in right-to-left (RTL) languages without breaking timer clarity during workouts.
+
+## Quick References
+- **UI/UX Guidelines**: See [UI Specs RTL Section](../ui-ux/ui-specs.md#rtl-right-to-left-language-support)
+- **Developer Implementation**: See [RTL Development Guide](../ui-ux/rtl-development-guide.md)
+- **Icon Rendering Issues**: See development guide for navigation icon solutions
 
 ## Direction and language attributes
 - On language change, set:

@@ -84,6 +84,28 @@
   - **Benefits**: Single point of control for button styling, automatic UI spec compliance, reduced CSS duplication
   - **Documentation**: Updated ui-specs.md with comprehensive button system documentation and usage examples
 
+### 2025-09-29 (RTL Icon Rendering Fix)
+#### Fixed
+- **RTL Icon Rendering Issue**: Fixed navigation icons not displaying in Arabic (RTL) mode
+  - **MoreIcon**: Navigation three-dot menu button now visible in Arabic interface
+    - Switched from stroke-based to filled circles for better visibility
+    - Increased icon size from 18px to 20px
+    - Added forced LTR direction to prevent RTL transform issues
+  - **CatalogSelector Navigation**: Horizontal scroll arrows now render properly in RTL
+    - Created dedicated `ChevronLeftIcon` and `ChevronRightIcon` components
+    - Replaced inline SVG with proper icon components for consistency
+    - Added forced LTR direction via inline styles to prevent RTL interference
+  - **CSS RTL Protection**: Added comprehensive RTL-safe styles
+    - Excluded navigation buttons from global RTL button padding rules
+    - Added `direction: ltr !important` for all navigation button SVGs
+    - Protected against unwanted transforms in RTL mode
+    - Ensured proper icon positioning regardless of text direction
+
+#### Changed
+- **Navigation Button Sizes**: Increased More button from 36px to 44px for better touch targets
+- **Icon Components**: Enhanced NavigationIcons.tsx with dedicated chevron components for reusability
+- **Documentation Cleanup**: Removed redundant `dark-mode-text-standards.md` file (content already covered in main UI specs)
+
 ### 2025-09-28 (RTL Layout Improvements & CatalogSelector Navigation Fix)
 #### Fixed
 - **CatalogSelector Navigation**: Fixed horizontal navigation buttons (`<` and `>`) not working properly
@@ -131,7 +153,7 @@
 ### 2025-09-28 (UI Redesign Implementation & Test Infrastructure Hardening)
 #### Added
 - **Design System Foundation**: Added centralized design tokens (`src/constants/designTokens.ts`) with teal-based color system, 8pt grid spacing, and comprehensive typography scale
-- **Dark Mode Text Standards**: Created `docs/ui-ux/dark-mode-text-standards.md` defining consistent text color hierarchy for dark mode across all UI components
+- **Dark Mode Text Standards**: Defined consistent text color hierarchy for dark mode across all UI components (consolidated into main UI specs)
 - **New UI Components**:
   - `CategorySelector.tsx` for improved exercise filtering
   - Enhanced accessibility hooks (`useAccessibility.ts`, `useKeyboardNavigation.ts`)

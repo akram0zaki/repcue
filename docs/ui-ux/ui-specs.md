@@ -145,6 +145,54 @@ To ensure consistency, use these predefined CSS classes instead of inline Tailwi
 3. **Content Flow**: Information flows from right-to-left in Arabic layouts
 4. **Icon Mirroring**: Directional icons (arrows, chevrons) should mirror horizontally
 
+#### Icon Rendering in RTL Mode
+
+**Critical Pattern**: Navigation and interactive icons must be protected from RTL interference to ensure proper rendering.
+
+**Navigation Icons (More menu, scroll buttons)**:
+```tsx
+// ✅ CORRECT: Force LTR direction for navigation icons
+<button 
+  className="nav-more-button ..." 
+  style={{ direction: 'ltr' }}
+>
+  <MoreIcon size={20} />
+</button>
+
+// ✅ CORRECT: CSS protection for navigation buttons
+.nav-more-button,
+.catalog-selector button[aria-label*="Scroll"] {
+  direction: ltr !important;
+  transform: none !important;
+}
+```
+
+**Icon Components Design**:
+- **Filled vs Stroke**: Use filled icons (`fill="currentColor"`) for better RTL visibility
+- **Size Standards**: Minimum 20px for navigation icons, 44px touch targets
+- **Contrast**: Ensure sufficient contrast in both light and dark themes
+
+**CSS Protection Patterns**:
+```css
+/* Exclude navigation from global RTL button rules */
+body.rtl button:not(.nav-more-button):not([aria-label*="Scroll"]) {
+  /* RTL-specific button styles */
+}
+
+/* Force LTR for navigation SVGs */
+body.rtl .nav-more-button svg,
+body.rtl .catalog-selector button svg {
+  direction: ltr !important;
+  transform: none !important;
+}
+```
+
+**Icon Component Standards**:
+- Use centralized icon components from `NavigationIcons.tsx`
+- Prefer component-based icons over inline SVG for consistency
+- Set explicit `size` prop rather than CSS sizing
+- Include `aria-hidden="true"` for decorative icons
+
 #### Responsive RTL Patterns
 
 **Information Cards** (like Upcoming Workout section):
@@ -180,6 +228,28 @@ To ensure consistency, use these predefined CSS classes instead of inline Tailwi
 3. **Touch Targets**: Maintain 44px minimum touch targets in both directions
 4. **Spacing**: Use generous padding and margins for Arabic text readability
 5. **Testing**: Verify all interactive elements work in both LTR and RTL modes
+6. **Icon Testing**: Test all navigation icons in Arabic mode to ensure visibility
+
+#### RTL Testing Checklist
+
+**Icon Rendering Verification**:
+- [ ] Navigation More button (three dots) visible in Arabic
+- [ ] Catalog selector arrows (left/right) render properly
+- [ ] All SVG icons maintain proper contrast and sizing
+- [ ] Touch targets remain accessible (minimum 44px)
+- [ ] Icons don't get distorted by RTL transforms
+
+**Layout Testing**:
+- [ ] Text flows naturally right-to-left
+- [ ] Interactive elements maintain proper spacing
+- [ ] No overlap or cramped layouts in Arabic
+- [ ] Responsive breakpoints work in RTL mode
+
+**Functional Testing**:
+- [ ] All buttons and links work in RTL mode
+- [ ] Form inputs align correctly
+- [ ] Dropdown menus appear in correct position
+- [ ] Modal dialogs center properly
 
 #### Arabic-Specific Design Considerations
 

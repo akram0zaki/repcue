@@ -56,10 +56,10 @@ body.rtl .gap-x-reverse > :not([hidden]) ~ :not([hidden]) {
   line-height: 1.6; /* Better line spacing for Arabic */
 }
 
-/* Improved button spacing for RTL */
+/* Improved button spacing for RTL - exclude navigation buttons */
 body.rtl .btn-primary,
 body.rtl .btn-secondary,
-body.rtl button {
+body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]) {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
@@ -348,9 +348,54 @@ body.rtl .truncate {
     padding-top: env(safe-area-inset-top);
   }
 
+  /* Navigation-specific compact spacing for mobile */
+  .nav-container {
+    padding: 6px 4px; /* Slightly more vertical padding */
+  }
+
+  .nav-item {
+    padding: 4px 1px; /* Reduced horizontal padding between items */
+  }
+
+  .nav-more-button {
+    width: 44px; /* Ensure proper touch target size */
+    height: 44px;
+    flex-shrink: 0; /* Prevent shrinking */
+    min-width: 44px; /* Ensure minimum width */
+  }
+
+  /* RTL-safe navigation buttons - override global button padding */
+  body.rtl .nav-more-button,
+  body.rtl .nav-item,
+  body.rtl nav button {
+    padding: 4px 1px !important; /* Override global RTL button padding */
+    direction: ltr !important; /* Keep icons LTR for proper rendering */
+  }
+
+  /* RTL-safe catalog navigation buttons */
+  body.rtl .catalog-selector button[aria-label*="Scroll"] {
+    direction: ltr !important; /* Keep scroll buttons LTR */
+    transform: none !important; /* Prevent transform issues */
+  }
+
+  /* RTL-safe SVG icons in navigation */
+  body.rtl .nav-more-button svg,
+  body.rtl .nav-item svg,
+  body.rtl .catalog-selector button svg {
+    direction: ltr !important; /* Keep SVG rendering LTR */
+    transform: none !important; /* Prevent RTL transforms on icons */
+  }
+
+  .nav-separator {
+    margin-left: 1px;
+    margin-right: 1px;
+    flex-shrink: 0; /* Prevent separator from shrinking */
+  }
+
   /* Touch target size (minimum 44px) */
   .touch-target {
-    @apply min-h-[2.75rem] min-w-[2.75rem];
+    min-height: 2.75rem;
+    min-width: 2.75rem;
   }
 
   /* Hide scrollbar for Netflix-style horizontal scrolling */

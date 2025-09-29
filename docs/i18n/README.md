@@ -6,6 +6,8 @@ This folder contains documentation for internationalization (i18n) in RepCue.
 
 - [rtl.md](./rtl.md) — Right-to-Left strategy for RTL languages (e.g. Arabic).
 
+- [RTL Development Guide](../ui-ux/rtl-development-guide.md) — Technical implementation patterns for RTL icon rendering and navigation.
+
 - [tech-choice.md](./tech-choice.md) — documenting the choice of i18n technology and rationale.
 
 - [exercise-localization.md](./exercise-localization.md) — End-to-end strategy to localize the exercise catalog and prepare for user-generated exercise translations.

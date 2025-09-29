@@ -298,14 +298,14 @@ When adding a new exercise with ID `exercise-id`:
 
 ### Required Files
 - [ ] `apps/frontend/src/data/exercises.ts` - Exercise definition
-- [ ] `apps/frontend/public/locales/en/exercises.json` - English translation
-- [ ] `apps/frontend/public/locales/de/exercises.json` - German translation
-- [ ] `apps/frontend/public/locales/es/exercises.json` - Spanish translation
-- [ ] `apps/frontend/public/locales/fr/exercises.json` - French translation
-- [ ] `apps/frontend/public/locales/nl/exercises.json` - Dutch translation
-- [ ] `apps/frontend/public/locales/ar/exercises.json` - Arabic translation
-- [ ] `apps/frontend/public/locales/ar-EG/exercises.json` - Egyptian Arabic translation
-- [ ] `apps/frontend/public/locales/fy/exercises.json` - Frisian translation
+- [ ] `apps/frontend/public/locales/en/exerciseDetails.json` - English translation
+- [ ] `apps/frontend/public/locales/de/exerciseDetails.json` - German translation
+- [ ] `apps/frontend/public/locales/es/exerciseDetails.json` - Spanish translation
+- [ ] `apps/frontend/public/locales/fr/exerciseDetails.json` - French translation
+- [ ] `apps/frontend/public/locales/nl/exerciseDetails.json` - Dutch translation
+- [ ] `apps/frontend/public/locales/ar/exerciseDetails.json` - Arabic translation
+- [ ] `apps/frontend/public/locales/ar-EG/exerciseDetails.json` - Egyptian Arabic translation
+- [ ] `apps/frontend/public/locales/fy/exerciseDetails.json` - Frisian translation
 
 ### Optional Files (if has_video: true)
 - [ ] `apps/frontend/public/exercise_media.json` - Media index entry
