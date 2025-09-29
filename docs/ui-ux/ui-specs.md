@@ -104,6 +104,17 @@ bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900
 
 To ensure consistency, use these predefined CSS classes instead of inline Tailwind classes:
 
+#### Semantic Typography Classes (Primary)
+```css
+.text-h1             /* Main page titles (32px, bold) */
+.text-h2             /* Section headers (24px, semi-bold) */
+.text-h3             /* Card titles, subsection headers (20px, semi-bold) */
+.text-body           /* Body text, descriptions (16px, regular) */
+.text-caption        /* Labels, button text (14px, medium) */
+.text-small          /* Helper text, badges (12px, medium) */
+```
+
+#### Utility Text Classes (Secondary)
 ```css
 .heading-text        /* Section headers, page titles */
 .label-text          /* Form labels, toggle labels */
@@ -115,19 +126,29 @@ To ensure consistency, use these predefined CSS classes instead of inline Tailwi
 .help-text           /* Helper text, descriptions */
 ```
 
-**Benefits**: Centralized control, consistent styling, easier maintenance.
+**Benefits**: 
+- **Semantic First**: Use `.text-h1` through `.text-small` for consistent typography hierarchy
+- **Automatic Dark Mode**: All classes include proper dark mode color variants
+- **Centralized Control**: Single point of control in `src/styles/tokens.css`
+- **Consistent Styling**: Prevents arbitrary font sizes and ensures accessibility
 
 ### Typography
 
 -   **Font Family**:
     -   **Latin text**: Inter, Roboto, or Open Sans (clean sans-serif)
     -   **Arabic text**: Cairo, Noto Sans Arabic, or Tajawal (Google Fonts, modern and legible)
--   **Heading Sizes**:
-    -   H1: 28--32px, Bold (`.text-h1`)
-    -   H2: 22--24px, Semi-bold (`.text-h2`)
-    -   H3: 18--20px, Semi-bold (`.text-h3`)
--   **Body Text**: 16px Regular, Line height 1.5 (`.text-body`)
--   **Captions/Tags**: 12--14px, Medium (`.text-caption` or `.text-small`)
+-   **Semantic Typography Scale** (implemented in `src/styles/tokens.css`):
+    -   **H1**: 32px, Bold (`.text-h1`) - Main page titles
+    -   **H2**: 24px, Semi-bold (`.text-h2`) - Section headers, large elements  
+    -   **H3**: 20px, Semi-bold (`.text-h3`) - Card titles, subsection headers
+    -   **Body**: 16px, Regular (`.text-body`) - Body text, descriptions
+    -   **Caption**: 14px, Medium (`.text-caption`) - Labels, button text
+    -   **Small**: 12px, Medium (`.text-small`) - Helper text, badges
+
+**Implementation**: 
+- Use semantic classes instead of arbitrary Tailwind sizes
+- All classes automatically adapt to light/dark modes
+- Consistent line heights optimized for readability
 
 ### RTL (Right-to-Left) Language Support
 
@@ -213,13 +234,29 @@ body.rtl .catalog-selector button svg {
 
 #### Typography Classes for Consistency
 
-**Defined Typography Scale** (use these instead of arbitrary sizes):
-- `.text-h1` → 32px, bold (main page titles)
-- `.text-h2` → 24px, semi-bold (section headers, large elements)
-- `.text-h3` → 20px, semi-bold (card titles, subsection headers)
-- `.text-body` → 16px, regular (body text, descriptions)
-- `.text-caption` → 14px, medium (labels, button text)
-- `.text-small` → 12px, medium (helper text, badges)
+**Implemented Semantic Typography Scale** (defined in `src/styles/tokens.css`):
+- `.text-h1` → 32px, bold, primary text color (main page titles)
+- `.text-h2` → 24px, semi-bold, primary text color (section headers)
+- `.text-h3` → 20px, semi-bold, primary text color (card titles, subsection headers)
+- `.text-body` → 16px, regular, secondary text color (body text, descriptions)
+- `.text-caption` → 14px, medium, tertiary text color (labels, button text)
+- `.text-small` → 12px, medium, tertiary text color (helper text, badges)
+
+**Usage Examples**:
+```tsx
+<h1 className="text-h1">Page Title</h1>
+<h2 className="text-h2">Section Header</h2>
+<h3 className="text-h3">Card Title</h3>
+<p className="text-body">Body content goes here</p>
+<span className="text-caption">Form label</span>
+<small className="text-small">Helper text</small>
+```
+
+**Benefits**:
+- **Automatic Dark Mode**: All classes include proper color variants
+- **Semantic Color System**: Uses CSS custom properties for consistent theming
+- **Accessibility**: Proper contrast ratios in both light and dark modes
+- **Maintainable**: Single source of truth in tokens.css
 
 #### Implementation Best Practices
 

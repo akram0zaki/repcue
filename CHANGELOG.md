@@ -1,5 +1,27 @@
 ## Unreleased
 
+### 2025-09-29 (Component Refactoring & Category Filter Enhancement)
+#### Enhanced
+- **CategoryFilter Component**: Created reusable category filtering component to replace category-specific implementations
+  - **Unified API**: Single component supports both dropdown (modal) and badges (inline) display styles
+  - **Multi-select Support**: Configurable single or multiple category selection modes
+  - **Style-guide Compliance**: Uses category-specific colors per design system (Core: blue, Strength: red, etc.)
+  - **Accessibility**: Proper ARIA labels, keyboard navigation, and 44px touch targets
+  - **Performance**: Internal state management eliminates need for external modal state
+
+#### Improved
+- **Exercise Page**: Replaced custom category selector with reusable CategoryFilter component in dropdown mode
+- **Activity Log Page**: Replaced manual category filter tabs with CategoryFilter component in badges mode
+  - **Better UX**: Consistent category filtering experience across both pages
+  - **Code Deduplication**: Eliminated duplicated category filtering logic
+  - **Internationalization**: Fully localized category names using react-i18next
+  - **Responsive Design**: Mobile-first responsive category selection interface
+
+#### Added
+- **Component Documentation**: Comprehensive README for CategoryFilter with usage examples and migration guide
+- **Unit Tests**: Full test coverage for CategoryFilter component covering both display styles and interactions
+- **TypeScript Support**: Strongly typed props interface with clear API documentation
+
 ### 2025-09-29 (Arabic Text Layout Improvements & UI Spec Compliance)
 #### Fixed
 - **Arabic Text Display**: Resolved cramped and poorly spaced Arabic text in home page upcoming workout section

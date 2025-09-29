@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { Exercise, ActivityLog, Workout } from '../types';
 import { storageService } from '../services/storageService';
 import { ExerciseCategory } from '../types';
+import CategoryFilter from '../components/CategoryFilter';
 import logger from '../utils/logger';
 
 interface ActivityLogPageProps {
@@ -26,7 +27,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   const { t, i18n } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedFilter, setSelectedFilter] = useState<'all' | ExerciseCategory>('all');
+  const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [showStatsCard, setShowStatsCard] = useState(true);
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState<StatsData>({
@@ -37,6 +38,23 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     thisWeekWorkouts: 0
   });
   const [workoutNameMap, setWorkoutNameMap] = useState<Record<string, string>>({});
+
+  // Category filter handlers
+  const handleCategoryToggle = (category: ExerciseCategory) => {
+    setSelectedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
+  const handleClearCategories = () => {
+    setSelectedCategories(new Set());
+  };
 
   // Calculate user statistics
   const calculateStats = useCallback((logs: ActivityLog[]) => {
@@ -171,21 +189,21 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     });
   };
 
-  // Filter logs based on selected category
+  // Filter logs based on selected categories
   const filteredLogs = activityLogs.filter(log => {
-    if (selectedFilter === 'all') return true;
+    if (selectedCategories.size === 0) return true;
     
     // For workout entries, check if any exercise in the workout matches the filter
     if (log.is_workout && log.exercises) {
       return log.exercises.some(ex => {
         const exercise = exercises.find(e => e.id === ex.exercise_id);
-        return exercise?.category === selectedFilter;
+        return exercise && selectedCategories.has(exercise.category);
       });
     }
     
     // For individual exercise entries
     const exercise = exercises.find(ex => ex.id === log.exercise_id);
-    return exercise?.category === selectedFilter;
+    return exercise && selectedCategories.has(exercise.category);
   });
 
   // Group logs by date
@@ -294,10 +312,10 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-h2 font-bold text-text-900 dark:text-text-50 mb-2">
             {t('activity.title')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
+          <p className="text-text-600 dark:text-text-400 text-caption">
             {t('activity.subtitle')}
           </p>
         </div>
@@ -306,7 +324,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
         {showStatsCard && activityLogs.length > 0 && (
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex justify-between items-start mb-3">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50">
                 {t('activity.yourProgress')}
               </h2>
               <button
@@ -325,36 +343,36 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                 <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {stats.totalWorkouts}
                 </div>
-                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.totalWorkouts')}</div>
+                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.totalWorkouts')}</div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {formatDuration(stats.total_duration)}
                 </div>
-                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.totalTime')}</div>
+                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.totalTime')}</div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {stats.currentStreak}
                 </div>
-                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.dayStreak')}</div>
+                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.dayStreak')}</div>
               </div>
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {stats.thisWeekWorkouts}
                 </div>
-                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.thisWeek')}</div>
+                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.thisWeek')}</div>
               </div>
             </div>
             
             {stats.favoriteExercise && (
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div className="text-center">
-                  <div className="text-sm font-medium text-gray-900 dark:text-white">{t('activity.favoriteExercise')}</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('activity.favoriteExercise')}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
                     {stats.favoriteExercise}
                   </div>
                 </div>
@@ -363,33 +381,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           </div>
         )}
 
-        {/* Filter Tabs */}
+        {/* Category Filter */}
         <div className="mb-6">
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedFilter('all')}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
-              }`}
-            >
-              {t('activity.all')}
-            </button>
-            {Object.values(ExerciseCategory).map(category => (
-              <button
-                key={category}
-                onClick={() => setSelectedFilter(category)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-                  selectedFilter === category
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                {t(`common:categories.${String(category)}`, { defaultValue: category.replace('-', ' ') })}
-              </button>
-            ))}
-          </div>
+          <CategoryFilter
+            selectedCategories={selectedCategories}
+            onCategoryToggle={handleCategoryToggle}
+            onClearAll={handleClearCategories}
+            style="dropdown"
+            size="md"
+            allowMultiple={true}
+          />
         </div>
 
         {/* Activity Logs */}
@@ -400,12 +401,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              {selectedFilter === 'all' 
+            <h3 className="text-h3 font-medium text-text-900 dark:text-text-50 mb-2">
+              {selectedCategories.size === 0
                 ? t('activity.noWorkoutsYet') 
-                : t('activity.noCategoryWorkoutsYet', { category: t(`common:categories.${String(selectedFilter)}`, { defaultValue: selectedFilter.replace('-', ' ') }) })}
+                : t('activity.noCategoryWorkoutsYet', { 
+                    category: Array.from(selectedCategories)
+                      .map(cat => t(`common:categories.${String(cat)}`, { defaultValue: cat.replace('-', ' ') }))
+                      .join(', ')
+                  })}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-text-600 dark:text-text-400 mb-4">
               {t('activity.emptySubtitle')}
             </p>
           </div>
@@ -416,7 +421,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               .map(([date, logs]) => (
                 <div key={date}>
                   <div className="sticky top-0 bg-gray-50 dark:bg-gray-900 py-2 mb-3">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h3 className="text-caption font-semibold text-text-900 dark:text-text-50">
                       {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
                         weekday: 'long', 
                         month: 'short', 
@@ -440,7 +445,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                                    <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
                                       {(() => {
                                         // Prefer the known workout name if available
                                         const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
@@ -468,7 +473,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     </svg>
                                   </div>
                                   
-                                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                                     <div className="flex items-center gap-1">
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -492,7 +497,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                   </div>
                                 </div>
                                 
-                                <div className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200">
+                                <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900">
                                     {t('activity.workoutBadge')}
                                 </div>
                               </div>
@@ -500,20 +505,20 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                               {/* Expandable exercise list */}
                               {expandedWorkouts.has(log.id) && log.exercises && (
                                 <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
-                                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('activity.exercisesHeading')}</h5>
+                                    <h5 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2">{t('activity.exercisesHeading')}</h5>
                                   <div className="space-y-2">
                                     {log.exercises.map((exercise, index) => (
                                       <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3">
                                         <div className="flex items-center gap-2">
                                           <span className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(exercise.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}></span>
-                                          <span className="text-sm font-medium text-gray-900 dark:text-white">{(() => {
+                                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{(() => {
                                             const ex = exercises.find(e => e.id === exercise.exercise_id);
                                             if (!ex) return exercise.exercise_name;
                                             const base = `${ex.id}`;
                                             return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                           })()}</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                                           {exercise.sets && exercise.reps && (
                                             <span>{t('exercises:defaultSetsReps', { sets: exercise.sets, reps: exercise.reps })}</span>
                                           )}
@@ -527,7 +532,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                               
                               {log.notes && (
                                 <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
                                     {localizeNotes(log.notes) ?? log.notes}
                                   </p>
                                 </div>
@@ -542,7 +547,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     <span
                                       className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}
                                     ></span>
-                                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                                    <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
                                       {(() => {
                                         const ex = exercises.find(e => e.id === log.exercise_id);
                                         if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
@@ -552,7 +557,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     </h4>
                                   </div>
                                   
-                                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                                     <div className="flex items-center gap-1">
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -569,14 +574,14 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                   </div>
                                 </div>
                                 
-                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(log.exercise_id)} ${getCategoryTextColor(log.exercise_id)}`}>
+                                <div className={`px-2 py-1 rounded-full text-small font-medium ${getCategoryColor(log.exercise_id)} ${getCategoryTextColor(log.exercise_id)}`}>
                                   {t(`common:categories.${exercises.find(ex => ex.id === log.exercise_id)?.category || ''}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
                                 </div>
                               </div>
                               
                               {log.notes && (
                                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
                                     {localizeNotes(log.notes) ?? log.notes}
                                   </p>
                                 </div>

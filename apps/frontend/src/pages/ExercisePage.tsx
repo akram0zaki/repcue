@@ -35,7 +35,7 @@ import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
 import { ShareButton } from '../components/ShareButton';
 import CatalogSelector from '../components/CatalogSelector';
-import CategorySelector from '../components/CategorySelector';
+import CategoryFilter from '../components/CategoryFilter';
 import { getDefaultCatalog, EXERCISE_CATALOGS } from '../data/catalogs';
 
 interface ExercisePageProps {
@@ -92,13 +92,14 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(savedFilters.showFavoritesOnly);
   const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom' | 'shared'>(savedFilters.exerciseFilter);
   const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>(savedFilters.sortBy);
+  // Filter collapse state - collapsed by default
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   // Video preview state
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Category selector state
-  const [categorySelectorOpen, setCategorySelectorOpen] = useState(false);
+
 
   // Refs for horizontal scrolling navigation
   const categoryScrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -478,172 +479,199 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-3 mb-4 sm:mb-6">
-          {/* Search Bar */}
-          <div className="mb-2 sm:mb-3">
-            <label htmlFor="search" className="sr-only">{t('exercises:searchLabel')}</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg mb-4 sm:mb-6">
+          {/* Filter Toggle Header - Always Visible */}
+          <div className="p-3 border-b border-surface-200 dark:border-surface-700">
+            <button
+              onClick={() => setFiltersExpanded(!filtersExpanded)}
+              className="w-full flex items-center justify-between text-left"
+              aria-expanded={filtersExpanded}
+              aria-controls="filters-content"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 2v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
                 </svg>
+                <span className="text-base font-medium text-text-900 dark:text-text-50">
+                  {t('exercises:filtersAndSearch', { defaultValue: 'Filters & Search' })}
+                </span>
+                {/* Active filter count indicator - only show when non-default filters are active */}
+                {(() => {
+                  const activeFilterCount = [
+                    selectedCategories.size, // Count each selected category
+                    searchTerm ? 1 : 0, // Count search if present
+                    showFavoritesOnly ? 1 : 0, // Count favorites toggle if active
+                    // Do NOT count exerciseFilter when it's 'all' (default state)
+                    (exerciseFilter !== 'all') ? 1 : 0,
+                    // Do NOT count sortBy when it's 'name' (default state)  
+                    (sortBy !== 'name') ? 1 : 0
+                  ].reduce((sum, count) => sum + count, 0);
+                  
+                  return activeFilterCount > 0 && (
+                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold bg-primary-500 text-white rounded-full">
+                      {activeFilterCount}
+                    </span>
+                  );
+                })()}
               </div>
-              <input
-                id="search"
-                type="text"
-                placeholder={t('exercises:searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-14 sm:pl-16 pr-10 sm:pr-12 py-2.5 sm:py-2 border border-surface-300 dark:border-surface-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  aria-label="Clear search"
-                >
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
+              <svg 
+                className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${filtersExpanded ? 'rotate-180' : ''}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
 
-          {/* Category Filter Selector and Sort */}
-          <div className="mb-2 sm:mb-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-              <div className="flex items-center gap-2 flex-1">
-                <label className="text-sm font-medium text-text-700 dark:text-text-300 flex-shrink-0">
-                  <span className="hidden sm:inline">{t('exercises:category', { defaultValue: 'Category' })}</span>
-                  <span className="sm:hidden">{t('exercises:categoryShort', { defaultValue: 'Cat' })}</span>
-                </label>
-                <button
-                  onClick={() => setCategorySelectorOpen(true)}
-                  className="px-2.5 py-1.5 text-sm font-medium bg-surface-0 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors flex items-center gap-2"
-                >
-                  {selectedCategories.size > 0 ? (
-                    <span className="text-primary-600 dark:text-primary-400">
-                      {t('categoriesSelected', {
-                        ns: 'common',
-                        count: selectedCategories.size,
-                        defaultValue: `${selectedCategories.size} selected`
-                      })}
-                    </span>
-                  ) : (
-                    <span className="text-text-500 dark:text-text-400">
-                      {t('exercises:selectCategories', { defaultValue: 'Select' })}
-                    </span>
+          {/* Collapsible Filter Content */}
+          <div 
+            id="filters-content"
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              filtersExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="p-3">
+              {/* Search Bar */}
+              <div className="mb-2 sm:mb-3">
+                <label htmlFor="search" className="sr-only">{t('exercises:searchLabel')}</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    id="search"
+                    type="text"
+                    placeholder={t('exercises:searchPlaceholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="block w-full pl-14 sm:pl-16 pr-10 sm:pr-12 py-2.5 sm:py-2 border border-surface-300 dark:border-surface-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   )}
-                  <svg className="w-4 h-4 text-text-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {selectedCategories.size > 0 && (
+                </div>
+              </div>
+
+              {/* Category Filter Selector and Sort */}
+              <div className="mb-2 sm:mb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                  <CategoryFilter
+                    selectedCategories={selectedCategories}
+                    onCategoryToggle={handleCategoryToggle}
+                    onClearAll={handleClearCategories}
+                    style="dropdown"
+                    label={t('exercises:category', { defaultValue: 'Category' })}
+                  />
+
+                  {/* Sort Dropdown */}
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <label htmlFor="sort-select" className="text-sm font-medium sort-label-text flex-shrink-0">
+                      <span className="hidden sm:inline">{t('exercises:sortBy', { defaultValue: 'Sort by:' })}</span>
+                      <span className="sm:hidden">{t('exercises:sortByShort', { defaultValue: 'Sort:' })}</span>
+                    </label>
+                    <select
+                      id="sort-select"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
+                      className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px] rtl:text-right rtl:pr-8 rtl:pl-2.5"
+                    >
+                      <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
+                      <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>
+                      <option value="recently-added">{t('exercises:sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Filter and Sort Controls */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-wrap">
+                {/* Exercise Type Filter */}
+                <div className="flex gap-1 flex-wrap justify-start">
                   <button
-                    onClick={handleClearCategories}
-                    className="px-2.5 py-1.5 text-sm font-medium text-text-500 dark:text-text-400 hover:text-text-700 dark:hover:text-text-200 transition-colors"
+                    onClick={() => setExerciseFilter('all')}
+                    className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
+                      exerciseFilter === 'all'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
+                    }`}
                   >
-                    {t('exercises:clearCategories', { defaultValue: 'Clear' })}
+                    {t('exercises:filterAll', { defaultValue: 'All' })}
                   </button>
-                )}
+                  <button
+                    onClick={() => setExerciseFilter('built-in')}
+                    className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
+                      exerciseFilter === 'built-in'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
+                    }`}
+                  >
+                    {t('exercises:filterBuiltIn', { defaultValue: 'Built-in' })}
+                  </button>
+                  <button
+                    onClick={() => setExerciseFilter('custom')}
+                    className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
+                      exerciseFilter === 'custom'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
+                    }`}
+                  >
+                    {t('exercises:filterCustom', { defaultValue: 'Custom' })}
+                  </button>
+                  <button
+                    onClick={() => setExerciseFilter('shared')}
+                    className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
+                      exerciseFilter === 'shared'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
+                    }`}
+                  >
+                    {t('exercises:filterShared', { defaultValue: 'Shared with me' })}
+                  </button>
+                </div>
+
+                {/* Favorites Toggle */}
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                    className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
+                      showFavoritesOnly
+                        ? 'bg-yellow-500 text-white'
+                        : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
+                    }`}
+                  >
+                    <StarIcon size={16} />
+                    <span>{t('exercises:favoritesOnly')}</span>
+                  </button>
+                </div>
               </div>
 
-              {/* Sort Dropdown */}
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                <label htmlFor="sort-select" className="text-sm font-medium sort-label-text flex-shrink-0">
-                  <span className="hidden sm:inline">{t('exercises:sortBy', { defaultValue: 'Sort by:' })}</span>
-                  <span className="sm:hidden">{t('exercises:sortByShort', { defaultValue: 'Sort:' })}</span>
-                </label>
-                <select
-                  id="sort-select"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
-                  className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px] rtl:text-right rtl:pr-8 rtl:pl-2.5"
-                >
-                  <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
-                  <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>
-                  <option value="recently-added">{t('exercises:sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
-                </select>
+              {/* Results Count */}
+              <div className="mt-2 text-xs sm:text-sm summary-text">
+                {(() => {
+                  const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
+                  const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { ns: 'catalogs', defaultValue: selectedCatalog.id }) : 'Unknown';
+                  const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
+                  return t('exercises:showingCountInCatalog', {
+                    count: filteredExercises.length,
+                    total: totalInCatalog,
+                    catalog: catalogName,
+                    defaultValue: `Showing ${filteredExercises.length} of ${totalInCatalog} exercises in ${catalogName}`
+                  });
+                })()}
               </div>
             </div>
-          </div>
-
-          {/* Filter and Sort Controls */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 flex-wrap">
-            {/* Exercise Type Filter */}
-            <div className="flex gap-1">
-              <button
-                onClick={() => setExerciseFilter('all')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
-                  exerciseFilter === 'all'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
-                }`}
-              >
-                {t('exercises:filterAll', { defaultValue: 'All' })}
-              </button>
-              <button
-                onClick={() => setExerciseFilter('built-in')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
-                  exerciseFilter === 'built-in'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
-                }`}
-              >
-                {t('exercises:filterBuiltIn', { defaultValue: 'Built-in' })}
-              </button>
-              <button
-                onClick={() => setExerciseFilter('custom')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
-                  exerciseFilter === 'custom'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
-                }`}
-              >
-                {t('exercises:filterCustom', { defaultValue: 'Custom' })}
-              </button>
-              <button
-                onClick={() => setExerciseFilter('shared')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
-                  exerciseFilter === 'shared'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
-                }`}
-              >
-                {t('exercises:filterShared', { defaultValue: 'Shared with me' })}
-              </button>
-            </div>
-
-            {/* Favorites Toggle */}
-            <div className="flex justify-center">
-              <button
-                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
-                  showFavoritesOnly
-                    ? 'bg-yellow-500 text-white'
-                    : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
-                }`}
-              >
-                <StarIcon size={16} />
-                <span>{t('exercises:favoritesOnly')}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Results Count */}
-          <div className="mt-2 text-xs sm:text-sm summary-text">
-            {(() => {
-              const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
-              const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { ns: 'catalogs', defaultValue: selectedCatalog.id }) : 'Unknown';
-              const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
-              return t('exercises:showingCountInCatalog', {
-                count: filteredExercises.length,
-                total: totalInCatalog,
-                catalog: catalogName,
-                defaultValue: `Showing ${filteredExercises.length} of ${totalInCatalog} exercises in ${catalogName}`
-              });
-            })()}
           </div>
         </div>
 
@@ -886,15 +914,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
       variant="danger"
     />
 
-    {/* Category Selector Overlay */}
-    {categorySelectorOpen && (
-      <CategorySelector
-        selectedCategories={selectedCategories}
-        onCategoryToggle={handleCategoryToggle}
-        onClose={() => setCategorySelectorOpen(false)}
-        onClearAll={handleClearCategories}
-      />
-    )}
+
 
     </>
   );

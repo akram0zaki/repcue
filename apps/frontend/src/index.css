@@ -350,25 +350,26 @@ body.rtl .truncate {
 
   /* Navigation-specific compact spacing for mobile */
   .nav-container {
-    padding: 6px 4px; /* Slightly more vertical padding */
+    padding: 8px 2px; /* Slightly more vertical padding, less horizontal */
   }
 
   .nav-item {
-    padding: 4px 1px; /* Reduced horizontal padding between items */
+    padding: 6px 2px; /* Increased vertical padding for larger touch targets, tighter horizontal */
+    min-height: 56px; /* Ensure adequate touch target height */
   }
 
   .nav-more-button {
-    width: 44px; /* Ensure proper touch target size */
-    height: 44px;
+    width: 48px; /* Slightly larger for bigger icon */
+    height: 56px; /* Match nav-item height */
     flex-shrink: 0; /* Prevent shrinking */
-    min-width: 44px; /* Ensure minimum width */
+    min-width: 48px; /* Ensure minimum width */
   }
 
   /* RTL-safe navigation buttons - override global button padding */
   body.rtl .nav-more-button,
   body.rtl .nav-item,
   body.rtl nav button {
-    padding: 4px 1px !important; /* Override global RTL button padding */
+    padding: 6px 2px !important; /* Override global RTL button padding to match new nav-item padding */
     direction: ltr !important; /* Keep icons LTR for proper rendering */
   }
 
@@ -390,6 +391,30 @@ body.rtl .truncate {
     margin-left: 1px;
     margin-right: 1px;
     flex-shrink: 0; /* Prevent separator from shrinking */
+  }
+
+  /* Navigation dropdown menu item styling */
+  .nav-dropdown-item {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Navigation dropdown positioning and sizing */
+  .nav-dropdown {
+    min-width: 280px;
+    max-width: 400px;
+  }
+
+  .nav-dropdown-ltr {
+    right: 0;
+    transform-origin: top right;
+  }
+
+  .nav-dropdown-rtl {
+    right: 50%;
+    transform: translateX(50%);
+    transform-origin: top center;
   }
 
   /* Touch target size (minimum 44px) */

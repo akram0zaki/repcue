@@ -94,7 +94,7 @@ const Navigation: React.FC = () => {
                 aria-label={`Navigate to ${item.label}`}
                 data-testid={item.testId}
               >
-                <IconComponent className="mb-1" size={18} />
+                <IconComponent className="mb-1" size={24} />
                 <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
               </button>
             );
@@ -119,13 +119,13 @@ const Navigation: React.FC = () => {
             data-testid="nav-more"
             style={{ direction: 'ltr' }}
           >
-            <MoreIcon size={20} />
+            <MoreIcon size={26} />
           </button>
 
           {/* Dropdown menu */}
           {showMoreMenu && (
-            <div className={`absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] max-w-[250px] ${
-              isRTL ? 'left-0' : 'right-0'
+            <div className={`absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg nav-dropdown ${
+              isRTL ? 'nav-dropdown-rtl' : 'nav-dropdown-ltr'
             }`}>
               {/* Settings */}
               <button
@@ -133,7 +133,9 @@ const Navigation: React.FC = () => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className={`nav-dropdown-item w-full px-10 py-6 text-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
+                  isRTL ? 'text-right justify-end' : 'text-left justify-start'
+                }`}
                 data-testid="nav-settings"
               >
                 {t('navigation.settings')}
