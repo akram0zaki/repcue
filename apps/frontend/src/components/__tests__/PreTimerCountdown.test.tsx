@@ -172,11 +172,11 @@ describe('Pre-Timer Countdown Feature', () => {
     };
 
     it('shows "Start" button when countdown is enabled', () => {
-      // TimerPage requires window.matchMedia which is not available in test environment
-      // This test expects the component to throw an error
-      expect(() => {
-        render(<TimerPage {...defaultTimerProps} />);
-      }).toThrow();
+      // Now that window.matchMedia is properly mocked, the component should render successfully
+      render(<TimerPage {...defaultTimerProps} />);
+
+      // Should show Start button when timer is not running
+      expect(screen.getByRole('button', { name: /start/i })).toBeInTheDocument();
     });
 
     it('shows "Start" button when countdown is disabled', () => {
@@ -184,12 +184,12 @@ describe('Pre-Timer Countdown Feature', () => {
         ...defaultTimerProps,
         appSettings: { ...DEFAULT_APP_SETTINGS, pre_timer_countdown: 0 }
       };
-      
-      // TimerPage requires window.matchMedia which is not available in test environment
-      // This test expects the component to throw an error
-      expect(() => {
-        render(<TimerPage {...propsWithoutCountdown} />);
-      }).toThrow();
+
+      // Now that window.matchMedia is properly mocked, the component should render successfully
+      render(<TimerPage {...propsWithoutCountdown} />);
+
+      // Should show Start button even when countdown is disabled
+      expect(screen.getByRole('button', { name: /start/i })).toBeInTheDocument();
     });
 
     it('displays countdown state correctly', () => {
@@ -199,12 +199,12 @@ describe('Pre-Timer Countdown Feature', () => {
         isCountdown: true,
         countdownTime: 3
       };
-      
-      // TimerPage requires window.matchMedia which is not available in test environment
-      // This test expects the component to throw an error
-      expect(() => {
-        render(<TimerPage {...defaultTimerProps} timerState={countdownState} />);
-      }).toThrow();
+
+      // Now that window.matchMedia is properly mocked, the component should render successfully
+      render(<TimerPage {...defaultTimerProps} timerState={countdownState} />);
+
+      // Should show countdown number in the timer display
+      expect(screen.getByText('3')).toBeInTheDocument();
     });
 
     it('shows "Cancel" button during countdown', () => {
@@ -214,12 +214,12 @@ describe('Pre-Timer Countdown Feature', () => {
         isCountdown: true,
         countdownTime: 5
       };
-      
-      // TimerPage requires window.matchMedia which is not available in test environment
-      // This test expects the component to throw an error
-      expect(() => {
-        render(<TimerPage {...defaultTimerProps} timerState={countdownState} />);
-      }).toThrow();
+
+      // Now that window.matchMedia is properly mocked, the component should render successfully
+      render(<TimerPage {...defaultTimerProps} timerState={countdownState} />);
+
+      // Should show Cancel button during countdown
+      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
     });
   });
 });

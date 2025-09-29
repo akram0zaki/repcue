@@ -42,7 +42,8 @@ describe('TimerPage - Workout Mode', () => {
   ];
 
   const mockAppSettings: AppSettings = createMockAppSettings({
-    ...DEFAULT_APP_SETTINGS
+    ...DEFAULT_APP_SETTINGS,
+    ring_timer: true // Enable circular timer mode for these tests
   });
 
   const mockWorkoutTimerState: TimerState = {

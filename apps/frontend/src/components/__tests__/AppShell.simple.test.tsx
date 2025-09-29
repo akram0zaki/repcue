@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import AppShell from '../AppShell';
+import { SnackbarProvider } from '../SnackbarProvider';
 
 // Mock the hooks and utilities
 vi.mock('../../utils/platformDetection', () => ({
@@ -85,7 +86,9 @@ const mockUseLocation = vi.mocked(
 const renderAppShell = (children = <div>Test Content</div>) => {
   return render(
     <BrowserRouter>
-      <AppShell>{children}</AppShell>
+      <SnackbarProvider>
+        <AppShell>{children}</AppShell>
+      </SnackbarProvider>
     </BrowserRouter>
   );
 };

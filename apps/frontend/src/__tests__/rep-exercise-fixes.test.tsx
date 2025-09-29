@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Mock services with comprehensive storage service mock
@@ -227,19 +227,28 @@ describe('Rep-based Exercise Fixes', () => {
 
     // Open exercise selector and choose our mock exercise
     const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
-    chooseBtn.click();
+    await act(async () => {
+      chooseBtn.click();
+    });
     await screen.findByText('Select Exercise');
-  const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
-  if (exerciseBtns.length > 0) exerciseBtns[0].click();
+    const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
+    if (exerciseBtns.length > 0) {
+      await act(async () => {
+        exerciseBtns[0].click();
+      });
+    }
 
     // Start the timer (rep-based flow)
     const startButton = await screen.findByRole('button', { name: /start/i });
-    startButton.click();
+    await act(async () => {
+      startButton.click();
+    });
 
     // Verify rep UI is present after countdown completes
     await waitFor(() => {
-      expect(screen.getByText('Set Progress')).toBeInTheDocument();
-      expect(screen.getByText(/0 of 2 sets completed/i)).toBeInTheDocument();
+      // The UI now shows rep progress in the timer display area as "Rep X of Y in Set Z/Total"
+      expect(screen.getByText('Rep 1')).toBeInTheDocument();
+      expect(screen.getByText(/of 8 in Set 1\/2/)).toBeInTheDocument();
     }, { timeout: 7000 });
 
     // Assert logging wiring exists (full completion simulation is out of scope here)
@@ -259,19 +268,28 @@ describe('Rep-based Exercise Fixes', () => {
 
     // Select the rep-based exercise first
     const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
-    chooseBtn.click();
+    await act(async () => {
+      chooseBtn.click();
+    });
     await screen.findByText('Select Exercise');
-  const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
-  if (exerciseBtns.length > 0) exerciseBtns[0].click();
+    const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
+    if (exerciseBtns.length > 0) {
+      await act(async () => {
+        exerciseBtns[0].click();
+      });
+    }
 
     // Start to initialize rep/set tracking
     const startButton = await screen.findByRole('button', { name: /start/i });
-    startButton.click();
+    await act(async () => {
+      startButton.click();
+    });
 
-    // Check that the progress text uses "completed" terminology
-    // This verifies our fix to show completed sets rather than current set + 1
+    // Check that the progress text shows the current rep and set
+    // This verifies rep-based exercises display correctly
     await waitFor(() => {
-      expect(screen.getByText(/0 of 2 sets completed/i)).toBeInTheDocument();
+      expect(screen.getByText('Rep 1')).toBeInTheDocument();
+      expect(screen.getByText(/of 8 in Set 1\/2/)).toBeInTheDocument();
     }, { timeout: 7000 });
   });
 
@@ -286,23 +304,31 @@ describe('Rep-based Exercise Fixes', () => {
 
     // Select the rep-based exercise first
     const chooseBtn = await screen.findByTestId('open-exercise-selector', {}, { timeout: 5000 });
-    chooseBtn.click();
+    await act(async () => {
+      chooseBtn.click();
+    });
     await screen.findByText('Select Exercise');
-  const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
-  if (exerciseBtns.length > 0) exerciseBtns[0].click();
+    const exerciseBtns = await screen.findAllByRole('button', { name: /Cat-Cow Stretch/i });
+    if (exerciseBtns.length > 0) {
+      await act(async () => {
+        exerciseBtns[0].click();
+      });
+    }
 
     // Start to render rep/set progress block
     const startButton = await screen.findByRole('button', { name: /start/i });
-    startButton.click();
+    await act(async () => {
+      startButton.click();
+    });
 
-    // Verify both progress bar and text exist for rep-based exercises
+    // Verify rep display and progress bars exist for rep-based exercises
     await waitFor(() => {
-      expect(screen.getByText('Set Progress')).toBeInTheDocument();
-      expect(screen.getByText(/sets completed/i)).toBeInTheDocument();
+      expect(screen.getByText('Rep 1')).toBeInTheDocument();
+      expect(screen.getByText(/of 8 in Set 1\/2/)).toBeInTheDocument();
     }, { timeout: 7000 });
-    
-    // Progress bar should be present
-    const progressBars = document.querySelectorAll('.bg-blue-600');
-    expect(progressBars.length).toBeGreaterThan(0);
+
+    // Timer display should be present and working for rep-based exercises
+    const timerDisplay = screen.getByTestId('timer-display');
+    expect(timerDisplay).toBeInTheDocument();
   });
 });

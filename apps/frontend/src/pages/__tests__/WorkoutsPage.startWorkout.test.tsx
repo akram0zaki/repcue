@@ -204,7 +204,7 @@ describe('WorkoutsPage - Start Workout Feature', () => {
     });
 
     const startButton = screen.getByTitle('Start workout');
-    expect(startButton).toHaveClass('bg-green-600', 'hover:bg-green-700');
+    expect(startButton).toHaveClass('btn-primary');
     
     // Check for the SVG icon
     const icon = startButton.querySelector('svg');

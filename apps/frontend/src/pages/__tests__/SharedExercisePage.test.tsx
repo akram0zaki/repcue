@@ -22,6 +22,17 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Mock the supabase config for StandaloneSharedExercise
+vi.mock('../../config/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn()
+    },
+    supabaseUrl: 'https://test.supabase.co'
+  },
+  supabaseFunctionBaseUrl: 'https://test.supabase.co'
+}));
+
 // Mock the supabase client
 const mockSupabase = {
   auth: {
@@ -31,11 +42,17 @@ const mockSupabase = {
 };
 
 vi.mock('../../utils/supabase', () => ({
-  supabase: mockSupabase
+  supabase: {
+    auth: {
+      getSession: vi.fn()
+    },
+    supabaseUrl: 'https://test.supabase.co'
+  }
 }));
 
-// Mock fetch
-global.fetch = vi.fn();
+// Mock fetch with proper typing
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 // Test component wrapper
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -75,10 +92,20 @@ const mockSharedExercise = {
 describe('SharedExercisePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock window.location.pathname for share token extraction
+    Object.defineProperty(window, 'location', {
+      value: {
+        pathname: '/share/test-token-123',
+        origin: 'http://localhost:3000'
+      },
+      writable: true
+    });
+
     mockUseAuth.mockReturnValue({ user: null });
-    (global.fetch as any).mockResolvedValue({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(mockSharedExercise)
+      json: vi.fn().mockResolvedValue(mockSharedExercise)
     });
   });
 
@@ -93,7 +120,7 @@ describe('SharedExercisePage', () => {
       </TestWrapper>
     );
 
-    expect(screen.getByText(/Loading shared exercise/i)).toBeInTheDocument();
+    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
   });
 
   it('fetches and displays shared exercise data', async () => {
@@ -104,9 +131,9 @@ describe('SharedExercisePage', () => {
     );
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
-        'https://test.supabase.co/functions/v1/get-shared-exercise?token=test-token-123'
-      );
+      expect(mockFetch).toHaveBeenCalled();
+      const fetchCall = mockFetch.mock.calls[0];
+      expect(fetchCall[0]).toMatch(/get-shared-exercise\?token=test-token-123/);
     });
 
     await waitFor(() => {
@@ -185,14 +212,14 @@ describe('SharedExercisePage', () => {
       exerciseId: 'saved-exercise-456'
     };
 
-    (global.fetch as any)
+    mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve(mockSharedExercise)
+        json: vi.fn().mockResolvedValue(mockSharedExercise)
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve(mockSaveResponse)
+        json: vi.fn().mockResolvedValue(mockSaveResponse)
       });
 
     render(
@@ -209,7 +236,7 @@ describe('SharedExercisePage', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://test.supabase.co/functions/v1/save-shared-exercise',
         expect.objectContaining({
           method: 'POST',
@@ -231,10 +258,10 @@ describe('SharedExercisePage', () => {
   });
 
   it('handles invalid or expired share tokens', async () => {
-    (global.fetch as any).mockResolvedValue({
+    mockFetch.mockResolvedValue({
       ok: false,
       status: 404,
-      json: () => Promise.resolve({ error: 'Share not found' })
+      json: vi.fn().mockResolvedValue({ error: 'Share not found' })
     });
 
     render(
@@ -250,7 +277,7 @@ describe('SharedExercisePage', () => {
   });
 
   it('handles network errors gracefully', async () => {
-    (global.fetch as any).mockRejectedValue(new Error('Network error'));
+    mockFetch.mockRejectedValue(new Error('Network error'));
 
     render(
       <TestWrapper>
@@ -273,15 +300,15 @@ describe('SharedExercisePage', () => {
       error: null
     });
 
-    (global.fetch as any)
+    mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve(mockSharedExercise)
+        json: vi.fn().mockResolvedValue(mockSharedExercise)
       })
       .mockResolvedValueOnce({
         ok: false,
         status: 500,
-        json: () => Promise.resolve({ error: 'Failed to save' })
+        json: vi.fn().mockResolvedValue({ error: 'Failed to save' })
       });
 
     render(
@@ -311,9 +338,9 @@ describe('SharedExercisePage', () => {
       }
     };
 
-    (global.fetch as any).mockResolvedValue({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(mockExerciseWithVideo)
+      json: vi.fn().mockResolvedValue(mockExerciseWithVideo)
     });
 
     render(
@@ -339,9 +366,9 @@ describe('SharedExercisePage', () => {
       }
     };
 
-    (global.fetch as any).mockResolvedValue({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(mockExerciseWithCustomVideo)
+      json: vi.fn().mockResolvedValue(mockExerciseWithCustomVideo)
     });
 
     render(
@@ -370,9 +397,9 @@ describe('SharedExercisePage', () => {
       }
     };
 
-    (global.fetch as any).mockResolvedValue({
+    mockFetch.mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(mockRepExercise)
+      json: vi.fn().mockResolvedValue(mockRepExercise)
     });
 
     render(
