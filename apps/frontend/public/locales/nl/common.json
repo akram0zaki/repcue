@@ -342,7 +342,25 @@
     "status": {
       "stoppedAfter": "Gestopt na {{duration}}",
       "completedSetsReps": "{{sets}} sets van {{reps}} herhalingen voltooid",
-      "completedTime": "Intervaltimer van {{duration}} voltooid"
+      "completedTime": "{{duration}} interval timer voltooid"
+    },
+    "charts": {
+      "weeklyStreak": "Wekelijkse Reeks",
+      "currentStreak": "Huidige Reeks",
+      "progressChart": "Voortgangsgrafiek",
+      "currentMonth": "Huidige Maand",
+      "last3Months": "Laatste 3 Maanden",
+      "sinceStart": "Sinds Begin",
+      "workoutsThisWeek": "trainingen deze week",
+      "workoutWeek": "training deze week",
+      "thisWeek": "Deze week",
+      "noWorkoutsThisWeek": "Geen trainingen deze week",
+      "previousWeek": "Vorige week",
+      "nextWeek": "Volgende week",
+      "streakDays": "{{count}} dagen",
+      "streakDay": "{{count}} dag",
+      "averageWorkouts": "{{count}} gem. trainingen/week",
+      "totalInPeriod": "{{count}} totale trainingen"
     }
   },
   "exercises": {

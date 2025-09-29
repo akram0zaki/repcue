@@ -366,6 +366,24 @@
       "stoppedAfter": "توقف بعد {{duration}}",
       "completedSetsReps": "اكتمل {{sets}} مجموعة من {{reps}} تكرار",
       "completedTime": "اكتمل مؤقت فاصل {{duration}}"
+    },
+    "charts": {
+      "weeklyStreak": "السلسلة الأسبوعية",
+      "currentStreak": "السلسلة الحالية",
+      "progressChart": "مخطط التقدم",
+      "currentMonth": "الشهر الحالي",
+      "last3Months": "آخر 3 أشهر",
+      "sinceStart": "منذ البداية",
+      "workoutsThisWeek": "تمارين هذا الأسبوع",
+      "workoutWeek": "تمرين هذا الأسبوع",
+      "thisWeek": "هذا الأسبوع",
+      "noWorkoutsThisWeek": "لا توجد تمارين هذا الأسبوع",
+      "previousWeek": "الأسبوع السابق",
+      "nextWeek": "الأسبوع القادم",
+      "streakDays": "{{count}} أيام",
+      "streakDay": "{{count}} يوم",
+      "averageWorkouts": "{{count}} متوسط تمارين/أسبوع",
+      "totalInPeriod": "{{count}} إجمالي التمارين"
     }
   },
   "exercises": {

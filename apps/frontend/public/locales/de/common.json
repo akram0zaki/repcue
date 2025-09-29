@@ -343,6 +343,24 @@
       "stoppedAfter": "Angehalten nach {{duration}}",
       "completedSetsReps": "{{sets}} Sätze à {{reps}} Wiederholungen abgeschlossen",
       "completedTime": "Intervalltimer {{duration}} abgeschlossen"
+    },
+    "charts": {
+      "weeklyStreak": "Wöchentliche Serie",
+      "currentStreak": "Aktuelle Serie",
+      "progressChart": "Fortschrittsdiagramm",
+      "currentMonth": "Aktueller Monat",
+      "last3Months": "Letzte 3 Monate",
+      "sinceStart": "Seit Beginn",
+      "workoutsThisWeek": "Trainings diese Woche",
+      "workoutWeek": "Training diese Woche",
+      "thisWeek": "Diese Woche",
+      "noWorkoutsThisWeek": "Keine Trainings diese Woche",
+      "previousWeek": "Vorherige Woche",
+      "nextWeek": "Nächste Woche",
+      "streakDays": "{{count}} Tage",
+      "streakDay": "{{count}} Tag",
+      "averageWorkouts": "{{count}} Ø Trainings/Woche",
+      "totalInPeriod": "{{count}} Trainings gesamt"
     }
   },
   "exercises": {

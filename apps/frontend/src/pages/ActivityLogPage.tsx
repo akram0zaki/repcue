@@ -1,10 +1,12 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: certain fallback strings localized via t(); remaining literals are icons/units */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Exercise, ActivityLog, Workout } from '../types';
 import { storageService } from '../services/storageService';
 import { ExerciseCategory } from '../types';
 import CategoryFilter from '../components/CategoryFilter';
+import WeeklyStreakCalendar from '../components/WeeklyStreakCalendar';
+import ProgressChart from '../components/ProgressChart';
 import logger from '../utils/logger';
 
 interface ActivityLogPageProps {
@@ -15,28 +17,13 @@ interface GroupedLogs {
   [key: string]: ActivityLog[];
 }
 
-interface StatsData {
-  totalWorkouts: number;
-  total_duration: number;
-  favoriteExercise: string;
-  currentStreak: number;
-  thisWeekWorkouts: number;
-}
-
 const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   const { t, i18n } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
-  const [showStatsCard, setShowStatsCard] = useState(true);
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
-  const [stats, setStats] = useState<StatsData>({
-    totalWorkouts: 0,
-    total_duration: 0,
-    favoriteExercise: 'None yet',
-    currentStreak: 0,
-    thisWeekWorkouts: 0
-  });
+  const [currentWeek, setCurrentWeek] = useState(new Date());
   const [workoutNameMap, setWorkoutNameMap] = useState<Record<string, string>>({});
 
   // Category filter handlers
@@ -55,73 +42,6 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   const handleClearCategories = () => {
     setSelectedCategories(new Set());
   };
-
-  // Calculate user statistics
-  const calculateStats = useCallback((logs: ActivityLog[]) => {
-    if (logs.length === 0) {
-      setStats({
-        totalWorkouts: 0,
-        total_duration: 0,
-        favoriteExercise: '',
-        currentStreak: 0,
-        thisWeekWorkouts: 0
-      });
-      return;
-    }
-
-    const totalWorkouts = logs.length;
-    const total_duration = Math.round(logs.reduce((sum, log) => sum + log.duration, 0));
-    
-    // Find favorite exercise (most frequently done) by ID for reliable localization
-    const exerciseCounts: { [exercise_id: string]: number } = {};
-    logs.forEach(log => {
-      const id = log.exercise_id;
-      exerciseCounts[id] = (exerciseCounts[id] || 0) + 1;
-    });
-    const favoriteExerciseId = Object.entries(exerciseCounts)
-      .sort(([,a], [,b]) => b - a)[0]?.[0];
-    const favoriteExercise = favoriteExerciseId
-      ? (() => {
-          const ex = exercises.find(e => e.id === favoriteExerciseId);
-          if (!ex) return '';
-          const base = `${ex.id}`;
-          return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
-        })()
-      : '';
-
-    // Calculate current streak (consecutive days with workouts)
-    const sortedLogs = [...logs].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-    let currentStreak = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const workoutDates = new Set(
-      sortedLogs.map(log => {
-        const date = new Date(log.timestamp);
-        date.setHours(0, 0, 0, 0);
-        return date.getTime();
-      })
-    );
-
-    const checkDate = new Date(today);
-    while (workoutDates.has(checkDate.getTime())) {
-      currentStreak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
-
-    // Calculate this week's workouts
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    const thisWeekWorkouts = logs.filter(log => new Date(log.timestamp) >= oneWeekAgo).length;
-
-    setStats({
-      totalWorkouts,
-      total_duration,
-      favoriteExercise,
-      currentStreak,
-      thisWeekWorkouts
-    });
-  }, [exercises, t]);
 
   // Load activity logs once on mount
   useEffect(() => {
@@ -170,11 +90,6 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
       window.removeEventListener('sync:applied', handleSyncApplied as EventListener);
     };
   }, []);
-
-  // Recalculate stats when logs, exercises, or language change (no loading spinner)
-  useEffect(() => {
-    calculateStats(activityLogs);
-  }, [activityLogs, calculateStats, i18n.language]);
 
   // Toggle workout expansion
   const toggleWorkoutExpansion = (workout_id: string) => {
@@ -320,64 +235,22 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           </p>
         </div>
 
-        {/* Stats Card */}
-        {showStatsCard && activityLogs.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-start mb-3">
-              <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50">
-                {t('activity.yourProgress')}
-              </h2>
-              <button
-                onClick={() => setShowStatsCard(false)}
-                className="btn-neutral p-1"
-                aria-label={t('activity.closeStatsAria')}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        {/* Charts Section */}
+        {activityLogs.length > 0 && (
+          <div className="space-y-6 mb-6">
+            {/* Weekly Streak Calendar */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <WeeklyStreakCalendar 
+                logs={activityLogs} 
+                currentWeek={currentWeek}
+                onWeekChange={setCurrentWeek}
+              />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  {stats.totalWorkouts}
-                </div>
-                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.totalWorkouts')}</div>
-              </div>
 
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  {formatDuration(stats.total_duration)}
-                </div>
-                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.totalTime')}</div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  {stats.currentStreak}
-                </div>
-                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.dayStreak')}</div>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                  {stats.thisWeekWorkouts}
-                </div>
-                <div className="text-small text-gray-500 dark:text-gray-400">{t('activity.thisWeek')}</div>
-              </div>
+            {/* Progress Chart */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <ProgressChart logs={activityLogs} />
             </div>
-            
-            {stats.favoriteExercise && (
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="text-center">
-                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('activity.favoriteExercise')}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {stats.favoriteExercise}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
