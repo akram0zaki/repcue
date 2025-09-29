@@ -465,7 +465,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
             )}
           </div>
           
-          <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mt-2">
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
             {t('common:exercises.subtitle')}
           </p>
         </div>
