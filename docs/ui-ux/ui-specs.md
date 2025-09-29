@@ -120,17 +120,73 @@ To ensure consistency, use these predefined CSS classes instead of inline Tailwi
 ### Typography
 
 -   **Font Family**:
-    -   **Latin text**: Inter, Roboto, or Open Sans (clean sans-serif).\
-    -   **Arabic text**: Cairo, Noto Sans Arabic, or Tajawal (Google
-        Fonts, modern and legible).\
+    -   **Latin text**: Inter, Roboto, or Open Sans (clean sans-serif)
+    -   **Arabic text**: Cairo, Noto Sans Arabic, or Tajawal (Google Fonts, modern and legible)
 -   **Heading Sizes**:
-    -   H1: 28--32px, Bold
-    -   H2: 22--24px, Semi-bold
-    -   H3: 18--20px, Semi-bold
--   **Body Text**: 16px Regular, Line height 1.5
--   **Captions/Tags**: 12--14px, Medium
--   **RTL Support**: Ensure UI auto-flips for Arabic (right-to-left),
-    with text alignment mirrored.
+    -   H1: 28--32px, Bold (`.text-h1`)
+    -   H2: 22--24px, Semi-bold (`.text-h2`)
+    -   H3: 18--20px, Semi-bold (`.text-h3`)
+-   **Body Text**: 16px Regular, Line height 1.5 (`.text-body`)
+-   **Captions/Tags**: 12--14px, Medium (`.text-caption` or `.text-small`)
+
+### RTL (Right-to-Left) Language Support
+
+**Languages**: Arabic (ar), Arabic Egyptian (ar-EG)
+
+#### Typography for RTL Languages
+-   **Font Stack**: Cairo, Tajawal, Noto Sans Arabic (loaded via Google Fonts)
+-   **Line Height**: Increased to 1.6 for better Arabic text readability
+-   **Font Selection**: Automatically applied via `[lang="ar"]` and `[lang="ar-EG"]` selectors
+-   **Text Direction**: Handled automatically via `document.dir` and `document.documentElement.lang`
+
+#### Layout Principles for RTL
+1. **Automatic Flipping**: UI automatically mirrors for RTL languages
+2. **Logical Properties**: Use CSS logical properties (`gap`, `padding-inline`) over directional ones
+3. **Content Flow**: Information flows from right-to-left in Arabic layouts
+4. **Icon Mirroring**: Directional icons (arrows, chevrons) should mirror horizontally
+
+#### Responsive RTL Patterns
+
+**Information Cards** (like Upcoming Workout section):
+```tsx
+<div className="flex flex-col sm:flex-row sm:items-center gap-4">
+  <div className="text-center sm:text-start-rtl">
+    <h2 className="text-h3">{title}</h2>
+    <p className="text-body">{description}</p>
+  </div>
+</div>
+```
+
+**Key Classes for RTL**:
+- `.text-start-rtl` → `text-left rtl:text-right` (responsive text alignment)
+- `.text-end-rtl` → `text-right rtl:text-left`
+- Use `gap-4` instead of `space-x-4` for better RTL support
+- Use `flex-col sm:flex-row` for responsive stacking
+
+#### Typography Classes for Consistency
+
+**Defined Typography Scale** (use these instead of arbitrary sizes):
+- `.text-h1` → 32px, bold (main page titles)
+- `.text-h2` → 24px, semi-bold (section headers, large elements)
+- `.text-h3` → 20px, semi-bold (card titles, subsection headers)
+- `.text-body` → 16px, regular (body text, descriptions)
+- `.text-caption` → 14px, medium (labels, button text)
+- `.text-small` → 12px, medium (helper text, badges)
+
+#### Implementation Best Practices
+
+1. **Mobile-First RTL**: Always test RTL on mobile viewports first
+2. **Content Stacking**: Use vertical layouts on mobile to avoid cramping
+3. **Touch Targets**: Maintain 44px minimum touch targets in both directions
+4. **Spacing**: Use generous padding and margins for Arabic text readability
+5. **Testing**: Verify all interactive elements work in both LTR and RTL modes
+
+#### Arabic-Specific Design Considerations
+
+- **Increased Spacing**: Arabic text needs more vertical spacing than Latin text
+- **Longer Text**: Arabic translations are often 20-30% longer than English
+- **Cursive Script**: Avoid letter-spacing as it breaks Arabic cursive connections
+- **Reading Flow**: Content should flow naturally from right to left
 
 ### Iconography
 
@@ -142,8 +198,39 @@ To ensure consistency, use these predefined CSS classes instead of inline Tailwi
 
 ## 2. Layout & Spacing
 
--   **Grid System**: 8pt spacing system for margins, paddings, and gaps
--   **Card Design**: Rounded corners (8px), subtle shadow for elevation
+### 8pt Grid System
+-   **Base Unit**: 8px
+-   **Spacing Scale**: 4px (0.5), 8px (1), 16px (2), 24px (3), 32px (4), 40px (5), 48px (6), 64px (8)
+-   **Component Spacing**: All margins, paddings, and gaps should follow this scale
+
+### Card Design Patterns
+-   **Default Cards**: `rounded-lg` (8px), `p-4` (32px padding), subtle shadow
+-   **Elevated Cards**: `rounded-xl` (12px), `p-5` or `p-6` (40px-48px padding), stronger shadow
+-   **Compact Cards**: `rounded-md` (6px), `p-3` (24px padding), minimal shadow
+
+### Responsive Layout Patterns
+
+#### Information Cards (like Upcoming Workout)
+```tsx
+<div className="bg-surface-0 dark:bg-surface-900 rounded-lg p-5 border border-surface-200 dark:border-surface-700 shadow-sm">
+  <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-4">
+    {title}
+  </h2>
+  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+    {/* Content with proper RTL support */}
+  </div>
+</div>
+```
+
+#### Touch-Friendly Interactive Elements
+-   **Minimum Size**: 44px × 44px (use `.touch-target` utility)
+-   **Button Padding**: `px-6 py-3` minimum for primary actions
+-   **Spacing Between**: At least 8px gap between interactive elements
+
+### RTL Layout Considerations
+-   **Responsive Stacking**: Use `flex-col sm:flex-row` for cards that need to stack on mobile
+-   **Content Alignment**: `text-center sm:text-left rtl:sm:text-right` for responsive text alignment
+-   **Gap Spacing**: Use `gap-4` instead of `space-x-4` for better RTL support
 
 ### Centralized Button System
 

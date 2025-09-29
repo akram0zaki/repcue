@@ -136,6 +136,20 @@ export default {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
         'sans-ar': ['Cairo', 'Tajawal', 'Noto Sans Arabic', 'sans-serif'],
       },
+
+      // RTL-aware utilities
+      spacing: {
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        '0.5': '4px',   // 4pt
+        '1': '8px',     // 8pt (maps to Tailwind's existing system)
+        '1.5': '12px',  // 12pt
+        '2': '16px',    // 16pt
+        '3': '24px',    // 24pt
+        '4': '32px',    // 32pt
+        '5': '40px',    // 40pt
+        '6': '48px',    // 48pt
+      },
     },
   },
   plugins: [

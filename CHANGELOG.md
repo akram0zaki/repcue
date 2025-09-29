@@ -1,5 +1,32 @@
 ## Unreleased
 
+### 2025-09-29 (Arabic Text Layout Improvements & UI Spec Compliance)
+#### Fixed
+- **Arabic Text Display**: Resolved cramped and poorly spaced Arabic text in home page upcoming workout section
+  - **Improved Layout Structure**: Changed from `justify-between` to responsive `flex-col sm:flex-row` layout with proper spacing
+  - **Enhanced Typography**: Applied UI spec-compliant typography classes (`text-h2`, `text-h3`, `text-body`, `text-caption`)
+  - **Better Spacing**: Increased padding from `p-4` to `p-5` and added proper gap spacing with `gap-4`
+  - **Responsive Design**: Content now stacks vertically on mobile to prevent horizontal cramping of Arabic text
+  - **RTL-Aware Alignment**: Added `text-start-rtl` utility for proper responsive text alignment in RTL languages
+
+#### Enhanced
+- **RTL Language Support**: Comprehensive improvements to Right-to-Left language handling
+  - **Typography**: Added Arabic-specific font rendering with better line heights (1.6) for improved readability
+  - **CSS Utilities**: Created RTL-aware utility classes (`text-start-rtl`, `text-end-rtl`, `gap-x-rtl`)
+  - **Spacing**: Improved gap and margin handling for RTL layouts using logical properties
+  - **Touch Targets**: Ensured all interactive elements meet minimum 44px touch target requirements
+- **UI Specification Compliance**: Updated components to follow centralized design system
+  - **Button Classes**: Used centralized `.btn-primary` class instead of inline Tailwind classes
+  - **Typography Scale**: Applied consistent typography classes following the defined scale in UI specs
+  - **8pt Grid System**: Ensured all spacing follows the standardized 8pt grid system
+
+#### Updated
+- **Design System Documentation**: Enhanced UI specifications with comprehensive RTL support section
+  - **Typography Guidelines**: Added detailed Arabic typography requirements and font stacks
+  - **Layout Patterns**: Documented responsive RTL layout patterns for information cards
+  - **Implementation Best Practices**: Added specific guidelines for RTL development and testing
+  - **CSS Utilities**: Documented all RTL-aware utility classes and their usage patterns
+
 ### 2025-09-29 (Unit Test Infrastructure Improvements)
 #### Fixed
 - **Unit Test Suite Stability**: Comprehensive fixes to failing unit tests for improved reliability

@@ -200,31 +200,34 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
         {hasConsent && (
           <section className="mb-4">
             {upcomingWorkout ? (
-              <div className="bg-surface-0 dark:bg-surface-900 rounded-lg p-4 border border-surface-200 dark:border-surface-700 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-1">
-                      {t('home.upcomingWorkout')}
-                    </h2>
-                    <div className="flex items-center space-x-4">
-                      <div>
-                        <div className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                          {upcomingWorkout.weekday}
-                        </div>
-                        <div className="text-sm secondary-label-text">
-                          {upcomingWorkout.date}
-                        </div>
+              <div className="bg-surface-0 dark:bg-surface-900 rounded-lg p-5 border border-surface-200 dark:border-surface-700 shadow-sm">
+                <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-4">
+                  {t('home.upcomingWorkout')}
+                </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  {/* Date Section */}
+                  <div className="flex items-center gap-4">
+                    <div className="text-center sm:text-start-rtl min-w-0">
+                      <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
+                        {upcomingWorkout.weekday}
                       </div>
-                      <div className="flex-1">
-                        <div className="text-sm label-text">
-                          {upcomingWorkout.workout.name}
-                        </div>
-                        <div className="text-xs help-text">
-                          {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
-                        </div>
+                      <div className="text-caption secondary-label-text mt-1">
+                        {upcomingWorkout.date}
+                      </div>
+                    </div>
+                    
+                    {/* Workout Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-body font-medium label-text truncate">
+                        {upcomingWorkout.workout.name}
+                      </div>
+                      <div className="text-small help-text mt-1">
+                        {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
                       </div>
                     </div>
                   </div>
+                  
+                  {/* Start Button */}
                   <button
                     onClick={() => {
                       // Navigate to timer in workout-guided mode
@@ -238,7 +241,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         }
                       });
                     }}
-                    className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                    className="btn-primary flex-shrink-0 touch-target"
                   >
                     {t('home.startNow')}
                   </button>
@@ -246,20 +249,20 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               </div>
             ) : (
               <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl p-6 text-white shadow-lg">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  <div className="flex-shrink-0 self-center sm:self-start">
                     <CalendarIcon size={48} className="drop-shadow-sm" />
                   </div>
-                  <div className="flex-1 text-left">
-                    <h2 className="text-xl font-bold mb-2">
+                  <div className="flex-1 text-center sm:text-start-rtl">
+                    <h2 className="text-h3 font-bold mb-3 leading-tight">
                       {t('home.noScheduleTitle')}
                     </h2>
-                    <p className="text-white/90 text-sm mb-4 leading-relaxed">
+                    <p className="text-white/90 text-body mb-5 leading-relaxed">
                       {t('home.noScheduleBody')}
                     </p>
                     <button
                       onClick={() => navigate(Routes.WORKOUTS)}
-                      className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border border-white/20 hover:border-white/30 shadow-sm"
+                      className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-lg text-caption font-semibold transition-all duration-200 border border-white/20 hover:border-white/30 shadow-sm touch-target"
                     >
                       {t('home.addWorkout')}
                     </button>

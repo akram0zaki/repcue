@@ -39,6 +39,38 @@ body.rtl .text-right {
   text-align: left;
 }
 
+/* RTL spacing improvements for Arabic text */
+body.rtl h1,
+body.rtl h2,
+body.rtl h3 {
+  line-height: 1.4; /* Better line height for Arabic text */
+}
+
+body.rtl .gap-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* Better Arabic font rendering */
+[lang="ar"], [lang="ar-EG"] {
+  font-family: 'Cairo', 'Tajawal', 'Noto Sans Arabic', system-ui, sans-serif;
+  line-height: 1.6; /* Better line spacing for Arabic */
+}
+
+/* Improved button spacing for RTL */
+body.rtl .btn-primary,
+body.rtl .btn-secondary,
+body.rtl button {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Better text truncation for Arabic */
+body.rtl .truncate {
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: right;
+}
+
 /* ========================================
    ACCESSIBILITY ENHANCEMENTS
    ======================================== */
@@ -329,5 +361,67 @@ body.rtl .text-right {
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;  /* Safari and Chrome */
+  }
+
+  /* Typography utilities following UI specs */
+  .text-h1 {
+    font-size: 32px;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  .text-h2 {
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .text-h3 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .text-body {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .text-caption {
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .text-small {
+    font-size: 12px;
+    line-height: 1.3;
+    font-weight: 500;
+  }
+
+  /* RTL-aware utilities */
+  .text-start-rtl {
+    @apply text-left rtl:text-right;
+  }
+
+  .text-end-rtl {
+    @apply text-right rtl:text-left;
+  }
+
+  .gap-x-rtl {
+    @apply gap-x-4 rtl:gap-x-reverse;
+  }
+
+  .space-x-rtl > :not([hidden]) ~ :not([hidden]) {
+    @apply space-x-4 rtl:space-x-reverse;
+  }
+
+  .float-start-rtl {
+    @apply float-left rtl:float-right;
+  }
+
+  .float-end-rtl {
+    @apply float-right rtl:float-left;
   }
 }
