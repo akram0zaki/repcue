@@ -106,23 +106,26 @@ export const calculateCurrentStreak = (logs: ActivityLog[]): number => {
     })
   );
   
-  // Sort dates in descending order
-  const sortedDates = Array.from(workoutDates).sort((a, b) => b - a);
-  
   let streak = 0;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  // Check from today backwards
-  const checkDate = new Date(today);
+  // Check if today has a workout
+  const hasWorkoutToday = workoutDates.has(today.getTime());
   
-  for (let i = 0; i < sortedDates.length; i++) {
-    if (workoutDates.has(checkDate.getTime())) {
-      streak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    } else {
-      break;
-    }
+  // Start checking from today if there's a workout, otherwise from yesterday
+  // This preserves the streak for the current day until it actually ends
+  const checkDate = new Date(today);
+  if (!hasWorkoutToday) {
+    // If no workout today, start checking from yesterday to preserve ongoing streak
+    checkDate.setDate(checkDate.getDate() - 1);
+  }
+  
+  // Count consecutive calendar days with workouts
+  // Break immediately if we find a day without a workout
+  while (workoutDates.has(checkDate.getTime())) {
+    streak++;
+    checkDate.setDate(checkDate.getDate() - 1);
   }
   
   return streak;
