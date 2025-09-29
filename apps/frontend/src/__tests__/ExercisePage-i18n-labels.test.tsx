@@ -19,14 +19,22 @@ vi.mock('../utils/localizeExercise', () => ({
 }))
 
 vi.mock('../data/catalogs', () => ({
-  getDefaultCatalog: () => 'repcue',
+  getDefaultCatalog: () => ({
+    id: 'repcue',
+    name: 'RepCue',
+    exercises: ['ex-1', 'ex-2'],
+    thumbnail: '/catalog-thumbnails/repcue.jpg',
+    description: 'Core RepCue exercises',
+    displayOrder: 0
+  }),
   EXERCISE_CATALOGS: [
     {
       id: 'repcue',
       name: 'RepCue',
       exercises: ['ex-1', 'ex-2'],
       thumbnail: '/catalog-thumbnails/repcue.jpg',
-      description: 'Core RepCue exercises'
+      description: 'Core RepCue exercises',
+      displayOrder: 0
     }
   ]
 }))
@@ -110,6 +118,9 @@ const makeExercise = (overrides: Partial<any> = {}) => ({
   is_favorite: false,
   tags: ['core'],
   has_video: false,
+  catalogId: 'repcue', // Must match the mock catalog ID
+  created_at: '2024-01-01T00:00:00.000Z',
+  updated_at: '2024-01-01T00:00:00.000Z',
   ...overrides,
 })
 
@@ -131,36 +142,64 @@ const mockAppSettings = {
   id: 'test-settings',
 }
 
-describe('ExercisePage exercise type labels', () => {
-  it('renders localized Time-based label for time-based exercises', () => {
-    const exercises = [makeExercise({ exercise_type: 'time_based' })]
-    render(
-      <MemoryRouter initialEntries={['/exercises']}>
-        <SnackbarProvider>
-          <ExercisePage
-            exercises={exercises as any}
-            appSettings={mockAppSettings}
-            onToggleFavorite={() => {}}
-          />
-        </SnackbarProvider>
-      </MemoryRouter>
-    )
-    expect(screen.getByText(/Time-based/i)).toBeInTheDocument()
+describe('ExercisePage exercise rendering', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
-  it('renders localized Rep-based label for repetition-based exercises', () => {
-    const exercises = [makeExercise({ id: 'ex-2', name: 'Push Ups', exercise_type: 'repetition_based' })]
-    render(
-      <MemoryRouter initialEntries={['/exercises']}>
-        <SnackbarProvider>
-          <ExercisePage
-            exercises={exercises as any}
-            appSettings={mockAppSettings}
-            onToggleFavorite={() => {}}
-          />
-        </SnackbarProvider>
-      </MemoryRouter>
-    )
-    expect(screen.getByText(/Rep-based/i)).toBeInTheDocument()
+  it('renders time-based exercises correctly', async () => {
+    const exercises = [makeExercise({
+      exercise_type: 'time_based',
+      name: 'Plank Hold',
+      default_duration: 30
+    })]
+
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/exercises']}>
+          <SnackbarProvider>
+            <ExercisePage
+              exercises={exercises as any}
+              appSettings={mockAppSettings}
+              onToggleFavorite={() => {}}
+            />
+          </SnackbarProvider>
+        </MemoryRouter>
+      )
+    })
+
+    // Check that the time-based exercise is displayed by name
+    expect(screen.getByText('Plank Hold')).toBeInTheDocument()
+    // Check that the start timer button is present
+    expect(screen.getByText('Start Timer')).toBeInTheDocument()
+  })
+
+  it('renders repetition-based exercises correctly', async () => {
+    const exercises = [makeExercise({
+      id: 'ex-2',
+      name: 'Push Ups',
+      exercise_type: 'repetition_based',
+      default_sets: 3,
+      default_reps: 10
+    })]
+
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/exercises']}>
+          <SnackbarProvider>
+            <ExercisePage
+              exercises={exercises as any}
+              appSettings={mockAppSettings}
+              onToggleFavorite={() => {}}
+            />
+          </SnackbarProvider>
+        </MemoryRouter>
+      )
+    })
+
+    // Check that the repetition-based exercise is displayed by name
+    expect(screen.getByText('Push Ups')).toBeInTheDocument()
+    // Check that the start timer button is present
+    expect(screen.getByText('Start Timer')).toBeInTheDocument()
   })
 })

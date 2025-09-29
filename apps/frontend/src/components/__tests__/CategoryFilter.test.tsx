@@ -38,8 +38,9 @@ describe('CategoryFilter', () => {
   describe('dropdown style', () => {
     it('renders dropdown button with correct text when no categories selected', () => {
       renderComponent({ style: 'dropdown', label: 'Category' });
-      
-      expect(screen.getByText('Category')).toBeInTheDocument();
+
+      // Use getAllByText since there are responsive versions (desktop/mobile)
+      expect(screen.getAllByText('Category')).toHaveLength(2);
       expect(screen.getByText('Select')).toBeInTheDocument();
     });
 

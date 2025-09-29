@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import ExercisePage from '../pages/ExercisePage';
 import { SnackbarProvider } from '../components/SnackbarProvider';
 import { I18nextProvider } from 'react-i18next';
@@ -47,9 +47,23 @@ vi.mock('../utils/localizeExercise', () => ({
 }));
 
 vi.mock('../data/catalogs', () => ({
-  getDefaultCatalog: () => 'repcue',
+  getDefaultCatalog: () => ({
+    id: 'repcue',
+    name: 'RepCue',
+    exercises: ['side-plan'],
+    thumbnail: '/catalog-thumbnails/repcue.jpg',
+    description: 'Core RepCue exercises',
+    displayOrder: 0
+  }),
   EXERCISE_CATALOGS: [
-    { id: 'repcue', name: 'RepCue', exercises: [] }
+    {
+      id: 'repcue',
+      name: 'RepCue',
+      exercises: ['side-plan'],
+      thumbnail: '/catalog-thumbnails/repcue.jpg',
+      description: 'Core RepCue exercises',
+      displayOrder: 0
+    }
   ]
 }));
 
@@ -84,6 +98,11 @@ vi.mock('../services/storageService', () => ({
       getFavoriteExercises: () => Promise.resolve([])
     })
   }
+}))
+
+// Mock RTL detection hook
+vi.mock('../hooks/useRTLDetection', () => ({
+  useRTLDetection: () => false
 }));
 // Mock fetch HEAD precheck responses
 const originalFetch: typeof fetch | undefined = (global as any).fetch as any;
@@ -112,7 +131,10 @@ describe('ExercisePage preview error handling', () => {
       exercise_type: 'time_based',
       default_duration: 30,
       has_video: true,
-      is_favorite: false
+      is_favorite: false,
+      catalogId: 'repcue', // Must match the mock catalog ID
+      created_at: '2024-01-01T00:00:00.000Z',
+      updated_at: '2024-01-01T00:00:00.000Z',
     } as any
   ];
 
@@ -183,9 +205,11 @@ describe('ExercisePage preview error handling', () => {
       (global as any).HTMLMediaElement.prototype.pause = vi.fn();
     }
 
-    renderWithProviders(
-      <ExercisePage exercises={exercises} appSettings={mockAppSettings} onToggleFavorite={() => {}} />
-    );
+    await act(async () => {
+      renderWithProviders(
+        <ExercisePage exercises={exercises} appSettings={mockAppSettings} onToggleFavorite={() => {}} />
+      );
+    });
 
     // Debug: Let's see what buttons are available
     await screen.findByText('Side Plan');
@@ -238,9 +262,11 @@ describe('ExercisePage preview error handling', () => {
     }
     (global as any).HTMLVideoElement = MockVideoEl;
 
-    renderWithProviders(
-      <ExercisePage exercises={exercises} appSettings={mockAppSettings} onToggleFavorite={() => {}} />
-    );
+    await act(async () => {
+      renderWithProviders(
+        <ExercisePage exercises={exercises} appSettings={mockAppSettings} onToggleFavorite={() => {}} />
+      );
+    });
 
     // Debug: Let's see what buttons are available
     await screen.findByText('Side Plan');

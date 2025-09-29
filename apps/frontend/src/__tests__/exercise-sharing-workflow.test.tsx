@@ -53,15 +53,43 @@ vi.mock('react-i18next', () => ({
         'exercises:shareNotFound': 'Exercise Not Found',
         'exercises:shareExpired': 'This share link may have expired or is invalid.',
         'exercises:invalidShareToken': 'Invalid share token',
-        'common.goHome': 'Go to RepCue'
+        'common.goHome': 'Go to RepCue',
+        'exercises.exercise': 'Exercise',
+        'exercises.sharedBy': 'Shared by',
+        'exercises.shareExercise': 'Share Exercise',
+        'exercises.shareTitle': 'Share this exercise',
+        'exercises.shareDescription': 'Share this exercise with friends and family',
+        'exercises.copyLink': 'Copy Link',
+        'exercises.close': 'Close',
+        'exercises.startTimer': 'Start Timer',
+        'exercises.favorite': 'Favorite',
+        'exercises.unfavorite': 'Unfavorite',
+        'filter.all': 'All',
+        'filter.shared': 'Shared',
+        'common.loading': 'Loading...',
+        'common:exercises.title': 'Exercises',
+        'common:exercises.subtitle': 'Browse and manage your workout exercises',
+        'exercises:createNew': 'Create New',
+        'common.create': 'Create',
+        'selectCatalog': 'Select Catalog',
+        'selectDescription': 'Choose a category to view exercises',
+        'catalog.name.custom': 'Custom',
+        'filter.filters': 'Filters',
+        'filter.search': 'Search',
+        'filter.searchPlaceholder': 'Search exercises...',
+        'filter.clearSearch': 'Clear search'
       };
       return translations[key] || key;
     },
     i18n: {
       resolvedLanguage: 'en',
-      language: 'en'
+      language: 'en',
+      languages: ['en'],
+      on: vi.fn(),
+      off: vi.fn()
     }
-  })
+  }),
+  I18nextProvider: ({ children }: any) => children
 }));
 
 // Mock shared exercises hook
@@ -91,6 +119,31 @@ vi.mock('../data/catalogs', () => ({
 
 vi.mock('../utils/videoSources', () => ({
   default: () => []
+}));
+
+// Mock RTL detection hook
+vi.mock('../hooks/useRTLDetection', () => ({
+  useRTLDetection: () => false
+}));
+
+// Mock consent service
+vi.mock('../services/consentService', () => ({
+  ConsentService: {
+    getInstance: () => ({
+      hasConsent: () => true,
+      isConsentGiven: () => true
+    })
+  }
+}));
+
+// Mock storage service
+vi.mock('../services/storageService', () => ({
+  StorageService: {
+    getInstance: () => ({
+      getUserExercises: () => Promise.resolve([]),
+      getFavoriteExercises: () => Promise.resolve([])
+    })
+  }
 }));
 
 // Test wrapper

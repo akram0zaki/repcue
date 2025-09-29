@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import ActivityLogPage from '../pages/ActivityLogPage';
 import type { Exercise, ActivityLog } from '../types';
 import { ExerciseCategory } from '../types';
@@ -17,6 +17,41 @@ vi.mock('../services/storageService', () => ({
   storageService: {
     getActivityLogs: vi.fn(),
   }
+}));
+
+// Mock i18n
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'activity.title': 'Activity Log',
+        'activity.subtitle': 'Track your fitness journey and progress',
+        'activity.noWorkouts': 'No workouts yet',
+        'activity.startFirstWorkout': 'Start your first workout to see your activity here',
+        'common:activity.charts.weekNumber': 'Week 40',
+        'common:activity.charts.previousWeek': 'Previous week',
+        'common:activity.charts.nextWeek': 'Next week',
+        'common:weekdayAbbrev.monday': 'Mon',
+        'common:weekdayAbbrev.tuesday': 'Tue',
+        'common:weekdayAbbrev.wednesday': 'Wed',
+        'common:weekdayAbbrev.thursday': 'Thu',
+        'common:weekdayAbbrev.friday': 'Fri',
+        'common:weekdayAbbrev.saturday': 'Sat',
+        'common:weekdayAbbrev.sunday': 'Sun',
+        'common.loading': 'Loading...'
+      };
+      return translations[key] || key;
+    },
+    i18n: { resolvedLanguage: 'en', language: 'en', languages: ['en'] }
+  }),
+  I18nextProvider: ({ children }: any) => children
+}));
+
+// Mock date utilities that ActivityLogPage might need
+vi.mock('../utils/dateUtils', () => ({
+  formatDate: (date: string | Date) => 'Jan 1',
+  getWeekNumber: () => 40,
+  getWeekRange: () => 'Sep 29 - Oct 5'
 }));
 
 import { storageService } from '../services/storageService';
@@ -69,7 +104,9 @@ describe('Duration Format Fix', () => {
 
     mockStorageService.getActivityLogs.mockResolvedValue(mockLogs);
 
-    render(<ActivityLogPage exercises={[mockExercise]} />);
+    await act(async () => {
+      render(<ActivityLogPage exercises={[mockExercise]} />);
+    });
 
     // Wait for the component to load
     await screen.findByText('Activity Log');
@@ -106,7 +143,9 @@ describe('Duration Format Fix', () => {
 
     mockStorageService.getActivityLogs.mockResolvedValue(mockLogs);
 
-    render(<ActivityLogPage exercises={[mockExercise]} />);
+    await act(async () => {
+      render(<ActivityLogPage exercises={[mockExercise]} />);
+    });
 
     await screen.findByText('Activity Log');
 
@@ -140,7 +179,9 @@ describe('Duration Format Fix', () => {
 
     mockStorageService.getActivityLogs.mockResolvedValue(mockLogs);
 
-    render(<ActivityLogPage exercises={[mockExercise]} />);
+    await act(async () => {
+      render(<ActivityLogPage exercises={[mockExercise]} />);
+    });
 
     await screen.findByText('Activity Log');
 
