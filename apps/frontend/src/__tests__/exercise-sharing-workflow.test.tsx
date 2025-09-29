@@ -45,6 +45,54 @@ vi.mock('../config/supabase', () => ({
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+// Mock i18n
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: any) => {
+      const translations: Record<string, string> = {
+        'exercises:shareNotFound': 'Exercise Not Found',
+        'exercises:shareExpired': 'This share link may have expired or is invalid.',
+        'exercises:invalidShareToken': 'Invalid share token',
+        'common.goHome': 'Go to RepCue'
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      resolvedLanguage: 'en',
+      language: 'en'
+    }
+  })
+}));
+
+// Mock shared exercises hook
+vi.mock('../hooks/useSharedExercises', () => ({
+  useSharedExercises: () => ({
+    sharedExercises: [],
+    isLoading: false,
+    error: null,
+    isSharedExercise: (exerciseId: string) => false // Mock function
+  })
+}));
+
+// Mock utility functions
+vi.mock('../utils/localizeExercise', () => ({
+  localizeExercise: (exercise: any) => ({
+    name: exercise.name,
+    description: exercise.description
+  })
+}));
+
+vi.mock('../data/catalogs', () => ({
+  getDefaultCatalog: () => 'repcue',
+  EXERCISE_CATALOGS: [
+    { id: 'repcue', name: 'RepCue', exercises: [] }
+  ]
+}));
+
+vi.mock('../utils/videoSources', () => ({
+  default: () => []
+}));
+
 // Test wrapper
 const TestWrapper = ({ children, initialEntries = ['/'] }: { children: React.ReactNode; initialEntries?: string[] }) => (
   <MemoryRouter initialEntries={initialEntries}>
@@ -73,6 +121,27 @@ const createMockExercise = (overrides: Partial<Exercise> = {}): Exercise => ({
   version: 1,
   ...overrides
 });
+
+// Mock app settings
+const mockAppSettings = {
+  interval_duration: 30,
+  sound_enabled: true,
+  vibration_enabled: false,
+  beep_volume: 0.5,
+  dark_mode: false,
+  auto_save: true,
+  pre_timer_countdown: 3,
+  default_rest_time: 60,
+  rep_speed_factor: 1.0,
+  show_exercise_videos: true,
+  reduce_motion: false,
+  auto_start_next: false,
+  horizontal_exercise_layout: false,
+  ring_timer: false,
+  update_mode: 'automatic' as const,
+  allow_auto_updates: true,
+  update_on_metered: false
+};
 
 describe('Exercise Sharing Workflow Integration Tests', () => {
   const mockUserA = { id: 'user-123', email: 'userA@example.com' };
@@ -111,6 +180,7 @@ describe('Exercise Sharing Workflow Integration Tests', () => {
         <TestWrapper>
           <ExercisePage
             exercises={exercises}
+            appSettings={mockAppSettings}
             onToggleFavorite={() => {}}
           />
         </TestWrapper>
@@ -163,6 +233,7 @@ describe('Exercise Sharing Workflow Integration Tests', () => {
         <TestWrapper>
           <ExercisePage
             exercises={exercises}
+            appSettings={mockAppSettings}
             onToggleFavorite={() => {}}
           />
         </TestWrapper>
@@ -377,6 +448,7 @@ describe('Exercise Sharing Workflow Integration Tests', () => {
         <TestWrapper>
           <ExercisePage
             exercises={exercises}
+            appSettings={mockAppSettings}
             onToggleFavorite={() => {}}
           />
         </TestWrapper>
@@ -417,7 +489,7 @@ describe('Exercise Sharing Workflow Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Exercise Not Found')).toBeInTheDocument();
-        expect(screen.getByText(/This share link may have expired or is invalid/i)).toBeInTheDocument();
+        expect(screen.getByText(/Invalid share token/i)).toBeInTheDocument();
       });
     });
 
@@ -481,6 +553,7 @@ describe('Exercise Sharing Workflow Integration Tests', () => {
         <TestWrapper>
           <ExercisePage
             exercises={exercises}
+            appSettings={mockAppSettings}
             onToggleFavorite={() => {}}
           />
         </TestWrapper>

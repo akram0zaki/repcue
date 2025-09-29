@@ -156,9 +156,15 @@ describe('ActivityLogPage', () => {
       expect(screen.getByText('Running')).toBeInTheDocument();
     });
 
+    // Open category filter dropdown
+    const filterDropdown = screen.getByRole('button', { name: /select/i });
+    fireEvent.click(filterDropdown);
+
     // Filter by core category
-    const coreFilter = screen.getByRole('button', { name: /core/i });
-    fireEvent.click(coreFilter);
+    await waitFor(() => {
+      const coreFilter = screen.getByRole('button', { name: /core/i });
+      fireEvent.click(coreFilter);
+    });
 
     await waitFor(() => {
       // Should only show core exercises (Plank) - stats favorite + filtered activity entries
@@ -226,14 +232,14 @@ describe('ActivityLogPage', () => {
 
   it('displays exercise categories with correct colors', async () => {
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(mockActivityLogs);
-    
+
     render(<ActivityLogPage exercises={mockExercises} />);
-    
+
     await waitFor(() => {
-      // Check that category filter buttons are displayed - match case-insensitively
-      expect(screen.getByRole('button', { name: /core/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /strength/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cardio/i })).toBeInTheDocument();
+      // Check that category badges are displayed in the activity log entries
+      expect(screen.getAllByText('core').length).toBeGreaterThan(0);
+      expect(screen.getByText('strength')).toBeInTheDocument();
+      expect(screen.getByText('cardio')).toBeInTheDocument();
     });
   });
 
@@ -359,9 +365,15 @@ describe('ActivityLogPage', () => {
       expect(screen.getAllByText('Plank')).toHaveLength(2); // Stats + logs
     });
 
+    // Open category filter dropdown
+    const filterDropdown = screen.getByRole('button', { name: /select/i });
+    fireEvent.click(filterDropdown);
+
     // Filter by strength category (should be empty)
-    const strengthFilter = screen.getByRole('button', { name: /strength/i });
-    fireEvent.click(strengthFilter);
+    await waitFor(() => {
+      const strengthFilter = screen.getByRole('button', { name: /strength/i });
+      fireEvent.click(strengthFilter);
+    });
 
     await waitFor(() => {
       // Heading uses capitalized category label; be tolerant of whitespace
