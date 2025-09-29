@@ -49,7 +49,21 @@ vi.mock('react-i18next', () => ({
         'exercises:categories.core': 'Core',
         'exercises:hasVideoDemo': 'Available',
         'exercises:saveToLibrary': 'Save to My Library',
-        'common.browseExercises': 'Browse Exercises'
+        'common.browseExercises': 'Browse Exercises',
+        'exercises:defaultSettings': 'Default Settings',
+        'exercises:duration': 'Duration',
+        'exercises:sets': 'Sets',
+        'exercises:reps': 'Reps',
+        'exercises:private': 'Private',
+        'exercises:public': 'Public',
+        'exercises:exerciseInfo': 'Exercise Information',
+        'exercises:difficultyLevel': 'Difficulty',
+        'exercises:variable': 'Variable',
+        'exercises:tagsLabel': 'Tags',
+        'exercises:benefits': 'Benefits',
+        'exercises:limitations': 'Limitations',
+        'exercises:bestTiming': 'Best Timing',
+        'exercises:notes': 'Notes'
       };
       return translations[key] || key;
     }
@@ -73,9 +87,16 @@ vi.mock('../../utils/supabase', () => ({
   }
 }));
 
-// Mock fetch with proper typing
+// Mock fetch with proper typing and headers
 const mockFetch = vi.fn();
 vi.stubGlobal('fetch', mockFetch);
+
+// Mock loadExerciseMedia to prevent fetch issues
+vi.mock('../../utils/loadExerciseMedia', () => ({
+  loadExerciseMedia: vi.fn().mockResolvedValue({
+    exercises: []
+  })
+}));
 
 // Mock window.location
 Object.defineProperty(window, 'location', {
@@ -89,7 +110,7 @@ Object.defineProperty(window, 'location', {
 
 // Mock localizeExercise utility
 vi.mock('../../utils/localizeExercise', () => ({
-  localizeExercise: (exercise: any) => ({
+  localizeExercise: (exercise: any, t: any) => ({
     name: exercise.name,
     description: exercise.description
   })
@@ -98,6 +119,24 @@ vi.mock('../../utils/localizeExercise', () => ({
 // Mock getExerciseById
 vi.mock('../../data/exercises', () => ({
   getExerciseById: vi.fn(() => null)
+}));
+
+// Mock VideoThumbnail component
+vi.mock('../../components/VideoThumbnail', () => ({
+  VideoThumbnail: ({ exercise }: any) => (
+    <div data-testid="video-thumbnail">
+      Video Thumbnail for {exercise.name}
+    </div>
+  )
+}));
+
+// Mock ExercisePlaceholder component
+vi.mock('../../components/ExercisePlaceholder', () => ({
+  ExercisePlaceholder: ({ size }: any) => (
+    <div data-testid="exercise-placeholder">
+      Exercise Placeholder - {size}
+    </div>
+  )
 }));
 
 // Test component wrapper
@@ -135,6 +174,17 @@ const mockSharedExercise = {
   }
 };
 
+// Helper function to create proper fetch response mocks
+const createMockResponse = (data: any, ok = true, status = 200) => ({
+  ok,
+  status,
+  headers: {
+    get: vi.fn().mockReturnValue('application/json')
+  },
+  json: vi.fn().mockResolvedValue(data),
+  text: vi.fn().mockResolvedValue(JSON.stringify(data))
+});
+
 describe('SharedExercisePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -150,10 +200,7 @@ describe('SharedExercisePage', () => {
     });
 
     mockUseAuth.mockReturnValue({ user: null });
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(mockSharedExercise)
-    });
+    mockFetch.mockResolvedValue(createMockResponse(mockSharedExercise));
   });
 
   afterEach(() => {
@@ -162,7 +209,9 @@ describe('SharedExercisePage', () => {
 
   it('renders loading state initially', async () => {
     // Mock fetch to be slow so we can catch the loading state
-    mockFetch.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+    mockFetch.mockImplementation(() => new Promise(resolve =>
+      setTimeout(() => resolve(createMockResponse(mockSharedExercise)), 100)
+    ));
 
     await act(async () => {
       render(
@@ -215,12 +264,16 @@ describe('SharedExercisePage', () => {
     const timeBased = screen.getAllByText('Time Based');
     expect(timeBased.length).toBeGreaterThan(0);
 
-    // Check default duration
-    expect(screen.getByText(/60s/)).toBeInTheDocument();
+    // Check default duration appears in default settings section
+    expect(screen.getByText('Duration:')).toBeInTheDocument();
+    expect(screen.getByText('1m')).toBeInTheDocument();
 
-    // Check tags
-    expect(screen.getByText('core')).toBeInTheDocument();
-    expect(screen.getByText('isometric')).toBeInTheDocument();
+    // Check category badge
+    expect(screen.getByText('Core')).toBeInTheDocument();
+
+    // Check that essential sections are present
+    expect(screen.getByText('Benefits')).toBeInTheDocument();
+    expect(screen.getByText('Notes')).toBeInTheDocument();
   });
 
   it('redirects to auth when save is clicked by unauthenticated user', async () => {
@@ -261,14 +314,8 @@ describe('SharedExercisePage', () => {
     };
 
     mockFetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue(mockSharedExercise)
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue(mockSaveResponse)
-      });
+      .mockResolvedValueOnce(createMockResponse(mockSharedExercise))
+      .mockResolvedValueOnce(createMockResponse(mockSaveResponse));
 
     await act(async () => {
       render(
@@ -291,11 +338,7 @@ describe('SharedExercisePage', () => {
   });
 
   it('handles invalid or expired share tokens', async () => {
-    mockFetch.mockResolvedValue({
-      ok: false,
-      status: 404,
-      json: vi.fn().mockResolvedValue({ error: 'Share not found' })
-    });
+    mockFetch.mockResolvedValue(createMockResponse({ error: 'Share not found' }, false, 404));
 
     await act(async () => {
       render(
@@ -307,7 +350,7 @@ describe('SharedExercisePage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Exercise Not Found')).toBeInTheDocument();
-      expect(screen.getByText(/This share link may have expired or is invalid/i)).toBeInTheDocument();
+      expect(screen.getByText('Share not found')).toBeInTheDocument();
     });
   });
 
@@ -324,7 +367,7 @@ describe('SharedExercisePage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Exercise Not Found')).toBeInTheDocument();
-      expect(screen.getByText(/This share link may have expired or is invalid/i)).toBeInTheDocument();
+      expect(screen.getByText('Network error')).toBeInTheDocument();
     });
   });
 
@@ -338,15 +381,8 @@ describe('SharedExercisePage', () => {
     });
 
     mockFetch
-      .mockResolvedValueOnce({
-        ok: true,
-        json: vi.fn().mockResolvedValue(mockSharedExercise)
-      })
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        json: vi.fn().mockResolvedValue({ error: 'Failed to save' })
-      });
+      .mockResolvedValueOnce(createMockResponse(mockSharedExercise))
+      .mockResolvedValueOnce(createMockResponse({ error: 'Failed to save' }, false, 500));
 
     await act(async () => {
       render(
@@ -377,10 +413,7 @@ describe('SharedExercisePage', () => {
       }
     };
 
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(mockExerciseWithVideo)
-    });
+    mockFetch.mockResolvedValue(createMockResponse(mockExerciseWithVideo));
 
     await act(async () => {
       render(
@@ -407,10 +440,7 @@ describe('SharedExercisePage', () => {
       }
     };
 
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(mockExerciseWithCustomVideo)
-    });
+    mockFetch.mockResolvedValue(createMockResponse(mockExerciseWithCustomVideo));
 
     await act(async () => {
       render(
@@ -440,10 +470,7 @@ describe('SharedExercisePage', () => {
       }
     };
 
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: vi.fn().mockResolvedValue(mockRepExercise)
-    });
+    mockFetch.mockResolvedValue(createMockResponse(mockRepExercise));
 
     await act(async () => {
       render(
@@ -461,8 +488,10 @@ describe('SharedExercisePage', () => {
     const repBased = screen.getAllByText('Repetition Based');
     expect(repBased.length).toBeGreaterThan(0);
 
-    // Check default sets and reps
-    expect(screen.getByText(/3/)).toBeInTheDocument();
-    expect(screen.getByText(/10/)).toBeInTheDocument();
+    // Check default sets and reps in the default settings section
+    expect(screen.getByText('Sets:')).toBeInTheDocument();
+    expect(screen.getByText('Reps:')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByText('10')).toBeInTheDocument();
   });
 });

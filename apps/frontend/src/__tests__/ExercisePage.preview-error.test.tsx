@@ -56,6 +56,35 @@ vi.mock('../data/catalogs', () => ({
 vi.mock('../utils/videoSources', () => ({
   default: () => []
 }));
+
+// Mock additional hooks that might be needed
+vi.mock('../hooks/useExerciseVideo', () => ({
+  useExerciseVideo: () => ({
+    isLoading: false,
+    error: null,
+    videoUrl: '/videos/side-plan-missing.webm'
+  })
+}));
+
+// Mock consent service
+vi.mock('../services/consentService', () => ({
+  ConsentService: {
+    getInstance: () => ({
+      hasConsent: () => true,
+      isConsentGiven: () => true
+    })
+  }
+}));
+
+// Mock storage service
+vi.mock('../services/storageService', () => ({
+  StorageService: {
+    getInstance: () => ({
+      getUserExercises: () => Promise.resolve([]),
+      getFavoriteExercises: () => Promise.resolve([])
+    })
+  }
+}));
 // Mock fetch HEAD precheck responses
 const originalFetch: typeof fetch | undefined = (global as any).fetch as any;
 beforeEach(() => {
@@ -117,12 +146,24 @@ describe('ExercisePage preview error handling', () => {
     );
   }
 
-  const original = global.HTMLVideoElement;
+  const originalVideo = global.HTMLVideoElement;
+  const originalMedia = global.HTMLMediaElement;
   beforeEach(() => {
     vi.resetModules();
+
+    // Ensure HTMLMediaElement prototype has required methods
+    if (!global.HTMLMediaElement) {
+      global.HTMLMediaElement = class {} as any;
+    }
+    if (!global.HTMLMediaElement.prototype) {
+      global.HTMLMediaElement.prototype = {};
+    }
+    global.HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined);
+    global.HTMLMediaElement.prototype.pause = vi.fn();
   });
   afterEach(() => {
-    global.HTMLVideoElement = original;
+    global.HTMLVideoElement = originalVideo;
+    global.HTMLMediaElement = originalMedia;
   });
 
   it('shows warning toast when preview video element errors', async () => {
@@ -149,6 +190,14 @@ describe('ExercisePage preview error handling', () => {
     // Debug: Let's see what buttons are available
     await screen.findByText('Side Plan');
 
+    // Log all buttons for debugging
+    const allButtons = screen.getAllByRole('button');
+    console.log('Available buttons:', allButtons.map(b => ({
+      text: b.textContent,
+      ariaLabel: b.getAttribute('aria-label'),
+      className: b.className
+    })));
+
     // Look for any video-related button - might have different text
     const playButtons = screen.getAllByRole('button').filter(button =>
       button.textContent?.toLowerCase().includes('video') ||
@@ -158,6 +207,7 @@ describe('ExercisePage preview error handling', () => {
       button.getAttribute('aria-label')?.toLowerCase().includes('preview')
     );
 
+    console.log('Video-related buttons found:', playButtons.length);
     expect(playButtons.length).toBeGreaterThan(0);
     fireEvent.click(playButtons[0]);
 
@@ -184,6 +234,7 @@ describe('ExercisePage preview error handling', () => {
       addEventListener(ev: string, cb: (...args: unknown[]) => unknown) { (listeners[ev] ||= []).push(cb); }
       removeEventListener() {}
       play(): Promise<void> { return Promise.resolve(); }
+      pause() {}
     }
     (global as any).HTMLVideoElement = MockVideoEl;
 

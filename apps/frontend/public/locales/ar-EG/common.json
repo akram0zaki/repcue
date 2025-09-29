@@ -652,5 +652,20 @@
     "submitError": "فشل في تقديم التقييم",
     "submitting": "جارٍ التقديم...",
     "loginToRate": "قم بتسجيل الدخول لتقييم ومراجعة التمارين"
+  },
+  "whatsNew": {
+    "title": "إيه الجديد",
+    "close": "اقفل",
+    "previous": "اللي قبل",
+    "next": "اللي بعد",
+    "gotIt": "تمام!",
+    "seeAllChanges": "شوف كل التغييرات",
+    "goToHighlight": "روح للميزة رقم {{number}}",
+    "categories": {
+      "newFeature": "ميزة جديدة",
+      "improvement": "تحسين",
+      "security": "تحديث أمني",
+      "update": "تحديث"
+    }
   }
 }

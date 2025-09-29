@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import InstallPrompt from '../InstallPrompt';
 
 // Mocks
@@ -39,11 +39,13 @@ describe('InstallPrompt focus management', () => {
     });
 
     // Render and advance timers to after animation
-    render(<InstallPrompt />);
-    vi.runAllTimers();
+    act(() => {
+      render(<InstallPrompt />);
+      vi.runAllTimers();
+    });
 
     // The install button exists but should not be the active element
-    const installBtn = screen.getByRole('button', { name: /install|how to install/i });
+    const installBtn = screen.getByRole('button', { name: 'Install' });
     expect(installBtn).toBeInTheDocument();
     expect(document.activeElement).not.toBe(installBtn);
   });
@@ -61,10 +63,12 @@ describe('InstallPrompt focus management', () => {
     select.focus();
     expect(document.activeElement).toBe(select);
 
-    render(<InstallPrompt />);
-    vi.runAllTimers();
+    act(() => {
+      render(<InstallPrompt />);
+      vi.runAllTimers();
+    });
 
-    const installBtn = screen.getByRole('button', { name: /install|how to install/i });
+    const installBtn = screen.getByRole('button', { name: 'Install' });
     expect(installBtn).toBeInTheDocument();
     // Focus should remain on the select
     expect(document.activeElement).toBe(select);
