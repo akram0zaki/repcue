@@ -618,5 +618,17 @@
       "message": "Dieses Update enthält Änderungen daran, wie wir Ihre Daten behandeln. Bitte überprüfen Sie die oben genannten Änderungen und bestätigen Sie Ihr Verständnis.",
       "acknowledge": "Ich verstehe und erkenne die Änderungen der Datenschutzbestimmungen in diesem Update an"
     }
+  },
+  "rating": {
+    "reviews": "Bewertungen",
+    "yourRating": "Ihre Bewertung",
+    "rateThis": "Bewerten Sie diese Übung",
+    "addReview": "Bewertung hinzufügen",
+    "hideReview": "Bewertung ausblenden",
+    "reviewPlaceholder": "Schreiben Sie Ihre Bewertung (optional)...",
+    "characters": "Zeichen",
+    "submitError": "Fehler beim Einreichen der Bewertung",
+    "submitting": "Wird eingereicht...",
+    "loginToRate": "Melden Sie sich an, um Übungen zu bewerten und zu überprüfen"
   }
 }

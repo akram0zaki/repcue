@@ -626,5 +626,17 @@
       "message": "Esta actualización incluye cambios en la forma en que manejamos sus datos. Revise los cambios anteriores y confirme su comprensión.",
       "acknowledge": "Entiendo y reconozco los cambios en la privacidad en esta actualización"
     }
+  },
+  "rating": {
+    "reviews": "Reseñas",
+    "yourRating": "Tu calificación",
+    "rateThis": "Califica este ejercicio",
+    "addReview": "Agregar Reseña",
+    "hideReview": "Ocultar Reseña",
+    "reviewPlaceholder": "Escriba su reseña (opcional)...",
+    "characters": "caracteres",
+    "submitError": "Error al enviar la reseña",
+    "submitting": "Enviando...",
+    "loginToRate": "Inicie sesión para calificar y revisar ejercicios"
   }
 }

@@ -559,7 +559,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   id="sort-select"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
-                  className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px]"
+                  className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px] rtl:text-right rtl:pr-8 rtl:pl-2.5"
                 >
                   <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
                   <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>

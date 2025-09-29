@@ -145,5 +145,6 @@
   "viewDetailsAria": "View exercise details",
   "visibility": "Visibility",
   "searchPlaceholder": "Search by name, description, or tag...",
-  "favoritesOnly": "Favorites Only"
+  "favoritesOnly": "Favorites Only",
+  "ratingsAndReviews": "Ratings & Reviews"
 }

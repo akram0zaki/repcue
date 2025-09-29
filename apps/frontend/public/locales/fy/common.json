@@ -626,5 +626,17 @@
       "message": "Dizze update omfettet wizigingen yn hoe’t wy jo gegevens behannelje. Lês de wizigingen hjirboppe troch en befêstigje jo begryp.",
       "acknowledge": "Ik begryp en erken de privacy­wizigingen yn dizze update"
     }
+  },
+  "rating": {
+    "reviews": "beoardielingen",
+    "yourRating": "Dyn beoardieling",
+    "rateThis": "Beoardielje dizze oefening",
+    "addReview": "Beoardieling tafoegje",
+    "hideReview": "Beoardieling ferbergje",
+    "reviewPlaceholder": "Skriuw dyn beoardieling (opsjoneel)...",
+    "characters": "tekens",
+    "submitError": "It ynstjoeren fan de beoardieling is mislearre",
+    "submitting": "Oan it ynstjoeren...",
+    "loginToRate": "Meld dy oan om oefeningen te beoardieljen en te besjen"
   }
 }

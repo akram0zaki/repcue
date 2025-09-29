@@ -219,33 +219,33 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Get exercise category color
+  // Get exercise category color per style guide
   const getCategoryColor = (exercise_id: string): string => {
     const exercise = exercises.find(ex => ex.id === exercise_id);
-    if (!exercise) return 'bg-gray-100 dark:bg-gray-700';
-    
+    if (!exercise) return 'bg-gray-100 dark:bg-gray-200';
+
     switch (exercise.category) {
-      case ExerciseCategory.CORE: return 'bg-blue-100 dark:bg-blue-900/30';
-      case ExerciseCategory.STRENGTH: return 'bg-red-100 dark:bg-red-900/30';
-      case ExerciseCategory.CARDIO: return 'bg-green-100 dark:bg-green-900/30';
-      case ExerciseCategory.FLEXIBILITY: return 'bg-purple-100 dark:bg-purple-900/30';
-      case ExerciseCategory.BALANCE: return 'bg-yellow-100 dark:bg-yellow-900/30';
-      default: return 'bg-gray-100 dark:bg-gray-700';
+      case ExerciseCategory.CORE: return 'bg-blue-100 dark:bg-blue-200';
+      case ExerciseCategory.STRENGTH: return 'bg-red-100 dark:bg-red-200';
+      case ExerciseCategory.CARDIO: return 'bg-green-100 dark:bg-green-200';
+      case ExerciseCategory.FLEXIBILITY: return 'bg-purple-100 dark:bg-purple-200';
+      case ExerciseCategory.BALANCE: return 'bg-yellow-100 dark:bg-yellow-200';
+      default: return 'bg-gray-100 dark:bg-gray-200';
     }
   };
 
-  // Get exercise category text color
+  // Get exercise category text color per style guide
   const getCategoryTextColor = (exercise_id: string): string => {
     const exercise = exercises.find(ex => ex.id === exercise_id);
-    if (!exercise) return 'text-gray-600 dark:text-gray-400';
-    
+    if (!exercise) return 'text-gray-800 dark:text-gray-900';
+
     switch (exercise.category) {
-      case ExerciseCategory.CORE: return 'text-blue-700 dark:text-blue-300';
-      case ExerciseCategory.STRENGTH: return 'text-red-700 dark:text-red-300';
-      case ExerciseCategory.CARDIO: return 'text-green-700 dark:text-green-300';
-      case ExerciseCategory.FLEXIBILITY: return 'text-purple-700 dark:text-purple-300';
-      case ExerciseCategory.BALANCE: return 'text-yellow-700 dark:text-yellow-300';
-      default: return 'text-gray-600 dark:text-gray-400';
+      case ExerciseCategory.CORE: return 'text-blue-800 dark:text-blue-900';
+      case ExerciseCategory.STRENGTH: return 'text-red-800 dark:text-red-900';
+      case ExerciseCategory.CARDIO: return 'text-green-800 dark:text-green-900';
+      case ExerciseCategory.FLEXIBILITY: return 'text-purple-800 dark:text-purple-900';
+      case ExerciseCategory.BALANCE: return 'text-yellow-800 dark:text-yellow-900';
+      default: return 'text-gray-800 dark:text-gray-900';
     }
   };
 
@@ -311,7 +311,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               </h2>
               <button
                 onClick={() => setShowStatsCard(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="btn-neutral p-1"
                 aria-label={t('activity.closeStatsAria')}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,31 +322,31 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {stats.totalWorkouts}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.totalWorkouts')}</div>
+                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.totalWorkouts')}</div>
               </div>
-              
+
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {formatDuration(stats.total_duration)}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.totalTime')}</div>
+                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.totalTime')}</div>
               </div>
-              
+
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {stats.currentStreak}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.dayStreak')}</div>
+                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.dayStreak')}</div>
               </div>
-              
+
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                   {stats.thisWeekWorkouts}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">{t('activity.thisWeek')}</div>
+                <div className="text-xs text-text-600 dark:text-text-400">{t('activity.thisWeek')}</div>
               </div>
             </div>
             

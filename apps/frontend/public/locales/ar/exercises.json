@@ -171,11 +171,14 @@
   "categoryShort": "فئة",
   "sortBy": "ترتيب حسب:",
   "sortByShort": "ترتيب:",
+  "sortName": "الاسم",
   "sortType": "النوع",
+  "sortRecentlyAdded": "المُضاف حديثاً",
   "filterAll": "الكل",
   "filterBuiltIn": "مدمج",
   "filterCustom": "مخصص",
   "favoritesOnly": "المفضلة فقط",
   "searchPlaceholder": "ابحث بالاسم أو الوصف أو العلامة...",
-  "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}"
+  "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}",
+  "ratingsAndReviews": "التقييمات والمراجعات"
 }

@@ -681,5 +681,17 @@
       "message": "Cette mise à jour comprend des modifications concernant la manière dont nous gérons vos données. Veuillez examiner les changements ci-dessus et confirmer votre compréhension.",
       "acknowledge": "Je comprends et reconnais les changements de confidentialité dans cette mise à jour"
     }
+  },
+  "rating": {
+    "reviews": "Avis",
+    "yourRating": "Votre note",
+    "rateThis": "Évaluer cet exercice",
+    "addReview": "Ajouter un avis",
+    "hideReview": "Masquer la revue",
+    "reviewPlaceholder": "Écrivez votre avis (facultatif)...",
+    "characters": "caractères",
+    "submitError": "Échec de l'envoi de la note",
+    "submitting": "Envoi en cours...",
+    "loginToRate": "Connectez-vous pour évaluer et commenter les exercices"
   }
 }

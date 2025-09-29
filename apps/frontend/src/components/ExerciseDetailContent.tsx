@@ -10,7 +10,6 @@ import {
   EditIcon,
 } from './icons/NavigationIcons';
 import { ExerciseRating } from './ExerciseRating';
-import { CopyExerciseButton } from './CopyExerciseButton';
 import { localizeExercise } from '../utils/localizeExercise';
 import { getExerciseById } from '../data/exercises';
 
@@ -177,14 +176,6 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               <span>{t('exercises:startTimer', 'Start Timer')}</span>
             </button>
 
-            {!isOwner && (
-              <CopyExerciseButton
-                exerciseId={exercise.id}
-                exerciseName={exercise.name}
-                size="md"
-                variant="secondary"
-              />
-            )}
           </div>
         )}
       </div>

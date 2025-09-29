@@ -24,6 +24,7 @@ const WorkoutsPage: React.FC = () => {
       if (consent) {
         try {
           const allWorkouts = await storageService.getWorkouts();
+          logger.debug('WorkoutsPage: Loaded workouts:', allWorkouts);
           setWorkouts(allWorkouts);
         } catch (error) {
           logger.error('Failed to load workouts:', error);
@@ -173,7 +174,7 @@ const WorkoutsPage: React.FC = () => {
                 <div className="mt-4">
                   <button
                     onClick={() => navigate(Routes.SETTINGS)}
-                    className="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="btn-secondary px-4 py-2 text-sm"
                   >
                     {t('common.goToSettings')}
                   </button>
@@ -195,7 +196,7 @@ const WorkoutsPage: React.FC = () => {
           </h1>
           <button
             onClick={handleCreateWorkout}
-            className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="btn-primary"
           >
             {t('workouts.createWorkout')}
           </button>
@@ -216,7 +217,7 @@ const WorkoutsPage: React.FC = () => {
             </p>
             <button
               onClick={handleCreateWorkout}
-              className="bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              className="btn-primary"
             >
               {t('workouts.createFirstWorkout')}
             </button>
@@ -232,7 +233,7 @@ const WorkoutsPage: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-lg font-semibold text-text-900 dark:text-text-50 truncate">
-                        {workout.name}
+                        {workout.name || `[No Name - ID: ${workout.id}]`}
                       </h3>
                       {!workout.is_active && (
                         <span className="px-2 py-1 text-xs font-medium bg-surface-100 dark:bg-surface-700 text-text-600 dark:text-text-400 rounded">
@@ -252,7 +253,7 @@ const WorkoutsPage: React.FC = () => {
                     <button
                       onClick={() => handleStartWorkout(workout)}
                       disabled={!workout.is_active}
-                      className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-md transition-colors"
+                      className="btn-primary px-3 py-2 text-sm"
                       title={workout.is_active ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
                     >
                       <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +263,7 @@ const WorkoutsPage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleEditWorkout(workout.id)}
-                      className="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-dark-disabled rounded-md transition-colors"
+                      className="btn-neutral p-2"
                       title={t('workouts.editWorkout')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +272,7 @@ const WorkoutsPage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(workout.id)}
-                      className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                      className="btn-danger p-2"
                       title={t('workouts.deleteWorkout')}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -310,13 +311,13 @@ const WorkoutsPage: React.FC = () => {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleDeleteWorkout(workout.id)}
-                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors"
+                        className="btn-danger px-3 py-1.5 text-sm"
                       >
                         {t('workouts.delete')}
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(null)}
-                        className="px-3 py-1.5 bg-surface-200 hover:bg-surface-300 dark:bg-surface-700 dark:hover:bg-surface-600 text-text-800 dark:text-text-200 text-sm font-medium rounded transition-colors"
+                        className="btn-secondary px-3 py-1.5 text-sm"
                       >
                         {t('common.cancel')}
                       </button>
