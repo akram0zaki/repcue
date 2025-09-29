@@ -429,7 +429,7 @@ const EditWorkoutPage: React.FC = () => {
                             setScheduledDays(prev => [...prev, day]);
                           }
                         }}
-                        className={`p-2 text-xs font-medium rounded-lg border transition-colors ${
+                        className={`px-1 py-2 text-xs font-medium rounded-lg border transition-colors min-w-0 text-center ${
                           isSelected
                             ? 'bg-blue-600 text-white border-blue-600'
                             : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
