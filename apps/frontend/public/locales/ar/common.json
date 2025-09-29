@@ -384,7 +384,16 @@
       "streakDay": "{{count}} يوم",
       "averageWorkouts": "{{count}} متوسط تمارين/أسبوع",
       "totalInPeriod": "{{count}} إجمالي التمارين",
-      "weekNumber": "الأسبوع {{week}}"
+      "weekNumber": "الأسبوع {{week}}",
+      "periodSummary": "فترة {{weeks}} أسابيع",
+      "workoutFrequency": "تردد التمارين",
+      "workoutsPerWeek": "تمارين في الأسبوع",
+      "maxWorkouts": "{{count}} الحد الأقصى",
+      "workoutCount": "{{count}} تمرين",
+      "workoutCount_plural": "{{count}} تمارين",
+      "avgPerWeek": "متوسط/أسبوع",
+      "avgPerPeriod": "متوسط/فترة",
+      "noDataForRange": "لا توجد بيانات تمارين لهذه الفترة"
     }
   },
   "exercises": {

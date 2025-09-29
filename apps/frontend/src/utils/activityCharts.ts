@@ -166,6 +166,50 @@ export const getWeeklyProgressData = (
 };
 
 /**
+ * Group weekly data into larger periods to fit chart container
+ */
+export const groupProgressData = (
+  weeklyData: WeeklyProgressData[], 
+  maxBars: number = 8
+): { data: WeeklyProgressData[], groupSize: number, unit: 'week' | 'period' } => {
+  if (weeklyData.length <= maxBars) {
+    return { data: weeklyData, groupSize: 1, unit: 'week' };
+  }
+  
+  // Calculate optimal group size
+  const groupSize = Math.ceil(weeklyData.length / maxBars);
+  const groupedData: WeeklyProgressData[] = [];
+  
+  for (let i = 0; i < weeklyData.length; i += groupSize) {
+    const group = weeklyData.slice(i, i + groupSize);
+    
+    const groupedWeek: WeeklyProgressData = {
+      weekStart: group[0].weekStart,
+      weekEnd: group[group.length - 1].weekEnd,
+      workoutCount: group.reduce((sum, week) => sum + week.workoutCount, 0),
+      totalDuration: group.reduce((sum, week) => sum + week.totalDuration, 0)
+    };
+    
+    groupedData.push(groupedWeek);
+  }
+  
+  return { data: groupedData, groupSize, unit: 'period' };
+};
+
+/**
+ * Get optimized chart data with intelligent grouping
+ */
+export const getOptimizedChartData = (
+  logs: ActivityLog[], 
+  startDate: Date, 
+  endDate: Date,
+  maxBars: number = 8
+) => {
+  const weeklyData = getWeeklyProgressData(logs, startDate, endDate);
+  return groupProgressData(weeklyData, maxBars);
+};
+
+/**
  * Get date range options for progress chart
  */
 export const getDateRangeOptions = (logs: ActivityLog[]) => {
@@ -205,4 +249,21 @@ export const formatWeekRange = (weekStart: Date, locale?: string): string => {
   
   // Same month, just show "Jan 1-7"
   return `${weekStart.toLocaleDateString(locale, { month: 'short' })} ${weekStart.getDate()}-${weekEnd.getDate()}`;
+};
+
+/**
+ * Format period range for grouped data display
+ */
+export const formatPeriodRange = (
+  startDate: Date, 
+  endDate: Date, 
+  locale?: string
+): string => {
+  const options: Intl.DateTimeFormatOptions = { 
+    month: 'short', 
+    day: 'numeric' 
+  };
+  
+  // Always show both dates for periods
+  return `${startDate.toLocaleDateString(locale, options)} - ${endDate.toLocaleDateString(locale, options)}`;
 };

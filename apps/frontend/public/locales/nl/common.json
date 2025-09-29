@@ -361,7 +361,16 @@
       "streakDay": "{{count}} dag",
       "averageWorkouts": "{{count}} gem. trainingen/week",
       "totalInPeriod": "{{count}} totale trainingen",
-      "weekNumber": "Week {{week}}"
+      "weekNumber": "Week {{week}}",
+      "periodSummary": "{{weeks}}-weken periode",
+      "workoutFrequency": "Trainingsfrequentie",
+      "workoutsPerWeek": "Trainingen per Week",
+      "maxWorkouts": "{{count}} max",
+      "workoutCount": "{{count}} training",
+      "workoutCount_plural": "{{count}} trainingen",
+      "avgPerWeek": "Gem/week",
+      "avgPerPeriod": "Gem/periode",
+      "noDataForRange": "Geen trainingsdata voor deze periode"
     }
   },
   "exercises": {

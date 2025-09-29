@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ActivityLog } from '../types';
-import { getWeeklyProgressData, getDateRangeOptions, formatWeekRange } from '../utils/activityCharts';
+import { getOptimizedChartData, getDateRangeOptions, formatWeekRange, formatPeriodRange } from '../utils/activityCharts';
 
 interface ProgressChartProps {
   logs: ActivityLog[];
@@ -15,14 +15,24 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
 
   const dateRanges = useMemo(() => getDateRangeOptions(logs), [logs]);
 
-  const chartData = useMemo(() => {
+  const chartResult = useMemo(() => {
     const range = dateRanges[selectedRange];
-    return getWeeklyProgressData(logs, range.start, range.end);
+    return getOptimizedChartData(logs, range.start, range.end, 8);
   }, [logs, selectedRange, dateRanges]);
+
+  const { data: chartData, groupSize, unit } = chartResult;
 
   const maxWorkouts = useMemo(() => {
     return Math.max(...chartData.map(week => week.workoutCount), 1);
   }, [chartData]);
+
+  // Dynamic chart title based on grouping
+  const chartTitle = useMemo(() => {
+    if (unit === 'period' && groupSize > 1) {
+      return t('common:activity.charts.workoutFrequency', { defaultValue: 'Workout Frequency' });
+    }
+    return t('common:activity.charts.workoutsPerWeek', { defaultValue: 'Workouts per Week' });
+  }, [unit, groupSize, t]);
 
   const formatDuration = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -62,7 +72,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-text-900 dark:text-text-50">
-          {t('activity.workoutsPerWeek', { defaultValue: 'Workouts per week' })}
+          {chartTitle}
         </h3>
         
         {/* Time range selector */}
@@ -77,7 +87,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
-              {t(`activity.timeRange.${key}`, { defaultValue: range.label })}
+              {t(`common:activity.charts.${key}`, { defaultValue: range.label })}
             </button>
           ))}
         </div>
@@ -101,19 +111,30 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
                   />
                 </div>
                 
-                {/* Week label */}
+                {/* Period label */}
                 <div className="text-xs text-gray-500 dark:text-gray-400 text-center leading-tight">
-                  {formatWeekRange(week.weekStart, locale)}
+                  {unit === 'period' && groupSize > 1 
+                    ? formatPeriodRange(week.weekStart, week.weekEnd, locale)
+                    : formatWeekRange(week.weekStart, locale)
+                  }
                 </div>
                 
                 {/* Tooltip on hover */}
                 <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded-lg px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
                   <div className="font-medium">
-                    {t('activity.workoutCount', { 
+                    {t('common:activity.charts.workoutCount', { 
                       count: week.workoutCount,
                       defaultValue: `${week.workoutCount} workout${week.workoutCount !== 1 ? 's' : ''}` 
                     })}
                   </div>
+                  {unit === 'period' && groupSize > 1 && (
+                    <div className="text-gray-300 dark:text-gray-600">
+                      {t('common:activity.charts.periodSummary', { 
+                        weeks: groupSize,
+                        defaultValue: `${groupSize}-week period` 
+                      })}
+                    </div>
+                  )}
                   {week.totalDuration > 0 && (
                     <div className="text-gray-300 dark:text-gray-600">
                       {formatDuration(week.totalDuration)}
@@ -130,7 +151,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 px-2">
             <span>0</span>
             <span className="text-primary-600 dark:text-primary-400 font-medium">
-              {t('activity.maxWorkouts', { 
+              {t('common:activity.charts.maxWorkouts', { 
                 count: maxWorkouts,
                 defaultValue: `${maxWorkouts} max` 
               })}
@@ -145,7 +166,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
                   {chartData.reduce((sum, week) => sum + week.workoutCount, 0)}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('activity.totalWorkouts', { defaultValue: 'Total' })}
+                  {t('common:activity.totalWorkouts', { defaultValue: 'Total' })}
                 </div>
               </div>
               
@@ -157,7 +178,10 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
                   ) / 10}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('activity.avgPerWeek', { defaultValue: 'Avg/week' })}
+                  {unit === 'period' && groupSize > 1 
+                    ? t('common:activity.charts.avgPerPeriod', { defaultValue: 'Avg/period' })
+                    : t('common:activity.charts.avgPerWeek', { defaultValue: 'Avg/week' })
+                  }
                 </div>
               </div>
               
@@ -166,7 +190,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
                   {formatDuration(chartData.reduce((sum, week) => sum + week.totalDuration, 0))}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('activity.totalTime', { defaultValue: 'Total time' })}
+                  {t('common:activity.totalTime', { defaultValue: 'Total time' })}
                 </div>
               </div>
             </div>
@@ -180,7 +204,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
             </svg>
           </div>
           <p className="text-gray-500 dark:text-gray-400">
-            {t('activity.noDataForRange', { defaultValue: 'No workout data for this time range' })}
+            {t('common:activity.charts.noDataForRange', { defaultValue: 'No workout data for this time range' })}
           </p>
         </div>
       )}

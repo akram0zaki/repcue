@@ -357,6 +357,8 @@
       "weeklyStreak": "Weekly Streak",
       "currentStreak": "Current Streak",
       "progressChart": "Progress Chart",
+      "workoutFrequency": "Workout Frequency",
+      "workoutsPerWeek": "Workouts per Week",
       "currentMonth": "Current Month",
       "last3Months": "Last 3 Months",
       "sinceStart": "Since Start",
@@ -370,7 +372,14 @@
       "streakDay": "{{count}} day",
       "averageWorkouts": "{{count}} avg. workouts/week",
       "totalInPeriod": "{{count}} total workouts",
-      "weekNumber": "Week {{week}}"
+      "weekNumber": "Week {{week}}",
+      "periodSummary": "{{weeks}}-week period",
+      "maxWorkouts": "{{count}} max",
+      "workoutCount": "{{count}} workout",
+      "workoutCount_plural": "{{count}} workouts",
+      "avgPerWeek": "Avg/week",
+      "avgPerPeriod": "Avg/period",
+      "noDataForRange": "No workout data for this time range"
     }
   },
   "exercises": {
