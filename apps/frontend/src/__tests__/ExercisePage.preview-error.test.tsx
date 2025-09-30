@@ -108,6 +108,12 @@ vi.mock('../hooks/useRTLDetection', () => ({
 // Mock fetch HEAD precheck responses
 const originalFetch: typeof fetch | undefined = (global as any).fetch as any;
 beforeEach(() => {
+  // Mock setTimeout for test environment
+  global.setTimeout = vi.fn((fn: Function) => {
+    fn();
+    return 0 as any;
+  });
+
   // Default: 404 for our missing asset
   // @ts-expect-error node types
   global.fetch = vi.fn(async (url: string, init?: RequestInit) => {
@@ -119,6 +125,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   (global as any).fetch = originalFetch as any;
+  vi.restoreAllMocks();
 });
 
 describe('ExercisePage preview error handling', () => {

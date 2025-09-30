@@ -111,18 +111,32 @@ describe('UpdateService', () => {
       })),
     });
 
-    // Mock service worker
-    Object.defineProperty(navigator, 'serviceWorker', {
-      value: {
+    // Mock service worker - check if it exists first
+    if (!navigator.serviceWorker) {
+      Object.defineProperty(navigator, 'serviceWorker', {
+        value: {
+          ready: Promise.resolve({
+            addEventListener: vi.fn(),
+            waiting: null,
+            update: vi.fn()
+          } as Partial<ServiceWorkerRegistration>),
+          addEventListener: vi.fn()
+        },
+        writable: true,
+        configurable: true
+      });
+    } else {
+      // If it exists, just mock its methods
+      const mockServiceWorker = {
         ready: Promise.resolve({
           addEventListener: vi.fn(),
           waiting: null,
           update: vi.fn()
         } as Partial<ServiceWorkerRegistration>),
         addEventListener: vi.fn()
-      },
-      writable: true
-    });
+      };
+      Object.assign(navigator.serviceWorker, mockServiceWorker);
+    }
 
     // Mock document and window events
     vi.spyOn(document, 'addEventListener');
@@ -134,7 +148,9 @@ describe('UpdateService', () => {
   });
 
   afterEach(() => {
-    updateService.destroy();
+    if (updateService && typeof updateService.destroy === 'function') {
+      updateService.destroy();
+    }
     vi.restoreAllMocks();
   });
 

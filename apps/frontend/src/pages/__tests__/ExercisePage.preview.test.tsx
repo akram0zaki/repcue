@@ -110,6 +110,7 @@ describe('ExercisePage - video preview', () => {
   beforeEach(() => {
     // Enable video demos for this test
     (window as any).__VIDEO_DEMOS_DISABLED__ = false;
+
     // Mock HEAD precheck as success so preview opens
     const originalFetch: typeof fetch | undefined = (globalThis as any).fetch as any;
     (globalThis as any).__origFetch = originalFetch;
@@ -123,6 +124,7 @@ describe('ExercisePage - video preview', () => {
   afterEach(() => {
     (globalThis as any).fetch = (globalThis as any).__origFetch;
     delete (globalThis as any).__origFetch;
+    vi.restoreAllMocks();
   });
 
   const baseExercise = {
