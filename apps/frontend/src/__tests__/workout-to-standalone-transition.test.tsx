@@ -104,7 +104,7 @@ describe('Workout to Standalone Exercise Transition', () => {
     // Should NOT show workout-specific elements
     expect(screen.queryByText(/Exercise \d+\/\d+/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Upper Body Workout/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Workout Controls/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\d+\/\d+/)).not.toBeInTheDocument(); // No workout progress indicator
     
     // Should show standard timer controls for standalone exercise
     expect(screen.getByText('Plank')).toBeInTheDocument();
@@ -114,17 +114,17 @@ describe('Workout to Standalone Exercise Transition', () => {
 
   it('should show workout elements when workoutMode is present', () => {
     render(
-      <TimerPage 
-        {...defaultProps} 
+      <TimerPage
+        {...defaultProps}
         timerState={workoutTimerState}
       />
     );
 
     // Should show workout-specific elements
     expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
-    
-    // Should show workout controls section
-    expect(screen.getByText('Workout Controls')).toBeInTheDocument();
+
+    // Should show workout progress indicator (get the first one, which should be in the blue header)
+    expect(screen.getAllByText(/1\/1/)[0]).toBeInTheDocument(); // Workout progress indicator
   });
 
   it('should verify the timer state clearing fix is working', () => {

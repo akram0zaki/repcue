@@ -4,15 +4,18 @@ import React from 'react';
 import '../i18n';
 import AppShell from '../components/AppShell';
 import { MemoryRouter } from 'react-router-dom';
+import { SnackbarProvider } from '../components/SnackbarProvider';
 
 describe('i18n initialization (Phase 2)', () => {
   it('renders AppShell with localized a11y strings', () => {
     render(
-      <MemoryRouter>
-        <AppShell>
-          <div>Test</div>
-        </AppShell>
-      </MemoryRouter>
+      <SnackbarProvider>
+        <MemoryRouter>
+          <AppShell>
+            <div>Test</div>
+          </AppShell>
+        </MemoryRouter>
+      </SnackbarProvider>
     );
 
     // Skip link text should come from i18n (fallback to defaultValue if not yet loaded)

@@ -12,7 +12,7 @@ function readJson(file: string) {
 }
 
 function getLocaleFile(lng: string) {
-  return path.resolve(process.cwd(), 'public', 'locales', lng, 'exercises.json');
+  return path.resolve(process.cwd(), 'public', 'locales', lng, 'exerciseDetails.json');
 }
 
 describe('exercise locales coverage', () => {
@@ -21,7 +21,7 @@ describe('exercise locales coverage', () => {
     // Only treat object entries as exercises (exclude helper strings/meta)
     // Exercise entries have both 'name' and 'description' properties, unlike utility keys
     const exerciseIds = Object.keys(en).filter(k => {
-      if (k.startsWith('_') || k === 'variable' || k === 'tags') return false;
+      if (k.startsWith('_')) return false; // Skip meta entries
       const entry = (en as any)[k];
       // Must be an object with both 'name' and 'description' to be considered an exercise
       return typeof entry === 'object' && entry.name && entry.description;
@@ -31,7 +31,6 @@ describe('exercise locales coverage', () => {
 
     for (const lng of LOCALES) {
       const json = readJson(getLocaleFile(lng));
-      expect(typeof json.variable, `Missing 'variable' key in ${lng}`).toBe('string');
       for (const id of exerciseIds) {
         const entry = (json as any)[id];
         expect(entry, `Missing '${id}' in ${lng}`).toBeTruthy();
