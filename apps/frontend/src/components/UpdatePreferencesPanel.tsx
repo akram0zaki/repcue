@@ -153,7 +153,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
       {/* Update Mode Selection */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">
+          <h3 className="section-subtitle mb-3">
             {t('settings.updateModeTitle', 'Update Behavior')}
           </h3>
 
@@ -254,7 +254,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
 
         {/* Metered Connection Settings */}
   <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">
+          <h3 className="section-subtitle mb-3">
             {t('settings.meteredConnection', 'Data Usage')}
           </h3>
 
@@ -307,7 +307,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
 
         {/* Additional Preferences */}
   <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-          <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">
+          <h3 className="section-subtitle mb-3">
             {t('settings.additionalPreferences', 'Additional Options')}
           </h3>
 

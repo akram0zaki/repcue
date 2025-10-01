@@ -575,7 +575,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             
             {/* Data Export */}
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-text-700 dark:text-text-300 mb-2">
+              <h3 className="section-subtitle mb-3">
                 {t('settings.exportYourData')}
               </h3>
               <DataExportButton className="w-full" />
@@ -583,7 +583,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
             {/* Account Deletion */}
             <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
-              <h3 className="text-sm font-medium text-text-700 dark:text-text-300 mb-2">
+              <h3 className="section-subtitle mb-3">
                 {t('settings.deleteAccount')}
               </h3>
               <button
@@ -592,7 +592,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               >
                 {t('settings.deleteMyAccount')}
               </button>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs help-text mt-1">
                 {t('settings.deleteAccountHelp')}
               </p>
             </div>

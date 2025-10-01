@@ -1,5 +1,19 @@
 ## Unreleased
 
+### 2025-10-01 (Settings Page Styling Consistency)
+#### Fixed
+- **Security & Privacy Section Dark Mode**: Fixed unreadable labels in dark mode
+  - Labels "Export Your Data" and "Delete Account" were dim (`text-text-700 dark:text-text-300`)
+  - Now use `section-subtitle` utility class for consistency with other sections
+  - Matches readability of "Update Behavior" and other section headers
+#### Added
+- **Centralized Styling Utilities**: Created utility classes in index.css for Settings page consistency
+  - `.label-text`: Standard label styling (`text-text-800 dark:text-text-100 font-medium`)
+  - `.help-text`: Standard help text styling (`text-gray-500 dark:text-gray-400`)
+  - `.section-subtitle`: Standard section subtitle styling (`text-base font-medium text-gray-900 dark:text-gray-100`)
+  - All Settings page components now use centralized classes instead of inline styles
+  - Single source of truth for styling makes future updates easier and ensures consistency
+
 ### 2025-10-01 (Comprehensive RTL Spacing Fixes)
 #### Fixed
 - **Settings Page RTL Spacing**: Systematic fix for all RTL spacing issues across Settings page and related components

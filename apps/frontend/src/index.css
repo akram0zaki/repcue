@@ -472,6 +472,19 @@ body.rtl .truncate {
     font-weight: 500;
   }
 
+  /* Settings page utilities */
+  .label-text {
+    @apply text-text-800 dark:text-text-100 font-medium;
+  }
+
+  .help-text {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  .section-subtitle {
+    @apply text-base font-medium text-gray-900 dark:text-gray-100;
+  }
+
   /* RTL-aware utilities */
   .text-start-rtl {
     @apply text-left rtl:text-right;
