@@ -124,9 +124,9 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
 
       {/* Privacy Notice */}
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-3 mb-4">
-        <div className="flex items-start">
+        <div className="flex items-start gap-2">
           <svg
-            className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2 mt-0.5 flex-shrink-0"
+            className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -159,14 +159,14 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
 
           <div className="space-y-3">
             {/* Automatic Updates */}
-            <label className="flex items-start p-3 rounded-lg border-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 relative">
+            <label className="flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 relative">
               <input
                 type="radio"
                 name="updateMode"
                 value="automatic"
                 checked={preferences.updateMode === 'automatic'}
                 onChange={() => handleUpdateModeChange('automatic')}
-                className="mt-1 mr-3 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                className="mt-1 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2 flex-shrink-0"
               />
               <div className="flex-1">
                 <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -182,14 +182,14 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
             </label>
 
             {/* Notify Only */}
-            <label className="flex items-start p-3 rounded-lg border-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 relative">
+            <label className="flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 relative">
               <input
                 type="radio"
                 name="updateMode"
                 value="notify"
                 checked={preferences.updateMode === 'notify'}
                 onChange={() => handleUpdateModeChange('notify')}
-                className="mt-1 mr-3 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                className="mt-1 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2 flex-shrink-0"
               />
               <div className="flex-1">
                 <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -205,14 +205,14 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
             </label>
 
             {/* Manual Only */}
-            <label className="flex items-start p-3 rounded-lg border-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 relative">
+            <label className="flex items-start gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 relative">
               <input
                 type="radio"
                 name="updateMode"
                 value="manual"
                 checked={preferences.updateMode === 'manual'}
                 onChange={() => handleUpdateModeChange('manual')}
-                className="mt-1 mr-3 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                className="mt-1 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2 flex-shrink-0"
               />
               <div className="flex-1">
                 <div className="font-medium text-gray-900 dark:text-gray-100">
@@ -230,9 +230,9 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
 
           {/* Important Note for Security Updates */}
           <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3 mt-3">
-            <div className="flex items-start">
+            <div className="flex items-start gap-2">
               <svg
-                className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mr-2 mt-0.5 flex-shrink-0"
+                className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -300,7 +300,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
               onChange={() => handleMeteredUpdatesChange(!preferences.allowMeteredUpdates)}
               dataTestId="toggle-allow-metered-updates"
               label={t('settings.allowMeteredUpdates', 'Allow updates on metered connections')}
-              className="ml-4"
+              className="flex-shrink-0"
             />
           </div>
         </div>
@@ -327,7 +327,7 @@ export const UpdatePreferencesPanel: React.FC<UpdatePreferencesPanelProps> = ({
               onChange={() => handleShowChangelogChange(!preferences.showChangelog)}
               dataTestId="toggle-show-changelog"
               label={t('settings.showChangelog', 'Show what\'s new')}
-              className="ml-4"
+              className="flex-shrink-0"
             />
           </div>
         </div>

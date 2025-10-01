@@ -51,7 +51,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
       {isAuthenticated && user ? (
         <div className="space-y-3">
           {/* User Info */}
-          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
@@ -76,7 +76,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex space-x-3">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={onViewProfile}

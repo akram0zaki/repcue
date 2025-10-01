@@ -1,5 +1,47 @@
 ## Unreleased
 
+### 2025-10-01 (Comprehensive RTL Spacing Fixes)
+#### Fixed
+- **Settings Page RTL Spacing**: Systematic fix for all RTL spacing issues across Settings page and related components
+  - **ProfileSection**: Fixed profile and sign-out button spacing using `gap-3` instead of `space-x-3`
+  - **ProfileSection**: Fixed user info container spacing using `gap-3` for RTL-aware layout
+  - **UpdatePreferencesPanel**: Fixed all three radio button options (Automatic, Notify, Manual) spacing
+    - Changed from `mr-3` to `gap-3` on label containers for RTL-aware spacing
+    - Added `flex-shrink-0` to radio inputs to prevent shrinking in flex layout
+  - **UpdatePreferencesPanel**: Fixed Privacy Notice and Security Notice icon spacing using `gap-2`
+  - **UpdatePreferencesPanel**: Fixed toggle switch alignment using `flex-shrink-0` instead of `ml-4`
+  - **Root Cause**: All directional spacing (`ml-`, `mr-`, `space-x-`) replaced with RTL-aware alternatives
+  - **Solution**: Used flexbox `gap` and `flex-shrink-0` utilities which automatically adapt to RTL layout
+  - Settings page now displays correctly with proper spacing in Arabic and all RTL languages
+
+### 2025-10-01 (Navigation Menu Consistency Fix)
+#### Fixed
+- **Settings Menu Size**: Fixed oversized Settings button in navigation dropdown menu
+  - Reduced padding from `px-10 py-6` to `px-4 py-3` for consistency with other nav items
+  - Reduced text size from `text-lg` to `text-sm` to match navigation standards
+  - Settings menu now has consistent sizing with other navigation elements
+  - Maintains 56px minimum touch target height via `.nav-dropdown-item` CSS class
+- **RTL Settings Menu**: Fixed Arabic settings menu positioning and text alignment
+  - Fixed dropdown positioning in RTL mode: changed from `right: 50%; transform: translateX(50%)` to `left: 0`
+  - Added explicit `dir="rtl"` attribute to dropdown container for proper text direction
+  - Fixed text alignment to be right-aligned in RTL mode using `text-right` for Arabic
+  - Settings menu now appears correctly within viewport in Arabic layout
+  - Text properly right-aligns in RTL languages and left-aligns in LTR languages
+
+### 2025-10-01 (Mobile-First Design Philosophy Documentation)
+#### Updated
+- **UI Specifications**: Added comprehensive "Design Philosophy: Mobile-First & Space-Efficient" section
+  - **10 Core Principles**: Documented mobile-first, zero horizontal overflow, space efficiency, smart content fitting
+  - **Responsive Breakpoints**: Mobile (320px-767px), Tablet (768px+), Desktop (1024px+)
+  - **Layout Patterns**: Good/bad examples for information cards, modals, button groups
+  - **Testing Requirements**: Mandatory testing at 320px, 375px, 428px widths
+  - **Common Pitfalls**: Documented 8 mobile pitfalls to avoid
+  - **Touch Optimization**: 44px minimum touch targets, 8px spacing between elements
+  - **Space Efficiency**: Every pixel matters, eliminate unnecessary whitespace
+  - **Smart Fitting**: Truncation, stacking, collapsible sections, progressive disclosure
+  - **Component Sizing**: Mobile uses `w-full`, tablet uses `sm:w-auto`, desktop uses `lg:max-w-lg`
+  - **Zero Overflow**: Never allow horizontal scrolling on mobile devices
+
 ### 2025-10-01 (ExerciseSelector Bug Fixes)
 #### Fixed
 - **ExerciseSelectorModal Scrolling**: Fixed vertical scrolling issue where modal content was not scrollable
