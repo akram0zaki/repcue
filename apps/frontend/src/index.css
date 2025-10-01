@@ -474,7 +474,7 @@ body.rtl .truncate {
 
   /* Settings page utilities */
   .label-text {
-    @apply text-text-800 dark:text-text-100 font-medium;
+    @apply text-text-700 dark:text-text-100 font-medium;
   }
 
   .help-text {

@@ -219,7 +219,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           {/* Sound Enable/Disable */}
           <div className="flex items-center justify-between mb-3">
-            <label htmlFor="sound-enabled" className="text-text-800 dark:text-text-100 font-medium">
+            <label htmlFor="sound-enabled" className="label-text">
               {t('settings.enableSound')}
             </label>
             <ToggleSwitch
@@ -233,7 +233,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                     {/* Volume Control */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="beep-volume" className="text-text-800 dark:text-text-100 font-medium">
+              <label htmlFor="beep-volume" className="label-text">
                 {t('settings.beepVolume')}
               </label>
               <span className="text-sm text-text-500 dark:text-text-400">
@@ -260,7 +260,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
           {/* Vibration Enable/Disable */}
           <div className="flex items-center justify-between">
-            <label htmlFor="vibration-enabled" className="text-text-800 dark:text-text-100 font-medium">
+            <label htmlFor="vibration-enabled" className="label-text">
               {t('settings.enableVibration')}
             </label>
             <ToggleSwitch
@@ -281,7 +281,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           {/* Pre-Timer Countdown */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="pre-timer-countdown" className="text-text-800 dark:text-text-100 font-medium">
+              <label htmlFor="pre-timer-countdown" className="label-text">
                 {t('settings.preTimerCountdown')}
               </label>
               <span className="text-sm text-text-500 dark:text-text-400">
@@ -310,7 +310,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           {/* Interval Duration */}
           <div>
-            <label htmlFor="interval-duration" className="block text-text-800 dark:text-text-100 font-medium mb-2">
+            <label htmlFor="interval-duration" className="block label-text mb-2">
               {t('timer.beepInterval')}
             </label>
             <select
@@ -354,7 +354,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           {/* Dark Mode */}
           <div className="flex items-center justify-between mb-4">
-            <label htmlFor="dark-mode" className="text-text-800 dark:text-text-100 font-medium">
+            <label htmlFor="dark-mode" className="label-text">
               {t('settings.darkMode')}
             </label>
             <ToggleSwitch
@@ -366,7 +366,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
           {/* Exercise Demo Videos */}
   <div className="flex items-center justify-between mb-4" data-testid="setting-show-exercise-videos">
-            <label htmlFor="exercise-videos" className="text-text-800 dark:text-text-100 font-medium">
+            <label htmlFor="exercise-videos" className="label-text">
               {t('settings.showExerciseVideos')}
             </label>
             <ToggleSwitch
@@ -382,7 +382,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
           {/* Horizontal Exercise Layout */}
           <div className="flex items-center justify-between mt-6 mb-4" data-testid="setting-horizontal-exercise-layout">
-            <label htmlFor="horizontal-exercise-layout" className="text-text-800 dark:text-text-100 font-medium">
+            <label htmlFor="horizontal-exercise-layout" className="label-text">
               {t('settings.horizontalExerciseLayout')}
             </label>
             <ToggleSwitch
