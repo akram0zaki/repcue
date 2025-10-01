@@ -88,7 +88,7 @@ export const ExerciseSelectorModal: React.FC<ExerciseSelectorModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 p-4"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -116,12 +116,11 @@ export const ExerciseSelectorModal: React.FC<ExerciseSelectorModalProps> = ({
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 min-h-0 p-4">
+        {/* Content - scrollable area */}
+        <div className="flex-1 overflow-y-auto p-4">
           <ExerciseSelector
             {...selectorProps}
             onSelectExercise={handleSelectExercise}
-            className="h-full"
           />
         </div>
       </div>
