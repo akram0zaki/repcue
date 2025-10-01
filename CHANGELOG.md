@@ -1,5 +1,21 @@
 ## Unreleased
 
+### 2025-10-01 (Exercise Card Dark Mode Contrast Improvements)
+#### Fixed
+- **Custom Badge Contrast**: Improved dark mode readability following style guide recommendations
+  - **Background**: Changed from `dark:bg-primary-dark-disabled` to `dark:bg-primary-200` for proper contrast
+  - **Text Color**: Updated from `dark:text-primary-300` to `dark:text-primary-900` for WCAG compliance
+  - **Style Guide Alignment**: Now uses recommended badge pattern (`bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900`)
+- **Action Button Icons**: Enhanced visibility and contrast in dark mode
+  - **Edit Button**: Changed from `text-text-600 dark:text-text-400` to `text-text-700 dark:text-text-200`
+  - **Delete Button**: Updated icon color for better visibility in dark mode
+  - **Share Button**: Improved contrast with lighter gray in dark mode
+  - **Hover States**: Maintained vibrant hover colors (primary, red, green) for clear interaction feedback
+- **Duration/Details Text**: Improved readability of exercise type and duration information
+  - **Text Color**: Changed from `text-text-600 dark:text-text-400` to `text-text-800 dark:text-text-100`
+  - **Hierarchy**: Now uses "Primary Labels" tier from style guide for better prominence
+  - **Consistency**: Matches form labels and other primary text elements throughout the app
+
 ### 2025-10-01 (Exercise Form UI Improvements & Scroll Position Fixes)
 #### Fixed
 - **Exercise Form Layout**: Fixed overflow and layout issues across all input sections

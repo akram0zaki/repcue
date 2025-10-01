@@ -977,13 +977,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {/* Left Side - Exercise Details and Tags */}
             <div className="flex items-center gap-2">
               {/* Exercise Details - Left-aligned */}
-              <span className="text-sm font-medium text-text-600 dark:text-text-400">
+              <span className="text-sm font-medium text-text-800 dark:text-text-100">
                 {formatSimplifiedDetails(exercise)}
               </span>
               {/* Custom/Shared Tags */}
               <div className="flex items-center gap-1">
                 {isUserCreated && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-dark-disabled text-primary-800 dark:text-primary-300 rounded-full">
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 rounded-full">
                     {t('exercises:custom', { defaultValue: 'Custom' })}
                   </span>
                 )}
@@ -1002,7 +1002,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               {isUserCreated && onEdit && (
                 <button
                   onClick={() => onEdit(exercise)}
-                  className="flex-shrink-0 text-text-600 dark:text-text-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  className="flex-shrink-0 text-text-700 dark:text-text-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                   title={t('exercises:editExercise', { defaultValue: 'Edit exercise' })}
                   aria-label={t('exercises:editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
                 >
@@ -1014,7 +1014,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               {(isUserCreated || isSharedExerciseCard) && onDelete && (
                 <button
                   onClick={() => onDelete(exercise.id)}
-                  className="flex-shrink-0 text-text-600 dark:text-text-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  className="flex-shrink-0 text-text-700 dark:text-text-200 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                   title={t('exercises:deleteExercise', { defaultValue: 'Delete exercise' })}
                   aria-label={t('exercises:deleteExerciseAria', { name: loc.name, defaultValue: `Delete ${loc.name}` })}
                 >
@@ -1028,7 +1028,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   exerciseId={exercise.id}
                   exerciseName={loc.name}
                   ownerId={exercise.owner_id}
-                  className="flex-shrink-0 text-text-600 dark:text-text-400 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  className="flex-shrink-0 text-text-700 dark:text-text-200 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                 />
               )}
 
