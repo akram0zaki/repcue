@@ -313,13 +313,14 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                             // Workout entry with expandable exercises
                             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
                               <div 
-                                className="flex items-start justify-between cursor-pointer"
+                                className="cursor-pointer"
                                 onClick={() => toggleWorkoutExpansion(log.id)}
                               >
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-2">
+                                {/* Title row with badge in top-right */}
+                                <div className="grid grid-cols-[1fr,auto] gap-3 items-start mb-2">
+                                  <div className="flex items-center gap-2 min-w-0">
                                     <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
-                                    <h4 className="flex-1 min-w-0 text-h3 font-semibold text-text-900 dark:text-text-50">
+                                    <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 break-words">
                                       {(() => {
                                         // Prefer the known workout name if available
                                         const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
@@ -337,17 +338,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                         return fallback;
                                       })()}
                                     </h4>
-                                    <svg 
-                                      className={`w-5 h-5 shrink-0 text-gray-500 transition-transform ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
-                                      fill="none" 
-                                      stroke="currentColor" 
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
                                   </div>
                                   
-                                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900 whitespace-nowrap shrink-0">
+                                      {t('activity.workoutBadge')}
+                                  </div>
+                                </div>
+                                  
+                                {/* Metadata row with expand button */}
+                                <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                                     <div className="flex items-center gap-1 shrink-0">
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -369,10 +369,16 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       <span className="whitespace-nowrap">{t('activity.exerciseCount', { count: log.exercises?.length || 0 })}</span>
                                     </div>
                                   </div>
-                                </div>
-                                
-                                <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900">
-                                    {t('activity.workoutBadge')}
+                                  
+                                  {/* Expand/collapse button */}
+                                  <svg 
+                                    className={`w-5 h-5 text-gray-500 transition-transform shrink-0 ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                  </svg>
                                 </div>
                               </div>
                               
@@ -382,21 +388,21 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     <h5 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2">{t('activity.exercisesHeading')}</h5>
                                   <div className="space-y-2">
                                     {log.exercises.map((exercise, index) => (
-                                      <div key={index} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3">
-                                        <div className="flex items-center gap-2">
-                                          <span className={`inline-block w-2 h-2 rounded-full ${getCategoryColor(exercise.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}></span>
-                                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{(() => {
+                                      <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${getCategoryColor(exercise.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}></span>
+                                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words flex-1">{(() => {
                                             const ex = exercises.find(e => e.id === exercise.exercise_id);
                                             if (!ex) return exercise.exercise_name;
                                             const base = `${ex.id}`;
                                             return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                           })()}</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-500 dark:text-gray-400">
                                           {exercise.sets && exercise.reps && (
-                                            <span>{t('exercises:defaultSetsReps', { sets: exercise.sets, reps: exercise.reps })}</span>
+                                            <span className="whitespace-nowrap">{exercise.sets}×{exercise.reps}</span>
                                           )}
-                                          <span>{formatDuration(exercise.duration)}</span>
+                                          <span className="whitespace-nowrap">{formatDuration(exercise.duration)}</span>
                                         </div>
                                       </div>
                                     ))}

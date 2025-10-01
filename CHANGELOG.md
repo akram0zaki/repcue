@@ -1,5 +1,35 @@
 ## Unreleased
 
+### 2025-10-01 (Activity Log Badge Overlap & Exercise Duration Overflow Fixes)
+#### Fixed
+- **Workout Card Badge Overlap**: Completely resolved badge overlapping with workout name
+  - **Layout Restructure**: Moved expand/collapse chevron below exercise count metadata
+  - **Badge Repositioning**: Placed badge in top-right position for clear workout identification
+  - **Grid Layout**: Used CSS Grid (`grid-cols-[1fr,auto]`) for proper space allocation
+  - **Full Name Width**: Workout name now has full left column width without competition
+  - **Visual Hierarchy**: Clear separation between title area and metadata area
+  - **RTL/LTR Compatible**: Works correctly in both Arabic and English layouts
+- **Exercise Duration Overflow**: Fixed text overflow in expandable exercise list
+  - **Vertical Layout**: Changed to `flex-col` on mobile, `flex-row` on larger screens
+  - **Simplified Format**: Used compact `3×8` format instead of long Arabic translation
+  - **Better Spacing**: Responsive gaps (`gap-1` mobile, `gap-3` desktop)
+  - **Text Wrapping**: Added `break-words` for exercise names and `whitespace-nowrap` for metadata
+  - **Mobile Optimization**: Metadata stacks vertically on narrow screens
+
+### 2025-10-01 (Activity Log Workout Card Layout & Translation Improvements)
+#### Fixed
+- **Workout Card Chevron Placement**: Fixed expand/collapse button overlap with workout name
+  - **Layout Restructure**: Moved chevron icon outside the title flex container to prevent text overlap
+  - **English Version**: Chevron no longer overlaps with long workout names
+  - **Arabic Version**: Better visual spacing and RTL-aware positioning
+  - **Icon Grouping**: Chevron now grouped with badge in a flex container with proper gap spacing
+  - **Maintain Functionality**: Click area and expand/collapse behavior preserved
+- **Arabic Workout Badge Translation**: Changed badge text to better reflect workout vs exercise distinction
+  - **Standard Arabic**: Changed from "تمرين" (exercise) to "برنامج" (program/workout)
+  - **Egyptian Arabic**: Changed from "تمرين" to "برنامج" for consistency
+  - **Better Semantics**: Clearly differentiates workout entries from individual exercise entries
+  - **User Clarity**: More accurate terminology for Arabic-speaking users
+
 ### 2025-10-01 (Activity Log UI & i18n Fixes)
 #### Fixed
 - **Activity Log Time Range Selector**: Fixed Arabic translation for "3 Months" button

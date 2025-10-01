@@ -11,10 +11,10 @@
     "close": "إغلاق",
     "dismiss": "تجاهل",
     "retry": "إعادة المحاولة",
-    "attemptsLeft": "{{attempts}} attempt(s) remaining",
-    "forceReload": "Force Reload",
-    "maxRetries": "Maximum retry attempts reached",
-    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "attemptsLeft": "متبقٍ {{attempts}} محاولة",
+    "forceReload": "إعادة تحميل إجباري",
+    "maxRetries": "تم الوصول إلى الحد الأقصى لمحاولات إعادة المحاولة",
+    "retryAttempt": "محاولة إعادة رقم {{current}} من {{max}}",
     "and": "و",
     "loading": "تحميل...",
     "optional": "اختياري",
@@ -333,10 +333,10 @@
     "errorLoadingTitle": "خطأ في تحميل البرنامج",
     "backToWorkouts": "العودة إلى البرامج",
     "retry": "إعادة المحاولة",
-    "attemptsLeft": "{{attempts}} attempt(s) remaining",
-    "forceReload": "Force Reload",
-    "maxRetries": "Maximum retry attempts reached",
-    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "attemptsLeft": "متبقٍ {{attempts}} محاولة",
+    "forceReload": "إعادة تحميل إجباري",
+    "maxRetries": "تم الوصول إلى الحد الأقصى لمحاولات إعادة المحاولة",
+    "retryAttempt": "محاولة رقم {{current}} من {{max}}",
     "saveWorkout": "حفظ البرنامج"
   },
   "activity": {
@@ -354,7 +354,7 @@
     "noWorkoutsYet": "لا توجد تمارين بعد",
     "noCategoryWorkoutsYet": "لا توجد تمارين {{category}} بعد",
     "emptySubtitle": "ابدأ تمرينك الأول لرؤية نشاطك هنا",
-    "workoutBadge": "تمرين",
+    "workoutBadge": "برنامج",
     "exercisesHeading": "التمارين:",
     "exerciseCount_zero": "{{count}} تمرين",
     "exerciseCount_one": "{{count}} تمرين",
@@ -655,24 +655,24 @@
       "title": "فشل التحديث"
     },
     "retry": "إعادة محاولة التحديث",
-    "attemptsLeft": "{{attempts}} attempt(s) remaining",
-    "forceReload": "Force Reload",
-    "maxRetries": "Maximum retry attempts reached",
-    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "attemptsLeft": "متبقٍ {{attempts}} محاولة",
+    "forceReload": "إعادة تحميل إجباري",
+    "maxRetries": "تم الوصول إلى الحد الأقصى لمحاولات إعادة المحاولة",
+    "retryAttempt": "محاولة إعادة رقم {{current}} من {{max}}",
     "workout": {
       "title": "تم اكتشاف تمرين نشط",
       "message": "لديك تمرين نشط حاليًا. اختر كيفية التعامل معه قبل التحديث:",
       "save": "حفظ التمرين ومتابعة التحديث",
-      "abandon": "Abandon Workout & Update",
-      "abandoning": "Abandoning workout...",
+      "abandon": "إلغاء التمرين ومتابعة التحديث",
+      "abandoning": "جارٍ إلغاء التمرين...",
       "active": {
-        "title": "Active Workout in Progress"
+        "title": "تمرين نشط قيد التنفيذ"
       },
-      "currentExercise": "Current: {{exercise}}",
-      "elapsed": "Elapsed: {{time}}",
-      "progress": "{{current}} of {{total}} exercises",
-      "saving": "Saving workout progress...",
-      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+      "currentExercise": "الحالي: {{exercise}}",
+      "elapsed": "المنقضي: {{time}}",
+      "progress": "{{current}} من {{total}} تمرين",
+      "saving": "جارٍ حفظ تقدم التمرين...",
+      "securityMessage": "مطلوب تحديث أمني. يرجى إكمال التمرين أو إلغاؤه للمتابعة."
     }
   },
   "changelog": {
