@@ -117,7 +117,7 @@ export const ExerciseSelectorModal: React.FC<ExerciseSelectorModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-hidden p-4">
+        <div className="flex-1 min-h-0 p-4">
           <ExerciseSelector
             {...selectorProps}
             onSelectExercise={handleSelectExercise}

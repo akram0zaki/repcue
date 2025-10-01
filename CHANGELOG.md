@@ -1,5 +1,15 @@
 ## Unreleased
 
+### 2025-10-01 (ExerciseSelector Bug Fixes)
+#### Fixed
+- **ExerciseSelectorModal Scrolling**: Fixed vertical scrolling issue where modal content was not scrollable
+  - Changed container from `overflow-hidden` to `min-h-0` to allow child flex item to scroll
+  - Exercise list now scrolls properly within the modal
+- **Search Input Layout**: Fixed search placeholder text overlapping magnifying glass icon
+  - Increased left padding from `pl-10` to `pl-11` for proper spacing
+  - Added `z-10` to icon container to ensure it stays above input
+  - Search icon and placeholder text now properly aligned
+
 ### 2025-10-01 (Unified Exercise Selector Component)
 #### Added
 - **ExerciseSelector Component**: Unified, reusable exercise selection component with comprehensive filtering
