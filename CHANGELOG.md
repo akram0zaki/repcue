@@ -1,5 +1,82 @@
 ## Unreleased
 
+### 2025-10-01 (Activity Log Future Week Navigation Restriction)
+#### Fixed
+- **Weekly Activity Calendar**: Prevented navigation into future weeks
+  - Next week button is now disabled when viewing the current week
+  - Users can only browse past and present weeks, not future ones
+  - Button appears visually disabled with grayed-out styling when navigation is restricted
+  - Navigation logic includes proper week boundary calculations using Monday as week start
+  - Prevents confusing UX where users could navigate to weeks that haven't occurred yet
+  - Maintains accessibility with proper disabled state and aria-label
+
+### 2025-10-01 (RTL Navigation Arrow Fix)
+#### Fixed
+- **Activity Log Calendar Navigation**: Fixed reversed navigation arrows in Arabic (RTL) languages
+  - Previous week button now shows right arrow (→) in RTL layout instead of left arrow (←)
+  - Next week button now shows left arrow (←) in RTL layout instead of right arrow (→)
+  - Used Tailwind CSS RTL-aware classes (`ltr:block rtl:hidden` and `ltr:hidden rtl:block`)
+  - Navigation arrows now correctly indicate direction of movement in both LTR and RTL languages
+  - Improves user experience for Arabic, Hebrew, and other right-to-left languages
+
+### 2025-10-01 (Settings Page Icon Standardization)
+#### Added
+- **Section Icon Utility Class**: Created `.section-icon` utility class in index.css for consistent icon styling
+  - Centralizes icon sizing (`h-5 w-5`) and theming (`text-blue-600 dark:text-blue-400`)
+  - Single source of truth for section icon appearance
+  - Eliminates inline styling duplication across components
+
+#### Fixed
+- **Security & Privacy Section Icon**: Added SVG lock icon to replace missing emoji
+  - Used proper lock icon with stroke design matching other section icons
+  - Maintains visual consistency across all settings sections
+- **Icon Size Standardization**: All section icons now use consistent sizing through CSS class
+  - Audio Settings icon updated from inline styling to utility class
+  - All SVG icons (Timer, Appearance, Language, Data, Security) now use `.section-icon` class
+  - Removed inline `h-5 w-5 text-blue-600 dark:text-blue-400` styling throughout SettingsPage
+- **Centralized Icon Styling**: Moved from inline styles to utility class for maintainability
+  - Easy to change icon appearance globally by modifying single CSS class
+  - Improved code consistency and reduced duplication
+
+### 2025-10-01 (Settings Page Icons Modernization)
+#### Changed
+- **Replaced Emojis with SVG Icons**: Modernized Settings page section headings with consistent monotone SVG icons
+  - Timer Settings: Replaced ⏱️ emoji with clock SVG icon
+  - Appearance: Replaced 🎨 emoji with palette/theme SVG icon  
+  - Language: Replaced 🌐 emoji with translate/language SVG icon
+  - Data: Replaced 💾 emoji with database SVG icon
+  - All icons use consistent blue theming (`text-blue-600 dark:text-blue-400`)
+  - Icons are properly sized (`h-5 w-5`) and aligned with section headings
+  - Updated all 8 supported language files (en, ar, ar-EG, fr, de, es, nl, fy)
+  - Improved visual consistency and accessibility across the settings interface
+  - SVG icons provide better scalability and theme integration than emojis
+
+### 2025-10-01 (Profile Section Button Layout Fix)
+#### Fixed
+- **Profile Section Button Overflow**: Fixed button layout overflow in Profile section on Settings page
+  - Buttons were overflowing their container when using longer text (especially in Arabic)
+  - Changed from horizontal flex layout to vertical stacked layout using CSS Grid
+  - Used `grid-cols-1 gap-2` for consistent vertical stacking at all screen sizes
+  - Added `w-full` and `min-w-0` to ensure buttons use full available width
+  - Changed `whitespace-nowrap` to `truncate` to handle very long text gracefully
+  - Increased padding to `py-2.5` for better touch targets on mobile
+  - Added `flex-shrink-0` to icons and `truncate` to text spans
+  - Buttons now stack vertically consistently across all resolutions and languages
+  - Eliminated overflow issues while maintaining accessibility and usability
+
+### 2025-10-01 (Ring Timer Localization Fix)
+#### Fixed
+- **Ring Timer Button Translation**: Fixed missing translations for Ring Timer control on Settings page
+  - Arabic (ar): "Ring Timer" → "مؤقت الحلقة", help text properly translated
+  - Arabic Egyptian (ar-EG): "Ring Timer" → "مؤقت الحلقة", help text in Egyptian dialect
+  - French (fr): "Ring Timer" → "Minuteur Circulaire", help text properly translated
+  - German (de): "Ring Timer" → "Ring-Timer", help text properly translated
+  - Spanish (es): "Ring Timer" → "Temporizador Circular", help text properly translated
+  - Dutch (nl): Help text translated, kept "Ring Timer" as brand name
+  - Frisian (fy): Help text translated, kept "Ring Timer" as brand name
+  - Ring Timer control was showing in English for all non-English languages
+  - Settings page now fully localized across all supported languages
+
 ### 2025-10-01 (Settings Page Styling Consistency)
 #### Fixed
 - **Security & Privacy Section Dark Mode**: Fixed unreadable labels in dark mode

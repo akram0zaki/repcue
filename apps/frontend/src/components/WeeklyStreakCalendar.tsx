@@ -33,6 +33,24 @@ const WeeklyStreakCalendar: React.FC<WeeklyStreakCalendarProps> = ({
   const navigateWeek = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentWeek);
     newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+    
+    // Prevent navigation into future weeks
+    if (direction === 'next') {
+      const today = new Date();
+      const currentWeekStart = new Date(today);
+      currentWeekStart.setDate(today.getDate() - today.getDay() + 1); // Monday of current week
+      currentWeekStart.setHours(0, 0, 0, 0);
+      
+      const newWeekStart = new Date(newDate);
+      newWeekStart.setDate(newDate.getDate() - newDate.getDay() + 1); // Monday of new week
+      newWeekStart.setHours(0, 0, 0, 0);
+      
+      // Don't allow navigation beyond current week
+      if (newWeekStart > currentWeekStart) {
+        return;
+      }
+    }
+    
     onWeekChange(newDate);
   };
 
@@ -71,6 +89,18 @@ const WeeklyStreakCalendar: React.FC<WeeklyStreakCalendarProps> = ({
     return date.toDateString() === today.toDateString();
   };
 
+  const isCurrentWeek = (): boolean => {
+    const today = new Date();
+    const currentWeekStart = new Date(today);
+    currentWeekStart.setDate(today.getDate() - today.getDay() + 1); // Monday of current week
+    currentWeekStart.setHours(0, 0, 0, 0);
+    
+    const viewingWeekStart = new Date(weekData.weekStart);
+    viewingWeekStart.setHours(0, 0, 0, 0);
+    
+    return viewingWeekStart.getTime() === currentWeekStart.getTime();
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
       {/* Header with navigation */}
@@ -81,7 +111,8 @@ const WeeklyStreakCalendar: React.FC<WeeklyStreakCalendarProps> = ({
           aria-label={t('common:activity.charts.previousWeek', { defaultValue: 'Previous week' })}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" className="ltr:block rtl:hidden" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" className="ltr:hidden rtl:block" />
           </svg>
         </button>
         
@@ -98,11 +129,17 @@ const WeeklyStreakCalendar: React.FC<WeeklyStreakCalendarProps> = ({
         
         <button
           onClick={() => navigateWeek('next')}
-          className="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          disabled={isCurrentWeek()}
+          className={`p-2 rounded-lg transition-colors ${
+            isCurrentWeek()
+              ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+          }`}
           aria-label={t('common:activity.charts.nextWeek', { defaultValue: 'Next week' })}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" className="ltr:block rtl:hidden" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" className="ltr:hidden rtl:block" />
           </svg>
         </button>
       </div>

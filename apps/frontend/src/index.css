@@ -485,6 +485,10 @@ body.rtl .truncate {
     @apply text-base font-medium text-gray-900 dark:text-gray-100;
   }
 
+  .section-icon {
+    @apply h-5 w-5 text-blue-600 dark:text-blue-400;
+  }
+
   /* RTL-aware utilities */
   .text-start-rtl {
     @apply text-left rtl:text-right;
