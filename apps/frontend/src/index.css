@@ -26,6 +26,9 @@ body.rtl textarea {
 
 body.rtl select {
   direction: rtl;
+  /* Adjust padding for RTL dropdown arrow (appears on left side) */
+  padding-left: 0.5rem !important; /* Reduced left padding */
+  padding-right: 2rem !important; /* Increased right padding for arrow space */
 }
 
 /* RTL-aware toggle switches - using Tailwind translate classes now */
@@ -368,7 +371,7 @@ body.rtl .truncate {
   /* RTL-safe navigation buttons - override global button padding */
   body.rtl .nav-more-button,
   body.rtl .nav-item,
-  body.rtl nav button {
+  body.rtl nav button:not(.nav-dropdown-item) {
     padding: 6px 2px !important; /* Override global RTL button padding to match new nav-item padding */
     direction: ltr !important; /* Keep icons LTR for proper rendering */
   }
@@ -412,9 +415,8 @@ body.rtl .truncate {
   }
 
   .nav-dropdown-rtl {
-    right: 50%;
-    transform: translateX(50%);
-    transform-origin: top center;
+    left: 0;
+    transform-origin: top left;
   }
 
   /* Touch target size (minimum 44px) */

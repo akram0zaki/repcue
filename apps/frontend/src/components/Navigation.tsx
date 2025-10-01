@@ -124,17 +124,20 @@ const Navigation: React.FC = () => {
 
           {/* Dropdown menu */}
           {showMoreMenu && (
-            <div className={`absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg nav-dropdown ${
-              isRTL ? 'nav-dropdown-rtl' : 'nav-dropdown-ltr'
-            }`}>
+            <div
+              className={`absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg nav-dropdown ${
+                isRTL ? 'nav-dropdown-rtl' : 'nav-dropdown-ltr'
+              }`}
+              dir={isRTL ? 'rtl' : 'ltr'}
+            >
               {/* Settings */}
               <button
                 onClick={() => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className={`nav-dropdown-item w-full px-10 py-6 text-lg font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
-                  isRTL ? 'text-right justify-end' : 'text-left justify-start'
+                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
+                  isRTL ? 'text-right' : 'text-left'
                 }`}
                 data-testid="nav-settings"
               >
