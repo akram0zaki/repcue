@@ -90,7 +90,7 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
         </div>
       )}
 
-      <div className="text-xs text-gray-500">
+      <div className="help-text">
         <p>{t('settings.exportDataHelp')}</p>
         <p>{t('settings.exportRateLimit')}</p>
       </div>

@@ -8,11 +8,16 @@
   - Matches readability of "Update Behavior" and other section headers
 #### Added
 - **Centralized Styling Utilities**: Created utility classes in index.css for Settings page consistency
-  - `.label-text`: Standard label styling (`text-text-800 dark:text-text-100 font-medium`)
-  - `.help-text`: Standard help text styling (`text-gray-500 dark:text-gray-400`)
+  - `.label-text`: Standard label styling (`text-text-700 dark:text-text-100 font-medium`)
+  - `.help-text`: Standard help text styling (`text-sm text-gray-600 dark:text-gray-400`)
   - `.section-subtitle`: Standard section subtitle styling (`text-base font-medium text-gray-900 dark:text-gray-100`)
   - All Settings page components now use centralized classes instead of inline styles
   - Single source of truth for styling makes future updates easier and ensures consistency
+  - **Help Text Consistency**: Fixed help/description text styling to match across all sections
+    - Updated `.help-text` from `text-gray-500` to `text-sm text-gray-600 dark:text-gray-400`
+    - DataExportButton now uses `.help-text` utility class
+    - Removed conflicting `text-xs` from delete account help text
+    - Export Your Data and Delete Account descriptions now match "Show what's new" style
 
 ### 2025-10-01 (Comprehensive RTL Spacing Fixes)
 #### Fixed

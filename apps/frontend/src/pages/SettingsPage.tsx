@@ -592,7 +592,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               >
                 {t('settings.deleteMyAccount')}
               </button>
-              <p className="text-xs help-text mt-1">
+              <p className="help-text mt-1">
                 {t('settings.deleteAccountHelp')}
               </p>
             </div>
