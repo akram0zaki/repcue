@@ -1,5 +1,40 @@
 ## Unreleased
 
+### 2025-10-01 (Unified Exercise Selector Component)
+#### Added
+- **ExerciseSelector Component**: Unified, reusable exercise selection component with comprehensive filtering
+  - **Reusable Architecture**: Single component replaces three duplicate implementations across TimerPage, CreateWorkoutPage, and EditWorkoutPage
+  - **Advanced Filtering**: Multi-dimensional filtering with catalog, category, search, type, and favorites
+  - **Search Functionality**: Real-time search by exercise name and localized descriptions
+  - **Catalog Support**: Filter exercises by catalog (default, custom, shared)
+  - **Category Filtering**: Integrated CategoryFilter component for category-based filtering
+  - **Type Toggles**: Quick toggle between All, Built-in, Custom, and Shared exercises
+  - **Favorites Filter**: Quick access to favorite exercises only
+  - **Sorting Options**: Sort by name, type, or recently added
+  - **Exercise Exclusion**: Exclude already-selected exercises (useful for workout creation)
+  - **Filter Persistence**: Optional localStorage persistence with configurable keys per context
+  - **Accessibility**: Modal with focus management, escape key handling, ARIA attributes
+  - **Mobile-First Design**: Responsive modal overlay optimized for touch interfaces
+
+#### Improved
+- **useExerciseFilter Hook**: Extracted filtering logic into reusable custom hook
+  - **Flexible API**: Supports multiple filter combinations and optional persistence
+  - **Type-Safe**: Full TypeScript support with comprehensive interfaces
+  - **Performance**: Optimized filtering with useMemo for large exercise lists
+  - **Localization-Aware**: Searches localized exercise names and descriptions
+- **Code Deduplication**: Eliminated ~150 lines of duplicate selector code across three pages
+- **User Experience**: Consistent exercise selection experience throughout the app
+  - **TimerPage**: Full-featured selector with all filters and persistence
+  - **CreateWorkoutPage**: Smart exclusion of already-added exercises with custom empty state
+  - **EditWorkoutPage**: Identical experience to CreateWorkoutPage
+
+#### Added
+- **Comprehensive Test Coverage**: Full unit test suite for hook and components
+  - **useExerciseFilter.test.ts**: ~400 lines covering filtering, sorting, exclusion, persistence
+  - **ExerciseSelector.test.tsx**: ~300 lines covering rendering, selection, prop variations
+  - **ExerciseSelectorModal.test.tsx**: ~250 lines covering modal behavior and accessibility
+- **Documentation**: Updated README.md with component usage examples and API documentation
+
 ### 2025-09-29 (Component Refactoring & Category Filter Enhancement)
 #### Enhanced
 - **CategoryFilter Component**: Created reusable category filtering component to replace category-specific implementations

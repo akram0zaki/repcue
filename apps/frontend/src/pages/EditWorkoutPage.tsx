@@ -8,6 +8,7 @@ import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
 import logger from '../utils/logger';
+import { ExerciseSelectorModal } from '../components/ExerciseSelector';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -637,46 +638,23 @@ const EditWorkoutPage: React.FC = () => {
         </form>
 
         {/* Exercise Picker Modal */}
-  {showExercisePicker && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-surface-50 dark:bg-surface-800 rounded-lg max-w-md w-full max-h-[80vh] overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-border-200 dark:border-border-700">
-                <h3 className="text-lg font-semibold text-text-900 dark:text-text-50">
-      {t('workouts.addExerciseTitle')}
-                </h3>
-                <button
-                  onClick={() => setShowExercisePicker(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div className="p-4 overflow-y-auto max-h-96">
-                <div className="space-y-2">
-                  {availableExercises
-                    .filter(exercise => !selectedExercises.some(se => se.id === exercise.id))
-                    .map(exercise => (
-                      <button
-                        key={exercise.id}
-                        onClick={() => handleAddExercise(exercise)}
-                        className="w-full text-left p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-                          {localizeExercise(exercise, t).name}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {localizeExercise(exercise, t).description}
-                        </p>
-                      </button>
-                    ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <ExerciseSelectorModal
+          exercises={availableExercises}
+          excludeExercises={selectedExercises}
+          onSelectExercise={(exercise) => {
+            handleAddExercise(exercise);
+          }}
+          isOpen={showExercisePicker}
+          onClose={() => setShowExercisePicker(false)}
+          title={t('workouts.addExerciseTitle')}
+          showCatalogSelector={true}
+          showCategoryFilter={true}
+          showTypeFilter={true}
+          showSearch={true}
+          showSort={true}
+          persistFilters={true}
+          filterStorageKey="edit-workout-exercise-selector"
+        />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { consentService } from '../services/consentService';
 import type { Exercise, Workout, WorkoutExercise, Weekday } from '../types';
 import { Routes } from '../types';
 import logger from '../utils/logger';
+import { ExerciseSelectorModal } from '../components/ExerciseSelector';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -633,71 +634,24 @@ const CreateWorkoutPage: React.FC = () => {
         </div>
 
         {/* Exercise Picker Modal */}
-        {showExercisePicker && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-96 overflow-hidden">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    {t('workouts.addExerciseTitle')}
-                  </h3>
-                  <button
-                    onClick={() => setShowExercisePicker(false)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="p-4 overflow-y-auto max-h-80">
-                <div className="space-y-2">
-                  {availableExercises
-                    .filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id))
-                    .map((exercise) => (
-                      <button
-                        key={exercise.id}
-                        onClick={() => addExercise(exercise)}
-                        className="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {localizeExercise(exercise, t).name}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises:timeBased.name') : t('exercises:repBased.name')}
-                          {exercise.exercise_type === 'time_based' 
-                            ? ` • ${exercise.default_duration}s` 
-                            : ` • ${exercise.default_sets}×${exercise.default_reps}`}
-                        </div>
-                      </button>
-                    ))}
-                </div>
-                {availableExercises.length === 0 ? (
-                  <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                    <p className="mb-2">{t('workouts.loadExercisesError')}</p>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await storageService.ensureExercisesSeeded();
-                          const refreshed = await storageService.getExercises();
-                          setAvailableExercises(refreshed);
-                        } catch {}
-                      }}
-                      className="inline-flex items-center px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
-                    >
-                      {t('common.retry')}
-                    </button>
-                  </div>
-                ) : availableExercises.filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id)).length === 0 && (
-                  <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                    {t('workouts.allExercisesAdded')}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <ExerciseSelectorModal
+          exercises={availableExercises}
+          excludeExercises={selectedExercises}
+          onSelectExercise={(exercise) => {
+            addExercise(exercise);
+          }}
+          isOpen={showExercisePicker}
+          onClose={() => setShowExercisePicker(false)}
+          title={t('workouts.addExerciseTitle')}
+          showCatalogSelector={true}
+          showCategoryFilter={true}
+          showTypeFilter={true}
+          showSearch={true}
+          showSort={true}
+          persistFilters={true}
+          filterStorageKey="create-workout-exercise-selector"
+          emptyStateMessage={t('workouts.allExercisesAdded')}
+        />
       </div>
     </div>
   );

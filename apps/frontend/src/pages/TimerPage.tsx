@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
 import type { Exercise, AppSettings, TimerState } from '../types';
 import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../constants';
-import { ReadyIcon, StarFilledIcon } from '../components/icons/NavigationIcons';
+import { ReadyIcon } from '../components/icons/NavigationIcons';
 import { VIDEO_DEMOS_ENABLED } from '../config/features';
+import { ExerciseSelectorModal } from '../components/ExerciseSelector';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
@@ -859,52 +860,24 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
 
         {/* Exercise Selector Modal */}
-        {showExerciseSelector && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-t-lg w-full max-w-md max-h-[70vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-600">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {t('timer.selectExercise')}
-                  </h3>
-                  <button
-                    onClick={() => onSetShowExerciseSelector(false)}
-                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-              
-              <div className="p-4 space-y-2">
-                {exercises.map(exercise => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => {
-                      onSetSelectedExercise(exercise);
-                      onSetShowExerciseSelector(false);
-                    }}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          {localizeExercise(exercise, t).name}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
-                        </p>
-                      </div>
-                      {exercise.is_favorite && (
-                        <StarFilledIcon size={16} className="text-yellow-500" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        <ExerciseSelectorModal
+          exercises={exercises}
+          selectedExercise={selectedExercise}
+          onSelectExercise={(exercise) => {
+            onSetSelectedExercise(exercise);
+          }}
+          isOpen={showExerciseSelector}
+          onClose={() => onSetShowExerciseSelector(false)}
+          title={t('timer.selectExercise')}
+          showCatalogSelector={true}
+          showCategoryFilter={true}
+          showTypeFilter={true}
+          showFavoritesToggle={true}
+          showSearch={true}
+          showSort={true}
+          persistFilters={true}
+          filterStorageKey="timer-exercise-selector"
+        />
       </div>
     </div>
   );
