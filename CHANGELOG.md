@@ -1,5 +1,68 @@
 ## Unreleased
 
+### 2025-10-01 (Exercise Form UI Improvements & Scroll Position Fixes)
+#### Fixed
+- **Exercise Form Layout**: Fixed overflow and layout issues across all input sections
+  - **Plus Button Overflow**: Fixed equipment, muscle groups, and tags input sections where plus buttons were overflowing on narrow screens
+  - **Responsive Layout**: Changed from `flex space-x-2` to `flex gap-2` with proper flex containers (`flex-1 min-w-0` and `flex-shrink-0`)
+  - **RTL Support**: Updated spacing to use `gap` instead of directional margins for proper Arabic language support
+  - **Button Sizing**: Fixed plus buttons to consistent `w-10 h-10` size instead of variable padding
+  - **Input Container**: Added proper `w-full` within flex containers to prevent text overflow
+- **Form Actions Responsive Design**: Improved button layout for all screen sizes
+  - **Desktop Layout**: Clear Draft button on left, Cancel/Create buttons on right using `sm:justify-between`
+  - **Mobile Stacking**: Buttons stack vertically on mobile for better touch interaction
+  - **Three-Button Layout**: Fixed issue where buttons were breaking into two rows on wider screens
+  - **Proper Spacing**: Consistent `gap-3` spacing that works in both LTR and RTL layouts
+- **Instructions Section UX**: Improved Add Step button positioning and layout
+  - **Natural Workflow**: Moved "Add Step" button to bottom of steps list for intuitive progression
+  - **Responsive Header**: Simplified Instructions section header to just the title
+  - **Better Spacing**: Added proper separation with `pt-2` above the Add Step button
+  - **Mobile-Friendly**: Centered button positioning works well on all screen sizes
+- **Scroll Position Management**: Fixed navigation behavior when leaving exercise forms
+  - **Cancel Navigation**: Added `window.scrollTo({ top: 0, behavior: 'instant' })` before navigation
+  - **Success Navigation**: Ensured users land at top of Exercises page after form submission
+  - **Consistent UX**: Applied to both CreateExercisePage and EditExercisePage
+  - **No Disorientation**: Eliminated confusing scroll position inheritance between pages
+
+### 2025-10-01 (Workout Progress Bar Style Guide Compliance)
+#### Fixed
+- **Workout Mode Header Colors**: Updated to align with official style guide color palette
+  - **Background**: Changed from generic `bg-blue-600` to `bg-primary-500` (#0096C7 teal)
+  - **Exercise Counter Badge**: Updated from `bg-blue-500` to `bg-primary-700` for better contrast
+  - **Progress Bar Track**: Changed from `bg-blue-500` to `bg-primary-700` for consistent theming
+  - **Progress Bar Fill**: Updated from `bg-blue-200/300` to `bg-secondary-300` (#74D0E4 light blue)
+  - **Style Guide Alignment**: Now uses defined Primary Accent and Secondary Accent colors
+  - **Better Contrast**: Improved text readability and visual hierarchy
+  - **Design System Consistency**: Matches established brand colors throughout the app
+
+### 2025-10-01 (Compact Exercise Selection)
+#### Added
+- **Compact Exercise Selection**: Streamlined exercise selection to save vertical space
+  - **When no exercise selected**: Shows "Exercise" label with "Choose" button on the right
+  - **When exercise selected**: Shows "Exercise" label with clickable exercise name on the right
+  - **Removed redundant content**: Eliminated exercise name and description rows below header
+  - **Interactive exercise name**: Clicking the selected exercise name opens the exercise selector
+  - **Space-saving design**: Keeps favorite exercises quick access when no exercise is selected
+  - **Improved mobile UX**: More timer space available without scrolling on smaller screens
+
+### 2025-10-01 (Collapsible Duration Selector)
+#### Added
+- **Collapsible Duration Selection**: Transformed duration badges into a compact, collapsible control
+  - Duration header shows currently selected time (e.g., "30s", "2m") with expand/collapse chevron
+  - Clicking header expands to show all duration options in a clean grid layout
+  - Selecting a duration automatically collapses the control and updates the display
+  - Saves vertical space to make the timer more prominent without scrolling
+  - Maintains all existing functionality while improving mobile UX
+  - Uses consistent styling with app's design system (blue badges, hover states)
+
+### 2025-10-01 (Workout Progress Bar Color Fix)
+#### Fixed
+- **Workout Mode Progress Bar**: Updated color scheme to align with app's design system
+  - Changed progress fill from harsh white (`bg-white`) to harmonious light blue (`bg-blue-200 dark:bg-blue-300`)
+  - Maintains excellent contrast while providing visual cohesion with blue background
+  - Supports both light and dark themes appropriately
+  - Progress bar now follows the app's primary blue color scheme consistently
+
 ### 2025-10-01 (Activity Log Future Week Navigation Restriction)
 #### Fixed
 - **Weekly Activity Calendar**: Prevented navigation into future weeks

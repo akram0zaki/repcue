@@ -654,17 +654,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
           {/* Instructions Section */}
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.instructions', 'Instructions')}</h3>
-              <button
-                type="button"
-                onClick={handleAddInstruction}
-                className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                disabled={loading}
-              >
-                <PlusIcon className="w-4 h-4 mr-1" />
-                {t('exercises.addStep', 'Add Step')}
-              </button>
             </div>
             
             <div className="space-y-3">
@@ -681,6 +672,19 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   canMoveDown={index < instructions.length - 1}
                 />
               ))}
+              
+              {/* Add Step Button - positioned after all steps */}
+              <div className="flex justify-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleAddInstruction}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  disabled={loading}
+                >
+                  <PlusIcon className="w-4 h-4 mr-1" />
+                  {t('exercises.addStep', 'Add Step')}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -689,37 +693,41 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.equipment', 'Equipment Needed')}</h3>
             
             <div className="space-y-2">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newEquipment}
-                  onChange={(e) => setNewEquipment(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={t('exercises.equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat (comma-separated)')}
-                  disabled={loading}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddArrayItem('equipment', newEquipment);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Auto-capture when user tabs away from field
-                    if (newEquipment.trim()) {
-                      handleAddArrayItem('equipment', newEquipment);
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddArrayItem('equipment', newEquipment)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading || !newEquipment.trim()}
-                  aria-label={t('exercises.addEquipment', 'Add equipment items')} 
-                  title={t('exercises.addEquipment', 'Add equipment items')}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                </button>
+              <div className="flex gap-2">
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={newEquipment}
+                    onChange={(e) => setNewEquipment(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                    placeholder={t('exercises.equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat (comma-separated)')}
+                    disabled={loading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddArrayItem('equipment', newEquipment);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Auto-capture when user tabs away from field
+                      if (newEquipment.trim()) {
+                        handleAddArrayItem('equipment', newEquipment);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleAddArrayItem('equipment', newEquipment)}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    disabled={loading || !newEquipment.trim()}
+                    aria-label={t('exercises.addEquipment', 'Add equipment items')} 
+                    title={t('exercises.addEquipment', 'Add equipment items')}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               {equipmentNeeded.length > 0 && (
@@ -749,37 +757,41 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.muscleGroups', 'Muscle Groups')}</h3>
             
             <div className="space-y-2">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newMuscleGroup}
-                  onChange={(e) => setNewMuscleGroup(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={t('exercises.muscleGroupPlaceholder', 'e.g., Arms, Core, Legs (comma-separated)')}
-                  disabled={loading}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddArrayItem('muscleGroups', newMuscleGroup);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Auto-capture when user tabs away from field
-                    if (newMuscleGroup.trim()) {
-                      handleAddArrayItem('muscleGroups', newMuscleGroup);
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddArrayItem('muscleGroups', newMuscleGroup)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading || !newMuscleGroup.trim()}
-                  aria-label={t('exercises.addMuscleGroup', 'Add muscle group items')} 
-                  title={t('exercises.addMuscleGroup', 'Add muscle group items')}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                </button>
+              <div className="flex gap-2">
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={newMuscleGroup}
+                    onChange={(e) => setNewMuscleGroup(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                    placeholder={t('exercises.muscleGroupPlaceholder', 'e.g., Arms, Core, Legs (comma-separated)')}
+                    disabled={loading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddArrayItem('muscleGroups', newMuscleGroup);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Auto-capture when user tabs away from field
+                      if (newMuscleGroup.trim()) {
+                        handleAddArrayItem('muscleGroups', newMuscleGroup);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleAddArrayItem('muscleGroups', newMuscleGroup)}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    disabled={loading || !newMuscleGroup.trim()}
+                    aria-label={t('exercises.addMuscleGroup', 'Add muscle group items')} 
+                    title={t('exercises.addMuscleGroup', 'Add muscle group items')}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               {muscleGroups.length > 0 && (
@@ -809,37 +821,41 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.tags', 'Tags')}</h3>
             
             <div className="space-y-2">
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                  placeholder={t('exercises.tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
-                  disabled={loading}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddArrayItem('tags', newTag);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Auto-capture when user tabs away from field
-                    if (newTag.trim()) {
-                      handleAddArrayItem('tags', newTag);
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddArrayItem('tags', newTag)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  disabled={loading || !newTag.trim()}
-                  aria-label={t('exercises.addTag', 'Add tag items')} 
-                  title={t('exercises.addTag', 'Add tag items')}
-                >
-                  <PlusIcon className="w-4 h-4" />
-                </button>
+              <div className="flex gap-2">
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                    placeholder={t('exercises.tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
+                    disabled={loading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddArrayItem('tags', newTag);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Auto-capture when user tabs away from field
+                      if (newTag.trim()) {
+                        handleAddArrayItem('tags', newTag);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleAddArrayItem('tags', newTag)}
+                    className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    disabled={loading || !newTag.trim()}
+                    aria-label={t('exercises.addTag', 'Add tag items')} 
+                    title={t('exercises.addTag', 'Add tag items')}
+                  >
+                    <PlusIcon className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               {tags.length > 0 && (
@@ -908,41 +924,48 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div>
-              {!isEditing && (
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+              {/* Clear Draft Button (only for new exercises) */}
+              <div className="flex justify-center sm:justify-start">
+                {!isEditing ? (
+                  <button
+                    type="button"
+                    onClick={handleClearForm}
+                    className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-none"
+                    disabled={loading}
+                  >
+                    {t('exercises.clearDraft', 'Clear Draft')}
+                  </button>
+                ) : (
+                  <div></div>
+                )}
+              </div>
+              
+              {/* Primary Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   type="button"
-                  onClick={handleClearForm}
-                  className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-none"
+                  onClick={handleCancel}
+                  className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 order-2 sm:order-1"
                   disabled={loading}
                 >
-                  {t('exercises.clearDraft', 'Clear Draft')}
+                  {t('common.cancel', 'Cancel')}
                 </button>
-              )}
-            </div>
-            <div className="flex space-x-3">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                disabled={loading}
-              >
-                {t('common.cancel', 'Cancel')}
-              </button>
-            
-              <button
-                type="submit"
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={loading || !name.trim()}
-              >
-                {loading 
-                  ? t('common.saving', 'Saving...') 
-                  : isEditing 
-                    ? t('common.saveChanges', 'Save Changes')
-                    : t('exercises.createExercise', 'Create Exercise')
-                }
-              </button>
+              
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+                  disabled={loading || !name.trim()}
+                >
+                  {loading 
+                    ? t('common.saving', 'Saving...') 
+                    : isEditing 
+                      ? t('common.saveChanges', 'Save Changes')
+                      : t('exercises.createExercise', 'Create Exercise')
+                  }
+                </button>
+              </div>
             </div>
           </div>
         </form>

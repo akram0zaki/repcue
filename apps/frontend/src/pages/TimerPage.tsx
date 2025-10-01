@@ -49,9 +49,24 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onResetTimer
 }) => {
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
+  
+  // State for collapsible duration selector
+  const [isDurationExpanded, setIsDurationExpanded] = useState(false);
+  
   // ---------------- Video Demo Integration (Phase 2) ----------------
   // Calculate display values
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
+
+  // Format duration for display
+  const formatDuration = (duration: number): string => {
+    return duration < 60 ? `${duration}s` : `${Math.floor(duration / 60)}m`;
+  };
+
+  // Handle duration selection (auto-collapse after selection)
+  const handleDurationSelect = (duration: TimerPreset) => {
+    onSetSelectedDuration(duration);
+    setIsDurationExpanded(false);
+  };
 
   // Rep-based exercise detection (needs selectedExercise so declare early for hook deps below)
   const isRepBased = selectedExercise?.exercise_type === 'repetition_based';
@@ -302,10 +317,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
         
         {/* Compact Workout Mode Header */}
         {isWorkoutMode && (
-          <div className="bg-blue-600 text-white rounded-lg p-3 mb-2">
+          <div className="bg-primary-500 text-white rounded-lg p-3 mb-2">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base font-semibold truncate">{workoutMode.workoutName}</h2>
-              <span className="text-xs bg-blue-500 px-2 py-0.5 rounded">
+              <span className="text-xs bg-primary-700 px-2 py-0.5 rounded">
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
                   const totalExercises = workoutMode.exercises.length;
@@ -324,9 +339,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </div>
             
             {/* Compact Workout Progress Bar */}
-            <div className="w-full bg-blue-500 rounded-full h-1.5">
+            <div className="w-full bg-primary-700 rounded-full h-1.5">
               <div 
-                className="bg-white h-1.5 rounded-full transition-all duration-300"
+                className="bg-secondary-300 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${workoutProgress}%` }}
               />
             </div>
@@ -337,70 +352,90 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Compact Exercise Selection - Hidden in workout mode */}
         {!isWorkoutMode && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 mb-2">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.exerciseLabel')}</span>
-              <button
-                onClick={() => onSetShowExerciseSelector(true)}
-                className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
-                data-testid="open-exercise-selector"
-              >
-                {t('common.choose')}
-              </button>
+              {selectedExercise ? (
+                <button
+                  onClick={() => onSetShowExerciseSelector(true)}
+                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline truncate max-w-48"
+                  data-testid="selected-exercise-button"
+                >
+                  {localizeExercise(selectedExercise, t).name}
+                </button>
+              ) : (
+                <button
+                  onClick={() => onSetShowExerciseSelector(true)}
+                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                  data-testid="open-exercise-selector"
+                >
+                  {t('common.choose')}
+                </button>
+              )}
             </div>
             
-            {selectedExercise ? (
-              <div className="text-center">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  {localizeExercise(selectedExercise, t).name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {localizeExercise(selectedExercise, t).description}
-                </p>
-            </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center text-sm">
-              {t('timer.noExerciseSelected')}
-            </p>
-          )}
+            {/* Favorite exercises quick access - only shown when no exercise selected */}
+            {!selectedExercise && favoriteExercises.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.quickSelectFavorites')}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {favoriteExercises.map(exercise => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => onSetSelectedExercise(exercise)}
+                      className="text-xs py-2 px-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors truncate"
+                    >
+                      {localizeExercise(exercise, t).name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-          {/* Favorite exercises quick access */}
-          {!selectedExercise && favoriteExercises.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.quickSelectFavorites')}</p>
-              <div className="grid grid-cols-2 gap-2">
-          {favoriteExercises.map(exercise => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => onSetSelectedExercise(exercise)}
-                    className="text-xs py-2 px-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors truncate"
-                  >
-            {localizeExercise(exercise, t).name}
-                  </button>
-                ))}
+        {/* Collapsible Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
+        {!isWorkoutMode && selectedExercise?.exercise_type !== 'repetition_based' && (
+        <div className="mb-2">
+          {/* Duration Header - Shows current selection and toggle */}
+          <button
+            onClick={() => setIsDurationExpanded(!isDurationExpanded)}
+            className="w-full flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
+          >
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.duration')}</span>
+              <span className="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+                {formatDuration(selectedDuration)}
+              </span>
+            </div>
+            <svg 
+              className={`w-4 h-4 text-gray-500 transition-transform ${isDurationExpanded ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {/* Expandable Duration Options */}
+          {isDurationExpanded && (
+            <div className="mt-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-3 gap-2">
+                {TIMER_PRESETS.map(duration => {
+                  const active = selectedDuration === duration;
+                  return (
+                    <button
+                      key={duration}
+                      onClick={() => handleDurationSelect(duration)}
+                      className={`duration-option ${active ? 'duration-option-active' : ''}`}
+                    >
+                      {formatDuration(duration)}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
-        </div>
-        )}
-
-        {/* Compact Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
-        {!isWorkoutMode && selectedExercise?.exercise_type !== 'repetition_based' && (
-        <div className="mb-2">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.duration')}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {TIMER_PRESETS.map(duration => {
-              const active = selectedDuration === duration;
-              return (
-                <button
-                  key={duration}
-                  onClick={() => onSetSelectedDuration(duration)}
-                  className={`duration-option ${active ? 'duration-option-active' : ''}`}
-                >
-                  {duration < 60 ? `${duration}s` : `${Math.floor(duration / 60)}m`}
-                </button>
-              );
-            })}
-          </div>
         </div>
         )}
 

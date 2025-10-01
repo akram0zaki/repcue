@@ -180,6 +180,8 @@ export const EditExercisePage: React.FC = () => {
         type: 'success'
       });
 
+      // Reset scroll position to top when navigating back
+      window.scrollTo({ top: 0, behavior: 'instant' });
       // Navigate back to exercises list
       navigate('/exercises');
     } catch (error) {
@@ -193,6 +195,8 @@ export const EditExercisePage: React.FC = () => {
   };
 
   const handleCancel = () => {
+    // Reset scroll position to top when navigating back
+    window.scrollTo({ top: 0, behavior: 'instant' });
     navigate('/exercises');
   };
 
