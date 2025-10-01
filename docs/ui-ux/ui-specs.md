@@ -1,5 +1,125 @@
 # RepCue App -- Full UI/UX Design Specification
 
+## 0. Design Philosophy: Mobile-First & Space-Efficient
+
+### Core Principles
+
+**CRITICAL**: RepCue is a **mobile-first PWA**. Every design decision must prioritize mobile usability and space efficiency.
+
+#### 1. Mobile-First Always
+- **Primary Target**: Mobile screens (320px - 428px width)
+- **Secondary Target**: Tablets (768px+)
+- **Desktop**: Progressive enhancement, not the focus
+
+#### 2. Zero Horizontal Overflow
+- **Never allow horizontal scrolling** on mobile devices
+- All UI components must fit within the viewport width
+- Test at minimum 320px width (iPhone SE)
+- Use `overflow-x-hidden` cautiously and only when necessary
+- Prefer responsive layouts that stack vertically
+
+#### 3. Space is Sacred
+- **Every pixel matters** on mobile screens
+- Eliminate unnecessary whitespace and padding
+- Use compact component variants by default
+- Only expand spacing on larger screens
+- Avoid decorative elements that waste space
+
+#### 4. Smart Content Fitting
+- **Truncate intelligently**: Use ellipsis (`text-overflow: ellipsis`) for long text
+- **Stack responsively**: Horizontal layouts on mobile → vertical stacking
+- **Collapsible sections**: Hide less critical content behind accordions/dropdowns
+- **Progressive disclosure**: Show essential info first, reveal details on demand
+- **Compact grids**: Reduce gaps and padding on mobile, expand on desktop
+
+#### 5. Touch-Optimized
+- **Minimum touch targets**: 44px × 44px (Apple HIG, WCAG 2.1 AAA)
+- **Adequate spacing**: 8px minimum between interactive elements
+- **Large hit areas**: Extend clickable areas beyond visible elements
+- **No hover states**: Design for touch-first, not mouse hover
+
+#### 6. Responsive Breakpoints
+```css
+/* Mobile-first approach */
+/* Base styles = Mobile (320px - 767px) */
+.component { padding: 0.75rem; gap: 0.5rem; }
+
+/* Tablet and above */
+@media (min-width: 768px) {
+  .component { padding: 1rem; gap: 0.75rem; }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .component { padding: 1.5rem; gap: 1rem; }
+}
+```
+
+#### 7. Component Sizing Strategy
+- **Mobile**: Use `w-full`, avoid fixed widths
+- **Tablet**: Use `sm:w-auto` or `sm:max-w-md` for flexibility
+- **Desktop**: Use `lg:max-w-lg` or `lg:max-w-xl` for optimal reading width
+
+#### 8. Layout Patterns for Space Efficiency
+
+**Information Cards** (Mobile-First):
+```tsx
+// ❌ BAD: Wastes space, causes overflow
+<div className="flex items-center justify-between p-6 gap-8">
+  <div className="flex-1 min-w-[200px]">...</div>
+  <div className="w-48">...</div>
+</div>
+
+// ✅ GOOD: Stacks on mobile, efficient spacing
+<div className="flex flex-col sm:flex-row sm:items-center p-4 sm:p-5 gap-3 sm:gap-4">
+  <div className="flex-1">...</div>
+  <div className="sm:w-auto">...</div>
+</div>
+```
+
+**Modal Dialogs** (Mobile-First):
+```tsx
+// ❌ BAD: Fixed width, wastes screen space
+<div className="w-96 max-w-full">...</div>
+
+// ✅ GOOD: Full width on mobile, constrained on desktop
+<div className="w-full sm:max-w-md lg:max-w-lg">...</div>
+```
+
+**Button Groups** (Mobile-First):
+```tsx
+// ❌ BAD: Forces horizontal overflow on mobile
+<div className="flex gap-4">
+  <button className="px-8 py-3">Long Button Text</button>
+  <button className="px-8 py-3">Another Long Button</button>
+</div>
+
+// ✅ GOOD: Stacks on mobile, horizontal on desktop
+<div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+  <button className="w-full sm:w-auto px-4 py-2">Button 1</button>
+  <button className="w-full sm:w-auto px-4 py-2">Button 2</button>
+</div>
+```
+
+#### 9. Testing Requirements
+- **Mandatory**: Test every component at 320px, 375px, and 428px widths
+- **No exceptions**: Zero horizontal overflow allowed
+- **Visual QA**: Check for wasted space, unnecessary padding
+- **Touch testing**: Verify all interactive elements are easily tappable
+- **Content testing**: Verify text truncation and wrapping work correctly
+
+#### 10. Common Mobile Pitfalls to Avoid
+- ❌ Fixed pixel widths (use percentages or flex)
+- ❌ Excessive padding/margins (mobile needs compact spacing)
+- ❌ Horizontal layouts that don't stack (always provide mobile stack variant)
+- ❌ Small touch targets (minimum 44px × 44px)
+- ❌ Tiny text (minimum 16px for body text)
+- ❌ Hover-dependent interactions (no hover on mobile)
+- ❌ Horizontal scrolling containers (avoid or use sparingly)
+- ❌ Multiple columns on narrow screens (prefer single column)
+
+---
+
 ## 1. Visual Identity
 
 ### Color Palette - Light Mode
