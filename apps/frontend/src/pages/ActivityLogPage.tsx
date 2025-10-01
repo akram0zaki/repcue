@@ -185,6 +185,11 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   // Localize legacy English notes generated at log creation time
   const localizeNotes = (notes?: string): string | null => {
     if (!notes) return null;
+    const workoutCompletedMatch = notes.match(/^Workout completed with (\d+) exercises?$/);
+    if (workoutCompletedMatch) {
+      const count = parseInt(workoutCompletedMatch[1], 10);
+      return t('activity.status.completedWorkout', { count });
+    }
     const stoppedMatch = notes.match(/^Stopped after (\d+)s$/);
     if (stoppedMatch) {
       const seconds = parseInt(stoppedMatch[1], 10);
@@ -313,27 +318,27 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                               >
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                                    <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
+                                    <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
+                                    <h4 className="flex-1 min-w-0 text-h3 font-semibold text-text-900 dark:text-text-50">
                                       {(() => {
                                         // Prefer the known workout name if available
                                         const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
                                         if (nameFromMap) {
-                                          return `${nameFromMap} (Workout)`;
+                                          return nameFromMap;
                                         }
                                         // Fallback to exercise lookup (legacy) or stored log name
                                         const ex = exercises.find(e => e.id === log.exercise_id);
                                         if (ex) {
                                           const base = `${ex.id}`;
                                           const name = t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
-                                          return `${name} (Workout)`;
+                                          return name;
                                         }
                                         const fallback = log.exercise_name && typeof log.exercise_name === 'string' ? log.exercise_name : t('activity.workoutBadge');
-                                        return `${fallback} (Workout)`;
+                                        return fallback;
                                       })()}
                                     </h4>
                                     <svg 
-                                      className={`w-5 h-5 text-gray-500 transition-transform ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
+                                      className={`w-5 h-5 shrink-0 text-gray-500 transition-transform ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
                                       fill="none" 
                                       stroke="currentColor" 
                                       viewBox="0 0 24 24"
@@ -342,26 +347,26 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     </svg>
                                   </div>
                                   
-                                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                                    <div className="flex items-center gap-1">
+                                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="flex items-center gap-1 shrink-0">
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                       </svg>
-                                      {formatTime(new Date(log.timestamp))}
+                                      <span className="whitespace-nowrap">{formatTime(new Date(log.timestamp))}</span>
                                     </div>
                                     
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1 shrink-0">
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                       </svg>
-                                      {formatDuration(log.duration)}
+                                      <span className="whitespace-nowrap">{formatDuration(log.duration)}</span>
                                     </div>
                                     
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1 shrink-0">
                                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                       </svg>
-                                      {t('activity.exerciseCount', { count: log.exercises?.length || 0 })}
+                                      <span className="whitespace-nowrap">{t('activity.exerciseCount', { count: log.exercises?.length || 0 })}</span>
                                     </div>
                                   </div>
                                 </div>

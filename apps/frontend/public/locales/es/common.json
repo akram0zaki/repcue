@@ -341,8 +341,10 @@
     "exerciseCount_other": "{{count}} ejercicios",
     "status": {
       "stoppedAfter": "Detenido después de {{duration}}",
-      "completedSetsReps": "Completadas {{sets}} series de {{reps}} repeticiones",
-      "completedTime": "Temporizador de intervalo de {{duration}} completado"
+      "completedSetsReps": "Completado {{sets}} series de {{reps}} repeticiones",
+      "completedTime": "Completado temporizador de intervalo de {{duration}}",
+      "completedWorkout": "Entrenamiento completado con {{count}} ejercicio",
+      "completedWorkout_plural": "Entrenamiento completado con {{count}} ejercicios"
     },
     "charts": {
       "weeklyStreak": "Racha Semanal",

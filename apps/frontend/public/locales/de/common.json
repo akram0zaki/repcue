@@ -340,9 +340,11 @@
     "exerciseCount_one": "{{count}} Übung",
     "exerciseCount_other": "{{count}} Übungen",
     "status": {
-      "stoppedAfter": "Angehalten nach {{duration}}",
-      "completedSetsReps": "{{sets}} Sätze à {{reps}} Wiederholungen abgeschlossen",
-      "completedTime": "Intervalltimer {{duration}} abgeschlossen"
+      "stoppedAfter": "Gestoppt nach {{duration}}",
+      "completedSetsReps": "{{sets}} Sätze von {{reps}} Wiederholungen abgeschlossen",
+      "completedTime": "{{duration}} Intervall-Timer abgeschlossen",
+      "completedWorkout": "Training mit {{count}} Übung abgeschlossen",
+      "completedWorkout_plural": "Training mit {{count}} Übungen abgeschlossen"
     },
     "charts": {
       "weeklyStreak": "Wöchentliche Serie",

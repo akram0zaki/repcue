@@ -365,7 +365,13 @@
     "status": {
       "stoppedAfter": "توقف بعد {{duration}}",
       "completedSetsReps": "اكتمل {{sets}} مجموعة من {{reps}} تكرار",
-      "completedTime": "اكتمل مؤقت فاصل {{duration}}"
+      "completedTime": "اكتمل مؤقت فاصل {{duration}}",
+      "completedWorkout_zero": "اكتمل التمرين بـ {{count}} تمرين",
+      "completedWorkout_one": "اكتمل التمرين بـ {{count}} تمرين",
+      "completedWorkout_two": "اكتمل التمرين بـ {{count}} تمرينان",
+      "completedWorkout_few": "اكتمل التمرين بـ {{count}} تمارين",
+      "completedWorkout_many": "اكتمل التمرين بـ {{count}} تمرين",
+      "completedWorkout_other": "اكتمل التمرين بـ {{count}} تمرين"
     },
     "charts": {
       "weeklyStreak": "السلسلة الأسبوعية",

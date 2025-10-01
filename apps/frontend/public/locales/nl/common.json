@@ -342,7 +342,9 @@
     "status": {
       "stoppedAfter": "Gestopt na {{duration}}",
       "completedSetsReps": "{{sets}} sets van {{reps}} herhalingen voltooid",
-      "completedTime": "{{duration}} interval timer voltooid"
+      "completedTime": "{{duration}} interval timer voltooid",
+      "completedWorkout": "Training voltooid met {{count}} oefening",
+      "completedWorkout_plural": "Training voltooid met {{count}} oefeningen"
     },
     "charts": {
       "weeklyStreak": "Wekelijkse Reeks",

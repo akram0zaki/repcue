@@ -341,17 +341,19 @@
     "exerciseCount_other": "{{count}} oefeningen",
     "status": {
       "stoppedAfter": "Stoppe nei {{duration}}",
-      "completedSetsReps": "Foltôge {{sets}} sets fan {{reps}} reps",
-      "completedTime": "Foltôge {{duration}} ynterfaltimer"
+      "completedSetsReps": "{{sets}} sets fan {{reps}} werhâldings foltóge",
+      "completedTime": "{{duration}} interval timer foltóge",
+      "completedWorkout": "Training foltóge mei {{count}} oefening",
+      "completedWorkout_plural": "Training foltóge mei {{count}} oefeningen"
     },
     "charts": {
       "weeklyStreak": "Wekelijkse rige",
       "currentStreak": "Aktuele rige",
       "progressChart": "Foarútgongsgrafyk",
-      "workoutFrequency": "Faakens fan workouts",
-      "workoutsPerWeek": "Workouts per wike",
+      "workoutFrequency": "Trainingsfrequinsje",
+      "workoutsPerWeek": "Trainings per wike",
       "currentMonth": "Dizze moanne",
-      "last3Months": "Lêste 3 moannen",
+      "last3Months": "Lêste 3 Moannen",
       "sinceStart": "Sûnt it begjin",
       "workoutsThisWeek": "workouts dizze wike",
       "workoutWeek": "workout dizze wike",

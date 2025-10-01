@@ -351,7 +351,9 @@
     "status": {
       "stoppedAfter": "Stopped after {{duration}}",
       "completedSetsReps": "Completed {{sets}} sets of {{reps}} reps",
-      "completedTime": "Completed {{duration}} interval timer"
+      "completedTime": "Completed {{duration}} interval timer",
+      "completedWorkout": "Workout completed with {{count}} exercise",
+      "completedWorkout_plural": "Workout completed with {{count}} exercises"
     },
     "charts": {
       "weeklyStreak": "Weekly Streak",
@@ -360,6 +362,7 @@
       "workoutFrequency": "Workout Frequency",
       "workoutsPerWeek": "Workouts per Week",
       "currentMonth": "Current Month",
+      "threeMonths": "3 Months",
       "last3Months": "Last 3 Months",
       "sinceStart": "Since Start",
       "workoutsThisWeek": "workouts this week",

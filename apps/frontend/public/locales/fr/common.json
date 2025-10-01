@@ -342,7 +342,9 @@
     "status": {
       "stoppedAfter": "Arrêté après {{duration}}",
       "completedSetsReps": "{{sets}} séries de {{reps}} répétitions terminées",
-      "completedTime": "Minuteur d'intervalle de {{duration}} terminé"
+      "completedTime": "Minuteur d'intervalle de {{duration}} terminé",
+      "completedWorkout": "Entraînement terminé avec {{count}} exercice",
+      "completedWorkout_plural": "Entraînement terminé avec {{count}} exercices"
     },
     "charts": {
       "weeklyStreak": "Série Hebdomadaire",

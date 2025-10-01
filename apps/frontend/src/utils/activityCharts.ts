@@ -230,7 +230,7 @@ export const getDateRangeOptions = (logs: ActivityLog[]) => {
   
   return {
     currentMonth: { start: currentMonth, end: now, label: 'Current Month' },
-    threeMonths: { start: threeMonthsAgo, end: now, label: '3 Months' },
+    last3Months: { start: threeMonthsAgo, end: now, label: 'Last 3 Months' },
     sinceStart: { start: sinceStart, end: now, label: 'Since Start' }
   };
 };

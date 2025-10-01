@@ -1,5 +1,29 @@
 ## Unreleased
 
+### 2025-10-01 (Activity Log UI & i18n Fixes)
+#### Fixed
+- **Activity Log Time Range Selector**: Fixed Arabic translation for "3 Months" button
+  - **Translation Key**: Changed from incorrect `threeMonths` to existing `last3Months` key in all language files
+  - **Component Update**: Updated TimeRange type and activityCharts utility to use `last3Months`
+  - **Arabic Display**: Button now correctly shows "آخر 3 أشهر" instead of English "3 Months"
+  - **All Languages**: Consistent translation across all 8 supported languages
+- **Activity Log Workout Cards**: Fixed workout name truncation and English text issues in Arabic
+  - **Name Truncation**: Removed `truncate` class and added proper flex layout (`flex-1 min-w-0`) to allow workout names to wrap instead of being cut off with ellipsis
+  - **Icon Layout**: Added `shrink-0` to blue dot and chevron icons to maintain their size while text wraps
+  - **Workout Name Display**: Removed hardcoded "(Workout)" English suffix, now shows clean workout name with separate translated badge
+  - **Completion Summary Translation**: Added `completedWorkout` translation key with proper pluralization
+    - **English**: "Workout completed with {{count}} exercise(s)"
+    - **Arabic**: "اكتمل التمرين بـ {{count}} تمرين/تمارين" with full Arabic plural forms (zero, one, two, few, many, other)
+    - **All Languages**: German, Spanish, French, Dutch, Frisian, Egyptian Arabic
+  - **localizeNotes Function**: Added pattern matching for workout completion messages
+  - **RTL Compatibility**: Layout works correctly in both LTR and RTL directions
+- **Activity Log Workout Entry Metadata**: Fixed overflow on workout entry labels
+  - **Responsive Layout**: Changed from `flex gap-4` to `flex flex-wrap gap-2 sm:gap-4`
+  - **Label Protection**: Added `shrink-0` to each metadata item (time, duration, exercise count)
+  - **Text Wrapping**: Wrapped text content in `<span>` with `whitespace-nowrap` to keep icon and text together
+  - **Mobile Optimization**: Reduced gap to `gap-2` on mobile screens for better space efficiency
+  - **No Overflow**: All three labels display properly on narrow screens without overflow
+
 ### 2025-10-01 (Exercise Card Dark Mode Contrast Improvements)
 #### Fixed
 - **Custom Badge Contrast**: Improved dark mode readability following style guide recommendations

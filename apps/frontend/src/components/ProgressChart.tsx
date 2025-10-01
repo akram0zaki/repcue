@@ -7,7 +7,7 @@ interface ProgressChartProps {
   logs: ActivityLog[];
 }
 
-type TimeRange = 'currentMonth' | 'threeMonths' | 'sinceStart';
+type TimeRange = 'currentMonth' | 'last3Months' | 'sinceStart';
 
 const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
   const { t, i18n } = useTranslation(['common', 'activity']);
@@ -75,13 +75,13 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
           {chartTitle}
         </h3>
         
-        {/* Time range selector */}
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        {/* Time range selector - Equal width buttons with text wrapping */}
+        <div className="flex flex-col sm:flex-row bg-gray-100 dark:bg-gray-700 rounded-lg p-1 gap-1">
           {Object.entries(dateRanges).map(([key, range]) => (
             <button
               key={key}
               onClick={() => setSelectedRange(key as TimeRange)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              className={`flex-1 min-w-0 px-3 py-1.5 text-xs font-medium rounded-md transition-colors text-center leading-tight ${
                 selectedRange === key
                   ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
