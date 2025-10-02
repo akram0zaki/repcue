@@ -259,7 +259,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
 
           {/* Vibration Enable/Disable */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <label htmlFor="vibration-enabled" className="label-text">
               {t('settings.enableVibration')}
             </label>
@@ -333,7 +333,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
 
           {/* Ring Timer */}
-          <div className="flex items-center justify-between mt-6 mb-4">
+          <div className="flex items-center justify-between mt-6 mb-3">
             <label htmlFor="ring-timer" className="label-text">
               {t('settings.ringTimer')}
             </label>
@@ -344,7 +344,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-ring-timer"
             />
           </div>
-          <p className="text-xs help-text mb-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {t('settings.ringTimerHelp')}
           </p>
         </div>
@@ -359,7 +359,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </h2>
           
           {/* Dark Mode */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <label htmlFor="dark-mode" className="label-text">
               {t('settings.darkMode')}
             </label>
@@ -371,7 +371,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             />
           </div>
           {/* Exercise Demo Videos */}
-  <div className="flex items-center justify-between mb-4" data-testid="setting-show-exercise-videos">
+          <div className="flex items-center justify-between mb-3" data-testid="setting-show-exercise-videos">
             <label htmlFor="exercise-videos" className="label-text">
               {t('settings.showExerciseVideos')}
             </label>
@@ -382,12 +382,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-exercise-videos"
             />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {t('settings.showExerciseVideosHelp')}
           </p>
 
           {/* Horizontal Exercise Layout */}
-          <div className="flex items-center justify-between mt-6 mb-4" data-testid="setting-horizontal-exercise-layout">
+          <div className="flex items-center justify-between mt-6 mb-3" data-testid="setting-horizontal-exercise-layout">
             <label htmlFor="horizontal-exercise-layout" className="label-text">
               {t('settings.horizontalExerciseLayout')}
             </label>
@@ -398,7 +398,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-horizontal-exercise-layout"
             />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {t('settings.horizontalExerciseLayoutHelp')}
           </p>
         </div>

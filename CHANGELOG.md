@@ -1,5 +1,16 @@
 ## Unreleased
 
+### 2025-10-03 (Settings Page Toggle Switch Styling Consistency)
+#### Fixed
+- **Toggle Switch Styling Consistency**: Applied uniform styling to all toggle switches on Settings page
+  - Standardized spacing: all toggles now use `mb-3` for consistent vertical spacing
+  - Unified help text spacing: changed from `mt-2` to `mt-1` for tighter, cleaner layout
+  - Fixed ring timer help text: changed from `help-text mb-4` to `text-gray-500 dark:text-gray-400 mt-1`
+  - All toggles now follow the same pattern as the "Enable Sound" toggle
+  - Affected toggles: vibration, ring timer, dark mode, exercise videos, horizontal layout
+  - Improved visual consistency and spacing rhythm across the Settings page
+  - Better alignment and professional appearance
+
 ### 2025-10-03 (Settings Page Color Scheme Update)
 #### Fixed
 - **Settings Page Color Scheme Alignment**: Updated all button and toggle colors to match teal-based design system
