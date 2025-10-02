@@ -109,10 +109,10 @@ vi.mock('../hooks/useRTLDetection', () => ({
 const originalFetch: typeof fetch | undefined = (global as any).fetch as any;
 beforeEach(() => {
   // Mock setTimeout for test environment
-  global.setTimeout = vi.fn((fn: Function) => {
+  global.setTimeout = vi.fn((fn: () => void) => {
     fn();
     return 0 as any;
-  });
+  }) as any;
 
   // Default: 404 for our missing asset
   // @ts-expect-error node types

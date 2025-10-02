@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ExerciseSelector } from '../ExerciseSelector';
 import type { Exercise } from '../../../types';
+import { useExerciseFilter } from '../../../hooks/useExerciseFilter';
 
 // Mock the hook
 vi.mock('../../../hooks/useExerciseFilter', () => ({
@@ -246,7 +247,7 @@ describe('ExerciseSelector', () => {
   });
 
   it('should show empty state when no exercises match filters', () => {
-    vi.mocked(require('../../../hooks/useExerciseFilter').useExerciseFilter).mockReturnValueOnce({
+    vi.mocked(useExerciseFilter).mockReturnValueOnce({
       filteredExercises: [],
       filterState: {
         selectedCatalogId: 'default',
@@ -275,7 +276,7 @@ describe('ExerciseSelector', () => {
   });
 
   it('should display custom empty state message', () => {
-    vi.mocked(require('../../../hooks/useExerciseFilter').useExerciseFilter).mockReturnValueOnce({
+    vi.mocked(useExerciseFilter).mockReturnValueOnce({
       filteredExercises: [],
       filterState: {
         selectedCatalogId: 'default',
