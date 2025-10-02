@@ -1,5 +1,13 @@
 ## Unreleased
 
+### 2025-10-03 (Fix "Custom" Badge Arabic Translation)
+#### Fixed
+- **Custom Exercise Badge Localization**: Fixed "Custom" badge displaying in English on Arabic screens
+  - Added missing `custom` translation key to `ar/exercises.json` and `ar-EG/exercises.json`
+  - Badge now displays "مخصص" (Custom in Arabic) instead of "Custom"
+  - Affects custom exercise badges shown on exercise cards throughout the app
+  - Consistent with existing `filterCustom` translation
+
 ### 2025-10-03 (Fix Day Labels Overflow on Workout Forms)
 #### Fixed
 - **Create/Edit Workout Days Selector Overflow**: Fixed day of week labels overflowing their containers

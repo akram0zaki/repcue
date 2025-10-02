@@ -186,6 +186,7 @@
   "filterAll": "الكل",
   "filterBuiltIn": "مدمج",
   "filterCustom": "مخصص",
+  "custom": "مخصص",
   "favoritesOnly": "المفضلة فقط",
   "searchPlaceholder": "ابحث بالاسم أو الوصف أو العلامة...",
   "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}",
