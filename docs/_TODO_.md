@@ -213,9 +213,9 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
 -✅ I want to rearrange the layout of the exercise card on ExercisePage. I want to make it visually attractive by displaying a frame of the video on the card with the exercise title and action buttons (edit/share/delete/favorite) above the picture (video frame), and below the video frame I want to display the type (time-based/rep-based) and the duration or reps/sets. I am not decided on where to place the "start timer" button and open to suggestions.
 Not all exercises have videos so if the exercise doesn't have a video we should use a placeholder image.
 
-- For the multi-catalog implementation:
-  - Each catalog should have a picture
-  - Each built-in exercise should have additional attributes: benefits, limitations, best_timing, suggested_combinations, notes, references. Example:
+- ✅ For the multi-catalog implementation:
+  - ✅ Each catalog should have a picture
+  - ✅ Each built-in exercise should have additional attributes: benefits, limitations, best_timing, suggested_combinations, notes, references. Example:
 ```typescript
   createExercise({
     id: 'wall-push-up',
@@ -238,12 +238,51 @@ Not all exercises have videos so if the exercise doesn't have a video we should 
     references: ['NHS Fitness Studio Exercises'],
   })
 ```
-  - Keep track of all the schema migrations, edge functions, and policies applied to the dev project to be later applied to the production project. I would rather keep the production project stable until this feature is fully implemented, and I don't want migrations to be forgotten.
-  - I added three catalogs that I want to be part of the implementation: womenHealth.ts, taiChi.ts, and zumba.ts
+- ✅ Keep track of all the schema migrations, edge functions, and policies applied to the dev project to be later applied to the production project. I would rather keep the production project stable until this feature is fully implemented, and I don't want migrations to be forgotten.
 
-- Since this is a PWA it is difficult to force-push new updates to users because pages are cached. I want to introduce a version system maintained in the database and a force-update mechanism linked to the version system. When the PWA comes online during initialization or sync or whatever applicable touchpoint, it would look up the version system in the database, compare the last published version against its local record, and prompt the user for a new version and if it is a mandatory upgrade, it only continues working if the user upgrades.
+- ✅ I added three catalogs that I want to be part of the implementation: womenHealth.ts, taiChi.ts, and zumba.ts
 
-- Go over the documentation @docs\implementation-plans\sharing-fix-implementation-plan.md @docs\exercises-sync.md @docs\exercise-sharing.md @docs\video-sync.md @docs\sync.md to understand how the sync system works. If there are contradictions in the documentation it is because each document was written at a different stage of the project, in which case you refer to the implementation to see what the real implementation is and update wrong documentation accordingly.
+- ✅ Since this is a PWA it is difficult to force-push new updates to users because pages are cached. I want to introduce a version system maintained in the database and a force-update mechanism linked to the version system. When the PWA comes online during initialization or sync or whatever applicable touchpoint, it would look up the version system in the database, compare the last published version against its local record, and prompt the user for a new version and if it is a mandatory upgrade, it only continues working if the user upgrades.
+
+- ✅ Go over the documentation @docs\implementation-plans\sharing-fix-implementation-plan.md @docs\exercises-sync.md @docs\exercise-sharing.md @docs\video-sync.md @docs\sync.md to understand how the sync system works. If there are contradictions in the documentation it is because each document was written at a different stage of the project, in which case you refer to the implementation to see what the real implementation is and update wrong documentation accordingly.
+
+- ✅ The SettingsPage is made up of multiple sections, e.g. Profile, Audio Settings, Timer Settings, Appearance, etc. There is spacing between each section and the other, and there is spacing between different controls within the same section. Currently this spacing is not consistent. For example there is no spacing between Data and App Updates sections. And there are a few sections where spacing between the controls within the section is not consistent like:
+- ✅ The SettingsPage is made up of multiple sections, e.g. Profile, Audio Settings, Timer Settings, Appearance, etc. There is spacing between each section and the other, and there is spacing between different controls within the same section. Currently this spacing is not consistent. For example there is no spacing between Data and App Updates sections. And there are a few sections where spacing between the controls within the section is not consistent like:
+- ✅ On the SettingsPage.tsx I want to introduce a new toggle in the Timer Settings section with label Ring Timer and default is On. This toggle should be persisted in indexeddb in app_settings table and should have bidirectional sync to supabase table app_settings. You must write any supabase changes/migrations to workspace first before applying to supabase. This toggle should control how the timer appears on the Timer page. Currently it is a circle and inside it the video is played (if available) while the outside of the circle there are two rings one for rep progress and the other is for reps per current set progress. If the toggle is off then the timer should be rendered in a rectangle (landscape) and video is inside the rectangle (if available) while the outer sides of the rectangle render same progress (progress per rep, rep progress within current set). but of course it is ia rectangle so the progress will take sharp turns along the border.
+
+- ✅ The SettingsPage is made up of multiple sections, e.g. Profile, Audio Settings, Timer Settings, Appearance, etc. There is spacing between each section and the other, and there is spacing between different controls within the same section. Currently this spacing is not consistent. For example there is no spacing between Data and App Updates sections. And there are a few sections where spacing between the controls within the section is not consistent like:
++ ✅ Timer Settings: No space above Ring Timer.
++ ✅ Appearance: No space above "Horizontal Category Listing"
+Fix the spacing issue, review the whole  page and implement a consistent spacing strategy.
+
+- ✅ On ExerciseDetailPage.tsx:
++ ✅ When the page loads the navigation starts somewhere down on the page not at the top. When page is opened the navigation should start at the very top of the page (video thumbnail).
++ ✅ Remove the horizontal colored bar at the top of the page below the video thumbnail.
++ ✅ Exercise description should move to the top just below the exercise name, and it should be rendered without the header "Description".
++ ✅ The buttons currently rendered below the exercise name (e.g. time-based/rep-based, core, beginner, private) should be removed completely because they are listed further below on the same page.
++ ✅ The "Start Timer" button should occupy the same line with the "Sign in to copy" button.
++ ✅ "Default Settings" section to be removed, both header and content (e.g. Duration 30s)
++ ✅ Exercise Information has Exercise Type label, that should display the exercise type followed by the duration (e.g. 30s or 3x8 etc) on the same line. And on the same section, the whole Video Demo line should be removed.
+
+- ✅ While on the exercise details page then I click on another exercise link in the suggested combinations section then from the second exercise  I click back I go straight to the exercises listing. The app should track the browsing hierarchy and take me back one step only. If I want to go to th exercises menu I will just      
+use the Exercises navigation tab.
+
+- ✅ I did some work in an effort to unify the structure of exercise-related locale files. We had two locale files exercise.json and exercises.json which was confusing. I copied all keys from exercise.json to exercises.json and corrected the how they are read in the different pages. However this doesn't seem to have been done correctly because I see now the exercise details are not localized in many pages in the application. Hence I refactored the exercise-related keys in all locales as such:
++ renamed exercises.json to exerciseDetails.json which now contains the translated string for the individual exercise attributes
++ renamed exercise.json to exercises.json which now contains all the screen labels and enums needed to render exercises on the different pages
+Now I need you to go over the application pages and make sure the i18n keys related to exercises are resolved according to this setup.
+                                                                                                                                                            
+- There is an exercise selector on TimerPage.tsx and also another one on CreateExercisePage.tsx and EditExercisePage.tsx. I don't know if this is the same component reused in different pages, or different implementations of the same logic. If no reusable component exists for choosing an exercise I would like you to create one and use it in these three pages. The exercise selector should offer exceptional user experience that makes it easy to find the desired exercise even when the exercise catalog grows significantly in size into hundreds of exercises. Currently the system offers about 77 exercises and the selector is nothing but a scrollable list. A good selector should cater for the fact that there are different catalogs now, and different categories of exercises (e.g. core, balance, etc). Also should offer toggles like All/Built-in/Custom/Shared with me. Maybe the filter & search component on the ExercisePage.tsx is a good example and maybe it can be reused. However in the three pages I listed (timer/create workout/edit workout) the selection should allow only one exercise not multiple.
+I would like you to examine the workspace understand the current implementation, then go over the relevant documentation like ui-specs.md, i18n-guide.md, exercise-catalog.md then create an implementation plan and write it to docs\implementation-plans\exercise-selector-implementation-plan.md. If any of the documentation I mentioned is not accurate according to the current implementation, then update the documentation as well.
+
+- Create exercise selector component and use it in create workout and timer pages.
+
+- Read the documentation and examine the workspace to understand what this app does. Basically it is an offline-first, mobile-first exercise catalog and workout tracker that helps users pick the exercises that suits them and create workout schedules assigned to weekdays. Then once an exercise or a workout starts, it is timer-guided and logged in the activity log. I would like to introduce an AI-onboarding process that would ask the user a few questions about their target (e.g. fitness, weight loss, etc), if they have injuries, among a few other questions, then with the use of an AI model it would create a workout or more matching their answers and save it to their profile. This onboarding feature would require login to work because the AI assistant needs to be online, but the output of it will be one or more workouts that would follow the app architecture and flow normally.
+I would like to add a button to the home screen above the workout section to trigger this onboarding flow. Below are further details about this requirement:
+  + There is a concept design in the workspace at docs\implementation-plans\onboarding\onboarding-concept.JPG which contains the three Arabic (RTL) onboarding screens.
+  + This is just a concept so don't take the style and layout literally, you should create the screens within RepCue's style guide docs\ui-ux\ui-specs.md and docs\ui-ux\rtl-development-guide.md and follow the localization guide to support the 8 locales
+  + The onboarding should be 3 screens as per the concept and progress is shown at the top so the user knows how much is left.
+Ask me questions if the requirement is not clear, and once you have all the answers, create an implementation plan made up with the different phases and tasks to implement this then write it to docs\implementation-plans\onboarding.md
 
 
 

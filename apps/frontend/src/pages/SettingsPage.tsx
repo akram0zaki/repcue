@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: UI text comes from t(); remaining literals are units/IDs/tokens */
 import React, { useState } from 'react';
+import ToggleSwitch from '../components/ToggleSwitch';
 import { useTranslation } from 'react-i18next';
 import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
@@ -200,7 +201,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const consentStatus = consentService.getConsentStatus();
 
   return (
-    <div id="main-content" className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+    <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Profile Section */}
         <ProfileSection 
@@ -210,43 +211,32 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         />
 
         {/* Audio Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-            <SpeakerIcon size={20} className="text-blue-600 dark:text-blue-400" />
+  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <SpeakerIcon size={20} className="section-icon" />
             {t('settings.audioSettings')}
           </h2>
           
           {/* Sound Enable/Disable */}
           <div className="flex items-center justify-between mb-3">
-            <label htmlFor="sound-enabled" className="text-gray-700 dark:text-gray-300 font-medium">
+            <label htmlFor="sound-enabled" className="label-text">
               {t('settings.enableSound')}
             </label>
-            <button
+            <ToggleSwitch
               id="sound-enabled"
-              onClick={() => onUpdateSettings({ sound_enabled: !appSettings.sound_enabled })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.sound_enabled 
-                  ? 'bg-blue-600' 
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.sound_enabled 
-                    ? 'translate-x-6 toggle-switch-on' 
-                    : 'translate-x-1 toggle-switch-off'
-                }`}
-              />
-            </button>
+              checked={appSettings.sound_enabled}
+              onChange={() => onUpdateSettings({ sound_enabled: !appSettings.sound_enabled })}
+              dataTestId="toggle-sound-enabled"
+            />
           </div>
 
                     {/* Volume Control */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="beep-volume" className="text-gray-700 dark:text-gray-300 font-medium">
+              <label htmlFor="beep-volume" className="label-text">
                 {t('settings.beepVolume')}
               </label>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-text-500 dark:text-text-400">
                 {Math.round(appSettings.beep_volume * 100)}%
               </span>
             </div>
@@ -259,7 +249,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               value={appSettings.beep_volume}
               onChange={handleVolumeChange}
               disabled={!appSettings.sound_enabled}
-              className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+              className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
             />
             <div className="grid grid-cols-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
               <span className="text-left">{t('common.low')}</span>
@@ -269,43 +259,35 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
 
           {/* Vibration Enable/Disable */}
-          <div className="flex items-center justify-between">
-            <label htmlFor="vibration-enabled" className="text-gray-700 dark:text-gray-300 font-medium">
+          <div className="flex items-center justify-between mb-3">
+            <label htmlFor="vibration-enabled" className="label-text">
               {t('settings.enableVibration')}
             </label>
-            <button
+            <ToggleSwitch
               id="vibration-enabled"
-              onClick={() => onUpdateSettings({ vibration_enabled: !appSettings.vibration_enabled })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.vibration_enabled 
-                  ? 'bg-blue-600' 
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.vibration_enabled 
-                    ? 'translate-x-6 toggle-switch-on' 
-                    : 'translate-x-1 toggle-switch-off'
-                }`}
-              />
-            </button>
+              checked={appSettings.vibration_enabled}
+              onChange={() => onUpdateSettings({ vibration_enabled: !appSettings.vibration_enabled })}
+              dataTestId="toggle-vibration-enabled"
+            />
           </div>
         </div>
 
         {/* Timer Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             {t('settings.timerSettings')}
           </h2>
           
           {/* Pre-Timer Countdown */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="pre-timer-countdown" className="text-gray-700 dark:text-gray-300 font-medium">
+              <label htmlFor="pre-timer-countdown" className="label-text">
                 {t('settings.preTimerCountdown')}
               </label>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-text-500 dark:text-text-400">
                 {appSettings.pre_timer_countdown === 0 ? t('common.off') : `${appSettings.pre_timer_countdown}${t('common.secondsShortSuffix')}`}
               </span>
             </div>
@@ -317,7 +299,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               step="1"
               value={appSettings.pre_timer_countdown}
               onChange={(e) => onUpdateSettings({ pre_timer_countdown: parseInt(e.target.value) })}
-              className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+              className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
             />
             <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
               <span>{t('common.off')}</span>
@@ -331,14 +313,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           {/* Interval Duration */}
           <div>
-            <label htmlFor="interval-duration" className="block text-gray-700 dark:text-gray-300 font-medium mb-2">
+            <label htmlFor="interval-duration" className="block label-text mb-2">
               {t('timer.beepInterval')}
             </label>
             <select
               id="interval-duration"
               value={appSettings.interval_duration}
               onChange={handleIntervalChange}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-3 border border-surface-300 dark:border-surface-600 rounded-lg bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value={15}>{t('timer.beepInterval15')}</option>
               <option value={30}>{t('timer.beepInterval30')}</option>
@@ -349,67 +331,84 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               {t('settings.beepIntervalHelp')}
             </p>
           </div>
+
+          {/* Ring Timer */}
+          <div className="flex items-center justify-between mt-6 mb-3">
+            <label htmlFor="ring-timer" className="label-text">
+              {t('settings.ringTimer')}
+            </label>
+            <ToggleSwitch
+              id="ring-timer"
+              checked={appSettings.ring_timer !== false}
+              onChange={() => onUpdateSettings({ ring_timer: !appSettings.ring_timer })}
+              dataTestId="toggle-ring-timer"
+            />
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {t('settings.ringTimerHelp')}
+          </p>
         </div>
 
         {/* Appearance Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+            </svg>
             {t('settings.appearance')}
           </h2>
           
           {/* Dark Mode */}
-          <div className="flex items-center justify-between">
-            <label htmlFor="dark-mode" className="text-gray-700 dark:text-gray-300 font-medium">
+          <div className="flex items-center justify-between mb-3">
+            <label htmlFor="dark-mode" className="label-text">
               {t('settings.darkMode')}
             </label>
-            <button
+            <ToggleSwitch
               id="dark-mode"
-              onClick={() => onUpdateSettings({ dark_mode: !appSettings.dark_mode })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.dark_mode 
-                  ? 'bg-blue-600' 
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.dark_mode 
-                    ? 'translate-x-6 toggle-switch-on' 
-                    : 'translate-x-1 toggle-switch-off'
-                }`}
-              />
-            </button>
+              checked={appSettings.dark_mode}
+              onChange={() => onUpdateSettings({ dark_mode: !appSettings.dark_mode })}
+              dataTestId="toggle-dark-mode"
+            />
           </div>
           {/* Exercise Demo Videos */}
-      <div className="flex items-center justify-between mt-4" data-testid="setting-show-exercise-videos">
-            <label htmlFor="exercise-videos" className="text-gray-700 dark:text-gray-300 font-medium">
+          <div className="flex items-center justify-between mb-3" data-testid="setting-show-exercise-videos">
+            <label htmlFor="exercise-videos" className="label-text">
               {t('settings.showExerciseVideos')}
             </label>
-            <button
+            <ToggleSwitch
               id="exercise-videos"
-              onClick={() => onUpdateSettings({ show_exercise_videos: !appSettings.show_exercise_videos })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.show_exercise_videos ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-        data-testid="toggle-exercise-videos"
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.show_exercise_videos 
-                    ? 'translate-x-6 toggle-switch-on' 
-                    : 'translate-x-1 toggle-switch-off'
-                }`}
-              />
-            </button>
+              checked={appSettings.show_exercise_videos === true}
+              onChange={() => onUpdateSettings({ show_exercise_videos: !appSettings.show_exercise_videos })}
+              dataTestId="toggle-exercise-videos"
+            />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {t('settings.showExerciseVideosHelp')}
+          </p>
+
+          {/* Horizontal Exercise Layout */}
+          <div className="flex items-center justify-between mt-6 mb-3" data-testid="setting-horizontal-exercise-layout">
+            <label htmlFor="horizontal-exercise-layout" className="label-text">
+              {t('settings.horizontalExerciseLayout')}
+            </label>
+            <ToggleSwitch
+              id="horizontal-exercise-layout"
+              checked={appSettings.horizontal_exercise_layout === true}
+              onChange={() => onUpdateSettings({ horizontal_exercise_layout: !appSettings.horizontal_exercise_layout })}
+              dataTestId="toggle-horizontal-exercise-layout"
+            />
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {t('settings.horizontalExerciseLayoutHelp')}
           </p>
         </div>
 
         {/* Language Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
             {t('settings.language')}
           </h2>
           
@@ -419,58 +418,38 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         </div>
 
         {/* Data Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+            </svg>
             {t('settings.data')}
           </h2>
-          
-          {/* Auto Save */}
-          <div className="flex items-center justify-between mb-4">
-            <label htmlFor="auto-save" className="text-gray-700 dark:text-gray-300 font-medium">
-              {t('settings.autoSave')}
-            </label>
-            <button
-              id="auto-save"
-              onClick={() => onUpdateSettings({ auto_save: !appSettings.auto_save })}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                appSettings.auto_save 
-                  ? 'bg-blue-600' 
-                  : 'bg-gray-200 dark:bg-gray-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  appSettings.auto_save 
-                    ? 'translate-x-6 toggle-switch-on' 
-                    : 'translate-x-1 toggle-switch-off'
-                }`}
-              />
-            </button>
-          </div>
 
-          {/* Data Storage Status */}
-          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          {/* (Auto Save & Data Storage status removed as per UX cleanup) */}
+          {/* Consent Status Panel */}
+          <div className="mb-4 p-3 bg-surface-50 dark:bg-surface-700 rounded-lg" data-testid="consent-status-panel">
             <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {t('settings.dataStorageLabel')} <span className="font-medium">{hasConsent ? t('settings.enabled') : t('settings.disabled')}</span>
+              <p className="text-sm text-gray-700 dark:text-gray-200">
+                {t('settings.consentStatusLabel', 'Consent Status')}: <span className="font-medium">{hasConsent ? t('settings.enabled', 'Enabled') : t('settings.disabled', 'Disabled')}</span>
               </p>
-              <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+              <span className="text-xs bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 px-2 py-1 rounded" title={t('settings.consentVersion', 'Consent version')}>
                 v{consentStatus.version}
               </span>
             </div>
             {hasConsent && (
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                {t('settings.dataStoredLocally')}
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t('settings.dataStoredLocally', 'Your data is stored locally and governed by your granted consent.')}
               </p>
             )}
             {!hasConsent && (
               <p className="text-xs text-red-500 dark:text-red-400 mt-1">
-                {t('settings.pleaseAcceptConsent')}
+                {t('settings.pleaseAcceptConsent', 'Please review and accept the consent notice to enable data storage.')}
               </p>
             )}
             {!consentStatus.isLatestVersion && (
               <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
-                {t('settings.consentMigrationWarning')}
+                {t('settings.consentMigrationWarning', 'A newer consent version is available — please review to stay up to date.')}
               </p>
             )}
           </div>
@@ -480,7 +459,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleExportData}
               disabled={!hasConsent}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
               {t('settings.exportData')}
             </button>
@@ -494,7 +473,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleSyncNow}
               disabled={!hasConsent || !isAuthenticated || isManualSyncing}
-              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
               data-testid="btn-sync-now"
             >
               {isManualSyncing ? t('settings.syncInProgress') : t('settings.syncNow')}
@@ -505,15 +484,15 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
 
           {/* Advanced Sync Controls */}
-          <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" data-testid="advanced-sync-controls">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 p-3 bg-surface-50 dark:bg-surface-700 rounded-lg" data-testid="advanced-sync-controls">
+              <h3 className="text-sm font-medium text-text-700 dark:text-text-300 mb-2">
                 {t('settings.syncAdvanced')}
               </h3>
               <div className="space-y-2">
                 <button
                   onClick={handleForceFullSync}
                   disabled={!hasConsent || !isAuthenticated || isForceFullSyncing}
-                  className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
                   data-testid="btn-force-full-sync"
                 >
                   {isForceFullSyncing ? t('settings.syncInProgress') : t('settings.forceFullSync')}
@@ -521,7 +500,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 <button
                   onClick={handleResetSyncState}
                   disabled={!hasConsent || !isAuthenticated || isResettingSyncState}
-                  className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
                   data-testid="btn-reset-sync-state"
                 >
                   {isResettingSyncState ? t('common.loading') : t('settings.resetSyncState')}
@@ -537,7 +516,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleRefreshExercises}
               disabled={!hasConsent}
-              className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
               {t('settings.refreshExercises')}
             </button>
@@ -551,7 +530,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleForceRefresh}
               disabled={isRefreshing}
-              className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
               {isRefreshing ? t('common.loading') : t('settings.forceRefreshApp')}
             </button>
@@ -563,14 +542,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <button
                 onClick={handleClearCaches}
                 disabled={isRefreshing}
-                className="py-2 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="py-2 px-3 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {t('settings.clearCachesOnly')}
               </button>
               <button
                 onClick={handleUpdateServiceWorker}
                 disabled={isRefreshing}
-                className="py-2 px-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="py-2 px-3 bg-secondary-300 hover:bg-secondary-400 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {t('settings.updateServiceWorker')}
               </button>
@@ -586,7 +565,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleClearData}
               disabled={!hasConsent}
-              className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
               {t('settings.clearAllDataAndReset')}
             </button>
@@ -597,18 +576,21 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         </div>
 
         {/* Update Preferences */}
-        <UpdatePreferencesPanel />
+  <UpdatePreferencesPanel />
 
         {/* Security & Privacy Settings */}
         {isAuthenticated && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mt-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+          <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4">
+            <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+              <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
               {t('settings.securityPrivacy')}
             </h2>
             
             {/* Data Export */}
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <h3 className="section-subtitle mb-3">
                 {t('settings.exportYourData')}
               </h3>
               <DataExportButton className="w-full" />
@@ -616,7 +598,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
             {/* Account Deletion */}
             <div className="pt-4 border-t border-gray-200 dark:border-gray-600">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <h3 className="section-subtitle mb-3">
                 {t('settings.deleteAccount')}
               </h3>
               <button
@@ -625,7 +607,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               >
                 {t('settings.deleteMyAccount')}
               </button>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="help-text mt-1">
                 {t('settings.deleteAccountHelp')}
               </p>
             </div>
@@ -670,4 +652,4 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   );
 };
 
-export default SettingsPage; 
+export default SettingsPage;

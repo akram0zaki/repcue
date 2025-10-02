@@ -6,12 +6,74 @@ import { storageService } from '../../services/storageService';
 import type { Exercise, ActivityLog } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
 import { createMockExercise, createMockActivityLog } from '../../test/testUtils';
+import logger from '../../utils/logger';
 
 // Mock the storage service
 vi.mock('../../services/storageService', () => ({
   storageService: {
     getActivityLogs: vi.fn()
   }
+}));
+
+// Mock components
+vi.mock('../../components/WeeklyStreakCalendar', () => ({
+  default: ({ logs }: { logs: any[] }) => (
+    <div data-testid="weekly-streak-calendar">
+      WeeklyStreakCalendar with {logs.length} logs
+    </div>
+  )
+}));
+
+vi.mock('../../components/ProgressChart', () => ({
+  default: ({ logs }: { logs: any[] }) => (
+    <div data-testid="progress-chart">
+      ProgressChart with {logs.length} logs
+    </div>
+  )
+}));
+
+vi.mock('../../components/CategoryFilter', () => ({
+  default: ({ selectedCategories, onCategoryToggle, onClearAll }: any) => (
+    <div data-testid="category-filter">
+      CategoryFilter (selected: {selectedCategories.size})
+      <button role="button" aria-label="Select categories">Select</button>
+      <button role="button" aria-label="Core category" onClick={() => onCategoryToggle && onCategoryToggle('core')}>core</button>
+      <button role="button" aria-label="Strength category" onClick={() => onCategoryToggle && onCategoryToggle('strength')}>strength</button>
+    </div>
+  )
+}));
+
+// Mock i18n
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: any) => {
+      const translations: Record<string, string> = {
+        'activity.title': 'Activity Log',
+        'activity.subtitle': 'Track your fitness journey and progress',
+        'activity.noWorkouts': 'No workouts yet',
+        'activity.noWorkoutsYet': 'No workouts yet',
+        'activity.emptySubtitle': 'Start your first workout to see your activity here',
+        'activity.startFirstWorkout': 'Start your first workout to see your activity here',
+        'common.secondsShortSuffix': 's',
+        'common.minutesShortSuffix': 'm',
+        'activity.status.completedTime': `Completed in ${options?.duration}`,
+        'common.at': 'at',
+        'activity.expandWorkout': 'Show exercises',
+        'activity.collapseWorkout': 'Hide exercises',
+        'exerciseDetails:plank.name': 'Plank',
+        'exerciseDetails:push-ups.name': 'Push-ups',
+        'exerciseDetails:running.name': 'Running',
+        'common:categories.core': 'core',
+        'common:categories.strength': 'strength',
+        'common:categories.cardio': 'cardio',
+        'activity.yourProgress': 'Your Progress',
+        'activity.noCategoryWorkoutsYet': 'No Strength workouts yet'
+      };
+      return translations[key] || key;
+    },
+    i18n: { resolvedLanguage: 'en', language: 'en', languages: ['en'] }
+  }),
+  I18nextProvider: ({ children }: any) => children
 }));
 
 const mockExercises: Exercise[] = [
@@ -103,9 +165,9 @@ describe('ActivityLogPage', () => {
 
   it('renders empty state when no logs exist', async () => {
     vi.mocked(storageService.getActivityLogs).mockResolvedValue([]);
-    
+
     render(<ActivityLogPage exercises={mockExercises} />);
-    
+
     await waitFor(() => {
       expect(screen.getByText('No workouts yet')).toBeInTheDocument();
       expect(screen.getByText('Start your first workout to see your activity here')).toBeInTheDocument();
@@ -121,25 +183,25 @@ describe('ActivityLogPage', () => {
       // Check header
       expect(screen.getByText('Activity Log')).toBeInTheDocument();
       expect(screen.getByText('Track your fitness journey and progress')).toBeInTheDocument();
-      
-      // Check exercise names - account for multiple appearances
-      expect(screen.getAllByText('Plank')).toHaveLength(3); // Stats favorite + 2 activity entries
+
+      // Check exercise names in activity entries (using exerciseDetails: prefix)
+      expect(screen.getAllByText('Plank')).toHaveLength(2); // 2 activity entries
       expect(screen.getByText('Push-ups')).toBeInTheDocument();
       expect(screen.getByText('Running')).toBeInTheDocument();
     });
   });
 
-  it('displays statistics correctly', async () => {
+  it('displays charts correctly', async () => {
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(mockActivityLogs);
-    
+
     render(<ActivityLogPage exercises={mockExercises} />);
-    
+
     await waitFor(() => {
-      // Check stats card
-      expect(screen.getByText('Your Progress')).toBeInTheDocument();
-      expect(screen.getByText('4')).toBeInTheDocument(); // Total workouts
-      expect(screen.getByText('8m 15s')).toBeInTheDocument(); // Total time (495 seconds)
-      expect(screen.getAllByText('Plank')).toHaveLength(3); // Favorite exercise in stats + 2 activity entries
+      // Check that chart components are rendered when there are logs
+      expect(screen.getByTestId('weekly-streak-calendar')).toBeInTheDocument();
+      expect(screen.getByTestId('progress-chart')).toBeInTheDocument();
+      expect(screen.getByText('WeeklyStreakCalendar with 4 logs')).toBeInTheDocument();
+      expect(screen.getByText('ProgressChart with 4 logs')).toBeInTheDocument();
     });
   });
 
@@ -150,18 +212,24 @@ describe('ActivityLogPage', () => {
     
     await waitFor(() => {
       // Initially shows all logs - expect Plank to appear multiple times
-      expect(screen.getAllByText('Plank')).toHaveLength(3); // Appears in stats, logs, and possibly category badge
+      expect(screen.getAllByText('Plank')).toHaveLength(2); // 2 activity entries
       expect(screen.getByText('Push-ups')).toBeInTheDocument();
       expect(screen.getByText('Running')).toBeInTheDocument();
     });
 
+    // Open category filter dropdown
+    const filterDropdown = screen.getByRole('button', { name: /select/i });
+    fireEvent.click(filterDropdown);
+
     // Filter by core category
-    const coreFilter = screen.getByRole('button', { name: /core/i });
-    fireEvent.click(coreFilter);
+    await waitFor(() => {
+      const coreFilter = screen.getByRole('button', { name: /core/i });
+      fireEvent.click(coreFilter);
+    });
 
     await waitFor(() => {
-      // Should only show core exercises (Plank) - stats favorite + filtered activity entries
-      expect(screen.getAllByText('Plank')).toHaveLength(3); // Stats favorite + 2 core activity entries
+      // Should only show core exercises (Plank) - only filtered activity entries
+      expect(screen.getAllByText('Plank')).toHaveLength(2); // 2 core activity entries
       expect(screen.queryByText('Push-ups')).not.toBeInTheDocument();
       expect(screen.queryByText('Running')).not.toBeInTheDocument();
     });
@@ -196,8 +264,8 @@ describe('ActivityLogPage', () => {
     render(<ActivityLogPage exercises={mockExercises} />);
     
     await waitFor(() => {
-      // Check that the specific duration appears in the activity list (not just stats)
-      expect(screen.getAllByText('30s')).toHaveLength(2); // Appears in stats total time and activity duration
+      // Check that the specific duration appears in the activity list
+      expect(screen.getByText('30s')).toBeInTheDocument(); // Duration in activity entry
     });
   });
 
@@ -225,40 +293,34 @@ describe('ActivityLogPage', () => {
 
   it('displays exercise categories with correct colors', async () => {
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(mockActivityLogs);
-    
+
     render(<ActivityLogPage exercises={mockExercises} />);
-    
+
     await waitFor(() => {
-      // Check that category filter buttons are displayed - match case-insensitively
-      expect(screen.getByRole('button', { name: /core/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /strength/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cardio/i })).toBeInTheDocument();
+      // Check that category badges are displayed in the activity log entries
+      expect(screen.getAllByText('core').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('strength').length).toBeGreaterThan(0);
+      expect(screen.getByText('cardio')).toBeInTheDocument();
     });
   });
 
-  it('allows closing stats card', async () => {
+  it('displays charts section correctly', async () => {
     vi.mocked(storageService.getActivityLogs).mockResolvedValue(mockActivityLogs);
-    
+
     render(<ActivityLogPage exercises={mockExercises} />);
-    
-    await waitFor(() => {
-      expect(screen.getByText('Your Progress')).toBeInTheDocument();
-    });
-
-    // Find and click close button
-    const closeButton = screen.getByLabelText('Close stats card');
-    fireEvent.click(closeButton);
 
     await waitFor(() => {
-      expect(screen.queryByText('Your Progress')).not.toBeInTheDocument();
+      // Check that chart components are rendered when there are logs
+      expect(screen.getByTestId('weekly-streak-calendar')).toBeInTheDocument();
+      expect(screen.getByTestId('progress-chart')).toBeInTheDocument();
     });
   });
 
   it('handles storage service errors gracefully', async () => {
     vi.mocked(storageService.getActivityLogs).mockRejectedValue(new Error('Storage error'));
     
-    // Mock console.error to avoid error output in tests
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // Mock logger.error to avoid error output in tests
+    const loggerSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
     
     render(<ActivityLogPage exercises={mockExercises} />);
     
@@ -266,9 +328,9 @@ describe('ActivityLogPage', () => {
       expect(screen.getByText('No workouts yet')).toBeInTheDocument();
     });
 
-    expect(consoleSpy).toHaveBeenCalledWith('Failed to load activity logs:', expect.any(Error));
+    expect(loggerSpy).toHaveBeenCalledWith('Failed to load activity logs:', expect.any(Error));
     
-    consoleSpy.mockRestore();
+    loggerSpy.mockRestore();
   });
 
   it('calculates current streak correctly', async () => {
@@ -310,10 +372,9 @@ describe('ActivityLogPage', () => {
     render(<ActivityLogPage exercises={mockExercises} />);
     
     await waitFor(() => {
-      // Should show streak of 3 days - look for the specific streak number
-      const streakSection = screen.getByText('Day Streak').parentElement;
-      const streakValue = streakSection?.querySelector('.text-2xl');
-      expect(streakValue).toHaveTextContent('3');
+      // Charts should be displayed with the streak logs
+      expect(screen.getByTestId('weekly-streak-calendar')).toBeInTheDocument();
+      expect(screen.getByTestId('progress-chart')).toBeInTheDocument();
     });
   });
 
@@ -355,12 +416,18 @@ describe('ActivityLogPage', () => {
     render(<ActivityLogPage exercises={mockExercises} />);
     
     await waitFor(() => {
-      expect(screen.getAllByText('Plank')).toHaveLength(2); // Stats + logs
+      expect(screen.getByText('Plank')).toBeInTheDocument(); // Activity log entry
     });
 
+    // Open category filter dropdown
+    const filterDropdown = screen.getByRole('button', { name: /select/i });
+    fireEvent.click(filterDropdown);
+
     // Filter by strength category (should be empty)
-    const strengthFilter = screen.getByRole('button', { name: /strength/i });
-    fireEvent.click(strengthFilter);
+    await waitFor(() => {
+      const strengthFilter = screen.getByRole('button', { name: /strength/i });
+      fireEvent.click(strengthFilter);
+    });
 
     await waitFor(() => {
       // Heading uses capitalized category label; be tolerant of whitespace

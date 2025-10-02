@@ -13,7 +13,12 @@ interface BeforeInstallPromptEvent extends Event {
  */
 export function isPWA(): boolean {
   // Check if running in standalone mode (iOS/Android)
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  let isStandalone = false;
+  try {
+    isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  } catch {
+    isStandalone = false;
+  }
   
   // Check iOS standalone mode
   const isIOSStandalone = ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;

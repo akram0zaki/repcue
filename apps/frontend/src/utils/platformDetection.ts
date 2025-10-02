@@ -60,8 +60,15 @@ export const isStandalone = (): boolean => {
   }
   const w = ((globalThis as unknown as { window?: unknown }).window ?? (globalThis as unknown)) as { matchMedia?: (q: string) => { matches: boolean } };
   const mm = w?.matchMedia as undefined | ((q: string) => { matches: boolean });
-  if (typeof mm === 'function' && mm('(display-mode: standalone)').matches) {
-    return true;
+  if (typeof mm === 'function') {
+    try {
+      const result = mm('(display-mode: standalone)');
+      if (result && result.matches) {
+        return true;
+      }
+    } catch {
+      // Ignore matchMedia errors in test environments
+    }
   }
   const ref = (globalThis?.document?.referrer || '');
   if (isAndroid() && ref.includes('android-app://')) {

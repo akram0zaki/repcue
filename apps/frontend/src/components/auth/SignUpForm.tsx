@@ -308,7 +308,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-600"
+            className="btn-primary w-full flex justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? t('common:loading') : t('signUp.button')}
           </button>
@@ -331,7 +331,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               type="button"
               onClick={() => handleOAuthSignIn('google')}
               disabled={loading || oauthLoading !== null}
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="btn-secondary w-full inline-flex justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {oauthLoading === 'google' ? (
                 <>
@@ -353,7 +353,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
               type="button"
               onClick={onSwitchToMagicLink}
               disabled={loading}
-              className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-secondary w-full inline-flex justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               { }
               <span className="mr-2">✉️</span> {/* i18n-exempt: universal email icon */}

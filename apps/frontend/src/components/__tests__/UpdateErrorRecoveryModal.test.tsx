@@ -242,7 +242,7 @@ describe('UpdateErrorRecoveryModal', () => {
       );
 
       expect(screen.getByText('Recovery Options')).toBeInTheDocument();
-      expect(screen.getByText('Retry Update')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Retry Update' })).toBeInTheDocument();
       expect(screen.getByText('Attempt to update again (1/3)')).toBeInTheDocument();
     });
 
@@ -293,7 +293,7 @@ describe('UpdateErrorRecoveryModal', () => {
         />
       );
 
-      const closeButton = screen.getByLabelText('Close error dialog');
+      const closeButton = screen.getByLabelText('Close');
       fireEvent.click(closeButton);
 
       expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -452,12 +452,11 @@ describe('UpdateErrorRecoveryModal', () => {
         expect(screen.getByText('Action completed successfully')).toBeInTheDocument();
       });
 
-      // Wait for the timeout to trigger onRecoveryComplete
-      await act(async () => {
-        vi.advanceTimersByTime(1500);
-      });
-
-      expect(mockOnRecoveryComplete).toHaveBeenCalledTimes(1);
+      // The onRecoveryComplete should be called after the success message is shown
+      // We'll wait a bit longer to ensure the timeout has a chance to execute
+      await waitFor(() => {
+        expect(mockOnRecoveryComplete).toHaveBeenCalledTimes(1);
+      }, { timeout: 2000 });
     });
 
     it('should prevent multiple concurrent action executions', async () => {
@@ -623,7 +622,7 @@ describe('UpdateErrorRecoveryModal', () => {
         />
       );
 
-      expect(screen.getByLabelText('Close error dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText('Close')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Retry Update' })).toBeInTheDocument();
     });
   });

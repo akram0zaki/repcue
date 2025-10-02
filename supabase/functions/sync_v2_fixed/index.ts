@@ -66,22 +66,50 @@ const PULL_PAGE_SIZE = 50; // Standard batch size for pulling server changes
 
 // Allowlisted fields per table (security measure to prevent unauthorized data modification)
 const MUTABLE_FIELD_ALLOWLIST = {
+  user_preferences: new Set([
+    'id', 'locale', 'units', 'rep_speed_factor', 'cues', 'favorite_exercises',
+    'owner_id', 'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  app_settings: new Set([
+    'id', 'dark_mode', 'reduce_motion', 'vibration_enabled', 'auto_start_next',
+    'default_rest_time', 'beep_interval_seconds', 'beep_volume', 'beep_sound_enabled',
+    'pre_timer_countdown', 'show_exercise_videos', 'data_auto_save', 'owner_id',
+    'sound_enabled', 'default_interval_duration', 'app_version', 'horizontal_exercise_layout',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  exercises: new Set([
+    'id', 'name', 'description', 'category', 'exercise_type', 'instructions',
+    'rep_duration_seconds', 'is_favorite', 'owner_id', 'created_at', 'updated_at',
+    'version', 'deleted', 'is_public', 'is_verified', 'rating_average', 'rating_count',
+    'copy_count', 'difficulty_level', 'equipment_needed', 'muscle_groups', 'tags',
+    'custom_video_url', 'has_video', 'default_duration', 'default_sets', 'default_reps',
+    'catalog_id', 'benefits', 'limitations', 'best_timing', 'suggested_combinations',
+    'notes', 'exercise_references'
+  ]),
+  user_favorites: new Set([
+    'id', 'owner_id', 'item_id', 'item_type', 'exercise_type',
+    'created_at', 'updated_at', 'version', 'deleted'
+  ]),
+  workouts: new Set([
+    'id', 'name', 'description', 'exercises', 'owner_id', 'created_at', 'updated_at',
+    'version', 'deleted', 'is_public', 'is_verified', 'rating_average', 'rating_count',
+    'copy_count', 'difficulty_level', 'tags', 'scheduled_days', 'is_active', 'estimated_duration'
+  ]),
+  activity_logs: new Set([
+    'id', 'exercise_id', 'exercise_name', 'workout_id', 'workout_name', 'duration',
+    'notes', 'timestamp', 'owner_id', 'created_at', 'updated_at', 'version', 'deleted',
+    'is_workout', 'exercises', 'sets_count', 'reps_count', 'catalog_id'
+  ]),
+  workout_sessions: new Set([
+    'id', 'workout_id', 'workout_name', 'start_time', 'end_time', 'total_duration',
+    'total_exercises', 'exercises_completed', 'is_completed', 'notes', 'owner_id',
+    'created_at', 'updated_at', 'version', 'deleted', 'exercises', 'completion_percentage'
+  ]),
   video_files: new Set([
-    'id',
-    'owner_id',
-    'exercise_id',
-    'file_name',
-    'file_data',
-    'file_size',
-    'mime_type',
-    'upload_pending',
-    'storage_path',
-    'created_at',
-    'updated_at',
-    'version',
-    'deleted'
+    'id', 'owner_id', 'exercise_id', 'file_name', 'file_data', 'file_size',
+    'mime_type', 'upload_pending', 'storage_path', 'created_at', 'updated_at',
+    'deleted', 'version'
   ])
-  // ... other tables omitted for brevity in this fix
 };
 
 // Enhanced file upload to Supabase Storage with detailed error reporting

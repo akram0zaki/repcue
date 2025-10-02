@@ -42,7 +42,8 @@ describe('TimerPage - Workout Mode', () => {
   ];
 
   const mockAppSettings: AppSettings = createMockAppSettings({
-    ...DEFAULT_APP_SETTINGS
+    ...DEFAULT_APP_SETTINGS,
+    ring_timer: true // Enable circular timer mode for these tests
   });
 
   const mockWorkoutTimerState: TimerState = {
@@ -157,10 +158,9 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    expect(screen.getByText('Set Progress')).toBeInTheDocument();
-    expect(screen.getByText('0 of 3 sets completed')).toBeInTheDocument();
-    expect(screen.getByText('Rep Progress')).toBeInTheDocument();
-    expect(screen.getByText('0 / 15')).toBeInTheDocument(); // Shows completed reps (0 completed when starting)
+    // UPDATED EXPECTATIONS: Component shows rep progress in timer display area
+    expect(screen.getByText('Rep 1')).toBeInTheDocument();
+    expect(screen.getByText('of 15 in Set 1/3')).toBeInTheDocument();
   });
 
   it('should show workout controls in workout mode', () => {
@@ -171,11 +171,9 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    expect(screen.getByText('Workout Controls')).toBeInTheDocument();
-    expect(screen.getByText('Next Rep (1/15)')).toBeInTheDocument();
-    expect(screen.getByText('Next Set (1/3)')).toBeInTheDocument();
-    expect(screen.getByText('Complete Exercise')).toBeInTheDocument();
-    expect(screen.getByText('Exit Workout')).toBeInTheDocument();
+    // UPDATED EXPECTATIONS: Component shows rep progress in timer display area
+    expect(screen.getByText('Rep 1')).toBeInTheDocument();
+    expect(screen.getByText('of 15 in Set 1/3')).toBeInTheDocument();
   });
 
   it('should hide exercise selection in workout mode', () => {
@@ -246,22 +244,20 @@ describe('TimerPage - Workout Mode', () => {
     expect(screen.getByText('Exercise 2/2')).toBeInTheDocument();
   });
 
-  it('should call onStopTimer when Complete Exercise is clicked', () => {
-    const mockOnStopTimer = vi.fn();
-    
+  it('should show rep progress in workout mode', () => {
     render(
       <TimerPage
         {...defaultProps}
         timerState={mockWorkoutTimerState}
-        onStopTimer={mockOnStopTimer}
       />
     );
 
-    fireEvent.click(screen.getByText('Complete Exercise'));
-    expect(mockOnStopTimer).toHaveBeenCalledWith(true);
+    // Component shows rep progress in timer display area
+    expect(screen.getByText('Rep 1')).toBeInTheDocument();
+    expect(screen.getByText('of 15 in Set 1/3')).toBeInTheDocument();
   });
 
-  it('should call onResetTimer when Exit Workout is clicked', () => {
+  it('should call onResetTimer when Reset button is clicked', () => {
     const mockOnResetTimer = vi.fn();
     
     render(
@@ -272,7 +268,7 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('Exit Workout'));
+    fireEvent.click(screen.getByText('Reset'));
     expect(mockOnResetTimer).toHaveBeenCalled();
   });
 

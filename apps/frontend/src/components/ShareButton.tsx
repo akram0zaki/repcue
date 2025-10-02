@@ -169,10 +169,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto" role="dialog" aria-labelledby="share-dialog-title" aria-modal="true">
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h3 id="share-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {t('exercises.shareExercise', 'Share Exercise')}
             </h3>
             <button

@@ -697,6 +697,49 @@ repcue/
 - **Audio**: Web Audio API + Speech Synthesis
 - **PWA**: Service Worker ready (future enhancement)
 
+### Core Components
+
+#### ExerciseSelector
+A unified, reusable component for selecting exercises with comprehensive filtering capabilities. Used across TimerPage, CreateWorkoutPage, and EditWorkoutPage.
+
+**Features:**
+- **Search**: Real-time exercise search by name and description
+- **Catalog Filtering**: Filter by exercise catalogs (default, custom, etc.)
+- **Category Filtering**: Filter by exercise categories (core, strength, cardio, etc.)
+- **Type Filtering**: Toggle between All, Built-in, Custom, and Shared exercises
+- **Favorites**: Quick filter to show only favorite exercises
+- **Sorting**: Sort by name, type, or recently added
+- **Exclusion**: Optionally exclude exercises (e.g., already added to workout)
+- **Persistence**: Optional filter state persistence via localStorage
+
+**Usage Example:**
+```tsx
+import { ExerciseSelectorModal } from '../components/ExerciseSelector/ExerciseSelectorModal';
+
+<ExerciseSelectorModal
+  exercises={exercises}
+  selectedExercise={selectedExercise}
+  excludeExercises={alreadyAdded}
+  onSelectExercise={(exercise) => handleSelect(exercise)}
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  title="Select Exercise"
+  showCatalogSelector={true}
+  showCategoryFilter={true}
+  showTypeFilter={true}
+  showFavoritesToggle={true}
+  showSearch={true}
+  showSort={true}
+  persistFilters={true}
+  filterStorageKey="my-selector-filters"
+/>
+```
+
+**Related Files:**
+- [ExerciseSelector.tsx](apps/frontend/src/components/ExerciseSelector/ExerciseSelector.tsx) - Main component
+- [ExerciseSelectorModal.tsx](apps/frontend/src/components/ExerciseSelector/ExerciseSelectorModal.tsx) - Modal wrapper
+- [useExerciseFilter.ts](apps/frontend/src/hooks/useExerciseFilter.ts) - Filtering logic hook
+
 ### Development Workflow
 
 1. **Start Development**:

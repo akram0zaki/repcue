@@ -67,6 +67,7 @@
     "exercises": "Oefeningen",
     "timer": "Timer",
     "activityLog": "Logboek",
+    "progress": "Voortgang",
     "settings": "Instellingen"
   },
   "settings": {
@@ -75,24 +76,30 @@
     "beepVolume": "Piep Volume",
     "beepIntervalHelp": "Speel elke N seconden een korte piep tijdens tijd-gebaseerde oefeningen.",
     "enableVibration": "Trillen Inschakelen",
-    "timerSettings": "⏱️ Timer Instellingen",
+    "timerSettings": "Timer Instellingen",
     "preTimerCountdown": "Pre-Timer Aftelling",
     "preTimerCountdownHelp": "Aftelling voordat de timer start om je te helpen in positie te komen",
-    "appearance": "🎨 Uiterlijk",
+    "appearance": "Uiterlijk",
     "darkMode": "Donkere Modus",
     "showExerciseVideos": "Toon Oefening Demo Video's",
     "showExerciseVideosHelp": "Experimenteel: loop stille demo video's binnen timer wanneer beschikbaar.",
-    "language": "🌐 Taal",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Schakel tussen cirkelvormige timer met ringen of rechthoekige timer met randvoortgang.",
+    "language": "Taal",
     "selectLanguage": "Selecteer Taal",
     "languageHelp": "Kies uw voorkeurstaal. De app onthoudt uw keuze.",
-    "data": "💾 Gegevens",
+    "data": "Gegevens",
     "autoSave": "Auto Opslaan",
     "dataStorageLabel": "Gegevensopslag:",
     "enabled": "Ingeschakeld",
     "disabled": "Uitgeschakeld",
     "dataStoredLocally": "Uw trainingsgegevens worden lokaal op dit apparaat opgeslagen.",
     "pleaseAcceptConsent": "Accepteer gegevensopslag toestemming om export/wis functies in te schakelen.",
-    "consentMigrationWarning": "⚠️ Toestemmingsgegevens worden gemigreerd naar de nieuwste versie bij volgende app start.",
+  "consentMigrationWarning": "⚠️ Toestemmingsgegevens worden gemigreerd naar de nieuwste versie bij volgende app start.",
+  "consentStatusLabel": "Toestemmingsstatus",
+  "consentVersion": "Toestemmingsversie",
     "exportData": "Gegevens Exporteren",
     "exportDataHelp": "Download uw trainingsgegevens als een JSON-bestand",
     "exportInProgress": "Exporteren...",
@@ -116,7 +123,7 @@
     "clearAllDataHelp": "Verwijder alle gegevens permanent, reset toestemming, en keer terug naar startscherm",
     "clearAllDataMessage": "Weet u zeker dat u alle gegevens wilt wissen? Deze actie kan niet ongedaan worden gemaakt. U wordt doorgestuurd naar het startscherm en gevraagd om opnieuw toestemming te geven.",
     "clearAllData": "Alle Gegevens Wissen",
-    "securityPrivacy": "🔒 Beveiliging & Privacy",
+    "securityPrivacy": "Beveiliging & Privacy",
     "exportYourData": "Uw gegevens exporteren",
     "deleteAccount": "Account verwijderen",
     "deleteMyAccount": "Mijn account verwijderen",
@@ -221,11 +228,13 @@
     "sunday": "Zo"
   },
   "home": {
+    "heroTitle": "Blijf consistent, blijf sterk.",
+    "heroSubtitle": "Uw trainingen, op uw manier.",
     "upcomingWorkout": "Aankomende Training",
     "tagline": "Uw persoonlijke oefeningentimer",
     "signInMessage": "Je kunt ",
     "signInLink": "inloggen",
-    "signInSuffix": " om je vooruitgang bij te houden vanaf verschillende apparaten.",
+    "signInSuffix": " om je voortgang te volgen en te delen.",
     "startNow": "Nu Starten",
     "noScheduleTitle": "Geen Schema Ingesteld",
     "noScheduleBody": "Maak een trainingsschema om uw aankomende trainingen hier te zien",
@@ -236,7 +245,9 @@
     "removeFromFavoritesAria": "{{name}} uit favorieten verwijderen",
     "noFavorites": "Nog geen favoriete oefeningen. Markeer enkele oefeningen als favoriet om ze hier te zien!",
     "availableExercises": "Beschikbare Oefeningen",
-    "changeLanguage": "Taal wijzigen"
+    "changeLanguage": "Taal wijzigen",
+    "popularExercises": "Populaire Oefeningen",
+    "noPopularExercises": "Geen populaire oefeningen met video's beschikbaar."
   },
   "workouts": {
     "title": "Trainingen",
@@ -331,7 +342,37 @@
     "status": {
       "stoppedAfter": "Gestopt na {{duration}}",
       "completedSetsReps": "{{sets}} sets van {{reps}} herhalingen voltooid",
-      "completedTime": "Intervaltimer van {{duration}} voltooid"
+      "completedTime": "{{duration}} interval timer voltooid",
+      "completedWorkout": "Training voltooid met {{count}} oefening",
+      "completedWorkout_plural": "Training voltooid met {{count}} oefeningen"
+    },
+    "charts": {
+      "weeklyStreak": "Wekelijkse Reeks",
+      "currentStreak": "Huidige Reeks",
+      "progressChart": "Voortgangsgrafiek",
+      "currentMonth": "Huidige Maand",
+      "last3Months": "Laatste 3 Maanden",
+      "sinceStart": "Sinds Begin",
+      "workoutsThisWeek": "trainingen deze week",
+      "workoutWeek": "training deze week",
+      "thisWeek": "Deze week",
+      "noWorkoutsThisWeek": "Geen trainingen deze week",
+      "previousWeek": "Vorige week",
+      "nextWeek": "Volgende week",
+      "streakDays": "{{count}} dagen",
+      "streakDay": "{{count}} dag",
+      "averageWorkouts": "{{count}} gem. trainingen/week",
+      "totalInPeriod": "{{count}} totale trainingen",
+      "weekNumber": "Week {{week}}",
+      "periodSummary": "{{weeks}}-weken periode",
+      "workoutFrequency": "Trainingsfrequentie",
+      "workoutsPerWeek": "Trainingen per Week",
+      "maxWorkouts": "{{count}} max",
+      "workoutCount": "{{count}} training",
+      "workoutCount_plural": "{{count}} trainingen",
+      "avgPerWeek": "Gem/week",
+      "avgPerPeriod": "Gem/periode",
+      "noDataForRange": "Geen trainingsdata voor deze periode"
     }
   },
   "exercises": {
@@ -530,6 +571,7 @@
     "workouts": "Trainingen",
     "workoutsOnly": "Alleen Trainingen"
   },
+  "exerciseParameters": "Oefenparameters",
   "video": {
     "exerciseVideo": "Oefenvideo",
     "uploadsNotAvailable": "Video-uploads zijn momenteel niet beschikbaar.",
@@ -662,5 +704,17 @@
       "message": "Deze update bevat wijzigingen in hoe we je gegevens verwerken. Bekijk de wijzigingen hierboven en bevestig dat je dit begrijpt.",
       "acknowledge": "Ik begrijp en erken de privacy­wijzigingen in deze update"
     }
+  },
+  "rating": {
+    "reviews": "Beoordelingen",
+    "yourRating": "Jouw beoordeling",
+    "rateThis": "Beoordeel deze oefening",
+    "addReview": "Beoordeling toevoegen",
+    "hideReview": "Beoordeling verbergen",
+    "reviewPlaceholder": "Schrijf je beoordeling (optioneel)...",
+    "characters": "tekens",
+    "submitError": "Verzenden van beoordeling mislukt",
+    "submitting": "Verzenden...",
+    "loginToRate": "Log in om oefeningen te beoordelen en te recenseren"
   }
 }

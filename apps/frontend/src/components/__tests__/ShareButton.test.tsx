@@ -10,6 +10,13 @@ vi.mock('../../hooks/useFeatureFlags', () => ({
   useFeatureFlags: () => ({ flags: { canShareExercises: true } })
 }));
 
+// Mock sync service
+vi.mock('../../services/syncService', () => ({
+  syncService: {
+    sync: vi.fn()
+  }
+}));
+
 // Mock the supabase config with proper factory
 vi.mock('../../config/supabase', () => {
   const mockSupabase = {
@@ -17,22 +24,27 @@ vi.mock('../../config/supabase', () => {
       getSession: vi.fn(),
       getUser: vi.fn()
     },
+    from: vi.fn(),
     supabaseUrl: 'https://test.supabase.co'
   };
 
-  return { supabase: mockSupabase };
+  return {
+    supabase: mockSupabase,
+    supabaseFunctionBaseUrl: 'https://test.supabase.co'
+  };
 });
 
 // Mock clipboard API
-Object.assign(navigator, {
-  clipboard: {
+Object.defineProperty(navigator, 'clipboard', {
+  value: {
     writeText: vi.fn().mockResolvedValue(undefined)
-  }
+  },
+  writable: true
 });
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+global.fetch = mockFetch as any;
 
 // Test component wrapper
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -135,6 +147,20 @@ describe('ShareButton', () => {
       shareToken: 'abc123'
     };
 
+    // Mock the Supabase exercise check to return found
+    mockSupabase.from = vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            maybeSingle: vi.fn(() => Promise.resolve({
+              data: { id: 'test-id' },
+              error: null
+            }))
+          }))
+        }))
+      }))
+    }));
+
     mockFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockResponse)
@@ -161,7 +187,7 @@ describe('ShareButton', () => {
     fireEvent.click(generateButton);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://test.supabase.co/functions/v1/share-exercise',
         expect.objectContaining({
           method: 'POST',

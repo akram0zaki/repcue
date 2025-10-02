@@ -15,7 +15,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'favicon.svg', 'splash/**/*', 'manifest.json'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'favicon.svg', 'splash/**/*', 'images/**/*', 'manifest.json'],
       devOptions: {
         enabled: false // Disable in development to avoid conflicts
       },
@@ -25,7 +25,7 @@ export default defineConfig({
       workbox: {
         skipWaiting: false, // Let our updateService handle this
         clientsClaim: false, // Let our updateService handle this
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'splash/*.{png,svg}', 'locales/**/*.json', 'manifest.json'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'splash/*.{png,svg}', 'images/*.{png,jpg,jpeg,svg}', 'locales/**/*.json', 'manifest.json'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
@@ -59,6 +59,18 @@ export default defineConfig({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
+          },
+          // Cache hero banner and UI images for offline functionality
+          {
+            urlPattern: /^\/images\/.*\.(png|jpg|jpeg|svg)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ui-images-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24 * 90 // 90 days
               }
             }
           },

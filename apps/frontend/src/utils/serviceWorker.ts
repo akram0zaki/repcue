@@ -186,8 +186,12 @@ export const updateServiceWorker = (registration: ServiceWorkerRegistration): Pr
  * Check if the app is running in standalone mode (installed as PWA)
  */
 export const isStandalone = (): boolean => {
-  return window.matchMedia('(display-mode: standalone)').matches ||
-         (window.navigator as { standalone?: boolean }).standalone === true;
+  try {
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    return mediaQuery.matches || (window.navigator as { standalone?: boolean }).standalone === true;
+  } catch {
+    return (window.navigator as { standalone?: boolean }).standalone === true;
+  }
 };
 
 /**

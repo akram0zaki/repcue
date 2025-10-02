@@ -29,7 +29,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
       >
         <div className="p-6">
           <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+            <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center mr-3">
               <svg 
                 className="w-6 h-6 text-white" 
                 fill="none" 
@@ -59,7 +59,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
             {!showDetails ? (
               <button
                 onClick={() => setShowDetails(true)}
-                className="text-blue-600 hover:text-blue-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                className="text-primary-600 hover:text-primary-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
                 aria-expanded="false"
                 aria-controls="privacy-details"
               >
@@ -93,7 +93,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
 
                 <button
                   onClick={() => setShowDetails(false)}
-                  className="text-blue-600 hover:text-blue-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                  className="text-primary-600 hover:text-primary-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
                   aria-expanded="true"
                   aria-controls="privacy-details"
                 >

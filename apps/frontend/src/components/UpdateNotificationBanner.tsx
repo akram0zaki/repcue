@@ -290,7 +290,7 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
       <div className="mt-4 flex flex-col sm:flex-row gap-3">
         <button
           onClick={handleApplyUpdate}
-          className={`btn-primary flex-1 sm:flex-none px-6 py-2 text-base font-medium rounded-lg transition-colors touch-target ${
+          className={`btn-primary flex-1 sm:flex-none px-6 py-2 text-base font-medium touch-target ${
             updateInfo.policy === 'force'
               ? 'bg-red-600 hover:bg-red-700 text-white'
               : updateInfo.policy === 'critical'

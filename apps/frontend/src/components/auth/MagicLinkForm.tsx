@@ -68,7 +68,7 @@ export const MagicLinkForm: React.FC<MagicLinkFormProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+                className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500"
               >
                 {t('common:close')}
               </button>
@@ -83,7 +83,7 @@ export const MagicLinkForm: React.FC<MagicLinkFormProps> = ({
     <div className="w-full max-w-md mx-auto">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <div className="text-center mb-6">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/20 mb-4">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 dark:bg-primary-dark-disabled mb-4">
             { }
             <span className="text-2xl">✉️</span> {/* i18n-exempt: universal email symbol */}
           </div>
@@ -111,7 +111,7 @@ export const MagicLinkForm: React.FC<MagicLinkFormProps> = ({
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
               placeholder={t('placeholders.email')}
               disabled={loading}
               required
@@ -132,7 +132,7 @@ export const MagicLinkForm: React.FC<MagicLinkFormProps> = ({
             type="button"
             onClick={onSwitchToSignIn}
             disabled={loading}
-            className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="block w-full text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('magicLink.switchToSignIn')}
           </button>
@@ -140,7 +140,7 @@ export const MagicLinkForm: React.FC<MagicLinkFormProps> = ({
             type="button"
             onClick={onSwitchToSignUp}
             disabled={loading}
-            className="block w-full text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="block w-full text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('magicLink.switchToSignUp')}
           </button>

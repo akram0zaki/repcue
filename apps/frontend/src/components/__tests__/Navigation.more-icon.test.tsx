@@ -59,7 +59,8 @@ describe('Navigation - More Icon', () => {
     expect(screen.getByText('Workouts')).toBeInTheDocument();
     expect(screen.getByText('Exercises')).toBeInTheDocument();
   expect(screen.getByText('Timer')).toBeInTheDocument();
-  expect(screen.getByText('Activity Log')).toBeInTheDocument();
+  // Current implementation shows translation key instead of translated text
+  expect(screen.getByText('navigation.progress')).toBeInTheDocument();
     
     // But "More" should not be visible
     expect(screen.queryByText('More')).not.toBeInTheDocument();

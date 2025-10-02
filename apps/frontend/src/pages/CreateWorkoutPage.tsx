@@ -1,13 +1,13 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: form validation messages pending localization */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { localizeExercise } from '../utils/localizeExercise';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
 import type { Exercise, Workout, WorkoutExercise, Weekday } from '../types';
 import { Routes } from '../types';
 import logger from '../utils/logger';
+import { ExerciseSelectorModal } from '../components/ExerciseSelector';
 
 interface SelectedExercise extends Exercise {
   order: number;
@@ -18,7 +18,7 @@ interface SelectedExercise extends Exercise {
 }
 
 const CreateWorkoutPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['common', 'exerciseDetails']);
   const navigate = useNavigate();
   const [hasConsent, setHasConsent] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -231,13 +231,13 @@ const CreateWorkoutPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
+            <div className="h-8 bg-surface-200 dark:bg-surface-700 rounded mb-6"></div>
             <div className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div key={i} className="h-16 bg-surface-200 dark:bg-surface-700 rounded"></div>
               ))}
             </div>
           </div>
@@ -248,7 +248,7 @@ const CreateWorkoutPage: React.FC = () => {
 
   if (!hasConsent) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -266,7 +266,7 @@ const CreateWorkoutPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       <div className="p-6 max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -310,11 +310,11 @@ const CreateWorkoutPage: React.FC = () => {
                   setValidationErrors(newErrors);
                 }
               }}
-              className={`w-full px-3 py-2 border rounded-lg dark:bg-gray-800 dark:text-white transition-colors ${
+              className={`w-full px-3 py-2 border rounded-lg bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 transition-colors ${
                 validationErrors.workoutName
                   ? 'border-red-300 dark:border-red-600'
-                  : 'border-gray-300 dark:border-gray-600'
-              } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  : 'border-border-300 dark:border-border-600'
+              } focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent`}
               placeholder={t('workouts.namePlaceholder')}
               disabled={saving}
             />
@@ -333,7 +333,7 @@ const CreateWorkoutPage: React.FC = () => {
               value={workoutDescription}
               onChange={(e) => setWorkoutDescription(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-border-300 dark:border-border-600 rounded-lg bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder={t('workouts.descriptionPlaceholder')}
               disabled={saving}
             />
@@ -352,10 +352,10 @@ const CreateWorkoutPage: React.FC = () => {
                   id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                   disabled={saving}
                 />
-                <label htmlFor="isActive" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="isActive" className="ms-2 text-sm text-gray-700 dark:text-gray-300">
                   {t('workouts.isActiveLabel')}
                 </label>
               </div>
@@ -365,7 +365,7 @@ const CreateWorkoutPage: React.FC = () => {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                   {t('workouts.scheduledDaysLabel')}
                 </label>
-                <div className="grid grid-cols-7 gap-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                   {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as Weekday[]).map((day) => {
                     const dayLabels = {
                       monday: t('weekdayAbbrev.monday', { defaultValue: 'Mon' }),
@@ -390,10 +390,10 @@ const CreateWorkoutPage: React.FC = () => {
                             setScheduledDays(prev => [...prev, day]);
                           }
                         }}
-                        className={`p-2 text-xs font-medium rounded-lg border transition-colors ${
+                        className={`px-2 py-2 text-xs font-medium rounded-lg border transition-colors flex-shrink-0 min-w-[2.5rem] text-center ${
                           isSelected
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            ? 'bg-primary-500 text-white border-primary-500'
+                            : 'bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 border-border-300 dark:border-border-600 hover:bg-surface-100 dark:hover:bg-surface-700'
                         }`}
                         disabled={saving || !isActive}
                       >
@@ -431,7 +431,7 @@ const CreateWorkoutPage: React.FC = () => {
                 <p className="text-gray-500 dark:text-gray-400 mb-4">{t('workouts.noneSelectedTitle')}</p>
                 <button
                   onClick={() => setShowExercisePicker(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
                   disabled={saving}
                 >
                   {t('workouts.addFirstExercise')}
@@ -440,7 +440,7 @@ const CreateWorkoutPage: React.FC = () => {
             ) : (
               <div className="space-y-3">
                 {selectedExercises.map((exercise, index) => (
-                  <div key={`${exercise.id}_${index}`} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div key={`${exercise.id}_${index}`} className="bg-surface-50 dark:bg-surface-800 border border-border-200 dark:border-border-700 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900 dark:text-white">
@@ -501,10 +501,10 @@ const CreateWorkoutPage: React.FC = () => {
                             min="1"
                             value={exercise.custom_duration || ''}
                             onChange={(e) => updateExerciseValue(index, 'custom_duration', parseInt(e.target.value) || 0)}
-                            className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                            className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                               validationErrors[`exercise_${index}_duration`]
                                 ? 'border-red-300 dark:border-red-600'
-                                : 'border-gray-300 dark:border-gray-600'
+                                : 'border-border-300 dark:border-border-600'
                             }`}
                             disabled={saving}
                           />
@@ -526,10 +526,10 @@ const CreateWorkoutPage: React.FC = () => {
                               min="1"
                               value={exercise.custom_sets || ''}
                               onChange={(e) => updateExerciseValue(index, 'custom_sets', parseInt(e.target.value) || 0)}
-                              className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                              className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                                 validationErrors[`exercise_${index}_sets`]
                                   ? 'border-red-300 dark:border-red-600'
-                                  : 'border-gray-300 dark:border-gray-600'
+                                  : 'border-border-300 dark:border-border-600'
                               }`}
                               disabled={saving}
                             />
@@ -549,10 +549,10 @@ const CreateWorkoutPage: React.FC = () => {
                               min="1"
                               value={exercise.custom_reps || ''}
                               onChange={(e) => updateExerciseValue(index, 'custom_reps', parseInt(e.target.value) || 0)}
-                              className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                              className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                                 validationErrors[`exercise_${index}_reps`]
                                   ? 'border-red-300 dark:border-red-600'
-                                  : 'border-gray-300 dark:border-gray-600'
+                                  : 'border-border-300 dark:border-border-600'
                               }`}
                               disabled={saving}
                             />
@@ -575,10 +575,10 @@ const CreateWorkoutPage: React.FC = () => {
                           min="0"
                           value={exercise.custom_rest_time || ''}
                           onChange={(e) => updateExerciseValue(index, 'custom_rest_time', parseInt(e.target.value) || 0)}
-                          className={`w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:text-white ${
+                          className={`w-full px-2 py-1 border rounded text-sm bg-surface-50 dark:bg-surface-700 text-text-900 dark:text-text-50 ${
                             validationErrors[`exercise_${index}_rest`]
                               ? 'border-red-300 dark:border-red-600'
-                              : 'border-gray-300 dark:border-gray-600'
+                              : 'border-border-300 dark:border-border-600'
                           }`}
                           disabled={saving}
                         />
@@ -604,18 +604,18 @@ const CreateWorkoutPage: React.FC = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex space-x-3 pt-6">
+          <div className="flex gap-3 pt-6">
             <button
               onClick={handleCancel}
               disabled={saving}
-              className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+              className="btn-neutral flex-1"
             >
               {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={saving || selectedExercises.length === 0}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="btn-primary flex-1"
             >
               {saving ? (
                 <>
@@ -633,71 +633,24 @@ const CreateWorkoutPage: React.FC = () => {
         </div>
 
         {/* Exercise Picker Modal */}
-        {showExercisePicker && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-96 overflow-hidden">
-              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    {t('workouts.addExerciseTitle')}
-                  </h3>
-                  <button
-                    onClick={() => setShowExercisePicker(false)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div className="p-4 overflow-y-auto max-h-80">
-                <div className="space-y-2">
-                  {availableExercises
-                    .filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id))
-                    .map((exercise) => (
-                      <button
-                        key={exercise.id}
-                        onClick={() => addExercise(exercise)}
-                        className="w-full text-left p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {localizeExercise(exercise, t).name}
-                        </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })} • {exercise.exercise_type === 'time_based' ? t('exercises.timeBased.name') : t('exercises.repBased.name')}
-                          {exercise.exercise_type === 'time_based' 
-                            ? ` • ${exercise.default_duration}s` 
-                            : ` • ${exercise.default_sets}×${exercise.default_reps}`}
-                        </div>
-                      </button>
-                    ))}
-                </div>
-                {availableExercises.length === 0 ? (
-                  <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                    <p className="mb-2">{t('workouts.loadExercisesError')}</p>
-                    <button
-                      onClick={async () => {
-                        try {
-                          await storageService.ensureExercisesSeeded();
-                          const refreshed = await storageService.getExercises();
-                          setAvailableExercises(refreshed);
-                        } catch {}
-                      }}
-                      className="inline-flex items-center px-3 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700"
-                    >
-                      {t('common.retry')}
-                    </button>
-                  </div>
-                ) : availableExercises.filter(exercise => !selectedExercises.find(selected => selected.id === exercise.id)).length === 0 && (
-                  <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                    {t('workouts.allExercisesAdded')}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <ExerciseSelectorModal
+          exercises={availableExercises}
+          excludeExercises={selectedExercises}
+          onSelectExercise={(exercise) => {
+            addExercise(exercise);
+          }}
+          isOpen={showExercisePicker}
+          onClose={() => setShowExercisePicker(false)}
+          title={t('workouts.addExerciseTitle')}
+          showCatalogSelector={true}
+          showCategoryFilter={true}
+          showTypeFilter={true}
+          showSearch={true}
+          showSort={true}
+          persistFilters={true}
+          filterStorageKey="create-workout-exercise-selector"
+          emptyStateMessage={t('workouts.allExercisesAdded')}
+        />
       </div>
     </div>
   );

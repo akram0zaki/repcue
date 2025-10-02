@@ -73,7 +73,7 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'id', 'dark_mode', 'reduce_motion', 'vibration_enabled', 'auto_start_next',
     'default_rest_time', 'beep_interval_seconds', 'beep_volume', 'beep_sound_enabled',
     'pre_timer_countdown', 'show_exercise_videos', 'data_auto_save', 'owner_id',
-    'sound_enabled', 'default_interval_duration', 'app_version',
+    'sound_enabled', 'default_interval_duration', 'app_version', 'horizontal_exercise_layout',
     'created_at', 'updated_at', 'version', 'deleted'
   ]),
   exercises: new Set([

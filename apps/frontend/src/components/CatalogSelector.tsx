@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
 import { EXERCISE_CATALOGS } from '../data/catalogs';
+import { useRTLDetection } from '../hooks/useRTLDetection';
+import { ChevronLeftIcon, ChevronRightIcon } from './icons/NavigationIcons';
 
 interface CatalogSelectorProps {
   selectedCatalogId: string;
@@ -15,12 +17,84 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   className = ''
 }) => {
   const { t } = useTranslation(['common', 'catalogs']);
+  const { isRTL } = useRTLDetection();
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Sort catalogs by display order
+  const sortedCatalogs = [...EXERCISE_CATALOGS].sort((a, b) => a.displayOrder - b.displayOrder);
 
   // Handle image loading errors
   const handleImageError = (catalogId: string) => {
     setImageErrors(prev => new Set(prev).add(catalogId));
   };
+
+  // Check scroll state (kept for scroll event listener, but state management removed)
+  const checkScrollState = () => {
+    // Function kept for onScroll event listener compatibility
+    // Scroll state detection is no longer needed since we use hover-based navigation
+  };
+
+  // Scroll functions - simplified to match ExercisePage pattern
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 200;
+      const currentScroll = scrollContainerRef.current.scrollLeft;
+      const newScroll = currentScroll - scrollAmount;
+
+      scrollContainerRef.current.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+      // Re-check scroll state after animation
+      setTimeout(() => checkScrollState(), 300);
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 200;
+      const currentScroll = scrollContainerRef.current.scrollLeft;
+      const newScroll = currentScroll + scrollAmount;
+
+      scrollContainerRef.current.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+      // Re-check scroll state after animation
+      setTimeout(() => checkScrollState(), 300);
+    }
+  };
+
+  // Initialize scroll state check
+  React.useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      // Use a timeout to ensure DOM is fully rendered
+      const timeoutId = setTimeout(() => {
+        checkScrollState();
+      }, 100);
+
+      checkScrollState();
+      container.addEventListener('scroll', checkScrollState);
+      window.addEventListener('resize', checkScrollState);
+
+      return () => {
+        clearTimeout(timeoutId);
+        container.removeEventListener('scroll', checkScrollState);
+        window.removeEventListener('resize', checkScrollState);
+      };
+    }
+  }, [isRTL]);
+
+  // Re-check scroll state when catalogs, selection, or RTL changes
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkScrollState();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedCatalogId, sortedCatalogs.length, isRTL]);
 
   // Get fallback icon for catalog when image fails
   const getFallbackIcon = (catalog: ExerciseCatalog) => {
@@ -42,7 +116,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   const getFallbackBackground = (catalog: ExerciseCatalog) => {
     switch (catalog.colorTheme) {
       case 'blue':
-        return 'bg-blue-600';
+        return 'bg-primary-500';
       case 'green':
         return 'bg-green-600';
       case 'purple':
@@ -50,20 +124,20 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
       case 'pink':
         return 'bg-pink-600';
       default:
-        return 'bg-blue-600';
+        return 'bg-primary-500';
     }
   };
 
-  // Get catalog thumbnail classes with size variations
+  // Get catalog thumbnail classes with different sizing for selected vs unselected
   const getThumbnailClasses = (catalog: ExerciseCatalog, isSelected: boolean) => {
-    const baseClasses = 'relative rounded-xl overflow-hidden transition-all duration-300 ease-in-out cursor-pointer group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500';
-    
+    const baseClasses = 'relative rounded-xl overflow-hidden transition-all duration-300 ease-in-out cursor-pointer group hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 flex-shrink-0';
+
     if (isSelected) {
-      // Selected catalog is larger
-      return `${baseClasses} w-32 h-24 sm:w-40 sm:h-28 ring-2 ring-offset-2 ${getRingColor(catalog)} shadow-lg`;
+      // Selected catalog - bigger with ring indicator
+      return `${baseClasses} w-40 h-32 sm:w-44 sm:h-36 ring-2 ${getRingColor(catalog)} shadow-lg`;
     } else {
-      // Unselected catalogs are smaller
-      return `${baseClasses} w-24 h-18 sm:w-28 sm:h-20 opacity-80 hover:opacity-100`;
+      // Unselected catalogs - smaller
+      return `${baseClasses} w-32 h-24 sm:w-36 sm:h-28 opacity-80 hover:opacity-100`;
     }
   };
 
@@ -83,40 +157,51 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
     }
   };
 
-  // Get overlay gradient based on catalog theme
-  const getOverlayGradient = (catalog: ExerciseCatalog) => {
-    switch (catalog.colorTheme) {
-      case 'blue':
-        return 'from-blue-600/70 to-blue-800/90';
-      case 'green':
-        return 'from-green-600/70 to-green-800/90';
-      case 'purple':
-        return 'from-purple-600/70 to-purple-800/90';
-      case 'pink':
-        return 'from-pink-600/70 to-pink-800/90';
-      default:
-        return 'from-blue-600/70 to-blue-800/90';
-    }
-  };
-
-  // Sort catalogs by display order
-  const sortedCatalogs = [...EXERCISE_CATALOGS].sort((a, b) => a.displayOrder - b.displayOrder);
-
   return (
     <div className={`catalog-selector ${className}`}>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           {t('selectCatalog', { ns: 'catalogs', defaultValue: 'Exercise Catalog' })}
         </label>
-        <div className="flex flex-wrap gap-3 items-end">
-          {sortedCatalogs.map((catalog) => {
+        <div className="relative group">
+          {/* Left Navigation Button */}
+          {sortedCatalogs.length > 1 && (
+            <button
+              onClick={scrollLeft}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+              aria-label="Scroll left"
+              style={{ direction: 'ltr' }}
+            >
+              <ChevronLeftIcon size={20} />
+            </button>
+          )}
+
+          {/* Right Navigation Button */}
+          {sortedCatalogs.length > 1 && (
+            <button
+              onClick={scrollRight}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+              aria-label="Scroll right"
+              style={{ direction: 'ltr' }}
+            >
+              <ChevronRightIcon size={20} />
+            </button>
+          )}
+
+          {/* Catalog Container */}
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-3 items-center overflow-x-auto pb-2 scrollbar-hide px-3 py-1"
+            onScroll={checkScrollState}
+          >
+            {sortedCatalogs.map((catalog) => {
             const isSelected = catalog.id === selectedCatalogId;
             return (
               <button
                 key={catalog.id}
                 onClick={() => onCatalogChange(catalog.id)}
                 className={getThumbnailClasses(catalog, isSelected)}
-                aria-pressed={isSelected ? 'true' : 'false'}
+                aria-pressed={isSelected}
                 title={t(catalog.descriptionKey, { ns: 'catalogs' })}
               >
                 {/* Background Image or Fallback */}
@@ -137,8 +222,8 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                   </div>
                 )}
                 
-                {/* Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t ${getOverlayGradient(catalog)}`} />
+                {/* Light overlay for text readability */}
+                <div className="absolute inset-0 bg-black/20" />
                 
                 {/* Content */}
                 <div className="relative z-10 p-2 sm:p-3 h-full flex flex-col justify-between">
@@ -153,7 +238,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
 
                   {/* Title */}
                   <div className="text-white">
-                    <h3 className={`font-semibold leading-tight text-center ${isSelected ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} ${!isSelected ? 'h-8 flex items-center justify-center' : ''}`}>
+                    <h3 className="font-semibold leading-tight text-center text-xs sm:text-sm">
                       {t(catalog.nameKey, { ns: 'catalogs' })}
                     </h3>
                   </div>
@@ -162,12 +247,13 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                 {/* Selection Indicator */}
                 {isSelected && (
                   <div className="absolute top-2 left-2 w-3 h-3 bg-white rounded-full shadow-lg flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
                   </div>
                 )}
               </button>
             );
           })}
+          </div>
         </div>
       </div>
 

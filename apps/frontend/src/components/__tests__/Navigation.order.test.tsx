@@ -1,10 +1,34 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import Navigation from '../Navigation';
 
+// Mock i18next completely including the i18n instance with event emitter
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'navigation.home': 'Home',
+        'navigation.exercises': 'Exercises',
+        'navigation.timer': 'Timer',
+        'navigation.workouts': 'Workouts',
+        'navigation.progress': 'Progress'
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      resolvedLanguage: 'en',
+      language: 'en',
+      changeLanguage: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+    },
+  }),
+}));
+
 // This test asserts the visual order of main navigation items
-// Expected: Home, Exercises, Timer, Workouts, Activity Log, then More button (no label)
+// Expected: Home, Exercises, Timer, Workouts, Progress, then More button (no label)
 describe('Navigation order', () => {
   const Wrapper: React.FC = () => (
     <MemoryRouter>
@@ -27,7 +51,7 @@ describe('Navigation order', () => {
       'Exercises',
       'Timer',
       'Workouts',
-      'Activity Log',
+      'Progress', // Updated to match current navigation label
     ]);
 
     // Ensure the last button is the More options button without text label

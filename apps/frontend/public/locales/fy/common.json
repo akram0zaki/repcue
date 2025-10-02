@@ -59,7 +59,17 @@
     "noVideo": "Gjin Fideo",
     "pauseVideo": "Pause Fideo",
     "playVideo": "Spylje Fideo",
-    "premium": "PRO"
+        "premium": "PRO",
+    "done": "Klear",
+    "addEquipment": "Materiaal tafoegje",
+    "removeEquipment": "Materiaal wiskje",
+    "addMuscleGroup": "Spiergroep tafoegje",
+    "removeMuscleGroup": "Spiergroep wiskje",
+    "addTag": "Label tafoegje",
+    "removeTag": "Label wiskje",
+    "exerciseParameters": "Oefeningsparameters",
+    "exerciseVideo": "Oefeningsfideo"
+  },
   },
   "navigation": {
     "home": "Thús",
@@ -67,6 +77,7 @@
     "exercises": "Oefeningen",
     "timer": "Timer",
     "activityLog": "Lochboek",
+    "progress": "Foardering",
     "settings": "Ynstellingen"
   },
   "settings": {
@@ -75,24 +86,30 @@
     "beepVolume": "Piipfolume",
     "beepIntervalHelp": "Spylje elke N sekonden in koarte piip ôf by tiidbasearre oefeningen.",
     "enableVibration": "Trilje oan",
-    "timerSettings": "⏱️ Timerynstellingen",
+    "timerSettings": "Timerynstellingen",
     "preTimerCountdown": "Ôftelmoment foar timer",
     "preTimerCountdownHelp": "Ôftelmoment foar de timer begjint om jo te helpen yn posysje te kommen",
-    "appearance": "🎨 Uterlik",
+    "appearance": "Uterlik",
     "darkMode": "Tsjustere modus",
     "showExerciseVideos": "Oefeningdemovideo's toane",
     "showExerciseVideosHelp": "Eksperimenteel: loop stille demovideo's yn timer as beskikber.",
-    "language": "🌐 Taal",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring Timer",
+    "ringTimerHelp": "Wikselje tusken sirkel timer mei ringen of rechthoekige timer mei râne foartgong.",
+    "language": "Taal",
     "selectLanguage": "Taal selektearje",
     "languageHelp": "Kies jo foarkar taal. De app ûnthâldt jo seleksje.",
-    "data": "💾 Gegevens",
+    "data": "Gegevens",
     "autoSave": "Automatysk bewarje",
     "dataStorageLabel": "Gegevensopslach:",
     "enabled": "Ynskeakele",
     "disabled": "Utskeakele",
     "dataStoredLocally": "Jo traininggegevens wurde lokaal op dit apparaat bewarre.",
     "pleaseAcceptConsent": "Akseptearje asjebleaft gegevensopslachtoestemming om eksport/wiskfunksjes yn te skeakeljen.",
-    "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
+  "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
+  "consentStatusLabel": "Tastimmingsstatus",
+  "consentVersion": "Tastimmingsferzje",
     "exportData": "Gegevens eksportearje",
     "exportDataHelp": "Laad jo traininggegevens yn as JSON-bestân",
     "exportInProgress": "Exportearje...",
@@ -116,7 +133,7 @@
     "clearAllDataHelp": "Permanint alle gegevens wiskje, toestemming tebeksette en werom nei startskerm",
     "clearAllDataMessage": "Binne jo wis dat jo alle gegevens wiskje wolle? Dizze aksje kin net ûngedien wurde. Jo wurde omrûte nei it startskerm en moatte opnij om toestemming frege.",
     "clearAllData": "Alle gegevens wiskje",
-    "securityPrivacy": "🔒 Feilichheid & Privacy",
+    "securityPrivacy": "Feilichheid & Privacy",
     "exportYourData": "Jo gegevens eksportearje",
     "deleteAccount": "Account wiskje",
     "deleteMyAccount": "Myn account wiskje",
@@ -221,11 +238,13 @@
     "sunday": "So"
   },
   "home": {
+    "heroTitle": "Bliuw konsekwint, bliuw sterk.",
+    "heroSubtitle": "Jo trainingen, op jo manier.",
     "upcomingWorkout": "Komende training",
     "tagline": "Jo persoanlike oefeningtimer",
     "signInMessage": "Jo kinne ",
     "signInLink": "ynlogge",
-    "signInSuffix": " om jo foarútgong fan ferskillende apparaten te folgjen.",
+    "signInSuffix": " om jo foarútgong te folgjen en te dielen.",
     "startNow": "No begjinne",
     "noScheduleTitle": "Gjin skema ynsteld",
     "noScheduleBody": "Meitsje in trainingskema om jo komende trainingen hjir te sjen",
@@ -236,7 +255,9 @@
     "removeFromFavoritesAria": "{{name}} út favoriten fuortsmite",
     "noFavorites": "Noch gjin favorite oefeningen. Markearje wat oefeningen as favoriten om se hjir te sjen!",
     "availableExercises": "Beskikbere oefeningen",
-    "changeLanguage": "Taal feroarje"
+    "changeLanguage": "Taal feroarje",
+    "popularExercises": "Populêre Oefeningen",
+    "noPopularExercises": "Gjin populêre oefeningen mei fideo's beskikber."
   },
   "workouts": {
     "title": "Trainingen",
@@ -330,8 +351,38 @@
     "exerciseCount_other": "{{count}} oefeningen",
     "status": {
       "stoppedAfter": "Stoppe nei {{duration}}",
-      "completedSetsReps": "Foltôge {{sets}} sets fan {{reps}} reps",
-      "completedTime": "Foltôge {{duration}} ynterfaltimer"
+      "completedSetsReps": "{{sets}} sets fan {{reps}} werhâldings foltóge",
+      "completedTime": "{{duration}} interval timer foltóge",
+      "completedWorkout": "Training foltóge mei {{count}} oefening",
+      "completedWorkout_plural": "Training foltóge mei {{count}} oefeningen"
+    },
+    "charts": {
+      "weeklyStreak": "Wekelijkse rige",
+      "currentStreak": "Aktuele rige",
+      "progressChart": "Foarútgongsgrafyk",
+      "workoutFrequency": "Trainingsfrequinsje",
+      "workoutsPerWeek": "Trainings per wike",
+      "currentMonth": "Dizze moanne",
+      "last3Months": "Lêste 3 Moannen",
+      "sinceStart": "Sûnt it begjin",
+      "workoutsThisWeek": "workouts dizze wike",
+      "workoutWeek": "workout dizze wike",
+      "thisWeek": "Dizze wike",
+      "noWorkoutsThisWeek": "Gjin workouts dizze wike",
+      "previousWeek": "Foarige wike",
+      "nextWeek": "Folgjende wike",
+      "streakDays": "{{count}} dagen",
+      "streakDay": "{{count}} dei",
+      "averageWorkouts": "{{count}} gem. workouts/wike",
+      "totalInPeriod": "{{count}} workouts yn totaal",
+      "weekNumber": "Wike {{week}}",
+      "periodSummary": "Perioade fan {{weeks}} wiken",
+      "maxWorkouts": "maks. {{count}}",
+      "workoutCount": "{{count}} workout",
+      "workoutCount_plural": "{{count}} workouts",
+      "avgPerWeek": "Gem./wike",
+      "avgPerPeriod": "Gem./perioade",
+      "noDataForRange": "Gjin workoutgegevens foar dizze perioade"
     }
   },
   "exercises": {
@@ -615,5 +666,17 @@
       "message": "Dizze update omfettet wizigingen yn hoe’t wy jo gegevens behannelje. Lês de wizigingen hjirboppe troch en befêstigje jo begryp.",
       "acknowledge": "Ik begryp en erken de privacy­wizigingen yn dizze update"
     }
+  },
+  "rating": {
+    "reviews": "beoardielingen",
+    "yourRating": "Dyn beoardieling",
+    "rateThis": "Beoardielje dizze oefening",
+    "addReview": "Beoardieling tafoegje",
+    "hideReview": "Beoardieling ferbergje",
+    "reviewPlaceholder": "Skriuw dyn beoardieling (opsjoneel)...",
+    "characters": "tekens",
+    "submitError": "It ynstjoeren fan de beoardieling is mislearre",
+    "submitting": "Oan it ynstjoeren...",
+    "loginToRate": "Meld dy oan om oefeningen te beoardieljen en te besjen"
   }
 }

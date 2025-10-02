@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import TimerPage from '../TimerPage';
@@ -73,88 +73,87 @@ describe('TimerPage - Exercise Display Improvements', () => {
       ...timerState
     };
 
-    return render(
-      <MemoryRouter>
-        <TimerPage {...defaultProps} timerState={fullTimerState} />
-      </MemoryRouter>
-    );
+    let renderResult;
+    act(() => {
+      renderResult = render(
+        <MemoryRouter>
+          <TimerPage {...defaultProps} timerState={fullTimerState} />
+        </MemoryRouter>
+      );
+    });
+    return renderResult;
   };
 
-  it('should display prominent exercise name in workout mode', () => {
+  it('should display workout name in workout mode', () => {
     renderTimerPage({
       workoutMode: mockWorkoutMode
     });
 
-    // Check that the exercise name is prominently displayed
-    expect(screen.getByText('Push-ups')).toBeInTheDocument();
-    
-    // Check that it shows as a heading (large and bold)
-    const exerciseNameElement = screen.getByText('Push-ups');
-    expect(exerciseNameElement).toHaveClass('text-lg', 'font-bold');
+    // Check that the workout name is displayed in the header
+    expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
+
+    // Check that it shows as a heading
+    const workoutNameElement = screen.getByText('Upper Body Workout');
+    expect(workoutNameElement.tagName.toLowerCase()).toBe('h2');
   });
 
-  it('should display exercise category in workout mode', () => {
+  it('should display exercise counter in workout mode', () => {
     renderTimerPage({
       workoutMode: mockWorkoutMode
     });
 
-    // Check that the category is displayed
-    expect(screen.getByText(/strength/)).toBeInTheDocument();
-    expect(screen.getByText(/Current Exercise • strength/)).toBeInTheDocument();
+    // Check that the exercise counter is displayed in the timer area
+    expect(screen.getByText('Exercise 1/1')).toBeInTheDocument();
   });
 
-  it('should display exercise description when available', () => {
+  it('should display workout progress indicator', () => {
     renderTimerPage({
       workoutMode: mockWorkoutMode
     });
 
-    // Check that the description is displayed
-    expect(screen.getByText('Classic upper body exercise')).toBeInTheDocument();
-    
-    // Check that it's styled as italic text
-    const descriptionElement = screen.getByText('Classic upper body exercise');
-    expect(descriptionElement).toHaveClass('italic');
+    // Check that the progress indicator exists in the header (1/1 without spaces)
+    expect(screen.getByText('1/1')).toBeInTheDocument();
   });
 
-  it('should not display prominent exercise card when not in workout mode', () => {
+  it('should not display workout header when not in workout mode', () => {
     renderTimerPage({
       workoutMode: undefined
     });
 
-    // The prominent exercise display should not be present
-    const exerciseCards = screen.queryByText('Current Exercise •');
-    expect(exerciseCards).not.toBeInTheDocument();
+    // The workout header should not be present
+    const workoutHeader = screen.queryByText('Upper Body Workout');
+    expect(workoutHeader).not.toBeInTheDocument();
+
+    // Exercise counter should also not be present
+    const exerciseCounter = screen.queryByText('Exercise 1/1');
+    expect(exerciseCounter).not.toBeInTheDocument();
   });
 
-  it('should handle exercise without description gracefully', () => {
-    const exerciseWithoutDescription: Exercise = createMockExercise({
-      ...mockExercise,
-      description: undefined as any
-    });
-
+  it('should handle normal workout mode display', () => {
     renderTimerPage({
       workoutMode: mockWorkoutMode
     });
 
-    // Should still display the name and category
-    expect(screen.getByText('Push-ups')).toBeInTheDocument();
-    expect(screen.getByText(/Current Exercise • strength/)).toBeInTheDocument();
+    // Should display workout name and progress
+    expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
+    expect(screen.getByText('1/1')).toBeInTheDocument();
+    expect(screen.getByText('Exercise 1/1')).toBeInTheDocument();
   });
 
-  it('should display workout header with exercise info', () => {
+  it('should display workout header correctly', () => {
     renderTimerPage({
       workoutMode: mockWorkoutMode
     });
 
     // Check workout header is present
     expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
-    expect(screen.getByText('1 / 1')).toBeInTheDocument();
-    
-    // Check exercise info in header
-    expect(screen.getByText('Exercise 1: Push-ups')).toBeInTheDocument();
+    expect(screen.getByText('1/1')).toBeInTheDocument();
+
+    // Check exercise counter is displayed in timer area
+    expect(screen.getByText('Exercise 1/1')).toBeInTheDocument();
   });
 
-  it('should show loading state when exercise is not yet loaded', () => {
+  it('should handle missing exercise gracefully', () => {
     // Create a workout mode with an exercise ID that doesn't exist in the exercises array
     const workoutModeWithMissingExercise = {
       ...mockWorkoutMode,
@@ -163,8 +162,8 @@ describe('TimerPage - Exercise Display Improvements', () => {
           id: 'ex-1',
           exercise_id: 'missing-exercise-id', // This ID doesn't exist in the exercises array
           order: 1,
-          customSets: 3,
-          customReps: 10
+          custom_sets: 3,
+          custom_reps: 10
         }
       ]
     };
@@ -172,27 +171,29 @@ describe('TimerPage - Exercise Display Improvements', () => {
     const propsWithMissingExercise = {
       ...defaultProps,
       selectedExercise: null,
-      timerState: {
-        isRunning: false,
-        currentTime: 0,
-        intervalDuration: 30,
-        targetTime: 30,
-        startTime: undefined,
-        currentExercise: undefined,
-        isCountdown: false,
-        countdownTime: 0,
-        isResting: false,
-        workoutMode: workoutModeWithMissingExercise,
-      }
     };
 
-    render(
-      <MemoryRouter>
-        <TimerPage {...propsWithMissingExercise} />
-      </MemoryRouter>
-    );
+    act(() => {
+      render(
+        <MemoryRouter>
+          <TimerPage {...propsWithMissingExercise} timerState={{
+            isRunning: false,
+            currentTime: 0,
+            intervalDuration: 30,
+            targetTime: 30,
+            startTime: undefined,
+            currentExercise: undefined,
+            isCountdown: false,
+            countdownTime: 0,
+            isResting: false,
+            workoutMode: workoutModeWithMissingExercise,
+          }} />
+        </MemoryRouter>
+      );
+    });
 
-    // Should show loading text in the header when exercise is not found
-    expect(screen.getByText('Exercise 1: Loading...')).toBeInTheDocument();
+    // Should still show the workout header
+    expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
+    expect(screen.getByText('1/1')).toBeInTheDocument();
   });
 });

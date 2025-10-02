@@ -175,8 +175,13 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
    */
   const checkIfInstalled = useCallback((): boolean => {
     // Check for standalone mode (indicates installed PWA)
-    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-      return true;
+    try {
+      const mediaQuery = window.matchMedia && window.matchMedia('(display-mode: standalone)');
+      if (mediaQuery && mediaQuery.matches) {
+        return true;
+      }
+    } catch {
+      // Gracefully handle environments where matchMedia is not available
     }
 
     // Check for iOS standalone

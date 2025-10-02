@@ -1,3 +1,6 @@
+/* Import design tokens */
+@import './styles/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -23,16 +26,12 @@ body.rtl textarea {
 
 body.rtl select {
   direction: rtl;
+  /* Adjust padding for RTL dropdown arrow (appears on left side) */
+  padding-left: 0.5rem !important; /* Reduced left padding */
+  padding-right: 2rem !important; /* Increased right padding for arrow space */
 }
 
-/* RTL-aware toggle switches */
-body.rtl .toggle-switch-off {
-  transform: translateX(-1.5rem); /* Move to right side when off in RTL */
-}
-
-body.rtl .toggle-switch-on {
-  transform: translateX(-0.25rem); /* Move to left side when on in RTL */
-}
+/* RTL-aware toggle switches - using Tailwind translate classes now */
 
 /* Ensure consistent alignment for RTL */
 body.rtl .text-left {
@@ -43,15 +42,177 @@ body.rtl .text-right {
   text-align: left;
 }
 
+/* RTL spacing improvements for Arabic text */
+body.rtl h1,
+body.rtl h2,
+body.rtl h3 {
+  line-height: 1.4; /* Better line height for Arabic text */
+}
+
+body.rtl .gap-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* Better Arabic font rendering */
+[lang="ar"], [lang="ar-EG"] {
+  font-family: 'Cairo', 'Tajawal', 'Noto Sans Arabic', system-ui, sans-serif;
+  line-height: 1.6; /* Better line spacing for Arabic */
+}
+
+/* Improved button spacing for RTL - exclude navigation buttons */
+body.rtl .btn-primary,
+body.rtl .btn-secondary,
+body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]) {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Better text truncation for Arabic */
+body.rtl .truncate {
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ========================================
+   ACCESSIBILITY ENHANCEMENTS
+   ======================================== */
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Enhanced focus styles for keyboard navigation */
+.keyboard-focus {
+  outline: 2px solid var(--color-primary, #0096C7) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .contrast-high {
+    --color-primary: #000000;
+    --color-primary-hover: #333333;
+    --color-background: #ffffff;
+    --color-text: #000000;
+    --color-border: #000000;
+  }
+
+  .dark.contrast-high {
+    --color-primary: #ffffff;
+    --color-primary-hover: #cccccc;
+    --color-background: #000000;
+    --color-text: #ffffff;
+    --color-border: #ffffff;
+  }
+}
+
+/* Reduced transparency preferences */
+@media (prefers-reduced-transparency: reduce) {
+  .transparency-reduce * {
+    backdrop-filter: none !important;
+    background-color: opaque !important;
+  }
+}
+
+/* Skip link styling */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--color-primary, #0096C7);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only.focus:focus,
+.sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Enhanced focus management */
+.focus-visible:focus {
+  outline: 2px solid var(--color-primary, #0096C7);
+  outline-offset: 2px;
+}
+
+/* Custom CSS properties for accessibility */
+:root {
+  --motion-duration: 300ms;
+  --motion-ease: ease;
+  --color-primary: #0096C7;
+  --color-primary-hover: #0077A5;
+  --color-primary-focus: #005F84;
+}
+
+/* Respect reduced motion preference */
+.motion-reduce * {
+  animation-duration: var(--motion-duration) !important;
+  transition-duration: var(--motion-duration) !important;
+}
+
+/* Ensure adequate color contrast */
+@media (prefers-contrast: high) {
+  button,
+  .btn,
+  [role="button"] {
+    border: 2px solid currentColor !important;
+  }
+
+  input,
+  textarea,
+  select {
+    border: 2px solid currentColor !important;
+  }
+}
+
 @layer base {
   html {
     @apply h-full;
   }
-  
+
   body {
     @apply h-full m-0 font-sans antialiased;
-    @apply bg-gray-50 text-gray-900;
-    @apply dark:bg-gray-900 dark:text-gray-100;
+    /* Use new design token system instead of generic gray colors */
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-primary);
   }
 
   #root {
@@ -95,15 +256,16 @@ body.rtl .text-right {
     @apply font-mono tracking-wider;
   }
 
-  /* Start/Stop button */
-  .btn-primary {
-    @apply min-h-[5rem] px-8 py-4 rounded-xl text-2xl font-bold;
-    @apply bg-green-500 text-white shadow-xl;
-    @apply hover:bg-green-600 active:bg-green-700;
-    @apply focus:outline-none focus:ring-4 focus:ring-green-500/50;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    @apply transition-all duration-200 transform active:scale-95;
+  /* Large Timer Start Button (uses primary brand color) */
+  .btn-timer-start {
+    @apply min-h-[5rem] px-8 py-4 rounded-xl text-2xl font-bold shadow-xl;
+    @apply transition-all duration-200 transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
   }
+  .btn-timer-start:hover { background-color: var(--color-primary-hover); }
+  .btn-timer-start:focus { background-color: var(--color-primary-focus); @apply focus:outline-none focus:ring-4 focus:ring-blue-500/50; }
+  .btn-timer-start:disabled { background-color: var(--color-primary-disabled); color: var(--color-text-tertiary); }
 
   .btn-secondary {
     @apply min-h-[3rem] px-6 py-3 rounded-lg text-lg font-semibold;
@@ -114,13 +276,46 @@ body.rtl .text-right {
     @apply transition-colors duration-200;
   }
 
-  /* Exercise card */
+  /* Ghost button for subtle actions */
+  .btn-ghost {
+    @apply rounded-lg text-sm font-medium px-3 py-2;
+    @apply text-gray-600 dark:text-gray-300;
+    @apply hover:bg-gray-100 dark:hover:bg-gray-700;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500/40;
+    @apply transition-colors duration-150;
+  }
+
+  /* Duration selector buttons */
+  .duration-option {
+    @apply py-2 px-3 text-sm font-medium rounded-md border transition-colors duration-150;
+    @apply bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+    @apply border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600;
+  }
+  .duration-option-active {
+    @apply text-white shadow-token-sm;
+    background-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-focus), 0 0 0 4px color-mix(in srgb, var(--color-primary) 40%, transparent);
+  }
+
+  /* Exercise card using design tokens */
   .exercise-card {
     @apply p-4 rounded-lg border-2 border-transparent;
-    @apply bg-white dark:bg-gray-800 shadow-md;
-    @apply hover:border-blue-200 hover:shadow-lg;
-    @apply focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/50;
+    background-color: var(--color-surface-primary);
+    box-shadow: var(--shadow-sm);
+    @apply hover:shadow-lg;
+    @apply focus-within:ring-4;
     @apply transition-all duration-200;
+    border-color: var(--color-border-primary);
+  }
+
+  .exercise-card:hover {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-primary);
+  }
+
+  .exercise-card:focus-within {
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
 
   .exercise-card.favorite {
@@ -128,14 +323,21 @@ body.rtl .text-right {
   }
 
   .exercise-card.selected {
-    @apply border-blue-500 bg-blue-50 dark:bg-blue-900/20;
+    border-color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary));
   }
 
-  /* Skip links for accessibility */
+  /* Skip links for accessibility using design tokens */
   .skip-link {
     @apply absolute left-[-9999px] top-4 z-50;
-    @apply bg-blue-600 text-white px-4 py-2 rounded;
-    @apply focus:left-4 focus:outline-none focus:ring-4 focus:ring-blue-500/50;
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    @apply px-4 py-2 rounded;
+    @apply focus:left-4 focus:outline-none focus:ring-4;
+  }
+
+  .skip-link:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 30%, transparent);
   }
 }
 
@@ -144,13 +346,188 @@ body.rtl .text-right {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
-  
+
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
 
+  /* Navigation-specific compact spacing for mobile */
+  .nav-container {
+    padding: 8px 2px; /* Slightly more vertical padding, less horizontal */
+  }
+
+  .nav-item {
+    padding: 6px 2px; /* Increased vertical padding for larger touch targets, tighter horizontal */
+    min-height: 56px; /* Ensure adequate touch target height */
+  }
+
+  .nav-more-button {
+    width: 48px; /* Slightly larger for bigger icon */
+    height: 56px; /* Match nav-item height */
+    flex-shrink: 0; /* Prevent shrinking */
+    min-width: 48px; /* Ensure minimum width */
+  }
+
+  /* RTL-safe navigation buttons - override global button padding */
+  body.rtl .nav-more-button,
+  body.rtl .nav-item,
+  body.rtl nav button:not(.nav-dropdown-item) {
+    padding: 6px 2px !important; /* Override global RTL button padding to match new nav-item padding */
+    direction: ltr !important; /* Keep icons LTR for proper rendering */
+  }
+
+  /* RTL-safe catalog navigation buttons */
+  body.rtl .catalog-selector button[aria-label*="Scroll"] {
+    direction: ltr !important; /* Keep scroll buttons LTR */
+    transform: none !important; /* Prevent transform issues */
+  }
+
+  /* RTL-safe SVG icons in navigation */
+  body.rtl .nav-more-button svg,
+  body.rtl .nav-item svg,
+  body.rtl .catalog-selector button svg {
+    direction: ltr !important; /* Keep SVG rendering LTR */
+    transform: none !important; /* Prevent RTL transforms on icons */
+  }
+
+  /* RTL-safe SVG icons in all buttons (forms, modals, etc.) */
+  body.rtl button svg {
+    direction: ltr !important; /* Keep SVG rendering LTR */
+    transform: none !important; /* Prevent RTL transforms on icons */
+    fill: none !important; /* Prevent fill from hiding stroke */
+    stroke: currentColor !important; /* Explicitly inherit stroke color */
+  }
+  
+  /* Ensure SVG stroke elements are visible in RTL mode */
+  body.rtl button svg line,
+  body.rtl button svg path,
+  body.rtl button svg polyline,
+  body.rtl button svg polygon,
+  body.rtl button svg circle {
+    stroke: currentColor !important;
+  }
+
+  .nav-separator {
+    margin-left: 1px;
+    margin-right: 1px;
+    flex-shrink: 0; /* Prevent separator from shrinking */
+  }
+
+  /* Navigation dropdown menu item styling */
+  .nav-dropdown-item {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Navigation dropdown positioning and sizing */
+  .nav-dropdown {
+    min-width: 280px;
+    max-width: 400px;
+  }
+
+  .nav-dropdown-ltr {
+    right: 0;
+    transform-origin: top right;
+  }
+
+  .nav-dropdown-rtl {
+    left: 0;
+    transform-origin: top left;
+  }
+
   /* Touch target size (minimum 44px) */
   .touch-target {
-    @apply min-h-[2.75rem] min-w-[2.75rem];
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+
+  /* Hide scrollbar for Netflix-style horizontal scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+
+  /* Typography utilities following UI specs */
+  .text-h1 {
+    font-size: 32px;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  .text-h2 {
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .text-h3 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .text-body {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .text-caption {
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  .text-small {
+    font-size: 12px;
+    line-height: 1.3;
+    font-weight: 500;
+  }
+
+  /* Settings page utilities */
+  .label-text {
+    @apply text-text-700 dark:text-text-100 font-medium;
+  }
+
+  .help-text {
+    @apply text-sm text-gray-600 dark:text-gray-400;
+  }
+
+  .section-subtitle {
+    @apply text-base font-medium text-gray-900 dark:text-gray-100;
+  }
+
+  .section-icon {
+    @apply h-5 w-5 text-blue-600 dark:text-blue-400;
+  }
+
+  /* RTL-aware utilities */
+  .text-start-rtl {
+    @apply text-left rtl:text-right;
+  }
+
+  .text-end-rtl {
+    @apply text-right rtl:text-left;
+  }
+
+  .gap-x-rtl {
+    @apply gap-x-4 rtl:gap-x-reverse;
+  }
+
+  .space-x-rtl > :not([hidden]) ~ :not([hidden]) {
+    @apply space-x-4 rtl:space-x-reverse;
+  }
+
+  .float-start-rtl {
+    @apply float-left rtl:float-right;
+  }
+
+  .float-end-rtl {
+    @apply float-right rtl:float-left;
   }
 }

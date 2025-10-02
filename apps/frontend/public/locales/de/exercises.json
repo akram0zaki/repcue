@@ -1,6 +1,30 @@
 {
-  "_meta": "Übersetzungen für eingebaute Übungen",
   "variable": "Variable Dauer",
+  "notFound": "Übung nicht gefunden",
+  "loadError": "Fehler beim Laden der Übung",
+  "backToExercises": "Zurück zu Übungen",
+  "details": "Details",
+  "defaultDuration": "Standarddauer",
+  "defaultSetsReps": "Standard-Sets & Wiederholungen",
+  "tagsHeading": "Tags",
+  "startTimer": "Timer starten",
+  "edit": "Bearbeiten",
+  "addToFavorites": "Zu Favoriten hinzufügen",
+  "removeFromFavorites": "Aus Favoriten entfernen",
+  "addEquipment": "Ausrüstung hinzufügen",
+  "removeEquipment": "Ausrüstung entfernen",
+  "addMuscleGroup": "Muskelgruppe hinzufügen",
+  "removeMuscleGroup": "Muskelgruppe entfernen",
+  "addTag": "Tag hinzufügen",
+  "removeTag": "Tag entfernen",
+  "durationSeconds": "Dauer (Sekunden)",
+  "benefits": "Vorteile",
+  "limitations": "Einschränkungen",
+  "bestTiming": "Beste Zeit",
+  "suggestedCombinations": "Empfohlene Kombinationen",
+  "notes": "Notizen",
+  "references": "Referenzen",
+  "difficultyLevel": "Schwierigkeit",
   "tags": {
     "isometric": "Isometrisch",
     "dynamic": "Dynamisch",
@@ -36,266 +60,6 @@
     "coordination": "Koordination",
     "rotation": "Rotation",
     "proprioception": "Propriozeption"
-  },
-  "plank": {
-    "name": "Unterarmstütz (Plank)",
-    "description": "Körper in gerader Linie halten, auf Unterarmen und Zehen gestützt",
-    "benefits": "Stärkt die Rumpfmuskulatur (Bauchmuskeln, schräge Bauchmuskeln usw.) und hilft dabei, die Wirbelsäule zu schützen und die Haltung zu verbessern. Auch praktisch, da keine Ausrüstung benötigt wird, und baut Stabilität für alltägliche Bewegungen auf.",
-    "limitations": "Isometrische Halteübungen über ~2 Minuten hinaus bringen abnehmende Erträge. Schlechte Form (durchhängende Hüften oder Schultern) kann Schmerzen verursachen. Menschen mit hohem Blutdruck sollten sehr lange Plank-Halteübungen vermeiden, da sie den Blutdruck erhöhen können. Bei Handgelenk- oder Schulterproblemen modifizieren (auf die Knie gehen oder eine Schräge verwenden).",
-    "best_timing": "Kann am Ende eines Trainings oder als schnelle Rumpfroutine gemacht werden. Planking 2–4 Mal pro Woche ist effektiv. Auch nützlich als Rumpfaktivierung während des Aufwärmens oder sogar täglich während Pausen.",
-    "suggested_combinations": ["side-plank", "dead-bug"],
-    "notes": "Halte eine gerade Linie von Kopf bis Fersen (keine durchhängenden Hüften). Atme gleichmäßig und spanne deine Bauchmuskeln und Gesäßmuskeln während der gesamten Zeit an. Beginne mit kürzeren Haltezeiten (z.B. 20–30 Sekunden) und steigere dich schrittweise.",
-    "exercise_references": ["Cleveland Clinic – Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Harvard Health – Plank Exercise Tips; https://www.health.harvard.edu/blog/straight-talk-on-planking-2019111318304"]
-  },
-  "side-plank": {
-    "name": "Seitstütz",
-    "description": "Seitlich stützen, auf einem Unterarm halten",
-    "benefits": "Betont die schrägen Bauchmuskeln und seitliche Rumpfstabilität. Hilft dabei, die Wirbelsäule zu stabilisieren und seitliche Muskelungleichgewichte zu beheben. Verbessert auch die Schulter- und Hüftausdauer auf jeder Seite.",
-    "limitations": "Übt mehr Druck auf eine Schulter aus – bei Schulterschmerzen auf den Knien beginnen oder vermeiden. Halte die Hüften davon ab zu sinken; ein schwacher Rumpf kann das Halten schwer machen, also langsam aufbauen. Vermeiden bei scharfen Schulter- oder Armschmerzen.",
-    "best_timing": "In Rumpftrainings nach dem Beherrschen des normalen Planks einbauen. Oft nach regulären Planks gemacht, um die schrägen Bauchmuskeln weiter zu aktivieren. Kann auch zu einer Yoga- oder Pilates-Routine hinzugefügt werden.",
-    "suggested_combinations": ["plank", "dead-bug"],
-    "notes": "Halte den Körper in einer Linie, ohne sich nach vorne oder hinten zu lehnen. Du kannst das untere Knie für eine einfachere Modifikation senken. Drücke den Unterarm fest in den Boden und lass die stützende Schulter nicht zusammenfallen.",
-    "exercise_references": ["Cleveland Clinic – Side Plank Benefits; https://health.clevelandclinic.org/plank-exercise-benefits", "Healthline – Side Plank Safety; https://www.healthline.com/health/side-plank"]
-  },
-  "mountain-climbers": {
-    "name": "Bergsteiger",
-    "description": "Abwechselnd Knie in der Plank-Position zur Brust ziehen",
-    "benefits": "Erhöht schnell die Herzfrequenz für kardiovaskuläre Kondition und arbeitet an der Rumpfstabilität. Bergsteiger sind eine zeiteffiziente Übung, die die Beinmuskulatur (besonders Quadrizeps und Gesäß) aktiviert und die Koordination zwischen Ober- und Unterkörper verbessert. Verbrennt Kalorien und baut kardiovaskuläre Ausdauer auf.",
-    "limitations": "Kann für Anfänger zu intensiv sein – mit langsamerer Geschwindigkeit beginnen und zur Geschwindigkeit aufbauen. Kann das Handgelenk durch die gewichtstragende Plank-Position belasten; bei Unbehagen kurze Pausen machen oder auf den Fäusten ausführen. Gute Plank-Form ist entscheidend – wenn die Hüften zu sinken beginnen, stoppen um die Form zu korrigieren. Bei akuten Schulter- oder Handgelenkproblemen vermeiden.",
-    "best_timing": "Hervorragend für Cardio-Bursts oder am Ende des Trainings für einen letzten Cardio-Schub. Häufig in HIIT-Trainings oder Bootcamp-Workouts verwendet. Gut für Aufwärmung, wenn mit moderater Geschwindigkeit ausgeführt, um Herz und Muskeln für intensiveres Training vorzubereiten.",
-    "suggested_combinations": ["burpees", "jumping-jacks"],
-    "notes": "Halte eine starke Plank-Position mit Händen unter den Schultern und engagiertem Rumpf. Bringe abwechselnd die Knie zur Brust, ohne die Hüften steigen oder fallen zu lassen. Beginne langsam, um die Form zu perfektionieren, bevor du die Geschwindigkeit erhöhst. Atme gleichmäßig – vermeide es, den Atem während schneller Bewegungen anzuhalten.",
-    "exercise_references": ["Healthline – Mountain Climber Benefits; https://www.healthline.com/health/mountain-climbers", "MedicalNewsToday – Mountain Climber Exercise; https://www.medicalnewstoday.com/articles/326594"]
-  },
-  "bicycle-crunches": {
-    "name": "Fahrrad-Crunches",
-    "description": "Ellenbogen zum gegenüberliegenden Knie im Wechsel",
-    "benefits": "Eine der effektivsten Bauchübungen – sie rangiert ganz oben bei der Aktivierung des geraden Bauchmuskels und der schrägen Bauchmuskeln. Baut Rumpfkraft und Stabilität auf und verbessert die Koordination durch ihre Kreuzkörperbewegung. Hilft auch dabei, die Muskeln für Rotationsbewegungen zu trainieren, was dem funktionellen Rumpfeinsatz zugute kommt.",
-    "limitations": "Kann den Nacken belasten, wenn falsch gemacht (vermeide es, am Nacken zu ziehen). Halte den unteren Rücken am Boden gedrückt; wenn er sich wölbt, verlangsame oder verkürze den Bewegungsbereich. Personen mit Rückenproblemen sollten vorsichtig vorgehen oder sanftere Rumpfübungen wählen.",
-    "best_timing": "In der Mitte oder am Ende eines Bauchtrainings machen. Oft mit statischen Rumpfübungen (wie Planks) gepaart, um den Rumpf umfassend zu trainieren. Da es intensiv sein kann, wird es normalerweise nach einem Aufwärmen gemacht, wenn die Muskeln bereit sind.",
-    "suggested_combinations": ["plank", "russian-twists"],
-    "notes": "Führe langsam und bewusst aus für beste Ergebnisse – Qualität über Geschwindigkeit. Konzentriere dich darauf, deine Schulter zum gegenüberliegenden Knie zu bringen (nicht nur den Ellenbogen), und strecke das gegenüberliegende Bein bei jeder Wiederholung vollständig aus. Atme aus, während du dich drehst, um die tiefen Bauchmuskeln zu aktivieren.",
-    "exercise_references": ["Bicycling – Bicycle Crunch Effectiveness; https://www.bicycling.com/training/a60659922/bicycle-crunches/", "Bicycling – Bicycle Crunch Form Tips; https://www.bicycling.com/training/a60659922/bicycle-crunches/"]
-  },
-  "push-ups": {
-    "name": "Liegestütze",
-    "description": "Körper aus der Bauchlage mit den Armen senken und heben",
-    "benefits": "Stärkt Brust, Schultern und Trizeps, während der Rumpf für Stabilität aktiviert wird. Es ist eine grundlegende Oberkörperübung, die auch die funktionelle Kraft für Druckbewegungen verbessert. Kann sogar die Herzgesundheit unterstützen – höhere Liegestütz-Kapazität wurde mit geringerem Herzrisiko in Verbindung gebracht.",
-    "limitations": "Zu viele ohne Variation können zu einem Plateau bei Kraftzuwächsen führen. Schlechte Form (wie abgespreizte Ellenbogen oder durchhängende Hüften) kann Schultern oder unteren Rücken belasten. Bei Handgelenkschmerzen Liegestütz-Griffe verwenden oder auf Knöcheln machen. Personen mit Schulterverletzungen sollten einen reduzierten Bereich verwenden oder bei Schmerzen überspringen.",
-    "best_timing": "Normalerweise früh in einem Oberkörpertraining gemacht, wenn die Arme frisch sind. Können auch täglich in Maßen als Teil einer Morgenroutine oder Kraftzirkel gemacht werden, aber Ruhetage für Erholung einplanen. Liegestütze eignen sich auch gut als Aufwärmung für den Oberkörper, mit modifizierter Intensität ausgeführt.",
-    "suggested_combinations": ["squats", "lunges"],
-    "notes": "Halte deinen Körper gerade und den Rumpf während der gesamten Zeit angespannt. Senke bis deine Brust nahe dem Boden ist (oder so weit wie bequem) und drücke hoch, ohne die Ellenbogen zu blockieren. Einatmen beim Senken, ausatmen beim Hochdrücken. Beginne auf den Knien oder gegen eine Wand, wenn ein voller Liegestütz zu schwierig ist.",
-    "exercise_references": ["Healthline – Benefits of Push-ups; https://www.healthline.com/health/fitness-exercise/pushups-everyday", "MedicalNewsToday – Push-up Risks; https://www.medicalnewstoday.com/articles/326149"]
-  },
-  "squats": {
-    "name": "Kniebeugen",
-    "description": "Knie beugen zum Absenken und wieder aufrichten",
-    "benefits": "Aktiviert die meisten großen Beinmuskeln (Gesäß, Quadrizeps und Hamstrings) und den Rumpf, was sie zu einer sehr funktionellen Übung macht. Hilft beim Aufbau von Unterkörperkraft für alltägliche Aktivitäten wie Heben oder Treppensteigen. Verbessert auch Balance und Flexibilität bei vollem Bewegungsumfang und kann die Kalorienverbrennung durch die Verwendung großer Muskelgruppen fördern.",
-    "limitations": "Richtige Form ist entscheidend – Knie sollten sich über den Zehen bewegen, nicht nach innen kollabieren, und Fersen sollten unten bleiben. Zu tief oder mit übermäßiger Tiefe ohne Flexibilität zu gehen kann Knie oder Rücken belasten. Personen mit Knie- oder Rückenproblemen sollten auf eine bequeme Tiefe arbeiten (oder einen Stuhl als Führung verwenden) und die Wirbelsäule neutral halten. Bei scharfen Schmerzen stoppen und Form überprüfen oder einen Trainer konsultieren.",
-    "best_timing": "Oft zu Beginn von Beintrainings platziert, da es sich um eine zusammengesetzte Bewegung handelt, die volle Kraft erfordert. Kann mit Körpergewicht als Aufwärmung oder Flexibilitätsübung oder mit Gewicht für Kraft zu Beginn gemacht werden. In allgemeinen Fitnessroutinen passen Kniebeugen gut mit Oberkörperübungen in Zirkeln zusammen.",
-    "suggested_combinations": ["lunges", "wall-sit"],
-    "notes": "Halte die Brust hoch und den Rumpf angespannt. Versuche so weit hinunterzugehen, dass die Oberschenkel parallel zum Boden sind (oder so weit wie bequem), während du die Knie hinter den Zehen und das Gewicht in den Fersen hältst. Drücke durch die Fersen, um aufzustehen, und spanne das Gesäß oben an. Stelle sicher, dass du eine neutrale Wirbelsäule beibehältst.",
-    "exercise_references": ["Healthline – Squat Benefits; https://www.healthline.com/health/fitness-exercise/squats-benefits", "Healthline – Squat Safety Tips; https://www.healthline.com/health/fitness-exercise/squats-benefits"]
-  },
-  "lunges": {
-    "name": "Ausfallschritte",
-    "description": "Schritt nach vorn und Körper absenken, Beine abwechseln",
-    "benefits": "Arbeitet alle wichtigen Beinmuskeln (Gesäß, Quadrizeps und Hamstrings) und verbessert natürlich das Gleichgewicht durch seine einseitige Natur. Ausfallschritte helfen dabei, Kraftungleichgewichte zwischen den Beinen zu korrigieren und die Hüftmobilität zu verbessern. Sie aktivieren auch Rumpf- und Stabilisierungsmuskeln, um eine aufrechte Haltung beizubehalten, was der allgemeinen Stabilität und Koordination zugute kommt.",
-    "limitations": "Stelle sicher, dass das vordere Knie nicht über die Zehen hinaus wandert, um das Gelenk zu schützen. Personen mit Knieproblemen können Vorwärts-Ausfallschritte herausfordernd finden – sie können Rückwärts-Ausfallschritte ausprobieren, die schonender für die Knie sind. Halte den Oberkörper aufrecht und vermeide übermäßiges Vorlehnen. Bei Gleichgewichtsproblemen führe Ausfallschritte neben einer Wand aus oder halte dich an etwas zur Unterstützung fest.",
-    "best_timing": "Baue Ausfallschritte in Beintrainings nach schwereren Lifts wie Kniebeugen oder in Zirkeln ein. Sie sind auch großartig nach dem Aufwärmen, um Gesäß und Beine zu aktivieren, oder als Teil einer dynamischen Aufwärmung für das Laufen. Da sie Muskelkater verursachen können, reichen 2–3 Mal pro Woche mit Ruhetagen dazwischen für die meisten Menschen aus.",
-    "suggested_combinations": ["squats", "calf-raises"],
-    "notes": "Tritt weit genug nach vorn, dass das vordere Knie ungefähr über dem Knöchel bleibt (nicht zu weit nach vorn). Senke dich gerade nach unten, indem du beide Knie beugst, und vermeide es, das hintere Knie hart auf den Boden zu knallen. Drücke durch die Ferse des vorderen Fußes, um wieder nach oben zu kommen. Halte den Rumpf aktiviert und den Oberkörper aufrecht für das Gleichgewicht.",
-    "exercise_references": ["Healthline – Benefits of Lunges; https://www.healthline.com/health/fitness-exercise/lunges-benefits", "Healthline – Lunge Variations (Reverse Lunge); https://www.healthline.com/health/fitness-exercise/lunges-benefits"]
-  },
-  "wall-sit": {
-    "name": "Wandsitz",
-    "description": "An der Wand herunterrutschen bis Oberschenkel waagrecht, Haltung halten",
-    "benefits": "Baut Ausdauer und Stärke in den Quadrizeps, Gesäß und Waden auf. Wandsitz ist eine isometrische Übung, die Muskeln unter konstante Spannung setzt, was sich von dynamischen Bewegungen unterscheidet. Es verbessert die Unterkörperkraft und kann bei der Kniestabilität helfen. Auch praktisch, da es wenig Platz benötigt.",
-    "limitations": "Kann für Anfänger herausfordernd sein – mit kürzeren Zeiten beginnen und schrittweise aufbauen. Personen mit Knieproblemen sollten vorsichtig sein; bei scharfen Schmerzen stoppen. Zu langes Halten kann Muskeln ermüden, ohne zusätzlichen Nutzen. Stelle sicher, dass die Wand sauber und stark genug für sichere Unterstützung ist.",
-    "best_timing": "Häufig in Beintrainings als Ausdauer-Herausforderung oder Finisher am Ende platziert. Kann in Zirkeln verwendet oder als schnelle Beinaktivierung für Sport gemacht werden. Auch nützlich als isometrische Kräftigung an Ruhetagen von schwerem Gewichtheben.",
-    "suggested_combinations": ["squats", "lunges"],
-    "notes": "Stehe mit dem Rücken gegen eine glatte Wand und rutsche herunter, bis die Oberschenkel parallel zum Boden sind (oder so weit wie bequem). Halte die Knie über den Knöcheln, nicht vorgeschoben. Verteile das Gewicht gleichmäßig auf beide Füße und atme gleichmäßig. Beginne mit 20–30 Sekunden und steigere dich schrittweise.",
-    "exercise_references": ["Healthline – Wall Sit Benefits; https://www.healthline.com/health/fitness-exercise/wall-sit", "Healthline – Wall Sit Safety; https://www.healthline.com/health/fitness-exercise/wall-sit"]
-  },
-  "burpees": {
-    "name": "Burpees",
-    "description": "Kniebeuge, in die Plank springen, Liegestütz, zurückspringen, Sprung nach oben",
-    "benefits": "Kraftvolle Ganzkörperübung, die Kraft und Cardio kombiniert. Burpees arbeiten deine Beine, deinen Rumpf, deine Brust und deine Schultern und erhöhen schnell die Herzfrequenz für kardiovaskuläre Ausdauer. Verbrennt viele Kalorien und kann explosive Kraft (durch das Springen) und allgemeine Athletik verbessern.",
-    "limitations": "Burpees sind sehr intensiv; Anfänger sollten mit weniger Wiederholungen oder Step-Back-Variationen beginnen, um Verletzungen zu vermeiden. Kann Handgelenke, Schultern und Knie durch schnelle Übergänge belasten. Halte eine kontrollierte Geschwindigkeit ein, um gute Form zu gewährleisten – nachlässige Burpees können den unteren Rücken oder die Schultern belasten. Bei Gelenkproblemen Modifikationen in Betracht ziehen (wie kein Springen oder Treten statt Springen).",
-    "best_timing": "Häufig am Ende von Trainings oder in HIIT-Sessions als hochintensive Periode ausgeführt. Da sie anstrengend sind, ist die Verwendung in kurzen Bursts (wie 10–15 Wiederholungen oder 30 Sekunden) mit Ruhe üblich. Auch populär in Bootcamp- oder CrossFit-Stil-Trainings für Konditionierung.",
-    "suggested_combinations": ["mountain-climbers", "jumping-jacks"],
-    "notes": "Halte eine gleichmäßige Geschwindigkeit ein: Kniebeuge, Füße in starke Plank zurückspringen, Liegestütz mit engagiertem Rumpf ausführen, Füße unter dich bringen, dann nach oben springen. Lande sanft beim Springen, um die Knie zu schützen. Atmung ist wichtig – beim Zurückspringen und beim Hochspringen ausatmen. Qualität über Quantität: besser weniger Burpees gut gemacht als viele schlecht gemacht.",
-    "exercise_references": ["Healthline – Burpee Benefits; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee", "Healthline – Burpee Safety Tips; https://www.healthline.com/health/fitness-exercise/how-to-do-a-burpee"]
-  },
-  "jumping-jacks": {
-    "name": "Hampelmänner",
-    "description": "Beine spreizen und Arme heben, dann wieder schließen",
-    "benefits": "Einfache aber effektive Cardio-Übung, die schnell die Herzfrequenz erhöht. Hampelmänner verbessern die Koordination zwischen Ober- und Unterkörper und aktivieren mehrere Muskelgruppen gleichzeitig. Sie sind hervorragend zum Aufwärmen, verbrennen Kalorien und verbessern die kardiovaskuläre Ausdauer. Und sie können überall ohne Ausrüstung gemacht werden.",
-    "limitations": "Das Springen kann Knie und Knöchel beeinträchtigen – Personen mit Gelenkproblemen können stattdessen Stepping Jacks ausprobieren. Die Armbewegung kann für Personen mit Schulterproblemen unangenehm sein; in diesem Fall nur die Beine verwenden. Auf harten Oberflächen kann es für Nachbarn laut sein.",
-    "best_timing": "Ideal zum Aufwärmen für jedes Training, um den Körper für intensiveres Training vorzubereiten. Auch üblich in Cardio-Zirkeln, HIIT-Trainings oder als schneller Energieschub während des Tages. Kann als aktive Erholung zwischen Krafttrainingsätzen verwendet werden.",
-    "suggested_combinations": ["high-knees", "butt-kicks"],
-    "notes": "Beginne mit Füßen zusammen und Armen an den Seiten. Springe, während du die Beine auf Schulterbreite spreizt und die Arme über den Kopf hebst. Springe zurück in die Startposition. Lande sanft auf den Fußbällen, um die Belastung zu reduzieren. Halte eine gleichmäßige Geschwindigkeit und atme gleichmäßig.",
-    "exercise_references": ["Healthline – Jumping Jack Benefits; https://www.healthline.com/health/jumping-jacks", "MedicalNewsToday – Jumping Jack Exercise; https://www.medicalnewstoday.com/articles/324739"]
-  },
-  "high-knees": {
-    "name": "Hohe Knie",
-    "description": "Auf der Stelle laufen, Knie bis auf Hüfthöhe anheben",
-    "benefits": "Erhöht schnell die Herzfrequenz und verbessert Beinkraft und Koordination. Hohe Knie aktivieren Muskeln wie Hüftbeuger, Quadrizeps und Waden, während sie kardiovaskuläre Ausdauer aufbauen. Sie sind hervorragend zur Verbesserung der Lauftechnik und Beingeschwindigkeit und können bei Beweglichkeit und Flexibilität helfen.",
-    "limitations": "Kann für Anfänger intensiv sein – mit langsamerer Geschwindigkeit beginnen und schrittweise steigern. Personen mit Knie- oder Hüftproblemen sollten bei hohen Lifts vorsichtig sein. Kann für die Hüftbeugemuskeln anstrengend sein, also auf den Körper hören und Pausen machen wenn nötig. Nicht überhitzen in warmen Umgebungen.",
-    "best_timing": "Ideal als Aufwärmung für das Laufen oder Sport, um Beine und Hüfte vorzubereiten. Häufig in Cardio-Zirkeln, Intervalltraining oder als schnelle Energie-Burst verwendet. Auch nützlich für Athleten, die Beingeschwindigkeit und Agilität verbessern wollen.",
-    "suggested_combinations": ["butt-kicks", "jumping-jacks"],
-    "notes": "Laufe auf der Stelle und hebe abwechselnd jedes Knie bis zur Hüfthöhe (oder so hoch wie angenehm). Halte den Oberkörper aufrecht und verwende deine Arme natürlich wie beim Laufen. Konzentriere dich auf schnelle Beinbewegungen und lande auf den Fußbällen. Halte eine gleichmäßige Geschwindigkeit und atme gleichmäßig.",
-    "exercise_references": ["Healthline – High Knees Exercise; https://www.healthline.com/health/fitness-exercise/high-knees", "Verywell Fit – High Knees; https://www.verywellfit.com/how-to-do-high-knees-4686709"]
-  },
-  "butt-kicks": {
-    "name": "Fersen zum Gesäß",
-    "description": "Auf der Stelle laufen und Fersen nach hinten zum Gesäß ziehen",
-    "benefits": "Aktiviert und dehnt die Hamstrings während es die kardiovaskuläre Ausdauer verbessert. Fersen zum Gesäß helfen dabei, Quadrizeps-Flexibilität zu entwickeln und können die Lauftechnik verbessern, indem sie die richtige Ferse-zum-Gesäß-Bewegung üben.",
-    "limitations": "Personen mit Knieproblemen sollten bei der Beugebewegung vorsichtig sein und möglicherweise nicht das Gesäß vollständig erreichen. Kann Quadrizeps-Spannung verursachen, wenn zu aggressiv ausgeführt – langsam beginnen. Fersen nicht zwanghaft zum Gesäß führen, wenn unangenehm; schrittweise an Flexibilität arbeiten.",
-    "best_timing": "Hervorragend als Lauf-Aufwärmung, um Hamstrings und Quadrizeps vorzubereiten. Häufig mit hohen Knien in Herz-Kreislauf-Zirkeln gepaart. Gut für dynamisches Aufwärmen für Sportarten, die Beinflexibilität erfordern.",
-    "suggested_combinations": ["high-knees", "jumping-jacks"],
-    "notes": "Laufe leicht auf der Stelle und bringe abwechselnd die Fersen zum Gesäß. Halte den Oberkörper aufrecht und verwende die Arme natürlich. Konzentriere dich darauf, die Hamstrings zu aktivieren, um die Ferse zu heben, anstatt nur die Knie zu beugen. Beginne langsam, um Flexibilität aufzubauen und vermeide erzwungene Bewegungen.",
-    "exercise_references": ["Healthline – Butt Kicks Exercise; https://www.healthline.com/health/fitness-exercise/butt-kicks", "Verywell Fit – Butt Kicks; https://www.verywellfit.com/how-to-do-butt-kicks-4707207"]
-  },
-  "downward-dog": {
-    "name": "Herabschauender Hund",
-    "description": "Umgekehrtes V mit Händen und Füßen am Boden bilden",
-    "benefits": "Dehnt mehrere Muskelgruppen gleichzeitig, besonders Hamstrings, Waden und Schultern. Herabschauender Hund stärkt Arme und Schultern während er die Wirbelsäule verlängert und Rückenspannung lindern kann. Er verbessert auch die Durchblutung durch sanfte Umkehrung und kann Stress durch seine beruhigende Natur reduzieren.",
-    "limitations": "Kann für Personen mit Handgelenkproblemen unbequem sein – Blöcke unter die Hände verwenden oder auf Fäusten machen wenn nötig. Personen mit hohem Blutdruck oder Kopfschmerzen sollten bei der umgekehrten Position vorsichtig sein. Bei straffen Hamstrings die Knie leicht beugen, um Rückendruck zu reduzieren.",
-    "best_timing": "Häufig in Yoga-Flows als Übergangsposition. Hervorragend für Post-Workout-Stretching oder als Teil einer Abkühlungsroutine. Kann auch als kurze Streckung während langer Arbeitspausen verwendet werden, um Haltung zu verbessern und Spannung zu lösen.",
-    "suggested_combinations": ["cat-cow", "child-pose"],
-    "notes": "Beginne auf Händen und Knien, hebe die Hüften während du die Beine streckst, um ein umgekehrtes V zu bilden. Halte die Hände schulterbreit mit gespreizten Fingern für Stabilität. Versuche die Fersen zum Boden zu drücken, aber mache dir keine Sorgen, wenn sie nicht berühren. Halte die Position und atme tief.",
-    "exercise_references": ["Yoga Journal – Downward Dog Benefits; https://www.yogajournal.com/poses/downward-facing-dog/", "Healthline – Downward Dog; https://www.healthline.com/health/fitness-exercise/downward-dog"]
-  },
-  "child-pose": {
-    "name": "Kindhaltung",
-    "description": "Knien, auf die Fersen setzen und Arme nach vorn strecken",
-    "benefits": "Sanfte Entspannungsposition, die den unteren Rücken, die Hüften und Schultern dehnt. Kindhaltung beruhigt das Nervensystem und hilft Stress und Angst zu reduzieren. Kann leichte Rückenschmerzen lindern und die allgemeine Wirbelsäulenflexibilität verbessern. Unterstützt die Verdauung und kann den Schlaf verbessern, wenn vor dem Schlafengehen gemacht.",
-    "limitations": "Personen mit Knie- oder Handgelenkproblemen sollten vorsichtig sein oder zusätzliche Kissen unter die Knie oder Stirn verwenden. Schwangere nach dem ersten Trimester sollten die Position mit breiteren Knien modifizieren. Bei Rückenverletzungen einen Arzt konsultieren, bevor diese Position ausgeführt wird.",
-    "best_timing": "Ideal am Ende einer Yoga-Sitzung oder eines Trainings als Entspannungsposition. Auch hervorragend zur Beruhigung jederzeit während des Tages, besonders vor dem Schlafengehen. Kann zwischen herausfordernden Posen als aktive Erholung oder während der Menstruation zur Entspannung verwendet werden.",
-    "suggested_combinations": ["cat-cow", "downward-dog"],
-    "notes": "Setze dich auf die Fersen mit zusammenberührenden großen Zehen, dann senke die Stirn zum Boden und strecke die Arme nach vorn oder neben den Körper. Atme tief und spüre die Dehnung im Rücken. Du kannst 30 Sekunden bis zu mehreren Minuten in dieser Position bleiben.",
-    "exercise_references": ["Yoga Journal – Child's Pose Benefits; https://www.yogajournal.com/poses/child-s-pose/", "Healthline – Child's Pose; https://www.healthline.com/health/fitness-exercise/childs-pose"]
-  },
-  "cat-cow": {
-    "name": "Katze-Kuh",
-    "description": "Wirbelsäule im Vierfüßler abwechselnd runden und durchhängen lassen",
-    "benefits": "Verbessert die Wirbelsäulenflexibilität und stärkt die grundlegenden Rücken- und Bauchmuskeln. Die sanfte Bewegung zwischen Katzen- und Kuhposition hilft Rückenspannung zu lösen und die Haltung zu verbessern. Kann auch bei Schmerzen im unteren Rücken helfen und die Koordination zwischen Atmung und Bewegung verbessern.",
-    "limitations": "Personen mit schwerwiegenden Nackenproblemen sollten den Bewegungsbereich begrenzen oder den Kopf in einer neutralen Position halten. Bei Wirbelsäulenverletzungen sehr langsam bewegen und einen Physiotherapeuten konsultieren. Bei Handgelenkproblemen Stützen oder die Übung auf den Unterarmen ausführen.",
-    "best_timing": "Hervorragend als Aufwärmung für eine Yoga-Sitzung oder jedes Training. Auch nützlich als schnelle Streckung während langer Arbeitsperioden oder zwischen schwierigeren Posen. Kann jederzeit zur Rückenspannungslösung gemacht werden.",
-    "suggested_combinations": ["child-pose", "downward-dog"],
-    "notes": "Beginne auf Händen und Knien (Tischposition). Für Katze: runde den Rücken nach oben und senke den Kopf. Für Kuh: hebe Brust und Kopf sanft an. Bewege dich langsam mit der Atmung – ausatmen in Katze, einatmen in Kuh.",
-    "exercise_references": ["Yoga Journal – Cat-Cow Pose; https://www.yogajournal.com/poses/cat-pose/", "Healthline – Cat-Cow Stretch; https://www.healthline.com/health/cat-cow-pose"]
-  },
-  "single-leg-stand": {
-    "name": "Einbeinstand",
-    "description": "Auf einem Bein stehen und halten, dann wechseln",
-    "benefits": "Verbessert Balance und Stabilität und stärkt Knöchel- und Wadenmuskeln. Einbeinstand aktiviert tiefe Rumpfmuskeln und verbessert die Propriozeption. Nützlich zur Sturzprävention und verbessert die sportliche Leistung in den meisten Aktivitäten.",
-    "limitations": "Anfänger finden es möglicherweise schwierig – mit kürzeren Zeiten beginnen und schrittweise aufbauen. Personen mit Gleichgewichtsproblemen oder Schwindel sollten in der Nähe einer Wand oder eines Stuhls zur Unterstützung bleiben. Kann für Personen mit Gelenkproblemen oder Nervenschmerzen herausfordernd bleiben.",
-    "best_timing": "Hervorragend als Teil einer Balance-Aufwärmung für Sport oder als Ausdauer-Herausforderung am Ende des Trainings. Kann täglich als schnelle Balanceübung gemacht werden. Auch nützlich für ältere Erwachsene als Sturzpräventionsübung.",
-    "suggested_combinations": ["tree-pose", "warrior-3"],
-    "notes": "Stehe auf einem Bein und beuge oder hebe das andere leicht vom Boden ab. Halte deinen Blick auf einen festen Punkt vor dir, um das Gleichgewicht zu halten. Beginne mit 10–15 Sekunden und steigere dich schrittweise. Du kannst eine Wand oder einen Stuhl zur Unterstützung am Anfang verwenden.",
-    "exercise_references": ["Harvard Health – Balance Exercises; https://www.health.harvard.edu/staying-healthy/balance-exercises", "Mayo Clinic – Balance Training; https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/balance-exercises/art-20044539"]
-  },
-  "tree-pose": {
-    "name": "Baum",
-    "description": "Auf einem Bein stehen, anderen Fuß an die Innenseite des Oberschenkels setzen",
-    "benefits": "Verbessert Balance und Konzentration und stärkt Bein- und Rumpfmuskeln. Baumposition verbessert die Haltung und öffnet die Hüftgelenke und entwickelt Körperbewusstsein. Hat auch eine meditative Komponente, die beruhigt und Stress reduziert.",
-    "limitations": "Personen mit Gleichgewichtsproblemen sollten eine Wand oder einen Stuhl zur Unterstützung verwenden. Den Fuß nicht an der Seite des Knies platzieren – oben oder unter dem Knie halten. Personen mit Hüft- oder Knieproblemen können beginnen, indem sie den Fuß an der Wade statt am Oberschenkel platzieren.",
-    "best_timing": "Hervorragend als Teil einer Yoga-Sitzung oder als Balanceübung jederzeit. Auch nützlich vor dem Schlafengehen zur Beruhigung und Zentrierung. Kann als kurze Pause bei der Arbeit für verbesserte Konzentration gemacht werden.",
-    "suggested_combinations": ["single-leg-stand", "warrior-3"],
-    "notes": "Stehe auf einem Bein und beuge das andere, platziere den Fuß an der Innenseite des Oberschenkels oder der Wade. Hebe deine Arme über den Kopf in Gebetsposition oder öffne sie zu den Seiten. Halte deinen Blick auf einen festen Punkt und atme tief. Beginne mit 10–30 Sekunden und steigere dich schrittweise.",
-    "exercise_references": ["Yoga Journal – Tree Pose; https://www.yogajournal.com/poses/tree-pose/", "Healthline – Tree Pose Benefits; https://www.healthline.com/health/fitness-exercise/tree-pose"]
-  },
-  "warrior-3": {
-    "name": "Krieger III",
-    "description": "Auf einem Bein balancieren, anderes Bein nach hinten strecken",
-    "benefits": "Stärkt Bein- und Gesäßmuskeln und verbessert Balance auf fortgeschrittenem Niveau. Krieger III entwickelt mentale Konzentration und dehnt die hinteren Kettenmuskeln. Baut auch Selbstvertrauen auf und verbessert die allgemeine Körperhaltung.",
-    "limitations": "Herausfordernd für Anfänger – beginne mit Händen an einer Wand oder einem Block zur Unterstützung. Personen mit Rückenproblemen sollten bei der Vorwärtsbeugungsposition vorsichtig sein. Nicht in die Dehnung erzwingen – arbeite mit einem angenehmen Bewegungsbereich. Bei Knie- oder Knöchelproblemen das Fuß am Boden halten.",
-    "best_timing": "Hervorragend in Yoga-Sitzungen nach dem Beherrschen grundlegender Balance-Posen. Nützlich als Konzentrations-Herausforderung jederzeit. Kann als Teil eines Unterkörper-Krafttrainings eingebaut werden.",
-    "suggested_combinations": ["tree-pose", "single-leg-stand"],
-    "notes": "Beginne aus der Bergposition und lehne dich nach vorn, während du ein Bein nach hinten hebst. Strecke deine Arme nach vorn mit Rumpf und Bein in einer geraden Linie. Halte deinen Blick auf einen festen Punkt auf dem Boden unter dir. Beginne mit kurzen Haltezeiten (5–10 Sekunden) und arbeite dich zu einer Minute vor.",
-    "exercise_references": ["Yoga Journal – Warrior III Pose; https://www.yogajournal.com/poses/warrior-iii-pose/", "Healthline – Warrior III Benefits; https://www.healthline.com/health/fitness-exercise/warrior-3"]
-  },
-  "dead-bug": {
-    "name": "Toter Käfer",
-    "description": "Rückenlage, gegenüberliegenden Arm und das Bein abwechselnd strecken",
-    "benefits": "Lehrt Rumpfmuskeln, wie sie andere Körpermuskeln unabhängig kontrollieren. Toter Käfer hilft dabei, den unteren Rücken zu schützen, indem er die richtige Rumpfaktivierung lehrt. Verbessert auch die Koordination zwischen Gliedmaßen und baut stabilisierende Stärke auf, die für viele Sportarten nützlich ist.",
-    "limitations": "Anfänger finden es möglicherweise schwierig – beginne mit weniger Streckung. Personen mit schwachen Rumpfmuskeln können Druck im unteren Rücken spüren. Wichtig, den Rücken die ganze Zeit am Boden zu halten – wenn du es nicht kannst, stoppe und kehre zur Grundposition zurück.",
-    "best_timing": "Hervorragend zu Beginn des Rumpftrainings, um tiefe Bauchmuskeln zu aktivieren. Häufig in Rumpfzirkeln mit anderen Übungen gemacht. Auch gut in sportlichen Aufwärmungen zur Rumpfaktivierung.",
-    "suggested_combinations": ["plank", "side-plank"],
-    "notes": "Liege auf dem Rücken mit 90-Grad-Kniebiegung. Strecke sanft einen Arm und das gegenüberliegende Bein aus (z.B. linker Arm mit rechtem Bein). Halte den Rücken flach am Boden und die Bauchmuskeln angespannt. Kehre langsam zurück und wechsle die Seiten. Atme die ganze Zeit gleichmäßig.",
-    "exercise_references": ["Healthline – Dead Bug Exercise; https://www.healthline.com/health/fitness-exercise/dead-bug-exercise", "Verywell Fit – Dead Bug; https://www.verywellfit.com/how-to-do-the-dead-bug-exercise-4588679"]
-  },
-  "glute-bridges": {
-    "name": "Hüftbrücke",
-    "description": "In Rückenlage die Hüfte durch Anspannen der Gesäßmuskeln anheben",
-    "benefits": "Stärkt Gesäß- und Hamstring-Muskeln und verbessert Hüftstabilität. Hüftbrücke ist hervorragend zur Stärkung der hinteren Kette, die oft durch viel Sitzen geschwächt wird. Hilft dabei, Schmerzen im unteren Rücken zu reduzieren und die Haltung zu verbessern.",
-    "limitations": "Personen mit Knieproblemen sollten bei der Beinposition vorsichtig sein. Vermeide Rückenüberstreckung – die Idee ist, mit den Gesäßmuskeln zu heben, nicht durch Rückenwölbung. Bei Nackenverletzungen mit reduziertem Bewegungsbereich beginnen.",
-    "best_timing": "Hervorragend als Teil des Unterkörpertrainings oder zur Gesäßaktivierung im Aufwärmen. Häufig nach Kniebeugen und Ausfallschritten gemacht, um spezifische Muskeln zu aktivieren. Auch nützlich in Rücken-Rehabilitation-Programmen.",
-    "suggested_combinations": ["squats", "dead-bug"],
-    "notes": "Liege auf dem Rücken mit gebeugten Knien und flachen Füßen am Boden. Spanne die Gesäßmuskeln an und hebe die Hüften, bis du eine gerade Linie von Knien zu Schultern bildest. Halte eine Sekunde und senke langsam ab. Atme gleichmäßig – halte nicht den Atem an.",
-    "exercise_references": ["Healthline – Glute Bridge Benefits; https://www.healthline.com/health/exercise-fitness/glute-bridge", "Verywell Fit – Glute Bridge; https://www.verywellfit.com/how-to-do-glute-bridge-exercise-3120738"]
-  },
-  "finger-roll": {
-    "name": "Fingerrollen",
-    "description": "Finger von der Faust zur vollständigen Streckung einzeln abrollen",
-    "benefits": "Verbessert Finger- und Handflexibilität und Geschicklichkeit. Fingerrollen sind nützlich für Menschen, die mit Mobilgeräten, Laptops oder anderen Werkzeugen arbeiten, die Handgeschicklichkeit erfordern. Hilft dabei, Handsteifigkeit und Schmerzen durch wiederholten Gebrauch zu reduzieren.",
-    "limitations": "Personen mit Hand- oder Handgelenkverletzungen sollten sanft vorgehen. Keine rückartigen oder schnellen Bewegungen machen – das Ziel ist Flexibilität, nicht Kraft. Manche Menschen finden diese Übung langweilig – halte sie einfach und konzentriere dich auf die Atmung.",
-    "best_timing": "Hervorragend als Pause von jeder Arbeit, die intensive Handnutzung erfordert. Nützlich für Masseure, Musiker oder Athleten, die auf Hände angewiesen sind. Kann jederzeit als kurze Entspannungspause gemacht werden.",
-    "suggested_combinations": ["tricep-dips", "bear-crawl"],
-    "notes": "Beginne mit einer geschlossenen Faust und rolle dann sanft jeden Finger einzeln auf. Beginne mit dem Daumen und beende mit dem kleinen Finger. Mache dies 5–10 Mal für jede Hand. Die Bewegung sollte glatt und kontrolliert sein, nicht hastig oder schnell.",
-    "exercise_references": ["Harvard Health – Hand Exercises; https://www.health.harvard.edu/pain/why-you-should-pay-attention-to-hand-pain", "Mayo Clinic – Hand Stretches; https://www.mayoclinic.org/diseases-conditions/carpal-tunnel-syndrome/in-depth/carpal-tunnel-exercises/art-20047004"]
-  },
-  "tricep-dips": {
-    "name": "Trizeps-Dips",
-    "description": "Körper mit den Armen an einer Kante senken und heben",
-    "benefits": "Stärkt den Trizeps (dreiköpfiger Muskel) sowie Brust und Schultern. Trizeps-Dips sind eine funktionelle Übung, die Drückbewegungen des täglichen Lebens nachahmt. Verbessert die allgemeine Oberkörperkraft und kann die Leistung bei anderen Übungen wie Liegestützen verbessern.",
-    "limitations": "Belastet Handgelenke und Schultern – Personen mit Gelenkproblemen sollten vorsichtig sein. Zu tiefes Senken ohne Flexibilität kann die Schulter verletzen. Manche Anfänger finden es herausfordernd – sie können es mit Füßen am Boden zur Hilfe machen.",
-    "best_timing": "Häufig am Ende von Oberkörpertrainings gemacht, um den Trizeps zu erschöpfen. Kann in Zirkel mit anderen Körpergewichtsübungen integriert werden. Auch nützlich in Schulter-Rehabilitation-Programmen.",
-    "suggested_combinations": ["push-ups", "finger-roll"],
-    "notes": "Setze dich an den Rand eines Stuhls oder einer Bank mit Händen hinter dir am Rand. Bewege deine Füße etwas vom Stuhl weg. Senke deinen Körper durch Ellenbogenbeugung und drücke dann mit dem Trizeps zurück nach oben. Halte die Bauchmuskeln angespannt und gehe nicht tiefer als deine Grenzen.",
-    "exercise_references": ["Healthline – Tricep Dips; https://www.healthline.com/health/fitness-exercise/tricep-dips", "Verywell Fit – Tricep Dips; https://www.verywellfit.com/triceps-dips-exercise-3120732"]
-  },
-  "calf-raises": {
-    "name": "Wadenheben",
-    "description": "Auf die Zehenspitzen heben, kurz halten und wieder absenken",
-    "benefits": "Stärkt Wadenmuskeln und verbessert Knöchelkraft und -stabilität. Wadenheben ist wichtig für Laufen und Springen und hilft dabei, das Risiko von Achillessehnen-Verletzungen zu reduzieren. Auch nützlich zur Verbesserung der Durchblutung in den Beinen.",
-    "limitations": "Personen mit Achillessehnenproblemen sollten bei der Streckung vorsichtig sein. Keine hüpfenden Bewegungen machen – halte sie kontrolliert und langsam. Bei Gleichgewichtsproblemen eine Wand oder einen Stuhl zur Unterstützung verwenden. Anfänger können mit beiden Füßen am Boden für Balance beginnen.",
-    "best_timing": "Hervorragend am Ende von Unterkörpertrainings oder als zusätzliche Übung nach dem Sport. Nützlich als Stärkungsübung für Läufer. Kann täglich als kurze Übung für Menschen gemacht werden, die lange stehen.",
-    "suggested_combinations": ["lunges", "squats"],
-    "notes": "Stehe aufrecht mit Füßen schulterbreit auseinander. Hebe deine Fersen durch Anspannen der Wadenmuskeln, bis du auf den Zehenspitzen stehst. Halte eine Sekunde und senke langsam ab. Mache 10–20 Wiederholungen. Atme gleichmäßig und halte nicht den Atem an.",
-    "exercise_references": ["Healthline – Calf Raise Benefits; https://www.healthline.com/health/fitness-exercise/calf-raises", "Verywell Fit – Calf Raises; https://www.verywellfit.com/calf-raise-exercise-3120299"]
-  },
-  "russian-twists": {
-    "name": "Russische Drehungen",
-    "description": "Sitz, Füße angehoben, Oberkörper nach rechts und links rotieren",
-    "benefits": "Konzentriert sich auf die schrägen Bauchmuskeln und verbessert rotatorische Rumpfkraft. Russische Drehungen verbessern die Querkraft und Rotationsbewegungen, was für Athleten nützlich ist. Lehrt Rumpfmuskeln, funktionell zusammenzuarbeiten.",
-    "limitations": "Kann für Anfänger schwierig sein – können Füße am Boden lassen für eine einfachere Version. Personen mit Problemen im unteren Rücken sollten bei der Rotationsbewegung vorsichtig sein. Wichtig, eine aufrechte Rückenposition zu halten.",
-    "best_timing": "Häufig am Ende von Rumpftrainings gemacht, um an den schrägen Bauchmuskeln zu arbeiten. Kann in Zirkeln mit anderen Rumpfübungen gemacht werden. Auch nützlich für Athleten in Sportarten, die Rotationsbewegung erfordern.",
-    "suggested_combinations": ["plank", "bicycle-crunches"],
-    "notes": "Setze dich mit gebeugten Knien und hebe die Füße vom Boden. Fasse die Hände vor der Brust zusammen und rotiere deinen Oberkörper nach rechts und links. Halte die Bauchmuskeln angespannt und den Rücken gerade. Bewege dich kontrolliert – Qualität vor Geschwindigkeit.",
-    "exercise_references": ["Healthline – Russian Twist Benefits; https://www.healthline.com/health/fitness-exercise/russian-twist", "Verywell Fit – Russian Twist; https://www.verywellfit.com/russian-twist-abs-exercise-3120765"]
-  },
-  "bear-crawl": {
-    "name": "Bärenlauf",
-    "description": "Auf Händen und Füßen vorwärts krabbeln, Knie vom Boden abgehoben",
-    "benefits": "Ganzkörperübung, die Schultern, Rumpf und Beine stärkt. Bärenlauf verbessert Koordination und funktionelle Bewegung durch Bewegung in menschlichen Grundbewegungsmustern. Erhöht die Herzfrequenz und hilft beim Kalorienverbrennen.",
-    "limitations": "Herausfordernd für Anfänger – beginne mit kurzer Distanz (5–10 Schritte). Belastet Handgelenke und Schultern – Personen mit Gelenkproblemen sollten modifizieren oder vermeiden. Wichtig, eine gerade Körperlinie zu halten, um den unteren Rücken zu schützen.",
-    "best_timing": "Hervorragend in Kraftzirkeln oder als Teil von CrossFit-Stil-Training. Nützlich als dynamische Ganzkörper-Aufwärmung vor intensivem Training. Kann jederzeit für Ganzkörper-Krafttraining gemacht werden.",
-    "suggested_combinations": ["mountain-climbers", "burpees"],
-    "notes": "Beginne auf Händen und Knien mit gehobenen Knien vom Boden. Bewege dich vorwärts, indem du Hand und Fuß gleichzeitig bewegst. Halte die Knie nahe am Boden und den Rumpf angespannt. Halte kleine Schritte und bewege dich kontrolliert, um die Form zu halten.",
-    "exercise_references": ["Healthline – Bear Crawl Exercise; https://www.healthline.com/health/fitness-exercise/bear-crawl", "Verywell Fit – Bear Crawl; https://www.verywellfit.com/bear-crawl-exercise-4589157"]
-  },
-  "forward-fold": {
-    "name": "Vorbeuge",
-    "description": "Im Stand nach vorn beugen und zu den Zehen greifen",
-    "benefits": "Dehnt Hamstring- und Wadenmuskeln sowie den unteren Rücken. Vorbeuge beruhigt das Nervensystem und hilft Stress zu reduzieren. Kann die Durchblutung durch sanfte Umkehrung verbessern und leichte Schmerzen im unteren Rücken lindern.",
-    "limitations": "Personen mit Problemen im unteren Rücken sollten langsam beugen und ihre Knie leicht beugen. Keine hüpfenden Bewegungen machen, um den Boden zu erreichen – arbeite sanft daran, Flexibilität zu verbessern. Bei hohem Blutdruck oder Kopfschmerzen langsam zurückkommen und nicht lange in der Position bleiben.",
-    "best_timing": "Hervorragend am Ende einer Yoga-Sitzung oder eines Trainings als Abkühlung. Nützlich nach dem Laufen oder intensivem Sport, um Beinmuskeln zu dehnen. Kann jederzeit zur Rückenspannungslinderung durch langes Sitzen gemacht werden.",
-    "suggested_combinations": ["downward-dog", "cat-cow"],
-    "notes": "Stehe aufrecht mit Füßen hüftbreit auseinander. Beuge dich langsam von der Hüfte (nicht vom Rücken) und reiche deine Hände zum Boden. Gehe nur so weit wie angenehm ohne Schmerzen. Atme tief und entspanne dich 15–30 Sekunden in der Position.",
-    "exercise_references": ["Yoga Journal – Forward Fold Benefits; https://www.yogajournal.com/poses/standing-forward-bend/", "Healthline – Forward Fold Stretch; https://www.healthline.com/health/fitness-exercise/standing-forward-fold"]
   },
   "timeBased": {
     "name": "Zeitbasiert"
@@ -382,6 +146,13 @@
   },
   "viewOnly": "Nur ansehen",
   "filterShared": "Mit mir geteilt",
+  "categoryShort": "Cat",
+  "sortByShort": "Sort:",
+  "selectCategories": "Kategorien auswählen",
+  "categoriesSelected_one": "{{count}} Kategorie ausgewählt",
+  "categoriesSelected_other": "{{count}} Kategorien ausgewählt",
+  "clearCategories": "Kategorien löschen",
+  "clearAll": "Alle löschen",
   "shared": "Geteilt",
   "shareExercise": "Teilen Übung",
   "shareDescription": "Erstellen Sie einen freigebbaren Link für \"{{name}}\"",
@@ -402,5 +173,16 @@
   "exerciseReferenceAdded": "Übung zu Ihrer Bibliothek hinzugefügt!",
   "saveFailed": "Fehler beim Speichern der Übung",
   "tagsLabel": "Tags",
-  "defaultDurationLabel": "Standarddauer"
+  "defaultDurationLabel": "Standarddauer",
+
+
+
+
+  "copies": "Kopien",
+  "created": "Erstellend",
+  "equipmentNeeded": "Ausrüstung benötigt",
+  "error": "Fehler beim Laden der Übung",
+  "ratingsAndReviews": "Bewertungen & Rezensionen",
+  "stats": "Statistiken",
+  "filtersAndSearch": "Filter & Suche"
 }

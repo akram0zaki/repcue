@@ -80,6 +80,8 @@ export const CreateExercisePage: React.FC = () => {
         type: 'success'
       });
 
+      // Reset scroll position to top when navigating back
+      window.scrollTo({ top: 0, behavior: 'instant' });
       // Navigate back to exercises page
       navigate('/exercises');
     } catch (error) {
@@ -94,6 +96,8 @@ export const CreateExercisePage: React.FC = () => {
   };
 
   const handleCancel = () => {
+    // Reset scroll position to top when navigating back
+    window.scrollTo({ top: 0, behavior: 'instant' });
     navigate('/exercises');
   };
 

@@ -59,7 +59,17 @@
     "noVideo": "Kein Video",
     "pauseVideo": "Video pausieren",
     "playVideo": "Video abspielen",
-    "premium": "PRO"
+    "premium": "PRO",
+    "done": "Fertig",
+    "addEquipment": "Ausrüstung hinzufügen",
+    "removeEquipment": "Ausrüstung entfernen",
+    "addMuscleGroup": "Muskelgruppe hinzufügen",
+    "removeMuscleGroup": "Muskelgruppe entfernen",
+    "addTag": "Tag hinzufügen",
+    "removeTag": "Tag entfernen",
+    "exerciseParameters": "Übungsparameter",
+    "exerciseVideo": "Übungsvideo"
+  },
   },
   "navigation": {
     "home": "Startseite",
@@ -67,6 +77,7 @@
     "exercises": "Übungen",
     "timer": "Timer",
     "activityLog": "Protokoll",
+    "progress": "Fortschritt",
     "settings": "Einstellungen"
   },
   "settings": {
@@ -75,24 +86,30 @@
     "beepVolume": "Piep-Lautstärke",
     "beepIntervalHelp": "Alle N Sekunden während zeitbasierten Übungen einen kurzen Piepton abspielen.",
     "enableVibration": "Vibration aktivieren",
-    "timerSettings": "⏱️ Timer-Einstellungen",
+    "timerSettings": "Timer-Einstellungen",
     "preTimerCountdown": "Vorlauf-Countdown",
     "preTimerCountdownHelp": "Countdown vor dem Timer-Start, um Ihnen zu helfen, sich in Position zu bringen",
-    "appearance": "🎨 Erscheinungsbild",
+    "appearance": "Erscheinungsbild",
     "darkMode": "Dunkler Modus",
     "showExerciseVideos": "Übungs-Demo-Videos anzeigen",
     "showExerciseVideosHelp": "Experimentell: Stumme Demo-Videos im Timer abspielen, falls verfügbar.",
-    "language": "🌐 Sprache",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Ring-Timer",
+    "ringTimerHelp": "Zwischen rundem Timer mit Ringen oder rechteckigem Timer mit Randfortschritt wechseln.",
+    "language": "Sprache",
     "selectLanguage": "Sprache auswählen",
     "languageHelp": "Wählen Sie Ihre bevorzugte Sprache. Die App merkt sich Ihre Auswahl.",
-    "data": "💾 Daten",
+    "data": "Daten",
     "autoSave": "Automatisch speichern",
     "dataStorageLabel": "Datenspeicherung:",
     "enabled": "Aktiviert",
     "disabled": "Deaktiviert",
     "dataStoredLocally": "Ihre Trainingsdaten werden lokal auf diesem Gerät gespeichert.",
     "pleaseAcceptConsent": "Bitte akzeptieren Sie die Datenspeicher-Einwilligung, um Export-/Lösch-Funktionen zu aktivieren.",
-    "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
+  "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
+  "consentStatusLabel": "Einwilligungsstatus",
+  "consentVersion": "Einwilligungsversion",
     "exportData": "Daten exportieren",
     "exportDataHelp": "Laden Sie Ihre Trainingsdaten als JSON-Datei herunter",
     "exportInProgress": "Export wird durchgeführt...",
@@ -116,7 +133,7 @@
     "clearAllDataHelp": "Alle Daten dauerhaft löschen, Einwilligung zurücksetzen und zum Startbildschirm zurückkehren",
     "clearAllDataMessage": "Sind Sie sicher, dass Sie alle Daten löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Sie werden zum Startbildschirm weitergeleitet und erneut um Einwilligung gebeten.",
     "clearAllData": "Alle Daten löschen",
-    "securityPrivacy": "🔒 Sicherheit & Datenschutz",
+    "securityPrivacy": "Sicherheit & Datenschutz",
     "exportYourData": "Ihre Daten exportieren",
     "deleteAccount": "Konto löschen",
     "deleteMyAccount": "Mein Konto löschen",
@@ -221,11 +238,13 @@
     "sunday": "So"
   },
   "home": {
+    "heroTitle": "Bleiben Sie konsequent, bleiben Sie stark.",
+    "heroSubtitle": "Ihre Workouts, auf Ihre Art.",
     "upcomingWorkout": "Anstehendes Workout",
     "tagline": "Ihr persönlicher Übungstimer",
     "signInMessage": "Sie können sich ",
     "signInLink": "anmelden",
-    "signInSuffix": ", um Ihren Fortschritt auf verschiedenen Geräten zu verfolgen.",
+    "signInSuffix": " um Ihren Fortschritt zu verfolgen und zu teilen.",
     "startNow": "Jetzt starten",
     "noScheduleTitle": "Kein Zeitplan gesetzt",
     "noScheduleBody": "Erstellen Sie einen Workout-Zeitplan, um Ihre anstehenden Workouts hier zu sehen",
@@ -236,7 +255,9 @@
     "removeFromFavoritesAria": "{{name}} aus Favoriten entfernen",
     "noFavorites": "Noch keine Lieblings-Übungen. Markieren Sie einige Übungen als Favoriten, um sie hier zu sehen!",
     "availableExercises": "Verfügbare Übungen",
-    "changeLanguage": "Sprache ändern"
+    "changeLanguage": "Sprache ändern",
+    "popularExercises": "Beliebte Übungen",
+    "noPopularExercises": "Keine beliebten Übungen mit Videos verfügbar."
   },
   "workouts": {
     "title": "Workouts",
@@ -329,9 +350,39 @@
     "exerciseCount_one": "{{count}} Übung",
     "exerciseCount_other": "{{count}} Übungen",
     "status": {
-      "stoppedAfter": "Angehalten nach {{duration}}",
-      "completedSetsReps": "{{sets}} Sätze à {{reps}} Wiederholungen abgeschlossen",
-      "completedTime": "Intervalltimer {{duration}} abgeschlossen"
+      "stoppedAfter": "Gestoppt nach {{duration}}",
+      "completedSetsReps": "{{sets}} Sätze von {{reps}} Wiederholungen abgeschlossen",
+      "completedTime": "{{duration}} Intervall-Timer abgeschlossen",
+      "completedWorkout": "Training mit {{count}} Übung abgeschlossen",
+      "completedWorkout_plural": "Training mit {{count}} Übungen abgeschlossen"
+    },
+    "charts": {
+      "weeklyStreak": "Wöchentliche Serie",
+      "currentStreak": "Aktuelle Serie",
+      "progressChart": "Fortschrittsdiagramm",
+      "currentMonth": "Aktueller Monat",
+      "last3Months": "Letzte 3 Monate",
+      "sinceStart": "Seit Beginn",
+      "workoutsThisWeek": "Trainings diese Woche",
+      "workoutWeek": "Training diese Woche",
+      "thisWeek": "Diese Woche",
+      "noWorkoutsThisWeek": "Keine Trainings diese Woche",
+      "previousWeek": "Vorherige Woche",
+      "nextWeek": "Nächste Woche",
+      "streakDays": "{{count}} Tage",
+      "streakDay": "{{count}} Tag",
+      "averageWorkouts": "{{count}} Ø Trainings/Woche",
+      "totalInPeriod": "{{count}} Trainings gesamt",
+      "weekNumber": "Woche {{week}}",
+      "periodSummary": "{{weeks}}-Wochen Zeitraum",
+      "workoutFrequency": "Trainingshäufigkeit",
+      "workoutsPerWeek": "Trainings pro Woche",
+      "maxWorkouts": "{{count}} max",
+      "workoutCount": "{{count}} Training",
+      "workoutCount_plural": "{{count}} Trainings",
+      "avgPerWeek": "Ø/Woche",
+      "avgPerPeriod": "Ø/Zeitraum",
+      "noDataForRange": "Keine Trainingsdaten für diesen Zeitraum"
     }
   },
   "exercises": {
@@ -607,5 +658,17 @@
       "message": "Dieses Update enthält Änderungen daran, wie wir Ihre Daten behandeln. Bitte überprüfen Sie die oben genannten Änderungen und bestätigen Sie Ihr Verständnis.",
       "acknowledge": "Ich verstehe und erkenne die Änderungen der Datenschutzbestimmungen in diesem Update an"
     }
+  },
+  "rating": {
+    "reviews": "Bewertungen",
+    "yourRating": "Ihre Bewertung",
+    "rateThis": "Bewerten Sie diese Übung",
+    "addReview": "Bewertung hinzufügen",
+    "hideReview": "Bewertung ausblenden",
+    "reviewPlaceholder": "Schreiben Sie Ihre Bewertung (optional)...",
+    "characters": "Zeichen",
+    "submitError": "Fehler beim Einreichen der Bewertung",
+    "submitting": "Wird eingereicht...",
+    "loginToRate": "Melden Sie sich an, um Übungen zu bewerten und zu überprüfen"
   }
 }

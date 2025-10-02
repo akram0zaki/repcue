@@ -26,7 +26,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
  * @returns true if the exercise is built-in (should not sync)
  */
 export function isBuiltin(exercise: Exercise | string): boolean {
-  const exerciseId = typeof exercise === 'string' ? exercise : exercise.id;
+  const exerciseId = typeof exercise === 'string' ? exercise : exercise?.id;
 
   if (!exerciseId) {
     return false;
@@ -49,7 +49,7 @@ export function isBuiltin(exercise: Exercise | string): boolean {
  * @returns true if the exercise is user-created (should sync)
  */
 export function isCustom(exercise: Exercise | string): boolean {
-  const exerciseId = typeof exercise === 'string' ? exercise : exercise.id;
+  const exerciseId = typeof exercise === 'string' ? exercise : exercise?.id;
 
   if (!exerciseId) {
     return false;
@@ -71,7 +71,7 @@ export function isCustom(exercise: Exercise | string): boolean {
  * @returns true if the catalog is built-in (should not sync)
  */
 export function isBuiltinCatalog(catalog: ExerciseCatalog | string): boolean {
-  const catalogId = typeof catalog === 'string' ? catalog : catalog.id;
+  const catalogId = typeof catalog === 'string' ? catalog : catalog?.id;
 
   if (!catalogId) {
     return false;
@@ -94,7 +94,7 @@ export function isBuiltinCatalog(catalog: ExerciseCatalog | string): boolean {
  * @returns true if the catalog is user-created (should sync)
  */
 export function isCustomCatalog(catalog: ExerciseCatalog | string): boolean {
-  const catalogId = typeof catalog === 'string' ? catalog : catalog.id;
+  const catalogId = typeof catalog === 'string' ? catalog : catalog?.id;
 
   if (!catalogId) {
     return false;
@@ -189,7 +189,7 @@ export function isSharedWithMe(
   exercise: Exercise | string,
   sharedExerciseIds: Set<string>
 ): boolean {
-  const exerciseId = typeof exercise === 'string' ? exercise : exercise.id;
+  const exerciseId = typeof exercise === 'string' ? exercise : exercise?.id;
   if (!exerciseId) return false;
   // Only UUIDs can be shared; slug IDs are always built-in.
   if (!isCustom(exerciseId)) return false;

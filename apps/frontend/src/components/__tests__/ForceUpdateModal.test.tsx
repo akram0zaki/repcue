@@ -43,6 +43,10 @@ describe('ForceUpdateModal', () => {
   const mockOnSaveWorkout = vi.fn();
   const mockOnAbandonWorkout = vi.fn();
 
+  // Mock window.history.pushState
+  const originalPushState = window.history.pushState;
+  const mockPushState = vi.fn();
+
   const createMockUpdateInfo = (): UpdateInfo => ({
     version: '2.1.0',
     policy: 'force',
@@ -64,11 +68,18 @@ describe('ForceUpdateModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+
+    // Mock window.history.pushState
+    window.history.pushState = mockPushState;
   });
 
   afterEach(() => {
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
+
+    // Restore original pushState
+    window.history.pushState = originalPushState;
+    mockPushState.mockClear();
   });
 
   describe('Modal Rendering', () => {

@@ -94,7 +94,12 @@
       "Bash(do echo \"Adding update translations to $lang\")",
       "Bash(echo:*)",
       "Bash(do echo:*)",
-      "Bash(for lang in es fr nl ar ar-EG fy)"
+      "Bash(for lang in es fr nl ar ar-EG fy)",
+      "Read(//c/Users/akram/OneDrive/Desktop/shafik/screens/**)",
+      "Bash(for lang in nl fy ar ar-EG de es fr)",
+      "Bash(for file in apps/frontend/src/__tests__/ExercisePage*.test.tsx)",
+      "Bash(timeout 60s pnpm --filter @repcue/frontend test --run --reporter=basic)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []

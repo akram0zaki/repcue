@@ -17,8 +17,10 @@ import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
+import ScrollToTop from './components/ScrollToTop';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
+import { UpdateNotificationManager } from './components/UpdateNotificationManager';
 import type { UpdateInfo, UpdateError } from './types';
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
@@ -2279,13 +2281,18 @@ useEffect(() => {
       void syncService.sync(true);
       
       // Update local UI state
-      setExercises(prev => 
-        prev.map(exercise => 
-          exercise.id === exercise_id 
+      setExercises(prev =>
+        prev.map(exercise =>
+          exercise.id === exercise_id
             ? { ...exercise, is_favorite: !exercise.is_favorite }
             : exercise
         )
       );
+
+      // Notify other components of the favorite update
+      window.dispatchEvent(new CustomEvent('exercise-favorite-updated', {
+        detail: { exerciseId: exercise_id }
+      }));
     } catch (error) {
       logger.error('Failed to toggle exercise favorite:', error);
     }
@@ -2389,7 +2396,13 @@ useEffect(() => {
   // Early theme detection to prevent flash - use system preference as fallback
   useEffect(() => {
     // Check system preference for initial theme
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let prefersDark = false;
+    try {
+      const mediaQuery = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      prefersDark = mediaQuery ? mediaQuery.matches : false;
+    } catch {
+      prefersDark = false;
+    }
     if (prefersDark) {
       document.documentElement.classList.add('dark');
     } else {
@@ -2424,7 +2437,7 @@ useEffect(() => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400 font-medium">Loading RepCue...</p>
         </div>
       </div>
@@ -2438,6 +2451,7 @@ useEffect(() => {
     <>
       {canUseBrowserRouter ? (
         <Router>
+        <ScrollToTop />
         <ChunkErrorBoundary>
           <MigrationSuccessBanner />
           <AppShell>
@@ -2459,8 +2473,9 @@ useEffect(() => {
                 path={AppRoutes.EXERCISES} 
                 element={
                   <Suspense fallback={createRouteLoader('Exercises')}>
-                    <ExercisePage 
+                    <ExercisePage
                       exercises={exercises}
+                      appSettings={appSettings}
                       onToggleFavorite={toggleExerciseFavorite}
                       onDeleteExercise={deleteExercise}
                     />
@@ -2635,6 +2650,23 @@ useEffect(() => {
           forceUpdateService.forceReload();
         }}
         blockAppUsage={true}
+      />
+
+      <UpdateNotificationManager
+        isWorkoutActive={timerState.isRunning && !!timerState.workoutMode}
+        onSaveWorkout={async () => {
+          // Save current workout if needed - this could be extended
+          if (timerState.workoutMode && timerState.isRunning) {
+            await stopTimer(true); // true = completion
+          }
+        }}
+        onAbandonWorkout={async () => {
+          // Abandon current workout
+          if (timerState.isRunning) {
+            await resetTimer();
+          }
+          setTimerState(prev => ({ ...prev, workoutMode: undefined }));
+        }}
       />
 
       <WorkoutForceUpdateModal

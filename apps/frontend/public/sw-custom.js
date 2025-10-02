@@ -59,6 +59,20 @@ if (workbox) {
     })
   );
 
+  // UI Images (hero banner, icons, etc.)
+  workbox.routing.registerRoute(
+    /^\/images\/.*\.(png|jpg|jpeg|svg)$/i,
+    new workbox.strategies.CacheFirst({
+      cacheName: 'ui-images-cache',
+      plugins: [
+        new workbox.expiration.ExpirationPlugin({
+          maxEntries: 20,
+          maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
+        }),
+      ],
+    })
+  );
+
   // Exercise videos
   workbox.routing.registerRoute(
     /^\/videos\/.*\.(mp4|webm|mov)$/i,

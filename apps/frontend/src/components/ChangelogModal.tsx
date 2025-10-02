@@ -326,7 +326,7 @@ export const ChangelogModal: React.FC<ChangelogModalProps> = ({
             <button
               onClick={handleApplyUpdate}
               disabled={hasPrivacyChanges && !privacyChangesAcknowledged}
-              className={`btn-primary flex-1 px-6 py-3 text-base font-medium rounded-lg transition-colors touch-target ${
+              className={`btn-primary flex-1 px-6 py-3 text-base font-medium touch-target ${
                 updateInfo.policy === 'force'
                   ? 'bg-red-600 hover:bg-red-700 text-white'
                   : updateInfo.policy === 'critical'

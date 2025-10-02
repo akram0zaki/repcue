@@ -78,7 +78,7 @@ const mockExercises: Exercise[] = [
     exercise_type: ExerciseType.TIME_BASED,
     default_duration: 60,
     is_favorite: true,
-    catalog_id: 'general-fitness'
+    catalogId: 'general-fitness'
   }),
   createMockExercise({
     id: 'push-ups',
@@ -88,9 +88,25 @@ const mockExercises: Exercise[] = [
     exercise_type: ExerciseType.REPETITION_BASED,
     default_duration: 45,
     is_favorite: false,
-    catalog_id: 'general-fitness'
+    catalogId: 'general-fitness'
   })
 ];
+
+// Mock AppSettings
+const mockAppSettings = {
+  horizontal_exercise_layout: false,
+  dark_mode: false,
+  reduce_motion: false,
+  vibration_enabled: true,
+  auto_start_next: false,
+  default_rest_time: 10,
+  interval_duration: 45,
+  sound_enabled: true,
+  beep_volume: 0.5,
+  pre_timer_countdown: true,
+  show_exercise_videos: true,
+  auto_save: true
+};
 
 describe('ExercisePage', () => {
   const mockOnToggleFavorite = vi.fn();
@@ -107,6 +123,7 @@ describe('ExercisePage', () => {
         <SnackbarProvider>
           <ExercisePage
             exercises={exercises}
+            appSettings={mockAppSettings}
             onToggleFavorite={mockOnToggleFavorite}
           />
         </SnackbarProvider>

@@ -101,19 +101,19 @@ describe('TimerPage - Pre-Timer Countdown Feature', () => {
     expect(cancelButton).toBeInTheDocument();
   });
 
-  it('uses orange styling during countdown', () => {
+  it('uses proper styling during countdown', () => {
     const countdownState = {
       ...defaultProps.timerState,
       isRunning: true,
       isCountdown: true,
       countdownTime: 4
     };
-    
+
     render(<TimerPage {...defaultProps} timerState={countdownState} />);
-    
-    // Check that countdown number has orange styling
+
+    // Check that countdown number has proper styling (rectangular timer uses white text)
     const countdownNumber = screen.getByText('4');
-    expect(countdownNumber).toHaveClass('text-orange-500');
+    expect(countdownNumber).toHaveClass('text-white');
   });
 
   it('handles countdown progress calculation', () => {

@@ -59,7 +59,17 @@
     "noVideo": "Sin video",
     "pauseVideo": "Pausar video",
     "playVideo": "Reproducir video",
-    "premium": "PRO"
+        "premium": "PRO",
+    "done": "Hecho",
+    "addEquipment": "Agregar equipo",
+    "removeEquipment": "Eliminar equipo",
+    "addMuscleGroup": "Agregar grupo muscular",
+    "removeMuscleGroup": "Eliminar grupo muscular",
+    "addTag": "Agregar etiqueta",
+    "removeTag": "Eliminar etiqueta",
+    "exerciseParameters": "Parámetros del ejercicio",
+    "exerciseVideo": "Video del ejercicio"
+  },
   },
   "navigation": {
     "home": "Inicio",
@@ -67,6 +77,7 @@
     "exercises": "Ejercicios",
     "timer": "Cronómetro",
     "activityLog": "Registro",
+    "progress": "Progreso",
     "settings": "Configuración"
   },
   "settings": {
@@ -75,24 +86,30 @@
     "beepVolume": "Volumen del pitido",
     "beepIntervalHelp": "Reproduce un pitido corto cada N segundos durante ejercicios basados en tiempo.",
     "enableVibration": "Activar vibración",
-    "timerSettings": "⏱️ Configuración del cronómetro",
+    "timerSettings": "Configuración del cronómetro",
     "preTimerCountdown": "Cuenta regresiva previa",
     "preTimerCountdownHelp": "Cuenta regresiva antes de que comience el cronómetro para ayudarte a ponerte en posición",
-    "appearance": "🎨 Apariencia",
+    "appearance": "Apariencia",
     "darkMode": "Modo oscuro",
     "showExerciseVideos": "Mostrar videos de demostración",
     "showExerciseVideosHelp": "Experimental: reproducir videos de demostración silenciosos dentro del cronómetro cuando estén disponibles.",
-    "language": "🌐 Idioma",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Temporizador Circular",
+    "ringTimerHelp": "Alternar entre temporizador circular con anillos o temporizador rectangular con barra de progreso.",
+    "language": "Idioma",
     "selectLanguage": "Seleccionar idioma",
     "languageHelp": "Elige tu idioma preferido. La aplicación recordará tu selección.",
-    "data": "💾 Datos",
+    "data": "Datos",
     "autoSave": "Guardado automático",
     "dataStorageLabel": "Almacenamiento de datos:",
     "enabled": "Activado",
     "disabled": "Desactivado",
     "dataStoredLocally": "Tus datos de entrenamiento se almacenan localmente en este dispositivo.",
     "pleaseAcceptConsent": "Por favor acepta el consentimiento de almacenamiento de datos para habilitar las funciones de exportación/borrado.",
-    "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
+  "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
+  "consentStatusLabel": "Estado del consentimiento",
+  "consentVersion": "Versión de consentimiento",
     "exportData": "Exportar datos",
     "exportDataHelp": "Descarga tus datos de entrenamiento como archivo JSON",
     "exportInProgress": "Exportando...",
@@ -116,7 +133,7 @@
     "clearAllDataHelp": "Eliminar permanentemente todos los datos, reiniciar consentimiento y volver a la pantalla de inicio",
     "clearAllDataMessage": "¿Estás seguro de que quieres borrar todos los datos? Esta acción no se puede deshacer. Serás redirigido a la pantalla de inicio y se te pedirá consentimiento nuevamente.",
     "clearAllData": "Borrar todos los datos",
-    "securityPrivacy": "🔒 Seguridad y privacidad",
+    "securityPrivacy": "Seguridad y privacidad",
     "exportYourData": "Exportar tus datos",
     "deleteAccount": "Eliminar cuenta",
     "deleteMyAccount": "Eliminar mi cuenta",
@@ -221,11 +238,13 @@
     "sunday": "Dom"
   },
   "home": {
+    "heroTitle": "Mantente constante, mantente fuerte.",
+    "heroSubtitle": "Tus entrenamientos, a tu manera.",
     "upcomingWorkout": "Próximo entrenamiento",
     "tagline": "Tu temporizador personal de ejercicios",
     "signInMessage": "Puedes ",
     "signInLink": "iniciar sesión",
-    "signInSuffix": " para hacer seguimiento de tu progreso desde diferentes dispositivos.",
+    "signInSuffix": " para hacer seguimiento de tu progreso y compartirlo.",
     "startNow": "Comenzar ahora",
     "noScheduleTitle": "Sin horario establecido",
     "noScheduleBody": "Crea un horario de entrenamiento para ver tus próximos entrenamientos aquí",
@@ -236,7 +255,9 @@
     "removeFromFavoritesAria": "Quitar {{name}} de favoritos",
     "noFavorites": "Aún no hay ejercicios favoritos. ¡Marca algunos ejercicios como favoritos para verlos aquí!",
     "availableExercises": "Ejercicios disponibles",
-    "changeLanguage": "Cambiar idioma"
+    "changeLanguage": "Cambiar idioma",
+    "popularExercises": "Ejercicios populares",
+    "noPopularExercises": "No hay ejercicios populares con videos disponibles."
   },
   "workouts": {
     "title": "Entrenamientos",
@@ -330,8 +351,38 @@
     "exerciseCount_other": "{{count}} ejercicios",
     "status": {
       "stoppedAfter": "Detenido después de {{duration}}",
-      "completedSetsReps": "Completadas {{sets}} series de {{reps}} repeticiones",
-      "completedTime": "Temporizador de intervalo de {{duration}} completado"
+      "completedSetsReps": "Completado {{sets}} series de {{reps}} repeticiones",
+      "completedTime": "Completado temporizador de intervalo de {{duration}}",
+      "completedWorkout": "Entrenamiento completado con {{count}} ejercicio",
+      "completedWorkout_plural": "Entrenamiento completado con {{count}} ejercicios"
+    },
+    "charts": {
+      "weeklyStreak": "Racha Semanal",
+      "currentStreak": "Racha Actual",
+      "progressChart": "Gráfico de Progreso",
+      "currentMonth": "Mes Actual",
+      "last3Months": "Últimos 3 Meses",
+      "sinceStart": "Desde el Inicio",
+      "workoutsThisWeek": "entrenamientos esta semana",
+      "workoutWeek": "entrenamiento esta semana",
+      "thisWeek": "Esta semana",
+      "noWorkoutsThisWeek": "Sin entrenamientos esta semana",
+      "previousWeek": "Semana anterior",
+      "nextWeek": "Próxima semana",
+      "streakDays": "{{count}} días",
+      "streakDay": "{{count}} día",
+      "averageWorkouts": "{{count}} promedio entrenamientos/semana",
+      "totalInPeriod": "{{count}} entrenamientos totales",
+      "weekNumber": "Semana {{week}}",
+      "periodSummary": "Período de {{weeks}} semanas",
+      "workoutFrequency": "Frecuencia de Entrenamientos",
+      "workoutsPerWeek": "Entrenamientos por Semana",
+      "maxWorkouts": "{{count}} máx",
+      "workoutCount": "{{count}} entrenamiento",
+      "workoutCount_plural": "{{count}} entrenamientos",
+      "avgPerWeek": "Prom/semana",
+      "avgPerPeriod": "Prom/período",
+      "noDataForRange": "Sin datos de entrenamientos para este período"
     }
   },
   "exercises": {
@@ -615,5 +666,17 @@
       "message": "Esta actualización incluye cambios en la forma en que manejamos sus datos. Revise los cambios anteriores y confirme su comprensión.",
       "acknowledge": "Entiendo y reconozco los cambios en la privacidad en esta actualización"
     }
+  },
+  "rating": {
+    "reviews": "Reseñas",
+    "yourRating": "Tu calificación",
+    "rateThis": "Califica este ejercicio",
+    "addReview": "Agregar Reseña",
+    "hideReview": "Ocultar Reseña",
+    "reviewPlaceholder": "Escriba su reseña (opcional)...",
+    "characters": "caracteres",
+    "submitError": "Error al enviar la reseña",
+    "submitting": "Enviando...",
+    "loginToRate": "Inicie sesión para calificar y revisar ejercicios"
   }
 }

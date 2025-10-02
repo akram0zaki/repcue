@@ -3,19 +3,21 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Routes } from '../types';
-import { 
-  HomeIcon, 
-  ExercisesIcon, 
-  TimerIcon, 
-  LogIcon, 
+import {
+  HomeIcon,
+  ExercisesIcon,
+  TimerIcon,
+  LogIcon,
   ScheduleIcon,
   MoreIcon
 } from './icons/NavigationIcons';
+import { useRTLDetection } from '../hooks/useRTLDetection';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { isRTL } = useRTLDetection();
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement>(null);
 
@@ -67,62 +69,76 @@ const Navigation: React.FC = () => {
     },
     {
       path: Routes.ACTIVITY_LOG,
-      label: t('navigation.activityLog'),
+      label: t('navigation.progress'), // Changed from activityLog to progress
       icon: LogIcon,
-  testId: 'nav-activity'
+  testId: 'nav-progress' // Changed from nav-activity to nav-progress
     },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50">
-      <div className="flex justify-around items-center py-2 px-4 max-w-md mx-auto">
-    {mainNavItems.map((item) => {
-          const IconComponent = item.icon;
-          return (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors ${
-                isActive(item.path)
-                  ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-              }`}
-              aria-label={`Navigate to ${item.label}`}
-      data-testid={item.testId}
-            >
-              <IconComponent className="mb-1" size={20} />
-              <span className="text-xs font-medium">{item.label}</span>
-            </button>
-          );
-        })}
-        
-        {/* More menu button */}
-        <div className="relative" ref={moreMenuRef}>
+      <div className="nav-container flex items-center max-w-md mx-auto">
+        {/* Main navigation items - 5 tabs with optimized spacing */}
+        <div className="flex justify-between items-center flex-1">
+          {mainNavItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`nav-item flex flex-col items-center justify-center rounded-lg transition-colors min-w-0 touch-target ${
+                  isActive(item.path)
+                    ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+                aria-label={`Navigate to ${item.label}`}
+                data-testid={item.testId}
+              >
+                <IconComponent className="mb-1" size={24} />
+                <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Separator between main tabs and More button */}
+        <div className="nav-separator w-px h-5 bg-gray-300 dark:bg-gray-500"></div>
+
+        {/* More menu button - ensure visibility */}
+        <div className="relative flex-shrink-0" ref={moreMenuRef}>
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className={`flex items-center justify-center p-2 rounded-lg transition-colors border-l border-gray-200 dark:border-gray-600 ml-2 pl-4 ${
+            className={`nav-more-button flex items-center justify-center rounded-lg transition-colors ${
               isActive(Routes.SETTINGS)
-                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
             aria-label="More options"
             aria-expanded={showMoreMenu}
             aria-haspopup="true"
             data-testid="nav-more"
+            style={{ direction: 'ltr' }}
           >
-            <MoreIcon size={20} />
+            <MoreIcon size={26} />
           </button>
 
           {/* Dropdown menu */}
           {showMoreMenu && (
-            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] max-w-[250px]">
+            <div
+              className={`absolute bottom-full mb-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg nav-dropdown ${
+                isRTL ? 'nav-dropdown-rtl' : 'nav-dropdown-ltr'
+              }`}
+              dir={isRTL ? 'rtl' : 'ltr'}
+            >
               {/* Settings */}
               <button
                 onClick={() => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
+                  isRTL ? 'text-right' : 'text-left'
+                }`}
                 data-testid="nav-settings"
               >
                 {t('navigation.settings')}

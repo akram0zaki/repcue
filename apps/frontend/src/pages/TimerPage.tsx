@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
 import type { Exercise, AppSettings, TimerState } from '../types';
 import { TIMER_PRESETS, REST_TIME_BETWEEN_SETS, type TimerPreset } from '../constants';
-import { ReadyIcon, StarFilledIcon } from '../components/icons/NavigationIcons';
+import { ReadyIcon } from '../components/icons/NavigationIcons';
 import { VIDEO_DEMOS_ENABLED } from '../config/features';
+import { ExerciseSelectorModal } from '../components/ExerciseSelector';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
@@ -47,10 +48,25 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onStopTimer,
   onResetTimer
 }) => {
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
+  
+  // State for collapsible duration selector
+  const [isDurationExpanded, setIsDurationExpanded] = useState(false);
+  
   // ---------------- Video Demo Integration (Phase 2) ----------------
   // Calculate display values
   const { currentTime, targetTime, isRunning, isCountdown, countdownTime, workoutMode, isResting, restTimeRemaining } = timerState;
+
+  // Format duration for display
+  const formatDuration = (duration: number): string => {
+    return duration < 60 ? `${duration}s` : `${Math.floor(duration / 60)}m`;
+  };
+
+  // Handle duration selection (auto-collapse after selection)
+  const handleDurationSelect = (duration: TimerPreset) => {
+    onSetSelectedDuration(duration);
+    setIsDurationExpanded(false);
+  };
 
   // Rep-based exercise detection (needs selectedExercise so declare early for hook deps below)
   const isRepBased = selectedExercise?.exercise_type === 'repetition_based';
@@ -59,7 +75,15 @@ const TimerPage: React.FC<TimerPageProps> = ({
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
-  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prefersReducedMotion = (() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const mediaQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+      return mediaQuery ? mediaQuery.matches : false;
+    } catch {
+      return false;
+    }
+  })();
   const videoFeatureEnabled = VIDEO_DEMOS_ENABLED && (appSettings.show_exercise_videos ?? true) && !prefersReducedMotion;
 
   useEffect(() => {
@@ -293,10 +317,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
         
         {/* Compact Workout Mode Header */}
         {isWorkoutMode && (
-          <div className="bg-blue-600 text-white rounded-lg p-3 mb-2">
+          <div className="bg-primary-500 text-white rounded-lg p-3 mb-2">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base font-semibold truncate">{workoutMode.workoutName}</h2>
-              <span className="text-xs bg-blue-500 px-2 py-0.5 rounded">
+              <span className="text-xs bg-primary-700 px-2 py-0.5 rounded">
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
                   const totalExercises = workoutMode.exercises.length;
@@ -315,9 +339,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </div>
             
             {/* Compact Workout Progress Bar */}
-            <div className="w-full bg-blue-500 rounded-full h-1.5">
+            <div className="w-full bg-primary-700 rounded-full h-1.5">
               <div 
-                className="bg-white h-1.5 rounded-full transition-all duration-300"
+                className="bg-secondary-300 h-1.5 rounded-full transition-all duration-300"
                 style={{ width: `${workoutProgress}%` }}
               />
             </div>
@@ -328,127 +352,93 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Compact Exercise Selection - Hidden in workout mode */}
         {!isWorkoutMode && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 mb-2">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.exerciseLabel')}</span>
-              <button
-                onClick={() => onSetShowExerciseSelector(true)}
-                className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
-                data-testid="open-exercise-selector"
-              >
-                {t('common.choose')}
-              </button>
+              {selectedExercise ? (
+                <button
+                  onClick={() => onSetShowExerciseSelector(true)}
+                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline truncate max-w-48"
+                  data-testid="selected-exercise-button"
+                >
+                  {localizeExercise(selectedExercise, t).name}
+                </button>
+              ) : (
+                <button
+                  onClick={() => onSetShowExerciseSelector(true)}
+                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                  data-testid="open-exercise-selector"
+                >
+                  {t('common.choose')}
+                </button>
+              )}
             </div>
             
-            {selectedExercise ? (
-              <div className="text-center">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  {localizeExercise(selectedExercise, t).name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {localizeExercise(selectedExercise, t).description}
-                </p>
-            </div>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400 text-center text-sm">
-              {t('timer.noExerciseSelected')}
-            </p>
-          )}
-
-          {/* Favorite exercises quick access */}
-          {!selectedExercise && favoriteExercises.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.quickSelectFavorites')}</p>
-              <div className="grid grid-cols-2 gap-2">
-          {favoriteExercises.map(exercise => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => onSetSelectedExercise(exercise)}
-                    className="text-xs py-2 px-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors truncate"
-                  >
-            {localizeExercise(exercise, t).name}
-                  </button>
-                ))}
+            {/* Favorite exercises quick access - only shown when no exercise selected */}
+            {!selectedExercise && favoriteExercises.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.quickSelectFavorites')}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {favoriteExercises.map(exercise => (
+                    <button
+                      key={exercise.id}
+                      onClick={() => onSetSelectedExercise(exercise)}
+                      className="text-xs py-2 px-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors truncate"
+                    >
+                      {localizeExercise(exercise, t).name}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
         )}
 
-        {/* Compact Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
+        {/* Collapsible Timer Duration Selection - Hidden in workout mode and for rep-based exercises */}
         {!isWorkoutMode && selectedExercise?.exercise_type !== 'repetition_based' && (
         <div className="mb-2">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.duration')}</p>
-          <div className="grid grid-cols-3 gap-2">
-            {TIMER_PRESETS.map(duration => (
-              <button
-                key={duration}
-                onClick={() => onSetSelectedDuration(duration)}
-                className={`py-2 px-3 text-sm font-medium rounded-md transition-colors ${
-                  selectedDuration === duration
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {duration < 60 ? `${duration}s` : `${Math.floor(duration / 60)}m`}
-              </button>
-            ))}
-          </div>
-        </div>
-        )}
-
-        {/* Compact Rep Duration Display - Shown for repetition-based exercises in standalone mode */}
-        {!isWorkoutMode && selectedExercise?.exercise_type === 'repetition_based' && (
-        <div className="mb-2">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('timer.repDuration')}</p>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-3">
-            <div className="text-center">
-              <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                {selectedDuration}s per rep
+          {/* Duration Header - Shows current selection and toggle */}
+          <button
+            onClick={() => setIsDurationExpanded(!isDurationExpanded)}
+            className="w-full flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
+          >
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.duration')}</span>
+              <span className="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+                {formatDuration(selectedDuration)}
               </span>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {(selectedExercise.default_sets || 3)} sets × {(selectedExercise.default_reps || 8)} reps
+            </div>
+            <svg 
+              className={`w-4 h-4 text-gray-500 transition-transform ${isDurationExpanded ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {/* Expandable Duration Options */}
+          {isDurationExpanded && (
+            <div className="mt-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-3 gap-2">
+                {TIMER_PRESETS.map(duration => {
+                  const active = selectedDuration === duration;
+                  return (
+                    <button
+                      key={duration}
+                      onClick={() => handleDurationSelect(duration)}
+                      className={`duration-option ${active ? 'duration-option-active' : ''}`}
+                    >
+                      {formatDuration(duration)}
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          )}
         </div>
         )}
 
-        {/* Compact Rep/Set Progress - Shown for repetition-based exercises (both workout mode and standalone) */}
-        {selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 mb-2">
-            <div className="mb-2">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                <span>{t('timer.setProgress')}</span>
-                <span>{
-                  isResting 
-                    ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets, count: totalSets })
-                    : (currentRep !== undefined && currentRep >= (totalReps || 0))
-                      ? t('timer.setsCompleted', { completed: (currentSet || 0) + 1, total: totalSets, count: totalSets })
-                      : t('timer.setsCompleted', { completed: (currentSet || 0), total: totalSets, count: totalSets })
-                }</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${setProgress}%` }}
-                />
-              </div>
-            </div>
-            
-            <div>
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                <span>{t('timer.repProgress')}</span>
-                <span>{isResting ? totalReps : (currentRep || 0)} / {totalReps}</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${repProgressInSet}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Countdown Banner */}
         {isCountdown && (
@@ -462,15 +452,20 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
         {/* Enhanced Timer Display */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
-          {/* Larger Circular Progress for Better Video Visibility */}
-      <div 
-        className={`relative mx-auto mb-3 ${repPulse ? 'transition-transform' : ''}`}
-        style={{ width: '280px', height: '280px' }}
-            aria-live="off"
-          >
+          {/* Conditional Timer Display: Circular (ring_timer: true) or Rectangular (ring_timer: false) */}
+          {appSettings.ring_timer !== false ? (
+            /* Circular Timer with Rings */
+            <div
+              className={`relative mx-auto mb-3 ${repPulse ? 'transition-transform' : ''}`}
+              style={{ width: '280px', height: '280px' }}
+              aria-live="off"
+            >
             {showVideoInsideCircle && (
-              // Inset the video slightly so progress ring(s) wrap AROUND, not over, the media
-  <div className="absolute inset-4 sm:inset-6 rounded-full overflow-hidden z-[1]" data-testid="exercise-video-wrapper">
+              <div
+                className="absolute inset-4 sm:inset-6 rounded-full overflow-hidden z-[1] flex items-center justify-center"
+                data-testid="exercise-video-wrapper"
+              >
+                {/* Inset the video slightly so progress ring(s) wrap AROUND, not over, the media */}
                 <video
                   ref={exerciseVideo.videoRef}
                   autoPlay
@@ -478,7 +473,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   loop
                   playsInline
                   preload="metadata"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-center mx-auto block"
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                   data-testid="exercise-video"
                   style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
@@ -607,9 +602,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     </div>
                   </>
                 ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
-                  // Rep-based exercise display: show rep progress instead of time countdown
-                  // Only show when not all reps are completed
                   <>
+                    {/* Rep-based exercise display: show rep progress instead of time countdown (only when reps remain). */}
                     <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-sm">
                       Rep {(currentRep || 0) + 1}
                     </div>
@@ -648,14 +642,215 @@ const TimerPage: React.FC<TimerPageProps> = ({
               </div>
             </div>
           </div>
+          ) : (
+            /* Rectangular Timer with Border Progress */
+            <div
+              className={`relative mb-3 mx-auto ${repPulse ? 'transition-transform' : ''}`}
+              style={{
+                width: '560px',
+                height: '320px',
+                maxWidth: '100%'
+              }}
+              aria-live="off"
+            >
+              {showVideoInsideCircle && (
+                <div
+                  className="absolute rounded-lg overflow-hidden z-[1]"
+                  data-testid="exercise-video-wrapper"
+                  style={{
+                    left: '10px',
+                    right: '10px',
+                    top: '10px',
+                    bottom: '10px'
+                  }}
+                >
+                  {/* Video taking maximum space with minimal border for progress */}
+                  <video
+                    ref={exerciseVideo.videoRef}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    className="h-full w-full object-cover"
+                    aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
+                    data-testid="exercise-video"
+                    style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
+                    onLoadedData={() => {
+                      // Safety: ensure play attempt if hook's effect missed due to timing
+                      if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
+                        exerciseVideo.videoRef.current.play().catch(() => {});
+                      }
+                    }}
+                  >
+                    {getVideoSources(videoUrl).map(s => (
+                      <source key={s.src} src={s.src} type={s.type} />
+                    ))}
+                  </video>
+                  {/* Subtle overlay to maintain border contrast */}
+                  <div className="absolute inset-0 bg-black/5 dark:bg-black/10 pointer-events-none" />
+                </div>
+              )}
+              <svg
+                className="pointer-events-none absolute inset-0 z-0 w-full h-full"
+                viewBox="0 0 480 280"
+                preserveAspectRatio="none"
+              >
+                {/* For repetition-based exercises: show nested rectangles */}
+                {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets ? (
+                  <>
+                    {/* Outer rectangle for set progress - exactly matching container */}
+                    <rect
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      fill="none"
+                      rx="12"
+                      className="text-gray-200 dark:text-gray-700"
+                    />
+                    {/* Set progress border */}
+                    <rect
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      fill="none"
+                      rx="12"
+                      className={`text-green-500 transition-all duration-300 ${repPulse ? 'animate-pulse' : ''}`}
+                      strokeDasharray={`${2 * (480 + 280)}`}
+                      strokeDashoffset={`${2 * (480 + 280) * (1 - setProgress / 100)}`}
+                    />
 
-          {/* Timer Controls */}
-          <div className="flex justify-center space-x-3 mt-2">
+                    {/* Inner rectangle for individual rep progress */}
+                    <rect
+                      x="8"
+                      y="8"
+                      width="464"
+                      height="264"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                      rx="8"
+                      className="text-gray-200 dark:text-gray-700"
+                    />
+                    <rect
+                      x="8"
+                      y="8"
+                      width="464"
+                      height="264"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                      rx="8"
+                      className={`transition-all duration-300 ${
+                        isCountdown
+                          ? 'text-orange-500'
+                          : isResting
+                            ? 'text-purple-500'  // Purple for rest progress
+                            : 'text-blue-500'    // Blue for rep progress
+                      }`}
+                      strokeDasharray={`${2 * (464 + 264)}`}
+                      strokeDashoffset={`${2 * (464 + 264) * (1 - finalDisplayProgress / 100)}`}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {/* Standard timer display for time-based exercises - single rectangle matching container */}
+                    <rect
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                      rx="12"
+                      className="text-gray-200 dark:text-gray-700"
+                    />
+                    <rect
+                      x="0"
+                      y="0"
+                      width="480"
+                      height="280"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                      rx="12"
+                      className={`transition-all duration-300 ${
+                        isCountdown
+                          ? 'text-orange-500'
+                          : isResting
+                            ? 'text-purple-500'  // Purple for rest progress
+                            : 'text-blue-500'    // Blue for rep progress
+                      }`}
+                      strokeDasharray={`${2 * (480 + 280)}`}
+                      strokeDashoffset={`${2 * (480 + 280) * (1 - finalDisplayProgress / 100)}`}
+                    />
+                  </>
+                )}
+              </svg>
+
+              {/* Time Display for Rectangular Timer */}
+              <div className="absolute inset-0 flex items-center justify-center z-10" data-testid="timer-display">
+                <div className="text-center">
+                  {isCountdown ? (
+                    <>
+                      <div className="text-4xl font-bold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)' }}>
+                        {countdownTime}
+                      </div>
+                      <div className="text-sm text-white mt-1" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                        {t('timer.getReadyEllipsis')}
+                      </div>
+                    </>
+                  ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
+                    <>
+                      {/* Rep-based exercise display: show rep progress instead of time countdown (only when reps remain). */}
+                      <div className="text-3xl font-bold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)' }}>
+                        Rep {(currentRep || 0) + 1}
+                      </div>
+                      <div className="text-sm text-white mt-1" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                        of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-4xl font-bold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)' }}>
+                        {formatTime(displayTime)}
+                      </div>
+                      <div className="text-sm text-white mt-1" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                        {actuallyResting
+                          ? t('timer.restPeriod')
+                          : isWorkoutMode
+                            ? (() => {
+                                const currentIndex = workoutMode.currentExerciseIndex;
+                                const totalExercises = workoutMode.exercises.length;
+                                if (currentIndex >= totalExercises) {
+                                  return t('timer.exerciseComplete', { total: totalExercises });
+                                }
+                                return t('timer.exerciseIndexOf', { index: currentIndex + 1, total: totalExercises });
+                              })()
+                            : targetTime ? t('timer.ofDuration', { duration: formatTime(targetTime) }) : t('timer.setDuration')
+                        }
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Timer Controls - Compact */}
+          <div className="flex justify-center space-x-2 mt-2">
             {!isRunning ? (
               <button
                 onClick={onStartTimer}
                 disabled={!selectedExercise}
-                className="btn-primary px-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="start-timer"
               >
                 {t('common.start')}
@@ -663,16 +858,16 @@ const TimerPage: React.FC<TimerPageProps> = ({
             ) : (
               <button
                 onClick={() => onStopTimer()}
-                className="btn-secondary px-8"
+                className="btn-secondary px-4 py-2 text-sm"
                 data-testid="stop-timer"
               >
                 {isCountdown ? t('common.cancel') : t('common.stop')}
               </button>
             )}
-            
+
             <button
               onClick={onResetTimer}
-              className="btn-ghost px-6"
+              className="btn-ghost"
               data-testid="reset-timer"
             >
               {t('common.reset')}
@@ -680,67 +875,6 @@ const TimerPage: React.FC<TimerPageProps> = ({
           </div>
         </div>
 
-        {/* Compact Exercise Controls - Shown for workout mode or standalone rep-based exercises */}
-        {(isWorkoutMode || (selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps)) && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 mb-2">
-            <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
-              {isWorkoutMode ? t('timer.workoutControls') : t('timer.exerciseControls')}
-            </h3>
-            
-            {selectedExercise?.exercise_type === 'repetition_based' && totalSets && totalReps && (
-              <div className="mb-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => {
-                      // Note: This would need state management through props
-                      // For now, this is a placeholder for rep advancement
-                      logger.log('Next rep clicked');
-                    }}
-                    disabled={(currentRep || 0) >= (totalReps || 0)}
-                    className="btn-secondary text-xs py-2 disabled:opacity-50"
-                  >
-                    {t('timer.nextRep', { current: (currentRep || 0) + 1, total: totalReps })}
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      // Complete current set or exercise
-                      const currentSetNum = (currentSet || 0) + 1;
-                      const totalSetNum = totalSets || 1;
-                      const isLastSet = currentSetNum >= totalSetNum;
-                      if (isLastSet) {
-                        onStopTimer(true);
-                      } else {
-                        logger.log('Next set clicked');
-                      }
-                    }}
-                    className="btn-primary text-xs py-2"
-                  >
-                    {((currentSet || 0) + 1) >= (totalSets || 1)
-                      ? t('timer.completeExercise')
-                      : t('timer.nextSet', { current: (currentSet || 0) + 1, total: totalSets })}
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => onStopTimer(true)}
-                className="btn-secondary text-xs py-2"
-              >
-                {t('timer.completeExercise')}
-              </button>
-              
-              <button
-                onClick={onResetTimer}
-                className="btn-ghost text-xs py-2"
-              >
-                {t('timer.exitWorkout')}
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Timer Info */}
   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 text-xs" data-testid={(!timerState.isRunning && !timerState.isCountdown && timerState.currentTime === (timerState.targetTime || 0) && timerState.targetTime) ? 'timer-complete' : undefined}>
@@ -761,52 +895,24 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
 
         {/* Exercise Selector Modal */}
-        {showExerciseSelector && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 rounded-t-lg w-full max-w-md max-h-[70vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-600">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {t('timer.selectExercise')}
-                  </h3>
-                  <button
-                    onClick={() => onSetShowExerciseSelector(false)}
-                    className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-              
-              <div className="p-4 space-y-2">
-                {exercises.map(exercise => (
-                  <button
-                    key={exercise.id}
-                    onClick={() => {
-                      onSetSelectedExercise(exercise);
-                      onSetShowExerciseSelector(false);
-                    }}
-                    className="w-full text-left p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          {localizeExercise(exercise, t).name}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {t(`exercises.category.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
-                        </p>
-                      </div>
-                      {exercise.is_favorite && (
-                        <StarFilledIcon size={16} className="text-yellow-500" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        <ExerciseSelectorModal
+          exercises={exercises}
+          selectedExercise={selectedExercise}
+          onSelectExercise={(exercise) => {
+            onSetSelectedExercise(exercise);
+          }}
+          isOpen={showExerciseSelector}
+          onClose={() => onSetShowExerciseSelector(false)}
+          title={t('timer.selectExercise')}
+          showCatalogSelector={true}
+          showCategoryFilter={true}
+          showTypeFilter={true}
+          showFavoritesToggle={true}
+          showSearch={true}
+          showSort={true}
+          persistFilters={true}
+          filterStorageKey="timer-exercise-selector"
+        />
       </div>
     </div>
   );

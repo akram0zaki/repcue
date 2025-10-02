@@ -25,7 +25,7 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
   className = '',
   showLabel = true
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('copy');
   const [isCoying, setIsCoying] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -82,13 +82,13 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
 
     } catch (err) {
       logger.error('Error copying exercise:', err);
-      const errorMessage = err instanceof Error ? err.message : t('copy.genericError');
-      
+      const errorMessage = err instanceof Error ? err.message : t('genericError');
+
       if (onCopyError) {
         onCopyError(errorMessage);
       } else {
         // Show error as alert if no custom handler
-        alert(t('copy.error', { error: errorMessage }));
+        alert(t('error', { error: errorMessage }));
       }
     } finally {
       setIsCoying(false);
@@ -113,9 +113,9 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
 
   // Variant configurations
   const variantClasses = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white',
+    primary: 'bg-primary-500 hover:bg-primary-600 text-white',
     secondary: 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white',
-    ghost: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+    ghost: 'text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-dark-disabled'
   };
 
   const currentSize = sizeClasses[size];
@@ -136,7 +136,7 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
         >
           <div className="flex items-center space-x-2">
             <CopyIcon className={currentSize.icon} />
-            {showLabel && <span>{t('copy.loginRequired')}</span>}
+            {showLabel && <span>{t('loginRequired')}</span>}
           </div>
         </button>
       </div>
@@ -149,7 +149,7 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
         onClick={handleCopy}
         disabled={isCoying || copied}
         className={`${currentSize.button} ${currentVariant} rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-        title={t('copy.tooltip', { name: exerciseName })}
+        title={t('tooltip', { name: exerciseName })}
       >
         <div className="flex items-center space-x-2">
           {copied ? (
@@ -159,11 +159,11 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
           )}
           {showLabel && (
             <span>
-              {copied 
-                ? t('copy.copied') 
-                : isCoying 
-                  ? t('copy.copying') 
-                  : t('copy.copy')
+              {copied
+                ? t('copied')
+                : isCoying
+                  ? t('copying')
+                  : t('copy')
               }
             </span>
           )}

@@ -1,0 +1,362 @@
+/* Design Token System - Semantic Color Variables */
+/* This file defines semantic color tokens that automatically adapt to light/dark modes */
+
+:root {
+  /* Primary Brand Colors - Light Mode Defaults */
+  --color-primary: #0096C7;
+  --color-primary-hover: #0077A5;
+  --color-primary-focus: #005F84;
+  --color-primary-disabled: #B3E0EF;
+
+  /* Secondary Brand Colors */
+  --color-secondary: #90E0EF;
+  --color-secondary-hover: #74D0E4;
+  --color-secondary-focus: #5BBACD;
+
+  /* Background System */
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+
+  /* Surface System (for cards, modals, etc.) */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+
+  /* Text System */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #475569;
+  --color-text-inverse: #f8fafc;
+
+  /* Border System */
+  --color-border-primary: #e2e8f0;
+  --color-border-secondary: #cbd5e1;
+  --color-border-focus: #0096C7;
+
+  /* Status Colors */
+  --color-success: #52B788;
+  --color-success-hover: #3D936B;
+  --color-success-background: #f0fdf4;
+
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-warning-background: #fffbeb;
+
+  --color-error: #E63946;
+  --color-error-hover: #CC2E3B;
+  --color-error-background: #fef2f2;
+
+  /* Interactive States */
+  --color-interactive-hover: #f1f5f9;
+  --color-interactive-active: #e2e8f0;
+  --color-interactive-disabled: #f1f5f9;
+
+  /* Shadow System */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark Mode Overrides */
+.dark {
+  /* Primary Brand Colors - Dark Mode Specific */
+  --color-primary: #0096C7;
+  --color-primary-hover: #33ADD3;
+  --color-primary-focus: #5CC2DE;
+  --color-primary-disabled: #1F3B47;
+
+  /* Secondary Brand Colors - Dark Mode */
+  --color-secondary: #90E0EF;
+  --color-secondary-hover: #74D0E4;
+  --color-secondary-focus: #5BBACD;
+
+  /* Background System - Dark Mode (following UI specs) */
+  --color-background-primary: #121212;   /* From UI specs, not #1f2937 */
+  --color-background-secondary: #0f172a;
+  --color-background-tertiary: #1e293b;
+
+  /* Surface System - Dark Mode */
+  --color-surface-primary: #0f172a;
+  --color-surface-secondary: #1e293b;
+  --color-surface-hover: #334155;
+
+  /* Text System - Dark Mode */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #f1f5f9;
+  --color-text-tertiary: #e2e8f0;
+  --color-text-inverse: #0f172a;
+
+  /* Border System - Dark Mode */
+  --color-border-primary: #334155;
+  --color-border-secondary: #475569;
+  --color-border-focus: #33ADD3;
+
+  /* Status Colors - Dark Mode */
+  --color-success: #52B788;
+  --color-success-hover: #3D936B;
+  --color-success-background: #0f2015;
+
+  --color-warning: #f59e0b;
+  --color-warning-hover: #d97706;
+  --color-warning-background: #1f1b0f;
+
+  --color-error: #FF5C66;  /* Dark mode error from UI specs */
+  --color-error-hover: #E63946;
+  --color-error-background: #2d1b1d;
+
+  /* Interactive States - Dark Mode */
+  --color-interactive-hover: #334155;
+  --color-interactive-active: #475569;
+  --color-interactive-disabled: #1e293b;
+
+  /* Shadow System - Dark Mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+}
+
+/* Utility Classes for Design Tokens */
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-hover { background-color: var(--color-primary-hover); }
+.bg-surface-primary { background-color: var(--color-surface-primary); }
+.bg-surface-secondary { background-color: var(--color-surface-secondary); }
+
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+
+.border-primary { border-color: var(--color-border-primary); }
+.border-focus { border-color: var(--color-border-focus); }
+
+.shadow-token-sm { box-shadow: var(--shadow-sm); }
+.shadow-token-md { box-shadow: var(--shadow-md); }
+.shadow-token-lg { box-shadow: var(--shadow-lg); }
+
+/* Component-specific token applications */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-color: transparent;
+  border-radius: 8px; /* UI specs: 8px rounded corners */
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem; /* 8px 16px - default button padding */
+  font-weight: 500; /* medium weight for buttons */
+  transition: all 0.2s ease-in-out; /* smooth transitions */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-primary:focus {
+  background-color: var(--color-primary-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.btn-primary:disabled {
+  background-color: var(--color-primary-disabled);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+/* Secondary button - outline style as per UI specs */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.btn-secondary:focus {
+  background-color: var(--color-primary-focus);
+  color: var(--color-text-inverse);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.btn-secondary:disabled {
+  background-color: transparent;
+  color: var(--color-text-tertiary);
+  border-color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+/* Neutral button style */
+.btn-neutral {
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-primary);
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-neutral:hover {
+  background-color: var(--color-surface-tertiary);
+}
+
+.btn-neutral:focus {
+  background-color: var(--color-surface-tertiary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-primary) 30%, transparent);
+}
+
+.btn-neutral:disabled {
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-tertiary);
+  border-color: var(--color-border-secondary);
+  cursor: not-allowed;
+}
+
+/* Danger button style for destructive actions */
+.btn-danger {
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
+  border-color: transparent;
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  outline: none;
+}
+
+.btn-danger:hover {
+  background-color: var(--color-error-hover);
+}
+
+.btn-danger:focus {
+  background-color: var(--color-error-hover);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 20%, transparent);
+}
+
+.btn-danger:disabled {
+  background-color: var(--color-error-background);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+}
+
+.card {
+  background-color: var(--color-surface-primary);
+  border-color: var(--color-border-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  background-color: var(--color-surface-hover);
+  box-shadow: var(--shadow-md);
+}
+
+/* Text utilities for consistent dark mode support */
+.help-text {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+.label-text {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.heading-text {
+  color: var(--color-text-primary);
+}
+
+/* Filter and UI element text classes */
+.filter-button-text {
+  color: var(--color-text-secondary);
+}
+
+.sort-label-text {
+  color: var(--color-text-secondary);
+}
+
+.summary-text {
+  color: var(--color-text-tertiary);
+}
+
+.duration-button-text {
+  color: var(--color-text-secondary);
+}
+
+.secondary-label-text {
+  color: var(--color-text-tertiary);
+}
+
+/* Semantic Typography Scale - Following UI Style Guide */
+.text-h1 {
+  font-size: 2rem; /* 32px */
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.text-h2 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+.text-h3 {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.text-body {
+  font-size: 1rem; /* 16px */
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.text-caption {
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+.text-small {
+  font-size: 0.75rem; /* 12px */
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  line-height: 1.3;
+}

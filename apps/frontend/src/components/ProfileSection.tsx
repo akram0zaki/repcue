@@ -51,7 +51,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
       {isAuthenticated && user ? (
         <div className="space-y-3">
           {/* User Info */}
-          <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
@@ -76,28 +76,28 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex space-x-3">
+          <div className="grid grid-cols-1 gap-2">
             <button
               type="button"
               onClick={onViewProfile}
-              className="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm min-w-0 w-full"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              {t('profile.viewProfile', 'View Profile')}
+              <span className="truncate">{t('profile.viewProfile', 'View Profile')}</span>
             </button>
             
             <button
               type="button"
               onClick={handleSignOut}
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-2 px-4 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm min-w-0 w-full"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              {loading ? t('common:loading') : t('signOut')}
+              <span className="truncate">{loading ? t('common:loading') : t('signOut')}</span>
             </button>
           </div>
         </div>

@@ -67,6 +67,7 @@
     "exercises": "Exercices",
     "timer": "Minuteur",
     "activityLog": "Journal",
+    "progress": "Progrès",
     "settings": "Paramètres"
   },
   "settings": {
@@ -75,24 +76,30 @@
     "beepVolume": "Volume du bip",
     "beepIntervalHelp": "Lire un court bip toutes les N secondes pendant les exercices basés sur le temps.",
     "enableVibration": "Activer la vibration",
-    "timerSettings": "⏱️ Paramètres du minuteur",
+    "timerSettings": "Paramètres du minuteur",
     "preTimerCountdown": "Compte à rebours pré-minuteur",
     "preTimerCountdownHelp": "Compte à rebours avant le démarrage du minuteur pour vous aider à vous mettre en position",
-    "appearance": "🎨 Apparence",
+    "appearance": "Apparence",
     "darkMode": "Mode sombre",
     "showExerciseVideos": "Afficher les vidéos de démonstration",
     "showExerciseVideosHelp": "Expérimental : lecture de vidéos de démonstration silencieuses dans le minuteur si disponibles.",
-    "language": "🌐 Langue",
+    "horizontalExerciseLayout": "Horizontal Category Listing",
+    "horizontalExerciseLayoutHelp": "Display exercises in horizontal scrollable lists grouped by category, similar to Netflix-style browsing.",
+    "ringTimer": "Minuteur Circulaire",
+    "ringTimerHelp": "Basculer entre le minuteur circulaire avec anneaux ou le minuteur rectangulaire avec barre de progression.",
+    "language": "Langue",
     "selectLanguage": "Sélectionner la langue",
     "languageHelp": "Choisissez votre langue préférée. L'application se souviendra de votre sélection.",
-    "data": "💾 Données",
+    "data": "Données",
     "autoSave": "Sauvegarde automatique",
     "dataStorageLabel": "Stockage des données :",
     "enabled": "Activé",
     "disabled": "Désactivé",
     "dataStoredLocally": "Vos données d'entraînement sont stockées localement sur cet appareil.",
     "pleaseAcceptConsent": "Veuillez accepter le consentement de stockage des données pour activer les fonctions d'exportation/effacement.",
-    "consentMigrationWarning": "⚠️ Les données de consentement seront migrées vers la dernière version au prochain chargement de l'app.",
+  "consentMigrationWarning": "⚠️ Les données de consentement seront migrées vers la dernière version au prochain chargement de l'app.",
+  "consentStatusLabel": "Statut du consentement",
+  "consentVersion": "Version du consentement",
     "exportData": "Exporter les données",
     "exportDataHelp": "L'export inclut vos entraînements, exercices, paramètres et journaux d'activité",
     "exportInProgress": "Exportation en cours...",
@@ -116,7 +123,7 @@
     "clearAllDataHelp": "Supprimer définitivement toutes les données, réinitialiser le consentement et retourner à l'écran d'accueil",
     "clearAllDataMessage": "Êtes-vous sûr de vouloir effacer toutes les données ? Cette action ne peut pas être annulée. Vous serez redirigé vers l'écran d'accueil et on vous demandera à nouveau votre consentement.",
     "clearAllData": "Effacer toutes les données",
-    "securityPrivacy": "🔒 Sécurité et confidentialité",
+    "securityPrivacy": "Sécurité et confidentialité",
     "exportYourData": "Exporter vos données",
     "deleteAccount": "Supprimer le compte",
     "deleteMyAccount": "Supprimer mon compte",
@@ -221,11 +228,13 @@
     "sunday": "Dim"
   },
   "home": {
+    "heroTitle": "Restez constant, restez fort.",
+    "heroSubtitle": "Vos entraînements, à votre façon.",
     "upcomingWorkout": "Entraînement à venir",
     "tagline": "Votre minuteur d'exercices personnel",
     "signInMessage": "Vous pouvez vous ",
     "signInLink": "connecter",
-    "signInSuffix": " pour suivre vos progrès depuis différents appareils.",
+    "signInSuffix": " pour suivre vos progrès et les partager.",
     "startNow": "Commencer maintenant",
     "noScheduleTitle": "Aucun planning défini",
     "noScheduleBody": "Créez un planning d'entraînement pour voir vos entraînements à venir ici",
@@ -236,7 +245,9 @@
     "removeFromFavoritesAria": "Retirer {{name}} des favoris",
     "noFavorites": "Aucun exercice favori pour le moment. Marquez quelques exercices comme favoris pour les voir ici !",
     "availableExercises": "Exercices disponibles",
-    "changeLanguage": "Changer de langue"
+    "changeLanguage": "Changer de langue",
+    "popularExercises": "Exercices populaires",
+    "noPopularExercises": "Aucun exercice populaire avec vidéos disponible."
   },
   "workouts": {
     "title": "Entraînements",
@@ -331,7 +342,37 @@
     "status": {
       "stoppedAfter": "Arrêté après {{duration}}",
       "completedSetsReps": "{{sets}} séries de {{reps}} répétitions terminées",
-      "completedTime": "Minuteur d'intervalle de {{duration}} terminé"
+      "completedTime": "Minuteur d'intervalle de {{duration}} terminé",
+      "completedWorkout": "Entraînement terminé avec {{count}} exercice",
+      "completedWorkout_plural": "Entraînement terminé avec {{count}} exercices"
+    },
+    "charts": {
+      "weeklyStreak": "Série Hebdomadaire",
+      "currentStreak": "Série Actuelle",
+      "progressChart": "Graphique de Progression",
+      "currentMonth": "Mois Actuel",
+      "last3Months": "3 Derniers Mois",
+      "sinceStart": "Depuis le Début",
+      "workoutsThisWeek": "entraînements cette semaine",
+      "workoutWeek": "entraînement cette semaine",
+      "thisWeek": "Cette semaine",
+      "noWorkoutsThisWeek": "Aucun entraînement cette semaine",
+      "previousWeek": "Semaine précédente",
+      "nextWeek": "Semaine suivante",
+      "streakDays": "{{count}} jours",
+      "streakDay": "{{count}} jour",
+      "averageWorkouts": "{{count}} moy. entraînements/semaine",
+      "totalInPeriod": "{{count}} entraînements au total",
+      "weekNumber": "Semaine {{week}}",
+      "periodSummary": "Période de {{weeks}} semaines",
+      "workoutFrequency": "Fréquence d'Entraînement",
+      "workoutsPerWeek": "Entraînements par Semaine",
+      "maxWorkouts": "{{count}} max",
+      "workoutCount": "{{count}} entraînement",
+      "workoutCount_plural": "{{count}} entraînements",
+      "avgPerWeek": "Moy/semaine",
+      "avgPerPeriod": "Moy/période",
+      "noDataForRange": "Aucune donnée d'entraînement pour cette période"
     }
   },
   "exercises": {
@@ -538,6 +579,7 @@
     "tooltip": "Copier {{name}} dans votre bibliothèque",
     "genericError": "Échec de la copie de l'exercice"
   },
+  "exerciseParameters": "Paramètres de l'exercice",
   "video": {
     "exerciseVideo": "Vidéo d'exercice",
     "uploadsNotAvailable": "Le téléversement de vidéos n’est pas encore disponible.",
@@ -670,5 +712,17 @@
       "message": "Cette mise à jour comprend des modifications concernant la manière dont nous gérons vos données. Veuillez examiner les changements ci-dessus et confirmer votre compréhension.",
       "acknowledge": "Je comprends et reconnais les changements de confidentialité dans cette mise à jour"
     }
+  },
+  "rating": {
+    "reviews": "Avis",
+    "yourRating": "Votre note",
+    "rateThis": "Évaluer cet exercice",
+    "addReview": "Ajouter un avis",
+    "hideReview": "Masquer la revue",
+    "reviewPlaceholder": "Écrivez votre avis (facultatif)...",
+    "characters": "caractères",
+    "submitError": "Échec de l'envoi de la note",
+    "submitting": "Envoi en cours...",
+    "loginToRate": "Connectez-vous pour évaluer et commenter les exercices"
   }
 }

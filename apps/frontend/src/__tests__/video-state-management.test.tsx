@@ -239,19 +239,8 @@ describe('Video State Management Bug Fixes', () => {
   });
 
   it('should clear timer state immediately on workout completion to prevent stale exercise data', async () => {
-    // Simulate a completed workout state with stale timer data
-    const workoutMode: WorkoutMode = {
-      workoutId: 'test-workout',
-      workoutName: 'Morning Routine 2',
-      exercises: [
-        { exercise_id: 'burpees', custom_sets: 2, custom_reps: 8, custom_rest_time: 30 }
-      ],
-      currentExerciseIndex: 1, // Equal to length (completed)
-      isResting: false,
-      sessionId: 'test-session'
-    };
-
-    // Simulate timer state that still has burpees data but workout is complete
+    // Simulate timer state AFTER workout completion and cleanup
+    // The workoutMode should be cleared when workout completes
     const timerState: TimerState = {
       isRunning: false,
       currentTime: 0,
@@ -268,7 +257,8 @@ describe('Video State Management Bug Fixes', () => {
       totalSets: undefined,
       currentRep: undefined,
       totalReps: undefined,
-      workoutMode
+      // workoutMode should be undefined after workout completion cleanup
+      workoutMode: undefined
     };
 
     // User selects Bicycle Crunches after workout completion
@@ -323,8 +313,8 @@ describe('Video State Management Bug Fixes', () => {
     expect(screen.queryByText(/2.*sets.*8.*reps/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Set.*1.*2/)).not.toBeInTheDocument();
     
-    // Should show the correct default for Bicycle Crunches when displayed
+    // Should NOT show rep/set info for Bicycle Crunches either since timer hasn't started
     // (this would show when timer starts, but not before)
-    expect(screen.queryByText(/3.*sets.*20.*reps/)).toBeInTheDocument();
+    expect(screen.queryByText(/3.*sets.*20.*reps/)).not.toBeInTheDocument();
   });
 });

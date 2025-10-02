@@ -11,10 +11,10 @@
     "close": "إغلاق",
     "dismiss": "تجاهل",
     "retry": "إعادة المحاولة",
-    "attemptsLeft": "{{attempts}} attempt(s) remaining",
-    "forceReload": "Force Reload",
-    "maxRetries": "Maximum retry attempts reached",
-    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "attemptsLeft": "متبقٍ {{attempts}} محاولة",
+    "forceReload": "إعادة تحميل إجباري",
+    "maxRetries": "تم الوصول إلى الحد الأقصى لمحاولات إعادة المحاولة",
+    "retryAttempt": "محاولة إعادة رقم {{current}} من {{max}}",
     "and": "و",
     "loading": "تحميل...",
     "optional": "اختياري",
@@ -59,7 +59,16 @@
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
-    "premium": "مميز"
+    "premium": "مميز",
+    "done": "تم"
+  },
+  "categories": {
+    "core": "الجذع",
+    "strength": "القوة",
+    "cardio": "كارديو",
+    "flexibility": "المرونة",
+    "balance": "التوازن",
+    "hand-warmup": "إحماء اليد"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -67,6 +76,7 @@
     "exercises": "التمارين",
     "timer": "المؤقت",
     "activityLog": "السجل",
+    "progress": "التقدم",
     "settings": "الإعدادات"
   },
   "settings": {
@@ -75,24 +85,30 @@
     "beepVolume": "مستوى الصوت",
     "beepIntervalHelp": "تشغيل صوت قصير كل N ثوانٍ أثناء التمارين المعتمدة على الوقت.",
     "enableVibration": "تفعيل الاهتزاز",
-    "timerSettings": "⏱️ إعدادات المؤقت",
+    "timerSettings": "إعدادات المؤقت",
     "preTimerCountdown": "العد التنازلي قبل المؤقت",
     "preTimerCountdownHelp": "العد التنازلي قبل بدء المؤقت لمساعدتك في اتخاذ الوضعية",
-    "appearance": "🎨 المظهر",
+    "appearance": "المظهر",
     "darkMode": "الوضع المظلم",
     "showExerciseVideos": "عرض فيديو التمارين التوضيحية",
     "showExerciseVideosHelp": "تجريبي: تشغيل فيديوهات توضيحية صامتة داخل المؤقت عند توفرها.",
-    "language": "🌐 اللغة",
+    "horizontalExerciseLayout": "التصنيف الأفقي للفئات",
+    "horizontalExerciseLayoutHelp": "عرض التمارين في قوائم أفقية قابلة للتمرير مجمعة حسب الفئة، مشابه لتصفح نتفليكس.",
+    "ringTimer": "مؤقت الحلقة",
+    "ringTimerHelp": "التبديل بين المؤقت الدائري بالحلقات أو المؤقت المستطيل مع شريط التقدم.",
+    "language": "اللغة",
     "selectLanguage": "اختر اللغة",
     "languageHelp": "اختر لغتك المفضلة. سيتذكر التطبيق اختيارك.",
-    "data": "💾 البيانات",
+    "data": "البيانات",
     "autoSave": "الحفظ التلقائي",
     "dataStorageLabel": "تخزين البيانات:",
     "enabled": "مفعل",
     "disabled": "معطل",
     "dataStoredLocally": "يتم تخزين بيانات التمرين محلياً على هذا الجهاز.",
     "pleaseAcceptConsent": "يرجى قبول موافقة تخزين البيانات لتفعيل ميزات التصدير/المسح.",
-    "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
+  "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
+  "consentStatusLabel": "حالة الموافقة",
+  "consentVersion": "إصدار الموافقة",
     "exportData": "تصدير البيانات",
     "exportDataHelp": "تحميل بيانات التمرين كملف JSON",
     "exportInProgress": "جارٍ التصدير...",
@@ -116,7 +132,7 @@
     "clearAllDataHelp": "حذف جميع البيانات نهائياً، إعادة تعيين الموافقة، والعودة إلى الشاشة الرئيسية",
     "clearAllDataMessage": "هل أنت متأكد من رغبتك في مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء. ستتم إعادة توجيهك إلى الشاشة الرئيسية وطلب الموافقة مرة أخرى.",
     "clearAllData": "مسح جميع البيانات",
-    "securityPrivacy": "🔒 الأمان والخصوصية",
+    "securityPrivacy": "الأمان والخصوصية",
     "exportYourData": "تصدير بياناتك",
     "deleteAccount": "حذف الحساب",
     "deleteMyAccount": "حذف حسابي",
@@ -178,6 +194,8 @@
     "minutes_other": "{{count}} دقائق",
     "exercises_one": "{{count}} تمرين",
     "exercises_other": "{{count}} تمارين",
+    "categoriesSelected_one": "{{count}} فئة محددة",
+    "categoriesSelected_other": "{{count}} فئات محددة",
     "exercisesRemaining_one": "{{count}} تمرين متبقي",
     "exercisesRemaining_other": "{{count}} تمارين متبقية",
     "repProgress": "تقدم التكرار",
@@ -221,11 +239,13 @@
     "sunday": "أحد"
   },
   "home": {
+    "heroTitle": "ابق ثابتاً، ابق قوياً.",
+    "heroSubtitle": "تمارينك، بطريقتك.",
     "upcomingWorkout": "التمرين القادم",
     "tagline": "مؤقت التمارين الشخصي",
     "signInMessage": "يمكنك ",
     "signInLink": "تسجيل الدخول",
-    "signInSuffix": " لتتبع تقدمك من أجهزة مختلفة.",
+    "signInSuffix": " لتتبع نشاطك ومشاركة تقدمك.",
     "startNow": "ابدأ الآن",
     "noScheduleTitle": "لا يوجد جدول محدد",
     "noScheduleBody": "أنشئ جدول تمرين لرؤية تمارينك القادمة هنا",
@@ -236,7 +256,9 @@
     "removeFromFavoritesAria": "إزالة {{name}} من المفضلة",
     "noFavorites": "لا توجد تمارين مفضلة بعد. ضع علامة على بعض التمارين كمفضلة لرؤيتها هنا!",
     "availableExercises": "التمارين المتاحة",
-    "changeLanguage": "تغيير اللغة"
+    "changeLanguage": "تغيير اللغة",
+    "popularExercises": "تمارين مشهورة",
+    "noPopularExercises": "لا توجد تمارين مشهورة مع فيديوهات متاحة."
   },
   "workouts": {
     "title": "البرامج",
@@ -311,10 +333,10 @@
     "errorLoadingTitle": "خطأ في تحميل البرنامج",
     "backToWorkouts": "العودة إلى البرامج",
     "retry": "إعادة المحاولة",
-    "attemptsLeft": "{{attempts}} attempt(s) remaining",
-    "forceReload": "Force Reload",
-    "maxRetries": "Maximum retry attempts reached",
-    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "attemptsLeft": "متبقٍ {{attempts}} محاولة",
+    "forceReload": "إعادة تحميل إجباري",
+    "maxRetries": "تم الوصول إلى الحد الأقصى لمحاولات إعادة المحاولة",
+    "retryAttempt": "محاولة رقم {{current}} من {{max}}",
     "saveWorkout": "حفظ البرنامج"
   },
   "activity": {
@@ -332,7 +354,7 @@
     "noWorkoutsYet": "لا توجد تمارين بعد",
     "noCategoryWorkoutsYet": "لا توجد تمارين {{category}} بعد",
     "emptySubtitle": "ابدأ تمرينك الأول لرؤية نشاطك هنا",
-    "workoutBadge": "تمرين",
+    "workoutBadge": "برنامج",
     "exercisesHeading": "التمارين:",
     "exerciseCount_zero": "{{count}} تمرين",
     "exerciseCount_one": "{{count}} تمرين",
@@ -343,7 +365,41 @@
     "status": {
       "stoppedAfter": "توقف بعد {{duration}}",
       "completedSetsReps": "اكتمل {{sets}} مجموعة من {{reps}} تكرار",
-      "completedTime": "اكتمل مؤقت فاصل {{duration}}"
+      "completedTime": "اكتمل مؤقت فاصل {{duration}}",
+      "completedWorkout_zero": "اكتمل التمرين بـ {{count}} تمرين",
+      "completedWorkout_one": "اكتمل التمرين بـ {{count}} تمرين",
+      "completedWorkout_two": "اكتمل التمرين بـ {{count}} تمرينان",
+      "completedWorkout_few": "اكتمل التمرين بـ {{count}} تمارين",
+      "completedWorkout_many": "اكتمل التمرين بـ {{count}} تمرين",
+      "completedWorkout_other": "اكتمل التمرين بـ {{count}} تمرين"
+    },
+    "charts": {
+      "weeklyStreak": "السلسلة الأسبوعية",
+      "currentStreak": "السلسلة الحالية",
+      "progressChart": "مخطط التقدم",
+      "currentMonth": "الشهر الحالي",
+      "last3Months": "آخر 3 أشهر",
+      "sinceStart": "منذ البداية",
+      "workoutsThisWeek": "تمارين هذا الأسبوع",
+      "workoutWeek": "تمرين هذا الأسبوع",
+      "thisWeek": "هذا الأسبوع",
+      "noWorkoutsThisWeek": "لا توجد تمارين هذا الأسبوع",
+      "previousWeek": "الأسبوع السابق",
+      "nextWeek": "الأسبوع القادم",
+      "streakDays": "{{count}} أيام",
+      "streakDay": "{{count}} يوم",
+      "averageWorkouts": "{{count}} متوسط تمارين/أسبوع",
+      "totalInPeriod": "{{count}} إجمالي التمارين",
+      "weekNumber": "الأسبوع {{week}}",
+      "periodSummary": "فترة {{weeks}} أسابيع",
+      "workoutFrequency": "تردد التمارين",
+      "workoutsPerWeek": "تمارين في الأسبوع",
+      "maxWorkouts": "{{count}} الحد الأقصى",
+      "workoutCount": "{{count}} تمرين",
+      "workoutCount_plural": "{{count}} تمارين",
+      "avgPerWeek": "متوسط/أسبوع",
+      "avgPerPeriod": "متوسط/فترة",
+      "noDataForRange": "لا توجد بيانات تمارين لهذه الفترة"
     }
   },
   "exercises": {
@@ -495,6 +551,7 @@
     "workouts": "التدريبات",
     "workoutsOnly": "التدريبات فقط"
   },
+  "exerciseParameters": "معاملات التمرين",
   "video": {
     "exerciseVideo": "فيديو التمرين",
     "uploadsNotAvailable": "تحميل مقاطع الفيديو غير متاح حالياً.",
@@ -553,9 +610,14 @@
   "update": {
     "force": {
       "title": "مطلوب تحديث أمني",
-      "action": "حدِّث الآن",
+      "applying": "جارٍ تطبيق التحديث...",
+      "inProgress": "جارٍ تحديث التطبيق...",
+      "pleaseWait": "يرجى عدم إغلاق أو تحديث المتصفح. سيتم إعادة تشغيل التطبيق تلقائيًا.",
       "modal": {
         "title": "مطلوب تحديث أمني",
+        "subtitle": "تحديث أمني حرجة مطلوب على الفور",
+        "autoUpdate": "التحديث التلقائي في:",
+        "preventLeave": "تحديث أمني مطلوب. يرجى إكمال التحديث قبل الإغلاق.",
         "warning": {
           "title": "تحديث أمني هام",
           "message": "هذا التحديث يتضمن إصلاحات أمنية حرجة ولا يمكن تأجيله. لن يكون التطبيق متاحًا حتى يكتمل التحديث."
@@ -594,24 +656,24 @@
       "title": "فشل التحديث"
     },
     "retry": "إعادة محاولة التحديث",
-    "attemptsLeft": "{{attempts}} attempt(s) remaining",
-    "forceReload": "Force Reload",
-    "maxRetries": "Maximum retry attempts reached",
-    "retryAttempt": "Retry attempt {{current}} of {{max}}",
+    "attemptsLeft": "متبقٍ {{attempts}} محاولة",
+    "forceReload": "إعادة تحميل إجباري",
+    "maxRetries": "تم الوصول إلى الحد الأقصى لمحاولات إعادة المحاولة",
+    "retryAttempt": "محاولة إعادة رقم {{current}} من {{max}}",
     "workout": {
       "title": "تم اكتشاف تمرين نشط",
       "message": "لديك تمرين نشط حاليًا. اختر كيفية التعامل معه قبل التحديث:",
       "save": "حفظ التمرين ومتابعة التحديث",
-      "abandon": "Abandon Workout & Update",
-      "abandoning": "Abandoning workout...",
+      "abandon": "إلغاء التمرين ومتابعة التحديث",
+      "abandoning": "جارٍ إلغاء التمرين...",
       "active": {
-        "title": "Active Workout in Progress"
+        "title": "تمرين نشط قيد التنفيذ"
       },
-      "currentExercise": "Current: {{exercise}}",
-      "elapsed": "Elapsed: {{time}}",
-      "progress": "{{current}} of {{total}} exercises",
-      "saving": "Saving workout progress...",
-      "securityMessage": "A security update is required. Please complete or abandon your workout to continue."
+      "currentExercise": "الحالي: {{exercise}}",
+      "elapsed": "المنقضي: {{time}}",
+      "progress": "{{current}} من {{total}} تمرين",
+      "saving": "جارٍ حفظ تقدم التمرين...",
+      "securityMessage": "مطلوب تحديث أمني. يرجى إكمال التمرين أو إلغاؤه للمتابعة."
     }
   },
   "changelog": {
@@ -626,6 +688,33 @@
       "title": "تم اكتشاف تغييرات في الخصوصية",
       "message": "يتضمن هذا التحديث تغييرات في كيفية تعاملنا مع بياناتك. يرجى مراجعة التغييرات أعلاه وتأكيد فهمك.",
       "acknowledge": "أفهم وأقر بالتغييرات المتعلقة بالخصوصية في هذا التحديث"
+    }
+  },
+  "rating": {
+    "reviews": "المراجعات",
+    "yourRating": "تقييمك",
+    "rateThis": "قيم هذا التمرين",
+    "addReview": "أضف مراجعة",
+    "hideReview": "إخفاء المراجعة",
+    "reviewPlaceholder": "اكتب مراجعتك (اختياري)...",
+    "characters": "الحروف",
+    "submitError": "فشل في تقديم التقييم",
+    "submitting": "جارٍ التقديم...",
+    "loginToRa,te": "قم بتسجيل الدخول لتقييم ومراجعة التمارين"
+  },
+  "whatsNew": {
+    "title": "ما الجديد",
+    "close": "إغلاق",
+    "previous": "السابق",
+    "next": "التالي",
+    "gotIt": "تم!",
+    "seeAllChanges": "عرض كل التغييرات",
+    "goToHighlight": "اذهب إلى المميز {{number}}",
+    "categories": {
+      "newFeature": "ميزة جديدة",
+      "improvement": "تحسين",
+      "security": "تحديث أمني",
+      "update": "تحديث"
     }
   }
 }
