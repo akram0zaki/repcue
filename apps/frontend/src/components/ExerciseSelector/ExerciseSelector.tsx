@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Exercise, ExerciseCategory } from '../../types';
+import type { Exercise } from '../../types';
 import { useExerciseFilter, type ExerciseFilterOptions } from '../../hooks/useExerciseFilter';
 import { localizeExercise } from '../../utils/localizeExercise';
 import CatalogSelector from '../CatalogSelector';

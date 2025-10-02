@@ -579,6 +579,7 @@
     "tooltip": "Copier {{name}} dans votre bibliothèque",
     "genericError": "Échec de la copie de l'exercice"
   },
+  "exerciseParameters": "Paramètres de l'exercice",
   "video": {
     "exerciseVideo": "Vidéo d'exercice",
     "uploadsNotAvailable": "Le téléversement de vidéos n’est pas encore disponible.",

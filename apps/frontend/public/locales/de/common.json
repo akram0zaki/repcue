@@ -59,7 +59,17 @@
     "noVideo": "Kein Video",
     "pauseVideo": "Video pausieren",
     "playVideo": "Video abspielen",
-    "premium": "PRO"
+    "premium": "PRO",
+    "done": "Fertig",
+    "addEquipment": "Ausrüstung hinzufügen",
+    "removeEquipment": "Ausrüstung entfernen",
+    "addMuscleGroup": "Muskelgruppe hinzufügen",
+    "removeMuscleGroup": "Muskelgruppe entfernen",
+    "addTag": "Tag hinzufügen",
+    "removeTag": "Tag entfernen",
+    "exerciseParameters": "Übungsparameter",
+    "exerciseVideo": "Übungsvideo"
+  },
   },
   "navigation": {
     "home": "Startseite",

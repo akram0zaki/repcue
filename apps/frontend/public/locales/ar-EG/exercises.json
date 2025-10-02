@@ -20,6 +20,13 @@
   "edit": "تعديل",
   "addToFavorites": "إضافة إلى المفضلة",
   "removeFromFavorites": "إزالة من المفضلة",
+  "addEquipment": "إضافة معدات",
+  "removeEquipment": "إزالة معدات",
+  "addMuscleGroup": "إضافة مجموعة عضلية",
+  "removeMuscleGroup": "إزالة مجموعة عضلية",
+  "addTag": "إضافة علامة",
+  "removeTag": "إزالة علامة",
+  "durationSeconds": "المدة (ثوان)",
 
   "benefits": "الفوايد",
   "limitations": "الحدود",

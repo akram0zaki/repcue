@@ -484,8 +484,8 @@ const EditWorkoutPage: React.FC = () => {
                   .sort((a, b) => a.order - b.order)
                   .map((exercise, index) => (
                     <div key={exercise.id} className="bg-surface-50 dark:bg-surface-800 rounded-lg p-4 border border-border-200 dark:border-border-700">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
+                      <div className="flex items-start justify-between mb-3 gap-3">
+                        <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
                             {localizeExercise(exercise, t).name}
                           </h4>
@@ -493,7 +493,7 @@ const EditWorkoutPage: React.FC = () => {
                             {localizeExercise(exercise, t).description}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-1 ml-4">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <button
                             type="button"
                             onClick={() => handleMoveExercise(exercise.id, 'up')}

@@ -46,40 +46,56 @@ const InstructionItem: React.FC<InstructionItemProps> = ({
   canMoveUp,
   canMoveDown,
 }) => {
+  // NOTE: We load both namespaces but MUST use explicit namespace prefixes (exercises: / common:)
+  // because common.json contains a nested object named "exercises". Previously calls like
+  // t('exercises.category') were resolved against the common namespace path 'exercises.category',
+  // which is an OBJECT (the category map) causing i18next to complain that it returned an object
+  // instead of a string. By using explicit namespace prefixes we disambiguate and always read
+  // the intended string keys from the proper file.
   const { t } = useTranslation(['common', 'exercises']);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-dark-disabled dark:text-primary-300">
-          Step {instruction.step}
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <span
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-primary-600 text-white dark:bg-primary-400 dark:text-gray-900 whitespace-nowrap shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary-500"
+          aria-label={t('exercises:stepLabel', 'Step') + ' ' + instruction.step}
+        >
+          <span>{t('exercises:stepLabel', 'Step')}</span>
+          <span>{instruction.step}</span>
         </span>
-        <div className="flex space-x-1">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <button
             type="button"
             onClick={() => onMoveUp(index)}
             disabled={!canMoveUp}
-            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-10 h-10 flex flex-col items-center justify-center rounded-md border border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-200 dark:disabled:bg-gray-600"
             title={t('common.moveUp')}
+            aria-label={t('common.moveUp')}
           >
-            <MoveUpIcon />
+            <MoveUpIcon className="w-4 h-4" />
+            <span className="sr-only">&nbsp;</span>
           </button>
           <button
             type="button"
             onClick={() => onMoveDown(index)}
             disabled={!canMoveDown}
-            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-10 h-10 flex flex-col items-center justify-center rounded-md border border-gray-300 dark:border-gray-500 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-gray-200 dark:disabled:bg-gray-600"
             title={t('common.moveDown')}
+            aria-label={t('common.moveDown')}
           >
-            <MoveDownIcon />
+            <MoveDownIcon className="w-4 h-4" />
+            <span className="sr-only">&nbsp;</span>
           </button>
           <button
             type="button"
             onClick={() => onRemove(index)}
-            className="p-1 text-red-400 hover:text-red-600 dark:hover:text-red-300"
+            className="w-10 h-10 flex flex-col items-center justify-center rounded-md border border-red-400 dark:border-red-600 bg-red-50 dark:bg-red-700/40 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-600/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
             title={t('common.remove')}
+            aria-label={t('common.remove')}
           >
-            <MinusIcon />
+            <MinusIcon className="w-4 h-4" />
+            <span className="sr-only">&nbsp;</span>
           </button>
         </div>
       </div>
@@ -88,7 +104,7 @@ const InstructionItem: React.FC<InstructionItemProps> = ({
         <textarea
           value={instruction.text}
           onChange={(e) => onUpdate(index, { ...instruction, text: e.target.value })}
-          placeholder={t('exercises.instructionPlaceholder', 'Describe this step...')}
+          placeholder={t('exercises:instructionPlaceholder', 'Describe this step...')}
           rows={3}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
           required
@@ -96,7 +112,7 @@ const InstructionItem: React.FC<InstructionItemProps> = ({
         
         <div>
           <label htmlFor={`duration-${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t('exercises.stepDuration', 'Duration (seconds)')}
+            {t('exercises:stepDuration', 'Duration (seconds)')}
           </label>
           <input
             id={`duration-${index}`}
@@ -486,11 +502,11 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.basicInfo', 'Basic Information')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:basicInfo', 'Basic Information')}</h3>
             
             <div>
               <label htmlFor="exercise-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('exercises.name', 'Exercise Name')} *
+                {t('exercises:name', 'Exercise Name')} *
               </label>
               <input
                 id="exercise-name"
@@ -498,7 +514,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                placeholder={t('exercises.namePlaceholder', 'Enter exercise name')}
+                placeholder={t('exercises:namePlaceholder', 'Enter exercise name')}
                 required
                 disabled={loading}
               />
@@ -506,7 +522,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
             <div>
               <label htmlFor="exercise-description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('exercises.description', 'Description')}
+                {t('exercises:description', 'Description')}
               </label>
               <textarea
                 id="exercise-description"
@@ -514,7 +530,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                 rows={3}
-                placeholder={t('exercises.descriptionPlaceholder', 'Brief description of the exercise')}
+                placeholder={t('exercises:descriptionPlaceholder', 'Brief description of the exercise')}
                 disabled={loading}
               />
             </div>
@@ -522,7 +538,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="exercise-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('exercises.category', 'Category')} *
+                  {t('exercises:category', 'Category')} *
                 </label>
                 <select
                   id="exercise-category"
@@ -534,7 +550,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 >
                   {Object.values(Categories).map(cat => (
                     <option key={cat} value={cat}>
-                      {t(`exercises.categories.${cat}`, cat)}
+                      {t(`exercises:categories.${cat}`, cat)}
                     </option>
                   ))}
                 </select>
@@ -542,7 +558,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
               <div>
                 <label htmlFor="exercise-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('exercises.type', 'Type')} *
+                  {t('exercises:type', 'Type')} *
                 </label>
                 <select
                   id="exercise-type"
@@ -553,10 +569,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   disabled={loading}
                 >
                   <option value={Types.TIME_BASED}>
-                    {t('exercises.types.time_based', 'Time Based')}
+                    {t('exercises:types.time_based', 'Time Based')}
                   </option>
                   <option value={Types.REPETITION_BASED}>
-                    {t('exercises.types.repetition_based', 'Repetition Based')}
+                    {t('exercises:types.repetition_based', 'Repetition Based')}
                   </option>
                 </select>
               </div>
@@ -564,7 +580,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
             <div>
               <label htmlFor="exercise-difficulty" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('exercises.difficultyLevel', 'Difficulty')}
+                {t('exercises:difficultyLevel', 'Difficulty')}
               </label>
               <select
                 id="exercise-difficulty"
@@ -573,20 +589,20 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                 disabled={loading}
               >
-                <option value="beginner">{t('exercises.difficulties.beginner', 'Beginner')}</option>
-                <option value="intermediate">{t('exercises.difficulties.intermediate', 'Intermediate')}</option>
-                <option value="advanced">{t('exercises.difficulties.advanced', 'Advanced')}</option>
+                <option value="beginner">{t('exercises:difficulties.beginner', 'Beginner')}</option>
+                <option value="intermediate">{t('exercises:difficulties.intermediate', 'Intermediate')}</option>
+                <option value="advanced">{t('exercises:difficulties.advanced', 'Advanced')}</option>
               </select>
             </div>
           </div>
 
           {/* Type-specific fields */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Exercise Parameters</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exerciseParameters', 'Exercise Parameters')}</h3>
             {exerciseType === Types.TIME_BASED ? (
               <div>
                 <label htmlFor="default-duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('exercises.durationSeconds', 'Duration (seconds)')}
+                  {t('exercises:durationSeconds', 'Duration (seconds)')}
                 </label>
                 <input
                   id="default-duration"
@@ -604,7 +620,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label htmlFor="default-sets" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('exercises.defaultSets', 'Default Sets')}
+                    {t('exercises:defaultSets', 'Default Sets')}
                   </label>
                   <input
                     id="default-sets"
@@ -619,7 +635,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 </div>
                 <div>
                   <label htmlFor="default-reps" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('exercises.defaultReps', 'Default Reps')}
+                    {t('exercises:defaultReps', 'Default Reps')}
                   </label>
                   <input
                     id="default-reps"
@@ -634,7 +650,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 </div>
                 <div>
                   <label htmlFor="rep-duration" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('exercises.repDuration', 'Rep Duration (seconds)')}
+                    {t('exercises:repDuration', 'Rep Duration (seconds)')}
                   </label>
                   <input
                     id="rep-duration"
@@ -655,7 +671,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           {/* Instructions Section */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.instructions', 'Instructions')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:instructions', 'Instructions')}</h3>
             </div>
             
             <div className="space-y-3">
@@ -682,7 +698,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   disabled={loading}
                 >
                   <PlusIcon className="w-4 h-4 mr-1" />
-                  {t('exercises.addStep', 'Add Step')}
+                  {t('exercises:addStep', 'Add Step')}
                 </button>
               </div>
             </div>
@@ -690,7 +706,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
           {/* Equipment Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.equipment', 'Equipment Needed')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:equipment', 'Equipment Needed')}</h3>
             
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -700,7 +716,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     value={newEquipment}
                     onChange={(e) => setNewEquipment(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                    placeholder={t('exercises.equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat (comma-separated)')}
+                    placeholder={t('exercises:equipmentPlaceholder', 'e.g., Dumbbells, Yoga Mat (comma-separated)')}
                     disabled={loading}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -720,12 +736,13 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddArrayItem('equipment', newEquipment)}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-10 h-10 flex flex-col items-center justify-center rounded-md border border-primary-500 dark:border-primary-400 bg-primary-100 dark:bg-primary-500/30 text-primary-700 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-40 disabled:cursor-not-allowed"
                     disabled={loading || !newEquipment.trim()}
-                    aria-label={t('exercises.addEquipment', 'Add equipment items')} 
-                    title={t('exercises.addEquipment', 'Add equipment items')}
+                    aria-label={t('exercises:addEquipment', 'Add equipment items')} 
+                    title={t('exercises:addEquipment', 'Add equipment items')}
                   >
-                    <PlusIcon className="w-4 h-4" />
+                    <PlusIcon className="w-5 h-5" />
+                    <span className="sr-only">&nbsp;</span>
                   </button>
                 </div>
               </div>
@@ -740,8 +757,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                         onClick={() => handleRemoveArrayItem('equipment', index)}
                         className="ml-1 inline-flex items-center p-0.5 text-primary-600 dark:text-primary-dark-600 hover:text-primary-700 dark:hover:text-primary-dark-700"
                         disabled={loading}
-                        aria-label={t('exercises.removeEquipment', 'Remove equipment item')}
-                        title={t('exercises.removeEquipment', 'Remove equipment item')}
+                        aria-label={t('exercises:removeEquipment', 'Remove equipment item')}
+                        title={t('exercises:removeEquipment', 'Remove equipment item')}
                       >
                         <MinusIcon className="w-3 h-3" />
                       </button>
@@ -754,7 +771,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
           {/* Muscle Groups Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.muscleGroups', 'Muscle Groups')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:muscleGroups', 'Muscle Groups')}</h3>
             
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -764,7 +781,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     value={newMuscleGroup}
                     onChange={(e) => setNewMuscleGroup(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                    placeholder={t('exercises.muscleGroupPlaceholder', 'e.g., Arms, Core, Legs (comma-separated)')}
+                    placeholder={t('exercises:muscleGroupPlaceholder', 'e.g., Arms, Core, Legs (comma-separated)')}
                     disabled={loading}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -784,12 +801,13 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddArrayItem('muscleGroups', newMuscleGroup)}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-10 h-10 flex flex-col items-center justify-center rounded-md border border-primary-500 dark:border-primary-400 bg-primary-100 dark:bg-primary-500/30 text-primary-700 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-40 disabled:cursor-not-allowed"
                     disabled={loading || !newMuscleGroup.trim()}
-                    aria-label={t('exercises.addMuscleGroup', 'Add muscle group items')} 
-                    title={t('exercises.addMuscleGroup', 'Add muscle group items')}
+                    aria-label={t('exercises:addMuscleGroup', 'Add muscle group items')} 
+                    title={t('exercises:addMuscleGroup', 'Add muscle group items')}
                   >
-                    <PlusIcon className="w-4 h-4" />
+                    <PlusIcon className="w-5 h-5" />
+                    <span className="sr-only">&nbsp;</span>
                   </button>
                 </div>
               </div>
@@ -804,8 +822,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                         onClick={() => handleRemoveArrayItem('muscleGroups', index)}
                         className="ml-1 inline-flex items-center p-0.5 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200"
                         disabled={loading}
-                        aria-label={t('exercises.removeMuscleGroup', 'Remove muscle group')}
-                        title={t('exercises.removeMuscleGroup', 'Remove muscle group')}
+                        aria-label={t('exercises:removeMuscleGroup', 'Remove muscle group')}
+                        title={t('exercises:removeMuscleGroup', 'Remove muscle group')}
                       >
                         <MinusIcon className="w-3 h-3" />
                       </button>
@@ -818,7 +836,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
           {/* Tags Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.tags', 'Tags')}</h3>
+            {/* Use tagsHeading to avoid colliding with nested tags object; Arabic file provides tagsHeading */}
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:tagsHeading', t('exercises:tagsLabel', 'Tags'))}</h3>
             
             <div className="space-y-2">
               <div className="flex gap-2">
@@ -828,7 +847,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                    placeholder={t('exercises.tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
+                    placeholder={t('exercises:tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
                     disabled={loading}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -848,12 +867,13 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   <button
                     type="button"
                     onClick={() => handleAddArrayItem('tags', newTag)}
-                    className="w-10 h-10 flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-10 h-10 flex flex-col items-center justify-center rounded-md border border-primary-500 dark:border-primary-400 bg-primary-100 dark:bg-primary-500/30 text-primary-700 dark:text-primary-200 hover:bg-primary-200 dark:hover:bg-primary-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-40 disabled:cursor-not-allowed"
                     disabled={loading || !newTag.trim()}
-                    aria-label={t('exercises.addTag', 'Add tag items')} 
-                    title={t('exercises.addTag', 'Add tag items')}
+                    aria-label={t('exercises:addTag', 'Add tag items')} 
+                    title={t('exercises:addTag', 'Add tag items')}
                   >
-                    <PlusIcon className="w-4 h-4" />
+                    <PlusIcon className="w-5 h-5" />
+                    <span className="sr-only">&nbsp;</span>
                   </button>
                 </div>
               </div>
@@ -868,8 +888,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                         onClick={() => handleRemoveArrayItem('tags', index)}
                         className="ml-1 inline-flex items-center p-0.5 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200"
                         disabled={loading}
-                        aria-label={t('exercises.removeTag', 'Remove tag')}
-                        title={t('exercises.removeTag', 'Remove tag')}
+                        aria-label={t('exercises:removeTag', 'Remove tag')}
+                        title={t('exercises:removeTag', 'Remove tag')}
                       >
                         <MinusIcon className="w-3 h-3" />
                       </button>
@@ -883,7 +903,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           {/* Video Upload - Only show if feature is enabled */}
           {canUploadVideos && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Exercise Video</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('video.exerciseVideo', 'Exercise Video')}</h3>
               {exercise?.id ? (
                 <VideoUploadWidget
                   exerciseId={exercise.id}
@@ -902,7 +922,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
 
           {/* Sharing Options */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises.sharing', 'Sharing Options')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:sharing', 'Sharing Options')}</h3>
             
             <div className="space-y-2">
               <label className="flex items-center">
@@ -914,11 +934,11 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  {t('exercises.makePublic', 'Make this exercise publicly available')}
+                  {t('exercises:makePublic', 'Make this exercise publicly available')}
                 </span>
               </label>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('exercises.publicHelp', 'Public exercises can be discovered and copied by other users.')}
+                {t('exercises:publicHelp', 'Public exercises can be discovered and copied by other users.')}
               </p>
             </div>
           </div>
@@ -935,7 +955,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     className="px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 focus:outline-none"
                     disabled={loading}
                   >
-                    {t('exercises.clearDraft', 'Clear Draft')}
+                    {t('exercises:clearDraft', 'Clear Draft')}
                   </button>
                 ) : (
                   <div></div>
@@ -962,7 +982,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     ? t('common.saving', 'Saving...') 
                     : isEditing 
                       ? t('common.saveChanges', 'Save Changes')
-                      : t('exercises.createExercise', 'Create Exercise')
+                      : t('exercises:createExercise', 'Create Exercise')
                   }
                 </button>
               </div>

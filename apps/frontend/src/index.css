@@ -390,6 +390,23 @@ body.rtl .truncate {
     transform: none !important; /* Prevent RTL transforms on icons */
   }
 
+  /* RTL-safe SVG icons in all buttons (forms, modals, etc.) */
+  body.rtl button svg {
+    direction: ltr !important; /* Keep SVG rendering LTR */
+    transform: none !important; /* Prevent RTL transforms on icons */
+    fill: none !important; /* Prevent fill from hiding stroke */
+    stroke: currentColor !important; /* Explicitly inherit stroke color */
+  }
+  
+  /* Ensure SVG stroke elements are visible in RTL mode */
+  body.rtl button svg line,
+  body.rtl button svg path,
+  body.rtl button svg polyline,
+  body.rtl button svg polygon,
+  body.rtl button svg circle {
+    stroke: currentColor !important;
+  }
+
   .nav-separator {
     margin-left: 1px;
     margin-right: 1px;

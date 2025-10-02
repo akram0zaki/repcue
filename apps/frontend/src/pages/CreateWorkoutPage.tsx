@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: form validation messages pending localization */
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { localizeExercise } from '../utils/localizeExercise';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';

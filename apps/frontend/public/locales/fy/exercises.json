@@ -153,6 +153,13 @@
 
 
   "addToFavorites": "Foegje ta oan Favoriten",
+  "addEquipment": "Apparatuer tafoegje",
+  "removeEquipment": "Apparatuer fuortsmite",
+  "addMuscleGroup": "Spiergroep tafoegje",
+  "removeMuscleGroup": "Spiergroep fuortsmite",
+  "addTag": "Tag tafoegje",
+  "removeTag": "Tag fuortsmite",
+  "durationSeconds": "Duorje (sekonden)",
   "backToExercises": "Werom nei Oefeningen",
   "copies": "Kopies",
   "created": "Makke",

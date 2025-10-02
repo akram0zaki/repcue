@@ -59,7 +59,17 @@
     "noVideo": "Gjin Fideo",
     "pauseVideo": "Pause Fideo",
     "playVideo": "Spylje Fideo",
-    "premium": "PRO"
+        "premium": "PRO",
+    "done": "Klear",
+    "addEquipment": "Materiaal tafoegje",
+    "removeEquipment": "Materiaal wiskje",
+    "addMuscleGroup": "Spiergroep tafoegje",
+    "removeMuscleGroup": "Spiergroep wiskje",
+    "addTag": "Label tafoegje",
+    "removeTag": "Label wiskje",
+    "exerciseParameters": "Oefeningsparameters",
+    "exerciseVideo": "Oefeningsfideo"
+  },
   },
   "navigation": {
     "home": "Thús",

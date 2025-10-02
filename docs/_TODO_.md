@@ -277,6 +277,15 @@ I would like you to examine the workspace understand the current implementation,
 
 - Create exercise selector component and use it in create workout and timer pages.
 
+- Read the documentation and examine the workspace to understand what this app does. Basically it is an offline-first, mobile-first exercise catalog and workout tracker that helps users pick the exercises that suits them and create workout schedules assigned to weekdays. Then once an exercise or a workout starts, it is timer-guided and logged in the activity log. I would like to introduce an AI-onboarding process that would ask the user a few questions about their target (e.g. fitness, weight loss, etc), if they have injuries, among a few other questions, then with the use of an AI model it would create a workout or more matching their answers and save it to their profile. This onboarding feature would require login to work because the AI assistant needs to be online, but the output of it will be one or more workouts that would follow the app architecture and flow normally.
+I would like to add a button to the home screen above the workout section to trigger this onboarding flow. Below are further details about this requirement:
+  + There is a concept design in the workspace at docs\implementation-plans\onboarding\onboarding-concept.JPG which contains the three Arabic (RTL) onboarding screens.
+  + This is just a concept so don't take the style and layout literally, you should create the screens within RepCue's style guide docs\ui-ux\ui-specs.md and docs\ui-ux\rtl-development-guide.md and follow the localization guide to support the 8 locales
+  + The onboarding should be 3 screens as per the concept and progress is shown at the top so the user knows how much is left.
+Ask me questions if the requirement is not clear, and once you have all the answers, create an implementation plan made up with the different phases and tasks to implement this then write it to docs\implementation-plans\onboarding.md
+
+
+
 - We don't need real migration:
 
 // Type for database records during migration - supports both user_id and owner_id

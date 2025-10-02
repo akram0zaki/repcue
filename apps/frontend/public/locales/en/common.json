@@ -508,6 +508,8 @@
   "shareErrorNotSynced": "Exercise must be synced before sharing",
   "shareErrorOffline": "Cannot share while offline",
     "shareExercise": "Share Exercise",
+    "exerciseParameters": "Exercise Parameters",
+    "exerciseVideo": "Exercise Video",
     "sharePublic": "Public",
     "sharePublicDesc": "Anyone can find and copy this exercise",
     "shareWithUser": "Share with User",

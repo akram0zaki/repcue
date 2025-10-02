@@ -1,5 +1,33 @@
 ## Unreleased
 
+### 2025-10-02 (Arabic RTL SVG Icon Visibility & Create Exercise Form Localization)
+#### Fixed
+- **SVG Icon Visibility in Arabic RTL Dark Mode**: Resolved invisible SVG icons in form buttons
+  - **Root Cause**: SVG icons in button components were not rendering in RTL + dark mode combination
+  - **Workaround Solution**: Added non-breaking space (`&nbsp;`) with `sr-only` class to all icon-only buttons
+  - **Affected Components**: Plus buttons (equipment/muscles/tags) and instruction step buttons (move up/down/remove)
+  - **CSS Enhancements**: Added comprehensive RTL-safe SVG rules in `index.css`
+    - `fill: none !important` to prevent fill from hiding stroke
+    - `stroke: currentColor !important` to ensure color inheritance
+    - `direction: ltr !important` to prevent RTL transforms on icons
+  - **Accessibility Maintained**: All buttons retain proper `aria-label` and `title` attributes
+  - **Visual Cleanup**: Removed visible text captions from step buttons for cleaner icon-only UI
+- **Create Exercise Form Arabic Localization**: Fixed translation namespace collision and missing keys
+  - **Namespace Collision**: Resolved `exercises.category` returning object instead of string error
+  - **Root Cause**: `common.json` contains nested `exercises` object; un-prefixed keys resolved incorrectly
+  - **Solution**: Explicit namespace prefixes throughout (`exercises:`, `common:`, root keys)
+  - **Missing Arabic Keys Added**:
+    - `stepLabel`: "خطوة" (Step)
+    - `clearDraft`: "مسح المسودة" (Clear Draft)
+    - `tagsHeading`: "الوسوم" (Tags heading)
+    - `tagsLabel`: "الوسوم" (Tags label)
+  - **Form Fields Localized**: Category label, step badges, step duration, instruction placeholders, tags header
+  - **Dark Mode Contrast**: Enhanced button visibility with improved color schemes
+- **Edit Workout Page Button Overflow**: Fixed arrow button layout issues in RTL mode
+  - **Layout Improvements**: Added `gap-3` to parent, `min-w-0` to text container, `flex-shrink-0` to buttons
+  - **RTL Compatibility**: Replaced `space-x-1 ml-4` with `gap-1` for proper RTL spacing
+  - **Prevents Overflow**: Buttons no longer compress or overflow in narrow viewports
+
 ### 2025-10-01 (Activity Log Badge Overlap & Exercise Duration Overflow Fixes)
 #### Fixed
 - **Workout Card Badge Overlap**: Completely resolved badge overlapping with workout name
