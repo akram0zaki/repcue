@@ -1,5 +1,21 @@
 ## Unreleased
 
+### 2025-10-03 (Settings Page Color Scheme Update)
+#### Fixed
+- **Settings Page Color Scheme Alignment**: Updated all button and toggle colors to match teal-based design system
+  - Changed Export Data button from `bg-blue-600/700` to `bg-primary-500/600` (teal)
+  - Changed Sync Now button from `bg-indigo-600/700` to `bg-primary-500/600` (teal)
+  - Changed Force Full Sync button from `bg-blue-600/700` to `bg-primary-500/600` (teal)
+  - Changed Clear Caches button from `bg-blue-600/700` to `bg-primary-500/600` (teal)
+  - Changed Update Service Worker button from `bg-purple-600/700` to `bg-secondary-300/400` (light blue)
+  - Changed interval duration select focus ring from `focus:ring-blue-500` to `focus:ring-primary-500`
+  - Changed consent version badge from blue to primary teal colors
+  - Updated ToggleSwitch component default color from `bg-blue-600` to `bg-primary-500` (teal)
+  - Updated ToggleSwitch focus ring from `focus-visible:ring-blue-400` to `focus-visible:ring-primary-500`
+  - All changes follow the UI specs color palette (docs/ui-ux/ui-specs.md)
+  - Maintains consistent teal accent color (#0096C7) across the entire app
+  - Toggle switch layout unchanged, only color scheme updated
+
 ### 2025-10-03 (Fix "Custom" Badge Arabic Translation)
 #### Fixed
 - **Custom Exercise Badge Localization**: Fixed "Custom" badge displaying in English on Arabic screens

@@ -320,7 +320,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               id="interval-duration"
               value={appSettings.interval_duration}
               onChange={handleIntervalChange}
-              className="w-full p-3 border border-surface-300 dark:border-surface-600 rounded-lg bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-3 border border-surface-300 dark:border-surface-600 rounded-lg bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
               <option value={15}>{t('timer.beepInterval15')}</option>
               <option value={30}>{t('timer.beepInterval30')}</option>
@@ -433,7 +433,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <p className="text-sm text-gray-700 dark:text-gray-200">
                 {t('settings.consentStatusLabel', 'Consent Status')}: <span className="font-medium">{hasConsent ? t('settings.enabled', 'Enabled') : t('settings.disabled', 'Disabled')}</span>
               </p>
-              <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded" title={t('settings.consentVersion', 'Consent version')}>
+              <span className="text-xs bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 px-2 py-1 rounded" title={t('settings.consentVersion', 'Consent version')}>
                 v{consentStatus.version}
               </span>
             </div>
@@ -459,7 +459,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleExportData}
               disabled={!hasConsent}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
             >
               {t('settings.exportData')}
             </button>
@@ -473,7 +473,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleSyncNow}
               disabled={!hasConsent || !isAuthenticated || isManualSyncing}
-              className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
               data-testid="btn-sync-now"
             >
               {isManualSyncing ? t('settings.syncInProgress') : t('settings.syncNow')}
@@ -492,7 +492,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 <button
                   onClick={handleForceFullSync}
                   disabled={!hasConsent || !isAuthenticated || isForceFullSyncing}
-                  className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
                   data-testid="btn-force-full-sync"
                 >
                   {isForceFullSyncing ? t('settings.syncInProgress') : t('settings.forceFullSync')}
@@ -542,14 +542,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <button
                 onClick={handleClearCaches}
                 disabled={isRefreshing}
-                className="py-2 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="py-2 px-3 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {t('settings.clearCachesOnly')}
               </button>
               <button
                 onClick={handleUpdateServiceWorker}
                 disabled={isRefreshing}
-                className="py-2 px-3 bg-purple-600 hover:bg-purple-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="py-2 px-3 bg-secondary-300 hover:bg-secondary-400 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {t('settings.updateServiceWorker')}
               </button>
