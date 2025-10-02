@@ -1,5 +1,17 @@
 ## Unreleased
 
+### 2025-10-02 (Video Section Dark Mode & Sharing Checkbox RTL Fixes)
+#### Fixed
+- **Video Upload Section Dark Mode**: Fixed white background and poor contrast in dark mode
+  - Changed from `bg-primary-50 dark:bg-primary-dark-disabled` to `bg-blue-50 dark:bg-blue-900/20`
+  - Updated border colors: `border-blue-200 dark:border-blue-800` for better visibility
+  - Fixed text colors: `text-blue-700 dark:text-blue-300` for proper contrast
+  - Now follows style guide with proper dark mode theming
+- **Sharing Checkbox RTL Spacing**: Fixed text attachment to checkbox in Arabic
+  - Changed from `ml-2` (margin-left) to `ms-2` (margin-inline-start)
+  - Properly respects RTL text direction
+  - Text now has correct spacing from checkbox in both LTR and RTL modes
+
 ### 2025-10-02 (Arabic RTL SVG Icon Visibility & Create Exercise Form Localization)
 #### Fixed
 - **SVG Icon Visibility in Arabic RTL Dark Mode**: Resolved invisible SVG icons in form buttons

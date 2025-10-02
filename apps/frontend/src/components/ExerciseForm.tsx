@@ -911,8 +911,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   onVideoUploaded={setCustomVideoUrl}
                 />
               ) : (
-                <div className="p-4 bg-primary-50 dark:bg-primary-dark-disabled border border-primary-200 dark:border-primary-dark-600 rounded-lg">
-                  <p className="text-sm text-primary-700 dark:text-primary-300">
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
                     {t('common.videoUploadAfterSave', 'Video upload will be available after saving the exercise.')}
                   </p>
                 </div>
@@ -933,7 +933,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   disabled={loading}
                   className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                <span className="ms-2 text-sm text-gray-700 dark:text-gray-300">
                   {t('exercises:makePublic', 'Make this exercise publicly available')}
                 </span>
               </label>
