@@ -251,11 +251,11 @@ const WorkoutsPage: React.FC = () => {
                 </div>
                 
                 {/* Centered Action Buttons */}
-                <div className="flex items-center justify-center gap-2 mt-3">
+                <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
                   <button
                     onClick={() => handleStartWorkout(workout)}
                     disabled={!workout.is_active}
-                    className="btn-primary px-4 py-2 text-sm flex items-center gap-2"
+                    className="btn-primary px-4 py-2 text-sm flex items-center gap-2 flex-shrink-0"
                     title={workout.is_active ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -265,7 +265,7 @@ const WorkoutsPage: React.FC = () => {
                   </button>
                   <button
                     onClick={() => handleEditWorkout(workout.id)}
-                    className="btn-neutral p-2"
+                    className="btn-neutral p-2 flex-shrink-0"
                     title={t('workouts.editWorkout')}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,7 +274,7 @@ const WorkoutsPage: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(workout.id)}
-                    className="btn-danger p-2"
+                    className="btn-danger p-2 flex-shrink-0"
                     title={t('workouts.deleteWorkout')}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,20 +284,20 @@ const WorkoutsPage: React.FC = () => {
                 </div>
                 
                 {/* Workout Info */}
-                <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-4 mb-3">
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-4 mb-3 flex-wrap">
+                  <span className="flex items-center gap-1 flex-shrink-0">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                     {t('workouts.exerciseCount', { count: workout.exercises.length, ns: 'common' })}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="flex items-center gap-1 flex-shrink-0">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     ~{calculateDuration(workout)}
                   </span>
-                  <span className="text-xs">
+                  <span className="text-xs flex-shrink-0">
                     {formatScheduledDays(workout.scheduled_days)}
                   </span>
                 </div>

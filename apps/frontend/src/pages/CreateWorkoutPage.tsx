@@ -231,7 +231,7 @@ const CreateWorkoutPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="animate-pulse">
             <div className="h-8 bg-surface-200 dark:bg-surface-700 rounded mb-6"></div>
@@ -248,7 +248,7 @@ const CreateWorkoutPage: React.FC = () => {
 
   if (!hasConsent) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
@@ -266,7 +266,7 @@ const CreateWorkoutPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16 pb-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
       <div className="p-6 max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -365,7 +365,7 @@ const CreateWorkoutPage: React.FC = () => {
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
                   {t('workouts.scheduledDaysLabel')}
                 </label>
-                <div className="grid grid-cols-7 gap-2">
+                <div className="flex flex-wrap gap-2 justify-center">
                   {(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as Weekday[]).map((day) => {
                     const dayLabels = {
                       monday: t('weekdayAbbrev.monday', { defaultValue: 'Mon' }),
@@ -390,7 +390,7 @@ const CreateWorkoutPage: React.FC = () => {
                             setScheduledDays(prev => [...prev, day]);
                           }
                         }}
-                        className={`px-1 py-2 text-xs font-medium rounded-lg border transition-colors min-w-0 text-center ${
+                        className={`px-2 py-2 text-xs font-medium rounded-lg border transition-colors flex-shrink-0 min-w-[2.5rem] text-center ${
                           isSelected
                             ? 'bg-primary-500 text-white border-primary-500'
                             : 'bg-surface-50 dark:bg-surface-800 text-text-900 dark:text-text-50 border-border-300 dark:border-border-600 hover:bg-surface-100 dark:hover:bg-surface-700'

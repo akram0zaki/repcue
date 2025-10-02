@@ -1,5 +1,57 @@
 ## Unreleased
 
+### 2025-10-03 (Fix Day Labels Overflow on Workout Forms)
+#### Fixed
+- **Create/Edit Workout Days Selector Overflow**: Fixed day of week labels overflowing their containers
+  - Changed from rigid `grid grid-cols-7` layout to flexible `flex flex-wrap justify-center` layout
+  - Increased horizontal padding from `px-1` to `px-2` for better readability and spacing
+  - Added `flex-shrink-0` to prevent button compression
+  - Set minimum width to `min-w-[2.5rem]` (40px) to ensure buttons remain readable
+  - Day buttons now wrap to multiple rows on narrow viewports or with longer text (e.g., Arabic)
+  - Works correctly across all languages and viewport sizes
+  - Fixes issue where text like "Mon", "Tue", "Wed" was overflowing rounded pill containers
+
+### 2025-10-02 (Remove Excessive Whitespace from Workout Pages)
+#### Fixed
+- **Create/Edit Workout Pages Top Whitespace**: Removed unnecessary `pt-16` (padding-top: 64px) from workout pages
+  - Fixed CreateWorkoutPage.tsx: removed top padding from loading, no-consent, and main form containers
+  - Fixed EditWorkoutPage.tsx: removed top padding from loading, no-consent, error, and main form containers
+  - Pages now start at the top of the viewport without excessive whitespace
+  - Consistent with other pages in the app that don't have a header
+  - Better use of screen real estate, especially on mobile devices
+
+### 2025-10-02 (Automatic Scroll to Top on Navigation)
+#### Added
+- **ScrollToTop Component**: New reusable component that automatically scrolls to the top of the page on route changes
+  - Placed inside Router component in App.tsx
+  - Triggers on every navigation event via `useLocation()` hook
+  - Uses instant scroll behavior for immediate, non-disorienting transitions
+  - Prevents scroll position inheritance between pages
+  - Improves UX by ensuring users always start at the top of new pages
+  - Consistent behavior across all routes (Home, Exercises, Timer, Workouts, Settings, etc.)
+
+### 2025-10-02 (EditWorkoutPage Days Selector RTL Fix)
+#### Fixed
+- **Days of Week Selector Overlap**: Fixed overlapping day names in Arabic RTL mode on EditWorkoutPage
+  - Changed from `grid grid-cols-7 gap-2` to `flex flex-wrap gap-2 justify-center`
+  - Increased button padding from `px-1` to `px-3` for better readability
+  - Added `flex-shrink-0` and `min-w-[3rem]` to prevent button compression
+  - Day names now wrap to multiple rows when needed instead of overlapping
+  - Works correctly with both short English abbreviations and longer Arabic day names
+
+### 2025-10-02 (Workouts Page Button Overflow Fix)
+#### Fixed
+- **Workout Action Buttons Overflow**: Fixed button overflow in RTL mode on WorkoutsPage
+  - Added `flex-wrap` to button container to allow wrapping on narrow viewports
+  - Added `flex-shrink-0` to all action buttons (Start, Edit, Delete) to prevent compression
+  - Buttons now properly wrap to next line instead of overflowing container
+  - Works correctly in both LTR and RTL layouts
+- **Workout Info Metadata Overflow**: Fixed workout details overflow below action buttons
+  - Added `flex-wrap` to info container for exercise count, duration, and scheduled days
+  - Added `flex-shrink-0` to all metadata items and their icons
+  - Metadata items now wrap to next line on narrow viewports
+  - Prevents text cutoff in both LTR and RTL modes
+
 ### 2025-10-02 (Video Section Dark Mode & Sharing Checkbox RTL Fixes)
 #### Fixed
 - **Video Upload Section Dark Mode**: Fixed white background and poor contrast in dark mode

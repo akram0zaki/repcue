@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
+import ScrollToTop from './components/ScrollToTop';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { UpdateNotificationManager } from './components/UpdateNotificationManager';
@@ -2450,6 +2451,7 @@ useEffect(() => {
     <>
       {canUseBrowserRouter ? (
         <Router>
+        <ScrollToTop />
         <ChunkErrorBoundary>
           <MigrationSuccessBanner />
           <AppShell>
