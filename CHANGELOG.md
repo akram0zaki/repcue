@@ -13,6 +13,14 @@
   - Changed from flex layout to CSS Grid for equal-width buttons
   - Both buttons now have consistent 50/50 width split
   - No overflow on smaller screens
+- **Auth Gate Modal Responsive Layout**: Improved mobile-first design
+  - Buttons stack vertically on narrow screens (flex-col)
+  - Horizontal grid layout on desktop (sm:grid-cols-2)
+  - Uses semantic typography classes (.text-h3, .text-body)
+  - Proper surface colors (bg-surface-0 dark:bg-surface-900)
+  - Border added for better definition (border-surface-200 dark:border-surface-700)
+  - Touch-friendly targets (.touch-target class)
+  - Full RTL support with proper text flow
 
 ### 2025-10-03 (AI Workout Assistant Progress Indicator)
 #### Changed

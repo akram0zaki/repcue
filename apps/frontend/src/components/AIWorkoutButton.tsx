@@ -112,9 +112,9 @@ export default function AIWorkoutButton({
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-          {/* Modal Content */}
+          {/* Modal Content - Mobile-first, responsive */}
           <div
-            className="relative bg-white dark:bg-surface-900 rounded-lg max-w-sm w-full p-6 shadow-2xl"
+            className="relative bg-surface-0 dark:bg-surface-900 rounded-lg w-full sm:max-w-md p-5 sm:p-6 shadow-2xl border border-surface-200 dark:border-surface-700"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-labelledby="auth-gate-title"
@@ -122,31 +122,32 @@ export default function AIWorkoutButton({
           >
             <h2
               id="auth-gate-title"
-              className="text-xl font-bold text-text-900 dark:text-text-50 mb-3"
+              className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-3"
             >
               {t('authGate.title', 'Sign In Required')}
             </h2>
             <p
               id="auth-gate-message"
-              className="text-sm text-text-600 dark:text-text-400 mb-6"
+              className="text-body text-text-600 dark:text-text-400 mb-6"
             >
               {t(
                 'authGate.message',
                 'You must be signed in to use the AI Workout Assistant. Sign in to save your personalized workouts.'
               )}
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            {/* Mobile-first: vertical stack, desktop: horizontal */}
+            <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={handleTryLater}
-                className="btn-secondary w-full"
+                className="btn-secondary w-full touch-target"
               >
                 {t('authGate.tryLater', 'Try Later')}
               </button>
               <button
                 type="button"
                 onClick={handleSignIn}
-                className="btn-primary w-full"
+                className="btn-primary w-full touch-target"
               >
                 {t('authGate.signIn', 'Sign In')}
               </button>
