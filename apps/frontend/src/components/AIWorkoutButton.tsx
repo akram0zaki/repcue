@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AI_WORKOUT_BUILDER } from '../config/features';
 import { useAuth } from '../hooks/useAuth';
+import { AuthModal } from './auth/AuthModal';
 import logger from '../utils/logger';
 
 interface AIWorkoutButtonProps {
@@ -38,6 +39,7 @@ export default function AIWorkoutButton({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [showAuthGate, setShowAuthGate] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Don't render if feature flag is disabled
   if (!AI_WORKOUT_BUILDER) {
@@ -58,7 +60,13 @@ export default function AIWorkoutButton({
 
   const handleSignIn = () => {
     setShowAuthGate(false);
-    navigate('/login', { state: { returnTo: '/ai-workout-onboarding' } });
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    // After successful auth, navigate to onboarding
+    navigate('/ai-workout-onboarding');
   };
 
   const handleTryLater = () => {
@@ -135,19 +143,19 @@ export default function AIWorkoutButton({
                 'You must be signed in to use the AI Workout Assistant. Sign in to save your personalized workouts.'
               )}
             </p>
-            {/* Buttons: vertical on mobile, equal-width grid on desktop */}
-            <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2">
+            {/* Buttons: always equal width and height using grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={handleTryLater}
-                className="btn-secondary w-full touch-target sm:order-1"
+                className="btn-secondary w-full touch-target h-12 text-base"
               >
                 {t('authGate.tryLater', 'Try Later')}
               </button>
               <button
                 type="button"
                 onClick={handleSignIn}
-                className="btn-primary w-full touch-target sm:order-2"
+                className="btn-primary w-full touch-target h-12 text-base"
               >
                 {t('authGate.signIn', 'Sign In')}
               </button>
@@ -155,6 +163,14 @@ export default function AIWorkoutButton({
           </div>
         </div>
       )}
+
+      {/* Auth Modal for Sign In */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+        initialMode="signin"
+      />
     </>
   );
 }
