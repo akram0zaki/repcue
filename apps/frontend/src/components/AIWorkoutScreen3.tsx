@@ -59,10 +59,7 @@ export default function AIWorkoutScreen3({ data, errors, onChange }: AIWorkoutSc
       {/* Injuries or Limitations */}
       <div>
         <label htmlFor="injuries" className="block text-body font-medium text-text-primary mb-2">
-          {t('screen3.injuries.label', 'Injuries or Limitations')}
-          <span className="text-text-secondary font-normal ml-2">
-            {t('screen3.injuries.optional', '(Optional)')}
-          </span>
+          {t('screen3.injuries.label', 'Injuries or Limitations (Optional)')}
         </label>
         <p className="text-small text-text-secondary mb-3">
           {t(

@@ -1,5 +1,10 @@
 ## Unreleased
 
+### 2025-10-03 (AI Workout Assistant Screen 3 Fix)
+#### Fixed
+- **Screen 3 Label**: Removed duplicate "(Optional)" text from Injuries field
+  - Label now shows "(Optional)" only once instead of twice
+
 ### 2025-10-03 (AI Workout Assistant Button Position)
 #### Changed
 - **HomePage Layout**: Moved AI Workout Assistant button above Upcoming Workout section
