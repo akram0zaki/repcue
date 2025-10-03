@@ -197,6 +197,15 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
           </div>
         )}
 
+        {/* AI Workout Assistant Section */}
+        <section className="mb-4">
+          <AIWorkoutButton
+            variant="primary"
+            isFirstTime={true}
+            className="w-full"
+          />
+        </section>
+
         {/* Upcoming Workout Section */}
         {hasConsent && (
           <section className="mb-4">
@@ -216,7 +225,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         {upcomingWorkout.date}
                       </div>
                     </div>
-                    
+
                     {/* Workout Info */}
                     <div className="flex-1 min-w-0">
                       <div className="text-body font-medium label-text truncate">
@@ -227,7 +236,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Start Button */}
                   <button
                     onClick={() => {
@@ -273,15 +282,6 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             )}
           </section>
         )}
-
-        {/* AI Workout Assistant Section */}
-        <section className="mb-4">
-          <AIWorkoutButton
-            variant="primary"
-            isFirstTime={true}
-            className="w-full"
-          />
-        </section>
 
         <div className="space-y-3">
           {/* Popular Exercises Section */}

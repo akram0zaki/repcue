@@ -1,5 +1,12 @@
 ## Unreleased
 
+### 2025-10-03 (AI Workout Assistant Button Position)
+#### Changed
+- **HomePage Layout**: Moved AI Workout Assistant button above Upcoming Workout section
+  - Better visual hierarchy and user flow
+  - AI Assistant is now more prominent on the home screen
+  - Positioned after sign-in prompt and before upcoming workout
+
 ### 2025-10-03 (AI Workout Assistant - Phase 6 Testing)
 #### Added
 - **Unit Tests for AI Workout Validation**: Comprehensive test suite for form validation
