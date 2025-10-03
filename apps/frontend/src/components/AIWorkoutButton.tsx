@@ -114,7 +114,7 @@ export default function AIWorkoutButton({
 
           {/* Modal Content - Mobile-first, responsive */}
           <div
-            className="relative bg-surface-0 dark:bg-surface-900 rounded-lg w-full sm:max-w-md p-5 sm:p-6 shadow-2xl border border-surface-200 dark:border-surface-700"
+            className="relative bg-white dark:bg-surface-900 rounded-lg w-full sm:max-w-md p-5 sm:p-6 shadow-2xl border border-surface-200 dark:border-surface-700"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-labelledby="auth-gate-title"
@@ -135,19 +135,19 @@ export default function AIWorkoutButton({
                 'You must be signed in to use the AI Workout Assistant. Sign in to save your personalized workouts.'
               )}
             </p>
-            {/* Mobile-first: vertical stack, desktop: horizontal */}
-            <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3">
+            {/* Buttons: vertical on mobile, equal-width grid on desktop */}
+            <div className="flex flex-col gap-3 sm:grid sm:grid-cols-2">
               <button
                 type="button"
                 onClick={handleTryLater}
-                className="btn-secondary w-full touch-target"
+                className="btn-secondary w-full touch-target sm:order-1"
               >
                 {t('authGate.tryLater', 'Try Later')}
               </button>
               <button
                 type="button"
                 onClick={handleSignIn}
-                className="btn-primary w-full touch-target"
+                className="btn-primary w-full touch-target sm:order-2"
               >
                 {t('authGate.signIn', 'Sign In')}
               </button>

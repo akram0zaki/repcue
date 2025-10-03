@@ -17,10 +17,11 @@
   - Buttons stack vertically on narrow screens (flex-col)
   - Horizontal grid layout on desktop (sm:grid-cols-2)
   - Uses semantic typography classes (.text-h3, .text-body)
-  - Proper surface colors (bg-surface-0 dark:bg-surface-900)
+  - Proper surface colors (bg-white dark:bg-surface-900) - fixed transparency issue
   - Border added for better definition (border-surface-200 dark:border-surface-700)
   - Touch-friendly targets (.touch-target class)
   - Full RTL support with proper text flow
+  - Equal button width enforced with grid-cols-2 on desktop
 
 ### 2025-10-03 (AI Workout Assistant Progress Indicator)
 #### Changed
