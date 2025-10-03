@@ -41,8 +41,8 @@ export default function AIWorkoutProgressIndicator({
                 transition-all duration-300 ease-in-out
                 ${
                   isCurrent
-                    ? 'w-10 h-2.5 bg-primary-600 dark:bg-primary-400'
-                    : 'w-6 h-2.5 bg-gray-400 dark:bg-gray-500 opacity-50'
+                    ? 'w-6 h-2.5 bg-primary-600 dark:bg-primary-400'
+                    : 'w-10 h-2.5 bg-gray-400 dark:bg-gray-500 opacity-50'
                 }
               `}
               role="img"

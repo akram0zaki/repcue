@@ -1,5 +1,12 @@
 ## Unreleased
 
+### 2025-10-03 (AI Workout Assistant Progress Indicator)
+#### Changed
+- **Progress Indicator Pills**: Swapped size of selected and unselected pills
+  - Selected pill: 24px wide (smaller, highlighted in primary color)
+  - Unselected pills: 40px wide (larger, dimmed gray)
+  - Creates better visual distinction for current step
+
 ### 2025-10-03 (AI Workout Assistant Screen 3 Fix)
 #### Fixed
 - **Screen 3 Label**: Removed duplicate "(Optional)" text from Injuries field
