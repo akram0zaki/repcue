@@ -1,5 +1,13 @@
 ## Unreleased
 
+### 2025-10-03 (AI Workout Assistant Auth Gate)
+#### Added
+- **Authentication Gate Modal**: Show auth requirement before user enters any data
+  - Modal appears when unauthenticated user clicks AI Workout Assistant button
+  - Two options: "Sign In" (navigates to login with return path) or "Try Later" (dismisses modal)
+  - Prevents data loss by checking authentication upfront
+  - Improves UX by avoiding 3-page form entry before auth error
+
 ### 2025-10-03 (AI Workout Assistant Progress Indicator)
 #### Changed
 - **Progress Indicator Pills**: Swapped size of selected and unselected pills
