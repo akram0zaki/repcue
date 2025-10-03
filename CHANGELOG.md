@@ -1,5 +1,52 @@
 ## Unreleased
 
+### 2025-10-03 (AI Workout Assistant UI Improvements)
+#### Added
+- **AI Workout Assistant Button**: Added entry points for AI workout generation feature
+  - Primary button on HomePage with "Get Your Personalized Workout Plan" text
+  - Secondary button on WorkoutsPage with contextual text based on workout count
+  - Both buttons navigate to `/ai-workout-onboarding` route
+  - Feature gated by `AI_WORKOUT_BUILDER` flag
+
+#### Fixed
+- **AI Workout Onboarding Page Styling**: Redesigned to follow RepCue style guide
+  - Replaced numbered step indicator with circular pill pagination (larger active pill, smaller inactive pills)
+  - Updated page background to `bg-background-50 dark:bg-background-950`
+  - Changed container to mobile-first `max-w-md` with proper safe area padding
+  - Updated card styling with `bg-surface-0 dark:bg-surface-800` and proper borders
+  - Standardized typography with `text-text-900 dark:text-text-50` for headings
+  - Added scroll-to-top on screen navigation for better UX
+  - Equal-width navigation buttons using CSS Grid instead of flex
+  - Replaced JavaScript `window.confirm()` with elegant modal dialog matching app style
+  - Exit confirmation modal with semi-transparent backdrop and blur effect
+- **AI Workout Screen 1 Form Styling**: Updated to match RepCue style guide
+  - Form inputs now use `bg-surface-0 dark:bg-surface-800` backgrounds
+  - Labels use `text-sm font-medium text-text-900 dark:text-text-50`
+  - Error states use `border-red-600` with `text-red-600 dark:text-red-400`
+  - Added `touch-target` class for accessibility (44px minimum)
+  - Gender radio buttons wrap on small screens with `flex-wrap`
+- **AI Workout Screen 2 Form Styling**: Fixed text overflow and updated styling
+  - Changed chip buttons from `text-sm` to `text-xs` with `break-words` for proper wrapping
+  - Reduced spacing from `space-y-8` to `space-y-5` for better density
+  - Updated grid gaps from `gap-3` to `gap-2` to give more room for text
+  - Fitness level cards use `items-start` for proper text wrapping
+  - Added `min-w-0 overflow-hidden` to prevent text overflow
+  - All buttons follow RepCue color scheme with primary-600 accent
+- **AI Workout Service Error Fix**: Fixed syntax error in aiWorkoutService.ts
+  - Escaped apostrophe in "You've reached the limit" error message (line 298)
+  - Service now loads without ESBuild transform errors
+
+#### Changed
+- **Navigation Button Layout**: Improved consistency across all three onboarding screens
+  - Buttons now maintain equal width on all pages using CSS Grid `grid-cols-2`
+  - Text wraps or truncates as needed within equal-width constraints
+  - Back/Exit and Next/Generate buttons always the same size
+- **Progress Indicator**: Enhanced visual clarity
+  - Active pill: 40px wide (w-10), highly visible
+  - Inactive pills: 24px wide (w-6), dimmed with opacity-50
+  - Used `bg-gray-400 dark:bg-gray-500` for better contrast on dark backgrounds
+  - All three pills now clearly visible
+
 ### 2025-10-03 (Settings Page Toggle Switch Styling Consistency)
 #### Fixed
 - **Toggle Switch Styling Consistency**: Applied uniform styling to all toggle switches on Settings page

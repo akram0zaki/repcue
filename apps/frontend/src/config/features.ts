@@ -19,3 +19,9 @@ export const SYNC_ENGINE = 'v2' as const;
 export const DEBUG = true;
 // Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
 export const SYNC_DEBUG = true;
+
+// AI Workout Builder feature flags
+// Enable/disable the entire AI Assistant feature (button visibility, flow access)
+export const AI_WORKOUT_BUILDER = true;
+// Beta testing mode - if true, restricts access to specific users (future use)
+export const AI_WORKOUT_BETA = false;

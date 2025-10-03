@@ -216,6 +216,11 @@ export const ProfilePage = lazy(() =>
   }))
 );
 
+export const AIWorkoutOnboardingPage = lazy(() =>
+  import('../pages/AIWorkoutOnboardingPage').catch(() => ({
+    default: () => <div>Error loading AI Workout Onboarding page</div>
+  }))
+);
 
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule

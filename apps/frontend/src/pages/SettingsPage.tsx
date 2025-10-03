@@ -204,7 +204,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Profile Section */}
-        <ProfileSection 
+        <ProfileSection
           onViewProfile={() => {
             window.location.href = '/profile';
           }}

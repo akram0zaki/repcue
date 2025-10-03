@@ -6,6 +6,7 @@ import { consentService } from '../services/consentService';
 import type { Workout, Weekday } from '../types';
 import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
+import AIWorkoutButton from '../components/AIWorkoutButton';
 import logger from '../utils/logger';
 
 const WorkoutsPage: React.FC = () => {
@@ -200,6 +201,15 @@ const WorkoutsPage: React.FC = () => {
           >
             {t('workouts.createWorkout')}
           </button>
+        </div>
+
+        {/* AI Workout Assistant */}
+        <div className="mb-4">
+          <AIWorkoutButton
+            variant="secondary"
+            isFirstTime={workouts.length === 0}
+            className="w-full"
+          />
         </div>
 
         {workouts.length === 0 ? (

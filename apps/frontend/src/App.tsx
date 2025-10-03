@@ -50,6 +50,7 @@ import {
   CommunityPage,
   AuthCallbackPage,
   ProfilePage,
+  AIWorkoutOnboardingPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -2597,13 +2598,21 @@ useEffect(() => {
                   </Suspense>
                 } 
               />
-              <Route 
-                path={AppRoutes.PROFILE_VIEW} 
+              <Route
+                path={AppRoutes.PROFILE_VIEW}
                 element={
                   <Suspense fallback={createRouteLoader('Profile')}>
                     <ProfilePage isOwnProfile={false} />
                   </Suspense>
-                } 
+                }
+              />
+              <Route
+                path="/ai-workout-onboarding"
+                element={
+                  <Suspense fallback={createRouteLoader('AI Workout Onboarding')}>
+                    <AIWorkoutOnboardingPage />
+                  </Suspense>
+                }
               />
               {/* Redirect any unknown routes to home */}
               <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />

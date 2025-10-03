@@ -14,6 +14,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useAuth } from '../hooks/useAuth';
 import { VideoThumbnail } from '../components/VideoThumbnail';
+import AIWorkoutButton from '../components/AIWorkoutButton';
 import logger from '../utils/logger';
 
 interface HomePageProps {
@@ -272,6 +273,15 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             )}
           </section>
         )}
+
+        {/* AI Workout Assistant Section */}
+        <section className="mb-4">
+          <AIWorkoutButton
+            variant="primary"
+            isFirstTime={true}
+            className="w-full"
+          />
+        </section>
 
         <div className="space-y-3">
           {/* Popular Exercises Section */}
