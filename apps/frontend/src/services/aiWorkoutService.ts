@@ -54,7 +54,6 @@ export class AIWorkoutServiceError extends Error {
  */
 class AIWorkoutService {
   private static instance: AIWorkoutService;
-  private readonly FUNCTION_URL = '/functions/v1/generate-ai-workout';
   private readonly TIMEOUT_MS = 90000; // 90 seconds (AI can take time)
 
   private constructor() {}
@@ -114,8 +113,7 @@ class AIWorkoutService {
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${authState.accessToken}`
-            },
-            signal: controller.signal
+            }
           }
         );
 
@@ -286,7 +284,7 @@ class AIWorkoutService {
   /**
    * Gets user-friendly error message from error code
    */
-  getErrorMessage(error: AIWorkoutServiceError, locale: string = 'en'): string {
+  getErrorMessage(error: AIWorkoutServiceError, _locale: string = 'en'): string {
     switch (error.code) {
       case 'UNAUTHORIZED':
         return 'You must be signed in to generate AI workouts.';

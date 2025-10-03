@@ -220,8 +220,10 @@ export type AIWorkoutErrorType =
   | 'network_error'
   | 'timeout'
   | 'rate_limit'
+  | 'auth_required'
   | 'auth_error'
   | 'validation_error'
+  | 'ai_error'
   | 'ai_service_error'
   | 'unknown_error';
 
@@ -231,8 +233,12 @@ export type AIWorkoutErrorType =
 export interface AIWorkoutError {
   type: AIWorkoutErrorType;
   message: string;
+  /** Error code from the service */
+  code?: string;
   /** HTTP status code (if applicable) */
   statusCode?: number;
+  /** Retry after duration in seconds (for rate limiting) */
+  retryAfter?: number;
   /** Additional error details for debugging */
   details?: Record<string, unknown>;
 }

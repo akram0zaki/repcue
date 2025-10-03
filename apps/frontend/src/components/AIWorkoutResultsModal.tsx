@@ -146,7 +146,7 @@ export default function AIWorkoutResultsModal({
         {/* Workouts list */}
         <div className="p-6 max-h-96 overflow-y-auto">
           <div className="space-y-4">
-            {workouts.map((workout, index) => (
+            {workouts.map((workout) => (
               <div
                 key={workout.id}
                 className="p-4 bg-surface-secondary rounded-lg border border-border hover:border-accent-primary transition-colors"
