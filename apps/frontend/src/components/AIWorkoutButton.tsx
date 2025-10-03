@@ -135,18 +135,18 @@ export default function AIWorkoutButton({
                 'You must be signed in to use the AI Workout Assistant. Sign in to save your personalized workouts.'
               )}
             </p>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={handleTryLater}
-                className="btn-secondary flex-1"
+                className="btn-secondary w-full"
               >
                 {t('authGate.tryLater', 'Try Later')}
               </button>
               <button
                 type="button"
                 onClick={handleSignIn}
-                className="btn-primary flex-1"
+                className="btn-primary w-full"
               >
                 {t('authGate.signIn', 'Sign In')}
               </button>

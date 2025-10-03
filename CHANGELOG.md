@@ -8,6 +8,12 @@
   - Prevents data loss by checking authentication upfront
   - Improves UX by avoiding 3-page form entry before auth error
 
+#### Fixed
+- **Auth Gate Modal Buttons**: Fixed button sizing and overflow issues
+  - Changed from flex layout to CSS Grid for equal-width buttons
+  - Both buttons now have consistent 50/50 width split
+  - No overflow on smaller screens
+
 ### 2025-10-03 (AI Workout Assistant Progress Indicator)
 #### Changed
 - **Progress Indicator Pills**: Swapped size of selected and unselected pills
