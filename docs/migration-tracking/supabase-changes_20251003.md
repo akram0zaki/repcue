@@ -151,8 +151,25 @@ Response: { workouts: GeneratedWorkout[], metadata: { ... } }
 - CORS headers configured
 - Error responses with correlation IDs
 
+**Deployment Status:**
+- ✅ Deployed to development environment (repcue-dev)
+  - Function ID: aba47521-e41e-4461-a2a9-34e17d1d2234
+  - Version: 2 (Enhanced error handling & observability)
+  - Status: ACTIVE
+  - Verify JWT: Yes
+
+**Enhanced Error Handling & Observability (v2):**
+- ✅ Comprehensive logging at each request stage
+- ✅ Detailed error categorization (AI_CONFIG_ERROR, DATABASE_ERROR, AI_SERVICE_ERROR, TIMEOUT_ERROR, etc.)
+- ✅ Correlation IDs in all responses for traceability
+- ✅ User-friendly error messages with specific guidance
+- ✅ Request metadata logging (method, origin, user-agent)
+- ✅ Rate limiting with remaining requests info
+- ✅ Validation error details in response
+- ✅ DEBUG mode support for detailed error info
+
 **Testing:**
-- [ ] Deploy to development environment
+- [x] Deploy to development environment
 - [ ] Test with valid JWT token
 - [ ] Test rate limiting (exceed 5 requests)
 - [ ] Test with invalid inputs
@@ -161,6 +178,7 @@ Response: { workouts: GeneratedWorkout[], metadata: { ... } }
 - [ ] Test AI provider fallback
 - [ ] Test injury filtering logic
 - [ ] Verify generated workouts are valid
+- [ ] Verify CORS from localhost:5173
 
 ---
 

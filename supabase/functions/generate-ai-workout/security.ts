@@ -30,6 +30,7 @@ interface ValidationResult {
 interface RateLimitResult {
   allowed: boolean;
   limit: number;
+  count?: number; // current request count
   retryAfter?: number; // seconds until next allowed request
 }
 
@@ -213,14 +214,14 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   if (!userLimit || now > userLimit.resetTime) {
     // First request or window expired
     rateLimitStore.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return { allowed: true, limit: RATE_LIMIT_MAX };
+    return { allowed: true, limit: RATE_LIMIT_MAX, count: 1 };
   }
 
   if (userLimit.count < RATE_LIMIT_MAX) {
     // Increment count
     userLimit.count++;
     rateLimitStore.set(userId, userLimit);
-    return { allowed: true, limit: RATE_LIMIT_MAX };
+    return { allowed: true, limit: RATE_LIMIT_MAX, count: userLimit.count };
   }
 
   // Rate limit exceeded
@@ -228,6 +229,7 @@ export async function checkRateLimit(userId: string): Promise<RateLimitResult> {
   return {
     allowed: false,
     limit: RATE_LIMIT_MAX,
+    count: userLimit.count,
     retryAfter
   };
 }

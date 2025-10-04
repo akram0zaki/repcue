@@ -6,7 +6,7 @@
  * Label changes based on first-time vs. returning usage.
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AI_WORKOUT_BUILDER } from '../config/features';
@@ -40,6 +40,17 @@ export default function AIWorkoutButton({
   const { isAuthenticated } = useAuth();
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const pendingNavigation = useRef(false);
+
+  // Watch for auth state changes - navigate when user becomes authenticated
+  useEffect(() => {
+    if (isAuthenticated && pendingNavigation.current) {
+      logger.log('[AIWorkoutButton] User authenticated, navigating to onboarding');
+      setShowAuthModal(false);
+      pendingNavigation.current = false;
+      navigate('/ai-workout-onboarding');
+    }
+  }, [isAuthenticated, navigate]);
 
   // Don't render if feature flag is disabled
   if (!AI_WORKOUT_BUILDER) {
@@ -59,18 +70,25 @@ export default function AIWorkoutButton({
   };
 
   const handleSignIn = () => {
+    logger.log('[AIWorkoutButton] Opening auth modal, setting pending navigation');
     setShowAuthGate(false);
     setShowAuthModal(true);
-  };
-
-  const handleAuthSuccess = () => {
-    setShowAuthModal(false);
-    // After successful auth, navigate to onboarding
-    navigate('/ai-workout-onboarding');
+    pendingNavigation.current = true; // Mark that we want to navigate after auth
   };
 
   const handleTryLater = () => {
+    logger.log('[AIWorkoutButton] User chose to try later');
     setShowAuthGate(false);
+    pendingNavigation.current = false; // Cancel pending navigation
+  };
+
+  const handleAuthModalClose = () => {
+    logger.log('[AIWorkoutButton] Auth modal closed', { isAuthenticated, hasPendingNav: pendingNavigation.current });
+    setShowAuthModal(false);
+    // If user closed modal without authenticating, cancel pending navigation
+    if (!isAuthenticated) {
+      pendingNavigation.current = false;
+    }
   };
 
   // Determine button label based on first-time usage
@@ -167,8 +185,7 @@ export default function AIWorkoutButton({
       {/* Auth Modal for Sign In */}
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onSuccess={handleAuthSuccess}
+        onClose={handleAuthModalClose}
         initialMode="signin"
       />
     </>

@@ -216,24 +216,22 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 </h2>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   {/* Date Section */}
-                  <div className="flex items-center gap-4">
-                    <div className="text-center sm:text-start-rtl min-w-0">
-                      <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
-                        {upcomingWorkout.weekday}
-                      </div>
-                      <div className="text-caption secondary-label-text mt-1">
-                        {upcomingWorkout.date}
-                      </div>
+                  <div className="text-center sm:text-start-rtl flex-shrink-0">
+                    <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
+                      {upcomingWorkout.weekday}
                     </div>
+                    <div className="text-caption secondary-label-text mt-1">
+                      {upcomingWorkout.date}
+                    </div>
+                  </div>
 
-                    {/* Workout Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-body font-medium label-text truncate">
-                        {upcomingWorkout.workout.name}
-                      </div>
-                      <div className="text-small help-text mt-1">
-                        {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
-                      </div>
+                  {/* Workout Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-body font-medium label-text truncate">
+                      {upcomingWorkout.workout.name}
+                    </div>
+                    <div className="text-small help-text mt-1">
+                      {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
                     </div>
                   </div>
 
@@ -251,7 +249,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         }
                       });
                     }}
-                    className="btn-primary flex-shrink-0 touch-target"
+                    className="btn-primary flex-shrink-0 touch-target w-full sm:w-auto"
                   >
                     {t('home.startNow')}
                   </button>

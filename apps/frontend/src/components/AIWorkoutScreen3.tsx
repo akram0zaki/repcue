@@ -137,12 +137,14 @@ export default function AIWorkoutScreen3({ data, errors, onChange }: AIWorkoutSc
                       flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center
                       ${
                         isSelected
-                          ? 'border-accent-primary bg-accent-primary'
+                          ? 'border-accent-primary bg-white dark:bg-surface-900'
                           : 'border-border bg-surface-primary'
                       }
                     `}
                   >
-                    {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
+                    {isSelected && (
+                      <div className="w-3 h-3 rounded-full bg-accent-primary" />
+                    )}
                   </div>
                   <div className="flex-1">
                     <div className={`text-body font-medium ${isSelected ? 'text-accent-primary' : 'text-text-primary'}`}>
