@@ -73,12 +73,19 @@
     "fitnessLevel": {
       "label": "Aktuelles Fitnessniveau",
       "beginner": "Anfänger",
+      "beginnerDesc": "Neu im Fitness oder nach einer Pause zurück",
       "intermediate": "Fortgeschritten",
+      "intermediateDesc": "Regelmäßige Trainingsroutine, vertraut mit grundlegenden Bewegungen",
       "advanced": "Experte",
+      "advancedDesc": "Erfahrener Athlet, bereit für intensive Herausforderungen",
       "error": "Bitte wählen Sie Ihr Fitnessniveau"
     },
     "trainingTime": {
       "label": "Trainingshäufigkeit (Tage pro Woche)",
+      "morning": "Morgen",
+      "afternoon": "Nachmittag",
+      "evening": "Abend",
+      "mixed": "Gemischt",
       "3-4": "3-4 Tage",
       "4-5": "4-5 Tage",
       "5-6": "5-6 Tage",
