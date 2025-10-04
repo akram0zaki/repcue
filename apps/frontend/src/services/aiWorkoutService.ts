@@ -126,8 +126,21 @@ class AIWorkoutService {
             context: error.context
           });
 
-          // Try to parse error response
-          const errorResponse = error.context as AIWorkoutErrorResponse | undefined;
+          // Parse error response from Response object
+          let errorResponse: AIWorkoutErrorResponse | undefined;
+
+          try {
+            if (error.context && typeof error.context === 'object' && 'json' in error.context) {
+              // error.context is a Response object - parse it
+              const response = error.context as Response;
+              errorResponse = await response.json();
+            } else if (error.context && typeof error.context === 'object') {
+              // error.context is already parsed
+              errorResponse = error.context as AIWorkoutErrorResponse;
+            }
+          } catch (parseError) {
+            logger.warn('[AIWorkoutService] Failed to parse error response', { parseError });
+          }
 
           // Log detailed error for debugging
           if (errorResponse) {
@@ -153,8 +166,12 @@ class AIWorkoutService {
 
             // Validation error
             if (error.message.includes('Invalid request') || errorResponse.errors) {
+              const validationMessage = errorResponse.errors 
+                ? `Validation failed: ${errorResponse.errors.join(', ')}`
+                : errorResponse.message || 'Request validation failed';
+              
               throw new AIWorkoutServiceError(
-                errorResponse.message || 'Request validation failed',
+                validationMessage,
                 'VALIDATION_ERROR',
                 400,
                 errorResponse.correlationId

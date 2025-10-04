@@ -166,8 +166,8 @@ export function validateRequest(request: any): ValidationResult {
   }
 
   // Validate training time
-  if (!['3-4', '4-5', '5-6', '6+'].includes(responses.trainingTime)) {
-    errors.push('trainingTime must be one of: 3-4, 4-5, 5-6, 6+');
+  if (!['morning', 'afternoon', 'evening', 'mixed'].includes(responses.trainingTime)) {
+    errors.push('trainingTime must be one of: morning, afternoon, evening, mixed');
   }
 
   // Validate injuries (optional)

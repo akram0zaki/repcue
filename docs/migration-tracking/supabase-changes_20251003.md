@@ -326,3 +326,26 @@ Response: { workouts: GeneratedWorkout[], metadata: { ... } }
 - PRD: `docs/implementation-plans/repcue-ai-assistant/ai-assisted-workouts-prd.md`
 - Token Estimation: `docs/ai-assistant-token-estimation.md`
 - Task: Phase 1, Task 1.2
+
+## Bug Fixes - Edge Function Validation
+
+**Date:** 2025-10-04
+**Issue:** Edge function validation schema mismatch causing 400 errors
+
+### Root Cause:
+Backend validation expected `trainingTime: '3-4' | '4-5' | '5-6' | '6+'` (hours per week) but frontend sends `trainingTime: 'morning' | 'afternoon' | 'evening' | 'mixed'` (preferred time of day).
+
+### Files Changed:
+1. **supabase/functions/generate-ai-workout/security.ts** (line 169)
+   - Changed validation from `['3-4', '4-5', '5-6', '6+']` to `['morning', 'afternoon', 'evening', 'mixed']`
+   - Updated error message to match
+
+### Deployment Status:
+- ✅ Fixed in workspace
+- ✅ Deployed to development environment
+- [ ] Deploy to production
+
+### Testing:
+- [ ] Test AI assistant submission with all time preferences
+- [ ] Verify validation errors are properly returned to frontend
+- [ ] Confirm edge function logs show correct validation
