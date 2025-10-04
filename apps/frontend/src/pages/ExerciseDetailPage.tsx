@@ -240,7 +240,7 @@ const ExerciseDetailPage: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">
+          <h1 className="text-h2 text-error mb-4">
             {t('exercises:loadError')}
           </h1>
           <p className="text-text-500 dark:text-text-400 mb-6">
@@ -248,7 +248,7 @@ const ExerciseDetailPage: React.FC = () => {
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
+            className="btn-primary"
           >
             {t('common.back', 'Back')}
           </button>
@@ -262,7 +262,7 @@ const ExerciseDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-surface-0 dark:bg-surface-900">
       {/* Hero Video/Image Section */}
       <div className="relative h-[480px] rounded-b-3xl overflow-hidden">
         {/* Back Button Overlay */}
@@ -287,7 +287,7 @@ const ExerciseDetailPage: React.FC = () => {
       </div>
 
       {/* Content Section with reference-style layout but keeping all existing functionality */}
-      <div className="px-6 py-6 bg-white dark:bg-gray-800 rounded-t-3xl -mt-6 relative z-10 min-h-screen">
+      <div className="px-6 py-6 bg-surface-0 dark:bg-surface-800 rounded-t-3xl -mt-6 relative z-10 min-h-screen">
 
         {/* Use the existing ExerciseDetailContent component to preserve all functionality */}
         <ExerciseDetailContent

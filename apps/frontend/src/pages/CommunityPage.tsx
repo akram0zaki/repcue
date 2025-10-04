@@ -291,12 +291,12 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
             <StarIcon
               key={star}
               className={`h-4 w-4 ${
-                star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                star <= rating ? 'text-warning' : 'text-tertiary'
               }`}
             />
           ))}
         </div>
-        <span className="text-sm text-gray-600 dark:text-gray-400">
+        <span className="text-sm text-body">
           ({count})
         </span>
       </div>
@@ -304,16 +304,16 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
   };
 
   const renderExerciseCard = (exercise: CommunityExercise) => (
-    <div key={exercise.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
+    <div key={exercise.id} className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
       <div 
         className="flex justify-between items-start mb-4"
         onClick={() => navigate(`/exercises/${exercise.id}`)}
       >
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-semibold text-text-900 dark:text-text-50 hover:text-primary transition-colors">
             {exercise.name}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-body">
             {t('community.createdBy')} {exercise.creator_name}
           </p>
         </div>
@@ -324,8 +324,8 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
           }}
           className={`p-2 rounded-full ${
             exercise.is_favorited 
-              ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-              : 'text-gray-400 hover:text-yellow-500'
+              ? 'text-warning bg-warning-soft'
+              : 'text-tertiary hover:text-warning'
           }`}
         >
           <StarIcon className="h-5 w-5" />
@@ -333,22 +333,22 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       </div>
 
       {exercise.description && (
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <p className="text-body mb-4">
           {exercise.description}
         </p>
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs rounded">
+        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
           {t(`exercises.categories.${exercise.category}`)}
         </span>
         {exercise.difficulty_level && (
-          <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs rounded">
+          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
             {t(`exercises.difficulty.${exercise.difficulty_level}`)}
           </span>
         )}
         {exercise.exercise_type && (
-          <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 text-xs rounded">
+          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
             {t(`exercises.types.${exercise.exercise_type}`)}
           </span>
         )}
@@ -358,7 +358,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
         <div className="space-y-1">
           {renderStars(exercise.rating_average, exercise.rating_count)}
           {exercise.copy_count && exercise.copy_count > 0 && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-body">
               {exercise.copy_count} {t('community.copies')}
             </p>
           )}
@@ -368,7 +368,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
             e.stopPropagation();
             handleCopyExercise(exercise.id);
           }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+          className="btn-primary text-sm"
         >
           {t('community.copyExercise')}
         </button>
@@ -377,13 +377,13 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
   );
 
   const renderWorkoutCard = (workout: CommunityWorkout) => (
-    <div key={workout.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div key={workout.id} className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-md p-6">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-text-900 dark:text-text-50">
             {workout.name}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-body">
             {t('community.createdBy')} {workout.creator_name}
           </p>
         </div>
@@ -394,8 +394,8 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
           }}
           className={`p-2 rounded-full ${
             workout.is_favorited 
-              ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-              : 'text-gray-400 hover:text-yellow-500'
+              ? 'text-warning bg-warning-soft'
+              : 'text-tertiary hover:text-warning'
           }`}
         >
           <StarIcon className="h-5 w-5" />
@@ -403,22 +403,22 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       </div>
 
       {workout.description && (
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
+        <p className="text-body mb-4">
           {workout.description}
         </p>
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
         {workout.difficulty_level && (
-          <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs rounded">
+          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
             {t(`exercises.difficulty.${workout.difficulty_level}`)}
           </span>
         )}
-        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs rounded">
+        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
           {workout.exercises.length} {t('community.exercises')}
         </span>
         {workout.estimated_duration && (
-          <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 text-xs rounded">
+          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
             {Math.round(workout.estimated_duration / 60)}min
           </span>
         )}
@@ -434,7 +434,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
           )}
         </div>
         <button
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+          className="btn-primary text-sm"
         >
           {t('community.viewWorkout')}
         </button>
@@ -446,8 +446,8 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-body">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -457,17 +457,17 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
     <FeatureGuard feature="canCreateExercises">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-h1 mb-2">
             {t('community.title')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-body">
             {t('community.description')}
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-red-800 dark:text-red-200">{error}</p>
+          <div className="mb-6 p-4 bg-error-soft border border-error rounded-lg">
+            <p className="text-error">{error}</p>
           </div>
         )}
 
@@ -475,18 +475,18 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
         <div className="mb-8 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-tertiary" />
               <input
                 type="text"
                 placeholder={t('community.searchPlaceholder')}
                 value={filters.query}
                 onChange={(e) => setFilters(prev => ({ ...prev, query: e.target.value }))}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-border-300 dark:border-border-600 rounded-lg bg-surface-0 dark:bg-surface-800 text-text-900 dark:text-text-50"
               />
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex items-center gap-2 px-4 py-2 border border-border-300 dark:border-border-600 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700"
             >
               <FilterIcon className="h-5 w-5" />
               {t('community.filters')}
@@ -494,15 +494,15 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
           </div>
 
           {showFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-surface-50 dark:bg-surface-800 rounded-lg">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-caption label-text mb-1">
                   {t('community.contentType')}
                 </label>
                 <select
                   value={filters.contentType}
                   onChange={(e) => setFilters(prev => ({ ...prev, contentType: e.target.value as SearchFilters['contentType'] }))}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full p-2 border border-border-300 dark:border-border-600 rounded bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50"
                 >
                   <option value="all">{t('community.allContent')}</option>
                   <option value="exercises">{t('community.exercisesOnly')}</option>
@@ -511,13 +511,13 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-caption label-text mb-1">
                   {t('community.category')}
                 </label>
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value as SearchFilters['category'] }))}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full p-2 border border-border-300 dark:border-border-600 rounded bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50"
                 >
                   <option value="all">{t('community.allCategories')}</option>
                   <option value="core">{t('exercises.categories.core')}</option>
@@ -529,13 +529,13 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-caption label-text mb-1">
                   {t('community.difficulty')}
                 </label>
                 <select
                   value={filters.difficulty}
                   onChange={(e) => setFilters(prev => ({ ...prev, difficulty: e.target.value as SearchFilters['difficulty'] }))}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full p-2 border border-border-300 dark:border-border-600 rounded bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50"
                 >
                   <option value="all">{t('community.allDifficulties')}</option>
                   <option value="beginner">{t('exercises.difficulty.beginner')}</option>
@@ -545,13 +545,13 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-caption label-text mb-1">
                   {t('community.sortBy')}
                 </label>
                 <select
                   value={filters.sortBy}
                   onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as SearchFilters['sortBy'] }))}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full p-2 border border-border-300 dark:border-border-600 rounded bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50"
                 >
                   <option value="recent">{t('community.sortRecent')}</option>
                   <option value="popular">{t('community.sortPopular')}</option>
@@ -567,7 +567,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
         <div className="space-y-8">
           {filteredContent.exercises.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-h2 mb-4">
                 {t('community.exercises')} ({filteredContent.exercises.length})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -578,7 +578,7 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
           {filteredContent.workouts.length > 0 && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <h2 className="text-h2 mb-4">
                 {t('community.workouts')} ({filteredContent.workouts.length})
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -589,10 +589,10 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
 
           {filteredContent.exercises.length === 0 && filteredContent.workouts.length === 0 && !loading && (
             <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400 text-lg">
+              <p className="text-body text-lg">
                 {t('community.noResults')}
               </p>
-              <p className="text-gray-500 dark:text-gray-500 mt-2">
+              <p className="help-text mt-2">
                 {t('community.tryDifferentSearch')}
               </p>
             </div>

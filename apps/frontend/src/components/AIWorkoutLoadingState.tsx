@@ -77,8 +77,7 @@ export default function AIWorkoutLoadingState({
         />
         {/* Inner ring (slower) */}
         <div
-          className="absolute inset-2 border-4 border-accent-secondary border-b-transparent rounded-full animate-spin-slow motion-reduce:animate-none"
-          style={{ animationDirection: 'reverse' }}
+          className="absolute inset-2 border-4 border-accent-secondary border-b-transparent rounded-full animate-spin-slow motion-reduce:animate-none [animation-direction:_reverse]"
           aria-hidden="true"
         />
         {/* Center dot */}

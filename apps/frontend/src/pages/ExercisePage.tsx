@@ -699,8 +699,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       {categoryExercises.length > 1 && (
                         <button
                           onClick={() => scrollCategory(category, 'left')}
-                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
-                          aria-label="Scroll left"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+                          aria-label={t('a11y.scrollLeft', 'Scroll left')}
                         >
                           <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -712,8 +712,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       {categoryExercises.length > 1 && (
                         <button
                           onClick={() => scrollCategory(category, 'right')}
-                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
-                          aria-label="Scroll right"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+                          aria-label={t('a11y.scrollRight', 'Scroll right')}
                         >
                           <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -727,7 +727,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                         }}
                         className="overflow-x-auto scrollbar-hide px-3 sm:px-4"
                       >
-                        <div className="flex gap-3 sm:gap-4 pb-2" style={{ width: 'max-content' }}>
+                        <div className="flex gap-3 sm:gap-4 pb-2 w-max">
                           {categoryExercises.map((exercise) => (
                             <div key={exercise.id} className="flex-none w-64 sm:w-72">
                               <ExerciseCard
@@ -873,7 +873,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   playsInline
                   onError={handleVideoError}
                   ref={videoRef}
-                  style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
+                  className="w-full h-auto rounded-md bg-black gpu-accelerated"
                 >
                   {getVideoSources(previewUrl).map(s => (
                     <source key={s.src} src={s.src} type={s.type} />

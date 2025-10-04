@@ -1,5 +1,42 @@
 ## Unreleased
 
+### 2025-10-04 (UI Audit — Styleguide Compliance Phase 1–2)
+#### Added
+- Global utilities in `apps/frontend/src/styles/tokens.css` to centralize styling:
+  - Progress component: `.progress`, `.progress__track`, `.progress__bar` (CSS var `--progress`)
+  - Timer utilities: `.timer-text-shadow-lg`, `.timer-text-shadow-sm`, `.timer-square-280`, `.timer-rect-560x320`, `.video-inset-10`, `.gpu-accelerated`
+  - RTL protections: `.nav-more-button`, `.catalog-selector` safeguards for icons/buttons
+  - Accessibility: `.sr-only-live`
+  - Spacing: `.chart-gap`
+  - Status tokens: `.text-warning/.bg-warning-soft`, `.text-error/.bg-error-soft`, `.text-success/.bg-success-soft`
+
+#### Changed
+- Replaced inline styles and ad-hoc Tailwind colors with semantic tokens and utilities across key screens/components:
+  - Navigation: removed inline `direction:ltr`; localized ARIA; RTL via class
+  - CatalogSelector: removed inline `direction:ltr`; localized scroll ARIA
+  - SnackbarProvider: offscreen live region uses `.sr-only-live`
+  - ProgressChart, ForceUpdateModal, WorkoutForceUpdateModal, OnboardingFlow: unified to shared `.progress` with `--progress`
+  - TimerPage: removed inline shadows/sizing; applied timer utilities and GPU class
+  - HomePage: tokenized hero typography and gradients
+  - SettingsPage: migrated actions to `.btn-primary/.btn-danger/.btn-neutral`
+  - LazyRoutes/App loading: tokenized loader colors/typography
+  - InstallPrompt: tokenized headers/body/badges; unified buttons
+  - ExercisePage: localized scroll ARIA, `w-max`, GPU hints on preview
+  - WorkoutsPage/EditWorkoutPage: tokenized warning/error/gray colors; headings/labels to semantic classes; checkbox colors to primary tokens
+  - ProfilePage: tokenized backgrounds, headings, buttons; standardized modal list styles
+  - CommunityPage: tokenized stars, cards, badges, filters, loader, headers, and errors; buttons to `.btn-primary`
+  - ExerciseDetailPage: tokenized error state and containers; `.btn-primary` for back button
+
+#### Fixed
+- Removed remaining inline text-shadow and width styles from `TimerPage` rectangular display section
+- Eliminated inline `style` usages across audited components (progress width remains via CSS var by design)
+- Replaced direct `console.*` calls with centralized logger in `pwaDetection.ts`
+- Localized hardcoded ARIA labels where found (Navigation, CatalogSelector, OnboardingFlow)
+
+#### Notes
+- Inline usage remaining: only shared progress `--progress` CSS var width. All other inline styles removed from app code.
+- Follow-up: spot-check minor components for any ad-hoc color classes and migrate to tokens as needed.
+
 ### 2025-10-03 (AI Workout Assistant Auth Gate)
 #### Added
 - **Authentication Gate Modal**: Show auth requirement before user enters any data

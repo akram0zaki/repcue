@@ -350,7 +350,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
         aria-describedby="ios-instructions-description"
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 id="ios-instructions-title" className="text-lg font-semibold text-gray-900">
+          <h3 id="ios-instructions-title" className="text-h3">
             Install RepCue
           </h3>
           <button
@@ -365,8 +365,8 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
         <div id="ios-instructions-description" className="mb-6">
           <div className="text-center mb-4">
             <div className="text-4xl mb-2">{iosInstructions[currentStep].icon}</div>
-            <p className="text-gray-700 mb-2">{iosInstructions[currentStep].text}</p>
-            <p className="text-sm text-gray-500">{iosInstructions[currentStep].highlight}</p>
+            <p className="text-body mb-2">{iosInstructions[currentStep].text}</p>
+            <p className="text-caption">{iosInstructions[currentStep].highlight}</p>
           </div>
 
           {/* Step indicator */}
@@ -375,7 +375,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full ${
-                  index === currentStep ? 'bg-blue-500' : 'bg-gray-300'
+                  index === currentStep ? 'bg-primary' : 'bg-surface-secondary'
                 }`}
                 aria-label={`Step ${index + 1} of ${iosInstructions.length}`}
               />
@@ -387,7 +387,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
             <button
               onClick={() => handleIOSStepNavigation('prev')}
               disabled={currentStep === 0}
-              className="px-4 py-2 text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              className="px-4 py-2 text-primary disabled:text-tertiary disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
               Previous
             </button>
@@ -397,7 +397,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
             <button
               onClick={() => handleIOSStepNavigation('next')}
               disabled={currentStep === iosInstructions.length - 1}
-              className="px-4 py-2 text-blue-600 disabled:text-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              className="px-4 py-2 text-primary disabled:text-tertiary disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary rounded"
             >
               Next
             </button>
@@ -480,18 +480,12 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
               <button
                 ref={installButtonRef}
                 onClick={handleInstallClick}
                 disabled={isInstalling}
-                className="
-                  bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg
-                  hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors duration-200
-                  text-sm min-w-[80px]
-                "
+              className="btn-neutral text-sm min-w-[80px]"
                 aria-describedby="install-button-description"
               >
                 {isInstalling ? (
@@ -510,10 +504,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
               <button
                 ref={dismissButtonRef}
                 onClick={handleDismiss}
-                className="
-                  text-blue-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600
-                  p-2 rounded-full transition-colors duration-200
-                "
+                className="btn-neutral p-2 rounded-full"
                 aria-label="Dismiss install banner"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

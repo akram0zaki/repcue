@@ -97,7 +97,7 @@ const ProgressChart: React.FC<ProgressChartProps> = ({ logs }) => {
       {chartData.length > 0 ? (
         <div className="space-y-4">
           {/* Chart area - Optimized for 8 bars */}
-          <div className="h-48 flex items-end px-1" style={{ gap: '2px' }}>
+          <div className="h-48 flex items-end px-1 chart-gap">
             {chartData.map((week, index) => (
               <div key={index} className="flex flex-col items-center group relative flex-1 min-w-0">
                 {/* Bar */}

@@ -16,7 +16,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   onCatalogChange,
   className = ''
 }) => {
-  const { t } = useTranslation(['common', 'catalogs']);
+  const { t } = useTranslation(['common', 'catalogs', 'a11y']);
   const { isRTL } = useRTLDetection();
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -168,9 +168,8 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
           {sortedCatalogs.length > 1 && (
             <button
               onClick={scrollLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-              aria-label="Scroll left"
-              style={{ direction: 'ltr' }}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+              aria-label={t('a11y.scrollLeft', 'Scroll left')}
             >
               <ChevronLeftIcon size={20} />
             </button>
@@ -180,9 +179,8 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
           {sortedCatalogs.length > 1 && (
             <button
               onClick={scrollRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700"
-              aria-label="Scroll right"
-              style={{ direction: 'ltr' }}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+              aria-label={t('a11y.scrollRight', 'Scroll right')}
             >
               <ChevronRightIcon size={20} />
             </button>

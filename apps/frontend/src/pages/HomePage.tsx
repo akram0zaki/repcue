@@ -160,10 +160,10 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {/* Motivational Text */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center px-4">
-                <h2 className="text-white text-xl font-bold mb-2 leading-tight drop-shadow-lg">
+                <h2 className="text-h3 text-white mb-2 leading-tight timer-text-shadow-lg">
                   {t('home.heroTitle', { defaultValue: 'Stay consistent, stay strong.' })}
                 </h2>
-                <p className="text-white/90 text-sm font-medium drop-shadow-md">
+                <p className="text-caption text-white/90 font-medium timer-text-shadow-sm">
                   {t('home.heroSubtitle', { defaultValue: 'Your workouts, your way.' })}
                 </p>
               </div>
@@ -188,7 +188,6 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               <button
                 onClick={() => setShowAuthModal(true)}
                 className="text-primary-600 dark:text-primary-400 underline hover:no-underline font-normal bg-transparent border-0 p-0 m-0 cursor-pointer inline leading-none"
-                style={{ fontSize: 'inherit', lineHeight: 'inherit' }}
               >
                 {t('home.signInLink', { defaultValue: 'sign-in' })}
               </button>
@@ -259,7 +258,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl p-6 text-white shadow-lg">
+              <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-6 text-white shadow-lg">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex-shrink-0 self-center sm:self-start">
                     <CalendarIcon size={48} className="drop-shadow-sm" />
@@ -268,7 +267,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                     <h2 className="text-h3 font-bold mb-3 leading-tight">
                       {t('home.noScheduleTitle')}
                     </h2>
-                    <p className="text-white/90 text-body mb-5 leading-relaxed">
+                    <p className="text-body text-white/90 mb-5 leading-relaxed">
                       {t('home.noScheduleBody')}
                     </p>
                     <button

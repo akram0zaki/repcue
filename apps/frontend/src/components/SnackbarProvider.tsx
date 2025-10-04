@@ -98,7 +98,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
     <SnackbarContext.Provider value={value}>
       {children}
       {/* Persistent live region for a11y/tests */}
-      <div role="status" aria-live="polite" style={{ position: 'absolute', left: '-9999px', height: 0, width: 0, overflow: 'hidden' }} />
+      <div role="status" aria-live="polite" className="sr-only-live" />
       {current && (
         <div
           role="status"

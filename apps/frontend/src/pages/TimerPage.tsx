@@ -339,11 +339,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
             </div>
             
             {/* Compact Workout Progress Bar */}
-            <div className="w-full bg-primary-700 rounded-full h-1.5">
-              <div 
-                className="bg-secondary-300 h-1.5 rounded-full transition-all duration-300"
-                style={{ width: `${workoutProgress}%` }}
-              />
+            <div className="progress">
+              <div className="progress__track">
+                <div className="progress__bar" style={{ ['--progress' as unknown as string]: workoutProgress } as React.CSSProperties} />
+              </div>
             </div>
           </div>
         )}
@@ -456,8 +455,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
           {appSettings.ring_timer !== false ? (
             /* Circular Timer with Rings */
             <div
-              className={`relative mx-auto mb-3 ${repPulse ? 'transition-transform' : ''}`}
-              style={{ width: '280px', height: '280px' }}
+              className={`relative mx-auto mb-3 ${repPulse ? 'transition-transform' : ''} timer-square-280`}
               aria-live="off"
             >
             {showVideoInsideCircle && (
@@ -473,10 +471,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   loop
                   playsInline
                   preload="metadata"
-                  className="h-full w-full object-cover object-center mx-auto block"
+                  className="h-full w-full object-cover object-center mx-auto block gpu-accelerated"
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                   data-testid="exercise-video"
-                  style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
                   onLoadedData={() => {
                     // Safety: ensure play attempt if hook's effect missed due to timing
                     if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
@@ -493,8 +490,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               </div>
             )}
             <svg 
-              className="transform -rotate-90 pointer-events-none relative z-0" 
-              style={{ width: '280px', height: '280px' }}
+              className="transform -rotate-90 pointer-events-none relative z-0 timer-square-280" 
               viewBox="0 0 280 280"
             >
               {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
@@ -594,26 +590,26 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <div className="text-center">
                 {isCountdown ? (
                   <>
-                    <div className="text-5xl font-bold text-orange-500 dark:text-orange-400">
+                    <div className="text-5xl font-bold text-orange-500 dark:text-orange-400 timer-text-shadow-lg">
                       {countdownTime}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 timer-text-shadow-sm">
                       {t('timer.getReadyEllipsis')}
                     </div>
                   </>
                 ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
                   <>
                     {/* Rep-based exercise display: show rep progress instead of time countdown (only when reps remain). */}
-                    <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 drop-shadow-sm">
+                    <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 timer-text-shadow-lg">
                       Rep {(currentRep || 0) + 1}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 timer-text-shadow-sm">
                       of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className={`text-4xl font-bold drop-shadow-sm ${
+                    <div className={`text-4xl font-bold timer-text-shadow-lg ${
                       isCountdown && displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
                         : actuallyResting
@@ -622,7 +618,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     }`}>
                       {formatTime(displayTime)}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 timer-text-shadow-sm">
                       {actuallyResting 
                         ? t('timer.restPeriod')
                         : isWorkoutMode 
@@ -645,24 +641,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
           ) : (
             /* Rectangular Timer with Border Progress */
             <div
-              className={`relative mb-3 mx-auto ${repPulse ? 'transition-transform' : ''}`}
-              style={{
-                width: '560px',
-                height: '320px',
-                maxWidth: '100%'
-              }}
+              className={`relative mb-3 mx-auto ${repPulse ? 'transition-transform' : ''} timer-rect-560x320`}
               aria-live="off"
             >
               {showVideoInsideCircle && (
                 <div
-                  className="absolute rounded-lg overflow-hidden z-[1]"
+                  className="absolute rounded-lg overflow-hidden z-[1] video-inset-10"
                   data-testid="exercise-video-wrapper"
-                  style={{
-                    left: '10px',
-                    right: '10px',
-                    top: '10px',
-                    bottom: '10px'
-                  }}
                 >
                   {/* Video taking maximum space with minimal border for progress */}
                   <video
@@ -672,10 +657,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     loop
                     playsInline
                     preload="metadata"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover gpu-accelerated"
                     aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                     data-testid="exercise-video"
-                    style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)', WebkitBackfaceVisibility: 'hidden', backfaceVisibility: 'hidden' } as React.CSSProperties}
                     onLoadedData={() => {
                       // Safety: ensure play attempt if hook's effect missed due to timing
                       if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
@@ -800,29 +784,29 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <div className="text-center">
                   {isCountdown ? (
                     <>
-                      <div className="text-4xl font-bold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)' }}>
+                      <div className="text-4xl font-bold text-white timer-text-shadow-lg">
                         {countdownTime}
                       </div>
-                      <div className="text-sm text-white mt-1" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                      <div className="text-sm text-white mt-1 timer-text-shadow-sm">
                         {t('timer.getReadyEllipsis')}
                       </div>
                     </>
                   ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
                     <>
                       {/* Rep-based exercise display: show rep progress instead of time countdown (only when reps remain). */}
-                      <div className="text-3xl font-bold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)' }}>
+                      <div className="text-3xl font-bold text-white timer-text-shadow-lg">
                         Rep {(currentRep || 0) + 1}
                       </div>
-                      <div className="text-sm text-white mt-1" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                      <div className="text-sm text-white mt-1 timer-text-shadow-sm">
                         of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="text-4xl font-bold text-white" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)' }}>
+                      <div className="text-4xl font-bold text-white timer-text-shadow-lg">
                         {formatTime(displayTime)}
                       </div>
-                      <div className="text-sm text-white mt-1" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                      <div className="text-sm text-white mt-1 timer-text-shadow-sm">
                         {actuallyResting
                           ? t('timer.restPeriod')
                           : isWorkoutMode

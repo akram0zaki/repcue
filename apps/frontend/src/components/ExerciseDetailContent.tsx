@@ -93,8 +93,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors break-all hyphens-auto"
-            style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors break-all hyphens-auto break-words [overflow-wrap:anywhere]"
           >
             {part}
           </a>

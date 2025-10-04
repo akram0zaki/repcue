@@ -91,7 +91,7 @@ const Navigation: React.FC = () => {
                     ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
-                aria-label={`Navigate to ${item.label}`}
+                aria-label={t('a11y.navigateTo', { label: item.label, defaultValue: 'Navigate to {{label}}' })}
                 data-testid={item.testId}
               >
                 <IconComponent className="mb-1" size={24} />
@@ -113,11 +113,10 @@ const Navigation: React.FC = () => {
                 ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
-            aria-label="More options"
+            aria-label={t('a11y.moreOptions', 'More options')}
             aria-expanded={showMoreMenu}
             aria-haspopup="true"
             data-testid="nav-more"
-            style={{ direction: 'ltr' }}
           >
             <MoreIcon size={26} />
           </button>
