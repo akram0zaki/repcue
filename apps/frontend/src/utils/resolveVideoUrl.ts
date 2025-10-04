@@ -31,11 +31,11 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
       }
 
       const [, originalExerciseId, originalOwnerId] = match;
-      logger.log('🎥 [ResolveVideo] Resolving shared video URL for original exercise:', {
-        originalExerciseId,
-        originalOwnerId,
-        sharedVideoUrl: videoUrl
-      });
+      // logger.log('🎥 [ResolveVideo] Resolving shared video URL for original exercise:', {
+      //   originalExerciseId,
+      //   originalOwnerId,
+      //   sharedVideoUrl: videoUrl
+      // });
 
       // Try to get the video file for the original exercise ID
       const originalVideoFile = await storageService.getVideoFile(originalExerciseId);
@@ -43,14 +43,14 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
       if (originalVideoFile?.file_data) {
         // Create a blob URL from the original exercise's video data
         const blobUrl = URL.createObjectURL(originalVideoFile.file_data);
-        logger.log('🎥 [ResolveVideo] Successfully created blob URL from shared video data:', {
-          originalExerciseId,
-          originalOwnerId,
-          sharedVideoUrl: videoUrl,
-          blobUrl,
-          fileSize: originalVideoFile.file_size,
-          mimeType: originalVideoFile.mime_type
-        });
+        // logger.log('🎥 [ResolveVideo] Successfully created blob URL from shared video data:', {
+        //   originalExerciseId,
+        //   originalOwnerId,
+        //   sharedVideoUrl: videoUrl,
+        //   blobUrl,
+        //   fileSize: originalVideoFile.file_size,
+        //   mimeType: originalVideoFile.mime_type
+        // });
 
         // Validate the created blob URL by attempting to fetch it
         try {
@@ -104,11 +104,11 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     }
 
     const exerciseId = match[1];
-    logger.log('🎥 [ResolveVideo] Resolving', {
-      exerciseId,
-      scheme: isPendingScheme ? 'blob-pending-sync' : 'blob-video',
-      videoUrl
-    });
+    // logger.log('🎥 [ResolveVideo] Resolving', {
+    //   exerciseId,
+    //   scheme: isPendingScheme ? 'blob-pending-sync' : 'blob-video',
+    //   videoUrl
+    // });
 
     // Get the stored video file from IndexedDB
     const storedVideoFile = await storageService.getVideoFile(exerciseId);
@@ -130,21 +130,21 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
         blobUrl = URL.createObjectURL(storedVideoFile.file_data);
       }
 
-      logger.log('🎥 [ResolveVideo] Successfully created blob URL from local data:', {
-        exerciseId,
-        originalUrl: videoUrl,
-        blobUrl,
-        fileSize: storedVideoFile.file_size,
-        mimeType: storedVideoFile.mime_type,
-        dataType: storedVideoFile.file_data.constructor.name
-      });
+      // logger.log('🎥 [ResolveVideo] Successfully created blob URL from local data:', {
+      //   exerciseId,
+      //   originalUrl: videoUrl,
+      //   blobUrl,
+      //   fileSize: storedVideoFile.file_size,
+      //   mimeType: storedVideoFile.mime_type,
+      //   dataType: storedVideoFile.file_data.constructor.name
+      // });
 
       return blobUrl;
     }
 
     // If no local data but we have a video record with storage_path, try downloading from cloud
     if (storedVideoFile?.storage_path && !storedVideoFile.file_data) {
-      logger.log('🎥 [ResolveVideo] Video exists in cloud storage, downloading:', storedVideoFile.storage_path);
+      // logger.log('🎥 [ResolveVideo] Video exists in cloud storage, downloading:', storedVideoFile.storage_path);
 
       try {
         // Check if this is a shared exercise video by examining the storage path
@@ -234,14 +234,14 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
           const bytes = new Uint8Array(arrayBuffer.slice(0, 12));
           const signature = Array.from(bytes.slice(4, 8)).map(b => String.fromCharCode(b)).join('');
 
-          logger.log('🎥 [ResolveVideo] Downloaded file validation:', {
-            exerciseId,
-            fileSize: arrayBuffer.byteLength,
-            expectedSize: data.size,
-            signature,
-            isValidMP4: signature === 'ftyp',
-            firstBytesHex: Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ')
-          });
+          // logger.log('🎥 [ResolveVideo] Downloaded file validation:', {
+          //   exerciseId,
+          //   fileSize: arrayBuffer.byteLength,
+          //   expectedSize: data.size,
+          //   signature,
+          //   isValidMP4: signature === 'ftyp',
+          //   firstBytesHex: Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ')
+          // });
 
           if (signature !== 'ftyp') {
             logger.error('🎥 [ResolveVideo] Downloaded file is not a valid MP4:', {
@@ -266,13 +266,13 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
           const directBlob = new Blob([arrayBuffer], { type: storedVideoFile.mime_type });
           const blobUrl = URL.createObjectURL(directBlob);
 
-          logger.log('🎥 [ResolveVideo] Successfully downloaded and created blob URL from ArrayBuffer:', {
-            exerciseId,
-            originalUrl: videoUrl,
-            blobUrl,
-            fileSize: arrayBuffer.byteLength,
-            mimeType: storedVideoFile.mime_type
-          });
+          // logger.log('🎥 [ResolveVideo] Successfully downloaded and created blob URL from ArrayBuffer:', {
+          //   exerciseId,
+          //   originalUrl: videoUrl,
+          //   blobUrl,
+          //   fileSize: arrayBuffer.byteLength,
+          //   mimeType: storedVideoFile.mime_type
+          // });
 
           return blobUrl;
         }

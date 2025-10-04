@@ -290,18 +290,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
       const isUserCreated = isUserCreatedExercise(exercise);
       const isShared = isSharedExerciseHelper(exercise);
 
-      // Debug logging for the "Ya 7amada" exercise
-      if (exercise.name === 'Ya 7amada') {
-        logger.log(`[ExercisePage] Filtering "Ya 7amada":`, {
-          exerciseId: exercise.id,
-          exerciseFilter,
-          isUserCreated,
-          isShared,
-          owner_id: exercise.owner_id,
-          userId: user?.id
-        });
-      }
-
       const matchesExerciseFilter = exerciseFilter === 'all' ||
         (exerciseFilter === 'built-in' && !isUserCreated && !isShared) ||
         (exerciseFilter === 'custom' && isUserCreated) ||

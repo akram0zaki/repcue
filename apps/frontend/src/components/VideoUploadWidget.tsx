@@ -37,36 +37,36 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       }
 
       try {
-        logger.log('🎥 [VideoDisplay] Restoring blob URL from IndexedDB for exercise:', exerciseId);
+        // logger.log('🎥 [VideoDisplay] Restoring blob URL from IndexedDB for exercise:', exerciseId);
         
         // Get the stored video file from IndexedDB
         const storedVideoFile = await storageService.getVideoFile(exerciseId);
         
         if (storedVideoFile) {
-          logger.log('🎥 [VideoDisplay] Found stored video file:', {
-            id: storedVideoFile.id,
-            exercise_id: storedVideoFile.exercise_id,
-            file_name: storedVideoFile.file_name,
-            file_size: storedVideoFile.file_size,
-            mime_type: storedVideoFile.mime_type,
-            hasFileData: !!storedVideoFile.file_data,
-            fileDataType: typeof storedVideoFile.file_data,
-            fileDataConstructor: storedVideoFile.file_data?.constructor?.name,
-            fileDataSize: storedVideoFile.file_data?.size,
-            fileDataType_blob: storedVideoFile.file_data?.type
-          });
+          // logger.log('🎥 [VideoDisplay] Found stored video file:', {
+          //   id: storedVideoFile.id,
+          //   exercise_id: storedVideoFile.exercise_id,
+          //   file_name: storedVideoFile.file_name,
+          //   file_size: storedVideoFile.file_size,
+          //   mime_type: storedVideoFile.mime_type,
+          //   hasFileData: !!storedVideoFile.file_data,
+          //   fileDataType: typeof storedVideoFile.file_data,
+          //   fileDataConstructor: storedVideoFile.file_data?.constructor?.name,
+          //   fileDataSize: storedVideoFile.file_data?.size,
+          //   fileDataType_blob: storedVideoFile.file_data?.type
+          // });
 
           if (storedVideoFile.file_data) {
             // Create a blob URL directly from the stored Blob/File
             const newBlobUrl = URL.createObjectURL(storedVideoFile.file_data);
             setActualVideoUrl(newBlobUrl);
-            logger.log('🎥 [VideoDisplay] Successfully restored blob URL from stored file:', {
-              newBlobUrl,
-              fileSize: storedVideoFile.file_size,
-              mimeType: storedVideoFile.mime_type,
-              fileBlobSize: storedVideoFile.file_data.size,
-              fileBlobType: storedVideoFile.file_data.type
-            });
+            // logger.log('🎥 [VideoDisplay] Successfully restored blob URL from stored file:', {
+            //   newBlobUrl,
+            //   fileSize: storedVideoFile.file_size,
+            //   mimeType: storedVideoFile.mime_type,
+            //   fileBlobSize: storedVideoFile.file_data.size,
+            //   fileBlobType: storedVideoFile.file_data.type
+            // });
           } else {
             logger.warn('🎥 [VideoDisplay] Stored video file has no file_data:', {
               storedVideoFile: Object.keys(storedVideoFile)
@@ -101,12 +101,12 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   }, [actualVideoUrl]);
 
   const handleVideoUpload = async (file: File) => {
-    logger.log('🎥 [VideoUpload] Starting offline-first upload process', {
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      exerciseId
-    });
+    // logger.log('🎥 [VideoUpload] Starting offline-first upload process', {
+    //   fileName: file.name,
+    //   fileSize: file.size,
+    //   fileType: file.type,
+    //   exerciseId
+    // });
 
     if (!file) {
       logger.warn('🎥 [VideoUpload] No file provided');
@@ -140,7 +140,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       return;
     }
 
-    logger.log('🎥 [VideoUpload] File validation passed, creating local blob URL...');
+    // logger.log('🎥 [VideoUpload] File validation passed, creating local blob URL...');
     setUploading(true);
     setUploadProgress(0);
     setError(null);
@@ -148,7 +148,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
 
     try {
       // OFFLINE-FIRST: Store the video file in IndexedDB with dirty flag
-      logger.log('🎥 [VideoUpload] Storing video file in IndexedDB for offline-first approach');
+      // logger.log('🎥 [VideoUpload] Storing video file in IndexedDB for offline-first approach');
       
       // Simulate progress for user feedback
       const progressInterval = setInterval(() => {
@@ -168,8 +168,8 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       clearInterval(progressInterval);
       setUploadProgress(100);
       
-      logger.log('🎥 [VideoUpload] Video file stored in IndexedDB successfully');
-      logger.log('🎥 [VideoUpload] Local video URL:', localVideoUrl);
+      // logger.log('🎥 [VideoUpload] Video file stored in IndexedDB successfully');
+      // logger.log('🎥 [VideoUpload] Local video URL:', localVideoUrl);
       
       // Create a blob URL for immediate display
       const immediateBlobUrl = URL.createObjectURL(file);
@@ -197,12 +197,12 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   };
 
   const handleRemoveVideo = async () => {
-    logger.log('🎥 [VideoUpload] Removing video file');
+    // logger.log('🎥 [VideoUpload] Removing video file');
     
     try {
       // Clean up video file from IndexedDB
       await storageService.deleteVideoFile(exerciseId);
-      logger.log('🎥 [VideoUpload] Video file removed from IndexedDB');
+      // logger.log('🎥 [VideoUpload] Video file removed from IndexedDB');
     } catch (error) {
       logger.warn('🎥 [VideoUpload] Failed to remove video file from IndexedDB:', error);
     }
@@ -267,10 +267,10 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
     
     // Clean up IndexedDB for files that can't be played
     if (shouldDeleteFile && currentVideoUrl?.startsWith('blob-pending-sync://')) {
-      logger.log('🎥 [VideoDisplay] Removing unplayable video file from IndexedDB');
+      // logger.log('🎥 [VideoDisplay] Removing unplayable video file from IndexedDB');
       storageService.deleteVideoFile(exerciseId)
         .then(() => {
-          logger.log('🎥 [VideoDisplay] Unplayable video file removed from IndexedDB');
+          // logger.log('🎥 [VideoDisplay] Unplayable video file removed from IndexedDB');
           // Reset the video URL to indicate no video
           onVideoUploaded('');
           setActualVideoUrl(null);
@@ -284,7 +284,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   };
 
   const handleVideoLoaded = () => {
-    logger.log('🎥 [VideoDisplay] Video loaded successfully', { currentVideoUrl, actualVideoUrl });
+    // logger.log('🎥 [VideoDisplay] Video loaded successfully', { currentVideoUrl, actualVideoUrl });
     setVideoLoadError(false);
     setError(null);
   };

@@ -1211,15 +1211,15 @@ export class StorageService {
       throw new Error(`Unsupported video format: ${file.type}. Please use MP4, WebM, or OGG format.`);
     }
 
-    logger.log('💾 [VideoFile] Saving video file to IndexedDB (singleton approach):', { 
-      exerciseId, 
-      fileName: file.name, 
-      fileSize: file.size,
-      mimeType: file.type 
-    });
+    // logger.log('💾 [VideoFile] Saving video file to IndexedDB (singleton approach):', { 
+    //   exerciseId, 
+    //   fileName: file.name, 
+    //   fileSize: file.size,
+    //   mimeType: file.type 
+    // });
 
     // SINGLETON APPROACH: Delete any existing video files for this exercise first
-    logger.log('💾 [VideoFile] Deleting existing video files for exercise (singleton approach)...');
+    // logger.log('💾 [VideoFile] Deleting existing video files for exercise (singleton approach)...');
     try {
       const existingFiles = await this.db.video_files
         .where('exercise_id')
@@ -1227,12 +1227,12 @@ export class StorageService {
         .toArray();
       
       if (existingFiles.length > 0) {
-        logger.log('💾 [VideoFile] Found existing files to delete:', existingFiles.length);
+        // logger.log('💾 [VideoFile] Found existing files to delete:', existingFiles.length);
         await this.db.video_files
           .where('exercise_id')
           .equals(exerciseId)
           .delete();
-        logger.log('💾 [VideoFile] Existing files deleted successfully');
+        // logger.log('💾 [VideoFile] Existing files deleted successfully');
       } else {
         logger.log('💾 [VideoFile] No existing files found');
       }
@@ -1248,13 +1248,13 @@ export class StorageService {
     const userId = this.getCurrentUserId();
     
     // Store File directly as Blob for IndexedDB compatibility
-    logger.log('💾 [VideoFile] Storing file directly as Blob...');
-    logger.log('💾 [VideoFile] File details:', {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      constructor: file.constructor.name
-    });
+    // logger.log('💾 [VideoFile] Storing file directly as Blob...');
+    // logger.log('💾 [VideoFile] File details:', {
+    //   name: file.name,
+    //   size: file.size,
+    //   type: file.type,
+    //   constructor: file.constructor.name
+    // });
     
     const storedVideoFile: StoredVideoFile = prepareUpsert({
       id: videoFileId,

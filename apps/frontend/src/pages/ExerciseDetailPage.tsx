@@ -123,9 +123,9 @@ const ExerciseDetailPage: React.FC = () => {
         setIsOwner(user?.id === exerciseData.owner_id);
       } else {
         // For built-in exercises, load from the exercises data
-        logger.log('Loading built-in exercise with ID:', id);
+        // logger.log('Loading built-in exercise with ID:', id);
         const builtInExercise = getExerciseById(id);
-        logger.log('Found built-in exercise:', builtInExercise ? builtInExercise.name : 'null');
+        // logger.log('Found built-in exercise:', builtInExercise ? builtInExercise.name : 'null');
         if (!builtInExercise) {
           throw new Error(`Built-in exercise not found: ${id}`);
         }
