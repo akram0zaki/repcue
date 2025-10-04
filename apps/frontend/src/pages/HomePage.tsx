@@ -210,32 +210,35 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
         {hasConsent && (
           <section className="mb-4">
             {upcomingWorkout ? (
-              <div className="bg-surface-0 dark:bg-surface-900 rounded-lg p-5 border border-surface-200 dark:border-surface-700 shadow-sm">
-                <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-4">
+              <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-4 sm:p-5 border border-primary-200 dark:border-primary-700/50 shadow-md">
+                <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4">
                   {t('home.upcomingWorkout')}
                 </h2>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  {/* Date Section */}
-                  <div className="text-center sm:text-start-rtl flex-shrink-0">
-                    <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
-                      {upcomingWorkout.weekday}
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  {/* Date and Workout Info Row */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                    {/* Date Section */}
+                    <div className="text-center sm:text-left rtl:sm:text-right flex-shrink-0">
+                      <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
+                        {upcomingWorkout.weekday}
+                      </div>
+                      <div className="text-caption secondary-label-text mt-1">
+                        {upcomingWorkout.date}
+                      </div>
                     </div>
-                    <div className="text-caption secondary-label-text mt-1">
-                      {upcomingWorkout.date}
+
+                    {/* Workout Info */}
+                    <div className="flex-1 min-w-0 text-center sm:text-left rtl:sm:text-right">
+                      <div className="text-body font-medium label-text truncate">
+                        {upcomingWorkout.workout.name}
+                      </div>
+                      <div className="text-small help-text mt-1">
+                        {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Workout Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-body font-medium label-text truncate">
-                      {upcomingWorkout.workout.name}
-                    </div>
-                    <div className="text-small help-text mt-1">
-                      {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
-                    </div>
-                  </div>
-
-                  {/* Start Button */}
+                  {/* Start Button - Full width on mobile, auto on larger screens */}
                   <button
                     onClick={() => {
                       // Navigate to timer in workout-guided mode
@@ -249,7 +252,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         }
                       });
                     }}
-                    className="btn-primary flex-shrink-0 touch-target w-full sm:w-auto"
+                    className="btn-primary touch-target w-full sm:w-auto sm:self-start rtl:sm:self-end"
                   >
                     {t('home.startNow')}
                   </button>
