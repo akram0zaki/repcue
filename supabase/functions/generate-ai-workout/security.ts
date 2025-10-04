@@ -125,16 +125,23 @@ export function validateRequest(request: any): ValidationResult {
     if (!['cm', 'ft'].includes(responses.height.unit)) {
       errors.push('height.unit must be "cm" or "ft"');
     }
-    if (responses.height.unit === 'cm') {
-      if (typeof responses.height.cm !== 'number' || responses.height.cm < 100 || responses.height.cm > 250) {
-        errors.push('height.cm must be between 100 and 250');
-      }
-    } else if (responses.height.unit === 'ft') {
-      if (typeof responses.height.feet !== 'number' || responses.height.feet < 3 || responses.height.feet > 8) {
-        errors.push('height.feet must be between 3 and 8');
-      }
-      if (typeof responses.height.inches !== 'number' || responses.height.inches < 0 || responses.height.inches > 11) {
-        errors.push('height.inches must be between 0 and 11');
+    if (typeof responses.height.value !== 'number') {
+      errors.push('height.value must be a number');
+    } else {
+      if (responses.height.unit === 'cm') {
+        if (responses.height.value < 100 || responses.height.value > 250) {
+          errors.push('height must be between 100 and 250 cm');
+        }
+      } else if (responses.height.unit === 'ft') {
+        if (responses.height.value < 3 || responses.height.value > 8) {
+          errors.push('height must be between 3 and 8 feet');
+        }
+        // Validate inches if provided
+        if (responses.height.inches !== undefined) {
+          if (typeof responses.height.inches !== 'number' || responses.height.inches < 0 || responses.height.inches > 11) {
+            errors.push('height.inches must be between 0 and 11');
+          }
+        }
       }
     }
   }
@@ -146,12 +153,15 @@ export function validateRequest(request: any): ValidationResult {
     if (!['kg', 'lbs'].includes(responses.weight.unit)) {
       errors.push('weight.unit must be "kg" or "lbs"');
     }
-    const weightValue = responses.weight.unit === 'kg' ? responses.weight.kg : responses.weight.lbs;
-    const minWeight = responses.weight.unit === 'kg' ? 30 : 66;
-    const maxWeight = responses.weight.unit === 'kg' ? 300 : 661;
+    if (typeof responses.weight.value !== 'number') {
+      errors.push('weight.value must be a number');
+    } else {
+      const minWeight = responses.weight.unit === 'kg' ? 30 : 66;
+      const maxWeight = responses.weight.unit === 'kg' ? 300 : 661;
 
-    if (typeof weightValue !== 'number' || weightValue < minWeight || weightValue > maxWeight) {
-      errors.push(`weight.${responses.weight.unit} must be between ${minWeight} and ${maxWeight}`);
+      if (responses.weight.value < minWeight || responses.weight.value > maxWeight) {
+        errors.push(`weight must be between ${minWeight} and ${maxWeight} ${responses.weight.unit}`);
+      }
     }
   }
 
