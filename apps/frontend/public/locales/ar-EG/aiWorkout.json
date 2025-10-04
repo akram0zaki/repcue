@@ -39,12 +39,21 @@
       "cm": "سم",
       "ft": "قدم",
       "inches": "بوصة",
+      "unitCm": "سم",
+      "unitFtIn": "قدم/بوصة",
+      "placeholderCm": "سنتيمترات",
+      "placeholderFeet": "أقدام",
+      "placeholderInches": "بوصات",
       "error": "يرجى إدخال طول صحيح"
     },
     "weight": {
       "label": "الوزن",
       "kg": "كجم",
       "lbs": "رطل",
+      "unitKg": "كجم",
+      "unitLbs": "رطل",
+      "placeholderKg": "كيلوغرامات",
+      "placeholderLbs": "أرطال",
       "error": "يرجى إدخال وزن صحيح"
     },
     "next": "التالي"

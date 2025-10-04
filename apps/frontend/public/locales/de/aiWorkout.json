@@ -39,12 +39,21 @@
       "cm": "cm",
       "ft": "ft",
       "inches": "in",
+      "unitCm": "cm",
+      "unitFtIn": "ft/in",
+      "placeholderCm": "Zentimeter",
+      "placeholderFeet": "Fuß",
+      "placeholderInches": "Zoll",
       "error": "Bitte geben Sie eine gültige Größe ein"
     },
     "weight": {
       "label": "Gewicht",
       "kg": "kg",
       "lbs": "lbs",
+      "unitKg": "kg",
+      "unitLbs": "lbs",
+      "placeholderKg": "Kilogramm",
+      "placeholderLbs": "Pfund",
       "error": "Bitte geben Sie ein gültiges Gewicht ein"
     },
     "next": "Weiter"
