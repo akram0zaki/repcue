@@ -104,6 +104,7 @@
     "exportDataHelp": "L'export inclut vos entraînements, exercices, paramètres et journaux d'activité",
     "exportInProgress": "Exportation en cours...",
     "exportSuccess": "Vos données ont été exportées avec succès !",
+    "exportError": " Erreur lors de l'exportation des données. Veuillez réessayer.",
     "exportRateLimit": "Vous pouvez demander jusqu'à 3 exports par jour",
     "exportNow": "Exporter maintenant",
     "exportNowHelp": "Exporter immédiatement vos dernières données vers un fichier JSON.",

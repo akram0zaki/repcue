@@ -99,6 +99,7 @@
     "injuries": {
       "label": "Injuries or Limitations (Optional)",
       "placeholder": "e.g., knee pain, lower back issues, shoulder injury...",
+      "description": "Let us know about any injuries or physical limitations so we can recommend safe exercises.",
       "helper": "The AI will exclude exercises that may aggravate these conditions",
       "charCount": "{{remaining}} characters remaining",
       "error": "Please keep injuries description under 500 characters"
@@ -106,8 +107,11 @@
     "trainingStyle": {
       "label": "Preferred Training Style",
       "strength": "Strength Training",
+      "strengthDesc": "Build muscle mass and increase overall strength",
       "cardio": "Cardio Focused",
+      "cardioDesc": "Improve cardiovascular fitness and endurance",
       "balanced": "Balanced Mix",
+      "balancedDesc": "Combination of strength and cardio training",
       "error": "Please select your training style"
     },
     "timeAvailability": {
@@ -148,6 +152,8 @@
     "saved": "Workouts saved successfully!"
   },
   "errors": {
+    "title": "Error Generating Workouts",
+    "retryAfterMessage": "Please wait {{seconds}} seconds before trying again.",
     "authRequired": "You must be signed in to generate AI workouts.",
     "offline": "You must be online to generate AI workouts. Please check your connection.",
     "rateLimit": "You've reached the limit for AI workout generation. Please try again in {{minutes}} minutes.",
@@ -160,7 +166,7 @@
     "noWorkouts": "AI did not generate any workouts. Please try again with different preferences.",
     "unknownError": "An unexpected error occurred. Please try again.",
     "incompleteData": "Please complete all required fields before generating workouts.",
-    "retry": "Retry",
+    "retry": "Try Again",
     "dismiss": "Dismiss"
   },
   "onboarding": {

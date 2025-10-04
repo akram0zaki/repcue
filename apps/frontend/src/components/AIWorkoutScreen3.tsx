@@ -117,15 +117,11 @@ export default function AIWorkoutScreen3({ data, errors, onChange }: AIWorkoutSc
                 key={value}
                 type="button"
                 onClick={() => handleTrainingStyleChange(value)}
-                className={`
-                  w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all
-                  text-start-rtl
-                  ${
-                    isSelected
-                      ? 'border-accent-primary bg-accent-surface'
-                      : 'border-border bg-surface-primary hover:border-accent-primary hover:bg-accent-surface'
-                  }
-                `}
+                className={
+                  isSelected
+                    ? 'w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all text-start-rtl border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                    : 'w-full min-h-[44px] px-4 py-3 rounded-lg border-2 transition-all text-start-rtl border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800 hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20'
+                }
                 role="radio"
                 aria-checked={isSelected}
                 aria-label={t(labelKey, value)}
@@ -133,24 +129,21 @@ export default function AIWorkoutScreen3({ data, errors, onChange }: AIWorkoutSc
                 <div className="flex items-center gap-3">
                   {/* Radio indicator */}
                   <div
-                    className={`
-                      flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center
-                      ${
-                        isSelected
-                          ? 'border-accent-primary bg-white dark:bg-surface-900'
-                          : 'border-border bg-surface-primary'
-                      }
-                    `}
+                    className={
+                      isSelected
+                        ? 'flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 border-primary-600 bg-primary-600'
+                        : 'flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800'
+                    }
                   >
                     {isSelected && (
-                      <div className="w-3 h-3 rounded-full bg-accent-primary" />
+                      <div className="w-2 h-2 rounded-full bg-white" />
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className={`text-body font-medium ${isSelected ? 'text-accent-primary' : 'text-text-primary'}`}>
+                    <div className={`text-sm font-medium ${isSelected ? 'text-primary-600 dark:text-primary-400' : 'text-text-900 dark:text-text-50'}`}>
                       {t(labelKey, value)}
                     </div>
-                    <div className="text-small text-text-secondary mt-1">
+                    <div className="text-xs text-text-600 dark:text-text-400 mt-1">
                       {t(descKey, `${value} training description`)}
                     </div>
                   </div>

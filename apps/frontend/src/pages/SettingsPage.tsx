@@ -72,8 +72,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         a.click();
       }
       URL.revokeObjectURL(url);
+
+      // Show success message
+      alert(t('settings.exportSuccess', 'Data exported successfully'));
     } catch (error) {
       logger.error('Failed to export data:', error);
+      // Show error message to user
+      alert(t('settings.exportError', 'Failed to export data. Please try again.'));
     }
   };
 

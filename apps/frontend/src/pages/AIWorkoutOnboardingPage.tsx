@@ -218,10 +218,32 @@ export default function AIWorkoutOnboardingPage() {
         {/* Error message */}
         {submitError && (
           <div
-            className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg"
+            className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-600 rounded-lg shadow-lg"
             role="alert"
           >
-            <p className="text-sm text-red-800 dark:text-red-300 font-medium">{submitError.message}</p>
+            <div className="flex items-start gap-3">
+              {/* Error icon */}
+              <svg className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-red-800 dark:text-red-300 mb-1">
+                  {t('errors.title', 'Error Generating Workouts')}
+                </h3>
+                <p className="text-sm text-red-700 dark:text-red-300">{submitError.message}</p>
+                {submitError.retryAfter && (
+                  <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                    {t('errors.retryAfterMessage', `Please wait ${submitError.retryAfter} seconds before trying again.`)}
+                  </p>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={() => submit()}
+              className="mt-3 w-full btn-secondary text-sm"
+            >
+              {t('errors.retry', 'Try Again')}
+            </button>
           </div>
         )}
 

@@ -106,6 +106,7 @@
     "exportDataHelp": "Export includes your workouts, exercises, settings, and activity logs",
     "exportInProgress": "Exporting...",
     "exportSuccess": "Your data has been exported successfully!",
+    "exportError": "Failed to export data. Please try again.",
     "exportRateLimit": "You can request up to 3 exports per day",
     "exportNow": "Export Now",
     "exportNowHelp": "Immediately export your latest data to a JSON file.",

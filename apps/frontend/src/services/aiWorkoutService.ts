@@ -129,6 +129,16 @@ class AIWorkoutService {
           // Try to parse error response
           const errorResponse = error.context as AIWorkoutErrorResponse | undefined;
 
+          // Log detailed error for debugging
+          if (errorResponse) {
+            logger.error('[AIWorkoutService] Error response details', {
+              message: errorResponse.message,
+              errors: errorResponse.errors,
+              correlationId: errorResponse.correlationId,
+              retryAfter: errorResponse.retryAfter
+            });
+          }
+
           if (errorResponse) {
             // Rate limit error
             if (error.message.includes('Rate limit') || errorResponse.retryAfter) {
@@ -162,11 +172,13 @@ class AIWorkoutService {
             }
           }
 
-          // Generic error
+          // Generic error - include response message if available
+          const errorMsg = errorResponse?.message || error.message || 'Failed to generate workouts';
           throw new AIWorkoutServiceError(
-            error.message || 'Failed to generate workouts',
+            errorMsg,
             'UNKNOWN_ERROR',
-            500
+            500,
+            errorResponse?.correlationId
           );
         }
 

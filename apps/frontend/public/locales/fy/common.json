@@ -114,6 +114,7 @@
     "exportDataHelp": "Laad jo traininggegevens yn as JSON-bestân",
     "exportInProgress": "Exportearje...",
     "exportSuccess": "Jo gegevens binne mei súkses eksportearre!",
+    "exportError": " Fout by it eksportearjen fan gegevens. Probeer it opnieuw.",
     "exportRateLimit": "Jo kinne oant 3 eksporten per dei oanfreegje",
     "exportNow": "No eksportearje",
     "exportNowHelp": "Eksportearje daliks jo nijste gegevens nei in JSON-bestân.",

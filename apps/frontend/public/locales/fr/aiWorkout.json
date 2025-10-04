@@ -1,183 +1,189 @@
 {
   "button": {
-    "getStarted": "Get Your Personalized Workout Plan",
-    "createNew": "Create New Workout Plan"
+    "getStarted": "Obtenez votre programme d’entraînement personnalisé",
+    "createNew": "Créer un nouveau programme d’entraînement"
   },
   "authGate": {
-    "title": "Sign In Required",
-    "message": "The RepCue AI Assistant requires an account to save your personalized workouts.",
-    "signIn": "Sign In",
-    "tryLater": "Try Later",
-    "close": "Close"
+    "title": "Connexion requise",
+    "message": "L’assistant AI RepCue nécessite un compte pour enregistrer vos entraînements personnalisés.",
+    "signIn": "Se connecter",
+    "tryLater": "Essayer plus tard",
+    "close": "Fermer"
   },
   "offlineGate": {
-    "title": "Internet Connection Required",
-    "message": "The AI Workout Builder requires an internet connection to generate personalized workouts. Please connect to the internet and try again.",
-    "messageShort": "Please connect to the internet to use the AI Workout Builder."
+    "title": "Connexion Internet requise",
+    "message": "Le générateur d’entraînement AI nécessite une connexion Internet pour créer des programmes personnalisés. Veuillez vous connecter à Internet et réessayer.",
+    "messageShort": "Connectez-vous à Internet pour utiliser le générateur d’entraînement AI."
   },
   "progress": {
-    "step": "Step {{current}} of {{total}}"
+    "step": "Étape {{current}} sur {{total}}"
   },
   "screen1": {
-    "title": "Tell Us About Yourself",
-    "subtitle": "Help us personalize your workout plan",
+    "title": "Parlez-nous de vous",
+    "subtitle": "Aidez-nous à personnaliser votre programme d’entraînement",
     "gender": {
-      "label": "Gender",
-      "male": "Male",
-      "female": "Female",
-      "other": "Other",
-      "error": "Please select your gender"
+      "label": "Genre",
+      "male": "Homme",
+      "female": "Femme",
+      "other": "Autre",
+      "error": "Veuillez sélectionner votre genre"
     },
     "age": {
-      "label": "Age",
-      "placeholder": "Enter your age",
-      "error": "Please enter a valid age (13-120)"
+      "label": "Âge",
+      "placeholder": "Entrez votre âge",
+      "error": "Veuillez entrer un âge valide (13-120)"
     },
     "height": {
-      "label": "Height",
+      "label": "Taille",
       "cm": "cm",
-      "ft": "ft",
-      "inches": "in",
+      "ft": "pieds",
+      "inches": "po",
       "unitCm": "cm",
-      "unitFtIn": "ft/in",
-      "placeholderCm": "Centimeters",
-      "placeholderFeet": "Feet",
-      "placeholderInches": "Inches",
-      "error": "Please enter a valid height"
+      "unitFtIn": "pieds/pouces",
+      "placeholderCm": "Centimètres",
+      "placeholderFeet": "Pieds",
+      "placeholderInches": "Pouces",
+      "error": "Veuillez entrer une taille valide"
     },
     "weight": {
-      "label": "Weight",
+      "label": "Poids",
       "kg": "kg",
       "lbs": "lbs",
       "unitKg": "kg",
       "unitLbs": "lbs",
-      "placeholderKg": "Kilograms",
-      "placeholderLbs": "Pounds",
-      "error": "Please enter a valid weight"
+      "placeholderKg": "Kilogrammes",
+      "placeholderLbs": "Livres",
+      "error": "Veuillez entrer un poids valide"
     },
-    "next": "Next"
+    "next": "Suivant"
   },
   "screen2": {
-    "title": "Your Goals & Preferences",
-    "subtitle": "What are you working towards?",
+    "title": "Vos objectifs et préférences",
+    "subtitle": "Vers quoi travaillez-vous ?",
     "goal": {
-      "label": "Primary Goal",
-      "weightLoss": "Weight Loss",
-      "muscleBuilding": "Muscle Building",
-      "healthMaintenance": "Health Maintenance",
-      "flexibility": "Flexibility & Mobility",
-      "error": "Please select your primary goal"
+      "label": "Objectif principal",
+      "weightLoss": "Perte de poids",
+      "muscleBuilding": "Prise de muscle",
+      "healthMaintenance": "Maintien de la santé",
+      "flexibility": "Souplesse et mobilité",
+      "error": "Veuillez sélectionner votre objectif principal"
     },
     "fitnessLevel": {
-      "label": "Current Fitness Level",
-      "beginner": "Beginner",
-      "beginnerDesc": "New to fitness or returning after a break",
-      "intermediate": "Intermediate",
-      "intermediateDesc": "Regular exercise routine, comfortable with basic movements",
-      "advanced": "Advanced",
-      "advancedDesc": "Experienced athlete, ready for intense challenges",
-      "error": "Please select your fitness level"
+      "label": "Niveau de forme actuel",
+      "beginner": "Débutant",
+      "beginnerDesc": "Nouveau dans le fitness ou retour après une pause",
+      "intermediate": "Intermédiaire",
+      "intermediateDesc": "Routine d’exercice régulière, à l’aise avec les mouvements de base",
+      "advanced": "Avancé",
+      "advancedDesc": "Athlète expérimenté, prêt pour des défis intenses",
+      "error": "Veuillez sélectionner votre niveau de forme"
     },
     "trainingTime": {
-      "label": "Training Frequency (days per week)",
-      "morning": "Morning",
-      "afternoon": "Afternoon",
-      "evening": "Evening",
-      "mixed": "Mixed",
-      "3-4": "3-4 days",
-      "4-5": "4-5 days",
-      "5-6": "5-6 days",
-      "6+": "6+ days",
-      "error": "Please select your training frequency"
+      "label": "Fréquence d’entraînement (jours par semaine)",
+      "morning": "Matin",
+      "afternoon": "Après-midi",
+      "evening": "Soir",
+      "mixed": "Mixte",
+      "3-4": "3-4 jours",
+      "4-5": "4-5 jours",
+      "5-6": "5-6 jours",
+      "6+": "6+ jours",
+      "error": "Veuillez sélectionner votre fréquence d’entraînement"
     },
-    "back": "Back",
-    "next": "Next"
+    "back": "Retour",
+    "next": "Suivant"
   },
   "screen3": {
-    "title": "Health & Training Style",
-    "subtitle": "Let's keep you safe and effective",
+    "title": "Santé et style d’entraînement",
+    "subtitle": "Restons efficaces et en sécurité",
     "injuries": {
-      "label": "Injuries or Limitations (Optional)",
-      "placeholder": "e.g., knee pain, lower back issues, shoulder injury...",
-      "helper": "The AI will exclude exercises that may aggravate these conditions",
-      "charCount": "{{remaining}} characters remaining",
-      "error": "Please keep injuries description under 500 characters"
+      "label": "Blessures ou limitations (facultatif)",
+      "placeholder": "ex. : douleur au genou, bas du dos, épaule blessée...",
+      "description": "Indiquez-nous vos blessures ou limitations physiques afin que nous puissions recommander des exercices sûrs.",
+      "helper": "L’IA exclura les exercices susceptibles d’aggraver ces conditions",
+      "charCount": "{{remaining}} caractères restants",
+      "error": "Veuillez garder la description en dessous de 500 caractères"
     },
     "trainingStyle": {
-      "label": "Preferred Training Style",
-      "strength": "Strength Training",
-      "cardio": "Cardio Focused",
-      "balanced": "Balanced Mix",
-      "error": "Please select your training style"
+      "label": "Style d’entraînement préféré",
+      "strength": "Entraînement de force",
+      "strengthDesc": "Développer la masse musculaire et la force globale",
+      "cardio": "Axé sur le cardio",
+      "cardioDesc": "Améliorer l’endurance et la condition cardiovasculaire",
+      "balanced": "Équilibré",
+      "balancedDesc": "Combinaison d’exercices de force et de cardio",
+      "error": "Veuillez sélectionner votre style d’entraînement"
     },
     "timeAvailability": {
-      "label": "Time Available per Session",
+      "label": "Temps disponible par séance",
       "15-30": "15-30 minutes",
       "30-45": "30-45 minutes",
       "45-60": "45-60 minutes",
       "60+": "60+ minutes",
-      "error": "Please select your available time"
+      "error": "Veuillez sélectionner votre temps disponible"
     },
-    "back": "Back",
-    "generate": "Generate Workouts"
+    "back": "Retour",
+    "generate": "Générer les entraînements"
   },
   "loading": {
-    "analyzing": "Analyzing your profile...",
-    "selecting": "Selecting exercises...",
-    "creating": "Creating your personalized workouts...",
-    "finalizing": "Almost done...",
-    "warning": "This is taking longer than usual. Please wait...",
-    "cancel": "Cancel",
+    "analyzing": "Analyse de votre profil...",
+    "selecting": "Sélection des exercices...",
+    "creating": "Création de vos entraînements personnalisés...",
+    "finalizing": "Presque terminé...",
+    "warning": "Cela prend plus de temps que prévu. Veuillez patienter...",
+    "cancel": "Annuler",
     "timeout": {
-      "title": "Request Timeout",
-      "message": "The AI is taking longer than expected. Would you like to try again?",
-      "retry": "Try Again",
-      "cancel": "Cancel"
+      "title": "Délai dépassé",
+      "message": "L’IA met plus de temps que prévu. Voulez-vous réessayer ?",
+      "retry": "Réessayer",
+      "cancel": "Annuler"
     }
   },
   "results": {
-    "title": "Your Personalized Workouts",
-    "subtitle": "AI-generated workouts tailored to your goals",
-    "aiGeneratedBadge": "AI-Generated",
-    "exercises": "{{count}} exercises",
+    "title": "Vos entraînements personnalisés",
+    "subtitle": "Entraînements générés par IA adaptés à vos objectifs",
+    "aiGeneratedBadge": "Généré par IA",
+    "exercises": "{{count}} exercices",
     "duration": "~{{minutes}} min",
-    "scheduledDays": "Scheduled for {{days}}",
-    "viewWorkouts": "View Workouts",
-    "generateAgain": "Generate Again",
-    "close": "Close",
-    "saved": "Workouts saved successfully!"
+    "scheduledDays": "Prévu pour {{days}}",
+    "viewWorkouts": "Voir les entraînements",
+    "generateAgain": "Générer à nouveau",
+    "close": "Fermer",
+    "saved": "Entraînements enregistrés avec succès !"
   },
   "errors": {
-    "authRequired": "You must be signed in to generate AI workouts.",
-    "offline": "You must be online to generate AI workouts. Please check your connection.",
-    "rateLimit": "You've reached the limit for AI workout generation. Please try again in {{minutes}} minutes.",
-    "rateLimitGeneric": "You've reached the limit for AI workout generation. Please try again later.",
-    "validationError": "The information you provided is invalid. Please check your answers and try again.",
-    "aiError": "AI workout generation failed. Please try again.",
-    "timeout": "The request took too long. Please try again.",
-    "networkError": "Network error. Please check your connection and try again.",
-    "invalidResponse": "Received invalid response from server. Please try again.",
-    "noWorkouts": "AI did not generate any workouts. Please try again with different preferences.",
-    "unknownError": "An unexpected error occurred. Please try again.",
-    "incompleteData": "Please complete all required fields before generating workouts.",
-    "retry": "Retry",
-    "dismiss": "Dismiss"
+    "title": "Erreur lors de la génération des entraînements",
+    "retryAfterMessage": "Veuillez attendre {{seconds}} secondes avant de réessayer.",
+    "authRequired": "Vous devez être connecté pour générer des entraînements IA.",
+    "offline": "Vous devez être en ligne pour générer des entraînements IA. Vérifiez votre connexion.",
+    "rateLimit": "Vous avez atteint la limite de génération d’entraînements IA. Réessayez dans {{minutes}} minutes.",
+    "rateLimitGeneric": "Vous avez atteint la limite de génération d’entraînements IA. Réessayez plus tard.",
+    "validationError": "Les informations saisies sont invalides. Vérifiez vos réponses et réessayez.",
+    "aiError": "Échec de la génération d’entraînement IA. Réessayez.",
+    "timeout": "La requête a pris trop de temps. Réessayez.",
+    "networkError": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+    "invalidResponse": "Réponse invalide du serveur. Réessayez.",
+    "noWorkouts": "L’IA n’a généré aucun entraînement. Essayez avec d’autres préférences.",
+    "unknownError": "Une erreur inattendue s’est produite. Réessayez.",
+    "incompleteData": "Veuillez remplir tous les champs requis avant de générer les entraînements.",
+    "retry": "Réessayer",
+    "dismiss": "Fermer"
   },
   "onboarding": {
     "exitConfirmation": {
-      "title": "Are you sure you want to exit?",
-      "message": "Your progress will be lost if you leave now.",
-      "continue": "Continue",
-      "exit": "Exit"
+      "title": "Êtes-vous sûr de vouloir quitter ?",
+      "message": "Votre progression sera perdue si vous quittez maintenant.",
+      "continue": "Continuer",
+      "exit": "Quitter"
     }
   },
   "days": {
-    "monday": "Monday",
-    "tuesday": "Tuesday",
-    "wednesday": "Wednesday",
-    "thursday": "Thursday",
-    "friday": "Friday",
-    "saturday": "Saturday",
-    "sunday": "Sunday"
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche"
   }
 }

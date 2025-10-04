@@ -104,6 +104,7 @@
     "exportDataHelp": "Download uw trainingsgegevens als een JSON-bestand",
     "exportInProgress": "Exporteren...",
     "exportSuccess": "Uw gegevens zijn succesvol geëxporteerd!",
+    "exportError": " Fout bij het exporteren van gegevens. Probeer het opnieuw.",
     "exportRateLimit": "U kunt tot 3 exports per dag aanvragen",
     "exportNow": "Nu exporteren",
     "exportNowHelp": "Exporteer direct uw meest recente gegevens naar een JSON-bestand.",

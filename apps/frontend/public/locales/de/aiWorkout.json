@@ -102,6 +102,7 @@
     "injuries": {
       "label": "Verletzungen oder Einschränkungen (Optional)",
       "placeholder": "z.B. Knieschmerzen, unterer Rücken, Schulterverletzung...",
+      "description": "Teilen Sie uns Verletzungen oder körperliche Einschränkungen mit, damit wir sichere Übungen empfehlen können.",
       "helper": "Die KI wird Übungen ausschließen, die diese Beschwerden verschlimmern könnten",
       "charCount": "{{remaining}} Zeichen verbleibend",
       "error": "Bitte halten Sie die Beschreibung unter 500 Zeichen"
@@ -109,8 +110,11 @@
     "trainingStyle": {
       "label": "Bevorzugter Trainingsstil",
       "strength": "Krafttraining",
+      "strengthDesc": "Muskelmasse aufbauen und Gesamtkraft steigern",
       "cardio": "Cardio-Fokus",
+      "cardioDesc": "Kardiovaskuläre Fitness und Ausdauer verbessern",
       "balanced": "Ausgewogene Mischung",
+      "balancedDesc": "Kombination aus Kraft- und Cardiotraining",
       "error": "Bitte wählen Sie Ihren Trainingsstil"
     },
     "timeAvailability": {
@@ -153,6 +157,8 @@
     "saved": "Workouts erfolgreich gespeichert!"
   },
   "errors": {
+    "title": "Fehler beim Erstellen der Workouts",
+    "retryAfterMessage": "Bitte warten Sie {{seconds}} Sekunden, bevor Sie es erneut versuchen.",
     "authRequired": "Sie müssen angemeldet sein, um KI-Workouts zu erstellen.",
     "offline": "Sie müssen online sein, um KI-Workouts zu erstellen. Bitte überprüfen Sie Ihre Verbindung.",
     "rateLimit": "Sie haben das Limit für KI-Workout-Generierung erreicht. Bitte versuchen Sie es in {{minutes}} Minuten erneut.",

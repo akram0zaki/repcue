@@ -106,6 +106,7 @@
     "exportDataHelp": "نزّل بيانات التمرين بتاعتك كملف JSON",
     "exportInProgress": "جارٍ التصدير...",
     "exportSuccess": "تم تصدير بياناتك بنجاح!",
+    "exportError": "فشل تصدير البيانات. يرجى المحاولة مرة أخرى.",
     "exportRateLimit": "تقدر تطلب لحدّ 3 تصديرات في اليوم",
     "exportNow": "صدّر دلوقتي",
     "exportNowHelp": "صدّر أحدث بياناتك فوراً لملف JSON.",

@@ -114,6 +114,7 @@
     "exportDataHelp": "Descarga tus datos de entrenamiento como archivo JSON",
     "exportInProgress": "Exportando...",
     "exportSuccess": "Tus datos han sido exportados con éxito!",
+    "exportError": " Error al exportar datos. Por favor, inténtalo de nuevo.",
     "exportRateLimit": "Puedes solicitar hasta 3 exportaciones por día",
     "exportNow": "Exportar ahora",
     "exportNowHelp": "Exporta inmediatamente tus datos más recientes a un archivo JSON.",
