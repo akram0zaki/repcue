@@ -228,6 +228,58 @@ Response: { workouts: GeneratedWorkout[], metadata: { ... } }
 
 ---
 
+## Bug Fixes
+
+### Export Data Edge Function CORS Issue
+
+**Date:** 2025-10-04
+**Issue:** Export data edge function failing with CORS error
+**Root Cause:**
+- Edge function `export-data` expects GET method
+- CORS headers only allowed POST, OPTIONS
+- Client was using POST via `supabase.functions.invoke()`
+
+**Files Changed:**
+1. `supabase/functions/_shared/cors.ts`
+   - Updated `Access-Control-Allow-Methods` from `POST, OPTIONS` to `GET, POST, OPTIONS`
+
+2. `apps/frontend/src/components/security/DataExportButton.tsx`
+   - Changed invoke call to explicitly use GET method
+   - Added dark mode styling to error message
+   - Added translation support for error messages
+   - Added check for authentication errors
+
+**Enhanced Error Handling & Observability (v2):**
+1. **Created logger.ts**
+   - Structured logging with correlation IDs
+   - Log levels: INFO, WARN, ERROR, DEBUG
+   - JSON output format for log aggregation
+   - User ID tracking in all logs
+
+2. **Enhanced index.ts error handling:**
+   - ✅ Validation that exportData is not null/undefined before success
+   - ✅ Validation that exportData is an object
+   - ✅ Correlation IDs in all responses for traceability
+   - ✅ Comprehensive logging at each stage (15+ log points)
+   - ✅ Try-catch around JWT validation
+   - ✅ Try-catch around rate limit check
+   - ✅ Environment variable validation
+   - ✅ Profile update error handling (warn but continue)
+   - ✅ User-friendly error messages
+   - ✅ DEBUG mode support for detailed error info
+   - ✅ Structured error responses with correlationId
+   - ✅ X-Correlation-ID header in all responses
+   - ✅ Retry-After header for rate limit errors
+
+**Deployment Status:**
+- ✅ Workspace changes completed
+- ✅ Deployed v1 (CORS fix) to development environment
+- ✅ Deployed v2 (enhanced error handling & observability) to development environment
+- [ ] Deploy to production environment
+- [ ] Test export functionality end-to-end
+
+---
+
 ## References
 
 - Implementation Plan: `docs/implementation-plans/repcue-ai-assistant/ai-assisted-workouts-implementation-plan.md`

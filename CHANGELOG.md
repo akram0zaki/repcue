@@ -1,5 +1,38 @@
 ## Unreleased
 
+### 2025-10-04 (Export Data Edge Function - Enhanced Error Handling & i18n)
+#### Added
+- **Structured Logging for export-data Edge Function**:
+  - Created `supabase/functions/export-data/logger.ts` with correlation ID support
+  - Log levels: INFO, WARN, ERROR, DEBUG
+  - JSON output format for log aggregation
+  - User ID tracking in all log entries
+
+#### Fixed
+- **Export Data CORS Error**: Fixed CORS configuration mismatch
+  - Updated `supabase/functions/_shared/cors.ts` to allow GET, POST, OPTIONS methods
+  - Changed `DataExportButton.tsx` to explicitly use GET method
+  - Edge function now properly handles export requests
+
+- **Export Data Null Response Bug**: Enhanced error handling to prevent null data downloads
+  - Added validation that exportData is not null/undefined before returning success (lines 222-239)
+  - Added validation that exportData is an object (lines 242-258)
+  - Returns HTTP 500 with meaningful error message if data is invalid
+
+- **Export Data Observability**: Comprehensive error handling and logging (15+ log points)
+  - Try-catch around JWT validation with detailed error logging
+  - Try-catch around rate limit check
+  - Environment variable validation
+  - Profile update error handling (warns but continues)
+  - Correlation IDs in all responses and headers (X-Correlation-ID)
+  - Retry-After header for rate limit errors
+  - User-friendly error messages with DEBUG mode support for detailed info
+
+- **Export Data Translation**: Error messages now properly translated
+  - Added dark mode styling to error display in `DataExportButton.tsx`
+  - Authentication errors show translated message via `t('errors.notAuthenticated')`
+  - Generic errors use `t('settings.exportError')` from locale files
+
 ### 2025-10-04 (UI Audit — Styleguide Compliance Phase 1–2)
 #### Added
 - Global utilities in `apps/frontend/src/styles/tokens.css` to centralize styling:
