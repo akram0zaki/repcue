@@ -100,6 +100,10 @@ class AIWorkoutService {
         fitnessLevel: request.responses.fitnessLevel,
         locale: request.locale
       });
+      // Debug: Log full request for troubleshooting
+      logger.log('[AIWorkoutService] Full request payload', {
+        request: JSON.stringify(request, null, 2)
+      });
 
       // Call Edge Function with timeout
       const controller = new AbortController();
@@ -110,10 +114,6 @@ class AIWorkoutService {
           'generate-ai-workout',
           {
             body: request,
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${authState.accessToken}`
-            }
           }
         );
 
