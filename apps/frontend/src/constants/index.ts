@@ -3,7 +3,7 @@ import type { AppSettings } from '../types';
 // Application Constants
 export const APP_NAME = 'RepCue';
 export const APP_DESCRIPTION = 'Your personal exercise timer';
-export const APP_VERSION = '0.1.0';
+export const APP_VERSION = null;
 
 // Timer Constants
 export const TIMER_PRESETS = [5, 15, 30, 60, 120, 180, 300] as const;

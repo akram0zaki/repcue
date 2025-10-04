@@ -101,7 +101,8 @@
       "Bash(timeout 60s pnpm --filter @repcue/frontend test --run --reporter=basic)",
       "Bash(timeout:*)",
       "Bash(Select-Object -First 20)",
-      "Read(//c/c/Users/akram/OneDrive/Documents/Workspace/repcue/**)"
+      "Read(//c/c/Users/akram/OneDrive/Documents/Workspace/repcue/**)",
+      "Bash(curl -s -w \"\\n%{http_code}\" https://api.mistral.ai/v1/models -H \"Authorization: Bearer Bfaa52QtIYiJnFqdafVmDqW9m3IZW15L\")"
     ],
     "deny": [],
     "ask": []

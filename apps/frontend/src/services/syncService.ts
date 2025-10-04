@@ -89,7 +89,7 @@ class V2SyncService {
   async sync(force?: boolean): Promise<SyncResult> {
     if (this.isSyncing) {
       // Return early with info message instead of queuing
-      logger.debug('[sync:v2] sync already in progress, returning early');
+      // logger.debug('[sync:v2] sync already in progress, returning early');
       return {
         success: true,
         tablesProcessed: 0,

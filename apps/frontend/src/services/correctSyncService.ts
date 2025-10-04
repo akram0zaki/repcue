@@ -92,19 +92,19 @@ export class CorrectSyncService {
   private async initializeServices(): Promise<void> {
     if (!this.servicesInitialized) {
       try {
-        logger.debug('CorrectSyncService: Starting service initialization');
+        // logger.debug('CorrectSyncService: Starting service initialization');
         this.storage = StorageService.getInstance();
         this.auth = AuthService.getInstance();
         this.consent = ConsentService.getInstance();
         
         // Check if storage service is available but don't wait for ready() to avoid circular dependency
         if (this.storage) {
-          logger.debug('CorrectSyncService: Storage service available');
+          // logger.debug('CorrectSyncService: Storage service available');
           // Note: Not waiting for storage.ready() to avoid circular dependency during app init
         }
         
         this.servicesInitialized = true;
-        logger.debug('CorrectSyncService: Service initialization complete');
+        // logger.debug('CorrectSyncService: Service initialization complete');
       } catch (error) {
         logger.warn('CorrectSyncService: Failed to initialize services:', error);
         throw error; // Re-throw to signal initialization failure
@@ -148,7 +148,7 @@ export class CorrectSyncService {
 
     // Thread-safe concurrency guard - return same in-flight promise
     if (this.inFlight) {
-      logger.debug(`[sync:v2] sync already in progress, returning in-flight promise (mode=${mode})`);
+      // logger.debug(`[sync:v2] sync already in progress, returning in-flight promise (mode=${mode})`);
       return this.inFlight;
     }
 
