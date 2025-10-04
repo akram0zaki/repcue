@@ -16,6 +16,7 @@ import AIWorkoutLoadingState from '../components/AIWorkoutLoadingState';
 import AIWorkoutResultsModal from '../components/AIWorkoutResultsModal';
 import AIWorkoutOfflineGate from '../components/AIWorkoutOfflineGate';
 import { useAIWorkoutFlow } from '../hooks/useAIWorkoutFlow';
+import type { Screen1ValidationErrors, Screen2ValidationErrors, Screen3ValidationErrors } from '../types/aiWorkout';
 import logger from '../utils/logger';
 
 /**
@@ -175,7 +176,7 @@ export default function AIWorkoutOnboardingPage() {
               </p>
               <AIWorkoutScreen1
                 data={data.screen1 || {}}
-                errors={errors as any}
+                errors={errors as Screen1ValidationErrors}
                 onChange={(screenData) => updateData(screenData)}
               />
             </>
@@ -191,7 +192,7 @@ export default function AIWorkoutOnboardingPage() {
               </p>
               <AIWorkoutScreen2
                 data={data.screen2 || {}}
-                errors={errors as any}
+                errors={errors as Screen2ValidationErrors}
                 onChange={(screenData) => updateData(screenData)}
               />
             </>
@@ -207,7 +208,7 @@ export default function AIWorkoutOnboardingPage() {
               </p>
               <AIWorkoutScreen3
                 data={data.screen3 || {}}
-                errors={errors as any}
+                errors={errors as Screen3ValidationErrors}
                 onChange={(screenData) => updateData(screenData)}
               />
             </>

@@ -217,7 +217,7 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
       setWorkouts(response.workouts);
       setIsSuccess(true);
       setState((prev) => ({ ...prev, isSubmitting: false }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('[useAIWorkoutFlow] Failed to generate workouts', error);
 
       // Handle AIWorkoutServiceError

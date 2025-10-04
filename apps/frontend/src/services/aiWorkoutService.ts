@@ -199,11 +199,11 @@ class AIWorkoutService {
 
         return data;
 
-      } catch (fetchError: any) {
+      } catch (fetchError: unknown) {
         clearTimeout(timeoutId);
 
         // Handle timeout
-        if (fetchError.name === 'AbortError') {
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
           logger.error('[AIWorkoutService] Request timeout', { timeoutMs: this.TIMEOUT_MS });
           throw new AIWorkoutServiceError(
             'Request timed out. The AI is taking longer than expected. Please try again.',
@@ -218,7 +218,7 @@ class AIWorkoutService {
         }
 
         // Network error
-        if (fetchError.message?.includes('network') || fetchError.message?.includes('fetch')) {
+        if (fetchError instanceof Error && (fetchError.message?.includes('network') || fetchError.message?.includes('fetch'))) {
           logger.error('[AIWorkoutService] Network error', { error: fetchError.message });
           throw new AIWorkoutServiceError(
             'Network error. Please check your connection and try again.',
@@ -228,9 +228,11 @@ class AIWorkoutService {
         }
 
         // Unknown error
+        const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+        const errorStack = fetchError instanceof Error ? fetchError.stack : undefined;
         logger.error('[AIWorkoutService] Unknown error', {
-          error: fetchError.message,
-          stack: fetchError.stack
+          error: errorMessage,
+          stack: errorStack
         });
         throw new AIWorkoutServiceError(
           'An unexpected error occurred. Please try again.',
@@ -239,19 +241,21 @@ class AIWorkoutService {
         );
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Re-throw AIWorkoutServiceError
       if (error instanceof AIWorkoutServiceError) {
         throw error;
       }
 
       // Wrap unknown errors
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       logger.error('[AIWorkoutService] Unexpected error in generateWorkouts', {
-        error: error.message,
-        stack: error.stack
+        error: errorMessage,
+        stack: errorStack
       });
       throw new AIWorkoutServiceError(
-        error.message || 'An unexpected error occurred',
+        errorMessage || 'An unexpected error occurred',
         'UNKNOWN_ERROR',
         500
       );
