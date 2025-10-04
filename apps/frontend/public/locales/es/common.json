@@ -657,6 +657,7 @@
   "changelog": {
     "title": "Novedades",
     "close": "Cerrar registro de cambios",
+    "closeButton": "Cerrar",
     "done": "Hecho",
     "empty": {
       "title": "No hay Cambios Detallados Disponibles",
@@ -666,6 +667,12 @@
       "title": "Cambios en la Privacidad Detectados",
       "message": "Esta actualización incluye cambios en la forma en que manejamos sus datos. Revise los cambios anteriores y confirme su comprensión.",
       "acknowledge": "Entiendo y reconozco los cambios en la privacidad en esta actualización"
+    },
+    "categories": {
+      "newFeatures": "Nuevas funciones",
+      "improvements": "Mejoras",
+      "bugFixes": "Correcciones de errores",
+      "securityUpdates": "Actualizaciones de seguridad"
     }
   },
   "rating": {

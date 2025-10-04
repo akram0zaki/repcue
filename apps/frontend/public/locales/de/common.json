@@ -648,7 +648,8 @@
   },
   "changelog": {
     "title": "Neuigkeiten",
-    "close": "CChangelog schließen",
+    "close": "Changelog schließen",
+    "closeButton": "Schließen",
     "done": "Fertig",
     "empty": {
       "title": "Keine detaillierten Änderungen verfügbar",
@@ -658,6 +659,12 @@
       "title": "Änderungen der Datenschutzbestimmungen erkannt",
       "message": "Dieses Update enthält Änderungen daran, wie wir Ihre Daten behandeln. Bitte überprüfen Sie die oben genannten Änderungen und bestätigen Sie Ihr Verständnis.",
       "acknowledge": "Ich verstehe und erkenne die Änderungen der Datenschutzbestimmungen in diesem Update an"
+    },
+    "categories": {
+      "newFeatures": "Neue Funktionen",
+      "improvements": "Verbesserungen",
+      "bugFixes": "Fehlerbehebungen",
+      "securityUpdates": "Sicherheitsupdates"
     }
   },
   "rating": {

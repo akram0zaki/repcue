@@ -657,6 +657,7 @@
   "changelog": {
     "title": "Wat is Nij",
     "close": "Changelog slute",
+    "closeButton": "Slute",
     "done": "Klear",
     "empty": {
       "title": "Gjin detaillearre wizigingen beskikber",
@@ -664,8 +665,14 @@
     },
     "privacy": {
       "title": "Privacy­wizigingen ûntdutsen",
-      "message": "Dizze update omfettet wizigingen yn hoe’t wy jo gegevens behannelje. Lês de wizigingen hjirboppe troch en befêstigje jo begryp.",
+      "message": "Dizze update omfettet wizigingen yn hoe't wy jo gegevens behannelje. Lês de wizigingen hjirboppe troch en befêstigje jo begryp.",
       "acknowledge": "Ik begryp en erken de privacy­wizigingen yn dizze update"
+    },
+    "categories": {
+      "newFeatures": "Nije funksjes",
+      "improvements": "Ferbetteringen",
+      "bugFixes": "Bugfixes",
+      "securityUpdates": "Befeiligingsupdates"
     }
   },
   "rating": {

@@ -703,6 +703,7 @@
   "changelog": {
     "title": "Quoi de neuf",
     "close": "Fermer le changelog",
+    "closeButton": "Fermer",
     "done": "Terminé",
     "empty": {
       "title": "Aucun changement détaillé disponible",
@@ -712,6 +713,12 @@
       "title": "Changements de confidentialité détectés",
       "message": "Cette mise à jour comprend des modifications concernant la manière dont nous gérons vos données. Veuillez examiner les changements ci-dessus et confirmer votre compréhension.",
       "acknowledge": "Je comprends et reconnais les changements de confidentialité dans cette mise à jour"
+    },
+    "categories": {
+      "newFeatures": "Nouvelles fonctionnalités",
+      "improvements": "Améliorations",
+      "bugFixes": "Corrections de bogues",
+      "securityUpdates": "Mises à jour de sécurité"
     }
   },
   "rating": {

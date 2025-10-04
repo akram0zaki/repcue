@@ -1,5 +1,20 @@
 ## Unreleased
 
+### 2025-10-04 (Update Notification UI - Style Guide Compliance & i18n)
+#### Fixed
+- **Update Notification Styling**: Migrated to semantic tokens and style guide compliance
+  - Replaced ad-hoc color classes (`bg-red-100`, `text-blue-600`) with semantic tokens (`bg-error-soft`, `text-warning`, `btn-primary`)
+  - Applied semantic typography classes (`.text-h3`, `.text-body`, `.text-caption`, `.text-small`)
+  - Used centralized button classes (`.btn-primary`, `.btn-secondary`, `.btn-danger`)
+  - Added RTL support for changelog lists (`ml-2 rtl:mr-2 rtl:ml-0`)
+  - Mobile-first responsive design with proper stacking (`w-full sm:w-auto`)
+  - Touch-friendly targets (`.touch-target` class on interactive elements)
+
+- **Update Notification Translation**: All text now properly translated
+  - Translated changelog category headers ("New Features", "Improvements", "Bug Fixes", "Security Updates")
+  - Added `changelog.categories` translations to all 8 locales (en, ar, ar-EG, de, es, fr, nl, fy)
+  - Added `closeButton` key for consistency across all changelog-related components
+
 ### 2025-10-04 (Export Data Edge Function - Enhanced Error Handling & i18n)
 #### Added
 - **Structured Logging for export-data Edge Function**:

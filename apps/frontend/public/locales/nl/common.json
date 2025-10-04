@@ -695,6 +695,7 @@
   "changelog": {
     "title": "Wat is Nieuw",
     "close": "Changelog sluiten",
+    "closeButton": "Sluiten",
     "done": "Klaar",
     "empty": {
       "title": "Geen Gedetailleerde Wijzigingen Beschikbaar",
@@ -704,6 +705,12 @@
       "title": "Privacy­wijzigingen Gedetecteerd",
       "message": "Deze update bevat wijzigingen in hoe we je gegevens verwerken. Bekijk de wijzigingen hierboven en bevestig dat je dit begrijpt.",
       "acknowledge": "Ik begrijp en erken de privacy­wijzigingen in deze update"
+    },
+    "categories": {
+      "newFeatures": "Nieuwe functies",
+      "improvements": "Verbeteringen",
+      "bugFixes": "Bugfixes",
+      "securityUpdates": "Beveiligingsupdates"
     }
   },
   "rating": {
