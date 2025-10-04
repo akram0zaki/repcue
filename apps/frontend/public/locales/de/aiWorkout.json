@@ -1,167 +1,181 @@
 {
   "button": {
-    "getStarted": "Get Your Personalized Workout Plan",
-    "createNew": "Create New Workout Plan"
+    "getStarted": "Holen Sie sich Ihren personalisierten Trainingsplan",
+    "createNew": "Neuen Trainingsplan erstellen"
   },
   "authGate": {
-    "title": "Sign In Required",
-    "message": "The RepCue AI Assistant requires an account to save your personalized workouts.",
-    "signIn": "Sign In",
-    "tryLater": "Try Later",
-    "close": "Close"
+    "title": "Anmeldung erforderlich",
+    "message": "Der RepCue KI-Assistent benötigt ein Konto, um Ihre personalisierten Workouts zu speichern.",
+    "signIn": "Anmelden",
+    "tryLater": "Später versuchen",
+    "close": "Schließen"
   },
   "offlineGate": {
-    "title": "Internet Connection Required",
-    "message": "The AI Workout Builder requires an internet connection to generate personalized workouts. Please connect to the internet and try again.",
-    "messageShort": "Please connect to the internet to use the AI Workout Builder."
+    "title": "Internetverbindung erforderlich",
+    "message": "Der KI-Workout-Builder benötigt eine Internetverbindung, um personalisierte Workouts zu erstellen. Bitte stellen Sie eine Verbindung zum Internet her und versuchen Sie es erneut.",
+    "messageShort": "Bitte verbinden Sie sich mit dem Internet, um den KI-Workout-Builder zu verwenden."
   },
   "progress": {
-    "step": "Step {{current}} of {{total}}"
+    "step": "Schritt {{current}} von {{total}}"
   },
   "screen1": {
-    "title": "Tell Us About Yourself",
-    "subtitle": "Help us personalize your workout plan",
+    "title": "Erzählen Sie uns von sich",
+    "subtitle": "Helfen Sie uns, Ihren Trainingsplan zu personalisieren",
+    "description": "Erzählen Sie uns ein wenig über sich",
     "gender": {
-      "label": "Gender",
-      "male": "Male",
-      "female": "Female",
-      "other": "Other",
-      "error": "Please select your gender"
+      "label": "Geschlecht",
+      "male": "Männlich",
+      "female": "Weiblich",
+      "other": "Divers",
+      "error": "Bitte wählen Sie Ihr Geschlecht"
     },
     "age": {
-      "label": "Age",
-      "placeholder": "Enter your age",
-      "error": "Please enter a valid age (13-120)"
+      "label": "Alter",
+      "placeholder": "Geben Sie Ihr Alter ein",
+      "error": "Bitte geben Sie ein gültiges Alter ein (13-120)"
     },
     "height": {
-      "label": "Height",
+      "label": "Größe",
       "cm": "cm",
       "ft": "ft",
       "inches": "in",
-      "error": "Please enter a valid height"
+      "error": "Bitte geben Sie eine gültige Größe ein"
     },
     "weight": {
-      "label": "Weight",
+      "label": "Gewicht",
       "kg": "kg",
       "lbs": "lbs",
-      "error": "Please enter a valid weight"
+      "error": "Bitte geben Sie ein gültiges Gewicht ein"
     },
-    "next": "Next"
+    "next": "Weiter"
   },
   "screen2": {
-    "title": "Your Goals & Preferences",
-    "subtitle": "What are you working towards?",
+    "title": "Ihre Ziele und Präferenzen",
+    "subtitle": "Woran arbeiten Sie?",
+    "description": "Was sind Ihre Fitnessziele?",
     "goal": {
-      "label": "Primary Goal",
-      "weightLoss": "Weight Loss",
-      "muscleBuilding": "Muscle Building",
-      "healthMaintenance": "Health Maintenance",
-      "flexibility": "Flexibility & Mobility",
-      "error": "Please select your primary goal"
+      "label": "Hauptziel",
+      "weightLoss": "Gewichtsverlust",
+      "muscleBuilding": "Muskelaufbau",
+      "healthMaintenance": "Gesundheitserhaltung",
+      "flexibility": "Flexibilität & Mobilität",
+      "error": "Bitte wählen Sie Ihr Hauptziel"
     },
     "fitnessLevel": {
-      "label": "Current Fitness Level",
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "error": "Please select your fitness level"
+      "label": "Aktuelles Fitnessniveau",
+      "beginner": "Anfänger",
+      "intermediate": "Fortgeschritten",
+      "advanced": "Experte",
+      "error": "Bitte wählen Sie Ihr Fitnessniveau"
     },
     "trainingTime": {
-      "label": "Training Frequency (days per week)",
-      "3-4": "3-4 days",
-      "4-5": "4-5 days",
-      "5-6": "5-6 days",
-      "6+": "6+ days",
-      "error": "Please select your training frequency"
+      "label": "Trainingshäufigkeit (Tage pro Woche)",
+      "3-4": "3-4 Tage",
+      "4-5": "4-5 Tage",
+      "5-6": "5-6 Tage",
+      "6+": "6+ Tage",
+      "error": "Bitte wählen Sie Ihre Trainingshäufigkeit"
     },
-    "back": "Back",
-    "next": "Next"
+    "back": "Zurück",
+    "next": "Weiter"
   },
   "screen3": {
-    "title": "Health & Training Style",
-    "subtitle": "Let's keep you safe and effective",
+    "title": "Gesundheit & Trainingsstil",
+    "subtitle": "Bleiben Sie sicher und effektiv",
+    "description": "Helfen Sie uns, Ihre Workouts an Ihre Bedürfnisse anzupassen",
     "injuries": {
-      "label": "Injuries or Limitations (Optional)",
-      "placeholder": "e.g., knee pain, lower back issues, shoulder injury...",
-      "helper": "The AI will exclude exercises that may aggravate these conditions",
-      "charCount": "{{remaining}} characters remaining",
-      "error": "Please keep injuries description under 500 characters"
+      "label": "Verletzungen oder Einschränkungen (Optional)",
+      "placeholder": "z.B. Knieschmerzen, unterer Rücken, Schulterverletzung...",
+      "helper": "Die KI wird Übungen ausschließen, die diese Beschwerden verschlimmern könnten",
+      "charCount": "{{remaining}} Zeichen verbleibend",
+      "error": "Bitte halten Sie die Beschreibung unter 500 Zeichen"
     },
     "trainingStyle": {
-      "label": "Preferred Training Style",
-      "strength": "Strength Training",
-      "cardio": "Cardio Focused",
-      "balanced": "Balanced Mix",
-      "error": "Please select your training style"
+      "label": "Bevorzugter Trainingsstil",
+      "strength": "Krafttraining",
+      "cardio": "Cardio-Fokus",
+      "balanced": "Ausgewogene Mischung",
+      "error": "Bitte wählen Sie Ihren Trainingsstil"
     },
     "timeAvailability": {
-      "label": "Time Available per Session",
-      "15-30": "15-30 minutes",
-      "30-45": "30-45 minutes",
-      "45-60": "45-60 minutes",
-      "60+": "60+ minutes",
-      "error": "Please select your available time"
+      "label": "Verfügbare Zeit pro Sitzung",
+      "description": "Wie viel Zeit können Sie pro Trainingseinheit aufbringen?",
+      "select": "Verfügbare Zeit auswählen",
+      "15-30": "15-30 Minuten",
+      "30-45": "30-45 Minuten",
+      "45-60": "45-60 Minuten",
+      "60+": "60+ Minuten",
+      "error": "Bitte wählen Sie Ihre verfügbare Zeit"
     },
-    "back": "Back",
-    "generate": "Generate Workouts"
+    "back": "Zurück",
+    "generate": "Workouts erstellen"
   },
   "loading": {
-    "analyzing": "Analyzing your profile...",
-    "selecting": "Selecting exercises...",
-    "creating": "Creating your personalized workouts...",
-    "finalizing": "Almost done...",
-    "warning": "This is taking longer than usual. Please wait...",
-    "cancel": "Cancel",
+    "analyzing": "Profil wird analysiert...",
+    "selecting": "Übungen werden ausgewählt...",
+    "creating": "Ihre personalisierten Workouts werden erstellt...",
+    "finalizing": "Fast fertig...",
+    "warning": "Dies dauert länger als üblich. Bitte warten Sie...",
+    "cancel": "Abbrechen",
     "timeout": {
-      "title": "Request Timeout",
-      "message": "The AI is taking longer than expected. Would you like to try again?",
-      "retry": "Try Again",
-      "cancel": "Cancel"
+      "title": "Zeitüberschreitung",
+      "message": "Die KI braucht länger als erwartet. Möchten Sie es erneut versuchen?",
+      "retry": "Erneut versuchen",
+      "cancel": "Abbrechen"
     }
   },
   "results": {
-    "title": "Your Personalized Workouts",
-    "subtitle": "AI-generated workouts tailored to your goals",
-    "aiGeneratedBadge": "AI-Generated",
-    "exercises": "{{count}} exercises",
-    "duration": "~{{minutes}} min",
-    "scheduledDays": "Scheduled for {{days}}",
-    "viewWorkouts": "View Workouts",
-    "generateAgain": "Generate Again",
-    "close": "Close",
-    "saved": "Workouts saved successfully!"
+    "title": "Ihre personalisierten Workouts",
+    "subtitle": "KI-generierte Workouts für Ihre Ziele",
+    "aiGeneratedBadge": "KI-generiert",
+    "exercises": "{{count}} Übungen",
+    "duration": "~{{minutes}} Min",
+    "scheduledDays": "Geplant für {{days}}",
+    "viewWorkouts": "Workouts ansehen",
+    "generateAgain": "Erneut erstellen",
+    "close": "Schließen",
+    "saved": "Workouts erfolgreich gespeichert!"
   },
   "errors": {
-    "authRequired": "You must be signed in to generate AI workouts.",
-    "offline": "You must be online to generate AI workouts. Please check your connection.",
-    "rateLimit": "You've reached the limit for AI workout generation. Please try again in {{minutes}} minutes.",
-    "rateLimitGeneric": "You've reached the limit for AI workout generation. Please try again later.",
-    "validationError": "The information you provided is invalid. Please check your answers and try again.",
-    "aiError": "AI workout generation failed. Please try again.",
-    "timeout": "The request took too long. Please try again.",
-    "networkError": "Network error. Please check your connection and try again.",
-    "invalidResponse": "Received invalid response from server. Please try again.",
-    "noWorkouts": "AI did not generate any workouts. Please try again with different preferences.",
-    "unknownError": "An unexpected error occurred. Please try again.",
-    "incompleteData": "Please complete all required fields before generating workouts.",
-    "retry": "Retry",
-    "dismiss": "Dismiss"
+    "authRequired": "Sie müssen angemeldet sein, um KI-Workouts zu erstellen.",
+    "offline": "Sie müssen online sein, um KI-Workouts zu erstellen. Bitte überprüfen Sie Ihre Verbindung.",
+    "rateLimit": "Sie haben das Limit für KI-Workout-Generierung erreicht. Bitte versuchen Sie es in {{minutes}} Minuten erneut.",
+    "rateLimitGeneric": "Sie haben das Limit für KI-Workout-Generierung erreicht. Bitte versuchen Sie es später erneut.",
+    "validationError": "Die von Ihnen angegebenen Informationen sind ungültig. Bitte überprüfen Sie Ihre Antworten und versuchen Sie es erneut.",
+    "aiError": "KI-Workout-Erstellung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+    "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "invalidResponse": "Ungültige Antwort vom Server erhalten. Bitte versuchen Sie es erneut.",
+    "noWorkouts": "Die KI hat keine Workouts erstellt. Bitte versuchen Sie es mit anderen Präferenzen erneut.",
+    "unknownError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "incompleteData": "Bitte füllen Sie alle erforderlichen Felder aus, bevor Sie Workouts erstellen.",
+    "retry": "Wiederholen",
+    "dismiss": "Schließen"
   },
   "onboarding": {
+    "title": "KI-Workout-Builder",
+    "subtitle": "Beantworten Sie einige Fragen und wir erstellen personalisierte Trainingspläne für Sie.",
+    "exitTitle": "Workout-Builder verlassen?",
+    "exitConfirm": "Sind Sie sicher, dass Sie den Builder verlassen möchten? Ihr Fortschritt geht verloren.",
+    "stayButton": "Bleiben",
+    "exitButton": "Verlassen",
+    "backButton": "Zurück",
+    "nextButton": "Weiter",
+    "generateButton": "Meine Workouts erstellen",
     "exitConfirmation": {
-      "title": "Are you sure you want to exit?",
-      "message": "Your progress will be lost if you leave now.",
-      "continue": "Continue",
-      "exit": "Exit"
+      "title": "Sind Sie sicher, dass Sie verlassen möchten?",
+      "message": "Ihr Fortschritt geht verloren, wenn Sie jetzt gehen.",
+      "continue": "Fortsetzen",
+      "exit": "Verlassen"
     }
   },
   "days": {
-    "monday": "Monday",
-    "tuesday": "Tuesday",
-    "wednesday": "Wednesday",
-    "thursday": "Thursday",
-    "friday": "Friday",
-    "saturday": "Saturday",
-    "sunday": "Sunday"
+    "monday": "Montag",
+    "tuesday": "Dienstag",
+    "wednesday": "Mittwoch",
+    "thursday": "Donnerstag",
+    "friday": "Freitag",
+    "saturday": "Samstag",
+    "sunday": "Sonntag"
   }
 }

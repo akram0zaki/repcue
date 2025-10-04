@@ -1,167 +1,181 @@
 {
   "button": {
-    "getStarted": "Get Your Personalized Workout Plan",
-    "createNew": "Create New Workout Plan"
+    "getStarted": "احصل على خطة تمرينك الشخصية",
+    "createNew": "إنشاء خطة تمرين جديدة"
   },
   "authGate": {
-    "title": "Sign In Required",
-    "message": "The RepCue AI Assistant requires an account to save your personalized workouts.",
-    "signIn": "Sign In",
-    "tryLater": "Try Later",
-    "close": "Close"
+    "title": "يجب تسجيل الدخول",
+    "message": "يتطلب مساعد RepCue AI حسابًا لحفظ تمارينك الشخصية.",
+    "signIn": "تسجيل الدخول",
+    "tryLater": "المحاولة لاحقًا",
+    "close": "إغلاق"
   },
   "offlineGate": {
-    "title": "Internet Connection Required",
-    "message": "The AI Workout Builder requires an internet connection to generate personalized workouts. Please connect to the internet and try again.",
-    "messageShort": "Please connect to the internet to use the AI Workout Builder."
+    "title": "يلزم الاتصال بالإنترنت",
+    "message": "يتطلب منشئ التمارين بالذكاء الاصطناعي اتصالًا بالإنترنت لإنشاء تمارين مخصصة. يرجى الاتصال بالإنترنت والمحاولة مرة أخرى.",
+    "messageShort": "يرجى الاتصال بالإنترنت لاستخدام منشئ التمارين بالذكاء الاصطناعي."
   },
   "progress": {
-    "step": "Step {{current}} of {{total}}"
+    "step": "الخطوة {{current}} من {{total}}"
   },
   "screen1": {
-    "title": "Tell Us About Yourself",
-    "subtitle": "Help us personalize your workout plan",
+    "title": "أخبرنا عن نفسك",
+    "subtitle": "ساعدنا في تخصيص خطة تمرينك",
+    "description": "أخبرنا قليلاً عن نفسك",
     "gender": {
-      "label": "Gender",
-      "male": "Male",
-      "female": "Female",
-      "other": "Other",
-      "error": "Please select your gender"
+      "label": "الجنس",
+      "male": "ذكر",
+      "female": "أنثى",
+      "other": "آخر",
+      "error": "يرجى اختيار جنسك"
     },
     "age": {
-      "label": "Age",
-      "placeholder": "Enter your age",
-      "error": "Please enter a valid age (13-120)"
+      "label": "العمر",
+      "placeholder": "أدخل عمرك",
+      "error": "يرجى إدخال عمر صحيح (13-120)"
     },
     "height": {
-      "label": "Height",
-      "cm": "cm",
-      "ft": "ft",
-      "inches": "in",
-      "error": "Please enter a valid height"
+      "label": "الطول",
+      "cm": "سم",
+      "ft": "قدم",
+      "inches": "بوصة",
+      "error": "يرجى إدخال طول صحيح"
     },
     "weight": {
-      "label": "Weight",
-      "kg": "kg",
-      "lbs": "lbs",
-      "error": "Please enter a valid weight"
+      "label": "الوزن",
+      "kg": "كجم",
+      "lbs": "رطل",
+      "error": "يرجى إدخال وزن صحيح"
     },
-    "next": "Next"
+    "next": "التالي"
   },
   "screen2": {
-    "title": "Your Goals & Preferences",
-    "subtitle": "What are you working towards?",
+    "title": "أهدافك وتفضيلاتك",
+    "subtitle": "ما الذي تسعى لتحقيقه؟",
+    "description": "ما هي أهدافك في اللياقة البدنية؟",
     "goal": {
-      "label": "Primary Goal",
-      "weightLoss": "Weight Loss",
-      "muscleBuilding": "Muscle Building",
-      "healthMaintenance": "Health Maintenance",
-      "flexibility": "Flexibility & Mobility",
-      "error": "Please select your primary goal"
+      "label": "الهدف الأساسي",
+      "weightLoss": "فقدان الوزن",
+      "muscleBuilding": "بناء العضلات",
+      "healthMaintenance": "الحفاظ على الصحة",
+      "flexibility": "المرونة والحركة",
+      "error": "يرجى اختيار هدفك الأساسي"
     },
     "fitnessLevel": {
-      "label": "Current Fitness Level",
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced",
-      "error": "Please select your fitness level"
+      "label": "مستوى اللياقة الحالي",
+      "beginner": "مبتدئ",
+      "intermediate": "متوسط",
+      "advanced": "متقدم",
+      "error": "يرجى اختيار مستوى لياقتك"
     },
     "trainingTime": {
-      "label": "Training Frequency (days per week)",
-      "3-4": "3-4 days",
-      "4-5": "4-5 days",
-      "5-6": "5-6 days",
-      "6+": "6+ days",
-      "error": "Please select your training frequency"
+      "label": "تكرار التدريب (أيام في الأسبوع)",
+      "3-4": "3-4 أيام",
+      "4-5": "4-5 أيام",
+      "5-6": "5-6 أيام",
+      "6+": "6+ أيام",
+      "error": "يرجى اختيار تكرار تدريبك"
     },
-    "back": "Back",
-    "next": "Next"
+    "back": "رجوع",
+    "next": "التالي"
   },
   "screen3": {
-    "title": "Health & Training Style",
-    "subtitle": "Let's keep you safe and effective",
+    "title": "الصحة وأسلوب التدريب",
+    "subtitle": "دعنا نحافظ على سلامتك وفعاليتك",
+    "description": "ساعدنا في تخصيص تمارينك لاحتياجاتك",
     "injuries": {
-      "label": "Injuries or Limitations (Optional)",
-      "placeholder": "e.g., knee pain, lower back issues, shoulder injury...",
-      "helper": "The AI will exclude exercises that may aggravate these conditions",
-      "charCount": "{{remaining}} characters remaining",
-      "error": "Please keep injuries description under 500 characters"
+      "label": "الإصابات أو القيود (اختياري)",
+      "placeholder": "مثال: ألم الركبة، مشاكل أسفل الظهر، إصابة الكتف...",
+      "helper": "سيستبعد الذكاء الاصطناعي التمارين التي قد تؤدي إلى تفاقم هذه الحالات",
+      "charCount": "{{remaining}} حرف متبقي",
+      "error": "يرجى إبقاء وصف الإصابات أقل من 500 حرف"
     },
     "trainingStyle": {
-      "label": "Preferred Training Style",
-      "strength": "Strength Training",
-      "cardio": "Cardio Focused",
-      "balanced": "Balanced Mix",
-      "error": "Please select your training style"
+      "label": "أسلوب التدريب المفضل",
+      "strength": "تدريب القوة",
+      "cardio": "التركيز على القلب",
+      "balanced": "مزيج متوازن",
+      "error": "يرجى اختيار أسلوب تدريبك"
     },
     "timeAvailability": {
-      "label": "Time Available per Session",
-      "15-30": "15-30 minutes",
-      "30-45": "30-45 minutes",
-      "45-60": "45-60 minutes",
-      "60+": "60+ minutes",
-      "error": "Please select your available time"
+      "label": "الوقت المتاح لكل جلسة",
+      "description": "كم من الوقت يمكنك تخصيصه لكل جلسة تمرين؟",
+      "select": "اختر الوقت المتاح",
+      "15-30": "15-30 دقيقة",
+      "30-45": "30-45 دقيقة",
+      "45-60": "45-60 دقيقة",
+      "60+": "60+ دقيقة",
+      "error": "يرجى اختيار وقتك المتاح"
     },
-    "back": "Back",
-    "generate": "Generate Workouts"
+    "back": "رجوع",
+    "generate": "إنشاء التمارين"
   },
   "loading": {
-    "analyzing": "Analyzing your profile...",
-    "selecting": "Selecting exercises...",
-    "creating": "Creating your personalized workouts...",
-    "finalizing": "Almost done...",
-    "warning": "This is taking longer than usual. Please wait...",
-    "cancel": "Cancel",
+    "analyzing": "تحليل ملفك الشخصي...",
+    "selecting": "اختيار التمارين...",
+    "creating": "إنشاء تمارينك الشخصية...",
+    "finalizing": "على وشك الانتهاء...",
+    "warning": "هذا يستغرق وقتًا أطول من المعتاد. يرجى الانتظار...",
+    "cancel": "إلغاء",
     "timeout": {
-      "title": "Request Timeout",
-      "message": "The AI is taking longer than expected. Would you like to try again?",
-      "retry": "Try Again",
-      "cancel": "Cancel"
+      "title": "انتهت مهلة الطلب",
+      "message": "الذكاء الاصطناعي يستغرق وقتًا أطول من المتوقع. هل تريد المحاولة مرة أخرى؟",
+      "retry": "حاول مرة أخرى",
+      "cancel": "إلغاء"
     }
   },
   "results": {
-    "title": "Your Personalized Workouts",
-    "subtitle": "AI-generated workouts tailored to your goals",
-    "aiGeneratedBadge": "AI-Generated",
-    "exercises": "{{count}} exercises",
-    "duration": "~{{minutes}} min",
-    "scheduledDays": "Scheduled for {{days}}",
-    "viewWorkouts": "View Workouts",
-    "generateAgain": "Generate Again",
-    "close": "Close",
-    "saved": "Workouts saved successfully!"
+    "title": "تمارينك الشخصية",
+    "subtitle": "تمارين مُنشأة بالذكاء الاصطناعي مصممة لأهدافك",
+    "aiGeneratedBadge": "مُنشأ بالذكاء الاصطناعي",
+    "exercises": "{{count}} تمرين",
+    "duration": "~{{minutes}} دقيقة",
+    "scheduledDays": "مجدولة ليوم {{days}}",
+    "viewWorkouts": "عرض التمارين",
+    "generateAgain": "إنشاء مرة أخرى",
+    "close": "إغلاق",
+    "saved": "تم حفظ التمارين بنجاح!"
   },
   "errors": {
-    "authRequired": "You must be signed in to generate AI workouts.",
-    "offline": "You must be online to generate AI workouts. Please check your connection.",
-    "rateLimit": "You've reached the limit for AI workout generation. Please try again in {{minutes}} minutes.",
-    "rateLimitGeneric": "You've reached the limit for AI workout generation. Please try again later.",
-    "validationError": "The information you provided is invalid. Please check your answers and try again.",
-    "aiError": "AI workout generation failed. Please try again.",
-    "timeout": "The request took too long. Please try again.",
-    "networkError": "Network error. Please check your connection and try again.",
-    "invalidResponse": "Received invalid response from server. Please try again.",
-    "noWorkouts": "AI did not generate any workouts. Please try again with different preferences.",
-    "unknownError": "An unexpected error occurred. Please try again.",
-    "incompleteData": "Please complete all required fields before generating workouts.",
-    "retry": "Retry",
-    "dismiss": "Dismiss"
+    "authRequired": "يجب تسجيل الدخول لإنشاء تمارين بالذكاء الاصطناعي.",
+    "offline": "يجب أن تكون متصلاً بالإنترنت لإنشاء تمارين بالذكاء الاصطناعي. يرجى التحقق من اتصالك.",
+    "rateLimit": "لقد وصلت إلى الحد الأقصى لإنشاء التمارين بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى خلال {{minutes}} دقيقة.",
+    "rateLimitGeneric": "لقد وصلت إلى الحد الأقصى لإنشاء التمارين بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى لاحقًا.",
+    "validationError": "المعلومات التي قدمتها غير صحيحة. يرجى التحقق من إجاباتك والمحاولة مرة أخرى.",
+    "aiError": "فشل إنشاء التمارين بالذكاء الاصطناعي. يرجى المحاولة مرة أخرى.",
+    "timeout": "استغرق الطلب وقتًا طويلاً. يرجى المحاولة مرة أخرى.",
+    "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    "invalidResponse": "تم تلقي استجابة غير صالحة من الخادم. يرجى المحاولة مرة أخرى.",
+    "noWorkouts": "لم ينشئ الذكاء الاصطناعي أي تمارين. يرجى المحاولة مرة أخرى بتفضيلات مختلفة.",
+    "unknownError": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+    "incompleteData": "يرجى إكمال جميع الحقول المطلوبة قبل إنشاء التمارين.",
+    "retry": "إعادة المحاولة",
+    "dismiss": "تجاهل"
   },
   "onboarding": {
+    "title": "منشئ التمارين بالذكاء الاصطناعي",
+    "subtitle": "أجب عن بعض الأسئلة وسننشئ لك خطط تمرين مخصصة.",
+    "exitTitle": "الخروج من منشئ التمارين؟",
+    "exitConfirm": "هل أنت متأكد أنك تريد الخروج؟ سيتم فقدان تقدمك.",
+    "stayButton": "البقاء",
+    "exitButton": "خروج",
+    "backButton": "رجوع",
+    "nextButton": "التالي",
+    "generateButton": "إنشاء تمارينني",
     "exitConfirmation": {
-      "title": "Are you sure you want to exit?",
-      "message": "Your progress will be lost if you leave now.",
-      "continue": "Continue",
-      "exit": "Exit"
+      "title": "هل أنت متأكد أنك تريد الخروج؟",
+      "message": "سيتم فقدان تقدمك إذا غادرت الآن.",
+      "continue": "متابعة",
+      "exit": "خروج"
     }
   },
   "days": {
-    "monday": "Monday",
-    "tuesday": "Tuesday",
-    "wednesday": "Wednesday",
-    "thursday": "Thursday",
-    "friday": "Friday",
-    "saturday": "Saturday",
-    "sunday": "Sunday"
+    "monday": "الاثنين",
+    "tuesday": "الثلاثاء",
+    "wednesday": "الأربعاء",
+    "thursday": "الخميس",
+    "friday": "الجمعة",
+    "saturday": "السبت",
+    "sunday": "الأحد"
   }
 }
