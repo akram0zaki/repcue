@@ -280,8 +280,49 @@ Response: { workouts: GeneratedWorkout[], metadata: { ... } }
 
 ---
 
+## Mistral AI Provider Integration
+
+**Date:** 2025-10-04
+**Purpose:** Add Mistral as third AI provider option for cost optimization
+
+### Changes Made:
+
+1. **Code Changes:**
+   - Added `MistralProvider` class to `supabase/functions/generate-ai-workout/ai-client.ts`
+   - Updated `getAIProvider()` to support 'mistral' option
+   - Uses `mistral-small-latest` model (Mistral Small 3)
+   - Implements same interface as Claude and OpenAI providers
+
+2. **Environment Configuration:**
+   - Added `MISTRAL_API_KEY` secret to Supabase
+   - Set `AI_PROVIDER=mistral` as default in development environment
+
+3. **Model Configuration:**
+   - **Model:** `mistral-small-latest` (Mistral Small 3)
+   - **Cost:** $0.10 input / $0.30 output per 1M tokens
+   - **Estimated cost per request:** $0.0024
+   - **Context window:** 128K tokens
+   - **Benefits:** European data privacy (GDPR), excellent value, good structured output
+
+### Deployment Status:
+- ✅ Code updated in workspace
+- ✅ Secrets configured in development environment
+- ✅ Function deployed to development
+- [ ] Test AI workout generation with Mistral
+- [ ] Monitor quality and performance
+- [ ] Compare with Claude Haiku results
+- [ ] Deploy to production if quality is acceptable
+
+### API Endpoint:
+- Development: `https://xwzrsfkzqxdybjrkkkvh.supabase.co/functions/v1/generate-ai-workout`
+- Provider: Mistral AI
+- Model: mistral-small-latest
+
+---
+
 ## References
 
 - Implementation Plan: `docs/implementation-plans/repcue-ai-assistant/ai-assisted-workouts-implementation-plan.md`
 - PRD: `docs/implementation-plans/repcue-ai-assistant/ai-assisted-workouts-prd.md`
+- Token Estimation: `docs/ai-assistant-token-estimation.md`
 - Task: Phase 1, Task 1.2

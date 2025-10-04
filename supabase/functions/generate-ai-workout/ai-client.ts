@@ -4,11 +4,13 @@
  * Provides abstraction layer for multiple AI providers:
  * - Anthropic Claude (primary)
  * - OpenAI GPT (fallback/alternative)
+ * - Mistral AI (European option)
  *
  * Environment variables:
- * - AI_PROVIDER: 'anthropic' | 'openai' (default: 'anthropic')
+ * - AI_PROVIDER: 'anthropic' | 'openai' | 'mistral' (default: 'anthropic')
  * - ANTHROPIC_API_KEY: Anthropic API key
  * - OPENAI_API_KEY: OpenAI API key (optional)
+ * - MISTRAL_API_KEY: Mistral API key (optional)
  */
 
 import { logError, logInfo, logDebug, logWarn } from './logger.ts';
@@ -234,9 +236,110 @@ class OpenAIProvider implements AIProvider {
 }
 
 /**
+ * Mistral AI provider
+ */
+class MistralProvider implements AIProvider {
+  readonly name = 'mistral';
+  private apiKey: string;
+  private baseUrl = 'https://api.mistral.ai/v1/chat/completions';
+
+  constructor() {
+    const apiKey = Deno.env.get('MISTRAL_API_KEY');
+    if (!apiKey) {
+      throw new Error('MISTRAL_API_KEY environment variable is not set');
+    }
+    this.apiKey = apiKey;
+  }
+
+  async generateCompletion(
+    prompt: string,
+    options: AIOptions,
+    correlationId: string
+  ): Promise<string> {
+    const maxTokens = options.maxTokens || 4096;
+    const temperature = options.temperature || 0.7;
+    const timeout = options.timeout || 60000;
+
+    logDebug(correlationId, 'Calling Mistral API', {
+      provider: this.name,
+      maxTokens,
+      temperature,
+      timeoutMs: timeout
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(this.baseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'mistral-small-latest', // Mistral Small 3 - best value
+          max_tokens: maxTokens,
+          temperature,
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        logError(correlationId, 'Mistral API error', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorBody
+        });
+        throw new Error(`Mistral API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        logError(correlationId, 'Invalid response format from Mistral', { data });
+        throw new Error('Invalid response format from Mistral API');
+      }
+
+      const completion = data.choices[0].message.content;
+      logInfo(correlationId, 'Mistral API call successful', {
+        provider: this.name,
+        responseLength: completion.length,
+        usage: data.usage
+      });
+
+      return completion;
+
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      if (error.name === 'AbortError') {
+        logError(correlationId, 'Mistral API timeout', { timeoutMs: timeout });
+        throw new Error(`AI request timed out after ${timeout}ms`);
+      }
+
+      logError(correlationId, 'Mistral API request failed', {
+        error: error.message,
+        stack: error.stack
+      });
+      throw error;
+    }
+  }
+}
+
+/**
  * Gets AI provider based on environment variable
  *
- * @param providerName - Name of provider ('anthropic' | 'openai')
+ * @param providerName - Name of provider ('anthropic' | 'openai' | 'mistral')
  * @returns AIProvider instance
  * @throws Error if provider is unknown or API key is missing
  */
@@ -250,9 +353,11 @@ export function getAIProvider(providerName?: string, correlationId?: string): AI
       return new AnthropicProvider();
     case 'openai':
       return new OpenAIProvider();
+    case 'mistral':
+      return new MistralProvider();
     default:
       logError(correlationId || 'init', 'Unknown AI provider', { provider });
-      throw new Error(`Unknown AI provider: ${provider}. Supported: anthropic, openai`);
+      throw new Error(`Unknown AI provider: ${provider}. Supported: anthropic, openai, mistral`);
   }
 }
 

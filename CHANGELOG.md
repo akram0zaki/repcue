@@ -1,5 +1,25 @@
 ## Unreleased
 
+### 2025-10-04 (AI Assistant - Mistral Support)
+#### Added
+- **Mistral AI Provider Support**: Added Mistral as third AI provider option
+  - Implemented `MistralProvider` class in `ai-client.ts`
+  - Uses `mistral-small-latest` model (Mistral Small 3)
+  - Cost-effective European alternative: $0.0024 per request
+  - GDPR compliant by design
+  - Configured via `AI_PROVIDER=mistral` environment variable
+  - API key stored securely in Supabase secrets
+
+- **Multi-Provider Architecture**: Enhanced AI client to support 3 providers
+  - Anthropic Claude (original)
+  - OpenAI GPT (fallback)
+  - Mistral AI (new European option)
+  - Easy switching via environment variable
+
+#### Changed
+- Updated AI provider documentation to include Mistral
+- Deployed to development environment with Mistral as default provider
+
 ### 2025-10-04 (Update Notification UI - Style Guide Compliance & i18n)
 #### Fixed
 - **Update Notification Styling**: Migrated to semantic tokens and style guide compliance
