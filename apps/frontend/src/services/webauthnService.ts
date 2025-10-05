@@ -304,7 +304,7 @@ export class WebAuthnService {
       const { data, error } = await supabase
         .from('user_authenticators')
         .select('id, device_name, created_at, last_used_at')
-        .eq('user_id', user.id)
+        .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -341,7 +341,7 @@ export class WebAuthnService {
         .from('user_authenticators')
         .delete()
         .eq('id', passkeyId)
-        .eq('user_id', user.id);
+        .eq('owner_id', user.id);
 
       if (error) {
         return { success: false, error: error.message };
@@ -370,7 +370,7 @@ export class WebAuthnService {
         .from('user_authenticators')
         .update({ device_name: deviceName })
         .eq('id', passkeyId)
-        .eq('user_id', user.id);
+        .eq('owner_id', user.id);
 
       if (error) {
         return { success: false, error: error.message };

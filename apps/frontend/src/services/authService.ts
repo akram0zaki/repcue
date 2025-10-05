@@ -396,16 +396,26 @@ export class AuthService {
    */
   public async registerPasskey(email: string): Promise<PasskeyRegistrationResult> {
     const result = await webauthnService.registerPasskey(email);
-    
+
     if (result.success && result.session) {
-      // The session data from WebAuthn edge function contains the session info
-      // We need to refresh the current session to get the latest auth state
-      const { data, error } = await supabase.auth.getSession();
-      if (!error && data.session) {
-        await this.handleSessionChange(data.session);
+      // The session data from WebAuthn edge function contains a hashed_token
+      // We need to verify this token to establish the session
+      const hashedToken = result.session.properties?.hashed_token;
+
+      if (hashedToken) {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: hashedToken,
+          type: 'magiclink'
+        });
+
+        if (!error && data.session) {
+          await this.handleSessionChange(data.session);
+        } else {
+          logger.error('Failed to verify passkey session:', error);
+        }
       }
     }
-    
+
     return result;
   }
 
@@ -414,16 +424,26 @@ export class AuthService {
    */
   public async signInWithPasskey(email?: string): Promise<PasskeyAuthenticationResult> {
     const result = await webauthnService.authenticateWithPasskey(email);
-    
+
     if (result.success && result.session) {
-      // The session data from WebAuthn edge function contains the session info
-      // We need to refresh the current session to get the latest auth state
-      const { data, error } = await supabase.auth.getSession();
-      if (!error && data.session) {
-        await this.handleSessionChange(data.session);
+      // The session data from WebAuthn edge function contains a hashed_token
+      // We need to verify this token to establish the session
+      const hashedToken = result.session.properties?.hashed_token;
+
+      if (hashedToken) {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: hashedToken,
+          type: 'magiclink'
+        });
+
+        if (!error && data.session) {
+          await this.handleSessionChange(data.session);
+        } else {
+          logger.error('Failed to verify passkey session:', error);
+        }
       }
     }
-    
+
     return result;
   }
 

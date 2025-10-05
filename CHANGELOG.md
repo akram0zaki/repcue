@@ -1,5 +1,22 @@
 ## Unreleased
 
+### 2025-10-05 (Biometric Authentication Fixes)
+
+#### Fixed
+- **WebAuthn Biometric Authentication**: Fixed passkey signup and signin flows
+  - Fixed `webauthn-register` edge function to use correct Supabase Admin API methods
+    - Replaced non-existent `getUserByEmail()` with `listUsers()` and client-side filtering
+    - Updated all database queries to use `owner_id` instead of deprecated `user_id` column
+  - Fixed credential data structure for SimpleWebAuthn v12 compatibility
+    - Registration: Updated to use `credential.publicKey` from nested structure instead of `credentialID`/`credentialPublicKey`
+    - Authentication: Changed `authenticator` parameter to `credential` with `id`/`publicKey` properties
+    - Fixed `excludeCredentials` to use base64url strings instead of Uint8Arrays
+  - Fixed session establishment after successful authentication
+    - Updated `authService.ts` to use `supabase.auth.verifyOtp()` with hashed token
+    - Previously used `getSession()` which couldn't find un-established sessions
+  - Added duplicate passkey prevention with clear user messaging
+  - Deployed fixes to both development and production environments
+
 ### 2025-10-06 (Update Error Dialog i18n & AI Workout Fixes)
 
 #### Fixed
