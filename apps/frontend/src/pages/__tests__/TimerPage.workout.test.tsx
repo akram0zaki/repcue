@@ -144,8 +144,8 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    // Check for workout progress bar (white bar in blue container)
-    const progressBar = document.querySelector('.bg-white.h-1\\.5.rounded-full');
+    // Check for workout progress bar using new CSS classes
+    const progressBar = document.querySelector('.progress__bar');
     expect(progressBar).toBeInTheDocument();
   });
 
@@ -165,9 +165,11 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    // Check for workout progress bar with 50% width
-    const progressBar = document.querySelector('[style*="width: 50%"]');
+    // Check for workout progress bar with CSS variable set to 50%
+    const progressBar = document.querySelector('.progress__bar') as HTMLElement;
     expect(progressBar).toBeInTheDocument();
+    // Check CSS variable is set correctly (value is '50' without %)
+    expect(progressBar.style.getPropertyValue('--progress')).toBe('50');
   });
 
   it('should display rep/set progress for repetition-based exercises', () => {
@@ -306,6 +308,7 @@ describe('TimerPage - Workout Mode', () => {
     render(
       <TimerPage
         {...defaultProps}
+        selectedExercise={null} // No exercise selected to show "Choose" button
         timerState={standaloneTimerState}
       />
     );

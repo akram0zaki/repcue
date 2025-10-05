@@ -107,7 +107,8 @@ describe('OnboardingFlow', () => {
       render(<OnboardingFlow />);
 
       const progressBar = screen.getByRole('progressbar');
-      expect(progressBar).toHaveStyle({ width: '33.33%' });
+      // Progress bar now uses CSS variable --progress instead of width style
+      expect((progressBar as HTMLElement).style.getPropertyValue('--progress')).toBe('33');
       expect(progressBar).toHaveAttribute('aria-valuenow', '33');
     });
 
