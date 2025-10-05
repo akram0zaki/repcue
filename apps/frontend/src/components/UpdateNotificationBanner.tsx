@@ -66,18 +66,18 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
         };
       case 'optional':
         return {
-          bgColor: 'bg-primary-50 dark:bg-primary-900/20',
-          borderColor: 'border-primary-600',
-          textColor: 'text-primary-800 dark:text-primary-200',
+          bgColor: 'bg-success-soft',
+          borderColor: 'border-success',
+          textColor: 'text-success',
           icon: '🔄',
           urgency: 'low' as const,
           canDismiss: true
         };
       default:
         return {
-          bgColor: 'bg-surface-100 dark:bg-surface-800',
-          borderColor: 'border-surface-300 dark:border-surface-600',
-          textColor: 'text-text-900 dark:text-text-50',
+          bgColor: 'bg-surface-0 dark:bg-surface-800',
+          borderColor: 'border-primary',
+          textColor: 'text-body',
           icon: 'ℹ️',
           urgency: 'low' as const,
           canDismiss: true
@@ -142,12 +142,15 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
 
   return (
     <div
-      className={`${config.bgColor} border-l-4 ${config.borderColor} ${config.textColor} p-4 mb-4 ${className}`}
+      className="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none"
       role={config.urgency === 'high' ? 'alert' : 'status'}
       aria-live={config.urgency === 'high' ? 'assertive' : 'polite'}
-      data-testid="update-notification-banner"
     >
-      <div className="flex items-start justify-between">
+      <div
+        className={`${config.bgColor} border ${config.borderColor} ${config.textColor} rounded-lg shadow-lg max-w-md w-full pointer-events-auto p-4 ${className}`}
+        data-testid="update-notification-banner"
+      >
+        <div className="flex items-start justify-between">
         <div className="flex items-start flex-1">
           <div className="flex-shrink-0 mr-3" aria-hidden="true">
             <span className="text-2xl">{config.icon}</span>
@@ -317,6 +320,7 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
           <span className="mr-2 rtl:ml-2 rtl:mr-0" aria-hidden="true">📊</span>
           {t('update.estimatedSize', 'Est. {{size}}MB', { size: estimatedSize })}
         </div>
+      </div>
       </div>
     </div>
   );

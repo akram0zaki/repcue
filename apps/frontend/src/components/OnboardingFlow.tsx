@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: onboarding copy and hints pending full localization */
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { TargetIcon, LightningIcon, LockIcon } from './icons/NavigationIcons';
 
@@ -28,6 +29,7 @@ interface OnboardingFlowProps {
  * @param className - Additional CSS classes
  */
 export function OnboardingFlow({ onComplete, onSkip, className = '' }: OnboardingFlowProps) {
+  const { t } = useTranslation();
   const {
     isOnboardingActive,
     currentStepData,

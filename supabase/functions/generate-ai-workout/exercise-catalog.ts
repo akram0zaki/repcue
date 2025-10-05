@@ -1,12 +1,24 @@
 /**
- * Exercise Catalog Fetcher
+ * Exercise Catalog Manager with Access Control
  *
- * Fetches exercises from Supabase database for AI workout generation.
- * Includes all exercise attributes needed for intelligent workout planning.
+ * Fetches exercises based on user's catalog access.
+ * Implements granular catalog access control for premium features.
+ *
+ * Access Rules:
+ * - general-fitness: Always accessible (free for all users)
+ * - Premium catalogs (women-health, tai-chi, zumba): Require user_catalog_access record
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { logError, logInfo, logDebug } from './logger.ts';
+import {
+  CATALOG_METADATA,
+  FREE_CATALOGS,
+  PREMIUM_CATALOGS,
+  INITIAL_EXERCISES,
+  getExercisesFromCatalogs,
+  type CatalogId
+} from './exercises.ts';
 
 /**
  * Exercise data structure (matches frontend Exercise type)
@@ -34,86 +46,178 @@ export interface Exercise {
 }
 
 /**
- * Fetches exercises from Supabase database
+ * Fetches exercises based on user's catalog access
  *
- * @param correlationId - Correlation ID for logging
- * @returns Array of exercises from all catalogs (excluding user-created/deleted exercises)
+ * Access Rules:
+ * - general-fitness: Always included (free for all users)
+ * - Premium catalogs: Requires record in user_catalog_access table
+ *
+ * @param userId - User UUID from auth.users
+ * @param correlationId - Request correlation ID for logging
+ * @returns Array of exercises user has access to
+ * @throws Error if no exercises available or access check fails
  */
-export async function fetchExerciseCatalog(correlationId: string): Promise<Exercise[]> {
+export async function fetchExerciseCatalog(
+  userId: string,
+  correlationId: string
+): Promise<Exercise[]> {
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      logError(correlationId, 'Missing Supabase environment variables', {
-        hasUrl: !!supabaseUrl,
-        hasServiceKey: !!supabaseServiceKey
-      });
-      throw new Error('Supabase configuration is missing');
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    logDebug(correlationId, 'Fetching exercises from database', {});
-
-    // Fetch all built-in exercises (exclude user-created, only get non-deleted)
-    // Built-in exercises have owner_id = null
-    const { data: exercises, error } = await supabase
-      .from('exercises')
-      .select('*')
-      .is('owner_id', null) // Only built-in exercises
-      .eq('deleted', false) // Only active exercises
-      .order('name');
-
-    if (error) {
-      logError(correlationId, 'Failed to fetch exercises from database', {
-        error: error.message,
-        code: error.code
-      });
-      throw new Error(`Database error: ${error.message}`);
-    }
-
-    if (!exercises || exercises.length === 0) {
-      logError(correlationId, 'No exercises found in database', {});
-      throw new Error('Exercise catalog is empty');
-    }
-
-    logInfo(correlationId, 'Successfully fetched exercises from database', {
-      count: exercises.length
+    logInfo(correlationId, 'Fetching exercise catalog for user', {
+      userId,
+      totalExercises: INITIAL_EXERCISES.length,
+      totalCatalogs: Object.keys(CATALOG_METADATA).length
     });
 
-    // Map database records to Exercise interface
-    const mappedExercises: Exercise[] = exercises.map((ex: any) => ({
-      id: ex.id,
-      name: ex.name,
-      description: ex.description,
-      category: ex.category,
-      exercise_type: ex.exercise_type,
-      catalogId: ex.catalogId || 'general-fitness',
-      default_duration: ex.default_duration,
-      default_sets: ex.default_sets,
-      default_reps: ex.default_reps,
-      rep_duration_seconds: ex.rep_duration_seconds,
-      tags: ex.tags || [],
-      difficulty_level: ex.difficulty_level,
-      equipment_needed: ex.equipment_needed || [],
-      muscle_groups: ex.muscle_groups || [],
-      benefits: ex.benefits,
-      limitations: ex.limitations,
-      best_timing: ex.best_timing,
-      suggested_combinations: ex.suggested_combinations || [],
-      notes: ex.notes
+    // Step 1: Get user's allowed catalog IDs
+    const allowedCatalogIds = await getUserCatalogAccess(userId, correlationId);
+
+    logInfo(correlationId, 'User catalog access retrieved', {
+      userId,
+      allowedCatalogs: allowedCatalogIds,
+      catalogCount: allowedCatalogIds.length
+    });
+
+    // Step 2: Get exercises from allowed catalogs
+    const allowedExercises = getExercisesFromCatalogs(allowedCatalogIds);
+
+    if (allowedExercises.length === 0) {
+      logError(correlationId, 'No exercises available for user', {
+        userId,
+        allowedCatalogs: allowedCatalogIds
+      });
+      throw new Error('No exercises available. Please contact support.');
+    }
+
+    // Step 3: Log catalog breakdown for debugging
+    const catalogBreakdown = allowedCatalogIds.map(catalogId => ({
+      catalogId,
+      name: CATALOG_METADATA[catalogId]?.name,
+      isPremium: CATALOG_METADATA[catalogId]?.isPremium,
+      exerciseCount: CATALOG_METADATA[catalogId]?.exercises.length
     }));
 
-    return mappedExercises;
+    logInfo(correlationId, 'Exercises filtered by catalog access', {
+      userId,
+      totalExercises: INITIAL_EXERCISES.length,
+      allowedExercises: allowedExercises.length,
+      catalogsUsed: catalogBreakdown
+    });
+
+    return allowedExercises;
 
   } catch (error) {
-    logError(correlationId, 'Error fetching exercise catalog', {
+    logError(correlationId, 'Failed to fetch exercise catalog', {
+      userId,
       error: error.message,
       stack: error.stack
     });
     throw error;
   }
+}
+
+/**
+ * Gets catalog IDs the user has access to
+ *
+ * Access Logic:
+ * 1. Always include FREE_CATALOGS (general-fitness)
+ * 2. Query user_catalog_access for premium catalogs
+ * 3. Filter by active access (not expired)
+ * 4. Return combined list
+ *
+ * @param userId - User UUID
+ * @param correlationId - Request correlation ID for logging
+ * @returns Array of catalog IDs (always includes 'general-fitness')
+ */
+async function getUserCatalogAccess(
+  userId: string,
+  correlationId: string
+): Promise<CatalogId[]> {
+  // Always include free catalogs
+  const accessibleCatalogs: CatalogId[] = [...FREE_CATALOGS];
+
+  logDebug(correlationId, 'Starting catalog access check', {
+    userId,
+    freeCatalogs: FREE_CATALOGS
+  });
+
+  try {
+    // Get Supabase credentials
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      logError(correlationId, 'Supabase configuration missing - returning free catalogs only', {
+        hasUrl: !!supabaseUrl,
+        hasServiceKey: !!supabaseServiceKey
+      });
+      return accessibleCatalogs;
+    }
+
+    // Create Supabase client with service role key
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Query user's premium catalog access
+    // Filter for active access: expires_at IS NULL OR expires_at > now()
+    const { data, error } = await supabase
+      .from('user_catalog_access')
+      .select('catalog_id, expires_at, granted_at, granted_by, notes')
+      .eq('owner_id', userId)
+      .or('expires_at.is.null,expires_at.gt.' + new Date().toISOString());
+
+    if (error) {
+      // Log error but don't fail - return free catalogs as fallback
+      logError(correlationId, 'Failed to query catalog access - returning free catalogs only', {
+        userId,
+        error: error.message,
+        code: error.code
+      });
+      return accessibleCatalogs;
+    }
+
+    // Log query result
+    logDebug(correlationId, 'Catalog access query completed', {
+      userId,
+      recordsFound: data?.length || 0
+    });
+
+    // Add premium catalogs user has access to
+    if (data && data.length > 0) {
+      const premiumCatalogs = data
+        .map(row => row.catalog_id as CatalogId)
+        .filter(catalogId => PREMIUM_CATALOGS.includes(catalogId));
+
+      if (premiumCatalogs.length > 0) {
+        accessibleCatalogs.push(...premiumCatalogs);
+
+        logInfo(correlationId, 'Premium catalog access granted', {
+          userId,
+          premiumCatalogs,
+          grantDetails: data.map(row => ({
+            catalog: row.catalog_id,
+            grantedBy: row.granted_by,
+            grantedAt: row.granted_at,
+            expiresAt: row.expires_at,
+            notes: row.notes
+          }))
+        });
+      }
+    } else {
+      logDebug(correlationId, 'No premium catalog access found', {
+        userId,
+        message: 'User has access to free catalogs only'
+      });
+    }
+
+  } catch (error) {
+    // Catch any unexpected errors - log but return free catalogs as fallback
+    logError(correlationId, 'Unexpected error during catalog access check', {
+      userId,
+      error: error.message,
+      stack: error.stack
+    });
+  }
+
+  return accessibleCatalogs;
 }
 
 /**
@@ -216,4 +320,31 @@ export function groupExercisesByCategory(exercises: Exercise[]): Record<string, 
   }
 
   return grouped;
+}
+
+/**
+ * Get catalog metadata for a specific catalog
+ *
+ * @param catalogId - Catalog identifier
+ * @returns Catalog metadata or undefined if not found
+ */
+export function getCatalogMetadata(catalogId: string) {
+  return CATALOG_METADATA[catalogId as CatalogId];
+}
+
+/**
+ * Check if user has access to a specific catalog
+ *
+ * @param userId - User UUID
+ * @param catalogId - Catalog identifier
+ * @param correlationId - Request correlation ID
+ * @returns True if user has access, false otherwise
+ */
+export async function hasUserCatalogAccess(
+  userId: string,
+  catalogId: CatalogId,
+  correlationId: string
+): Promise<boolean> {
+  const allowedCatalogs = await getUserCatalogAccess(userId, correlationId);
+  return allowedCatalogs.includes(catalogId);
 }

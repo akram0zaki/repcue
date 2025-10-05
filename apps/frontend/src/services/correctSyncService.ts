@@ -242,7 +242,6 @@ export class CorrectSyncService {
 
       // 1. Collect dirty records per table (initial queue per table)
   const queues: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }> = {};
-  const collectStart = performance.now();
       // Track records we push in this sync cycle to avoid overwriting them with pulled data
       const pushedRecords = new Set<string>();
       for (const table of tableList) {

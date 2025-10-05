@@ -25,11 +25,24 @@ export interface AIOptions {
 }
 
 /**
+ * AI completion result with usage data
+ */
+export interface AICompletionResult {
+  completion: string;
+  model: string;
+  usage: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+}
+
+/**
  * AI provider interface
  */
 export interface AIProvider {
   readonly name: string;
-  generateCompletion(prompt: string, options: AIOptions, correlationId: string): Promise<string>;
+  generateCompletion(prompt: string, options: AIOptions, correlationId: string): Promise<AICompletionResult>;
 }
 
 /**
@@ -52,13 +65,15 @@ class AnthropicProvider implements AIProvider {
     prompt: string,
     options: AIOptions,
     correlationId: string
-  ): Promise<string> {
+  ): Promise<AICompletionResult> {
     const maxTokens = options.maxTokens || 4096;
     const temperature = options.temperature || 0.7;
     const timeout = options.timeout || 60000;
+    const model = 'claude-3-5-sonnet-20241022'; // Latest Sonnet model
 
     logDebug(correlationId, 'Calling Anthropic API', {
       provider: this.name,
+      model,
       maxTokens,
       temperature,
       timeoutMs: timeout
@@ -76,7 +91,7 @@ class AnthropicProvider implements AIProvider {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20241022', // Latest Sonnet model
+          model,
           max_tokens: maxTokens,
           temperature,
           messages: [
@@ -109,13 +124,24 @@ class AnthropicProvider implements AIProvider {
       }
 
       const completion = data.content[0].text;
+      const usage = {
+        prompt_tokens: data.usage?.input_tokens || 0,
+        completion_tokens: data.usage?.output_tokens || 0,
+        total_tokens: (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0),
+      };
+
       logInfo(correlationId, 'Anthropic API call successful', {
         provider: this.name,
+        model,
         responseLength: completion.length,
-        usage: data.usage
+        usage
       });
 
-      return completion;
+      return {
+        completion,
+        model,
+        usage,
+      };
 
     } catch (error) {
       clearTimeout(timeoutId);
@@ -154,13 +180,15 @@ class OpenAIProvider implements AIProvider {
     prompt: string,
     options: AIOptions,
     correlationId: string
-  ): Promise<string> {
+  ): Promise<AICompletionResult> {
     const maxTokens = options.maxTokens || 4096;
     const temperature = options.temperature || 0.7;
     const timeout = options.timeout || 60000;
+    const model = 'gpt-4o-mini'; // Latest GPT-4o-mini
 
     logDebug(correlationId, 'Calling OpenAI API', {
       provider: this.name,
+      model,
       maxTokens,
       temperature,
       timeoutMs: timeout
@@ -177,7 +205,7 @@ class OpenAIProvider implements AIProvider {
           'Authorization': `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4-turbo-preview', // Latest GPT-4 Turbo
+          model,
           max_tokens: maxTokens,
           temperature,
           messages: [
@@ -210,13 +238,24 @@ class OpenAIProvider implements AIProvider {
       }
 
       const completion = data.choices[0].message.content;
+      const usage = {
+        prompt_tokens: data.usage?.prompt_tokens || 0,
+        completion_tokens: data.usage?.completion_tokens || 0,
+        total_tokens: data.usage?.total_tokens || 0,
+      };
+
       logInfo(correlationId, 'OpenAI API call successful', {
         provider: this.name,
+        model,
         responseLength: completion.length,
-        usage: data.usage
+        usage
       });
 
-      return completion;
+      return {
+        completion,
+        model,
+        usage,
+      };
 
     } catch (error) {
       clearTimeout(timeoutId);
@@ -255,13 +294,15 @@ class MistralProvider implements AIProvider {
     prompt: string,
     options: AIOptions,
     correlationId: string
-  ): Promise<string> {
+  ): Promise<AICompletionResult> {
     const maxTokens = options.maxTokens || 4096;
     const temperature = options.temperature || 0.7;
     const timeout = options.timeout || 60000;
+    const model = 'mistral-small-latest'; // Mistral Small 3 - best value
 
     logDebug(correlationId, 'Calling Mistral API', {
       provider: this.name,
+      model,
       maxTokens,
       temperature,
       timeoutMs: timeout
@@ -278,7 +319,7 @@ class MistralProvider implements AIProvider {
           'Authorization': `Bearer ${this.apiKey}`
         },
         body: JSON.stringify({
-          model: 'mistral-small-latest', // Mistral Small 3 - best value
+          model,
           max_tokens: maxTokens,
           temperature,
           messages: [
@@ -311,13 +352,24 @@ class MistralProvider implements AIProvider {
       }
 
       const completion = data.choices[0].message.content;
+      const usage = {
+        prompt_tokens: data.usage?.prompt_tokens || 0,
+        completion_tokens: data.usage?.completion_tokens || 0,
+        total_tokens: data.usage?.total_tokens || 0,
+      };
+
       logInfo(correlationId, 'Mistral API call successful', {
         provider: this.name,
+        model: data.model || model,
         responseLength: completion.length,
-        usage: data.usage
+        usage
       });
 
-      return completion;
+      return {
+        completion,
+        model: data.model || model,
+        usage,
+      };
 
     } catch (error) {
       clearTimeout(timeoutId);
@@ -372,13 +424,13 @@ export function getAIProvider(providerName?: string, correlationId?: string): AI
  * @param prompt - The prompt to send to AI
  * @param options - AI generation options
  * @param correlationId - Correlation ID for logging
- * @returns AI completion text
+ * @returns AI completion result with usage data
  */
 export async function generateAICompletion(
   prompt: string,
   options: AIOptions = {},
   correlationId: string
-): Promise<string> {
+): Promise<AICompletionResult> {
   const maxRetries = 3;
   const initialBackoff = 1000; // 1 second
 

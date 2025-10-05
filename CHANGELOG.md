@@ -1,5 +1,77 @@
 ## Unreleased
 
+### 2025-10-05 (User-Catalog ACL, AI Token Usage Tracking & Cost Monitoring)
+
+#### Added
+- **Access Control List for Catalog Access**: Premium catalogs are accessible only by assigning them to users:
+  - General Fitness catalog is available for all users with no entitlement check.
+  - Database table `user_catalog_access` controls which users can view which premium catalogs.
+- **AI Token Usage Tracking System**: Comprehensive server-side tracking for all AI API calls
+  - Created `ai_usage_logs` database table tracking token counts, costs, and metadata
+  - Automatic cost calculation based on provider pricing (Mistral, Anthropic, OpenAI)
+  - Non-blocking logging - failures never interrupt workout generation
+  - Correlation ID linking to Edge Function logs for debugging
+  - Database constraints ensure token consistency (total = input + output)
+
+- **AI Usage Analytics Views**: SQL views for cost monitoring and optimization
+  - `ai_usage_daily` - Daily aggregated metrics by provider and model
+  - `ai_usage_monthly` - Monthly cost trends and usage patterns
+  - `ai_usage_per_user` - Per-user lifetime usage for identifying heavy users
+  - `ai_usage_errors` - Error breakdown by date, provider, and error code
+  - `ai_usage_summary` - Overall summary statistics (all-time)
+
+- **AI Usage Helper Functions**: Quick cost queries
+  - `get_current_month_ai_cost()` - Total AI cost for current month
+  - `get_today_ai_cost()` - Today's total cost
+  - `get_avg_ai_cost_per_request(days)` - Average cost per request for last N days
+
+- **Enhanced AI Client with Usage Data**: Updated all AI providers to return token usage
+  - New `AICompletionResult` interface with completion, model, and usage data
+  - Updated `AnthropicProvider`, `OpenAIProvider`, `MistralProvider` to extract usage from API responses
+  - Automatic usage extraction and logging after each AI call
+
+- **Usage Logger Module**: New `usage-logger.ts` with pricing tables and cost calculation
+  - Pricing table for all supported models (Mistral, Anthropic, OpenAI)
+  - `calculateCost()` - Automatic cost calculation based on provider/model
+  - `logAIUsage()` - Non-blocking database logging with error handling
+  - Utility functions for extracting usage from different provider responses
+  - 18 comprehensive unit tests covering all providers and edge cases
+
+#### Changed
+- **AI Client Architecture**: Modified to support usage tracking
+  - `generateAICompletion()` now returns `AICompletionResult` instead of plain string
+  - All 3 providers updated to include usage data in responses
+  - Workout generator extracts completion text from result object
+
+- **Workout Generator**: Integrated usage logging
+  - Wraps AI calls in try/catch to capture usage data
+  - Logs successful AI usage with token counts and costs
+  - Logs failed AI usage with error codes (when available)
+  - Tracks processing time for performance monitoring
+
+#### Technical Details
+- **Database Schema**: `ai_usage_logs` table with 5 indexes, RLS policies, and validation constraints
+- **Cost Estimation**: ~$0.0023 per request using Mistral Small (10K input + 500 output tokens)
+- **Monthly Projections**: $0.69 (10 req/day) to $69 (1000 req/day) based on Mistral Small pricing
+- **Security**: RLS enabled, service role only access, no user-facing queries
+- **Precision**: 6 decimal places for micro-transaction accuracy
+- **Provider Agnostic**: Easy to add new providers by updating pricing table
+
+#### Files Changed
+- `supabase/migrations/20251005122735_create_ai_usage_logs.sql` - Database schema (new)
+- `supabase/migrations/20251005122736_create_ai_usage_views.sql` - Views and functions (new)
+- `supabase/functions/generate-ai-workout/usage-logger.ts` - Usage logging module (new)
+- `supabase/functions/generate-ai-workout/ai-client.ts` - Enhanced with usage data
+- `supabase/functions/generate-ai-workout/workout-generator.ts` - Integrated logging
+- `supabase/functions/generate-ai-workout/__tests__/usage-logger.test.ts` - Unit tests (new)
+- `docs/implementation-plans/repcue-ai-assistant/token-audit-implementation-plan.md` - Implementation plan (new)
+- `docs/migration-tracking/supabase-changes_20251005.md` - Migration tracking updated
+
+#### Deployed
+- ✅ Edge Function deployed to dev (xwzrsfkzqxdybjrkkkvh)
+- ✅ Migrations applied to dev database
+- ✅ Production deployment pending
+
 ### 2025-10-04 (AI Assistant - Mistral Support)
 #### Added
 - **Mistral AI Provider Support**: Added Mistral as third AI provider option

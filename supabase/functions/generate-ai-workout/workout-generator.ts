@@ -14,6 +14,7 @@ import { fetchExerciseCatalog, filterExercisesForUser, type Exercise } from './e
 import { buildAIPrompt, type UserProfile } from './prompt-builder.ts';
 import { generateAICompletion } from './ai-client.ts';
 import { logError, logInfo, logDebug, logWarn } from './logger.ts';
+import { logAIUsage, type TokenUsage } from './usage-logger.ts';
 
 /**
  * Generated workout structure (matches frontend Workout type)
@@ -245,9 +246,9 @@ export async function generateWorkouts(
 ): Promise<GeneratedWorkout[]> {
   logInfo(correlationId, 'Starting workout generation', { userId });
 
-  // Step 1: Fetch exercise catalog
+  // Step 1: Fetch exercise catalog (filtered by user's catalog access)
   logDebug(correlationId, 'Fetching exercise catalog', {});
-  const allExercises = await fetchExerciseCatalog(correlationId);
+  const allExercises = await fetchExerciseCatalog(userId, correlationId);
 
   if (!allExercises || allExercises.length === 0) {
     throw new Error('Exercise catalog is empty');
@@ -287,16 +288,71 @@ export async function generateWorkouts(
   const prompt = buildAIPrompt(userProfile, filteredExercises, correlationId);
 
   // Step 4: Call AI provider
+  const aiStartTime = Date.now();
   logInfo(correlationId, 'Calling AI provider', {});
-  const aiResponseText = await generateAICompletion(
-    prompt,
-    {
-      maxTokens: 4096,
-      temperature: 0.7,
-      timeout: 60000
-    },
-    correlationId
-  );
+
+  let aiResult;
+  let aiProcessingTime = 0;
+
+  try {
+    aiResult = await generateAICompletion(
+      prompt,
+      {
+        maxTokens: 4096,
+        temperature: 0.7,
+        timeout: 60000
+      },
+      correlationId
+    );
+
+    aiProcessingTime = Date.now() - aiStartTime;
+
+    // Step 4a: Log AI usage (non-blocking)
+    const provider = Deno.env.get('AI_PROVIDER') || 'anthropic';
+    const usage: TokenUsage = {
+      input_tokens: aiResult.usage.prompt_tokens,
+      output_tokens: aiResult.usage.completion_tokens,
+      total_tokens: aiResult.usage.total_tokens,
+    };
+
+    await logAIUsage({
+      correlationId,
+      userId,
+      provider,
+      model: aiResult.model,
+      usage,
+      processingTimeMs: aiProcessingTime,
+      success: true,
+    });
+
+  } catch (error) {
+    aiProcessingTime = Date.now() - aiStartTime;
+
+    // Log failed AI usage if we have partial data
+    const provider = Deno.env.get('AI_PROVIDER') || 'anthropic';
+    if (error.usage) {
+      const usage: TokenUsage = {
+        input_tokens: error.usage.prompt_tokens || 0,
+        output_tokens: error.usage.completion_tokens || 0,
+        total_tokens: error.usage.total_tokens || 0,
+      };
+
+      await logAIUsage({
+        correlationId,
+        userId,
+        provider,
+        model: error.model || 'unknown',
+        usage,
+        processingTimeMs: aiProcessingTime,
+        success: false,
+        errorCode: error.code || 'AI_GENERATION_ERROR',
+      });
+    }
+
+    throw error;
+  }
+
+  const aiResponseText = aiResult.completion;
 
   // Step 5: Parse AI response
   logDebug(correlationId, 'Parsing AI response', { responseLength: aiResponseText.length });

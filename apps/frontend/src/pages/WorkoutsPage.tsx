@@ -237,7 +237,7 @@ const WorkoutsPage: React.FC = () => {
             {workouts.map((workout) => (
               <div
                 key={workout.id}
-                className="bg-surface-0 dark:bg-surface-800 rounded-lg p-4 border border-surface-200 dark:border-surface-700 shadow-sm"
+                className="bg-surface-0 dark:bg-surface-800 rounded-lg p-4 border border-primary shadow-sm"
               >
                 {/* Workout Header */}
                 <div className="text-center mb-3">

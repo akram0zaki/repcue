@@ -853,7 +853,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
             <div className="p-3 sm:p-4">
               {previewUrl ? (
                 <video
-                  className="w-full h-auto rounded-md bg-black"
+                  className="w-full h-auto rounded-md bg-black gpu-accelerated"
                   controls
                   autoPlay
                   muted
@@ -861,7 +861,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   playsInline
                   onError={handleVideoError}
                   ref={videoRef}
-                  className="w-full h-auto rounded-md bg-black gpu-accelerated"
                 >
                   {getVideoSources(previewUrl).map(s => (
                     <source key={s.src} src={s.src} type={s.type} />

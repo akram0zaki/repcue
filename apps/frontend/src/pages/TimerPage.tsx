@@ -324,11 +324,11 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
                   const totalExercises = workoutMode.exercises.length;
-                  
+
                   if (currentIndex >= totalExercises) {
                     return `${totalExercises}/${totalExercises}`;
                   }
-                  
+
                   if (workoutMode.isResting) {
                     return `${currentIndex}/${totalExercises}`;
                   } else {
@@ -337,9 +337,21 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 })()}
               </span>
             </div>
+
+            {/* Current Exercise Name */}
+            {workoutCurrentExercise && !workoutMode.isResting && workoutMode.currentExerciseIndex < workoutMode.exercises.length && (
+              <div className="text-sm opacity-90 truncate mb-1">
+                {localizeExercise(workoutCurrentExercise, t).name}
+              </div>
+            )}
+            {workoutMode.isResting && (
+              <div className="text-sm opacity-90 truncate mb-1">
+                {t('timer.restPeriod')}
+              </div>
+            )}
             
             {/* Compact Workout Progress Bar */}
-            <div className="progress">
+            <div className="progress progress--inverse">
               <div className="progress__track">
                 <div className="progress__bar" style={{ ['--progress' as unknown as string]: workoutProgress } as React.CSSProperties} />
               </div>

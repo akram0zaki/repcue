@@ -324,7 +324,7 @@ export class UpdateService {
    * Debounced external request funnel for update checks.
    * Coalesces rapid successive triggers (focus, visibility, SW) into one check.
    */
-  private requestUpdateCheck(source: string, opts?: { force?: boolean }): void {
+  private requestUpdateCheck(_source: string, opts?: { force?: boolean }): void {
     // If a check is already in flight, we don't need to schedule another; callers will piggyback.
     if (this.isChecking) {
       // logger.debug(`Coalescing update check (already running) from ${source}`);

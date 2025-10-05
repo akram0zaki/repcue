@@ -75,20 +75,30 @@ const EditWorkoutPage: React.FC = () => {
         setIsActive(workoutData.is_active ?? true);
 
         // Convert workout exercises to selected exercises
-        const selectedExs: SelectedExercise[] = workoutData.exercises.map((we, index) => {
-          const exercise = exercises.find(e => e.id === we.exercise_id);
-          if (!exercise) {
-            throw new Error(`Exercise not found: ${we.exercise_id}`);
-          }
-          return {
-            ...exercise,
-            order: we.order || index,
-            custom_duration: we.custom_duration,
-            custom_sets: we.custom_sets,
-            custom_reps: we.custom_reps,
-            custom_rest_time: we.custom_rest_time
-          };
-        });
+        const selectedExs: SelectedExercise[] = workoutData.exercises
+          .filter(we => {
+            // Filter out exercises with undefined/null exercise_id (malformed AI workouts)
+            if (!we.exercise_id) {
+              logger.warn('[EditWorkoutPage] Skipping exercise with undefined exercise_id', { workoutExercise: we });
+              return false;
+            }
+            return true;
+          })
+          .map((we, index) => {
+            const exercise = exercises.find(e => e.id === we.exercise_id);
+            if (!exercise) {
+              logger.error(`[EditWorkoutPage] Exercise not found: ${we.exercise_id}`);
+              throw new Error(`Exercise not found: ${we.exercise_id}`);
+            }
+            return {
+              ...exercise,
+              order: we.order || index,
+              custom_duration: we.custom_duration,
+              custom_sets: we.custom_sets,
+              custom_reps: we.custom_reps,
+              custom_rest_time: we.custom_rest_time
+            };
+          });
 
         setSelectedExercises(selectedExs);
       } catch (error) {

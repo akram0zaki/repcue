@@ -20,6 +20,7 @@ import type {
   AIWorkoutError,
   AIWorkoutRequest,
 } from '../types/aiWorkout';
+import type { Workout, Weekday } from '../types';
 import {
   validateScreen1,
   validateScreen2,
@@ -27,6 +28,7 @@ import {
   hasErrors,
 } from '../utils/aiWorkoutValidation';
 import { aiWorkoutService, AIWorkoutServiceError } from '../services/aiWorkoutService';
+import { StorageService } from '../services/storageService';
 import logger from '../utils/logger';
 
 interface UseAIWorkoutFlowReturn {
@@ -212,6 +214,62 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
       logger.log('[useAIWorkoutFlow] Workouts generated successfully', {
         count: response.workouts.length,
         correlationId: response.metadata.correlationId,
+      });
+
+      // Save workouts to IndexedDB
+      // Convert GeneratedWorkout format to Workout format
+      const storageService = StorageService.getInstance();
+      for (const generatedWorkout of response.workouts) {
+        logger.debug('[useAIWorkoutFlow] Converting workout', {
+          id: generatedWorkout.id,
+          name: generatedWorkout.name,
+          exerciseCount: generatedWorkout.exercises.length,
+          firstExercise: generatedWorkout.exercises[0],
+        });
+
+        const workout: Workout = {
+          id: generatedWorkout.id,
+          name: generatedWorkout.name,
+          description: generatedWorkout.description,
+          exercises: generatedWorkout.exercises.map((ex, index) => {
+            logger.debug('[useAIWorkoutFlow] Converting exercise', {
+              index,
+              exerciseId: ex.exerciseId,
+              order: ex.order,
+            });
+            return {
+              id: `${generatedWorkout.id}-ex-${index}`,
+              exercise_id: ex.exerciseId,
+              order: ex.order,
+              custom_sets: ex.customSets,
+              custom_reps: ex.customReps,
+              custom_duration: ex.customDuration,
+              custom_rest_time: ex.customRestTime,
+            };
+          }),
+          scheduled_days: (generatedWorkout.scheduledDays || []) as Weekday[],
+          is_active: true,
+          estimated_duration: generatedWorkout.estimatedDuration,
+          // Sync metadata
+          owner_id: null, // Will be set by StorageService based on auth
+          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          deleted: false,
+          version: 1,
+          dirty: 1, // Mark as dirty for sync
+          op: 'upsert' as const,
+        };
+
+        logger.debug('[useAIWorkoutFlow] Saving workout to IndexedDB', {
+          id: workout.id,
+          exerciseIds: workout.exercises.map(e => e.exercise_id),
+        });
+
+        await storageService.saveWorkout(workout);
+      }
+
+      logger.log('[useAIWorkoutFlow] Workouts saved to IndexedDB', {
+        count: response.workouts.length,
       });
 
       setWorkouts(response.workouts);

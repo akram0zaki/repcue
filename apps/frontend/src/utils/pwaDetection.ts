@@ -2,6 +2,8 @@
  * PWA Detection and Deep Link Utilities
  */
 
+import logger from './logger';
+
 // Declare the BeforeInstallPromptEvent interface for PWA install prompts
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
