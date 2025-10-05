@@ -8,15 +8,30 @@ import type {
 import { supabase } from '../config/supabase';
 import logger from '../utils/logger';
 
+export interface WebAuthnSession {
+  properties: {
+    hashed_token: string;
+    action_link: string;
+    email_otp: string;
+    redirect_to: string;
+    verification_type: string;
+  };
+  user: {
+    id: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
 export interface PasskeyRegistrationResult {
   success: boolean;
-  session?: unknown;
+  session?: WebAuthnSession;
   error?: string;
 }
 
 export interface PasskeyAuthenticationResult {
   success: boolean;
-  session?: unknown;
+  session?: WebAuthnSession;
   user?: {
     id: string;
     email: string;
