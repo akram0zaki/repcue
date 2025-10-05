@@ -70,7 +70,6 @@
     "exerciseParameters": "Parámetros del ejercicio",
     "exerciseVideo": "Video del ejercicio"
   },
-  },
   "navigation": {
     "home": "Inicio",
     "workouts": "Entrenamientos",
@@ -593,6 +592,7 @@
   "update": {
     "force": {
       "title": "Actualización de Seguridad Requerida",
+      "message": "Esta es una actualización de seguridad requerida. La aplicación se actualizará automáticamente para garantizar su seguridad.",
       "action": "Actualizar Ahora",
       "modal": {
         "title": "Actualización de Seguridad Requerida",
@@ -604,13 +604,16 @@
       }
     },
     "critical": {
-      "title": "Actualización Importante Disponible"
+      "title": "Actualización Importante Disponible",
+      "message": "Esta es una actualización importante con correcciones de seguridad y mejoras críticas."
     },
     "optional": {
-      "title": "Nueva Versión Disponible"
+      "title": "Nueva Versión Disponible",
+      "message": "Una nueva versión está disponible con mejoras y nuevas funciones."
     },
     "default": {
-      "title": "Actualización Disponible"
+      "title": "Actualización Disponible",
+      "message": "Una nueva versión está disponible."
     },
     "version": "Versión: {{version}}",
     "action": "Actualizar",

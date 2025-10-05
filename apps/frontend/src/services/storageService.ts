@@ -2570,13 +2570,20 @@ export class StorageService {
     return await this.safeDatabaseAccess(
       async () => {
         const storedWorkouts = await this.db.workouts.orderBy('updated_at').reverse().toArray();
-        return storedWorkouts.map(this.convertStoredWorkout);
+        // Filter out soft-deleted workouts
+        return storedWorkouts
+          .filter(workout => !workout.deleted)
+          .map(this.convertStoredWorkout);
       },
       () => {
         const workouts: Workout[] = [];
         this.fallbackStorage.forEach((value, key) => {
           if (key.startsWith('workout_')) {
-            workouts.push(this.convertStoredWorkout(value as StoredWorkout));
+            const workout = value as StoredWorkout;
+            // Filter out soft-deleted workouts
+            if (!workout.deleted) {
+              workouts.push(this.convertStoredWorkout(workout));
+            }
           }
         });
         return workouts;

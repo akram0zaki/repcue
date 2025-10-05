@@ -126,11 +126,16 @@
     "generate": "Trainingen oanmeitsje"
   },
   "loading": {
-    "analyzing": "Dyn profyl wurdt analysearre...",
-    "selecting": "Oefeningen wurde selektearre...",
-    "creating": "Dyn persoanlike trainingen wurde makke...",
+    "title": "Jo personaliseare trainingen meitsje",
+    "analyzing": "Analysearje fan jo profyl...",
+    "selecting": "Selektearje fan oefeningen...",
+    "creating": "Meitsje fan jo personaliseare trainingen...",
     "finalizing": "Hast klear...",
-    "warning": "Dit duorret langer as gewoanlik. Wacht efkes...",
+    "elapsed": "Ferrûn tiid: {{seconds}}s",
+    "tip": "Us AI analysearret tûzenen oefeningen om it perfekte trainingsplan foar jo te meitsjen. Dit kin oant 30 sekonden duorje.",
+    "slowWarning": "Dit duorret langer as ferwachte. Wachtsje noch efkes of besykje it opnij as it proses in time-out krijt.",
+    "srAnnouncement": "AI-trainingsplan wurdt generearre. Efkes geduld.",
+    "warning": "Dit duorret langer as gewoan. Efkes geduld...",
     "cancel": "Annulearje",
     "timeout": {
       "title": "Time-out",

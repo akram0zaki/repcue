@@ -593,6 +593,7 @@
   "update": {
     "force": {
       "title": "Feiligens­update Fereaske",
+      "message": "Dit is in fereaske feiligens­update. De app wurdt automatysk bywurke om jo feiligens te garandearjen.",
       "action": "No bywurkje",
       "modal": {
         "title": "Feiligens­update Fereaske",
@@ -604,13 +605,16 @@
       }
     },
     "critical": {
-      "title": "Belangrike Update Beskikber"
+      "title": "Belangrike Update Beskikber",
+      "message": "Dit is in belangrike update mei feiligensreparaasjes en krúsjale ferbetteringen."
     },
     "optional": {
-      "title": "Nije Fersje Beskikber"
+      "title": "Nije Fersje Beskikber",
+      "message": "In nije fersje is beskikber mei ferbetteringen en nije funksjes."
     },
     "default": {
-      "title": "Update Beskikber"
+      "title": "Update Beskikber",
+      "message": "In nije fersje is beskikber."
     },
     "version": "Fersje: {{version}}",
     "action": "Bywurkje",

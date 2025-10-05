@@ -1,5 +1,29 @@
 ## Unreleased
 
+### 2025-10-06 (AI Workout i18n Fixes & Soft Delete Bug Fix)
+
+#### Fixed
+- **Update Notification Localization**: Fixed update notification banner showing English description text regardless of user's locale
+  - Added `message` translation keys to all 8 locale files for force/critical/optional/default update policies
+  - Updated `updateService.getUpdatePolicyMessage()` to use i18n instead of hardcoded English strings
+  - Update descriptions now display in user's preferred language (ar, ar-EG, de, es, fr, fy, nl, en)
+- **Workout Deletion Sync Bug**: Fixed deleted workouts reappearing after AI workout generation
+  - Root cause: `getWorkouts()` was not filtering out soft-deleted records
+  - Deleted workouts were being pulled back from server during sync before local deletions were pushed
+  - Added `deleted: true` filter to both IndexedDB and fallback storage in `getWorkouts()` method
+  - Now properly hides workouts marked for deletion until sync completes
+- **AI Workout Localization**: Fixed AI-generated workout titles and descriptions appearing in English regardless of user's locale selection
+  - Added `locale` field to `UserProfile` interface in `prompt-builder.ts`
+  - Updated workout generator to include user's locale in profile object
+  - Enhanced AI system prompt with explicit language instructions for all 8 supported locales (ar, ar-EG, de, es, fr, fy, nl, en)
+  - AI now generates workout names and descriptions in user's preferred language
+- **AI Workout Loading Banner**: Added missing translation keys for loading state
+  - Added `loading.title`, `loading.elapsed`, `loading.tip`, `loading.slowWarning`, `loading.srAnnouncement` to all 8 locale files
+  - Loading banner now displays properly translated text in all languages
+- **RTL Button Spacing**: Fixed delete confirmation buttons appearing attached in Arabic RTL mode
+  - Changed `space-x-2` to `gap-2` in WorkoutsPage.tsx for bidirectional spacing compatibility
+  - Buttons now properly spaced in both LTR and RTL layouts
+
 ### 2025-10-05 (User-Catalog ACL, AI Token Usage Tracking & Cost Monitoring)
 
 #### Added

@@ -126,10 +126,15 @@
     "generate": "Generate Workouts"
   },
   "loading": {
+    "title": "Creating Your Personalized Workouts",
     "analyzing": "Analyzing your profile...",
     "selecting": "Selecting exercises...",
     "creating": "Creating your personalized workouts...",
     "finalizing": "Almost done...",
+    "elapsed": "Elapsed time: {{seconds}}s",
+    "tip": "Our AI is analyzing thousands of exercises to create the perfect workout plan for you. This may take up to 30 seconds.",
+    "slowWarning": "This is taking longer than expected. Please wait a bit longer or try again if the process times out.",
+    "srAnnouncement": "Generating AI workout plan. Please wait.",
     "warning": "This is taking longer than usual. Please wait...",
     "cancel": "Cancel",
     "timeout": {

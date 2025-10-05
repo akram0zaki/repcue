@@ -639,6 +639,7 @@
   "update": {
     "force": {
       "title": "Mise à jour de sécurité requise",
+      "message": "Il s'agit d'une mise à jour de sécurité requise. L'application se mettra à jour automatiquement pour garantir votre sécurité.",
       "action": "Mettre à jour maintenant",
       "modal": {
         "title": "Mise à jour de sécurité requise",
@@ -650,13 +651,16 @@
       }
     },
     "critical": {
-      "title": "Mise à jour importante disponible"
+      "title": "Mise à jour importante disponible",
+      "message": "Il s'agit d'une mise à jour importante avec des corrections de sécurité et des améliorations critiques."
     },
     "optional": {
-      "title": "Nouvelle version disponible"
+      "title": "Nouvelle version disponible",
+      "message": "Une nouvelle version est disponible avec des améliorations et de nouvelles fonctionnalités."
     },
     "default": {
-      "title": "Mise à jour disponible"
+      "title": "Mise à jour disponible",
+      "message": "Une nouvelle version est disponible."
     },
     "version": "Version: {{version}}",
     "action": "Mettre à jour",

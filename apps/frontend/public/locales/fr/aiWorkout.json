@@ -126,10 +126,15 @@
     "generate": "Générer les entraînements"
   },
   "loading": {
+    "title": "Création de vos entraînements personnalisés",
     "analyzing": "Analyse de votre profil...",
     "selecting": "Sélection des exercices...",
     "creating": "Création de vos entraînements personnalisés...",
     "finalizing": "Presque terminé...",
+    "elapsed": "Temps écoulé: {{seconds}}s",
+    "tip": "Notre IA analyse des milliers d'exercices pour créer le plan d'entraînement parfait pour vous. Cela peut prendre jusqu'à 30 secondes.",
+    "slowWarning": "Cela prend plus de temps que prévu. Veuillez patienter encore un peu ou réessayer si le processus expire.",
+    "srAnnouncement": "Génération du plan d'entraînement par IA. Veuillez patienter.",
     "warning": "Cela prend plus de temps que prévu. Veuillez patienter...",
     "cancel": "Annuler",
     "timeout": {

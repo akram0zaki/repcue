@@ -131,11 +131,16 @@
     "generate": "Workouts erstellen"
   },
   "loading": {
-    "analyzing": "Profil wird analysiert...",
-    "selecting": "Übungen werden ausgewählt...",
-    "creating": "Ihre personalisierten Workouts werden erstellt...",
+    "title": "Erstelle deine personalisierten Workouts",
+    "analyzing": "Analysiere dein Profil...",
+    "selecting": "Wähle Übungen aus...",
+    "creating": "Erstelle deine personalisierten Workouts...",
     "finalizing": "Fast fertig...",
-    "warning": "Dies dauert länger als üblich. Bitte warten Sie...",
+    "elapsed": "Verstrichene Zeit: {{seconds}}s",
+    "tip": "Unsere KI analysiert Tausende von Übungen, um den perfekten Trainingsplan für dich zu erstellen. Dies kann bis zu 30 Sekunden dauern.",
+    "slowWarning": "Dies dauert länger als erwartet. Bitte warte noch etwas oder versuche es erneut, wenn der Vorgang abbricht.",
+    "srAnnouncement": "KI-Trainingsplan wird erstellt. Bitte warten.",
+    "warning": "Dies dauert länger als üblich. Bitte warten...",
     "cancel": "Abbrechen",
     "timeout": {
       "title": "Zeitüberschreitung",

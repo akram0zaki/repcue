@@ -36,6 +36,7 @@ export interface UserProfile {
   injuries?: string;
   trainingStyle: 'strength' | 'cardio' | 'balanced';
   timeAvailability: '15-30' | '30-45' | '45-60' | '60+'; // minutes per session
+  locale: string; // User's preferred language for workout names/descriptions
 }
 
 /**
@@ -237,6 +238,17 @@ Remember to:
 3. Respect user's fitness level: ${profile.fitnessLevel}
 4. Stay within time constraints: ${profile.timeAvailability} minutes per session
 5. Follow training style preference: ${profile.trainingStyle}
+
+IMPORTANT - LANGUAGE REQUIREMENT:
+The user's preferred language is: ${profile.locale}
+You MUST generate ALL workout names and descriptions in this language.
+- For locale 'ar' or 'ar-EG': Use Arabic (العربية)
+- For locale 'fr': Use French (Français)
+- For locale 'de': Use German (Deutsch)
+- For locale 'es': Use Spanish (Español)
+- For locale 'nl': Use Dutch (Nederlands)
+- For locale 'fy': Use Frisian (Frysk)
+- For locale 'en' or any other: Use English
 
 Return ONLY the JSON response as specified in the output format above.`;
 

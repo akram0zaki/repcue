@@ -631,6 +631,7 @@
   "update": {
     "force": {
       "title": "Beveiligingsupdate Vereist",
+      "message": "Dit is een vereiste beveiligingsupdate. De app wordt automatisch bijgewerkt om je veiligheid te garanderen.",
       "action": "Nu bijwerken",
       "modal": {
         "title": "Beveiligingsupdate Vereist",
@@ -642,13 +643,16 @@
       }
     },
     "critical": {
-      "title": "Belangrijke Update Beschikbaar"
+      "title": "Belangrijke Update Beschikbaar",
+      "message": "Dit is een belangrijke update met beveiligingsoplossingen en kritieke verbeteringen."
     },
     "optional": {
-      "title": "Nieuwe Versie Beschikbaar"
+      "title": "Nieuwe Versie Beschikbaar",
+      "message": "Een nieuwe versie is beschikbaar met verbeteringen en nieuwe functies."
     },
     "default": {
-      "title": "Update Beschikbaar"
+      "title": "Update Beschikbaar",
+      "message": "Een nieuwe versie is beschikbaar."
     },
     "version": "Versie: {{version}}",
     "action": "Bijwerken",

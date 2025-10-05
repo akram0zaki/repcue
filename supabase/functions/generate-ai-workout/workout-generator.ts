@@ -267,7 +267,8 @@ export async function generateWorkouts(
     trainingTime: request.responses.trainingTime,
     injuries: request.responses.injuries,
     trainingStyle: request.responses.trainingStyle,
-    timeAvailability: request.responses.timeAvailability
+    timeAvailability: request.responses.timeAvailability,
+    locale: request.locale
   };
 
   const filteredExercises = filterExercisesForUser(allExercises, userProfile, correlationId);

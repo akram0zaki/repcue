@@ -318,7 +318,7 @@ const WorkoutsPage: React.FC = () => {
                     <p className="text-sm text-error mb-3">
                       {t('workouts.deleteConfirm', { name: workout.name })}
                     </p>
-                    <div className="flex space-x-2">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => handleDeleteWorkout(workout.id)}
                         className="btn-danger px-3 py-1.5 text-sm"

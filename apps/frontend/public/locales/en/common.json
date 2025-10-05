@@ -697,6 +697,7 @@
   "update": {
     "force": {
       "title": "Security Update Required",
+      "message": "This is a required security update. The app will update automatically to ensure your safety.",
       "action": "Update Now",
       "applying": "Applying Update...",
       "inProgress": "Updating Application...",
@@ -714,13 +715,16 @@
       }
     },
     "critical": {
-      "title": "Important Update Available"
+      "title": "Important Update Available",
+      "message": "This is an important update with security fixes and critical improvements."
     },
     "optional": {
-      "title": "New Version Available"
+      "title": "New Version Available",
+      "message": "A new version is available with improvements and new features."
     },
     "default": {
-      "title": "Update Available"
+      "title": "Update Available",
+      "message": "A new version is available."
     },
     "version": "Version: {{version}}",
     "action": "Update",

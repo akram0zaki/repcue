@@ -83,14 +83,14 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode } > = ({ chi
     switch (type) {
       case 'danger':
       case 'error':
-        return 'bg-red-600 text-white';
+        return 'bg-gradient-to-br from-red-500/95 via-red-600/90 to-rose-700/95 text-white backdrop-blur-md shadow-lg shadow-red-500/30';
       case 'info':
-        return 'bg-blue-600 text-white';
+        return 'bg-gradient-to-br from-blue-500/95 via-blue-600/90 to-cyan-700/95 text-white backdrop-blur-md shadow-lg shadow-blue-500/30';
       case 'success':
-        return 'bg-green-600 text-white';
+        return 'bg-gradient-to-br from-green-500/95 via-green-600/90 to-emerald-700/95 text-white backdrop-blur-md shadow-lg shadow-green-500/30';
       case 'warning':
       default:
-        return 'bg-yellow-500 text-black';
+        return 'bg-gradient-to-br from-yellow-400/95 via-yellow-500/90 to-orange-600/95 text-black backdrop-blur-md shadow-lg shadow-yellow-500/30';
     }
   };
 

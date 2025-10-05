@@ -14,6 +14,7 @@ import type {
 import { UpdateErrorType } from '../types';
 import { consentService } from './consentService';
 import { storageService } from './storageService';
+import i18n from '../i18n';
 // APP_VERSION removed - using server-based versioning
 import { swEventEmitter, updateServiceWorkerCoordinated } from '../utils/serviceWorker';
 import { updateErrorHandler } from '../utils/updateErrorHandler';
@@ -1096,13 +1097,13 @@ export class UpdateService {
   public getUpdatePolicyMessage(updateInfo: UpdateInfo): string {
     switch (updateInfo.policy) {
       case 'force':
-        return 'This is a required security update. The app will update automatically to ensure your safety.';
+        return i18n.t('update.force.message', 'This is a required security update. The app will update automatically to ensure your safety.');
       case 'critical':
-        return 'This is an important update with security fixes and critical improvements.';
+        return i18n.t('update.critical.message', 'This is an important update with security fixes and critical improvements.');
       case 'optional':
-        return 'A new version is available with improvements and new features.';
+        return i18n.t('update.optional.message', 'A new version is available with improvements and new features.');
       default:
-        return 'A new version is available.';
+        return i18n.t('update.default.message', 'A new version is available.');
     }
   }
 

@@ -126,10 +126,15 @@
     "generate": "Trainingen genereren"
   },
   "loading": {
-    "analyzing": "Je profiel wordt geanalyseerd...",
-    "selecting": "Oefeningen worden geselecteerd...",
-    "creating": "Je persoonlijke trainingen worden aangemaakt...",
+    "title": "Je gepersonaliseerde trainingen maken",
+    "analyzing": "Analyseren van je profiel...",
+    "selecting": "Selecteren van oefeningen...",
+    "creating": "Maken van je gepersonaliseerde trainingen...",
     "finalizing": "Bijna klaar...",
+    "elapsed": "Verstreken tijd: {{seconds}}s",
+    "tip": "Onze AI analyseert duizenden oefeningen om het perfecte trainingsplan voor jou te maken. Dit kan tot 30 seconden duren.",
+    "slowWarning": "Dit duurt langer dan verwacht. Wacht nog even of probeer het opnieuw als het proces een time-out krijgt.",
+    "srAnnouncement": "AI-trainingsplan wordt gegenereerd. Even geduld.",
     "warning": "Dit duurt langer dan normaal. Even geduld...",
     "cancel": "Annuleren",
     "timeout": {

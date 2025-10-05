@@ -70,7 +70,6 @@
     "exerciseParameters": "Übungsparameter",
     "exerciseVideo": "Übungsvideo"
   },
-  },
   "navigation": {
     "home": "Startseite",
     "workouts": "Trainings",
@@ -585,6 +584,7 @@
   "update": {
     "force": {
       "title": "Sicherheitsupdate erforderlich",
+      "message": "Dies ist ein erforderliches Sicherheitsupdate. Die App wird automatisch aktualisiert, um Ihre Sicherheit zu gewährleisten.",
       "action": "Jetzt aktualisieren",
       "modal": {
         "title": "Sicherheitsupdate erforderlich",
@@ -596,13 +596,16 @@
       }
     },
     "critical": {
-      "title": "Wichtiges Update Verfügbar"
+      "title": "Wichtiges Update Verfügbar",
+      "message": "Dies ist ein wichtiges Update mit Sicherheitsfixes und kritischen Verbesserungen."
     },
     "optional": {
-      "title": "Neue Version Verfügbar"
+      "title": "Neue Version Verfügbar",
+      "message": "Eine neue Version mit Verbesserungen und neuen Funktionen ist verfügbar."
     },
     "default": {
-      "title": "Update Verfügbar"
+      "title": "Update Verfügbar",
+      "message": "Eine neue Version ist verfügbar."
     },
     "version": "Version: {{version}}",
     "action": "Update",
