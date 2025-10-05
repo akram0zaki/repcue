@@ -43,9 +43,9 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       if (consentStatus) {
         try {
           const workouts = await storageService.getWorkouts();
-          logger.debug('HomePage: All workouts loaded:', workouts);
+          // logger.debug('HomePage: All workouts loaded:', workouts);
           const activeWorkouts = workouts.filter(workout => workout.is_active);
-          logger.debug('HomePage: Active workouts:', activeWorkouts);
+          // logger.debug('HomePage: Active workouts:', activeWorkouts);
           if (activeWorkouts.length > 0) {
             const today = new Date();
             const currentWeekday = Object.values(Weekday)[today.getDay()] as Weekday;

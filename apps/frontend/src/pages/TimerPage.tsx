@@ -501,6 +501,19 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />
               </div>
             )}
+            {/* Show exercise description when no video is available */}
+            {!showVideoInsideCircle && selectedExercise && !isCountdown && !restingNow && (
+              <div
+                className="absolute inset-4 sm:inset-6 rounded-full flex items-center justify-center z-[1] p-4"
+                data-testid="exercise-description-wrapper"
+              >
+                <div className="text-center max-h-full overflow-y-auto">
+                  <p className="text-sm sm:text-base text-text-700 dark:text-text-200 leading-relaxed">
+                    {localizeExercise(selectedExercise, t).description || selectedExercise.name}
+                  </p>
+                </div>
+              </div>
+            )}
             <svg 
               className="transform -rotate-90 pointer-events-none relative z-0 timer-square-280" 
               viewBox="0 0 280 280"
@@ -597,8 +610,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
               )}
             </svg>
             
-            {/* Time Display */}
-            <div className="absolute inset-0 flex items-center justify-center z-10" data-testid="timer-display">
+            {/* Time Display - Positioned at top to avoid overlapping description/video */}
+            <div className="absolute top-0 left-0 right-0 flex justify-center pt-4 z-10" data-testid="timer-display">
               <div className="text-center">
                 {isCountdown ? (
                   <>
@@ -685,6 +698,19 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   </video>
                   {/* Subtle overlay to maintain border contrast */}
                   <div className="absolute inset-0 bg-black/5 dark:bg-black/10 pointer-events-none" />
+                </div>
+              )}
+              {/* Show exercise description when no video is available */}
+              {!showVideoInsideCircle && selectedExercise && !isCountdown && !restingNow && (
+                <div
+                  className="absolute rounded-lg flex items-center justify-center z-[1] video-inset-10 px-8 py-6"
+                  data-testid="exercise-description-wrapper"
+                >
+                  <div className="text-center max-h-full overflow-y-auto">
+                    <p className="text-base sm:text-lg text-text-700 dark:text-text-200 leading-relaxed">
+                      {localizeExercise(selectedExercise, t).description || selectedExercise.name}
+                    </p>
+                  </div>
                 </div>
               )}
               <svg
@@ -791,8 +817,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 )}
               </svg>
 
-              {/* Time Display for Rectangular Timer */}
-              <div className="absolute inset-0 flex items-center justify-center z-10" data-testid="timer-display">
+              {/* Time Display for Rectangular Timer - Positioned at top to avoid overlapping description/video */}
+              <div className="absolute top-0 left-0 right-0 flex justify-center pt-4 z-10" data-testid="timer-display">
                 <div className="text-center">
                   {isCountdown ? (
                     <>

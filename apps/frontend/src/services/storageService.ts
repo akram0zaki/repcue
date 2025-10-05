@@ -1470,10 +1470,10 @@ export class StorageService {
         return fileWithData;
       }
       
-      logger.warn('💾 [VideoFile] No video files with file_data found, returning most recent:', {
-        mostRecentId: videoFiles[0]?.id,
-        mostRecentCreatedAt: videoFiles[0]?.created_at
-      });
+      // logger.warn('💾 [VideoFile] No video files with file_data found, returning most recent:', {
+      //   mostRecentId: videoFiles[0]?.id,
+      //   mostRecentCreatedAt: videoFiles[0]?.created_at
+      // });
       
       return videoFiles.length > 0 ? videoFiles[0] : null;
     } catch (error) {
