@@ -70,7 +70,6 @@
     "exerciseParameters": "Oefeningsparameters",
     "exerciseVideo": "Oefeningsfideo"
   },
-  },
   "navigation": {
     "home": "Thús",
     "workouts": "Trainingen",
@@ -510,6 +509,111 @@
     "loadFailed": "It laden fan 'e oefening is mislearre",
     "updateFailed": "It bywurkje fan 'e oefening is mislearre"
   },
+  "updateError": {
+    "actionFailed": "Aksje mislearre: {{error}}",
+    "actionSuccess": "Aksje mei sukses foltôge",
+    "close": "Slute",
+    "completed": "Klear",
+    "confirmAction": "Bisto wis datsto {{description}} dwaan wolst? Dizze aksje kin net ûngedien makke wurde.",
+    "executing": "Dwaande...",
+    "needHelp": "Help nedich? Nim kontakt op mei stipe en jou de technyske details hjirboppe troch.",
+    "recoveryActions": "Herstelopsjes",
+    "rollbackAvailable": "Herstel beskikber",
+    "rollbackDescription": "Do kinst de foarige ferzje ({{version}}) weromsette as de herstelaksjes net wurkje.",
+    "rollbackInProgress": "Herstel wurdt útfierd...",
+    "severity": {
+      "critical": "Earnst: Kritysk",
+      "high": "Earnst: Heech",
+      "medium": "Earnst: Middel",
+      "low": "Earnst: Leech"
+    },
+    "suggestions": "Foarstellen:",
+    "technicalDetails": "Technyske details",
+    "whatHappened": "Wat is der bard?",
+    "types": {
+      "compatibility": "Kompatibiliteitsflater",
+      "download": "Download mislearre",
+      "installation": "Ynstallaasje mislearre",
+      "network": "Netwurkprobleem",
+      "permission": "Tagong wegere",
+      "rollback": "Herstel mislearre",
+      "serviceWorker": "Serviceworker-flater",
+      "storage": "Opslachflater",
+      "timeout": "Update-time-out",
+      "unknown": "Unbekende flater",
+      "verification": "Update-ferifikaasje mislearre"
+    },
+    "messages": {
+      "network_error": "Kin gjin ferbining meitsje mei de updateservers. Kontrolearje dyn ynternetferbining.",
+      "download_error": "De update koe net downloade wurde. Dit kin komme troch in minne ferbining of serverproblemen.",
+      "installation_error": "De update koe net goed ynstallearre wurde. Do moatst de app mooglik opnij starte.",
+      "verification_error": "Update-ferifikaasje mislearre. It updatebestân kin skansearre wêze.",
+      "storage_error": "Net genôch opslachromte of tagong wegere. Meitsje romte frij en besykje it opnij.",
+      "service_worker_error": "Der is in flater bard yn de updateservice. Fernij de side en besykje it opnij.",
+      "timeout_error": "It updateproses duorre te lang. Besykje it opnij.",
+      "permission_error": "Tagong wegere. Kontrolearje dyn browserynstellingen en besykje it opnij.",
+      "compatibility_error": "Dizze update is net kompatibel mei dyn browser of apparaat.",
+      "rollback_error": "De foarige ferzje koe net wersteld wurde. Nim kontakt op mei stipe.",
+      "unknown_error": "Der is in ûnferwachte flater bard by it bywurkje."
+    },
+    "actions": {
+      "network_error": {
+        "0": "Kontrolearje dyn ynternetferbining",
+        "1": "Besykje in oar netwurk",
+        "2": "Wachtsje efkes en besykje it letter opnij"
+      },
+      "download_error": {
+        "0": "Besykje de download opnij",
+        "1": "Kontrolearje oft der genôch opslachromte is",
+        "2": "Brûk in stabylere ferbining"
+      },
+      "installation_error": {
+        "0": "Start de applikaasje opnij",
+        "1": "Wiskje de browsercache",
+        "2": "Besykje de update opnij"
+      },
+      "verification_error": {
+        "0": "Wiskje de browsercache",
+        "1": "Besykje de update opnij",
+        "2": "Nim kontakt op mei stipe as it probleem bliuwt"
+      },
+      "storage_error": {
+        "0": "Meitsje opslachromte frij",
+        "1": "Wiskje browsergegevens en cache",
+        "2": "Slút oare applikaasjes"
+      },
+      "service_worker_error": {
+        "0": "Fernij de side",
+        "1": "Wiskje de browsercache",
+        "2": "Start de browser opnij"
+      },
+      "timeout_error": {
+        "0": "Kontrolearje dyn ynternetsnelheid",
+        "1": "Besykje opnij mei in bettere ferbining",
+        "2": "Wachtsje efkes en besykje letter opnij"
+      },
+      "permission_error": {
+        "0": "Kontrolearje browserfergunnings",
+        "1": "Tastean notifikaasjes en cache-opslach",
+        "2": "Besykje yn in priveefinster (incognito)"
+      },
+      "compatibility_error": {
+        "0": "Bywurkje dyn browser",
+        "1": "Besykje in oare browser",
+        "2": "Nim kontakt op mei stipe foar help"
+      },
+      "rollback_error": {
+        "0": "Start de applikaasje opnij",
+        "1": "Wiskje alle browsergegevens",
+        "2": "Nim fuortendaliks kontakt op mei stipe"
+      },
+      "unknown_error": {
+        "0": "Start de applikaasje opnij",
+        "1": "Kontrolearje de browserkonsole foar details",
+        "2": "Nim kontakt op mei stipe en jou de flaterdetails troch"
+      }
+    }
+  },
   "community": {
     "allCategories": "Alle Kategoryen",
     "allContent": "Alle Ynhâld",
@@ -690,5 +794,28 @@
     "submitError": "It ynstjoeren fan de beoardieling is mislearre",
     "submitting": "Oan it ynstjoeren...",
     "loginToRate": "Meld dy oan om oefeningen te beoardieljen en te besjen"
+  },
+  "sync": {
+    "syncing": "Gegevens wurde syngronisearre...",
+    "backingUp": "Dyn foarútgong wurdt bewarre yn de wolk",
+    "failed": "Syngronisaasje mislearre: {{error}}",
+    "lastAttempt": "Lêste poging: {{time}}",
+    "offline": {
+      "authenticated": "Do bist offline. Alle funksjes wurkje gewoan. De ferbining wurdt automatysk wersteld.",
+      "unauthenticated": "Do bist offline. Alle funksjes wurkje gewoan. Dyn gegevens wurde lokaal opslein."
+    },
+    "reconnected": {
+      "authenticated": "Ferbining wersteld! Gegevens wurde automatysk syngronisearre.",
+      "authenticatedSimple": "Ferbining wersteld! Alle funksjes beskikber.",
+      "unauthenticated": "Ferbining wersteld! Alle funksjes beskikber."
+    },
+    "pendingChanges": "Feroarings klear om te syngronisearjen. Lêste syngronisaasje: {{time}}",
+    "timeAgo": {
+      "never": "Nea",
+      "justNow": "No krekt",
+      "minutesAgo": "{{count}} min lyn",
+      "hoursAgo": "{{count}} oeren lyn",
+      "daysAgo": "{{count}} dagen lyn"
+    }
   }
 }

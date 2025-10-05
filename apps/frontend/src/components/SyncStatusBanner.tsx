@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useOfflineStatus } from '../hooks/useOfflineStatus';
 import { useNetworkSync } from '../hooks/useNetworkSync';
 import { useAuth } from '../hooks/useAuth';
@@ -10,6 +11,7 @@ import { DEBUG } from '../config/features';
  * Uses toasts for error notifications instead of persistent banners
  */
 const SyncStatusBanner: React.FC = () => {
+  const { t } = useTranslation();
   const { isOffline, isOnline, hasBeenOffline } = useOfflineStatus();
   const { state: syncState } = useNetworkSync();
   const { isAuthenticated } = useAuth();
@@ -18,13 +20,13 @@ const SyncStatusBanner: React.FC = () => {
 
   // Helper to format time ago
   const formatTimeAgo = (timestamp?: number) => {
-    if (!timestamp) return 'Never';
+    if (!timestamp) return t('sync.timeAgo.never');
     const minutes = Math.floor((Date.now() - timestamp) / 60000);
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 1) return t('sync.timeAgo.justNow');
+    if (minutes < 60) return t('sync.timeAgo.minutesAgo', { count: minutes });
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
+    if (hours < 24) return t('sync.timeAgo.hoursAgo', { count: hours });
+    return t('sync.timeAgo.daysAgo', { count: Math.floor(hours / 24) });
   };
 
   // Show sync errors as toasts instead of persistent banners
@@ -38,7 +40,7 @@ const SyncStatusBanner: React.FC = () => {
         
         const lastAttemptText = formatTimeAgo(syncState.lastSyncAttempt);
         showSnackbar(
-          `Sync failed: ${currentError} • Last attempt: ${lastAttemptText}`,
+          t('sync.failed', { error: currentError }) + ' • ' + t('sync.lastAttempt', { time: lastAttemptText }),
           { 
             type: 'error',
             durationMs: 8000  // Show longer for error messages
@@ -49,17 +51,17 @@ const SyncStatusBanner: React.FC = () => {
       // Clear reference when no errors
       lastErrorRef.current = null;
     }
-  }, [isAuthenticated, syncState.errors, syncState.lastSyncAttempt, showSnackbar]);
+  }, [isAuthenticated, syncState.errors, syncState.lastSyncAttempt, showSnackbar, t, formatTimeAgo]);
 
   // Show sync in progress (for authenticated users) - as toast
   useEffect(() => {
     if (DEBUG && isAuthenticated && syncState.isSyncing) {
-      showSnackbar('Syncing data... Backing up your progress to the cloud', {
+      showSnackbar(t('sync.syncing') + ' ' + t('sync.backingUp'), {
         type: 'info',
         durationMs: 3000
       });
     }
-  }, [DEBUG, isAuthenticated, syncState.isSyncing, showSnackbar]);
+  }, [DEBUG, isAuthenticated, syncState.isSyncing, showSnackbar, t]);
 
   // Show offline message (highest priority for non-authenticated users) - as toast
   const offlineMessageRef = useRef(false);
@@ -67,8 +69,8 @@ const SyncStatusBanner: React.FC = () => {
     if (isOffline && !offlineMessageRef.current) {
       offlineMessageRef.current = true;
       const message = isAuthenticated
-        ? "You're offline. All features work normally. You'll reconnect automatically."
-        : "You're offline. All features work normally. Your data is saved locally.";
+        ? t('sync.offline.authenticated')
+        : t('sync.offline.unauthenticated');
       showSnackbar(message, {
         type: 'warning',
         durationMs: 5000
@@ -76,7 +78,7 @@ const SyncStatusBanner: React.FC = () => {
     } else if (!isOffline) {
       offlineMessageRef.current = false;
     }
-  }, [isOffline, isAuthenticated, showSnackbar]);
+  }, [isOffline, isAuthenticated, showSnackbar, t]);
 
   // Show reconnection message briefly (for all users) - as toast
   const reconnectionMessageRef = useRef(false);
@@ -84,8 +86,8 @@ const SyncStatusBanner: React.FC = () => {
     if (isOnline && hasBeenOffline && !reconnectionMessageRef.current) {
       reconnectionMessageRef.current = true;
       const message = isAuthenticated
-        ? (DEBUG ? "Connection restored! Data will sync automatically." : "Connection restored! All features available.")
-        : "Connection restored! All features available.";
+        ? (DEBUG ? t('sync.reconnected.authenticated') : t('sync.reconnected.authenticatedSimple'))
+        : t('sync.reconnected.unauthenticated');
       showSnackbar(message, {
         type: 'success',
         durationMs: 4000
@@ -96,7 +98,7 @@ const SyncStatusBanner: React.FC = () => {
         reconnectionMessageRef.current = false;
       }, 10000);
     }
-  }, [isOnline, hasBeenOffline, isAuthenticated, DEBUG, showSnackbar]);
+  }, [isOnline, hasBeenOffline, isAuthenticated, DEBUG, showSnackbar, t]);
 
   // Show pending changes indicator (for authenticated users only) - as toast
   const pendingChangesRef = useRef(false);
@@ -104,7 +106,7 @@ const SyncStatusBanner: React.FC = () => {
     if (DEBUG && isAuthenticated && isOnline && syncState.hasChangesToSync && !syncState.isSyncing && !pendingChangesRef.current) {
       pendingChangesRef.current = true;
       const lastSyncText = formatTimeAgo(syncState.lastSuccessfulSync);
-      showSnackbar(`Changes ready to sync. Last synced: ${lastSyncText}`, {
+      showSnackbar(t('sync.pendingChanges', { time: lastSyncText }), {
         type: 'info',
         durationMs: 6000
       });
@@ -116,7 +118,7 @@ const SyncStatusBanner: React.FC = () => {
     } else if (!syncState.hasChangesToSync) {
       pendingChangesRef.current = false;
     }
-  }, [DEBUG, isAuthenticated, isOnline, syncState.hasChangesToSync, syncState.isSyncing, syncState.lastSuccessfulSync, showSnackbar]);
+  }, [DEBUG, isAuthenticated, isOnline, syncState.hasChangesToSync, syncState.isSyncing, syncState.lastSuccessfulSync, showSnackbar, t, formatTimeAgo]);
 
   // No banner when online and no sync issues
   return null;

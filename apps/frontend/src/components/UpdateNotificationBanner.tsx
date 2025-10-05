@@ -101,9 +101,8 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
   };
 
   const getUpdateMessage = () => {
-    if (updateInfo.message) {
-      return updateInfo.message;
-    }
+    // Always use client-side i18n translations instead of server-provided message
+    // Server message is in English only and doesn't respect user's locale
     return updateService.getUpdatePolicyMessage(updateInfo);
   };
 

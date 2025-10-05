@@ -1,8 +1,24 @@
 ## Unreleased
 
-### 2025-10-06 (AI Workout i18n Fixes & Soft Delete Bug Fix)
+### 2025-10-06 (Update Error Dialog i18n & AI Workout Fixes)
 
 #### Fixed
+- **Sync Banner Messages**: Fixed all sync status messages showing English text regardless of user's locale
+  - Added comprehensive sync translation keys to `en/common.json`: syncing, backup, offline, reconnected, errors, pending changes
+  - Added `sync.timeAgo.*` keys for time formatting (Never, Just now, minutes/hours/days ago)
+  - Updated `SyncStatusBanner.tsx` to use i18n for all messages (7 different message types)
+  - Sync notifications now properly translated in all 8 supported locales
+- **Update Notification Description**: Fixed "What's New" dialog showing English description regardless of user's locale
+  - Root cause: `UpdateNotificationBanner` was using server-provided `updateInfo.message` which is hardcoded in English on the Edge Function
+  - Solution: Always use client-side `updateService.getUpdatePolicyMessage()` which uses i18n translations
+  - Update descriptions now properly translated in all 8 supported locales
+- **Update Error Dialog Localization**: Fixed network error and recovery dialog showing English text regardless of user's locale
+  - Added comprehensive translation keys to `en/common.json` for all error messages and suggested actions
+  - Created `updateError.messages.*` keys for all 11 error types (network, download, installation, verification, storage, service worker, timeout, permission, compatibility, rollback, unknown)
+  - Created `updateError.actions.*` keys with 3 suggested actions for each error type (33 total action strings)
+  - Updated `updateErrorHandler.ts` to use i18n for `getUserFriendlyMessage()` and `getSuggestedActions()` methods
+  - Fixed severity display in `UpdateErrorRecoveryModal.tsx` to use lowercase translation keys
+  - Error dialogs now fully translatable across all 8 supported locales
 - **Update Notification Localization**: Fixed update notification banner showing English description text regardless of user's locale
   - Added `message` translation keys to all 8 locale files for force/critical/optional/default update policies
   - Updated `updateService.getUpdatePolicyMessage()` to use i18n instead of hardcoded English strings

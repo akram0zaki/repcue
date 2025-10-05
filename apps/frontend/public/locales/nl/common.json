@@ -546,6 +546,111 @@
     "loadFailed": "Laden van oefening is mislukt",
     "updateFailed": "Bijwerken van oefening is mislukt"
   },
+  "updateError": {
+    "actionFailed": "Actie mislukt: {{error}}",
+    "actionSuccess": "Actie succesvol voltooid",
+    "close": "Sluiten",
+    "completed": "Voltooid",
+    "confirmAction": "Weet je zeker dat je {{description}} wilt uitvoeren? Deze actie kan niet ongedaan worden gemaakt.",
+    "executing": "Bezig met uitvoeren...",
+    "needHelp": "Hulp nodig? Neem contact op met ondersteuning en geef de technische details hierboven door.",
+    "recoveryActions": "Herstelopties",
+    "rollbackAvailable": "Herstel beschikbaar",
+    "rollbackDescription": "Je kunt de vorige versie ({{version}}) herstellen als de herstelacties niet werken.",
+    "rollbackInProgress": "Bezig met herstellen...",
+    "severity": {
+      "critical": "Ernst: Kritiek",
+      "high": "Ernst: Hoog",
+      "medium": "Ernst: Gemiddeld",
+      "low": "Ernst: Laag"
+    },
+    "suggestions": "Suggesties:",
+    "technicalDetails": "Technische details",
+    "whatHappened": "Wat is er gebeurd?",
+    "types": {
+      "compatibility": "Compatibiliteitsfout",
+      "download": "Download mislukt",
+      "installation": "Installatie mislukt",
+      "network": "Netwerkprobleem",
+      "permission": "Toegang geweigerd",
+      "rollback": "Herstel mislukt",
+      "serviceWorker": "Serviceworker-fout",
+      "storage": "Opslagfout",
+      "timeout": "Update time-out",
+      "unknown": "Onbekende fout",
+      "verification": "Updateverificatie mislukt"
+    },
+    "messages": {
+      "network_error": "Kan geen verbinding maken met de updateservers. Controleer je internetverbinding.",
+      "download_error": "De update kon niet worden gedownload. Dit kan te wijten zijn aan een slechte verbinding of serverproblemen.",
+      "installation_error": "De update kon niet correct worden geïnstalleerd. Mogelijk moet je de app opnieuw starten.",
+      "verification_error": "Updateverificatie mislukt. Het updatebestand is mogelijk beschadigd.",
+      "storage_error": "Onvoldoende opslagruimte of toegang geweigerd. Maak ruimte vrij en probeer het opnieuw.",
+      "service_worker_error": "Er is een fout opgetreden bij de updateservice. Vernieuw de pagina en probeer opnieuw.",
+      "timeout_error": "Het updateproces duurde te lang. Probeer het opnieuw.",
+      "permission_error": "Toestemming geweigerd. Controleer je browserinstellingen en probeer opnieuw.",
+      "compatibility_error": "Deze update is niet compatibel met je browser of apparaat.",
+      "rollback_error": "Kon de vorige versie niet herstellen. Neem contact op met ondersteuning.",
+      "unknown_error": "Er is een onverwachte fout opgetreden tijdens het updateproces."
+    },
+    "actions": {
+      "network_error": {
+        "0": "Controleer je internetverbinding",
+        "1": "Probeer verbinding te maken met een ander netwerk",
+        "2": "Wacht even en probeer het later opnieuw"
+      },
+      "download_error": {
+        "0": "Probeer de download opnieuw",
+        "1": "Controleer de beschikbare opslagruimte",
+        "2": "Gebruik een stabielere verbinding"
+      },
+      "installation_error": {
+        "0": "Start de applicatie opnieuw",
+        "1": "Wis de browsercache",
+        "2": "Probeer de update opnieuw"
+      },
+      "verification_error": {
+        "0": "Wis de browsercache",
+        "1": "Probeer de update opnieuw",
+        "2": "Neem contact op met ondersteuning als het probleem blijft bestaan"
+      },
+      "storage_error": {
+        "0": "Maak opslagruimte vrij",
+        "1": "Wis browsergegevens en cache",
+        "2": "Sluit andere applicaties"
+      },
+      "service_worker_error": {
+        "0": "Vernieuw de pagina",
+        "1": "Wis de browsercache",
+        "2": "Start de browser opnieuw"
+      },
+      "timeout_error": {
+        "0": "Controleer je internetsnelheid",
+        "1": "Probeer opnieuw met een betere verbinding",
+        "2": "Wacht even en probeer later opnieuw"
+      },
+      "permission_error": {
+        "0": "Controleer de browsermachtigingen",
+        "1": "Sta meldingen en cache-opslag toe",
+        "2": "Probeer in een privé/incognito venster"
+      },
+      "compatibility_error": {
+        "0": "Werk je browser bij",
+        "1": "Probeer een andere browser",
+        "2": "Neem contact op met ondersteuning voor hulp"
+      },
+      "rollback_error": {
+        "0": "Start de applicatie opnieuw",
+        "1": "Wis alle browsergegevens",
+        "2": "Neem direct contact op met ondersteuning"
+      },
+      "unknown_error": {
+        "0": "Start de applicatie opnieuw",
+        "1": "Controleer de browserconsole voor details",
+        "2": "Neem contact op met ondersteuning en geef foutdetails door"
+      }
+    }
+  },
   "community": {
     "allCategories": "Alle Categorieën",
     "allContent": "Alle Inhoud",
@@ -728,5 +833,28 @@
     "submitError": "Verzenden van beoordeling mislukt",
     "submitting": "Verzenden...",
     "loginToRate": "Log in om oefeningen te beoordelen en te recenseren"
+  },
+  "sync": {
+    "syncing": "Gegevens worden gesynchroniseerd...",
+    "backingUp": "Je voortgang wordt geback-upt naar de cloud",
+    "failed": "Synchronisatie mislukt: {{error}}",
+    "lastAttempt": "Laatste poging: {{time}}",
+    "offline": {
+      "authenticated": "Je bent offline. Alle functies werken normaal. De verbinding wordt automatisch hersteld.",
+      "unauthenticated": "Je bent offline. Alle functies werken normaal. Je gegevens worden lokaal opgeslagen."
+    },
+    "reconnected": {
+      "authenticated": "Verbinding hersteld! Gegevens worden automatisch gesynchroniseerd.",
+      "authenticatedSimple": "Verbinding hersteld! Alle functies zijn beschikbaar.",
+      "unauthenticated": "Verbinding hersteld! Alle functies zijn beschikbaar."
+    },
+    "pendingChanges": "Wijzigingen klaar om te synchroniseren. Laatste synchronisatie: {{time}}",
+    "timeAgo": {
+      "never": "Nooit",
+      "justNow": "Zojuist",
+      "minutesAgo": "{{count}} min geleden",
+      "hoursAgo": "{{count}} uur geleden",
+      "daysAgo": "{{count}} dagen geleden"
+    }
   }
 }

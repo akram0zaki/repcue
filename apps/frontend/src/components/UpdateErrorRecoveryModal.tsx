@@ -198,9 +198,7 @@ export const UpdateErrorRecoveryModal: React.FC<UpdateErrorRecoveryModalProps> =
                   {getErrorTypeTitle(error.type)}
                 </h2>
                 <p className={`text-sm ${config.textColor} opacity-90`}>
-                  {t('updateError.severity.{{severity}}', 'Severity: {{severity}}', {
-                    severity: error.severity.charAt(0).toUpperCase() + error.severity.slice(1)
-                  })}
+                  {t(`updateError.severity.${error.severity}`, `Severity: ${error.severity.charAt(0).toUpperCase() + error.severity.slice(1)}`)}
                 </p>
               </div>
             </div>
