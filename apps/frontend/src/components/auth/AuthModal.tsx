@@ -38,6 +38,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     };
   }, [isOpen, onClose]);
 
+  // Scroll to top when mode changes
+  useEffect(() => {
+    if (isOpen) {
+      // Find the scrollable container (the modal overlay)
+      const scrollContainer = document.querySelector('.fixed.inset-0.overflow-y-auto');
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [mode, isOpen]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
