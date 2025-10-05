@@ -173,6 +173,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                   placeholder={t('fields.email')}
+                  autoComplete="username"
                   disabled={loading}
                   required
                 />
@@ -240,6 +241,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder={t('placeholders.email')}
+                autoComplete="username"
                 disabled={loading}
                 required
               />
@@ -258,6 +260,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder={t('placeholders.password')}
+                autoComplete="new-password"
                 disabled={loading}
                 required
                 minLength={6}

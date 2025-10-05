@@ -1,5 +1,19 @@
 ## Unreleased
 
+### 2025-10-05 (Auth Form Accessibility Improvements)
+
+#### Fixed
+- **Form Accessibility**: Improved password manager compatibility and accessibility
+  - Updated email fields in password forms to use `autoComplete="username"` for proper password manager integration
+  - Resolves browser console warnings about missing autocomplete attributes and username fields
+  - Affects both SignInForm and SignUpForm components
+  - Email fields in passkey-only contexts keep `autoComplete="email"` as they're not part of password forms
+
+#### Added
+- **Auth Modal UX**: Added scroll-to-top behavior when switching between signin/signup forms
+  - Prevents users from landing at the bottom of forms when switching between authentication modes
+  - Uses smooth scroll behavior for better user experience
+
 ### 2025-10-05 (Biometric Authentication Fixes)
 
 #### Fixed
