@@ -70,7 +70,6 @@
     "exerciseParameters": "Parámetros del ejercicio",
     "exerciseVideo": "Video del ejercicio"
   },
-  },
   "navigation": {
     "home": "Inicio",
     "workouts": "Entrenamientos",
@@ -114,6 +113,7 @@
     "exportDataHelp": "Descarga tus datos de entrenamiento como archivo JSON",
     "exportInProgress": "Exportando...",
     "exportSuccess": "Tus datos han sido exportados con éxito!",
+    "exportError": " Error al exportar datos. Por favor, inténtalo de nuevo.",
     "exportRateLimit": "Puedes solicitar hasta 3 exportaciones por día",
     "exportNow": "Exportar ahora",
     "exportNowHelp": "Exporta inmediatamente tus datos más recientes a un archivo JSON.",
@@ -509,6 +509,111 @@
     "loadFailed": "Error al cargar el ejercicio",
     "updateFailed": "Error al actualizar el ejercicio"
   },
+  "updateError": {
+    "actionFailed": "Acción fallida: {{error}}",
+    "actionSuccess": "Acción completada con éxito",
+    "close": "Cerrar",
+    "completed": "Completado",
+    "confirmAction": "¿Estás seguro de que quieres {{description}}? Esta acción no se puede deshacer.",
+    "executing": "Ejecutando...",
+    "needHelp": "¿Necesitas ayuda? Contacta con soporte e incluye los detalles técnicos de arriba.",
+    "recoveryActions": "Opciones de recuperación",
+    "rollbackAvailable": "Reversión disponible",
+    "rollbackDescription": "Puedes restaurar la versión anterior ({{version}}) si las acciones de recuperación no funcionan.",
+    "rollbackInProgress": "Reversión en progreso...",
+    "severity": {
+      "critical": "Gravedad: Crítica",
+      "high": "Gravedad: Alta",
+      "medium": "Gravedad: Media",
+      "low": "Gravedad: Baja"
+    },
+    "suggestions": "Sugerencias:",
+    "technicalDetails": "Detalles técnicos",
+    "whatHappened": "¿Qué pasó?",
+    "types": {
+      "compatibility": "Error de compatibilidad",
+      "download": "Fallo en la descarga",
+      "installation": "Fallo en la instalación",
+      "network": "Problema de red",
+      "permission": "Permiso denegado",
+      "rollback": "Fallo en la reversión",
+      "serviceWorker": "Error del Service Worker",
+      "storage": "Error de almacenamiento",
+      "timeout": "Tiempo de actualización agotado",
+      "unknown": "Error desconocido",
+      "verification": "Fallo en la verificación de la actualización"
+    },
+    "messages": {
+      "network_error": "No se pudo conectar con los servidores de actualización. Verifica tu conexión a Internet.",
+      "download_error": "No se pudo descargar la actualización. Puede deberse a una mala conexión o a problemas del servidor.",
+      "installation_error": "La actualización no se pudo instalar correctamente. Puede que necesites reiniciar la aplicación.",
+      "verification_error": "La verificación de la actualización falló. El archivo puede estar dañado.",
+      "storage_error": "Espacio de almacenamiento insuficiente o acceso denegado. Libera espacio e inténtalo de nuevo.",
+      "service_worker_error": "El servicio de actualización encontró un error. Intenta actualizar la página.",
+      "timeout_error": "El proceso de actualización superó el tiempo límite. Inténtalo de nuevo.",
+      "permission_error": "Permiso denegado. Verifica la configuración de tu navegador e inténtalo de nuevo.",
+      "compatibility_error": "Esta actualización no es compatible con tu navegador o dispositivo.",
+      "rollback_error": "No se pudo restaurar la versión anterior. Contacta con soporte.",
+      "unknown_error": "Ocurrió un error inesperado durante el proceso de actualización."
+    },
+    "actions": {
+      "network_error": {
+        "0": "Verifica tu conexión a Internet",
+        "1": "Prueba con otra red",
+        "2": "Espera un momento y vuelve a intentarlo"
+      },
+      "download_error": {
+        "0": "Reintenta la descarga",
+        "1": "Verifica el espacio de almacenamiento disponible",
+        "2": "Usa una conexión más estable"
+      },
+      "installation_error": {
+        "0": "Reinicia la aplicación",
+        "1": "Borra la caché del navegador",
+        "2": "Vuelve a intentar la actualización"
+      },
+      "verification_error": {
+        "0": "Borra la caché del navegador",
+        "1": "Reintenta la actualización",
+        "2": "Contacta con soporte si el problema persiste"
+      },
+      "storage_error": {
+        "0": "Libera espacio de almacenamiento",
+        "1": "Borra los datos y la caché del navegador",
+        "2": "Cierra otras aplicaciones"
+      },
+      "service_worker_error": {
+        "0": "Actualiza la página",
+        "1": "Borra la caché del navegador",
+        "2": "Reinicia el navegador"
+      },
+      "timeout_error": {
+        "0": "Verifica la velocidad de tu conexión",
+        "1": "Intenta de nuevo con una conexión mejor",
+        "2": "Espera un poco y vuelve a intentarlo"
+      },
+      "permission_error": {
+        "0": "Verifica los permisos del navegador",
+        "1": "Permite notificaciones y almacenamiento en caché",
+        "2": "Prueba en una ventana de incógnito o privada"
+      },
+      "compatibility_error": {
+        "0": "Actualiza tu navegador",
+        "1": "Prueba con otro navegador",
+        "2": "Contacta con soporte para obtener ayuda"
+      },
+      "rollback_error": {
+        "0": "Reinicia la aplicación",
+        "1": "Borra todos los datos del navegador",
+        "2": "Contacta con soporte inmediatamente"
+      },
+      "unknown_error": {
+        "0": "Reinicia la aplicación",
+        "1": "Revisa la consola del navegador para ver los detalles",
+        "2": "Contacta con soporte e incluye los detalles del error"
+      }
+    }
+  },
   "community": {
     "allCategories": "Todas las Categorías",
     "allContent": "Todo el Contenido",
@@ -592,6 +697,7 @@
   "update": {
     "force": {
       "title": "Actualización de Seguridad Requerida",
+      "message": "Esta es una actualización de seguridad requerida. La aplicación se actualizará automáticamente para garantizar su seguridad.",
       "action": "Actualizar Ahora",
       "modal": {
         "title": "Actualización de Seguridad Requerida",
@@ -603,13 +709,16 @@
       }
     },
     "critical": {
-      "title": "Actualización Importante Disponible"
+      "title": "Actualización Importante Disponible",
+      "message": "Esta es una actualización importante con correcciones de seguridad y mejoras críticas."
     },
     "optional": {
-      "title": "Nueva Versión Disponible"
+      "title": "Nueva Versión Disponible",
+      "message": "Una nueva versión está disponible con mejoras y nuevas funciones."
     },
     "default": {
-      "title": "Actualización Disponible"
+      "title": "Actualización Disponible",
+      "message": "Una nueva versión está disponible."
     },
     "version": "Versión: {{version}}",
     "action": "Actualizar",
@@ -656,6 +765,7 @@
   "changelog": {
     "title": "Novedades",
     "close": "Cerrar registro de cambios",
+    "closeButton": "Cerrar",
     "done": "Hecho",
     "empty": {
       "title": "No hay Cambios Detallados Disponibles",
@@ -665,6 +775,12 @@
       "title": "Cambios en la Privacidad Detectados",
       "message": "Esta actualización incluye cambios en la forma en que manejamos sus datos. Revise los cambios anteriores y confirme su comprensión.",
       "acknowledge": "Entiendo y reconozco los cambios en la privacidad en esta actualización"
+    },
+    "categories": {
+      "newFeatures": "Nuevas funciones",
+      "improvements": "Mejoras",
+      "bugFixes": "Correcciones de errores",
+      "securityUpdates": "Actualizaciones de seguridad"
     }
   },
   "rating": {
@@ -678,5 +794,28 @@
     "submitError": "Error al enviar la reseña",
     "submitting": "Enviando...",
     "loginToRate": "Inicie sesión para calificar y revisar ejercicios"
+  },
+  "sync": {
+    "syncing": "Sincronizando datos...",
+    "backingUp": "Guardando tu progreso en la nube",
+    "failed": "Error de sincronización: {{error}}",
+    "lastAttempt": "Último intento: {{time}}",
+    "offline": {
+      "authenticated": "Estás sin conexión. Todas las funciones funcionan con normalidad. La conexión se restablecerá automáticamente.",
+      "unauthenticated": "Estás sin conexión. Todas las funciones funcionan con normalidad. Tus datos se guardan localmente."
+    },
+    "reconnected": {
+      "authenticated": "¡Conexión restaurada! Los datos se sincronizarán automáticamente.",
+      "authenticatedSimple": "¡Conexión restaurada! Todas las funciones están disponibles.",
+      "unauthenticated": "¡Conexión restaurada! Todas las funciones están disponibles."
+    },
+    "pendingChanges": "Cambios listos para sincronizar. Última sincronización: {{time}}",
+    "timeAgo": {
+      "never": "Nunca",
+      "justNow": "Justo ahora",
+      "minutesAgo": "Hace {{count}} min",
+      "hoursAgo": "Hace {{count}} h",
+      "daysAgo": "Hace {{count}} d"
+    }
   }
 }

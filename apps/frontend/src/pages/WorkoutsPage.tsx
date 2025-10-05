@@ -6,6 +6,7 @@ import { consentService } from '../services/consentService';
 import type { Workout, Weekday } from '../types';
 import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
+import AIWorkoutButton from '../components/AIWorkoutButton';
 import logger from '../utils/logger';
 
 const WorkoutsPage: React.FC = () => {
@@ -157,18 +158,18 @@ const WorkoutsPage: React.FC = () => {
       <div className="min-h-screen bg-background-50 dark:bg-background-950 pt-safe pb-20">
         <div className="container mx-auto px-4 py-4 max-w-md">
           <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-6">{t('workouts.title')}</h1>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+          <div className="bg-warning-soft border border-warning rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-5 w-5 text-warning" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                <h3 className="text-sm font-medium text-warning">
                   {t('workouts.dataRequiredTitle')}
                 </h3>
-                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                <div className="mt-2 text-sm text-warning">
                   <p>{t('workouts.dataRequiredBody')}</p>
                 </div>
                 <div className="mt-4">
@@ -202,10 +203,19 @@ const WorkoutsPage: React.FC = () => {
           </button>
         </div>
 
+        {/* AI Workout Assistant */}
+        <div className="mb-4">
+          <AIWorkoutButton
+            variant="secondary"
+            isFirstTime={workouts.length === 0}
+            className="w-full"
+          />
+        </div>
+
         {workouts.length === 0 ? (
           <div className="text-center py-12">
             <div className="mx-auto w-16 h-16 bg-surface-200 dark:bg-surface-700 rounded-full flex items-center justify-center mb-6">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
@@ -227,7 +237,7 @@ const WorkoutsPage: React.FC = () => {
             {workouts.map((workout) => (
               <div
                 key={workout.id}
-                className="bg-surface-0 dark:bg-surface-800 rounded-lg p-4 border border-surface-200 dark:border-surface-700 shadow-sm"
+                className="bg-surface-0 dark:bg-surface-800 rounded-lg p-4 border border-primary shadow-sm"
               >
                 {/* Workout Header */}
                 <div className="text-center mb-3">
@@ -243,7 +253,7 @@ const WorkoutsPage: React.FC = () => {
                   </div>
                   
                   {workout.description && (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
+                    <p className="text-body text-sm mb-2 line-clamp-2">
                       {workout.description}
                     </p>
                   )}
@@ -284,7 +294,7 @@ const WorkoutsPage: React.FC = () => {
                 </div>
                 
                 {/* Workout Info */}
-                <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-4 mb-3 flex-wrap">
+                <div className="flex items-center justify-center gap-4 text-sm text-body mt-4 mb-3 flex-wrap">
                   <span className="flex items-center gap-1 flex-shrink-0">
                     <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -304,11 +314,11 @@ const WorkoutsPage: React.FC = () => {
 
                 {/* Delete Confirmation */}
                 {deleteConfirm === workout.id && (
-                  <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg">
-                    <p className="text-sm text-red-800 dark:text-red-300 mb-3">
+                  <div className="mt-4 p-3 bg-error-soft border border-error rounded-lg">
+                    <p className="text-sm text-error mb-3">
                       {t('workouts.deleteConfirm', { name: workout.name })}
                     </p>
-                    <div className="flex space-x-2">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => handleDeleteWorkout(workout.id)}
                         className="btn-danger px-3 py-1.5 text-sm"

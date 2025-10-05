@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: onboarding copy and hints pending full localization */
 import { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { TargetIcon, LightningIcon, LockIcon } from './icons/NavigationIcons';
 
@@ -28,6 +29,7 @@ interface OnboardingFlowProps {
  * @param className - Additional CSS classes
  */
 export function OnboardingFlow({ onComplete, onSkip, className = '' }: OnboardingFlowProps) {
+  const { t } = useTranslation();
   const {
     isOnboardingActive,
     currentStepData,
@@ -187,22 +189,24 @@ export function OnboardingFlow({ onComplete, onSkip, className = '' }: Onboardin
               </span>
               <button
                 onClick={handleSkip}
-                className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
-                aria-label="Skip onboarding"
+                className="text-caption help-text transition-colors"
+                aria-label={t('a11y.skipOnboarding', 'Skip onboarding')}
               >
-                Skip
+                {t('onboarding.skip', 'Skip')}
               </button>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300 ease-out"
-                style={{ width: `${progress}%` }}
-                role="progressbar"
-                aria-valuenow={Math.round(progress)}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-label={`Onboarding progress: ${Math.round(progress)}%`}
-              />
+            <div className="progress">
+              <div className="progress__track">
+                <div
+                  className="progress__bar"
+                  style={{ ['--progress' as unknown as string]: progress } as React.CSSProperties}
+                  role="progressbar"
+                  aria-valuenow={Math.round(progress)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Onboarding progress: ${Math.round(progress)}%`}
+                />
+              </div>
             </div>
           </div>
 

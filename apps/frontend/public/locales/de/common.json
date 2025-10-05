@@ -70,7 +70,6 @@
     "exerciseParameters": "Übungsparameter",
     "exerciseVideo": "Übungsvideo"
   },
-  },
   "navigation": {
     "home": "Startseite",
     "workouts": "Trainings",
@@ -114,6 +113,7 @@
     "exportDataHelp": "Laden Sie Ihre Trainingsdaten als JSON-Datei herunter",
     "exportInProgress": "Export wird durchgeführt...",
     "exportSuccess": "Ihre Daten wurden erfolgreich exportiert!",
+    "exportError": "Fehler beim Exportieren der Daten. Bitte versuchen Sie es erneut.",
     "exportRateLimit": "Sie können bis zu 3 Exporte pro Tag anfordern",
     "exportNow": "Jetzt exportieren",
     "exportNowHelp": "Ihre neuesten Daten sofort als JSON-Datei exportieren.",
@@ -501,6 +501,111 @@
     "loadFailed": "Fehler beim Laden der Übung",
     "updateFailed": "Fehler beim Aktualisieren der Übung"
   },
+  "updateError": {
+    "actionFailed": "Aktion fehlgeschlagen: {{error}}",
+    "actionSuccess": "Aktion erfolgreich abgeschlossen",
+    "close": "Schließen",
+    "completed": "Abgeschlossen",
+    "confirmAction": "Bist du sicher, dass du {{description}} möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "executing": "Wird ausgeführt...",
+    "needHelp": "Brauchst du Hilfe? Kontaktiere den Support mit den technischen Details oben.",
+    "recoveryActions": "Wiederherstellungsoptionen",
+    "rollbackAvailable": "Wiederherstellung verfügbar",
+    "rollbackDescription": "Du kannst die vorherige Version ({{version}}) wiederherstellen, wenn die Wiederherstellungsoptionen nicht funktionieren.",
+    "rollbackInProgress": "Wiederherstellung läuft...",
+    "severity": {
+      "critical": "Schweregrad: Kritisch",
+      "high": "Schweregrad: Hoch",
+      "medium": "Schweregrad: Mittel",
+      "low": "Schweregrad: Niedrig"
+    },
+    "suggestions": "Vorschläge:",
+    "technicalDetails": "Technische Details",
+    "whatHappened": "Was ist passiert?",
+    "types": {
+      "compatibility": "Kompatibilitätsfehler",
+      "download": "Download fehlgeschlagen",
+      "installation": "Installation fehlgeschlagen",
+      "network": "Netzwerkproblem",
+      "permission": "Zugriff verweigert",
+      "rollback": "Wiederherstellung fehlgeschlagen",
+      "serviceWorker": "Service-Worker-Fehler",
+      "storage": "Speicherfehler",
+      "timeout": "Update-Timeout",
+      "unknown": "Unbekannter Fehler",
+      "verification": "Update-Überprüfung fehlgeschlagen"
+    },
+    "messages": {
+      "network_error": "Verbindung zu den Update-Servern nicht möglich. Bitte überprüfe deine Internetverbindung.",
+      "download_error": "Update konnte nicht heruntergeladen werden. Möglicherweise aufgrund einer schlechten Verbindung oder Serverproblemen.",
+      "installation_error": "Update konnte nicht richtig installiert werden. Bitte starte die App neu.",
+      "verification_error": "Überprüfung des Updates fehlgeschlagen. Die Update-Datei könnte beschädigt sein.",
+      "storage_error": "Nicht genügend Speicherplatz oder Zugriff auf Speicher verweigert. Bitte Platz schaffen und erneut versuchen.",
+      "service_worker_error": "Update-Dienst hat einen Fehler festgestellt. Bitte die App aktualisieren.",
+      "timeout_error": "Update-Prozess hat zu lange gedauert. Bitte erneut versuchen.",
+      "permission_error": "Zugriff verweigert. Bitte überprüfe die Browser-Einstellungen und versuche es erneut.",
+      "compatibility_error": "Dieses Update ist nicht mit deinem Browser oder Gerät kompatibel.",
+      "rollback_error": "Vorherige Version konnte nicht wiederhergestellt werden. Bitte kontaktiere den Support.",
+      "unknown_error": "Während des Update-Vorgangs ist ein unerwarteter Fehler aufgetreten."
+    },
+    "actions": {
+      "network_error": {
+        "0": "Überprüfe deine Internetverbindung",
+        "1": "Versuche es mit einem anderen Netzwerk",
+        "2": "Warte etwas und versuche es später erneut"
+      },
+      "download_error": {
+        "0": "Download erneut versuchen",
+        "1": "Überprüfe den verfügbaren Speicherplatz",
+        "2": "Versuche eine stabilere Verbindung zu nutzen"
+      },
+      "installation_error": {
+        "0": "Anwendung neu starten",
+        "1": "Browser-Cache leeren",
+        "2": "Update erneut versuchen"
+      },
+      "verification_error": {
+        "0": "Browser-Cache leeren",
+        "1": "Update erneut versuchen",
+        "2": "Support kontaktieren, falls das Problem weiterhin besteht"
+      },
+      "storage_error": {
+        "0": "Speicherplatz freigeben",
+        "1": "Browser-Cache und Daten löschen",
+        "2": "Andere Anwendungen schließen"
+      },
+      "service_worker_error": {
+        "0": "Seite aktualisieren",
+        "1": "Browser-Cache leeren",
+        "2": "Browser neu starten"
+      },
+      "timeout_error": {
+        "0": "Internetgeschwindigkeit überprüfen",
+        "1": "Mit besserer Verbindung erneut versuchen",
+        "2": "Etwas warten und später erneut versuchen"
+      },
+      "permission_error": {
+        "0": "Browser-Berechtigungen überprüfen",
+        "1": "Benachrichtigungen und Cache-Speicherung erlauben",
+        "2": "Im privaten/Inkognito-Fenster versuchen"
+      },
+      "compatibility_error": {
+        "0": "Browser aktualisieren",
+        "1": "Einen anderen Browser ausprobieren",
+        "2": "Support für weitere Hilfe kontaktieren"
+      },
+      "rollback_error": {
+        "0": "Anwendung neu starten",
+        "1": "Alle Browserdaten löschen",
+        "2": "Unverzüglich den Support kontaktieren"
+      },
+      "unknown_error": {
+        "0": "Anwendung neu starten",
+        "1": "Browser-Konsole auf Details prüfen",
+        "2": "Support mit den Fehlerdetails kontaktieren"
+      }
+    }
+  },
   "community": {
     "allCategories": "Alle Kategorien",
     "allContent": "Alle Inhalte",
@@ -584,6 +689,7 @@
   "update": {
     "force": {
       "title": "Sicherheitsupdate erforderlich",
+      "message": "Dies ist ein erforderliches Sicherheitsupdate. Die App wird automatisch aktualisiert, um Ihre Sicherheit zu gewährleisten.",
       "action": "Jetzt aktualisieren",
       "modal": {
         "title": "Sicherheitsupdate erforderlich",
@@ -595,13 +701,16 @@
       }
     },
     "critical": {
-      "title": "Wichtiges Update Verfügbar"
+      "title": "Wichtiges Update Verfügbar",
+      "message": "Dies ist ein wichtiges Update mit Sicherheitsfixes und kritischen Verbesserungen."
     },
     "optional": {
-      "title": "Neue Version Verfügbar"
+      "title": "Neue Version Verfügbar",
+      "message": "Eine neue Version mit Verbesserungen und neuen Funktionen ist verfügbar."
     },
     "default": {
-      "title": "Update Verfügbar"
+      "title": "Update Verfügbar",
+      "message": "Eine neue Version ist verfügbar."
     },
     "version": "Version: {{version}}",
     "action": "Update",
@@ -647,7 +756,8 @@
   },
   "changelog": {
     "title": "Neuigkeiten",
-    "close": "CChangelog schließen",
+    "close": "Changelog schließen",
+    "closeButton": "Schließen",
     "done": "Fertig",
     "empty": {
       "title": "Keine detaillierten Änderungen verfügbar",
@@ -657,6 +767,12 @@
       "title": "Änderungen der Datenschutzbestimmungen erkannt",
       "message": "Dieses Update enthält Änderungen daran, wie wir Ihre Daten behandeln. Bitte überprüfen Sie die oben genannten Änderungen und bestätigen Sie Ihr Verständnis.",
       "acknowledge": "Ich verstehe und erkenne die Änderungen der Datenschutzbestimmungen in diesem Update an"
+    },
+    "categories": {
+      "newFeatures": "Neue Funktionen",
+      "improvements": "Verbesserungen",
+      "bugFixes": "Fehlerbehebungen",
+      "securityUpdates": "Sicherheitsupdates"
     }
   },
   "rating": {
@@ -670,5 +786,28 @@
     "submitError": "Fehler beim Einreichen der Bewertung",
     "submitting": "Wird eingereicht...",
     "loginToRate": "Melden Sie sich an, um Übungen zu bewerten und zu überprüfen"
+  },
+  "sync": {
+    "syncing": "Daten werden synchronisiert...",
+    "backingUp": "Fortschritt wird in der Cloud gesichert",
+    "failed": "Synchronisierung fehlgeschlagen: {{error}}",
+    "lastAttempt": "Letzter Versuch: {{time}}",
+    "offline": {
+      "authenticated": "Du bist offline. Alle Funktionen funktionieren normal. Die Verbindung wird automatisch wiederhergestellt.",
+      "unauthenticated": "Du bist offline. Alle Funktionen funktionieren normal. Deine Daten werden lokal gespeichert."
+    },
+    "reconnected": {
+      "authenticated": "Verbindung wiederhergestellt! Daten werden automatisch synchronisiert.",
+      "authenticatedSimple": "Verbindung wiederhergestellt! Alle Funktionen sind verfügbar.",
+      "unauthenticated": "Verbindung wiederhergestellt! Alle Funktionen sind verfügbar."
+    },
+    "pendingChanges": "Änderungen bereit zur Synchronisierung. Zuletzt synchronisiert: {{time}}",
+    "timeAgo": {
+      "never": "Nie",
+      "justNow": "Gerade eben",
+      "minutesAgo": "Vor {{count}} Min.",
+      "hoursAgo": "Vor {{count}} Std.",
+      "daysAgo": "Vor {{count}} Tg."
+    }
   }
 }

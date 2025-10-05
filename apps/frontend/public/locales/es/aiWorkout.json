@@ -1,0 +1,194 @@
+{
+  "button": {
+    "getStarted": "Obtén tu plan de entrenamiento personalizado",
+    "createNew": "Crear nuevo plan de entrenamiento"
+  },
+  "authGate": {
+    "title": "Inicio de sesión requerido",
+    "message": "El asistente de IA de RepCue requiere una cuenta para guardar tus entrenamientos personalizados.",
+    "signIn": "Iniciar sesión",
+    "tryLater": "Intentar más tarde",
+    "close": "Cerrar"
+  },
+  "offlineGate": {
+    "title": "Se requiere conexión a Internet",
+    "message": "El generador de entrenamientos con IA requiere una conexión a Internet para crear entrenamientos personalizados. Conéctate a Internet e inténtalo de nuevo.",
+    "messageShort": "Conéctate a Internet para usar el generador de entrenamientos con IA."
+  },
+  "progress": {
+    "step": "Paso {{current}} de {{total}}"
+  },
+  "screen1": {
+    "title": "Cuéntanos sobre ti",
+    "subtitle": "Ayúdanos a personalizar tu plan de entrenamiento",
+    "gender": {
+      "label": "Género",
+      "male": "Hombre",
+      "female": "Mujer",
+      "other": "Otro",
+      "error": "Por favor selecciona tu género"
+    },
+    "age": {
+      "label": "Edad",
+      "placeholder": "Introduce tu edad",
+      "error": "Introduce una edad válida (13-120)"
+    },
+    "height": {
+      "label": "Altura",
+      "cm": "cm",
+      "ft": "ft",
+      "inches": "in",
+      "unitCm": "cm",
+      "unitFtIn": "ft/in",
+      "placeholderCm": "Centímetros",
+      "placeholderFeet": "Pies",
+      "placeholderInches": "Pulgadas",
+      "error": "Introduce una altura válida"
+    },
+    "weight": {
+      "label": "Peso",
+      "kg": "kg",
+      "lbs": "lbs",
+      "unitKg": "kg",
+      "unitLbs": "lbs",
+      "placeholderKg": "Kilogramos",
+      "placeholderLbs": "Libras",
+      "error": "Introduce un peso válido"
+    },
+    "next": "Siguiente"
+  },
+  "screen2": {
+    "title": "Tus metas y preferencias",
+    "subtitle": "¿Qué quieres lograr?",
+    "goal": {
+      "label": "Meta principal",
+      "weightLoss": "Pérdida de peso",
+      "muscleBuilding": "Aumento de masa muscular",
+      "healthMaintenance": "Mantenimiento de la salud",
+      "flexibility": "Flexibilidad y movilidad",
+      "error": "Por favor selecciona tu meta principal"
+    },
+    "fitnessLevel": {
+      "label": "Nivel de condición física actual",
+      "beginner": "Principiante",
+      "beginnerDesc": "Nuevo en el ejercicio o regresando después de una pausa",
+      "intermediate": "Intermedio",
+      "intermediateDesc": "Rutina regular de ejercicio, cómodo con movimientos básicos",
+      "advanced": "Avanzado",
+      "advancedDesc": "Deportista experimentado, listo para desafíos intensos",
+      "error": "Por favor selecciona tu nivel de condición física"
+    },
+    "trainingTime": {
+      "label": "Frecuencia de entrenamiento (días por semana)",
+      "morning": "Mañana",
+      "afternoon": "Tarde",
+      "evening": "Noche",
+      "mixed": "Mixto",
+      "3-4": "3-4 días",
+      "4-5": "4-5 días",
+      "5-6": "5-6 días",
+      "6+": "6+ días",
+      "error": "Por favor selecciona tu frecuencia de entrenamiento"
+    },
+    "back": "Atrás",
+    "next": "Siguiente"
+  },
+  "screen3": {
+    "title": "Salud y estilo de entrenamiento",
+    "subtitle": "Mantengámoslo seguro y efectivo",
+    "injuries": {
+      "label": "Lesiones o limitaciones (opcional)",
+      "placeholder": "ej. dolor de rodilla, problemas lumbares, lesión de hombro...",
+      "description": "Cuéntanos si tienes alguna lesión o limitación física para poder recomendarte ejercicios seguros.",
+      "helper": "La IA excluirá ejercicios que puedan agravar estas condiciones",
+      "charCount": "{{remaining}} caracteres restantes",
+      "error": "Mantén la descripción de lesiones por debajo de 500 caracteres"
+    },
+    "trainingStyle": {
+      "label": "Estilo de entrenamiento preferido",
+      "strength": "Entrenamiento de fuerza",
+      "strengthDesc": "Aumenta masa muscular y fuerza general",
+      "cardio": "Enfocado en cardio",
+      "cardioDesc": "Mejora tu resistencia y capacidad cardiovascular",
+      "balanced": "Equilibrado",
+      "balancedDesc": "Combinación de fuerza y cardio",
+      "error": "Por favor selecciona tu estilo de entrenamiento"
+    },
+    "timeAvailability": {
+      "label": "Tiempo disponible por sesión",
+      "15-30": "15-30 minutos",
+      "30-45": "30-45 minutos",
+      "45-60": "45-60 minutos",
+      "60+": "60+ minutos",
+      "error": "Por favor selecciona tu tiempo disponible"
+    },
+    "back": "Atrás",
+    "generate": "Generar entrenamientos"
+  },
+  "loading": {
+    "title": "Creando tus entrenamientos personalizados",
+    "analyzing": "Analizando tu perfil...",
+    "selecting": "Seleccionando ejercicios...",
+    "creating": "Creando tus entrenamientos personalizados...",
+    "finalizing": "Casi terminado...",
+    "elapsed": "Tiempo transcurrido: {{seconds}}s",
+    "tip": "Nuestra IA está analizando miles de ejercicios para crear el plan de entrenamiento perfecto para ti. Esto puede tardar hasta 30 segundos.",
+    "slowWarning": "Esto está tardando más de lo esperado. Por favor espera un poco más o inténtalo de nuevo si se agota el tiempo.",
+    "srAnnouncement": "Generando plan de entrenamiento con IA. Por favor espera.",
+    "warning": "Esto está tardando más de lo habitual. Por favor espera...",
+    "cancel": "Cancelar",
+    "timeout": {
+      "title": "Tiempo de espera agotado",
+      "message": "La IA está tardando más de lo esperado. ¿Quieres intentarlo de nuevo?",
+      "retry": "Intentar de nuevo",
+      "cancel": "Cancelar"
+    }
+  },
+  "results": {
+    "title": "Tus entrenamientos personalizados",
+    "subtitle": "Entrenamientos generados por IA adaptados a tus objetivos",
+    "aiGeneratedBadge": "Generado por IA",
+    "exercises": "{{count}} ejercicios",
+    "duration": "~{{minutes}} min",
+    "scheduledDays": "Programado para {{days}}",
+    "viewWorkouts": "Ver entrenamientos",
+    "generateAgain": "Generar de nuevo",
+    "close": "Cerrar",
+    "saved": "¡Entrenamientos guardados correctamente!"
+  },
+  "errors": {
+    "title": "Error al generar los entrenamientos",
+    "retryAfterMessage": "Por favor espera {{seconds}} segundos antes de intentarlo de nuevo.",
+    "authRequired": "Debes iniciar sesión para generar entrenamientos con IA.",
+    "offline": "Debes estar en línea para generar entrenamientos con IA. Verifica tu conexión.",
+    "rateLimit": "Has alcanzado el límite de generación de entrenamientos con IA. Inténtalo de nuevo en {{minutes}} minutos.",
+    "rateLimitGeneric": "Has alcanzado el límite de generación de entrenamientos con IA. Inténtalo más tarde.",
+    "validationError": "La información que ingresaste no es válida. Revisa tus respuestas e inténtalo de nuevo.",
+    "aiError": "Error al generar el entrenamiento con IA. Inténtalo de nuevo.",
+    "timeout": "La solicitud tardó demasiado. Inténtalo de nuevo.",
+    "networkError": "Error de red. Verifica tu conexión e inténtalo de nuevo.",
+    "invalidResponse": "Respuesta inválida del servidor. Inténtalo de nuevo.",
+    "noWorkouts": "La IA no generó ningún entrenamiento. Prueba con diferentes preferencias.",
+    "unknownError": "Ocurrió un error inesperado. Inténtalo de nuevo.",
+    "incompleteData": "Completa todos los campos requeridos antes de generar los entrenamientos.",
+    "retry": "Reintentar",
+    "dismiss": "Cerrar"
+  },
+  "onboarding": {
+    "exitConfirmation": {
+      "title": "¿Seguro que quieres salir?",
+      "message": "Tu progreso se perderá si sales ahora.",
+      "continue": "Continuar",
+      "exit": "Salir"
+    }
+  },
+  "days": {
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado",
+    "sunday": "Domingo"
+  }
+}

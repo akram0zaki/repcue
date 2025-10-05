@@ -1,5 +1,334 @@
 ## Unreleased
 
+### 2025-10-06 (Update Error Dialog i18n & AI Workout Fixes)
+
+#### Fixed
+- **Sync Banner Messages**: Fixed all sync status messages showing English text regardless of user's locale
+  - Added comprehensive sync translation keys to `en/common.json`: syncing, backup, offline, reconnected, errors, pending changes
+  - Added `sync.timeAgo.*` keys for time formatting (Never, Just now, minutes/hours/days ago)
+  - Updated `SyncStatusBanner.tsx` to use i18n for all messages (7 different message types)
+  - Sync notifications now properly translated in all 8 supported locales
+- **Update Notification Description**: Fixed "What's New" dialog showing English description regardless of user's locale
+  - Root cause: `UpdateNotificationBanner` was using server-provided `updateInfo.message` which is hardcoded in English on the Edge Function
+  - Solution: Always use client-side `updateService.getUpdatePolicyMessage()` which uses i18n translations
+  - Update descriptions now properly translated in all 8 supported locales
+- **Update Error Dialog Localization**: Fixed network error and recovery dialog showing English text regardless of user's locale
+  - Added comprehensive translation keys to `en/common.json` for all error messages and suggested actions
+  - Created `updateError.messages.*` keys for all 11 error types (network, download, installation, verification, storage, service worker, timeout, permission, compatibility, rollback, unknown)
+  - Created `updateError.actions.*` keys with 3 suggested actions for each error type (33 total action strings)
+  - Updated `updateErrorHandler.ts` to use i18n for `getUserFriendlyMessage()` and `getSuggestedActions()` methods
+  - Fixed severity display in `UpdateErrorRecoveryModal.tsx` to use lowercase translation keys
+  - Error dialogs now fully translatable across all 8 supported locales
+- **Update Notification Localization**: Fixed update notification banner showing English description text regardless of user's locale
+  - Added `message` translation keys to all 8 locale files for force/critical/optional/default update policies
+  - Updated `updateService.getUpdatePolicyMessage()` to use i18n instead of hardcoded English strings
+  - Update descriptions now display in user's preferred language (ar, ar-EG, de, es, fr, fy, nl, en)
+- **Workout Deletion Sync Bug**: Fixed deleted workouts reappearing after AI workout generation
+  - Root cause: `getWorkouts()` was not filtering out soft-deleted records
+  - Deleted workouts were being pulled back from server during sync before local deletions were pushed
+  - Added `deleted: true` filter to both IndexedDB and fallback storage in `getWorkouts()` method
+  - Now properly hides workouts marked for deletion until sync completes
+- **AI Workout Localization**: Fixed AI-generated workout titles and descriptions appearing in English regardless of user's locale selection
+  - Added `locale` field to `UserProfile` interface in `prompt-builder.ts`
+  - Updated workout generator to include user's locale in profile object
+  - Enhanced AI system prompt with explicit language instructions for all 8 supported locales (ar, ar-EG, de, es, fr, fy, nl, en)
+  - AI now generates workout names and descriptions in user's preferred language
+- **AI Workout Loading Banner**: Added missing translation keys for loading state
+  - Added `loading.title`, `loading.elapsed`, `loading.tip`, `loading.slowWarning`, `loading.srAnnouncement` to all 8 locale files
+  - Loading banner now displays properly translated text in all languages
+- **RTL Button Spacing**: Fixed delete confirmation buttons appearing attached in Arabic RTL mode
+  - Changed `space-x-2` to `gap-2` in WorkoutsPage.tsx for bidirectional spacing compatibility
+  - Buttons now properly spaced in both LTR and RTL layouts
+
+### 2025-10-05 (User-Catalog ACL, AI Token Usage Tracking & Cost Monitoring)
+
+#### Added
+- **Access Control List for Catalog Access**: Premium catalogs are accessible only by assigning them to users:
+  - General Fitness catalog is available for all users with no entitlement check.
+  - Database table `user_catalog_access` controls which users can view which premium catalogs.
+- **AI Token Usage Tracking System**: Comprehensive server-side tracking for all AI API calls
+  - Created `ai_usage_logs` database table tracking token counts, costs, and metadata
+  - Automatic cost calculation based on provider pricing (Mistral, Anthropic, OpenAI)
+  - Non-blocking logging - failures never interrupt workout generation
+  - Correlation ID linking to Edge Function logs for debugging
+  - Database constraints ensure token consistency (total = input + output)
+
+- **AI Usage Analytics Views**: SQL views for cost monitoring and optimization
+  - `ai_usage_daily` - Daily aggregated metrics by provider and model
+  - `ai_usage_monthly` - Monthly cost trends and usage patterns
+  - `ai_usage_per_user` - Per-user lifetime usage for identifying heavy users
+  - `ai_usage_errors` - Error breakdown by date, provider, and error code
+  - `ai_usage_summary` - Overall summary statistics (all-time)
+
+- **AI Usage Helper Functions**: Quick cost queries
+  - `get_current_month_ai_cost()` - Total AI cost for current month
+  - `get_today_ai_cost()` - Today's total cost
+  - `get_avg_ai_cost_per_request(days)` - Average cost per request for last N days
+
+- **Enhanced AI Client with Usage Data**: Updated all AI providers to return token usage
+  - New `AICompletionResult` interface with completion, model, and usage data
+  - Updated `AnthropicProvider`, `OpenAIProvider`, `MistralProvider` to extract usage from API responses
+  - Automatic usage extraction and logging after each AI call
+
+- **Usage Logger Module**: New `usage-logger.ts` with pricing tables and cost calculation
+  - Pricing table for all supported models (Mistral, Anthropic, OpenAI)
+  - `calculateCost()` - Automatic cost calculation based on provider/model
+  - `logAIUsage()` - Non-blocking database logging with error handling
+  - Utility functions for extracting usage from different provider responses
+  - 18 comprehensive unit tests covering all providers and edge cases
+
+#### Changed
+- **AI Client Architecture**: Modified to support usage tracking
+  - `generateAICompletion()` now returns `AICompletionResult` instead of plain string
+  - All 3 providers updated to include usage data in responses
+  - Workout generator extracts completion text from result object
+
+- **Workout Generator**: Integrated usage logging
+  - Wraps AI calls in try/catch to capture usage data
+  - Logs successful AI usage with token counts and costs
+  - Logs failed AI usage with error codes (when available)
+  - Tracks processing time for performance monitoring
+
+#### Technical Details
+- **Database Schema**: `ai_usage_logs` table with 5 indexes, RLS policies, and validation constraints
+- **Cost Estimation**: ~$0.0023 per request using Mistral Small (10K input + 500 output tokens)
+- **Monthly Projections**: $0.69 (10 req/day) to $69 (1000 req/day) based on Mistral Small pricing
+- **Security**: RLS enabled, service role only access, no user-facing queries
+- **Precision**: 6 decimal places for micro-transaction accuracy
+- **Provider Agnostic**: Easy to add new providers by updating pricing table
+
+#### Files Changed
+- `supabase/migrations/20251005122735_create_ai_usage_logs.sql` - Database schema (new)
+- `supabase/migrations/20251005122736_create_ai_usage_views.sql` - Views and functions (new)
+- `supabase/functions/generate-ai-workout/usage-logger.ts` - Usage logging module (new)
+- `supabase/functions/generate-ai-workout/ai-client.ts` - Enhanced with usage data
+- `supabase/functions/generate-ai-workout/workout-generator.ts` - Integrated logging
+- `supabase/functions/generate-ai-workout/__tests__/usage-logger.test.ts` - Unit tests (new)
+- `docs/implementation-plans/repcue-ai-assistant/token-audit-implementation-plan.md` - Implementation plan (new)
+- `docs/migration-tracking/supabase-changes_20251005.md` - Migration tracking updated
+
+#### Deployed
+- ✅ Edge Function deployed to dev (xwzrsfkzqxdybjrkkkvh)
+- ✅ Migrations applied to dev database
+- ✅ Production deployment pending
+
+### 2025-10-04 (AI Assistant - Mistral Support)
+#### Added
+- **Mistral AI Provider Support**: Added Mistral as third AI provider option
+  - Implemented `MistralProvider` class in `ai-client.ts`
+  - Uses `mistral-small-latest` model (Mistral Small 3)
+  - Cost-effective European alternative: $0.0024 per request
+  - GDPR compliant by design
+  - Configured via `AI_PROVIDER=mistral` environment variable
+  - API key stored securely in Supabase secrets
+
+- **Multi-Provider Architecture**: Enhanced AI client to support 3 providers
+  - Anthropic Claude (original)
+  - OpenAI GPT (fallback)
+  - Mistral AI (new European option)
+  - Easy switching via environment variable
+
+#### Changed
+- Updated AI provider documentation to include Mistral
+- Deployed to development environment with Mistral as default provider
+
+### 2025-10-04 (Update Notification UI - Style Guide Compliance & i18n)
+#### Fixed
+- **Update Notification Styling**: Migrated to semantic tokens and style guide compliance
+  - Replaced ad-hoc color classes (`bg-red-100`, `text-blue-600`) with semantic tokens (`bg-error-soft`, `text-warning`, `btn-primary`)
+  - Applied semantic typography classes (`.text-h3`, `.text-body`, `.text-caption`, `.text-small`)
+  - Used centralized button classes (`.btn-primary`, `.btn-secondary`, `.btn-danger`)
+  - Added RTL support for changelog lists (`ml-2 rtl:mr-2 rtl:ml-0`)
+  - Mobile-first responsive design with proper stacking (`w-full sm:w-auto`)
+  - Touch-friendly targets (`.touch-target` class on interactive elements)
+
+- **Update Notification Translation**: All text now properly translated
+  - Translated changelog category headers ("New Features", "Improvements", "Bug Fixes", "Security Updates")
+  - Added `changelog.categories` translations to all 8 locales (en, ar, ar-EG, de, es, fr, nl, fy)
+  - Added `closeButton` key for consistency across all changelog-related components
+
+### 2025-10-04 (Export Data Edge Function - Enhanced Error Handling & i18n)
+#### Added
+- **Structured Logging for export-data Edge Function**:
+  - Created `supabase/functions/export-data/logger.ts` with correlation ID support
+  - Log levels: INFO, WARN, ERROR, DEBUG
+  - JSON output format for log aggregation
+  - User ID tracking in all log entries
+
+#### Fixed
+- **Export Data CORS Error**: Fixed CORS configuration mismatch
+  - Updated `supabase/functions/_shared/cors.ts` to allow GET, POST, OPTIONS methods
+  - Changed `DataExportButton.tsx` to explicitly use GET method
+  - Edge function now properly handles export requests
+
+- **Export Data Null Response Bug**: Enhanced error handling to prevent null data downloads
+  - Added validation that exportData is not null/undefined before returning success (lines 222-239)
+  - Added validation that exportData is an object (lines 242-258)
+  - Returns HTTP 500 with meaningful error message if data is invalid
+
+- **Export Data Observability**: Comprehensive error handling and logging (15+ log points)
+  - Try-catch around JWT validation with detailed error logging
+  - Try-catch around rate limit check
+  - Environment variable validation
+  - Profile update error handling (warns but continues)
+  - Correlation IDs in all responses and headers (X-Correlation-ID)
+  - Retry-After header for rate limit errors
+  - User-friendly error messages with DEBUG mode support for detailed info
+
+- **Export Data Translation**: Error messages now properly translated
+  - Added dark mode styling to error display in `DataExportButton.tsx`
+  - Authentication errors show translated message via `t('errors.notAuthenticated')`
+  - Generic errors use `t('settings.exportError')` from locale files
+
+### 2025-10-04 (UI Audit — Styleguide Compliance Phase 1–2)
+#### Added
+- Global utilities in `apps/frontend/src/styles/tokens.css` to centralize styling:
+  - Progress component: `.progress`, `.progress__track`, `.progress__bar` (CSS var `--progress`)
+  - Timer utilities: `.timer-text-shadow-lg`, `.timer-text-shadow-sm`, `.timer-square-280`, `.timer-rect-560x320`, `.video-inset-10`, `.gpu-accelerated`
+  - RTL protections: `.nav-more-button`, `.catalog-selector` safeguards for icons/buttons
+  - Accessibility: `.sr-only-live`
+  - Spacing: `.chart-gap`
+  - Status tokens: `.text-warning/.bg-warning-soft`, `.text-error/.bg-error-soft`, `.text-success/.bg-success-soft`
+
+#### Changed
+- Replaced inline styles and ad-hoc Tailwind colors with semantic tokens and utilities across key screens/components:
+  - Navigation: removed inline `direction:ltr`; localized ARIA; RTL via class
+  - CatalogSelector: removed inline `direction:ltr`; localized scroll ARIA
+  - SnackbarProvider: offscreen live region uses `.sr-only-live`
+  - ProgressChart, ForceUpdateModal, WorkoutForceUpdateModal, OnboardingFlow: unified to shared `.progress` with `--progress`
+  - TimerPage: removed inline shadows/sizing; applied timer utilities and GPU class
+  - HomePage: tokenized hero typography and gradients
+  - SettingsPage: migrated actions to `.btn-primary/.btn-danger/.btn-neutral`
+  - LazyRoutes/App loading: tokenized loader colors/typography
+  - InstallPrompt: tokenized headers/body/badges; unified buttons
+  - ExercisePage: localized scroll ARIA, `w-max`, GPU hints on preview
+  - WorkoutsPage/EditWorkoutPage: tokenized warning/error/gray colors; headings/labels to semantic classes; checkbox colors to primary tokens
+  - ProfilePage: tokenized backgrounds, headings, buttons; standardized modal list styles
+  - CommunityPage: tokenized stars, cards, badges, filters, loader, headers, and errors; buttons to `.btn-primary`
+  - ExerciseDetailPage: tokenized error state and containers; `.btn-primary` for back button
+
+#### Fixed
+- Removed remaining inline text-shadow and width styles from `TimerPage` rectangular display section
+- Eliminated inline `style` usages across audited components (progress width remains via CSS var by design)
+- Replaced direct `console.*` calls with centralized logger in `pwaDetection.ts`
+- Localized hardcoded ARIA labels where found (Navigation, CatalogSelector, OnboardingFlow)
+
+#### Notes
+- Inline usage remaining: only shared progress `--progress` CSS var width. All other inline styles removed from app code.
+- Follow-up: spot-check minor components for any ad-hoc color classes and migrate to tokens as needed.
+
+### 2025-10-03 (AI Workout Assistant Auth Gate)
+#### Added
+- **Authentication Gate Modal**: Show auth requirement before user enters any data
+  - Modal appears when unauthenticated user clicks AI Workout Assistant button
+  - Two options: "Sign In" (navigates to login with return path) or "Try Later" (dismisses modal)
+  - Prevents data loss by checking authentication upfront
+  - Improves UX by avoiding 3-page form entry before auth error
+
+#### Fixed
+- **Auth Gate Modal Buttons**: Fixed button sizing and overflow issues
+  - Changed from flex layout to CSS Grid for equal-width buttons
+  - Both buttons now have consistent 50/50 width split
+  - No overflow on smaller screens
+- **Auth Gate Modal Responsive Layout**: Improved mobile-first design
+  - Buttons stack vertically on narrow screens (flex-col)
+  - Horizontal grid layout on desktop (sm:grid-cols-2)
+  - Uses semantic typography classes (.text-h3, .text-body)
+  - Proper surface colors (bg-white dark:bg-surface-900) - fixed transparency issue
+  - Border added for better definition (border-surface-200 dark:border-surface-700)
+  - Touch-friendly targets (.touch-target class)
+  - Full RTL support with proper text flow
+  - Equal button width enforced with grid-cols-2 on desktop
+
+### 2025-10-03 (AI Workout Assistant Progress Indicator)
+#### Changed
+- **Progress Indicator Pills**: Swapped size of selected and unselected pills
+  - Selected pill: 24px wide (smaller, highlighted in primary color)
+  - Unselected pills: 40px wide (larger, dimmed gray)
+  - Creates better visual distinction for current step
+
+### 2025-10-03 (AI Workout Assistant Screen 3 Fix)
+#### Fixed
+- **Screen 3 Label**: Removed duplicate "(Optional)" text from Injuries field
+  - Label now shows "(Optional)" only once instead of twice
+
+### 2025-10-03 (AI Workout Assistant Button Position)
+#### Changed
+- **HomePage Layout**: Moved AI Workout Assistant button above Upcoming Workout section
+  - Better visual hierarchy and user flow
+  - AI Assistant is now more prominent on the home screen
+  - Positioned after sign-in prompt and before upcoming workout
+
+### 2025-10-03 (AI Workout Assistant - Phase 6 Testing)
+#### Added
+- **Unit Tests for AI Workout Validation**: Comprehensive test suite for form validation
+  - 70 tests covering all three onboarding screens (Screen 1, 2, and 3)
+  - Tests for input sanitization (XSS protection, HTML tag removal)
+  - Boundary value testing for age (16-100), height (cm and ft-in), weight (kg and lbs)
+  - Edge case testing for gender, goals, fitness levels, training times, injuries
+  - Validation helper function tests (hasErrors, getFirstError)
+  - All tests passing with 100% coverage for validation logic
+- **Test Infrastructure**: Set up testing foundation for AI Assistant feature
+  - Validation tests in `src/utils/__tests__/aiWorkoutValidation.test.ts`
+  - Test configuration follows RepCue standards
+  - Integration with Vitest test runner
+
+#### Fixed
+- **TypeScript Compilation Errors**: Resolved all 8 TypeScript errors
+  - Removed unused `index` parameter in AIWorkoutResultsModal
+  - Added missing `auth_required` and `ai_error` error types
+  - Added `code` and `retryAfter` fields to AIWorkoutError interface
+  - Removed unused `FUNCTION_URL` constant
+  - Removed unsupported `signal` property from Supabase function invoke
+  - Prefixed unused `locale` parameter with underscore
+
+### 2025-10-03 (AI Workout Assistant UI Improvements)
+#### Added
+- **AI Workout Assistant Button**: Added entry points for AI workout generation feature
+  - Primary button on HomePage with "Get Your Personalized Workout Plan" text
+  - Secondary button on WorkoutsPage with contextual text based on workout count
+  - Both buttons navigate to `/ai-workout-onboarding` route
+  - Feature gated by `AI_WORKOUT_BUILDER` flag
+
+#### Fixed
+- **AI Workout Onboarding Page Styling**: Redesigned to follow RepCue style guide
+  - Replaced numbered step indicator with circular pill pagination (larger active pill, smaller inactive pills)
+  - Updated page background to `bg-background-50 dark:bg-background-950`
+  - Changed container to mobile-first `max-w-md` with proper safe area padding
+  - Updated card styling with `bg-surface-0 dark:bg-surface-800` and proper borders
+  - Standardized typography with `text-text-900 dark:text-text-50` for headings
+  - Added scroll-to-top on screen navigation for better UX
+  - Equal-width navigation buttons using CSS Grid instead of flex
+  - Replaced JavaScript `window.confirm()` with elegant modal dialog matching app style
+  - Exit confirmation modal with semi-transparent backdrop and blur effect
+- **AI Workout Screen 1 Form Styling**: Updated to match RepCue style guide
+  - Form inputs now use `bg-surface-0 dark:bg-surface-800` backgrounds
+  - Labels use `text-sm font-medium text-text-900 dark:text-text-50`
+  - Error states use `border-red-600` with `text-red-600 dark:text-red-400`
+  - Added `touch-target` class for accessibility (44px minimum)
+  - Gender radio buttons wrap on small screens with `flex-wrap`
+- **AI Workout Screen 2 Form Styling**: Fixed text overflow and updated styling
+  - Changed chip buttons from `text-sm` to `text-xs` with `break-words` for proper wrapping
+  - Reduced spacing from `space-y-8` to `space-y-5` for better density
+  - Updated grid gaps from `gap-3` to `gap-2` to give more room for text
+  - Fitness level cards use `items-start` for proper text wrapping
+  - Added `min-w-0 overflow-hidden` to prevent text overflow
+  - All buttons follow RepCue color scheme with primary-600 accent
+- **AI Workout Service Error Fix**: Fixed syntax error in aiWorkoutService.ts
+  - Escaped apostrophe in "You've reached the limit" error message (line 298)
+  - Service now loads without ESBuild transform errors
+
+#### Changed
+- **Navigation Button Layout**: Improved consistency across all three onboarding screens
+  - Buttons now maintain equal width on all pages using CSS Grid `grid-cols-2`
+  - Text wraps or truncates as needed within equal-width constraints
+  - Back/Exit and Next/Generate buttons always the same size
+- **Progress Indicator**: Enhanced visual clarity
+  - Active pill: 40px wide (w-10), highly visible
+  - Inactive pills: 24px wide (w-6), dimmed with opacity-50
+  - Used `bg-gray-400 dark:bg-gray-500` for better contrast on dark backgrounds
+  - All three pills now clearly visible
+
 ### 2025-10-03 (Settings Page Toggle Switch Styling Consistency)
 #### Fixed
 - **Toggle Switch Styling Consistency**: Applied uniform styling to all toggle switches on Settings page

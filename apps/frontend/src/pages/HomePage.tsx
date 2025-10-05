@@ -14,6 +14,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher';
 import { AuthModal } from '../components/auth/AuthModal';
 import { useAuth } from '../hooks/useAuth';
 import { VideoThumbnail } from '../components/VideoThumbnail';
+import AIWorkoutButton from '../components/AIWorkoutButton';
 import logger from '../utils/logger';
 
 interface HomePageProps {
@@ -42,9 +43,9 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
       if (consentStatus) {
         try {
           const workouts = await storageService.getWorkouts();
-          logger.debug('HomePage: All workouts loaded:', workouts);
+          // logger.debug('HomePage: All workouts loaded:', workouts);
           const activeWorkouts = workouts.filter(workout => workout.is_active);
-          logger.debug('HomePage: Active workouts:', activeWorkouts);
+          // logger.debug('HomePage: Active workouts:', activeWorkouts);
           if (activeWorkouts.length > 0) {
             const today = new Date();
             const currentWeekday = Object.values(Weekday)[today.getDay()] as Weekday;
@@ -159,10 +160,10 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {/* Motivational Text */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center px-4">
-                <h2 className="text-white text-xl font-bold mb-2 leading-tight drop-shadow-lg">
+                <h2 className="text-h3 text-white mb-2 leading-tight timer-text-shadow-lg">
                   {t('home.heroTitle', { defaultValue: 'Stay consistent, stay strong.' })}
                 </h2>
-                <p className="text-white/90 text-sm font-medium drop-shadow-md">
+                <p className="text-caption text-white/90 font-medium timer-text-shadow-sm">
                   {t('home.heroSubtitle', { defaultValue: 'Your workouts, your way.' })}
                 </p>
               </div>
@@ -187,7 +188,6 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
               <button
                 onClick={() => setShowAuthModal(true)}
                 className="text-primary-600 dark:text-primary-400 underline hover:no-underline font-normal bg-transparent border-0 p-0 m-0 cursor-pointer inline leading-none"
-                style={{ fontSize: 'inherit', lineHeight: 'inherit' }}
               >
                 {t('home.signInLink', { defaultValue: 'sign-in' })}
               </button>
@@ -196,18 +196,28 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
           </div>
         )}
 
+        {/* AI Workout Assistant Section */}
+        <section className="mb-4">
+          <AIWorkoutButton
+            variant="primary"
+            isFirstTime={true}
+            className="w-full"
+          />
+        </section>
+
         {/* Upcoming Workout Section */}
         {hasConsent && (
           <section className="mb-4">
             {upcomingWorkout ? (
-              <div className="bg-surface-0 dark:bg-surface-900 rounded-lg p-5 border border-surface-200 dark:border-surface-700 shadow-sm">
-                <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-4">
+              <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-4 sm:p-5 border border-primary-200 dark:border-primary-700/50 shadow-md">
+                <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4">
                   {t('home.upcomingWorkout')}
                 </h2>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  {/* Date Section */}
-                  <div className="flex items-center gap-4">
-                    <div className="text-center sm:text-start-rtl min-w-0">
+                <div className="flex flex-col gap-3 sm:gap-4">
+                  {/* Date and Workout Info Row */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                    {/* Date Section */}
+                    <div className="text-center sm:text-left rtl:sm:text-right flex-shrink-0">
                       <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
                         {upcomingWorkout.weekday}
                       </div>
@@ -215,9 +225,9 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         {upcomingWorkout.date}
                       </div>
                     </div>
-                    
+
                     {/* Workout Info */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 text-center sm:text-left rtl:sm:text-right">
                       <div className="text-body font-medium label-text truncate">
                         {upcomingWorkout.workout.name}
                       </div>
@@ -226,8 +236,8 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Start Button */}
+
+                  {/* Start Button - Full width on mobile, auto on larger screens */}
                   <button
                     onClick={() => {
                       // Navigate to timer in workout-guided mode
@@ -241,14 +251,14 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                         }
                       });
                     }}
-                    className="btn-primary flex-shrink-0 touch-target"
+                    className="btn-primary touch-target w-full sm:w-auto sm:self-start rtl:sm:self-end"
                   >
                     {t('home.startNow')}
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl p-6 text-white shadow-lg">
+              <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-6 text-white shadow-lg">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex-shrink-0 self-center sm:self-start">
                     <CalendarIcon size={48} className="drop-shadow-sm" />
@@ -257,7 +267,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
                     <h2 className="text-h3 font-bold mb-3 leading-tight">
                       {t('home.noScheduleTitle')}
                     </h2>
-                    <p className="text-white/90 text-body mb-5 leading-relaxed">
+                    <p className="text-body text-white/90 mb-5 leading-relaxed">
                       {t('home.noScheduleBody')}
                     </p>
                     <button

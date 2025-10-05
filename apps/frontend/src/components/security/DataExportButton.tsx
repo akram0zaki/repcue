@@ -28,11 +28,14 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
         throw new Error('Authentication required');
       }
 
-      const response = await supabase.functions.invoke('export-data', {
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('export-data', {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+
+      const response = { data: functionData, error: functionError };
 
       if (response.error) {
         throw new Error(response.error.message || 'Export failed');
@@ -57,7 +60,8 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
 
     } catch (err) {
       console.error('Data export failed:', err);
-      setError(err instanceof Error ? err.message : 'Export failed');
+      const errorMessage = err instanceof Error ? err.message : t('settings.exportError');
+      setError(errorMessage);
     } finally {
       setIsExporting(false);
     }
@@ -79,8 +83,8 @@ const DataExportButton: React.FC<DataExportButtonProps> = ({
       </button>
 
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md p-2" role="alert">
-          {error}
+        <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-600 rounded-md p-2" role="alert">
+          {error.includes('Authentication') ? t('errors.notAuthenticated') : error}
         </div>
       )}
 

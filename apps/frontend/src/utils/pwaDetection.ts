@@ -2,6 +2,8 @@
  * PWA Detection and Deep Link Utilities
  */
 
+import logger from './logger';
+
 // Declare the BeforeInstallPromptEvent interface for PWA install prompts
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -93,7 +95,8 @@ export function handleDeepLink(url: string): boolean {
     
     return false;
   } catch (error) {
-    console.warn('Failed to handle deep link:', error);
+    // Use centralized logger for warnings
+    logger.warn('Failed to handle deep link:', error);
     return false;
   }
 }
@@ -111,7 +114,7 @@ export function registerPWALinkHandlers(): void {
         `${window.location.origin}/auth/callback?url=%s`
       );
     } catch (error) {
-      console.warn('Failed to register protocol handler:', error);
+      logger.warn('Failed to register protocol handler:', error);
     }
   }
   
@@ -147,7 +150,7 @@ export function enhanceInstallPrompt(): void {
     if (target?.id === 'pwa-install-button' && deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log(`PWA install outcome: ${outcome}`);
+      logger.info('PWA install outcome:', outcome);
       deferredPrompt = null;
     }
   });

@@ -1,0 +1,194 @@
+{
+  "button": {
+    "getStarted": "Krij dyn persoanlik trainingsplan",
+    "createNew": "Nij trainingsplan oanmeitsje"
+  },
+  "authGate": {
+    "title": "Oanmelde fereaske",
+    "message": "De RepCue AI-assistint fereasket in akkount om dyn persoanlike trainingen op te slaan.",
+    "signIn": "Oanmelde",
+    "tryLater": "Letter probearje",
+    "close": "Slute"
+  },
+  "offlineGate": {
+    "title": "Ynternetferbining fereaske",
+    "message": "De AI-trainingsbouwer fereasket in ynternetferbining om persoanlike trainingen te meitsjen. Ferbyn mei it ynternet en probearje opnij.",
+    "messageShort": "Ferbyn mei it ynternet om de AI-trainingsbouwer te brûken."
+  },
+  "progress": {
+    "step": "Stap {{current}} fan {{total}}"
+  },
+  "screen1": {
+    "title": "Fertel ús oer dysels",
+    "subtitle": "Help ús dyn trainingsplan te personalisearjen",
+    "gender": {
+      "label": "Geslacht",
+      "male": "Man",
+      "female": "Frou",
+      "other": "Oars",
+      "error": "Kies dyn geslacht"
+    },
+    "age": {
+      "label": "Leeftiid",
+      "placeholder": "Fier dyn leeftiid yn",
+      "error": "Fier in jildige leeftiid yn (13-120)"
+    },
+    "height": {
+      "label": "Lingte",
+      "cm": "cm",
+      "ft": "ft",
+      "inches": "in",
+      "unitCm": "cm",
+      "unitFtIn": "ft/in",
+      "placeholderCm": "Sintimeters",
+      "placeholderFeet": "Fuotten",
+      "placeholderInches": "Ynches",
+      "error": "Fier in jildige lingte yn"
+    },
+    "weight": {
+      "label": "Gewicht",
+      "kg": "kg",
+      "lbs": "lbs",
+      "unitKg": "kg",
+      "unitLbs": "lbs",
+      "placeholderKg": "Kilogrammen",
+      "placeholderLbs": "Ponnen",
+      "error": "Fier in jildich gewicht yn"
+    },
+    "next": "Folgjende"
+  },
+  "screen2": {
+    "title": "Dyn doelen & foarkarren",
+    "subtitle": "Wêr wurkest nei ta?",
+    "goal": {
+      "label": "Haaddoel",
+      "weightLoss": "Offalle",
+      "muscleBuilding": "Spierbou",
+      "healthMaintenance": "Sûnens hâlde",
+      "flexibility": "Fleksibiliteit & mobiliteit",
+      "error": "Kies dyn haaddoel"
+    },
+    "fitnessLevel": {
+      "label": "Hjoeddeistich fitheidsnivo",
+      "beginner": "Begjinner",
+      "beginnerDesc": "Nij yn fitness of werom nei in skoft",
+      "intermediate": "Gemiddeld",
+      "intermediateDesc": "Regelmjittige training, fertroud mei basisbewegingen",
+      "advanced": "Avansearre",
+      "advancedDesc": "Betûfte sporter, ree foar yntinsive útdagings",
+      "error": "Kies dyn fitheidsnivo"
+    },
+    "trainingTime": {
+      "label": "Trainingsfrekwinsje (dagen yn ’e wike)",
+      "morning": "Moarns",
+      "afternoon": "Middeis",
+      "evening": "Jûns",
+      "mixed": "Ferskaat",
+      "3-4": "3-4 dagen",
+      "4-5": "4-5 dagen",
+      "5-6": "5-6 dagen",
+      "6+": "6+ dagen",
+      "error": "Kies dyn trainingsfrekwinsje"
+    },
+    "back": "Werom",
+    "next": "Folgjende"
+  },
+  "screen3": {
+    "title": "Sûnens & trainingstyl",
+    "subtitle": "Wy hâlde it feilich en effektyf",
+    "injuries": {
+      "label": "Blessueres of beheiningen (opsjoneel)",
+      "placeholder": "bgl. knieskea, legere rêchpine, skouderblessuere...",
+      "description": "Fertel ús oer mooglike blessueres of beheiningen, sadat wy feilige oefeningen oanriede kinne.",
+      "helper": "De AI sil oefeningen útslute dy’t dizze klachten slimmer meitsje kinne",
+      "charCount": "{{remaining}} tekens oer",
+      "error": "Hâld de beskriuwing ûnder 500 tekens"
+    },
+    "trainingStyle": {
+      "label": "Foarkar fan trainingstyl",
+      "strength": "Krachtraining",
+      "strengthDesc": "Bouw spiermassa en fergrutsje dyn krêft",
+      "cardio": "Cardio rjochte",
+      "cardioDesc": "Ferbetter dyn úthâldingsfermogen en kondysje",
+      "balanced": "Balânsere miks",
+      "balancedDesc": "Kombinaasje fan krach- en cardiotraining",
+      "error": "Kies dyn trainingstyl"
+    },
+    "timeAvailability": {
+      "label": "Beskikbere tiid per sesje",
+      "15-30": "15-30 minuten",
+      "30-45": "30-45 minuten",
+      "45-60": "45-60 minuten",
+      "60+": "60+ minuten",
+      "error": "Kies dyn beskikbere tiid"
+    },
+    "back": "Werom",
+    "generate": "Trainingen oanmeitsje"
+  },
+  "loading": {
+    "title": "Jo personaliseare trainingen meitsje",
+    "analyzing": "Analysearje fan jo profyl...",
+    "selecting": "Selektearje fan oefeningen...",
+    "creating": "Meitsje fan jo personaliseare trainingen...",
+    "finalizing": "Hast klear...",
+    "elapsed": "Ferrûn tiid: {{seconds}}s",
+    "tip": "Us AI analysearret tûzenen oefeningen om it perfekte trainingsplan foar jo te meitsjen. Dit kin oant 30 sekonden duorje.",
+    "slowWarning": "Dit duorret langer as ferwachte. Wachtsje noch efkes of besykje it opnij as it proses in time-out krijt.",
+    "srAnnouncement": "AI-trainingsplan wurdt generearre. Efkes geduld.",
+    "warning": "Dit duorret langer as gewoan. Efkes geduld...",
+    "cancel": "Annulearje",
+    "timeout": {
+      "title": "Time-out",
+      "message": "De AI duorret langer as ferwachte. Wolst it opnij probearje?",
+      "retry": "Opnij probearje",
+      "cancel": "Annulearje"
+    }
+  },
+  "results": {
+    "title": "Dyn persoanlike trainingen",
+    "subtitle": "AI-makke trainingen oanpast oan dyn doelen",
+    "aiGeneratedBadge": "AI-makke",
+    "exercises": "{{count}} oefeningen",
+    "duration": "~{{minutes}} min",
+    "scheduledDays": "Plend foar {{days}}",
+    "viewWorkouts": "Sjoch trainingen",
+    "generateAgain": "Opnij oanmeitsje",
+    "close": "Slute",
+    "saved": "Trainingen mei sukses opslein!"
+  },
+  "errors": {
+    "title": "Flater by it oanmeitsjen fan trainingen",
+    "retryAfterMessage": "Wacht {{seconds}} sekonden foardatst it opnij probearrest.",
+    "authRequired": "Do moatst oanmeld wêze om AI-trainingen oan te meitsjen.",
+    "offline": "Do moatst online wêze om AI-trainingen oan te meitsjen. Kontrolearje dyn ferbining.",
+    "rateLimit": "Do hast it limyt foar AI-training oanmakken berikt. Probearje it opnij oer {{minutes}} minuten.",
+    "rateLimitGeneric": "Do hast it limyt foar AI-training oanmakken berikt. Probearje letter opnij.",
+    "validationError": "De ynfierde ynformaasje is net jildich. Kontrolearje dyn antwurden en probearje opnij.",
+    "aiError": "AI-training oanmeitsjen mislearre. Probearje opnij.",
+    "timeout": "It fersyk duorre te lang. Probearje opnij.",
+    "networkError": "Netwurkflater. Kontrolearje dyn ferbining en probearje opnij.",
+    "invalidResponse": "Unjildich antwurd fan de server ûntfongen. Probearje opnij.",
+    "noWorkouts": "De AI hat gjin trainingen makke. Probearje oare foarkarren.",
+    "unknownError": "Der is in ûnferwachte flater bard. Probearje opnij.",
+    "incompleteData": "Folsje alle fereaske fjilden yn foardatst trainingen oanmakest.",
+    "retry": "Opnij probearje",
+    "dismiss": "Slute"
+  },
+  "onboarding": {
+    "exitConfirmation": {
+      "title": "Wolst echt ôfslute?",
+      "message": "Dyn foarútgong giet ferlern as do no ôfslutst.",
+      "continue": "Trochgean",
+      "exit": "Ofslute"
+    }
+  },
+  "days": {
+    "monday": "Moandei",
+    "tuesday": "Tiisdei",
+    "wednesday": "Woansdei",
+    "thursday": "Tongersdei",
+    "friday": "Freed",
+    "saturday": "Sneon",
+    "sunday": "Snein"
+  }
+}

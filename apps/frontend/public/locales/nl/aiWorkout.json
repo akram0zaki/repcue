@@ -1,0 +1,194 @@
+{
+  "button": {
+    "getStarted": "Ontvang je persoonlijk trainingsplan",
+    "createNew": "Nieuw trainingsplan maken"
+  },
+  "authGate": {
+    "title": "Inloggen vereist",
+    "message": "De RepCue AI-assistent vereist een account om je persoonlijke trainingen op te slaan.",
+    "signIn": "Inloggen",
+    "tryLater": "Later proberen",
+    "close": "Sluiten"
+  },
+  "offlineGate": {
+    "title": "Internetverbinding vereist",
+    "message": "De AI-trainingsbouwer vereist een internetverbinding om gepersonaliseerde trainingen te genereren. Verbind met het internet en probeer opnieuw.",
+    "messageShort": "Verbind met het internet om de AI-trainingsbouwer te gebruiken."
+  },
+  "progress": {
+    "step": "Stap {{current}} van {{total}}"
+  },
+  "screen1": {
+    "title": "Vertel ons iets over jezelf",
+    "subtitle": "Help ons je trainingsplan te personaliseren",
+    "gender": {
+      "label": "Geslacht",
+      "male": "Man",
+      "female": "Vrouw",
+      "other": "Anders",
+      "error": "Selecteer je geslacht"
+    },
+    "age": {
+      "label": "Leeftijd",
+      "placeholder": "Voer je leeftijd in",
+      "error": "Voer een geldige leeftijd in (13-120)"
+    },
+    "height": {
+      "label": "Lengte",
+      "cm": "cm",
+      "ft": "ft",
+      "inches": "in",
+      "unitCm": "cm",
+      "unitFtIn": "ft/in",
+      "placeholderCm": "Centimeters",
+      "placeholderFeet": "Voeten",
+      "placeholderInches": "Inches",
+      "error": "Voer een geldige lengte in"
+    },
+    "weight": {
+      "label": "Gewicht",
+      "kg": "kg",
+      "lbs": "lbs",
+      "unitKg": "kg",
+      "unitLbs": "lbs",
+      "placeholderKg": "Kilogrammen",
+      "placeholderLbs": "Ponden",
+      "error": "Voer een geldig gewicht in"
+    },
+    "next": "Volgende"
+  },
+  "screen2": {
+    "title": "Je doelen & voorkeuren",
+    "subtitle": "Waar werk je naartoe?",
+    "goal": {
+      "label": "Primair doel",
+      "weightLoss": "Afvallen",
+      "muscleBuilding": "Spieropbouw",
+      "healthMaintenance": "Gezondheid behouden",
+      "flexibility": "Flexibiliteit & mobiliteit",
+      "error": "Selecteer je primaire doel"
+    },
+    "fitnessLevel": {
+      "label": "Huidig fitnessniveau",
+      "beginner": "Beginner",
+      "beginnerDesc": "Nieuw in fitness of na een pauze weer begonnen",
+      "intermediate": "Gemiddeld",
+      "intermediateDesc": "Regelmatige trainingsroutine, vertrouwd met basisbewegingen",
+      "advanced": "Gevorderd",
+      "advancedDesc": "Ervaren sporter, klaar voor intensieve uitdagingen",
+      "error": "Selecteer je fitnessniveau"
+    },
+    "trainingTime": {
+      "label": "Trainingsfrequentie (dagen per week)",
+      "morning": "Ochtend",
+      "afternoon": "Middag",
+      "evening": "Avond",
+      "mixed": "Afwisselend",
+      "3-4": "3-4 dagen",
+      "4-5": "4-5 dagen",
+      "5-6": "5-6 dagen",
+      "6+": "6+ dagen",
+      "error": "Selecteer je trainingsfrequentie"
+    },
+    "back": "Terug",
+    "next": "Volgende"
+  },
+  "screen3": {
+    "title": "Gezondheid & trainingsstijl",
+    "subtitle": "Laten we het veilig en effectief houden",
+    "injuries": {
+      "label": "Blessures of beperkingen (optioneel)",
+      "placeholder": "bijv. knieklachten, lage rugpijn, schouderblessure...",
+      "description": "Laat ons weten of je blessures of fysieke beperkingen hebt, zodat we veilige oefeningen kunnen aanbevelen.",
+      "helper": "De AI zal oefeningen uitsluiten die deze klachten kunnen verergeren",
+      "charCount": "{{remaining}} tekens over",
+      "error": "Houd de beschrijving van blessures onder 500 tekens"
+    },
+    "trainingStyle": {
+      "label": "Voorkeursstijl van trainen",
+      "strength": "Krachttraining",
+      "strengthDesc": "Bouw spiermassa op en vergroot je kracht",
+      "cardio": "Cardio gericht",
+      "cardioDesc": "Verbeter je uithoudingsvermogen en conditie",
+      "balanced": "Gebalanceerde mix",
+      "balancedDesc": "Combinatie van kracht- en cardiotraining",
+      "error": "Selecteer je trainingsstijl"
+    },
+    "timeAvailability": {
+      "label": "Beschikbare tijd per sessie",
+      "15-30": "15-30 minuten",
+      "30-45": "30-45 minuten",
+      "45-60": "45-60 minuten",
+      "60+": "60+ minuten",
+      "error": "Selecteer je beschikbare tijd"
+    },
+    "back": "Terug",
+    "generate": "Trainingen genereren"
+  },
+  "loading": {
+    "title": "Je gepersonaliseerde trainingen maken",
+    "analyzing": "Analyseren van je profiel...",
+    "selecting": "Selecteren van oefeningen...",
+    "creating": "Maken van je gepersonaliseerde trainingen...",
+    "finalizing": "Bijna klaar...",
+    "elapsed": "Verstreken tijd: {{seconds}}s",
+    "tip": "Onze AI analyseert duizenden oefeningen om het perfecte trainingsplan voor jou te maken. Dit kan tot 30 seconden duren.",
+    "slowWarning": "Dit duurt langer dan verwacht. Wacht nog even of probeer het opnieuw als het proces een time-out krijgt.",
+    "srAnnouncement": "AI-trainingsplan wordt gegenereerd. Even geduld.",
+    "warning": "Dit duurt langer dan normaal. Even geduld...",
+    "cancel": "Annuleren",
+    "timeout": {
+      "title": "Time-out",
+      "message": "De AI doet er langer over dan verwacht. Wil je het opnieuw proberen?",
+      "retry": "Opnieuw proberen",
+      "cancel": "Annuleren"
+    }
+  },
+  "results": {
+    "title": "Jouw gepersonaliseerde trainingen",
+    "subtitle": "AI-gegenereerde trainingen afgestemd op jouw doelen",
+    "aiGeneratedBadge": "AI-gegenereerd",
+    "exercises": "{{count}} oefeningen",
+    "duration": "~{{minutes}} min",
+    "scheduledDays": "Gepland voor {{days}}",
+    "viewWorkouts": "Bekijk trainingen",
+    "generateAgain": "Opnieuw genereren",
+    "close": "Sluiten",
+    "saved": "Trainingen succesvol opgeslagen!"
+  },
+  "errors": {
+    "title": "Fout bij het genereren van trainingen",
+    "retryAfterMessage": "Wacht {{seconds}} seconden voordat je het opnieuw probeert.",
+    "authRequired": "Je moet ingelogd zijn om AI-trainingen te genereren.",
+    "offline": "Je moet online zijn om AI-trainingen te genereren. Controleer je verbinding.",
+    "rateLimit": "Je hebt het limiet bereikt voor AI-trainingsgeneratie. Probeer het opnieuw over {{minutes}} minuten.",
+    "rateLimitGeneric": "Je hebt het limiet bereikt voor AI-trainingsgeneratie. Probeer het later opnieuw.",
+    "validationError": "De ingevoerde informatie is ongeldig. Controleer je antwoorden en probeer opnieuw.",
+    "aiError": "AI-trainingsgeneratie mislukt. Probeer opnieuw.",
+    "timeout": "Het verzoek duurde te lang. Probeer opnieuw.",
+    "networkError": "Netwerkfout. Controleer je verbinding en probeer opnieuw.",
+    "invalidResponse": "Ongeldig antwoord van de server ontvangen. Probeer opnieuw.",
+    "noWorkouts": "De AI heeft geen trainingen gegenereerd. Probeer andere voorkeuren.",
+    "unknownError": "Er is een onverwachte fout opgetreden. Probeer opnieuw.",
+    "incompleteData": "Vul alle vereiste velden in voordat je trainingen genereert.",
+    "retry": "Opnieuw proberen",
+    "dismiss": "Sluiten"
+  },
+  "onboarding": {
+    "exitConfirmation": {
+      "title": "Weet je zeker dat je wilt afsluiten?",
+      "message": "Je voortgang gaat verloren als je nu afsluit.",
+      "continue": "Doorgaan",
+      "exit": "Afsluiten"
+    }
+  },
+  "days": {
+    "monday": "Maandag",
+    "tuesday": "Dinsdag",
+    "wednesday": "Woensdag",
+    "thursday": "Donderdag",
+    "friday": "Vrijdag",
+    "saturday": "Zaterdag",
+    "sunday": "Zondag"
+  }
+}

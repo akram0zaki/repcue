@@ -106,6 +106,7 @@
     "exportDataHelp": "Export includes your workouts, exercises, settings, and activity logs",
     "exportInProgress": "Exporting...",
     "exportSuccess": "Your data has been exported successfully!",
+    "exportError": "Failed to export data. Please try again.",
     "exportRateLimit": "You can request up to 3 exports per day",
     "exportNow": "Export Now",
     "exportNowHelp": "Immediately export your latest data to a JSON file.",
@@ -540,31 +541,108 @@
     }
   },
   "updateError": {
-    "actionFailed": "Action failed",
-    "actionSuccess": "Action succeeded",
-    "completed": "Update completed",
-    "confirmAction": "Confirm action",
-    "executing": "Executing action...",
-    "needHelp": "Need help?",
-    "recoveryActions": "Recovery actions",
-    "rollbackAvailable": "Rollback available",
-    "rollbackDescription": "Rollback can restore previous version.",
+    "actionFailed": "Action failed: {{error}}",
+    "actionSuccess": "Action completed successfully",
+    "close": "Close",
+    "completed": "Completed",
+    "confirmAction": "Are you sure you want to {{description}}? This action cannot be undone.",
+    "executing": "Executing...",
+    "needHelp": "Need help? Contact support with the technical details above.",
+    "recoveryActions": "Recovery Options",
+    "rollbackAvailable": "Rollback Available",
+    "rollbackDescription": "You can restore the previous version ({{version}}) if the recovery actions don't work.",
     "rollbackInProgress": "Rollback in progress...",
-    "suggestions": "Suggestions",
-    "technicalDetails": "Technical details",
+    "severity": {
+      "critical": "Severity: Critical",
+      "high": "Severity: High",
+      "medium": "Severity: Medium",
+      "low": "Severity: Low"
+    },
+    "suggestions": "Suggestions:",
+    "technicalDetails": "Technical Details",
     "whatHappened": "What happened?",
     "types": {
-      "compatibility": "Compatibility issue",
-      "download": "Download issue",
-      "installation": "Installation issue",
+      "compatibility": "Compatibility Error",
+      "download": "Download Failed",
+      "installation": "Installation Failed",
       "network": "Network issue",
-      "permission": "Permission issue",
-      "rollback": "Rollback issue",
-      "serviceWorker": "Service worker issue",
-      "storage": "Storage issue",
-      "timeout": "Timeout issue",
-      "unknown": "Unknown issue",
-      "verification": "Verification issue"
+      "permission": "Permission Denied",
+      "rollback": "Recovery Failed",
+      "serviceWorker": "Service Worker Error",
+      "storage": "Storage Error",
+      "timeout": "Update Timeout",
+      "unknown": "Unknown Error",
+      "verification": "Update Verification Failed"
+    },
+    "messages": {
+      "network_error": "Unable to connect to update servers. Please check your internet connection.",
+      "download_error": "Failed to download the update. This may be due to a poor connection or server issues.",
+      "installation_error": "The update could not be installed properly. Your app may need to be restarted.",
+      "verification_error": "Update verification failed. The update file may be corrupted.",
+      "storage_error": "Insufficient storage space or storage access denied. Please free up space and try again.",
+      "service_worker_error": "Update service encountered an error. Try refreshing the app.",
+      "timeout_error": "Update process timed out. Please try again.",
+      "permission_error": "Permission denied. Please check your browser settings and try again.",
+      "compatibility_error": "This update is not compatible with your browser or device.",
+      "rollback_error": "Failed to restore previous version. Please contact support.",
+      "unknown_error": "An unexpected error occurred during the update process."
+    },
+    "actions": {
+      "network_error": {
+        "0": "Check your internet connection",
+        "1": "Try connecting to a different network",
+        "2": "Wait and try again later"
+      },
+      "download_error": {
+        "0": "Retry the download",
+        "1": "Check available storage space",
+        "2": "Try using a more stable connection"
+      },
+      "installation_error": {
+        "0": "Restart the application",
+        "1": "Clear browser cache",
+        "2": "Try updating again"
+      },
+      "verification_error": {
+        "0": "Clear browser cache",
+        "1": "Retry the update",
+        "2": "Contact support if problem persists"
+      },
+      "storage_error": {
+        "0": "Free up storage space",
+        "1": "Clear browser cache and data",
+        "2": "Close other applications"
+      },
+      "service_worker_error": {
+        "0": "Refresh the page",
+        "1": "Clear browser cache",
+        "2": "Restart your browser"
+      },
+      "timeout_error": {
+        "0": "Check your connection speed",
+        "1": "Try again with a better connection",
+        "2": "Wait and retry later"
+      },
+      "permission_error": {
+        "0": "Check browser permissions",
+        "1": "Allow notifications and cache storage",
+        "2": "Try in an incognito/private window"
+      },
+      "compatibility_error": {
+        "0": "Update your browser",
+        "1": "Try a different browser",
+        "2": "Contact support for assistance"
+      },
+      "rollback_error": {
+        "0": "Restart the application",
+        "1": "Clear all browser data",
+        "2": "Contact support immediately"
+      },
+      "unknown_error": {
+        "0": "Restart the application",
+        "1": "Check browser console for details",
+        "2": "Contact support with error details"
+      }
     }
   },
   "community": {
@@ -696,6 +774,7 @@
   "update": {
     "force": {
       "title": "Security Update Required",
+      "message": "This is a required security update. The app will update automatically to ensure your safety.",
       "action": "Update Now",
       "applying": "Applying Update...",
       "inProgress": "Updating Application...",
@@ -713,13 +792,16 @@
       }
     },
     "critical": {
-      "title": "Important Update Available"
+      "title": "Important Update Available",
+      "message": "This is an important update with security fixes and critical improvements."
     },
     "optional": {
-      "title": "New Version Available"
+      "title": "New Version Available",
+      "message": "A new version is available with improvements and new features."
     },
     "default": {
-      "title": "Update Available"
+      "title": "Update Available",
+      "message": "A new version is available."
     },
     "version": "Version: {{version}}",
     "action": "Update",
@@ -797,6 +879,29 @@
       "improvement": "Improvement",
       "security": "Security Update",
       "update": "Update"
+    }
+  },
+  "sync": {
+    "syncing": "Syncing data...",
+    "backingUp": "Backing up your progress to the cloud",
+    "failed": "Sync failed: {{error}}",
+    "lastAttempt": "Last attempt: {{time}}",
+    "offline": {
+      "authenticated": "You're offline. All features work normally. You'll reconnect automatically.",
+      "unauthenticated": "You're offline. All features work normally. Your data is saved locally."
+    },
+    "reconnected": {
+      "authenticated": "Connection restored! Data will sync automatically.",
+      "authenticatedSimple": "Connection restored! All features available.",
+      "unauthenticated": "Connection restored! All features available."
+    },
+    "pendingChanges": "Changes ready to sync. Last synced: {{time}}",
+    "timeAgo": {
+      "never": "Never",
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
     }
   }
 }

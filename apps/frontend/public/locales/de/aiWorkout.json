@@ -1,0 +1,208 @@
+{
+  "button": {
+    "getStarted": "Holen Sie sich Ihren personalisierten Trainingsplan",
+    "createNew": "Neuen Trainingsplan erstellen"
+  },
+  "authGate": {
+    "title": "Anmeldung erforderlich",
+    "message": "Der RepCue KI-Assistent benötigt ein Konto, um Ihre personalisierten Workouts zu speichern.",
+    "signIn": "Anmelden",
+    "tryLater": "Später versuchen",
+    "close": "Schließen"
+  },
+  "offlineGate": {
+    "title": "Internetverbindung erforderlich",
+    "message": "Der KI-Workout-Builder benötigt eine Internetverbindung, um personalisierte Workouts zu erstellen. Bitte stellen Sie eine Verbindung zum Internet her und versuchen Sie es erneut.",
+    "messageShort": "Bitte verbinden Sie sich mit dem Internet, um den KI-Workout-Builder zu verwenden."
+  },
+  "progress": {
+    "step": "Schritt {{current}} von {{total}}"
+  },
+  "screen1": {
+    "title": "Erzählen Sie uns von sich",
+    "subtitle": "Helfen Sie uns, Ihren Trainingsplan zu personalisieren",
+    "description": "Erzählen Sie uns ein wenig über sich",
+    "gender": {
+      "label": "Geschlecht",
+      "male": "Männlich",
+      "female": "Weiblich",
+      "other": "Divers",
+      "error": "Bitte wählen Sie Ihr Geschlecht"
+    },
+    "age": {
+      "label": "Alter",
+      "placeholder": "Geben Sie Ihr Alter ein",
+      "error": "Bitte geben Sie ein gültiges Alter ein (13-120)"
+    },
+    "height": {
+      "label": "Größe",
+      "cm": "cm",
+      "ft": "ft",
+      "inches": "in",
+      "unitCm": "cm",
+      "unitFtIn": "ft/in",
+      "placeholderCm": "Zentimeter",
+      "placeholderFeet": "Fuß",
+      "placeholderInches": "Zoll",
+      "error": "Bitte geben Sie eine gültige Größe ein"
+    },
+    "weight": {
+      "label": "Gewicht",
+      "kg": "kg",
+      "lbs": "lbs",
+      "unitKg": "kg",
+      "unitLbs": "lbs",
+      "placeholderKg": "Kilogramm",
+      "placeholderLbs": "Pfund",
+      "error": "Bitte geben Sie ein gültiges Gewicht ein"
+    },
+    "next": "Weiter"
+  },
+  "screen2": {
+    "title": "Ihre Ziele und Präferenzen",
+    "subtitle": "Woran arbeiten Sie?",
+    "description": "Was sind Ihre Fitnessziele?",
+    "goal": {
+      "label": "Hauptziel",
+      "weightLoss": "Gewichtsverlust",
+      "muscleBuilding": "Muskelaufbau",
+      "healthMaintenance": "Gesundheitserhaltung",
+      "flexibility": "Flexibilität & Mobilität",
+      "error": "Bitte wählen Sie Ihr Hauptziel"
+    },
+    "fitnessLevel": {
+      "label": "Aktuelles Fitnessniveau",
+      "beginner": "Anfänger",
+      "beginnerDesc": "Neu im Fitness oder nach einer Pause zurück",
+      "intermediate": "Fortgeschritten",
+      "intermediateDesc": "Regelmäßige Trainingsroutine, vertraut mit grundlegenden Bewegungen",
+      "advanced": "Experte",
+      "advancedDesc": "Erfahrener Athlet, bereit für intensive Herausforderungen",
+      "error": "Bitte wählen Sie Ihr Fitnessniveau"
+    },
+    "trainingTime": {
+      "label": "Trainingshäufigkeit (Tage pro Woche)",
+      "morning": "Morgen",
+      "afternoon": "Nachmittag",
+      "evening": "Abend",
+      "mixed": "Gemischt",
+      "3-4": "3-4 Tage",
+      "4-5": "4-5 Tage",
+      "5-6": "5-6 Tage",
+      "6+": "6+ Tage",
+      "error": "Bitte wählen Sie Ihre Trainingshäufigkeit"
+    },
+    "back": "Zurück",
+    "next": "Weiter"
+  },
+  "screen3": {
+    "title": "Gesundheit & Trainingsstil",
+    "subtitle": "Bleiben Sie sicher und effektiv",
+    "description": "Helfen Sie uns, Ihre Workouts an Ihre Bedürfnisse anzupassen",
+    "injuries": {
+      "label": "Verletzungen oder Einschränkungen (Optional)",
+      "placeholder": "z.B. Knieschmerzen, unterer Rücken, Schulterverletzung...",
+      "description": "Teilen Sie uns Verletzungen oder körperliche Einschränkungen mit, damit wir sichere Übungen empfehlen können.",
+      "helper": "Die KI wird Übungen ausschließen, die diese Beschwerden verschlimmern könnten",
+      "charCount": "{{remaining}} Zeichen verbleibend",
+      "error": "Bitte halten Sie die Beschreibung unter 500 Zeichen"
+    },
+    "trainingStyle": {
+      "label": "Bevorzugter Trainingsstil",
+      "strength": "Krafttraining",
+      "strengthDesc": "Muskelmasse aufbauen und Gesamtkraft steigern",
+      "cardio": "Cardio-Fokus",
+      "cardioDesc": "Kardiovaskuläre Fitness und Ausdauer verbessern",
+      "balanced": "Ausgewogene Mischung",
+      "balancedDesc": "Kombination aus Kraft- und Cardiotraining",
+      "error": "Bitte wählen Sie Ihren Trainingsstil"
+    },
+    "timeAvailability": {
+      "label": "Verfügbare Zeit pro Sitzung",
+      "description": "Wie viel Zeit können Sie pro Trainingseinheit aufbringen?",
+      "select": "Verfügbare Zeit auswählen",
+      "15-30": "15-30 Minuten",
+      "30-45": "30-45 Minuten",
+      "45-60": "45-60 Minuten",
+      "60+": "60+ Minuten",
+      "error": "Bitte wählen Sie Ihre verfügbare Zeit"
+    },
+    "back": "Zurück",
+    "generate": "Workouts erstellen"
+  },
+  "loading": {
+    "title": "Erstelle deine personalisierten Workouts",
+    "analyzing": "Analysiere dein Profil...",
+    "selecting": "Wähle Übungen aus...",
+    "creating": "Erstelle deine personalisierten Workouts...",
+    "finalizing": "Fast fertig...",
+    "elapsed": "Verstrichene Zeit: {{seconds}}s",
+    "tip": "Unsere KI analysiert Tausende von Übungen, um den perfekten Trainingsplan für dich zu erstellen. Dies kann bis zu 30 Sekunden dauern.",
+    "slowWarning": "Dies dauert länger als erwartet. Bitte warte noch etwas oder versuche es erneut, wenn der Vorgang abbricht.",
+    "srAnnouncement": "KI-Trainingsplan wird erstellt. Bitte warten.",
+    "warning": "Dies dauert länger als üblich. Bitte warten...",
+    "cancel": "Abbrechen",
+    "timeout": {
+      "title": "Zeitüberschreitung",
+      "message": "Die KI braucht länger als erwartet. Möchten Sie es erneut versuchen?",
+      "retry": "Erneut versuchen",
+      "cancel": "Abbrechen"
+    }
+  },
+  "results": {
+    "title": "Ihre personalisierten Workouts",
+    "subtitle": "KI-generierte Workouts für Ihre Ziele",
+    "aiGeneratedBadge": "KI-generiert",
+    "exercises": "{{count}} Übungen",
+    "duration": "~{{minutes}} Min",
+    "scheduledDays": "Geplant für {{days}}",
+    "viewWorkouts": "Workouts ansehen",
+    "generateAgain": "Erneut erstellen",
+    "close": "Schließen",
+    "saved": "Workouts erfolgreich gespeichert!"
+  },
+  "errors": {
+    "title": "Fehler beim Erstellen der Workouts",
+    "retryAfterMessage": "Bitte warten Sie {{seconds}} Sekunden, bevor Sie es erneut versuchen.",
+    "authRequired": "Sie müssen angemeldet sein, um KI-Workouts zu erstellen.",
+    "offline": "Sie müssen online sein, um KI-Workouts zu erstellen. Bitte überprüfen Sie Ihre Verbindung.",
+    "rateLimit": "Sie haben das Limit für KI-Workout-Generierung erreicht. Bitte versuchen Sie es in {{minutes}} Minuten erneut.",
+    "rateLimitGeneric": "Sie haben das Limit für KI-Workout-Generierung erreicht. Bitte versuchen Sie es später erneut.",
+    "validationError": "Die von Ihnen angegebenen Informationen sind ungültig. Bitte überprüfen Sie Ihre Antworten und versuchen Sie es erneut.",
+    "aiError": "KI-Workout-Erstellung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+    "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "invalidResponse": "Ungültige Antwort vom Server erhalten. Bitte versuchen Sie es erneut.",
+    "noWorkouts": "Die KI hat keine Workouts erstellt. Bitte versuchen Sie es mit anderen Präferenzen erneut.",
+    "unknownError": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "incompleteData": "Bitte füllen Sie alle erforderlichen Felder aus, bevor Sie Workouts erstellen.",
+    "retry": "Wiederholen",
+    "dismiss": "Schließen"
+  },
+  "onboarding": {
+    "title": "KI-Workout-Builder",
+    "subtitle": "Beantworten Sie einige Fragen und wir erstellen personalisierte Trainingspläne für Sie.",
+    "exitTitle": "Workout-Builder verlassen?",
+    "exitConfirm": "Sind Sie sicher, dass Sie den Builder verlassen möchten? Ihr Fortschritt geht verloren.",
+    "stayButton": "Bleiben",
+    "exitButton": "Verlassen",
+    "backButton": "Zurück",
+    "nextButton": "Weiter",
+    "generateButton": "Meine Workouts erstellen",
+    "exitConfirmation": {
+      "title": "Sind Sie sicher, dass Sie verlassen möchten?",
+      "message": "Ihr Fortschritt geht verloren, wenn Sie jetzt gehen.",
+      "continue": "Fortsetzen",
+      "exit": "Verlassen"
+    }
+  },
+  "days": {
+    "monday": "Montag",
+    "tuesday": "Dienstag",
+    "wednesday": "Mittwoch",
+    "thursday": "Donnerstag",
+    "friday": "Freitag",
+    "saturday": "Samstag",
+    "sunday": "Sonntag"
+  }
+}

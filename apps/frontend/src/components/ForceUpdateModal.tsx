@@ -336,11 +336,10 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
                 <span>{t('update.force.modal.autoUpdate', 'Automatic update in:')}</span>
                 <span className="font-mono font-bold">{formatTime(timeUntilForce)}</span>
               </div>
-              <div className="w-full bg-white bg-opacity-20 rounded-full h-1 mt-1">
-                <div
-                  className="bg-white h-1 rounded-full transition-all duration-1000"
-                  style={{ width: `${((300 - timeUntilForce) / 300) * 100}%` }}
-                />
+              <div className="progress mt-1">
+                <div className="progress__track">
+                  <div className="progress__bar" style={{ ['--progress' as unknown as string]: ((300 - timeUntilForce) / 300) * 100 } as React.CSSProperties} />
+                </div>
               </div>
             </div>
           )}
@@ -373,16 +372,18 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
                   {updateProgress}%
                 </span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${updateProgress}%` }}
-                  role="progressbar"
-                  aria-valuenow={updateProgress}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={t('update.progress.label', 'Update progress')}
-                />
+              <div className="progress">
+                <div className="progress__track">
+                  <div
+                    className="progress__bar"
+                    style={{ ['--progress' as unknown as string]: updateProgress } as React.CSSProperties}
+                    role="progressbar"
+                    aria-valuenow={updateProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={t('update.progress.label', 'Update progress')}
+                  />
+                </div>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 {updateProgress < 25
@@ -521,11 +522,10 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
                   <span>{t('update.workout.elapsed', 'Elapsed:')}</span>
                   <span className="font-medium">{formatElapsedTime(workoutData.elapsedTime)}</span>
                 </div>
-                <div className="w-full bg-orange-200 dark:bg-orange-800 rounded-full h-2 mt-2">
-                  <div
-                    className="bg-orange-600 dark:bg-orange-400 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${workoutData.progress}%` }}
-                  />
+                <div className="progress mt-2">
+                  <div className="progress__track">
+                    <div className="progress__bar" style={{ ['--progress' as unknown as string]: workoutData.progress } as React.CSSProperties} />
+                  </div>
                 </div>
               </div>
 

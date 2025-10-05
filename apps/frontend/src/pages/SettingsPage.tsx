@@ -72,8 +72,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         a.click();
       }
       URL.revokeObjectURL(url);
+
+      // Show success message
+      alert(t('settings.exportSuccess', 'Data exported successfully'));
     } catch (error) {
       logger.error('Failed to export data:', error);
+      // Show error message to user
+      alert(t('settings.exportError', 'Failed to export data. Please try again.'));
     }
   };
 
@@ -204,7 +209,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Profile Section */}
-        <ProfileSection 
+        <ProfileSection
           onViewProfile={() => {
             window.location.href = '/profile';
           }}
@@ -473,7 +478,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleSyncNow}
               disabled={!hasConsent || !isAuthenticated || isManualSyncing}
-              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full btn-primary"
               data-testid="btn-sync-now"
             >
               {isManualSyncing ? t('settings.syncInProgress') : t('settings.syncNow')}
@@ -492,7 +497,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 <button
                   onClick={handleForceFullSync}
                   disabled={!hasConsent || !isAuthenticated || isForceFullSyncing}
-                  className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="w-full btn-primary text-sm"
                   data-testid="btn-force-full-sync"
                 >
                   {isForceFullSyncing ? t('settings.syncInProgress') : t('settings.forceFullSync')}
@@ -500,7 +505,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 <button
                   onClick={handleResetSyncState}
                   disabled={!hasConsent || !isAuthenticated || isResettingSyncState}
-                  className="w-full py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                  className="w-full btn-danger text-sm"
                   data-testid="btn-reset-sync-state"
                 >
                   {isResettingSyncState ? t('common.loading') : t('settings.resetSyncState')}
@@ -542,14 +547,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <button
                 onClick={handleClearCaches}
                 disabled={isRefreshing}
-                className="py-2 px-3 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="btn-primary text-sm"
               >
                 {t('settings.clearCachesOnly')}
               </button>
               <button
                 onClick={handleUpdateServiceWorker}
                 disabled={isRefreshing}
-                className="py-2 px-3 bg-secondary-300 hover:bg-secondary-400 disabled:bg-surface-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                className="btn-neutral text-sm"
               >
                 {t('settings.updateServiceWorker')}
               </button>
@@ -565,7 +570,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleClearData}
               disabled={!hasConsent}
-              className="w-full py-2 px-4 bg-red-600 hover:bg-red-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full btn-danger"
             >
               {t('settings.clearAllDataAndReset')}
             </button>

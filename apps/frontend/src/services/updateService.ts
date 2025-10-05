@@ -14,6 +14,7 @@ import type {
 import { UpdateErrorType } from '../types';
 import { consentService } from './consentService';
 import { storageService } from './storageService';
+import i18n from '../i18n';
 // APP_VERSION removed - using server-based versioning
 import { swEventEmitter, updateServiceWorkerCoordinated } from '../utils/serviceWorker';
 import { updateErrorHandler } from '../utils/updateErrorHandler';
@@ -195,13 +196,13 @@ export class UpdateService {
       if (sessionPrefs && consentService.hasConsent()) {
         localStorage.setItem(UPDATE_PREFERENCES_KEY, sessionPrefs);
         sessionStorage.removeItem(UPDATE_PREFERENCES_KEY);
-        logger.log('Migrated update preferences to persistent storage');
+        // logger.log('Migrated update preferences to persistent storage');
       }
 
       if (sessionState && consentService.hasConsent()) {
         localStorage.setItem(UPDATE_STATE_KEY, sessionState);
         sessionStorage.removeItem(UPDATE_STATE_KEY);
-        logger.log('Migrated update state to persistent storage');
+        // logger.log('Migrated update state to persistent storage');
       }
     } catch (error) {
       logger.error('Failed to migrate update preferences on consent:', error);
@@ -230,7 +231,7 @@ export class UpdateService {
         }
       };
 
-      logger.log('Cleared all update service stored data');
+      // logger.log('Cleared all update service stored data');
     } catch (error) {
       logger.error('Failed to clear update service data:', error);
     }
@@ -251,7 +252,7 @@ export class UpdateService {
       // Set up enhanced service worker event listeners
       this.setupServiceWorkerEventListeners();
 
-      logger.log('✅ Service worker integration initialized');
+      // logger.log('✅ Service worker integration initialized');
 
     } catch (error) {
       logger.error('Failed to initialize service worker:', error);
@@ -324,10 +325,10 @@ export class UpdateService {
    * Debounced external request funnel for update checks.
    * Coalesces rapid successive triggers (focus, visibility, SW) into one check.
    */
-  private requestUpdateCheck(source: string, opts?: { force?: boolean }): void {
+  private requestUpdateCheck(_source: string, opts?: { force?: boolean }): void {
     // If a check is already in flight, we don't need to schedule another; callers will piggyback.
     if (this.isChecking) {
-      logger.debug(`Coalescing update check (already running) from ${source}`);
+      // logger.debug(`Coalescing update check (already running) from ${source}`);
       return;
     }
     if (this.scheduledCheck) {
@@ -439,7 +440,7 @@ export class UpdateService {
   public async checkForUpdates(opts?: { force?: boolean }): Promise<UpdateInfo | null> {
     // Single-flight guard: if a check is executing, return the existing promise.
     if (this.isChecking && this.inFlightCheck) {
-      logger.debug('Returning in-flight update check promise');
+      // logger.debug('Returning in-flight update check promise');
       return this.inFlightCheck;
     }
     this.isChecking = true;
@@ -448,7 +449,7 @@ export class UpdateService {
     const versionRegex = /^\d+\.\d+\.\d+$/;
     if (!this.updateState.currentVersion || this.updateState.currentVersion === 'unknown' || !versionRegex.test(this.updateState.currentVersion)) {
       if (!opts?.force) {
-        logger.debug('Aborting update check - version not initialized');
+        // logger.debug('Aborting update check - version not initialized');
         this.isChecking = false;
         return null;
       }
@@ -470,7 +471,7 @@ export class UpdateService {
       const minInterval = this.updateState.updatePolicy === 'force' ? 5 * 60 * 1000 : 30 * 60 * 1000; // 5 min for force, 30 min for others
 
       if (!opts?.force && lastCheck && (now.getTime() - lastCheck.getTime()) < minInterval) {
-        logger.log('Skipping update check - too recent');
+        // logger.log('Skipping update check - too recent');
         return this.updateState.pendingUpdate || null;
       }
 
@@ -978,7 +979,7 @@ export class UpdateService {
           // Note: show_changelog is not part of AppSettings, handled separately
         };
         await storageService.saveAppSettings(updatedSettings);
-        logger.log('Update preferences saved to storage');
+        // logger.log('Update preferences saved to storage');
       } else {
         logger.warn('No current settings found, skipping update preferences save');
       }
@@ -1096,13 +1097,13 @@ export class UpdateService {
   public getUpdatePolicyMessage(updateInfo: UpdateInfo): string {
     switch (updateInfo.policy) {
       case 'force':
-        return 'This is a required security update. The app will update automatically to ensure your safety.';
+        return i18n.t('update.force.message', 'This is a required security update. The app will update automatically to ensure your safety.');
       case 'critical':
-        return 'This is an important update with security fixes and critical improvements.';
+        return i18n.t('update.critical.message', 'This is an important update with security fixes and critical improvements.');
       case 'optional':
-        return 'A new version is available with improvements and new features.';
+        return i18n.t('update.optional.message', 'A new version is available with improvements and new features.');
       default:
-        return 'A new version is available.';
+        return i18n.t('update.default.message', 'A new version is available.');
     }
   }
 
@@ -1602,7 +1603,7 @@ export class UpdateService {
   private handleUpdateErrorDedup(error: UpdateError): void {
     const sig = `${error.type}|${error.message}`;
     if (this.lastErrorSig && this.lastErrorSig.sig === sig && Date.now() - this.lastErrorSig.ts < 2000) {
-      logger.debug('Suppressed duplicate update error (global handler)');
+      // logger.debug('Suppressed duplicate update error (global handler)');
       return;
     }
     this.lastErrorSig = { sig, ts: Date.now() };

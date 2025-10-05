@@ -24,11 +24,11 @@ export function useSharedExercises() {
 
         if (mounted) {
           // Debug: log the raw references
-          logger.log(`[useSharedExercises] Raw shared refs:`, sharedRefs);
+          // logger.log(`[useSharedExercises] Raw shared refs:`, sharedRefs);
 
           const exerciseIds = new Set(sharedRefs.map(ref => ref.item_id).filter(id => id)); // Filter out null/undefined
-          logger.log(`[useSharedExercises] Converted to exercise IDs:`, Array.from(exerciseIds));
-          logger.log(`[useSharedExercises] Loaded ${exerciseIds.size} shared exercise IDs for user ${user.id}`);
+          // logger.log(`[useSharedExercises] Converted to exercise IDs:`, Array.from(exerciseIds));
+          // logger.log(`[useSharedExercises] Loaded ${exerciseIds.size} shared exercise IDs for user ${user.id}`);
           setSharedExerciseIds(exerciseIds);
           setLoading(false);
         }

@@ -48,36 +48,36 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
     switch (policy) {
       case 'force':
         return {
-          bgColor: 'bg-red-100 dark:bg-red-900/20',
-          borderColor: 'border-red-500',
-          textColor: 'text-red-800 dark:text-red-200',
+          bgColor: 'bg-error-soft',
+          borderColor: 'border-error',
+          textColor: 'text-error',
           icon: '🔒',
           urgency: 'high' as const,
           canDismiss: false
         };
       case 'critical':
         return {
-          bgColor: 'bg-orange-100 dark:bg-orange-900/20',
-          borderColor: 'border-orange-500',
-          textColor: 'text-orange-800 dark:text-orange-200',
+          bgColor: 'bg-warning-soft',
+          borderColor: 'border-warning',
+          textColor: 'text-warning',
           icon: '⚠️',
           urgency: 'medium' as const,
           canDismiss: true
         };
       case 'optional':
         return {
-          bgColor: 'bg-blue-100 dark:bg-blue-900/20',
-          borderColor: 'border-blue-500',
-          textColor: 'text-blue-800 dark:text-blue-200',
+          bgColor: 'bg-success-soft',
+          borderColor: 'border-success',
+          textColor: 'text-success',
           icon: '🔄',
           urgency: 'low' as const,
           canDismiss: true
         };
       default:
         return {
-          bgColor: 'bg-gray-100 dark:bg-gray-900/20',
-          borderColor: 'border-gray-500',
-          textColor: 'text-gray-800 dark:text-gray-200',
+          bgColor: 'bg-surface-0 dark:bg-surface-800',
+          borderColor: 'border-primary',
+          textColor: 'text-body',
           icon: 'ℹ️',
           urgency: 'low' as const,
           canDismiss: true
@@ -101,9 +101,8 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
   };
 
   const getUpdateMessage = () => {
-    if (updateInfo.message) {
-      return updateInfo.message;
-    }
+    // Always use client-side i18n translations instead of server-provided message
+    // Server message is in English only and doesn't respect user's locale
     return updateService.getUpdatePolicyMessage(updateInfo);
   };
 
@@ -142,44 +141,47 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
 
   return (
     <div
-      className={`${config.bgColor} border-l-4 ${config.borderColor} ${config.textColor} p-4 mb-4 ${className}`}
+      className="fixed inset-0 z-50 flex items-end justify-center p-4 pointer-events-none"
       role={config.urgency === 'high' ? 'alert' : 'status'}
       aria-live={config.urgency === 'high' ? 'assertive' : 'polite'}
-      data-testid="update-notification-banner"
     >
-      <div className="flex items-start justify-between">
+      <div
+        className={`${config.bgColor} border ${config.borderColor} ${config.textColor} rounded-lg shadow-lg max-w-md w-full pointer-events-auto p-4 ${className}`}
+        data-testid="update-notification-banner"
+      >
+        <div className="flex items-start justify-between">
         <div className="flex items-start flex-1">
           <div className="flex-shrink-0 mr-3" aria-hidden="true">
             <span className="text-2xl">{config.icon}</span>
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold mb-2">
+            <h3 className="text-h3 mb-2">
               {getUpdateTitle()}
             </h3>
 
             <div className="space-y-2">
-              <p className="text-sm">
+              <p className="text-body">
                 {getUpdateMessage()}
               </p>
 
               {updateInfo.version && updateInfo.version !== 'unknown' && (
-                <p className="text-xs opacity-90">
+                <p className="text-small opacity-90">
                   {t('update.version', 'Version: {{version}}', { version: updateInfo.version })}
                 </p>
               )}
 
               {connectionInfo?.warning && (
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3 mt-3">
+                <div className="bg-warning-soft border border-warning rounded-md p-3 mt-3">
                   <div className="flex items-start">
-                    <span className="text-yellow-600 dark:text-yellow-400 mr-2" aria-hidden="true">
+                    <span className="text-warning mr-2" aria-hidden="true">
                       📱
                     </span>
-                    <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                    <div className="text-caption text-warning">
                       <p className="font-medium mb-1">
                         {t('update.meteredConnection.title', 'Metered Connection Detected')}
                       </p>
-                      <p className="text-xs">
+                      <p className="text-small">
                         {connectionInfo.warning}
                       </p>
                     </div>
@@ -195,7 +197,7 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
                       onShowChangelog();
                     }
                   }}
-                  className="text-sm underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current rounded-sm"
+                  className="text-caption underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current rounded-sm touch-target"
                   aria-expanded={isExpanded}
                   aria-controls="update-changelog"
                 >
@@ -209,16 +211,16 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
               {isExpanded && updateInfo.changelog && (
                 <div
                   id="update-changelog"
-                  className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-3 mt-2"
+                  className="bg-surface-0 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-md p-3 mt-2"
                 >
-                  <h4 className="font-medium mb-2 text-gray-900 dark:text-gray-100">
-                    {t('update.changelog.title', 'What\'s New')}
+                  <h4 className="text-h3 mb-2">
+                    {t('changelog.title', 'What\'s New')}
                   </h4>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                  <div className="text-caption space-y-1">
                     {updateInfo.changelog.new_features && updateInfo.changelog.new_features.length > 0 && (
                       <div>
-                        <strong>New Features:</strong>
-                        <ul className="list-disc list-inside ml-2">
+                        <strong>{t('changelog.categories.newFeatures', 'New Features')}:</strong>
+                        <ul className="list-disc list-inside ml-2 rtl:mr-2 rtl:ml-0">
                           {updateInfo.changelog.new_features.map((feature, index) => (
                             <li key={index}>{feature}</li>
                           ))}
@@ -227,8 +229,8 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
                     )}
                     {updateInfo.changelog.improvements && updateInfo.changelog.improvements.length > 0 && (
                       <div>
-                        <strong>Improvements:</strong>
-                        <ul className="list-disc list-inside ml-2">
+                        <strong>{t('changelog.categories.improvements', 'Improvements')}:</strong>
+                        <ul className="list-disc list-inside ml-2 rtl:mr-2 rtl:ml-0">
                           {updateInfo.changelog.improvements.map((improvement, index) => (
                             <li key={index}>{improvement}</li>
                           ))}
@@ -237,8 +239,8 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
                     )}
                     {updateInfo.changelog.bug_fixes && updateInfo.changelog.bug_fixes.length > 0 && (
                       <div>
-                        <strong>Bug Fixes:</strong>
-                        <ul className="list-disc list-inside ml-2">
+                        <strong>{t('changelog.categories.bugFixes', 'Bug Fixes')}:</strong>
+                        <ul className="list-disc list-inside ml-2 rtl:mr-2 rtl:ml-0">
                           {updateInfo.changelog.bug_fixes.map((fix, index) => (
                             <li key={index}>{fix}</li>
                           ))}
@@ -247,8 +249,8 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
                     )}
                     {updateInfo.changelog.security_updates && updateInfo.changelog.security_updates.length > 0 && (
                       <div>
-                        <strong>Security Updates:</strong>
-                        <ul className="list-disc list-inside ml-2">
+                        <strong>{t('changelog.categories.securityUpdates', 'Security Updates')}:</strong>
+                        <ul className="list-disc list-inside ml-2 rtl:mr-2 rtl:ml-0">
                           {updateInfo.changelog.security_updates.map((update, index) => (
                             <li key={index}>{update}</li>
                           ))}
@@ -287,16 +289,14 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
         )}
       </div>
 
-      <div className="mt-4 flex flex-col sm:flex-row gap-3">
+      <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-center">
         <button
           onClick={handleApplyUpdate}
-          className={`btn-primary flex-1 sm:flex-none px-6 py-2 text-base font-medium touch-target ${
+          className={`${
             updateInfo.policy === 'force'
-              ? 'bg-red-600 hover:bg-red-700 text-white'
-              : updateInfo.policy === 'critical'
-              ? 'bg-orange-600 hover:bg-orange-700 text-white'
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
+              ? 'btn-danger'
+              : 'btn-primary'
+          } w-full sm:w-auto touch-target`}
           data-testid="update-apply-button"
         >
           {updateInfo.policy === 'force'
@@ -308,17 +308,18 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
         {config.canDismiss && onDismiss && (
           <button
             onClick={handleDismiss}
-            className="btn-secondary flex-1 sm:flex-none px-6 py-2 text-base font-medium rounded-lg transition-colors touch-target"
+            className="btn-secondary w-full sm:w-auto touch-target"
             data-testid="update-postpone-button"
           >
             {t('update.postpone', 'Later')}
           </button>
         )}
 
-        <div className="text-xs opacity-75 flex items-center">
-          <span className="mr-2">📊</span>
+        <div className="text-small opacity-75 flex items-center sm:ml-auto">
+          <span className="mr-2 rtl:ml-2 rtl:mr-0" aria-hidden="true">📊</span>
           {t('update.estimatedSize', 'Est. {{size}}MB', { size: estimatedSize })}
         </div>
+      </div>
       </div>
     </div>
   );

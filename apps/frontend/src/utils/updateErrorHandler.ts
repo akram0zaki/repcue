@@ -7,6 +7,7 @@ import type {
   UpdateRecoveryState
 } from '../types';
 import logger from './logger';
+import i18n from '../i18n';
 
 /**
  * Comprehensive error handling and recovery utilities for PWA updates
@@ -232,86 +233,37 @@ export class UpdateErrorHandler {
    * Get user-friendly error messages
    */
   private getUserFriendlyMessage(errorType: UpdateErrorType, originalMessage: string): string {
-    const messages: Record<UpdateErrorType, string> = {
-      network_error: 'Unable to connect to update servers. Please check your internet connection.',
-      download_error: 'Failed to download the update. This may be due to a poor connection or server issues.',
-      installation_error: 'The update could not be installed properly. Your app may need to be restarted.',
-      verification_error: 'Update verification failed. The update file may be corrupted.',
-      storage_error: 'Insufficient storage space or storage access denied. Please free up space and try again.',
-      service_worker_error: 'Update service encountered an error. Try refreshing the app.',
-      timeout_error: 'Update process timed out. Please try again.',
-      permission_error: 'Permission denied. Please check your browser settings and try again.',
-      compatibility_error: 'This update is not compatible with your browser or device.',
-      rollback_error: 'Failed to restore previous version. Please contact support.',
-      unknown_error: 'An unexpected error occurred during the update process.'
-    };
-
-    return messages[errorType] || originalMessage;
+    const translationKey = `updateError.messages.${errorType}`;
+    const translatedMessage = i18n.t(translationKey);
+    
+    // If translation key not found, i18n returns the key itself
+    // In that case, fall back to original message
+    return translatedMessage !== translationKey ? translatedMessage : originalMessage;
   }
 
   /**
    * Get suggested recovery actions for each error type
    */
   private getSuggestedActions(errorType: UpdateErrorType): string[] {
-    const actions: Record<UpdateErrorType, string[]> = {
-      network_error: [
-        'Check your internet connection',
-        'Try connecting to a different network',
-        'Wait and try again later'
-      ],
-      download_error: [
-        'Retry the download',
-        'Check available storage space',
-        'Try using a more stable connection'
-      ],
-      installation_error: [
-        'Restart the application',
-        'Clear browser cache',
-        'Try updating again'
-      ],
-      verification_error: [
-        'Clear browser cache',
-        'Retry the update',
-        'Contact support if problem persists'
-      ],
-      storage_error: [
-        'Free up storage space',
-        'Clear browser cache and data',
-        'Close other applications'
-      ],
-      service_worker_error: [
-        'Refresh the page',
-        'Clear browser cache',
-        'Restart your browser'
-      ],
-      timeout_error: [
-        'Check your connection speed',
-        'Try again with a better connection',
-        'Wait and retry later'
-      ],
-      permission_error: [
-        'Check browser permissions',
-        'Allow notifications and cache storage',
-        'Try in an incognito/private window'
-      ],
-      compatibility_error: [
-        'Update your browser',
-        'Try a different browser',
-        'Contact support for assistance'
-      ],
-      rollback_error: [
-        'Restart the application',
-        'Clear all browser data',
-        'Contact support immediately'
-      ],
-      unknown_error: [
-        'Restart the application',
-        'Check browser console for details',
-        'Contact support with error details'
-      ]
-    };
-
-    return actions[errorType] || ['Contact support for assistance'];
+    const actions: string[] = [];
+    
+    // Try to get translated actions (0, 1, 2)
+    for (let i = 0; i < 3; i++) {
+      const translationKey = `updateError.actions.${errorType}.${i}`;
+      const translatedAction = i18n.t(translationKey);
+      
+      // Only add if translation exists (i18n returns key if not found)
+      if (translatedAction !== translationKey) {
+        actions.push(translatedAction);
+      }
+    }
+    
+    // Fallback to generic action if no translations found
+    if (actions.length === 0) {
+      actions.push(i18n.t('updateError.actions.unknown_error.2', 'Contact support with error details'));
+    }
+    
+    return actions;
   }
 
   /**

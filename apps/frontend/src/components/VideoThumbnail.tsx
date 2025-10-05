@@ -58,18 +58,18 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
         if (exercise.custom_video_url) {
           // For custom exercises, resolve the custom video URL
-          logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
-            exerciseId: exercise.id,
-            customVideoUrl: exercise.custom_video_url,
-            isSharedCopy: isSharedExercise(exercise.id)
-          });
+          // logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
+          //   exerciseId: exercise.id,
+          //   customVideoUrl: exercise.custom_video_url,
+          //   isSharedCopy: isSharedExercise(exercise.id)
+          // });
           url = await resolveVideoUrl(exercise.custom_video_url);
-          logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
-            exerciseId: exercise.id,
-            originalUrl: exercise.custom_video_url,
-            resolvedUrl: url,
-            isBlob: url?.startsWith('blob:')
-          });
+          // logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
+          //   exerciseId: exercise.id,
+          //   originalUrl: exercise.custom_video_url,
+          //   resolvedUrl: url,
+          //   isBlob: url?.startsWith('blob:')
+          // });
         } else if (exercise.has_video) {
           // For built-in exercises, load from exercise media
           const mediaIndex = await loadExerciseMedia();
@@ -176,7 +176,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           // Clear the video cache for this exercise (non-blocking)
           import('../services/storageService').then(({ storageService }) => {
             storageService.deleteVideoFile(exercise.id).then(() => {
-              logger.log('🎥 [VideoThumbnail] Video cache cleared, reload page to re-download');
+              // logger.log('🎥 [VideoThumbnail] Video cache cleared, reload page to re-download');
             }).catch((cacheError) => {
               logger.error('🎥 [VideoThumbnail] Failed to clear video cache:', cacheError);
             });

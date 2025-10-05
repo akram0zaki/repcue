@@ -92,19 +92,19 @@ export class CorrectSyncService {
   private async initializeServices(): Promise<void> {
     if (!this.servicesInitialized) {
       try {
-        logger.debug('CorrectSyncService: Starting service initialization');
+        // logger.debug('CorrectSyncService: Starting service initialization');
         this.storage = StorageService.getInstance();
         this.auth = AuthService.getInstance();
         this.consent = ConsentService.getInstance();
         
         // Check if storage service is available but don't wait for ready() to avoid circular dependency
         if (this.storage) {
-          logger.debug('CorrectSyncService: Storage service available');
+          // logger.debug('CorrectSyncService: Storage service available');
           // Note: Not waiting for storage.ready() to avoid circular dependency during app init
         }
         
         this.servicesInitialized = true;
-        logger.debug('CorrectSyncService: Service initialization complete');
+        // logger.debug('CorrectSyncService: Service initialization complete');
       } catch (error) {
         logger.warn('CorrectSyncService: Failed to initialize services:', error);
         throw error; // Re-throw to signal initialization failure
@@ -148,7 +148,7 @@ export class CorrectSyncService {
 
     // Thread-safe concurrency guard - return same in-flight promise
     if (this.inFlight) {
-      logger.debug(`[sync:v2] sync already in progress, returning in-flight promise (mode=${mode})`);
+      // logger.debug(`[sync:v2] sync already in progress, returning in-flight promise (mode=${mode})`);
       return this.inFlight;
     }
 
@@ -189,7 +189,7 @@ export class CorrectSyncService {
     });
 
   const startTs = performance.now();
-  if (SYNC_DEBUG) logger.debug(`[sync:v2] enqueue mode=${mode}`);
+  // if (SYNC_DEBUG) logger.debug(`[sync:v2] enqueue mode=${mode}`);
   const exec = Promise.race([
       this.performSync(mode, authState.accessToken, authState.user!.id),
       overallTimeout
@@ -238,11 +238,10 @@ export class CorrectSyncService {
       if (mode === 'priority' && this.priorityTables && this.priorityTables.size) {
         tableList = tableList.filter(t => this.priorityTables!.has(t));
       }
-  if (SYNC_DEBUG) logger.debug(`[sync:v2] tables=${tableList.join(',')}`);
+  // if (SYNC_DEBUG) logger.debug(`[sync:v2] tables=${tableList.join(',')}`);
 
       // 1. Collect dirty records per table (initial queue per table)
   const queues: Record<string, { upserts: Array<Record<string, unknown>>; deletes: string[] }> = {};
-  const collectStart = performance.now();
       // Track records we push in this sync cycle to avoid overwriting them with pulled data
       const pushedRecords = new Set<string>();
       for (const table of tableList) {
@@ -270,7 +269,7 @@ export class CorrectSyncService {
               }
             }
             if (dirty.upserts.length !== dedupMap.size) {
-              if (SYNC_DEBUG) logger.debug(`[sync:v2] Deduplicated video_files upserts ${dirty.upserts.length} -> ${dedupMap.size}`);
+              // if (SYNC_DEBUG) logger.debug(`[sync:v2] Deduplicated video_files upserts ${dirty.upserts.length} -> ${dedupMap.size}`);
             }
             queues[table] = { upserts: [...dedupMap.values()], deletes: [...dirty.deletes] };
           } else {
@@ -278,7 +277,7 @@ export class CorrectSyncService {
           }
         }
       }
-  if (SYNC_DEBUG) logger.debug(`[sync:v2] collectDirty done in ${(performance.now()-collectStart).toFixed(0)}ms queues=${Object.entries(queues).map(([k,v])=>`${k}:${(v.upserts?.length||0)+(v.deletes?.length||0)}`).join(' ')}`);
+  // if (SYNC_DEBUG) logger.debug(`[sync:v2] collectDirty done in ${(performance.now()-collectStart).toFixed(0)}ms queues=${Object.entries(queues).map(([k,v])=>`${k}:${(v.upserts?.length||0)+(v.deletes?.length||0)}`).join(' ')}`);
 
       // Helper to build a single request payload capped to 5 total records across all tables
       const buildCappedPayload = (): EdgeSyncRequestV2['tables'] => {
@@ -364,7 +363,7 @@ export class CorrectSyncService {
           if (!tableResp) continue;
           const { upserts, deletes, nextCursor, more } = tableResp;
           if (upserts.length || deletes.length) {
-            if (SYNC_DEBUG) logger.debug(`[sync:v2] apply ${table} upserts=${upserts.length} deletes=${deletes.length}`);
+            // if (SYNC_DEBUG) logger.debug(`[sync:v2] apply ${table} upserts=${upserts.length} deletes=${deletes.length}`);
             await this.applyServerTableChanges(table, upserts, deletes, userId, pushedRecords);
             result.pulled += upserts.length + deletes.length;
           }
@@ -379,7 +378,7 @@ export class CorrectSyncService {
             const tFollow = followResp.tables?.[table];
             if (!tFollow) break;
             if (tFollow.upserts.length || tFollow.deletes.length) {
-              if (SYNC_DEBUG) logger.debug(`[sync:v2] follow ${table} upserts=${tFollow.upserts.length} deletes=${tFollow.deletes.length}`);
+              // if (SYNC_DEBUG) logger.debug(`[sync:v2] follow ${table} upserts=${tFollow.upserts.length} deletes=${tFollow.deletes.length}`);
               await this.applyServerTableChanges(table, tFollow.upserts, tFollow.deletes, userId, pushedRecords);
               result.pulled += tFollow.upserts.length + tFollow.deletes.length;
             }
@@ -969,12 +968,12 @@ export class CorrectSyncService {
     if (!this.storage || !videoFileRow.storage_path) return;
 
     const storagePath = videoFileRow.storage_path as string;
-    logger.debug(`[sync:v2] Downloading video file for offline access: ${storagePath}`, {
-      videoFileId: videoFileRow.id,
-      fileName: videoFileRow.file_name,
-      fileSize: videoFileRow.file_size,
-      uploadPending: videoFileRow.upload_pending
-    });
+    // logger.debug(`[sync:v2] Downloading video file for offline access: ${storagePath}`, {
+    //   videoFileId: videoFileRow.id,
+    //   fileName: videoFileRow.file_name,
+    //   fileSize: videoFileRow.file_size,
+    //   uploadPending: videoFileRow.upload_pending
+    // });
 
     try {
       // Import supabase dynamically to avoid circular dependency
@@ -991,7 +990,7 @@ export class CorrectSyncService {
         throw new Error(`Authentication required for video download: ${authError?.message || 'No user'}`);
       }
 
-      logger.debug(`[sync:v2] Authenticated user for video download: ${user.id}`);
+      // logger.debug(`[sync:v2] Authenticated user for video download: ${user.id}`);
 
       // Check if this is a shared exercise video by examining the storage path
       // Shared exercise videos have paths like: {original_owner_id}/{exercise_id}/{filename}
@@ -1085,7 +1084,7 @@ export class CorrectSyncService {
         synced_at: new Date().toISOString()
       });
 
-      logger.debug(`[sync:v2] Successfully downloaded and stored video file: ${videoFileRow.id}`);
+      // logger.debug(`[sync:v2] Successfully downloaded and stored video file: ${videoFileRow.id}`);
     } catch (error) {
       logger.error(`[sync:v2] Failed to download video file ${videoFileRow.id}:`, error);
       throw error;
@@ -1138,7 +1137,7 @@ export class CorrectSyncService {
           op: 'upsert',
           updated_at: new Date().toISOString()
         });
-        logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${localUrl}`);
+        // logger.debug(`[sync:v2] Updated exercise ${exerciseId} with video URL: ${localUrl}`);
       }
     } catch (error) {
       logger.warn(`[sync:v2] Failed to update exercise video URL for ${exerciseId}:`, error);

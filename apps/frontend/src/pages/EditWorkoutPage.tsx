@@ -75,20 +75,30 @@ const EditWorkoutPage: React.FC = () => {
         setIsActive(workoutData.is_active ?? true);
 
         // Convert workout exercises to selected exercises
-        const selectedExs: SelectedExercise[] = workoutData.exercises.map((we, index) => {
-          const exercise = exercises.find(e => e.id === we.exercise_id);
-          if (!exercise) {
-            throw new Error(`Exercise not found: ${we.exercise_id}`);
-          }
-          return {
-            ...exercise,
-            order: we.order || index,
-            custom_duration: we.custom_duration,
-            custom_sets: we.custom_sets,
-            custom_reps: we.custom_reps,
-            custom_rest_time: we.custom_rest_time
-          };
-        });
+        const selectedExs: SelectedExercise[] = workoutData.exercises
+          .filter(we => {
+            // Filter out exercises with undefined/null exercise_id (malformed AI workouts)
+            if (!we.exercise_id) {
+              logger.warn('[EditWorkoutPage] Skipping exercise with undefined exercise_id', { workoutExercise: we });
+              return false;
+            }
+            return true;
+          })
+          .map((we, index) => {
+            const exercise = exercises.find(e => e.id === we.exercise_id);
+            if (!exercise) {
+              logger.error(`[EditWorkoutPage] Exercise not found: ${we.exercise_id}`);
+              throw new Error(`Exercise not found: ${we.exercise_id}`);
+            }
+            return {
+              ...exercise,
+              order: we.order || index,
+              custom_duration: we.custom_duration,
+              custom_sets: we.custom_sets,
+              custom_reps: we.custom_reps,
+              custom_rest_time: we.custom_rest_time
+            };
+          });
 
         setSelectedExercises(selectedExs);
       } catch (error) {
@@ -239,7 +249,7 @@ const EditWorkoutPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+      <div className="min-h-screen bg-surface-secondary pb-20">
         <div className="p-6 max-w-md mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-surface-200 dark:bg-surface-700 rounded w-3/4"></div>
@@ -255,25 +265,25 @@ const EditWorkoutPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
         <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('workouts.editTitle')}</h1>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+          <h1 className="text-h1 mb-6">{t('workouts.editTitle')}</h1>
+          <div className="bg-warning-soft border border-warning rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-5 w-5 text-warning" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                <h3 className="text-sm font-medium text-warning">
                   {t('workouts.dataRequiredTitle')}
                 </h3>
-                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                <div className="mt-2 text-sm text-warning">
                   <p>{t('workouts.dataRequiredBody')}</p>
                 </div>
                 <div className="mt-4">
                   <button
                     onClick={() => navigate(Routes.SETTINGS)}
-                    className="bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-800 dark:hover:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="btn-neutral text-sm"
                   >
                     {t('common.goToSettings')}
                   </button>
@@ -288,21 +298,21 @@ const EditWorkoutPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+      <div className="min-h-screen bg-surface-secondary pb-20">
         <div className="p-6 max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('workouts.editTitle')}</h1>
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6">
+          <h1 className="text-h1 mb-6">{t('workouts.editTitle')}</h1>
+          <div className="bg-error-soft border border-error rounded-lg p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-5 w-5 text-error" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                <h3 className="text-sm font-medium text-error">
                   {t('workouts.errorLoadingTitle')}
                 </h3>
-                <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                <div className="mt-2 text-sm text-error">
                   <p>{error}</p>
                 </div>
                 <div className="mt-4 space-x-2">
@@ -328,10 +338,10 @@ const EditWorkoutPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+    <div className="min-h-screen bg-surface-secondary pb-20">
       <div className="p-6 max-w-md mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('workouts.editTitle')}</h1>
+          <h1 className="text-h1">{t('workouts.editTitle')}</h1>
           <button
             onClick={() => navigate(Routes.WORKOUTS)}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -345,7 +355,7 @@ const EditWorkoutPage: React.FC = () => {
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-6">
       {/* Workout Name */}
           <div>
-            <label htmlFor="workoutName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="workoutName" className="block text-caption label-text mb-2">
         {t('workouts.nameLabel')}
             </label>
             <input
@@ -359,13 +369,13 @@ const EditWorkoutPage: React.FC = () => {
               required
             />
             {validationErrors.name && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.name}</p>
+              <p className="mt-1 text-caption text-error">{validationErrors.name}</p>
             )}
           </div>
 
           {/* Workout Description */}
       <div>
-            <label htmlFor="workoutDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="workoutDescription" className="block text-caption label-text mb-2">
         {t('workouts.descriptionLabel')}
             </label>
             <textarea
@@ -381,7 +391,7 @@ const EditWorkoutPage: React.FC = () => {
 
           {/* Workout Schedule */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-caption label-text mb-3">
               {t('workouts.scheduleLabel')}
             </label>
             <div className="space-y-3">
@@ -392,17 +402,17 @@ const EditWorkoutPage: React.FC = () => {
                   id="isActive"
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-primary border-primary rounded focus:ring-2 focus:ring-primary"
                   disabled={saving}
                 />
-                <label htmlFor="isActive" className="ms-2 text-sm text-gray-700 dark:text-gray-300">
+                <label htmlFor="isActive" className="ms-2 text-caption label-text">
                   {t('workouts.isActiveLabel')}
                 </label>
               </div>
               
               {/* Days of Week */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <label className="block text-small help-text mb-2">
                   {t('workouts.scheduledDaysLabel')}
                 </label>
                 <div className="flex flex-wrap gap-2 justify-center">
@@ -443,7 +453,7 @@ const EditWorkoutPage: React.FC = () => {
                   })}
                 </div>
                 {scheduledDays.length > 0 && (
-                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-2 text-small help-text">
                     {t('workouts.scheduledPerWeek', { count: scheduledDays.length })}
                   </p>
                 )}

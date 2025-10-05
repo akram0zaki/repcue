@@ -85,18 +85,18 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen pt-safe pb-20 bg-surface-secondary">
         <div className="container mx-auto px-4 py-8 max-w-md text-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-8">
+            <h1 className="text-h3 mb-4">
               {t('profile.signInRequired')}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-body mb-6">
               {t('profile.signInToViewProfile')}
             </p>
             <button
               onClick={() => navigate('/settings')}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              className="w-full btn-primary"
             >
               {t('common.signIn')}
             </button>
@@ -108,10 +108,10 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen pt-safe pb-20 bg-surface-secondary">
         <div className="container mx-auto px-4 py-8 max-w-md">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         </div>
       </div>
@@ -120,18 +120,18 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen pt-safe pb-20 bg-surface-secondary">
         <div className="container mx-auto px-4 py-8 max-w-md text-center">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-8">
+            <h1 className="text-h3 mb-4">
               {t('profile.notFound')}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-body mb-6">
               {t('profile.profileNotFoundMessage')}
             </p>
             <button
               onClick={() => navigate(-1)}
-              className="w-full py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
+              className="w-full btn-neutral"
             >
               {t('common.goBack')}
             </button>
@@ -145,17 +145,17 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
   const initials = getInitials(profile.display_name, user?.email);
 
   return (
-    <div className="min-h-screen pt-safe pb-20 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen pt-safe pb-20 bg-surface-secondary">
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-h1">
             {isViewingOwnProfile ? t('profile.myProfile') : t('profile.profile')}
           </h1>
           {isViewingOwnProfile && (
             <button
               onClick={handleEditProfile}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="p-2 text-tertiary hover:text-primary transition-colors"
               aria-label={t('profile.editProfile')}
             >
               <EditIcon size={20} />
@@ -164,7 +164,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
         </div>
 
         {/* Profile Card */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-4">
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-6 mb-4">
           {/* Avatar and Basic Info */}
           <div className="flex items-center space-x-4 mb-6">
             {user?.avatarUrl ? (
@@ -174,21 +174,21 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                 className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
-              <div className="h-16 w-16 rounded-full bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white text-xl font-medium">
+              <div className="h-16 w-16 rounded-full bg-primary text-white flex items-center justify-center text-xl font-medium">
                 {initials}
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white truncate">
+              <h2 className="text-h3 truncate">
                 {displayName}
               </h2>
               {user?.email && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-caption help-text truncate">
                   {user.email}
                 </p>
               )}
               {profile.bio && (
-                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                <p className="text-body mt-1">
                   {profile.bio}
                 </p>
               )}
@@ -196,27 +196,27 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
           </div>
 
           {/* Connections Section */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+          <div className="border-t border-surface-200 dark:border-surface-700 pt-4">
             <button
               onClick={handleConnectionsClick}
               className="flex items-center justify-between w-full p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
               disabled={connectionsCount === 0}
             >
               <div className="flex items-center space-x-3">
-                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 <div className="text-left">
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className="font-medium text-text-900 dark:text-text-50">
                     {t('profile.connections')}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-caption help-text">
                     {t('profile.connectionsCount', { count: connectionsCount })}
                   </p>
                 </div>
               </div>
               {connectionsCount > 0 && (
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               )}
@@ -225,40 +225,40 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
 
           {/* Stats Section */}
           {profile.stats && profile.privacy_settings.show_stats && (
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+            <div className="border-t border-surface-200 dark:border-surface-700 pt-4 mt-4">
+              <h3 className="text-h3 mb-3">
                 {t('profile.stats')}
               </h3>
               <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-center p-3 bg-surface-50 dark:bg-surface-700 rounded-lg">
+                  <p className="text-2xl font-bold text-primary">
                     {profile.stats.total_workouts}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-caption help-text">
                     {t('profile.totalWorkouts')}
                   </p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <div className="text-center p-3 bg-surface-50 dark:bg-surface-700 rounded-lg">
+                  <p className="text-2xl font-bold text-success">
                     {profile.stats.streak_days}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-caption help-text">
                     {t('profile.currentStreak')}
                   </p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                <div className="text-center p-3 bg-surface-50 dark:bg-surface-700 rounded-lg">
+                  <p className="text-2xl font-bold text-primary">
                     {profile.stats.total_exercises_created}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-caption help-text">
                     {t('profile.exercisesCreated')}
                   </p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                <div className="text-center p-3 bg-surface-50 dark:bg-surface-700 rounded-lg">
+                  <p className="text-2xl font-bold text-warning">
                     {profile.stats.total_workouts_created}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-caption help-text">
                     {t('profile.workoutsCreated')}
                   </p>
                 </div>
@@ -267,8 +267,8 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
           )}
 
           {/* Member Since */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="border-t border-surface-200 dark:border-surface-700 pt-4 mt-4">
+            <p className="text-small help-text">
               {t('profile.memberSince', { 
                 date: new Date(profile.join_date).toLocaleDateString() 
               })}
@@ -279,14 +279,14 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
         {/* Connections List Modal/Overlay */}
         {showConnectionsList && connections.length > 0 && (
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-surface-200 dark:border-surface-700">
+                <h3 className="text-h3">
                   {t('profile.connections')}
                 </h3>
                 <button
                   onClick={() => setShowConnectionsList(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="p-2 text-tertiary hover:text-primary transition-colors"
                   aria-label={t('common:close')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,17 +299,17 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                   <button
                     key={connection.id}
                     onClick={() => handleConnectionProfile(connection.connected_user_id)}
-                    className="w-full p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors"
+                    className="w-full p-4 text-left hover:bg-surface-50 dark:hover:bg-surface-700 border-b border-surface-100 dark:border-surface-700 last:border-b-0 transition-colors"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="h-10 w-10 rounded-full bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white text-sm font-medium">
+                      <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
                         {connection.nickname ? connection.nickname.charAt(0).toUpperCase() : '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 dark:text-white truncate">
+                        <p className="font-medium text-text-900 dark:text-text-50 truncate">
                           {connection.nickname || t('profile.unknownUser')}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-caption help-text">
                           {t('profile.connectedSince', { 
                             date: connection.accepted_at 
                               ? new Date(connection.accepted_at).toLocaleDateString() 
@@ -317,7 +317,7 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
                           })}
                         </p>
                       </div>
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </div>

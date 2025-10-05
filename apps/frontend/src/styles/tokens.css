@@ -360,3 +360,128 @@
   color: var(--color-text-tertiary);
   line-height: 1.3;
 }
+
+/* ==========================
+   Phase 1 Utilities (Audit)
+   ========================== */
+
+/* Progress component (CSS variable driven) */
+.progress {
+  position: relative;
+  width: 100%;
+}
+
+.progress__track {
+  width: 100%;
+  height: 0.5rem; /* 8px per 8pt grid */
+  background-color: var(--color-border-primary);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 9999px;
+  width: calc(var(--progress, 0) * 1%);
+  transition: width 200ms ease;
+}
+
+/* Progress bar inverse variant for use on colored backgrounds */
+.progress--inverse .progress__track {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.progress--inverse .progress__bar {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* RTL protection for navigation icons (per UI spec) */
+.nav-more-button,
+.catalog-selector button[aria-label*="Scroll"] {
+  direction: ltr !important;
+  transform: none !important;
+}
+
+/* Force LTR for navigation SVGs when in RTL */
+body.rtl .nav-more-button svg,
+body.rtl .catalog-selector button svg {
+  direction: ltr !important;
+  transform: none !important;
+}
+
+/* Timer utilities */
+.timer-text-shadow-lg {
+  text-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.8),
+    -1px -1px 2px rgba(0, 0, 0, 0.8),
+    1px -1px 2px rgba(0, 0, 0, 0.8),
+    -1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.timer-text-shadow-sm {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.timer-square-280 {
+  width: 280px;
+  height: 280px;
+}
+
+/* Rectangular timer size (maintains current layout; may be revisited) */
+.timer-rect-560x320 {
+  width: 560px;
+  height: 320px;
+  max-width: 100%;
+}
+
+/* Absolute inset utility for 10px (migrated from inline) */
+.video-inset-10 {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+}
+
+/* GPU acceleration hint */
+.gpu-accelerated {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Accessibility: offscreen live region utility */
+.sr-only-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Spacing utility for chart tiny gaps */
+.chart-gap {
+  gap: 2px;
+}
+
+/* Status utility classes (warning, error, success) */
+.text-success { color: var(--color-success); }
+.bg-success { background-color: var(--color-success); }
+.bg-success-soft { background-color: var(--color-success-background); }
+.border-success { border-color: var(--color-success); }
+
+.text-warning { color: var(--color-warning); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-warning-soft { background-color: var(--color-warning-background); }
+.border-warning { border-color: var(--color-warning); }
+
+.text-error { color: var(--color-error); }
+.bg-error { background-color: var(--color-error); }
+.bg-error-soft { background-color: var(--color-error-background); }
+.border-error { border-color: var(--color-error); }
