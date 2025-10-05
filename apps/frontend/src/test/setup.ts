@@ -352,6 +352,13 @@ Object.defineProperty(navigator, 'vibrate', {
   writable: true,
 })
 
+// Mock window.scrollTo for components that use it (e.g., ScrollToTop, AuthModal)
+Object.defineProperty(window, 'scrollTo', {
+  value: vi.fn(),
+  writable: true,
+  configurable: true,
+})
+
 
 // Mock logger to prevent "default.debug is not a function" errors
 vi.mock('../utils/logger', () => ({

@@ -32,7 +32,7 @@ describe('ScrollToTop', () => {
 
   it('should scroll to top when route changes', () => {
     const { rerender } = render(
-      <MemoryRouter initialEntries={['/home']}>
+      <MemoryRouter initialEntries={['/home', '/exercises']} initialIndex={0}>
         <ScrollToTop />
         <Routes>
           <Route path="/home" element={<div>Home</div>} />
@@ -43,9 +43,9 @@ describe('ScrollToTop', () => {
 
     expect(scrollToSpy).toHaveBeenCalledTimes(1);
 
-    // Change route
+    // Change route by updating the index
     rerender(
-      <MemoryRouter initialEntries={['/exercises']}>
+      <MemoryRouter initialEntries={['/home', '/exercises']} initialIndex={1}>
         <ScrollToTop />
         <Routes>
           <Route path="/home" element={<div>Home</div>} />

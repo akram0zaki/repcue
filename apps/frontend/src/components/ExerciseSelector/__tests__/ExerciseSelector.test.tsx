@@ -1,27 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ExerciseSelector } from '../ExerciseSelector';
 import type { Exercise } from '../../../types';
 import { useExerciseFilter } from '../../../hooks/useExerciseFilter';
 
 // Mock the hook
+const mockUseExerciseFilter = vi.fn();
 vi.mock('../../../hooks/useExerciseFilter', () => ({
-  useExerciseFilter: (exercises: Exercise[], options: any) => ({
-    filteredExercises: exercises,
-    filterState: {
-      selectedCatalogId: 'default',
-      selectedCategories: new Set(),
-      searchTerm: '',
-      showFavoritesOnly: false,
-      exerciseFilter: 'all',
-      sortBy: 'name'
-    },
-    updateFilter: vi.fn(),
-    clearFilters: vi.fn(),
-    setCatalog: vi.fn(),
-    toggleCategory: vi.fn(),
-    clearCategories: vi.fn()
-  })
+  useExerciseFilter: mockUseExerciseFilter
 }));
 
 // Mock CatalogSelector
@@ -81,6 +67,26 @@ const createMockExercise = (overrides: Partial<Exercise> = {}): Exercise => ({
 
 describe('ExerciseSelector', () => {
   const mockOnSelectExercise = vi.fn();
+
+  // Set up default mock implementation
+  beforeEach(() => {
+    mockUseExerciseFilter.mockImplementation((exercises: Exercise[], options: any) => ({
+      filteredExercises: exercises,
+      filterState: {
+        selectedCatalogId: 'default',
+        selectedCategories: new Set(),
+        searchTerm: '',
+        showFavoritesOnly: false,
+        exerciseFilter: 'all',
+        sortBy: 'name'
+      },
+      updateFilter: vi.fn(),
+      clearFilters: vi.fn(),
+      setCatalog: vi.fn(),
+      toggleCategory: vi.fn(),
+      clearCategories: vi.fn()
+    }));
+  });
 
   it('should render exercise list', () => {
     const exercises = [
@@ -247,7 +253,7 @@ describe('ExerciseSelector', () => {
   });
 
   it('should show empty state when no exercises match filters', () => {
-    vi.mocked(useExerciseFilter).mockReturnValueOnce({
+    mockUseExerciseFilter.mockReturnValueOnce({
       filteredExercises: [],
       filterState: {
         selectedCatalogId: 'default',
@@ -276,7 +282,7 @@ describe('ExerciseSelector', () => {
   });
 
   it('should display custom empty state message', () => {
-    vi.mocked(useExerciseFilter).mockReturnValueOnce({
+    mockUseExerciseFilter.mockReturnValueOnce({
       filteredExercises: [],
       filterState: {
         selectedCatalogId: 'default',
