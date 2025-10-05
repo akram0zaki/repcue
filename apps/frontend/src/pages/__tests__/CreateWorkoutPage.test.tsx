@@ -1,19 +1,53 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import CreateWorkoutPage from '../CreateWorkoutPage';
-import { storageService } from '../../services/storageService';
-import { consentService } from '../../services/consentService';
 import type { Exercise } from '../../types';
 import { ExerciseCategory, ExerciseType } from '../../types';
 import { createMockExercise } from '../../test/testUtils';
+import { createStorageServiceModuleMock } from '../../test/storageServiceMock';
 
 // Mock dependencies
-vi.mock('../../services/storageService');
-vi.mock('../../services/consentService');
+vi.mock('../../services/storageService', () => createStorageServiceModuleMock());
+vi.mock('../../services/consentService', () => ({
+  ConsentService: {
+    getInstance: vi.fn(() => ({
+      hasConsent: vi.fn().mockReturnValue(true),
+      getConsentData: vi.fn().mockReturnValue({ hasConsented: true })
+    }))
+  },
+  consentService: {
+    hasConsent: vi.fn().mockReturnValue(true),
+    getConsentData: vi.fn().mockReturnValue({ hasConsented: true })
+  }
+}));
 
-const mockStorageService = vi.mocked(storageService);
-const mockConsentService = vi.mocked(consentService);
+// Mock useExerciseFilter hook
+vi.mock('../../hooks/useExerciseFilter', () => ({
+  useExerciseFilter: (exercises: Exercise[]) => ({
+    filteredExercises: exercises,
+    filterState: {
+      selectedCatalogId: 'default',
+      selectedCategories: new Set(),
+      searchTerm: '',
+      showFavoritesOnly: false,
+      exerciseFilter: 'all',
+      sortBy: 'name'
+    },
+    updateFilter: vi.fn(),
+    clearFilters: vi.fn(),
+    setCatalog: vi.fn(),
+    toggleCategory: vi.fn(),
+    clearCategories: vi.fn()
+  })
+}));
+
+// Import after mocks
+import CreateWorkoutPage from '../CreateWorkoutPage';
+import { storageService } from '../../services/storageService';
+import { consentService } from '../../services/consentService';
+
+const mockStorageService = storageService as any;
+const mockConsentService = consentService as any;
 
 const mockExercises: Exercise[] = [
   createMockExercise({

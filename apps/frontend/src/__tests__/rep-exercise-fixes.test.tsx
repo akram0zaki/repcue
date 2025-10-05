@@ -77,6 +77,26 @@ vi.mock('../utils/serviceWorker', () => ({
   }
 }));
 
+// Mock useExerciseFilter hook
+vi.mock('../hooks/useExerciseFilter', () => ({
+  useExerciseFilter: (exercises: any[]) => ({
+    filteredExercises: exercises,
+    filterState: {
+      selectedCatalogId: 'default',
+      selectedCategories: new Set(),
+      searchTerm: '',
+      showFavoritesOnly: false,
+      exerciseFilter: 'all',
+      sortBy: 'name'
+    },
+    updateFilter: vi.fn(),
+    clearFilters: vi.fn(),
+    setCatalog: vi.fn(),
+    toggleCategory: vi.fn(),
+    clearCategories: vi.fn()
+  })
+}));
+
 // Now import modules under test and constants after mocks
 import App from '../App';
 import { DEFAULT_APP_SETTINGS } from '../constants';

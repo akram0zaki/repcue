@@ -16,6 +16,26 @@ vi.mock('../../services/audioService', () => ({
   }
 }));
 
+// Mock useExerciseFilter hook
+vi.mock('../../hooks/useExerciseFilter', () => ({
+  useExerciseFilter: (exercises: Exercise[]) => ({
+    filteredExercises: exercises,
+    filterState: {
+      selectedCatalogId: 'default',
+      selectedCategories: new Set(),
+      searchTerm: '',
+      showFavoritesOnly: false,
+      exerciseFilter: 'all',
+      sortBy: 'name'
+    },
+    updateFilter: vi.fn(),
+    clearFilters: vi.fn(),
+    setCatalog: vi.fn(),
+    toggleCategory: vi.fn(),
+    clearCategories: vi.fn()
+  })
+}));
+
 describe('TimerPage - Workout Mode', () => {
   const mockExercises: Exercise[] = [
     createMockExercise({
