@@ -4,6 +4,7 @@ import { GENERAL_FITNESS_EXERCISES } from './exercises/generalFitness';
 import { WOMEN_HEALTH_EXERCISES } from './exercises/womenHealth';
 import { TAI_CHI_EXERCISES } from './exercises/taiChi';
 import { ZUMBA_EXERCISES } from './exercises/zumba';
+import { AIKIDO_EXERCISES } from './exercises/aikido';
 
 /**
  * All exercises from all catalogs
@@ -13,7 +14,8 @@ export const INITIAL_EXERCISES: Exercise[] = [
   ...GENERAL_FITNESS_EXERCISES,
   ...WOMEN_HEALTH_EXERCISES,
   ...TAI_CHI_EXERCISES,
-  ...ZUMBA_EXERCISES
+  ...ZUMBA_EXERCISES,
+  ...AIKIDO_EXERCISES
 ];
 
 

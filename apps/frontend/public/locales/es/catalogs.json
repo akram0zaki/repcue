@@ -16,5 +16,9 @@
   "women-health": {
     "name": "Salud de la Mujer",
     "description": "Ejercicios especializados para la salud y bienestar de la mujer"
+  },
+  "aikido": {
+    "name": "Aikido",
+    "description": "Arte marcial japonés tradicional enfocado en la armonía, el equilibrio y los movimientos fluidos mediante llaves y proyecciones"
   }
 }

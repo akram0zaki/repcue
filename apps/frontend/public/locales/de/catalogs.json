@@ -16,5 +16,9 @@
   "women-health": {
     "name": "Frauengesundheit",
     "description": "Spezialisierte Übungen für Frauengesundheit und Wohlbefinden"
+  },
+    "aikido": {
+    "name": "Aikido",
+    "description": "Traditionelle japanische Kampfkunst, die sich auf Harmonie, Gleichgewicht und fließende Bewegungen durch Hebel und Würfe konzentriert"
   }
 }
