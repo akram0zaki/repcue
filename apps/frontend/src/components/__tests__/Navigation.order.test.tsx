@@ -13,7 +13,8 @@ vi.mock('react-i18next', () => ({
         'navigation.exercises': 'Exercises',
         'navigation.timer': 'Timer',
         'navigation.workouts': 'Workouts',
-        'navigation.progress': 'Progress'
+        'navigation.progress': 'Progress',
+        'a11y.moreOptions': 'More options'
       };
       return translations[key] || key;
     },

@@ -18,5 +18,9 @@
       "name": "Vrouwen­gezondheid",
       "description": "Gespecialiseerde oefeningen voor de gezondheid en het welzijn van vrouwen"
     }
+  },
+    "aikido": {
+    "name": "Aikido",
+    "description": "Traditionele Japanse krijgskunst gericht op harmonie, balans en vloeiende bewegingen met grepen en worpen"
   }
 }

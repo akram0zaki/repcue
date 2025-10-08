@@ -136,6 +136,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-sm"
                 placeholder={t('fields.emailOptional', 'Email (optional for faster sign in)')} /* i18n-exempt: fallback text provided */
+                autoComplete="email"
                 disabled={loading}
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -172,6 +173,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder={t('placeholders.email')}
+                autoComplete="username"
                 disabled={loading}
                 required
               />
@@ -190,6 +192,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder={t('placeholders.password')}
+                autoComplete="current-password"
                 disabled={loading}
                 required
               />

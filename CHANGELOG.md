@@ -1,5 +1,36 @@
 ## Unreleased
 
+### 2025-10-05 (Auth Form Accessibility Improvements)
+
+#### Fixed
+- **Form Accessibility**: Improved password manager compatibility and accessibility
+  - Updated email fields in password forms to use `autoComplete="username"` for proper password manager integration
+  - Resolves browser console warnings about missing autocomplete attributes and username fields
+  - Affects both SignInForm and SignUpForm components
+  - Email fields in passkey-only contexts keep `autoComplete="email"` as they're not part of password forms
+
+#### Added
+- **Auth Modal UX**: Added scroll-to-top behavior when switching between signin/signup forms
+  - Prevents users from landing at the bottom of forms when switching between authentication modes
+  - Uses smooth scroll behavior for better user experience
+
+### 2025-10-05 (Biometric Authentication Fixes)
+
+#### Fixed
+- **WebAuthn Biometric Authentication**: Fixed passkey signup and signin flows
+  - Fixed `webauthn-register` edge function to use correct Supabase Admin API methods
+    - Replaced non-existent `getUserByEmail()` with `listUsers()` and client-side filtering
+    - Updated all database queries to use `owner_id` instead of deprecated `user_id` column
+  - Fixed credential data structure for SimpleWebAuthn v12 compatibility
+    - Registration: Updated to use `credential.publicKey` from nested structure instead of `credentialID`/`credentialPublicKey`
+    - Authentication: Changed `authenticator` parameter to `credential` with `id`/`publicKey` properties
+    - Fixed `excludeCredentials` to use base64url strings instead of Uint8Arrays
+  - Fixed session establishment after successful authentication
+    - Updated `authService.ts` to use `supabase.auth.verifyOtp()` with hashed token
+    - Previously used `getSession()` which couldn't find un-established sessions
+  - Added duplicate passkey prevention with clear user messaging
+  - Deployed fixes to both development and production environments
+
 ### 2025-10-06 (Update Error Dialog i18n & AI Workout Fixes)
 
 #### Fixed

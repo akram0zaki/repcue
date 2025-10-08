@@ -59,25 +59,26 @@ serve(async (req) => {
 
       if (body.email) {
         // Email provided - get specific user's credentials
-        const { data: existingUser } = await supabase.auth.admin.getUserByEmail(body.email)
-        
-        if (!existingUser?.user) {
+        const { data: existingUsers } = await supabase.auth.admin.listUsers()
+        const existingUser = existingUsers?.users?.find(user => user.email === body.email)
+
+        if (!existingUser) {
           return new Response(
-            JSON.stringify({ error: 'No account found with this email' }), 
-            { 
-              status: 404, 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            JSON.stringify({ error: 'No account found with this email' }),
+            {
+              status: 404,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             }
           )
         }
 
-        userID = existingUser.user.id
+        userID = existingUser.id
 
         // Get user's authenticators
         const { data: userAuthenticators } = await supabase
           .from('user_authenticators')
           .select('credential_id')
-          .eq('user_id', userID)
+          .eq('owner_id', userID)
 
         if (!userAuthenticators || userAuthenticators.length === 0) {
           return new Response(
@@ -117,17 +118,17 @@ serve(async (req) => {
         await supabase
           .from('webauthn_challenges')
           .upsert({
-            user_id: userID,
+            owner_id: userID,
             challenge: authenticationOptions.challenge,
             type: 'authentication',
             expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() // 5 minutes
           })
       } else {
-        // For discoverable credentials, store challenge without user_id
+        // For discoverable credentials, store challenge without owner_id
         await supabase
           .from('webauthn_challenges')
           .insert({
-            user_id: null,
+            owner_id: null,
             challenge: authenticationOptions.challenge,
             type: 'authentication',
             expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() // 5 minutes
@@ -157,20 +158,48 @@ serve(async (req) => {
       }
 
       const credentialID = body.response.credential.id
-      
+
+      // The credential.rawId from the response is base64url encoded
+      // We need to decode it to bytes to match what's stored in the database
+      const credentialRawId = body.response.credential.rawId
+
+      // Helper function to decode base64url to bytes
+      function base64urlToUint8Array(base64url: string): Uint8Array {
+        // Convert base64url to base64
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        // Decode base64 to binary string
+        const binaryString = atob(base64);
+        // Convert binary string to Uint8Array
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+      }
+
+      const credentialBytes = base64urlToUint8Array(credentialRawId);
+
+      console.log('Looking up authenticator with credential_id:', JSON.stringify(Array.from(credentialBytes)))
+
       // Find authenticator by credential ID
-      const { data: authenticator } = await supabase
+      const { data: authenticator, error: authError } = await supabase
         .from('user_authenticators')
-        .select('user_id, credential_public_key, counter')
-        .eq('credential_id', JSON.stringify(Array.from(new Uint8Array(credentialID))))
+        .select('owner_id, credential_public_key, counter, credential_id')
+        .eq('credential_id', JSON.stringify(Array.from(credentialBytes)))
         .single()
+
+      if (authError) {
+        console.error('Authenticator lookup error:', authError)
+      }
+
+      console.log('Found authenticator:', authenticator)
 
       if (!authenticator) {
         return new Response(
-          JSON.stringify({ error: 'Passkey not recognized' }), 
-          { 
-            status: 404, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          JSON.stringify({ error: 'Passkey not recognized' }),
+          {
+            status: 404,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         )
       }
@@ -179,7 +208,7 @@ serve(async (req) => {
       const { data: challengeRecord } = await supabase
         .from('webauthn_challenges')
         .select('challenge')
-        .or(`user_id.eq.${authenticator.user_id},user_id.is.null`)
+        .or(`owner_id.eq.${authenticator.owner_id},owner_id.is.null`)
         .eq('type', 'authentication')
         .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false })
@@ -196,40 +225,66 @@ serve(async (req) => {
         )
       }
 
+      // Ensure counter is a number
+      const counter = typeof authenticator.counter === 'number'
+        ? authenticator.counter
+        : (typeof authenticator.counter === 'string' ? parseInt(authenticator.counter, 10) : 0)
+
+      console.log('Preparing verification with counter:', counter)
+
+      // SimpleWebAuthn v12+ uses 'credential' instead of 'authenticator'
+      // and the property names are different (id/publicKey instead of credentialID/credentialPublicKey)
       const opts: VerifyAuthenticationResponseOpts = {
         response: body.response.credential,
         expectedChallenge: challengeRecord.challenge,
         expectedOrigin: origin,
         expectedRPID: rpID,
-        authenticator: {
-          credentialID: new Uint8Array(JSON.parse(authenticator.credential_id || '[]')),
-          credentialPublicKey: new Uint8Array(JSON.parse(authenticator.credential_public_key)),
-          counter: authenticator.counter || 0
+        credential: {
+          id: new Uint8Array(JSON.parse(authenticator.credential_id || '[]')),
+          publicKey: new Uint8Array(JSON.parse(authenticator.credential_public_key)),
+          counter: counter,
+          transports: ['internal'] // Default to internal for platform authenticators
         }
       }
 
-      const verification = await verifyAuthenticationResponse(opts)
+      let verification
+      try {
+        verification = await verifyAuthenticationResponse(opts)
+        console.log('Verification successful:', verification.verified)
+      } catch (error) {
+        console.error('Verification failed:', error)
+        return new Response(
+          JSON.stringify({
+            error: 'Authentication verification failed',
+            message: error instanceof Error ? error.message : 'Unknown error'
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400
+          }
+        )
+      }
 
       if (verification.verified) {
         // Update counter
         await supabase
           .from('user_authenticators')
-          .update({ 
+          .update({
             counter: verification.authenticationInfo.newCounter,
             last_used_at: new Date().toISOString()
           })
-          .eq('user_id', authenticator.user_id)
-          .eq('credential_id', JSON.stringify(Array.from(new Uint8Array(credentialID))))
+          .eq('owner_id', authenticator.owner_id)
+          .eq('credential_id', JSON.stringify(Array.from(credentialBytes)))
 
         // Clean up challenges
         await supabase
           .from('webauthn_challenges')
           .delete()
-          .or(`user_id.eq.${authenticator.user_id},user_id.is.null`)
+          .or(`owner_id.eq.${authenticator.owner_id},owner_id.is.null`)
           .eq('type', 'authentication')
 
         // Generate session token
-        const { data: user } = await supabase.auth.admin.getUserById(authenticator.user_id)
+        const { data: user } = await supabase.auth.admin.getUserById(authenticator.owner_id)
         
         if (!user?.user?.email) {
           return new Response(

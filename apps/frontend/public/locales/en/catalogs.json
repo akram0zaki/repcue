@@ -16,5 +16,9 @@
   "women-health": {
     "name": "Women's Health",
     "description": "Specialized exercises for women's health and wellness"
+  },
+  "aikido": {
+    "name": "Aikido",
+    "description": "Traditional Japanese martial art focused on harmony, balance, and fluid movement through joint locks and throws"
   }
 }

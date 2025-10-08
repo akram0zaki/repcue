@@ -106,6 +106,26 @@ vi.mock('../../hooks/useRTLDetection', () => ({
   useRTLDetection: () => false
 }));
 
+// Mock useExerciseFilter hook
+vi.mock('../../hooks/useExerciseFilter', () => ({
+  useExerciseFilter: (exercises: any[]) => ({
+    filteredExercises: exercises,
+    filterState: {
+      selectedCatalogId: 'default',
+      selectedCategories: new Set(),
+      searchTerm: '',
+      showFavoritesOnly: false,
+      exerciseFilter: 'all',
+      sortBy: 'name'
+    },
+    updateFilter: vi.fn(),
+    clearFilters: vi.fn(),
+    setCatalog: vi.fn(),
+    toggleCategory: vi.fn(),
+    clearCategories: vi.fn()
+  })
+}));
+
 describe('ExercisePage - video preview', () => {
   beforeEach(() => {
     // Enable video demos for this test

@@ -1,0 +1,1993 @@
+# Catalog Badge System Implementation Plan
+
+**Version**: 1.0  
+**Date**: 2025-01-08  
+**Status**: Planning  
+**Related Documents**: 
+- `docs/exercise-catalog.md`
+- `docs/sync-system.md`
+
+---
+
+## Executive Summary
+
+This plan outlines the implementation of a flexible, catalog-specific badge system to replace the hardcoded Aikido Kyu-level filtering. The new system will support multiple badges per catalog, dynamic value discovery, and work seamlessly with both built-in and user-created exercises across all filtering contexts.
+
+### Current State
+- Aikido catalog has hardcoded Kyu-level filtering in `ExerciseSelector.tsx`, `ExercisePage.tsx`, and `useExerciseFilter.ts`
+- Filter state includes Aikido-specific `selectedKyuLevels` field
+- **Exercise categories are hardcoded as a required `category` field** in the Exercise type
+- CategoryFilter component operates independently from catalog system
+- Non-scalable approach requiring code changes for each new catalog-specific filter
+
+### Target State
+- Generic badge system defined at the catalog level
+- Zero or more badges per catalog
+- **Categories become a badge type**, making the `category` field optional in Exercise type
+- Support for structured values (numeric levels), simple categories (strings), and dynamic discovery
+- Badge filtering integrated throughout the application
+- User-created exercises can use badges from their assigned catalog
+- Full sync support for badge-related tags
+- CategoryFilter component deprecated in favor of unified badge filtering
+
+---
+
+## Implementation Refinements
+
+The following optimizations have been incorporated based on development best practices:
+
+| **Area** | **Refinement** | **Benefit** |
+|----------|---------------|-------------|
+| **Type Definitions** | Make `filterType` optional, defaulting to `'multiple'` | Simplifies catalog configuration for 90% of use cases |
+| **Dynamic Discovery** | Cache discovered values using `useMemo` keyed by `catalogId + badge.id` | Prevents repeated regex scans on every render, improves performance |
+| **UI Development** | Build `BadgeFilterGroup` first, then refactor into `BadgeFilter` after functional testing | Get working filtering faster, iterate on styling separately |
+| **Internationalization** | Add English only for MVP, use translation pipeline for other locales post-validation | Avoid 8× duplication during active development, faster iteration |
+| **Testing Strategy** | Add one integration test early (Phase 1) covering selection → filter → persistence | Catch structural issues before building UI components |
+
+---
+
+## Architecture Overview
+
+### Type System
+
+```typescript
+// New types in src/types/catalog.ts
+
+export interface BadgeValue {
+  id: string | number;          // Badge value identifier
+  label: string;                // i18n key for value label
+  labelParams?: Record<string, any>; // Parameters for i18n interpolation
+  icon?: React.ReactNode;       // Optional icon component
+  fallbackLabel?: string;       // Fallback if translation missing
+}
+
+export interface CatalogBadge {
+  id: string;                   // Unique badge ID within catalog (e.g., 'kyuLevel', 'vehicleType')
+  label: string;                // i18n key for badge label
+  filterType?: 'single' | 'multiple'; // Selection mode (defaults to 'multiple')
+  
+  // Value definition (choose one approach):
+  values?: BadgeValue[];        // Predefined values (for static badges)
+  
+  // Tag-based filtering configuration
+  tagPattern?: {
+    prefix?: string;            // Tag prefix (e.g., 'kyu:')
+    suffix?: string;            // Tag suffix
+    extractPattern?: RegExp;    // Regex to extract value from tag
+  };
+  
+  // Discovery mode
+  dynamicDiscovery?: boolean;   // If true, discover values from exercises
+  
+  // Computed badges (read-only, derived from other data)
+  computed?: boolean;           // If true, badge is not editable in form, only displayed/filterable
+                                // Examples: hasVideo (from video_files), durationRange (from default_duration)
+}
+
+export interface ExerciseCatalog {
+  id: string;
+  nameKey: string;
+  descriptionKey: string;
+  isDefault?: boolean;
+  isPremium?: boolean;
+  displayOrder: number;
+  icon?: React.ReactNode;
+  colorTheme?: string;
+  pictureUrl?: string;
+  
+  // NEW: Badge definitions
+  badges?: CatalogBadge[];
+}
+```
+
+### Filter State Enhancement
+
+```typescript
+// Update ExerciseFilterState in src/hooks/useExerciseFilter.ts
+
+export interface ExerciseFilterState {
+  selectedCatalogId: string;
+  searchTerm: string;
+  showFavoritesOnly: boolean;
+  exerciseFilter: 'all' | 'built-in' | 'custom' | 'shared';
+  sortBy: 'name' | 'type' | 'recently-added';
+  
+  // REPLACE selectedKyuLevels and selectedCategories with generic badge selections
+  selectedBadges: Record<string, Set<string | number>>; // badgeId -> Set of selected values
+  // Note: Categories are now handled as a badge type (e.g., selectedBadges['category'])
+}
+```
+
+---
+
+## Implementation Phases
+
+### Phase 1: Core Type System and Infrastructure
+
+**Estimated Effort**: 4 hours
+
+#### Tasks
+
+1. **Create Type Definitions** (`src/types/catalog.ts`)
+   - [ ] Define `BadgeValue` interface
+   - [ ] Define `CatalogBadge` interface
+   - [ ] Update `ExerciseCatalog` interface to include `badges?: CatalogBadge[]`
+   - [ ] Export all new types from `src/types/index.ts`
+
+2. **Update Exercise Type** (`src/types/index.ts`)
+   - [ ] Make `category` field optional in `Exercise` interface: `category?: ExerciseCategory`
+   - [ ] Add migration note: existing exercises will keep category, new ones can use badge system
+   - [ ] Update JSDoc to indicate category is deprecated in favor of category badge
+
+3. **Update Filter Hook** (`src/hooks/useExerciseFilter.ts`)
+   - [ ] Replace `selectedKyuLevels` and `selectedCategories` with `selectedBadges` in `ExerciseFilterState`
+   - [ ] Update `loadSavedFilters()` to handle migration from old Kyu format AND old category format
+   - [ ] Update `clearFilters()` to reset badge selections
+   - [ ] Replace `toggleKyuLevel()`, `clearKyuLevels()`, `toggleCategory()`, `clearCategories()` with generic `toggleBadgeValue()` and `clearBadge()`
+   - [ ] Update filter persistence to save/load badge selections
+   - [ ] Implement generic badge filtering logic in `filteredExercises` useMemo
+   - [ ] Handle backward compatibility: if exercise has `category` field, treat it as `category` badge
+
+4. **Catalog Utility Functions** (`src/utils/catalogBadges.ts` - NEW)
+   - [ ] `getCatalogBadges(catalogId: string): CatalogBadge[]`
+   - [ ] `discoverBadgeValues(exercises: Exercise[], badge: CatalogBadge, catalogId: string): BadgeValue[]`
+   - [ ] `matchesBadgeFilter(exercise: Exercise, badge: CatalogBadge, selectedValues: Set<string | number>): boolean`
+   - [ ] `getBadgeValuesForCatalog(exercises: Exercise[], catalogId: string): Map<string, BadgeValue[]>`
+   - [ ] `extractExerciseBadges(exercise: Exercise, catalogBadges: CatalogBadge[]): Array<{ badge: CatalogBadge; values: BadgeValue[] }>` (for display)
+
+5. **Custom Hook for Cached Discovery** (`src/hooks/useBadgeValues.ts` - NEW)
+   - [ ] Implement `useBadgeValues(exercises: Exercise[], catalogId: string, badge: CatalogBadge)` hook
+   - [ ] Use `useMemo` keyed by `catalogId` and `badge.id` to cache discovered values
+   - [ ] Prevent repeated regex scans on every render
+   - [ ] Return both predefined and discovered values
+
+#### Acceptance Criteria
+- Type system compiles without errors
+- Filter hook tests pass with new badge structure
+- Backward compatibility maintained for saved filter preferences
+
+---
+
+### Phase 2: Badge UI Components
+
+**Estimated Effort**: 6 hours
+
+#### Tasks
+
+1. **Create BadgeFilterGroup Component** (`src/components/BadgeFilterGroup.tsx` - NEW)
+   **PRIORITY: Build this first for rapid functional testing**
+   ```tsx
+   interface BadgeFilterGroupProps {
+     catalogId: string;
+     exercises: Exercise[];
+     selectedBadges: Record<string, Set<string | number>>;
+     onToggleBadgeValue: (badgeId: string, value: string | number) => void;
+     onClearBadge: (badgeId: string) => void;
+   }
+   ```
+   - [ ] Render all badges for a catalog
+   - [ ] Use `useBadgeValues` hook for cached discovery
+   - [ ] Implement basic functional layout (styling comes later)
+   - [ ] Show/hide based on catalog selection
+   - [ ] Use simple button elements for MVP
+
+2. **Integrate into ExerciseSelector** (`src/components/ExerciseSelector/ExerciseSelector.tsx`)
+   - [ ] Remove hardcoded Aikido Kyu filter (lines 199-226)
+   - [ ] **Remove CategoryFilter component** - replaced by badge system
+   - [ ] Import and use `BadgeFilterGroup` component
+   - [ ] Connect to filter hook's badge methods
+   - [ ] **Implement "More filters" collapse for mobile**:
+     - Show first 3 badges by default
+     - Collapse remaining badges under "More filters" button
+     - Improves UX density on mobile screens
+   - [ ] Test basic filtering functionality
+   - [ ] Update props interface if needed
+   - [ ] Verify category filtering works via badge system
+
+3. **Create BadgeFilter Component** (`src/components/BadgeFilter.tsx` - NEW)
+   **Build this after functional testing passes**
+   ```tsx
+   interface BadgeFilterProps {
+     badge: CatalogBadge;
+     selectedValues: Set<string | number>;
+     availableValues?: BadgeValue[];  // For dynamic discovery
+     onToggleValue: (badgeId: string, value: string | number) => void;
+     onClearValues: (badgeId: string) => void;
+   }
+   ```
+   - [ ] Refactor BadgeFilterGroup to use this component
+   - [ ] Implement responsive design
+   - [ ] Support both single and multiple selection modes (default to multiple)
+   - [ ] Handle icon rendering if provided
+   - [ ] Implement clear button when selections exist
+   - [ ] Add proper ARIA labels and accessibility
+   - [ ] Polish styling to match design system
+
+4. **Create ExerciseBadgeDisplay Component** (`src/components/ExerciseBadgeDisplay.tsx` - NEW)
+   **For displaying badges on exercise detail pages**
+   ```tsx
+   interface ExerciseBadgeDisplayProps {
+     exercise: Exercise;
+     className?: string;
+   }
+   ```
+   - [ ] Extract badge values from exercise tags
+   - [ ] Get catalog badge definitions
+   - [ ] Display badges with proper i18n labels
+   - [ ] Handle icon rendering if available
+   - [ ] Group multiple badges clearly
+   - [ ] Return null if no badges present
+   - [ ] Responsive design for mobile
+
+#### Acceptance Criteria
+- Badge filters render correctly for all catalog types
+- Badge display shows exercise badges correctly
+- Multiple badges per catalog display properly
+- Single/multiple selection modes work as expected (filtering)
+- Dynamic value discovery populates correctly
+- Responsive design works on mobile
+- Distinction clear between filtering UI and display UI
+
+---
+
+### Phase 3: Catalog Badge Definitions
+
+**Estimated Effort**: 8 hours
+
+#### Tasks
+
+1. **Update Existing Catalogs** (`src/data/catalogs.ts`)
+
+   **Aikido Catalog** (Structured Numeric + Category Badge)
+   ```typescript
+   {
+     id: 'aikido',
+     badges: [
+       {
+         id: 'category',
+         label: 'catalogs:aikido.badges.category.label',
+         // filterType defaults to 'multiple'
+         values: [
+           { id: 'core', label: 'common:categories.core' },
+           { id: 'strength', label: 'common:categories.strength' },
+           { id: 'flexibility', label: 'common:categories.flexibility' },
+           { id: 'balance', label: 'common:categories.balance' },
+         ],
+         tagPattern: { prefix: 'category:' }
+       },
+       {
+         id: 'kyuLevel',
+         label: 'catalogs:aikido.badges.kyuLevel.label',
+         // filterType defaults to 'multiple'
+         values: [
+           { id: 1, label: 'catalogs:aikido.badges.kyuLevel.values.kyu1' },
+           { id: 2, label: 'catalogs:aikido.badges.kyuLevel.values.kyu2' },
+           { id: 3, label: 'catalogs:aikido.badges.kyuLevel.values.kyu3' },
+           { id: 4, label: 'catalogs:aikido.badges.kyuLevel.values.kyu4' },
+           { id: 5, label: 'catalogs:aikido.badges.kyuLevel.values.kyu5' },
+           { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.kyu6' },
+         ],
+         tagPattern: { prefix: 'kyu:' }
+       }
+     ]
+   }
+   ```
+
+   **General Fitness Catalog** (Category + Equipment + Intensity)
+   ```typescript
+   {
+     id: 'general-fitness',
+     badges: [
+       {
+         id: 'category',
+         label: 'catalogs:general-fitness.badges.category.label',
+         values: [
+           { id: 'core', label: 'common:categories.core' },
+           { id: 'strength', label: 'common:categories.strength' },
+           { id: 'cardio', label: 'common:categories.cardio' },
+           { id: 'flexibility', label: 'common:categories.flexibility' },
+           { id: 'balance', label: 'common:categories.balance' },
+         ],
+         tagPattern: { prefix: 'category:' }
+       },
+       {
+         id: 'equipment',
+         label: 'catalogs:general-fitness.badges.equipment.label',
+         // filterType defaults to 'multiple'
+         values: [
+           { id: 'bodyweight', label: 'catalogs:general-fitness.badges.equipment.values.bodyweight' },
+           { id: 'dumbbells', label: 'catalogs:general-fitness.badges.equipment.values.dumbbells' },
+           { id: 'resistance-band', label: 'catalogs:general-fitness.badges.equipment.values.resistanceBand' },
+           { id: 'none', label: 'catalogs:general-fitness.badges.equipment.values.none' },
+         ],
+         tagPattern: { prefix: 'equipment:' }
+       },
+       {
+         id: 'intensity',
+         label: 'catalogs:general-fitness.badges.intensity.label',
+         filterType: 'single',
+         values: [
+           { id: 'low', label: 'catalogs:general-fitness.badges.intensity.values.low' },
+           { id: 'moderate', label: 'catalogs:general-fitness.badges.intensity.values.moderate' },
+           { id: 'high', label: 'catalogs:general-fitness.badges.intensity.values.high' },
+         ],
+         tagPattern: { prefix: 'intensity:' }
+       }
+     ]
+   }
+   ```
+
+   **Women's Health Catalog** (Category + Focus)
+   ```typescript
+   {
+     id: 'women-health',
+     badges: [
+       {
+         id: 'category',
+         label: 'catalogs:women-health.badges.category.label',
+         values: [
+           { id: 'core', label: 'common:categories.core' },
+           { id: 'strength', label: 'common:categories.strength' },
+           { id: 'flexibility', label: 'common:categories.flexibility' },
+           { id: 'balance', label: 'common:categories.balance' },
+         ],
+         tagPattern: { prefix: 'category:' }
+       },
+       {
+         id: 'focus',
+         label: 'catalogs:women-health.badges.focus.label',
+         // filterType defaults to 'multiple'
+         values: [
+           { id: 'prenatal', label: 'catalogs:women-health.badges.focus.values.prenatal' },
+           { id: 'postnatal', label: 'catalogs:women-health.badges.focus.values.postnatal' },
+           { id: 'pelvic-floor', label: 'catalogs:women-health.badges.focus.values.pelvicFloor' },
+           { id: 'core-strength', label: 'catalogs:women-health.badges.focus.values.coreStrength' },
+         ],
+         tagPattern: { prefix: 'focus:' }
+       }
+     ]
+   }
+   ```
+
+   **Tai Chi Catalog** (Category + Dynamic Discovery)
+   ```typescript
+   {
+     id: 'tai-chi',
+     badges: [
+       {
+         id: 'category',
+         label: 'catalogs:tai-chi.badges.category.label',
+         values: [
+           { id: 'flexibility', label: 'common:categories.flexibility' },
+           { id: 'balance', label: 'common:categories.balance' },
+         ],
+         tagPattern: { prefix: 'category:' }
+       },
+       {
+         id: 'form',
+         label: 'catalogs:tai-chi.badges.form.label',
+         // filterType defaults to 'multiple'
+         dynamicDiscovery: true,
+         tagPattern: { 
+           prefix: 'form:',
+           extractPattern: /^form:(.+)$/
+         }
+       }
+     ]
+   }
+   ```
+
+   **Zumba Catalog** (Category + Style)
+   ```typescript
+   {
+     id: 'zumba',
+     badges: [
+       {
+         id: 'category',
+         label: 'catalogs:zumba.badges.category.label',
+         values: [
+           { id: 'cardio', label: 'common:categories.cardio' },
+         ],
+         tagPattern: { prefix: 'category:' }
+       },
+       {
+         id: 'style',
+         label: 'catalogs:zumba.badges.style.label',
+         // filterType defaults to 'multiple'
+         values: [
+           { id: 'salsa', label: 'catalogs:zumba.badges.style.values.salsa' },
+           { id: 'merengue', label: 'catalogs:zumba.badges.style.values.merengue' },
+           { id: 'reggaeton', label: 'catalogs:zumba.badges.style.values.reggaeton' },
+           { id: 'cumbia', label: 'catalogs:zumba.badges.style.values.cumbia' },
+         ],
+         tagPattern: { prefix: 'style:' }
+       }
+     ]
+   }
+   ```
+
+2. **Tag Exercise Definitions** (`src/data/exercises/*.ts`)
+   - [ ] **Migrate categories to tags**: Add `category:X` tags to all exercises based on their current `category` field
+   - [ ] Keep existing `category` field for backward compatibility (will be deprecated)
+   - [ ] Review all Aikido exercises, ensure tags include `kyu:1` through `kyu:6` where appropriate
+   - [ ] Add equipment tags to general-fitness exercises (e.g., `equipment:bodyweight`, `equipment:dumbbells`)
+   - [ ] Add intensity tags to general-fitness exercises (e.g., `intensity:moderate`)
+   - [ ] Add focus tags to women-health exercises (e.g., `focus:prenatal`)
+   - [ ] Add form tags to tai-chi exercises (e.g., `form:yang-24`, `form:chen`)
+   - [ ] Add style tags to zumba exercises (e.g., `style:salsa`)
+   - [ ] Example migration: `{ category: 'core', tags: ['kyu:3'] }` → `{ category: 'core', tags: ['category:core', 'kyu:3'] }`
+
+#### Acceptance Criteria
+- All catalogs have appropriate badge definitions
+- Exercise tags align with badge patterns
+- Dynamic discovery works for Tai Chi catalog
+- Multiple badges per catalog function correctly
+
+---
+
+### Phase 4: Page Integration
+
+**Estimated Effort**: 10 hours
+
+#### Tasks
+
+1. **ExercisePage** (`src/pages/ExercisePage.tsx`)
+   - [ ] Remove hardcoded Aikido Kyu filter (lines 678-702)
+   - [ ] **Remove CategoryFilter component** - categories now handled by badge system
+   - [ ] Import and use `BadgeFilterGroup`
+   - [ ] Update localStorage persistence to handle badges
+   - [ ] Remove `selectedKyuLevels` and `selectedCategories` state
+   - [ ] Remove `toggleKyuLevel()`, `clearKyuLevels()`, `toggleCategory()`, `clearCategories()` functions
+   - [ ] Update filter state initialization
+   - [ ] Test filter persistence across page reloads
+   - [ ] Verify category filtering still works via badge system
+
+2. **ExerciseDetailsPage** (`src/pages/ExerciseDetailsPage.tsx`)
+   - [ ] Import and use `ExerciseBadgeDisplay` component
+   - [ ] Place in appropriate section (e.g., below description, above instructions)
+   - [ ] Ensure styling consistent with page design
+   - [ ] Test with exercises that have 0, 1, and multiple badges
+   - [ ] Verify i18n labels display correctly
+
+3. **ExerciseFormPage** (`src/pages/ExerciseFormPage.tsx`)
+   **Critical for user-created exercises - this is where badge data is captured**
+   
+   - [ ] Add badge selection section in form (below catalog selection, above submit)
+   - [ ] Load catalog badges dynamically based on selected catalog
+   - [ ] Render badge selection UI for each badge in catalog:
+     - Use checkboxes/multi-select for `filterType: 'multiple'`
+     - Use radio buttons/dropdown for `filterType: 'single'`
+     - **Skip computed badges** (`computed: true`) - they're read-only
+   - [ ] Handle category badge specially (if present in catalog)
+   - [ ] Convert badge selections to tag array format when saving:
+     ```typescript
+     // Example: User selects Category: Core, Equipment: Bodyweight, Intensity: Moderate
+     // Result: tags = ['category:core', 'equipment:bodyweight', 'intensity:moderate']
+     ```
+   - [ ] Pre-populate badge selections when editing (extract from existing tags)
+   - [ ] **Clear ALL badge selections when catalog changes** (test this - classic footgun!)
+   - [ ] **Client-side validation before save**:
+     - Call `validateBadgeTags(tags, catalogId)` before saving
+     - Block save if validation fails
+     - Show user-friendly error messages
+   - [ ] Validate: Required badges must have at least one selection
+   - [ ] Validate: Single-select badges can only have one value
+   - [ ] Show helper text explaining badge selection
+   - [ ] Add "Skip" option for optional badges
+   - [ ] Save to IndexedDB immediately (offline-first)
+   - [ ] Mark exercise as dirty for sync
+
+4. **StandaloneSharedExercisePage** (`src/pages/StandaloneSharedExercise.tsx`)
+   - [ ] Import and use `ExerciseBadgeDisplay` component (same as ExerciseDetailsPage)
+   - [ ] Place in appropriate section within standalone layout
+   - [ ] Ensure badges render correctly in standalone/anonymous context
+   - [ ] Test with shared exercises that have badges
+
+5. **WorkoutBuilderPage** (`src/pages/WorkoutBuilderPage.tsx`)
+   - [ ] Verify ExerciseSelector integration with new badge system
+   - [ ] Test badge filtering when adding exercises to workout
+   - [ ] Ensure excluded exercises don't appear
+
+#### Acceptance Criteria
+- Badge filters work on all relevant pages
+- User-created exercises can use catalog badges
+- Badge selections persist correctly
+- Mobile responsive design maintained
+- No regressions in existing functionality
+
+---
+
+### Phase 5: Database and Sync Integration
+
+**Estimated Effort**: 8 hours (increased from 6 hours)
+
+#### Tasks
+
+1. **Database Schema Review and Validation**
+   
+   **Supabase Schema** (`supabase/migrations/`)
+   - [ ] Verify `exercises.tags` field exists as `TEXT[]` type
+   - [ ] Verify `exercises.category` can be nullable (for migration to optional)
+   - [ ] Add database comment documenting category deprecation
+   - [ ] Create migration if needed: `ALTER TABLE exercises ALTER COLUMN category DROP NOT NULL;`
+   - [ ] Add index on tags for better filter performance: `CREATE INDEX idx_exercises_tags ON exercises USING GIN (tags);`
+   
+   **IndexedDB Schema** (`src/db/schema.ts`)
+   - [ ] Verify `exercises` table schema includes `tags: string[]`
+   - [ ] Verify `category` field is optional in TypeScript type
+   - [ ] Update Dexie schema version if needed
+   - [ ] Add migration for existing IndexedDB data if category becomes truly optional
+
+2. **Sync System - Full Badge Support** (`src/services/correctSyncService.ts`)
+   
+   **Push (Upload) Flow**
+   - [ ] Verify `tags` field is in exercises push allowlist
+   - [ ] Verify `category` field remains in allowlist for backward compatibility
+   - [ ] Test tag array serialization/deserialization
+   - [ ] Test push of user-created exercises with badge tags (category:X, equipment:Y, etc.)
+   - [ ] Verify tag arrays merge correctly during conflict resolution
+   - [ ] Test empty tags array handling
+   
+   **Pull (Download) Flow**
+   - [ ] Verify tags array properly downloaded from Supabase
+   - [ ] Test badge tag extraction on received exercises
+   - [ ] Verify category field optional handling
+   - [ ] Test exercises without category field (badge-only)
+   
+   **Conflict Resolution**
+   - [ ] Implement tag array merge strategy (union of tags, not replacement)
+   - [ ] Handle conflicts where both devices added different badge tags
+   - [ ] Version-based conflict resolution for tag changes
+   - [ ] Test concurrent tag modifications from multiple devices
+
+3. **Edge Function Updates** (`supabase/functions/sync_v2/index.ts`)
+   - [ ] Verify `tags` in `MUTABLE_FIELD_ALLOWLIST.exercises`
+   - [ ] Verify `category` in allowlist (for backward compatibility)
+   - [ ] Add validation: tags must be array of strings
+   - [ ] Add validation: category values must be valid ExerciseCategory enum (if present)
+   - [ ] Add server-side tag sanitization (prevent injection, max length per tag)
+   - [ ] Test tag array handling in push/pull operations
+   - [ ] Document tag format requirements (e.g., 'prefix:value' pattern)
+
+4. **StorageService Enhancements** (`src/services/storageService.ts`)
+   - [ ] Add `getExercisesByBadge(catalogId: string, badgeId: string, value: string | number): Promise<Exercise[]>`
+   - [ ] Add `getUniqueBadgeValues(catalogId: string, badgeId: string): Promise<Array<string | number>>`
+   - [ ] Update `saveExercise()` to validate tags array format
+   - [ ] Update `updateExercise()` to handle tag updates properly
+   - [ ] Add helper `addTagsToExercise(exerciseId: string, tags: string[]): Promise<boolean>`
+   - [ ] Add helper `removeTagsFromExercise(exerciseId: string, tags: string[]): Promise<boolean>`
+   - [ ] Ensure dirty marking works correctly when tags change
+
+5. **Data Validation and Sanitization** (`src/utils/badgeValidation.ts` - NEW)
+   
+   **Client-Side Validation (Blocking on Save)**
+   - [ ] Create `sanitizeTagValue(value: string): string` utility
+     - Strip leading/trailing whitespace
+     - Remove special characters (except hyphen, underscore)
+     - Lowercase the value
+     - Max 50 characters per value
+   - [ ] Create `validateBadgeTags(tags: string[], catalogId: string): { valid: string[]; errors: string[] }` utility
+     - Validate tag format: `badgeId:value` pattern (regex: `/^[a-z0-9-]+:[a-z0-9-]+$/i`)
+     - Prevent malicious tags (XSS, injection attempts)
+     - Enforce max tag length (100 characters total)
+     - Enforce max tags per exercise (20 tags)
+     - Return both valid tags and error messages
+   - [ ] **Block save in ExerciseFormPage if validation fails**
+   - [ ] Show user-friendly error messages for invalid tags
+   - [ ] Add validation before marking exercise as dirty
+   - [ ] Reduces failed syncs by catching issues early
+   
+   **Server-Side Validation (Defense in Depth)**
+   - [ ] Same validation in edge function as fallback
+   - [ ] Log validation failures for monitoring
+
+#### Acceptance Criteria
+- User-created exercise badges sync across devices successfully
+- Tag changes propagate correctly in both directions (push/pull)
+- Tag array merge conflicts resolve without data loss
+- Category field can be null/undefined in database
+- Supabase GIN index improves tag filtering performance
+- No sync regressions for existing data
+- Badge filtering works with synced exercises
+- Validation prevents malicious or malformed tags
+- Offline-first: User can create exercises with badges while offline
+- Cross-device: Badges created on Device A appear on Device B after sync
+
+---
+
+### Phase 6: Internationalization
+
+**Estimated Effort**: 3 hours (MVP: English only)
+
+#### Tasks
+
+1. **English Translations - MVP** (`apps/frontend/public/locales/en/catalogs.json`)
+   ```json
+   {
+     "aikido": {
+       "name": "Aikido",
+       "description": "Traditional Japanese martial art exercises",
+       "badges": {
+         "kyuLevel": {
+           "label": "Kyu Level",
+           "values": {
+             "kyu1": "6th Kyu (Beginner)",
+             "kyu2": "5th Kyu",
+             "kyu3": "4th Kyu (Intermediate)",
+             "kyu4": "3rd Kyu",
+             "kyu5": "2nd Kyu (Advanced)",
+             "kyu6": "1st Kyu (Pre-Black Belt)"
+           }
+         }
+       }
+     },
+     "general-fitness": {
+       "name": "General Fitness",
+       "description": "Comprehensive fitness exercises for all levels",
+       "badges": {
+         "equipment": {
+           "label": "Equipment",
+           "values": {
+             "bodyweight": "Bodyweight Only",
+             "dumbbells": "Dumbbells",
+             "resistanceBand": "Resistance Band",
+             "none": "No Equipment"
+           }
+         },
+         "intensity": {
+           "label": "Intensity",
+           "values": {
+             "low": "Low Intensity",
+             "moderate": "Moderate Intensity",
+             "high": "High Intensity"
+           }
+         }
+       }
+     },
+     "women-health": {
+       "name": "Women's Health",
+       "description": "Specialized exercises for women's wellness",
+       "badges": {
+         "focus": {
+           "label": "Focus Area",
+           "values": {
+             "prenatal": "Prenatal",
+             "postnatal": "Postnatal",
+             "pelvicFloor": "Pelvic Floor",
+             "coreStrength": "Core Strength"
+           }
+         }
+       }
+     },
+     "tai-chi": {
+       "name": "Tai Chi",
+       "description": "Traditional Chinese martial art and meditation",
+       "badges": {
+         "form": {
+           "label": "Form",
+           "values": {}
+         }
+       }
+     },
+     "zumba": {
+       "name": "Zumba",
+       "description": "High-energy dance fitness",
+       "badges": {
+         "style": {
+           "label": "Dance Style",
+           "values": {
+             "salsa": "Salsa",
+             "merengue": "Merengue",
+             "reggaeton": "Reggaeton",
+             "cumbia": "Cumbia"
+           }
+         }
+       }
+     }
+   }
+   ```
+
+2. **Translation Pipeline - Post-MVP** (Deferred to reduce iteration overhead)
+   - [ ] Use automated translation pipeline after English keys are stable
+   - [ ] Generate translations for remaining 7 locales:
+     - French (`fr/catalogs.json`)
+     - German (`de/catalogs.json`)
+     - Spanish (`es/catalogs.json`)
+     - Dutch (`nl/catalogs.json`)
+     - Arabic (`ar/catalogs.json`)
+     - Egyptian Arabic (`ar-EG/catalogs.json`)
+     - Frisian (`fy/catalogs.json`)
+   - [ ] Professional review of automated translations
+   - [ ] Add to `exerciseDetails.json` if new exercises were added
+
+3. **Validation**
+   - [ ] Run `pnpm i18n:scan` to verify English keys present (MVP)
+   - [ ] Test UI in English
+   - [ ] Post-MVP: Verify all 8 locales
+   - [ ] Post-MVP: Test RTL layouts for Arabic locales
+
+#### Acceptance Criteria
+- English badge labels complete and consistent (MVP)
+- `pnpm i18n:scan` passes for English keys (MVP)
+- Badge filters display correctly in English (MVP)
+- Post-MVP: All 8 languages complete, RTL layouts tested
+
+---
+
+### Phase 7: Testing and Quality Assurance
+
+**Estimated Effort**: 8 hours
+
+#### Tasks
+
+1. **Early Integration Test** (Build this in Phase 1 for structural validation)
+   - [ ] `src/hooks/__tests__/useExerciseFilter.badge-integration.test.ts`
+     - Test complete flow: badge selection → filtering → persistence
+     - Verify filter state updates correctly
+     - Test localStorage save/load with badges
+     - Validate multi-badge filtering logic
+     - **Run this after Phase 1 to catch structural issues early**
+
+2. **Unit Tests**
+   - [ ] `src/utils/catalogBadges.test.ts`
+     - Test value discovery with caching
+     - Test badge matching logic
+     - Test edge cases (empty badges, missing tags)
+     - Test regex extraction patterns
+   
+   - [ ] `src/hooks/useBadgeValues.test.ts`
+     - Test memoization behavior
+     - Test cache invalidation on catalog/badge change
+     - Test dynamic discovery performance
+   
+   - [ ] `src/hooks/useExerciseFilter.test.ts`
+     - Test badge filtering
+     - Test multiple badge selections
+     - Test filter persistence
+     - Test catalog switching
+     - Test backward compatibility with old Kyu format
+   
+   - [ ] `src/components/BadgeFilter.test.tsx`
+     - Test single vs multiple selection
+     - Test value toggling
+     - Test clear functionality
+
+3. **Integration Tests**
+   - [ ] Exercise page badge filtering (filtering exercises by badge)
+   - [ ] Exercise details page badge display (showing badges of a single exercise)
+   - [ ] Exercise form badge selection (selecting badges when creating/editing)
+   - [ ] Standalone shared exercise badge display (showing badges in shared view)
+   - [ ] Workout builder with badge filters (filtering available exercises)
+
+4. **E2E Tests** (`tests/e2e/catalog-badges.spec.ts` - NEW)
+   - [ ] User selects badge values and sees filtered results
+   - [ ] User creates exercise with badges offline
+   - [ ] Badges persist in IndexedDB across page reloads
+   - [ ] User creates exercise → goes online → badges sync to Supabase
+   - [ ] Dual-session test: Create on Device A → Sync → Appears on Device B
+   - [ ] Conflict resolution: Edit tags on both devices offline → Both sync → Union merge works
+   - [ ] Badge filtering works on synced exercises
+   - [ ] Shared exercise badges display correctly
+
+5. **Manual Testing Checklist**
+   - [ ] Test on mobile devices (iOS/Android)
+   - [ ] Test in all supported languages
+   - [ ] Test with screen readers
+   - [ ] Test keyboard navigation
+   - [ ] Test with reduced motion enabled
+   - [ ] **Test offline functionality**:
+     - Create exercise with badges while offline
+     - Verify badges saved to IndexedDB
+     - Go online and verify sync to Supabase
+   - [ ] **Test cross-device sync**:
+     - Create exercise on Phone → Sync → Verify on Desktop
+     - Edit badges on Desktop → Sync → Verify on Phone
+   - [ ] **Test conflict scenarios**:
+     - Edit same exercise on two devices offline
+     - Bring both online
+     - Verify tag merge (union) works correctly
+   - [ ] **Test migration scenarios**:
+     - Exercises with old category field still filter correctly
+     - Exercises with category badge filter correctly
+     - Mixed exercises (some with field, some with badge) work together
+
+#### Acceptance Criteria
+- All unit tests pass
+- Integration tests pass
+- E2E tests pass
+- Manual testing checklist complete
+- No accessibility regressions
+
+---
+
+### Phase 8: Documentation and Migration
+
+**Estimated Effort**: 4 hours
+
+#### Tasks
+
+1. **Update Documentation**
+   
+   **`docs/exercise-catalog.md`**
+   - [ ] Add "Badge System" section
+   - [ ] Document badge type definitions
+   - [ ] Provide examples for each badge approach
+   - [ ] Update "Add a New Catalog" checklist to include badges
+   - [ ] Add badge-related i18n requirements
+   - [ ] Document tag naming conventions for badges
+   
+   **Create `docs/catalog-badge-system.md`** (NEW)
+   - [ ] Comprehensive badge system guide
+   - [ ] Badge type reference
+   - [ ] Value discovery documentation
+   - [ ] Tag pattern examples
+   - [ ] UI integration guide
+   - [ ] Developer workflow for adding badges
+
+2. **Migration Guide**
+   
+   **Create `docs/migration-guides/catalog-badges-migration.md`** (NEW)
+   - [ ] Document changes from Kyu-specific to generic badges
+   - [ ] Provide code examples for common patterns
+   - [ ] List breaking changes (if any)
+   - [ ] Migration path for saved filter preferences
+
+3. **Code Comments**
+   - [ ] Add JSDoc comments to all badge-related types
+   - [ ] Document complex badge matching logic
+   - [ ] Add examples in inline comments
+
+4. **CHANGELOG.md Update**
+   ```markdown
+   ### [Version] - 2025-01-XX
+   
+   #### Added
+   - Generic catalog badge system supporting multiple badges per catalog
+   - Dynamic badge value discovery from exercise tags
+   - Badge filtering in ExerciseSelector and ExercisePage
+   - Badge selection in exercise create/edit forms
+   - Badge display in exercise details page
+   - Internationalization support for all catalog badges
+   
+   #### Changed
+   - Replaced hardcoded Aikido Kyu filtering with generic badge system
+   - Updated filter state structure to use `selectedBadges` instead of `selectedKyuLevels`
+   - Enhanced catalog definitions to include badge metadata
+   
+   #### Deprecated
+   - `selectedKyuLevels` in filter state (migrated to `selectedBadges`)
+   
+   #### Removed
+   - Aikido-specific filter UI components
+   ```
+
+#### Acceptance Criteria
+- Documentation is comprehensive and clear
+- Migration guide covers all breaking changes
+- Code comments added to complex sections
+- CHANGELOG.md updated
+
+---
+
+## Technical Specifications
+
+### Database Schema Changes
+
+#### Supabase Migration
+
+```sql
+-- Migration: Make category optional and add tag index
+-- File: supabase/migrations/YYYYMMDDHHMMSS_add_badge_support.sql
+
+-- 1. Make category nullable (for new badge-only exercises)
+ALTER TABLE exercises 
+ALTER COLUMN category DROP NOT NULL;
+
+-- 2. Add comment documenting deprecation
+COMMENT ON COLUMN exercises.category IS 
+  'DEPRECATED: Use category badge in tags array instead. 
+   Kept for backward compatibility. New exercises should use tags.';
+
+-- 3. Add GIN index for efficient tag filtering
+CREATE INDEX IF NOT EXISTS idx_exercises_tags 
+ON exercises USING GIN (tags);
+
+-- 4. Verify tags column exists and is TEXT[]
+-- (Should already exist, but verify)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'exercises' 
+    AND column_name = 'tags'
+  ) THEN
+    ALTER TABLE exercises ADD COLUMN tags TEXT[] DEFAULT '{}';
+  END IF;
+END $$;
+
+-- 5. Add check constraint for tag format (optional, for data integrity)
+ALTER TABLE exercises
+ADD CONSTRAINT check_tag_format
+CHECK (
+  tags IS NULL OR
+  array_length(tags, 1) IS NULL OR
+  array_length(tags, 1) <= 50  -- Max 50 tags per exercise
+);
+```
+
+#### IndexedDB Schema
+
+```typescript
+// src/db/schema.ts
+
+interface Exercise {
+  id: string;
+  name: string;
+  description?: string;
+  catalogId: string;
+  
+  // DEPRECATED: Use category badge in tags instead
+  // Kept for backward compatibility
+  category?: ExerciseCategory;
+  
+  // Badge data stored here
+  tags: string[];  // e.g., ['category:core', 'equipment:bodyweight', 'kyu:3']
+  
+  // Exercise metadata
+  exercise_type: 'time_based' | 'repetition_based';
+  default_duration?: number;
+  default_sets?: number;
+  default_reps?: number;
+  
+  // User-created exercise fields
+  owner_id?: string;
+  is_favorite?: boolean;
+  
+  // Sync metadata
+  created_at: string;
+  updated_at: string;
+  version: number;
+  deleted: boolean;
+  dirty: number;  // 0 = clean, 1 = needs sync
+}
+
+// Dexie schema update (increment version if needed)
+db.version(X).stores({
+  exercises: 'id, owner_id, catalogId, updated_at, dirty, *tags, [catalogId+*tags]',
+  // Note: *tags creates a multi-entry index for array search
+  // Note: [catalogId+*tags] creates a compound index for "all exercises in catalog X with tag Y"
+  //       This keeps list screens snappy as data grows (e.g., 1000+ exercises)
+  // ...other tables
+});
+```
+
+### Badge Matching Algorithm
+
+```typescript
+function matchesBadgeFilter(
+  exercise: Exercise,
+  badge: CatalogBadge,
+  selectedValues: Set<string | number>
+): boolean {
+  // No selection means no filter applied
+  if (selectedValues.size === 0) return true;
+  
+  const { tagPattern } = badge;
+  if (!tagPattern) return true;
+  
+  const { prefix = '', suffix = '', extractPattern } = tagPattern;
+  const exerciseTags = new Set(exercise.tags || []);
+  
+  // Try to find at least one matching tag
+  for (const value of selectedValues) {
+    if (extractPattern) {
+      // Regex-based matching
+      for (const tag of exerciseTags) {
+        const match = tag.match(extractPattern);
+        if (match && match[1] === String(value)) {
+          return true;
+        }
+      }
+    } else {
+      // Prefix/suffix matching
+      const targetTag = `${prefix}${value}${suffix}`;
+      if (exerciseTags.has(targetTag)) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+```
+
+### Value Discovery Algorithm (Cached)
+
+```typescript
+// Hook with memoization for performance
+function useBadgeValues(
+  exercises: Exercise[],
+  catalogId: string,
+  badge: CatalogBadge
+): BadgeValue[] {
+  // Compile regex once and reuse (cost control for extractPattern)
+  const compiledRegex = useMemo(() => {
+    return badge.tagPattern?.extractPattern || null;
+  }, [badge.id]); // Only recompile if badge changes
+  
+  return useMemo(() => {
+    // If values are predefined, return them
+    if (badge.values && !badge.dynamicDiscovery) {
+      return badge.values;
+    }
+    
+    // Handle computed badges (read-only, derived from other data)
+    if (badge.computed) {
+      return computeBadgeValues(exercises, catalogId, badge);
+    }
+    
+    // Discover from tags
+    const { tagPattern } = badge;
+    if (!tagPattern) return badge.values || [];
+    
+    const discoveredValues = new Set<string>();
+    const { prefix = '' } = tagPattern;
+    
+    for (const exercise of exercises) {
+      if (exercise.catalogId !== catalogId) continue;
+      
+      for (const tag of exercise.tags || []) {
+        let value: string;
+        
+        if (compiledRegex) {
+          const match = tag.match(compiledRegex);
+          if (!match || !match[1]) continue;
+          value = match[1];
+        } else if (prefix) {
+          if (!tag.startsWith(prefix)) continue;
+          value = tag.substring(prefix.length);
+        } else {
+          value = tag;
+        }
+        
+        discoveredValues.add(value);
+      }
+    }
+    
+    // Convert to badge values
+    return Array.from(discoveredValues)
+      .sort()
+      .map(value => ({
+        id: value,
+        label: `catalogs:${catalogId}.badges.${badge.id}.values.${value}`,
+        fallbackLabel: value
+      }));
+  }, [exercises, catalogId, badge.id, badge.values, badge.dynamicDiscovery, badge.computed, compiledRegex]); // Cache key
+}
+
+// Helper for computed badges
+function computeBadgeValues(
+  exercises: Exercise[],
+  catalogId: string,
+  badge: CatalogBadge
+): BadgeValue[] {
+  const values = new Set<string>();
+  
+  for (const exercise of exercises) {
+    if (exercise.catalogId !== catalogId) continue;
+    
+    // Example computed badges
+    switch (badge.id) {
+      case 'hasVideo':
+        if (exercise.has_video || exercise.custom_video_url) {
+          values.add('yes');
+        } else {
+          values.add('no');
+        }
+        break;
+      
+      case 'durationRange':
+        if (exercise.default_duration) {
+          const mins = Math.floor(exercise.default_duration / 60);
+          if (mins < 5) values.add('0-5min');
+          else if (mins < 15) values.add('5-15min');
+          else if (mins < 30) values.add('15-30min');
+          else values.add('30min+');
+        }
+        break;
+    }
+  }
+  
+  return Array.from(values).map(value => ({
+    id: value,
+    label: `catalogs:${catalogId}.badges.${badge.id}.values.${value}`,
+    fallbackLabel: value
+  }));
+}
+```
+
+### Badge Extraction for Display
+
+```typescript
+/**
+ * Extract badge values from an exercise for display purposes
+ * Used in ExerciseDetailsPage, StandaloneSharedExercisePage, etc.
+ */
+function extractExerciseBadges(
+  exercise: Exercise,
+  catalogBadges: CatalogBadge[]
+): Array<{ badge: CatalogBadge; values: BadgeValue[] }> {
+  const result: Array<{ badge: CatalogBadge; values: BadgeValue[] }> = [];
+  
+  if (!exercise.tags || exercise.tags.length === 0) {
+    return result;
+  }
+  
+  const exerciseTags = new Set(exercise.tags);
+  
+  for (const badge of catalogBadges) {
+    const matchedValues: BadgeValue[] = [];
+    const { tagPattern } = badge;
+    
+    if (!tagPattern) continue;
+    
+    const { prefix = '', suffix = '', extractPattern } = tagPattern;
+    
+    // Get all badge values (predefined or discovered)
+    const availableValues = badge.values || [];
+    
+    for (const value of availableValues) {
+      let matches = false;
+      
+      if (extractPattern) {
+        // Regex-based matching
+        for (const tag of exerciseTags) {
+          const match = tag.match(extractPattern);
+          if (match && match[1] === String(value.id)) {
+            matches = true;
+            break;
+          }
+        }
+      } else {
+        // Prefix/suffix matching
+        const targetTag = `${prefix}${value.id}${suffix}`;
+        if (exerciseTags.has(targetTag)) {
+          matches = true;
+        }
+      }
+      
+      if (matches) {
+        matchedValues.push(value);
+      }
+    }
+    
+    if (matchedValues.length > 0) {
+      result.push({ badge, values: matchedValues });
+    }
+  }
+  
+  return result;
+}
+
+// Usage in components:
+const ExerciseDetailsBadgeDisplay: React.FC<{ exercise: Exercise }> = ({ exercise }) => {
+  const { t } = useTranslation(['catalogs']);
+  const catalogBadges = getCatalogBadges(exercise.catalogId);
+  const exerciseBadges = extractExerciseBadges(exercise, catalogBadges);
+  
+  if (exerciseBadges.length === 0) return null;
+  
+  return (
+    <div className="badge-section">
+      <h3>{t('common.badges', { defaultValue: 'Badges' })}</h3>
+      {exerciseBadges.map(({ badge, values }) => (
+        <div key={badge.id} className="badge-group">
+          <span className="badge-label">{t(badge.label)}:</span>
+          <div className="badge-values">
+            {values.map(value => (
+              <span key={value.id} className="badge-value">
+                {value.icon && <span>{value.icon}</span>}
+                {value.labelParams 
+                  ? t(value.label, value.labelParams) 
+                  : t(value.label, { defaultValue: value.fallbackLabel || value.id })}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+### Filter State Persistence
+
+```typescript
+// Saving
+localStorage.setItem(storageKey, JSON.stringify({
+  selectedCatalogId,
+  selectedCategories: Array.from(selectedCategories),
+  searchTerm,
+  showFavoritesOnly,
+  exerciseFilter,
+  sortBy,
+  selectedBadges: Object.fromEntries(
+    Object.entries(selectedBadges).map(([badgeId, values]) => [
+      badgeId,
+      Array.from(values)
+    ])
+  )
+}));
+
+// Loading
+const parsed = JSON.parse(localStorage.getItem(storageKey));
+const selectedBadges = Object.fromEntries(
+  Object.entries(parsed.selectedBadges || {}).map(([badgeId, values]) => [
+    badgeId,
+    new Set(values)
+  ])
+);
+```
+
+---
+
+## Data Flow Diagrams
+
+### Badge Filtering Flow
+
+```
+User selects badge value
+    ↓
+useExerciseFilter.toggleBadgeValue(badgeId, value)
+    ↓
+Update filterState.selectedBadges
+    ↓
+Trigger filteredExercises recalculation
+    ↓
+For each exercise:
+  - Get catalog badges
+  - For each badge with selections:
+    - matchesBadgeFilter(exercise, badge, selectedValues)
+    - Check tags match pattern
+  - Include if all badge filters match
+    ↓
+Return filtered exercise list
+    ↓
+UI updates to show filtered results
+```
+
+### Exercise Creation with Badges (User-Created Exercises)
+
+```
+DEVICE A - Creation Flow
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. User navigates to Create Exercise page
+   ↓
+2. User selects catalog (e.g., "General Fitness")
+   ↓
+3. ExerciseFormPage loads catalog badges:
+   - Category badge (Core, Strength, Cardio, etc.)
+   - Equipment badge (Bodyweight, Dumbbells, etc.)
+   - Intensity badge (Low, Moderate, High)
+   ↓
+4. User fills in exercise details:
+   - Name: "Modified Push-ups"
+   - Description: "Push-ups with knees on ground"
+   - Type: rep_based
+   ↓
+5. User selects badges:
+   - Category: ✓ Strength
+   - Equipment: ✓ Bodyweight
+   - Intensity: ○ Moderate (radio button)
+   ↓
+6. Form validation passes
+   ↓
+7. Convert to tags array:
+   tags = ['category:strength', 'equipment:bodyweight', 'intensity:moderate']
+   ↓
+8. Save to IndexedDB (OFFLINE-FIRST):
+   {
+     id: '550e8400-e29b-41d4-a716-446655440000',
+     name: 'Modified Push-ups',
+     catalogId: 'general-fitness',
+     tags: ['category:strength', 'equipment:bodyweight', 'intensity:moderate'],
+     owner_id: 'user-123',
+     dirty: 1,  // Mark for sync
+     version: 1,
+     created_at: '2025-01-08T10:00:00Z'
+   }
+   ↓
+9. User sees success message: "Exercise created! Will sync when online."
+
+BACKGROUND SYNC (When Online)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. CorrectSyncService detects dirty record
+    ↓
+11. Push to Supabase via sync_v2 edge function:
+    POST /functions/v1/sync_v2
+    {
+      push: {
+        exercises: [{
+          id: '550e8400-...',
+          tags: ['category:strength', 'equipment:bodyweight', 'intensity:moderate'],
+          // ... other fields
+        }]
+      }
+    }
+    ↓
+12. Edge function validates:
+    - owner_id matches authenticated user ✓
+    - tags is array of strings ✓
+    - tag format valid (prefix:value) ✓
+    - No malicious content ✓
+    ↓
+13. Insert into Supabase exercises table:
+    INSERT INTO exercises (id, tags, ...) VALUES (...)
+    ↓
+14. Response: { success: true, version: 1 }
+    ↓
+15. Mark record as clean in IndexedDB (dirty: 0)
+
+DEVICE B - Sync & Display Flow
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+16. User logs in on Device B
+    ↓
+17. Full sync triggered automatically
+    ↓
+18. Pull from Supabase:
+    GET /functions/v1/sync_v2?mode=full
+    {
+      pull: {
+        exercises: [{
+          id: '550e8400-...',
+          tags: ['category:strength', 'equipment:bodyweight', 'intensity:moderate'],
+          owner_id: 'user-123',
+          // ... other fields
+        }]
+      }
+    }
+    ↓
+19. Store in IndexedDB on Device B
+    ↓
+20. User navigates to Exercise List
+    ↓
+21. Badge filters available:
+    - Category: Strength ✓
+    - Equipment: Bodyweight ✓
+    - Intensity: Moderate ✓
+    ↓
+22. User selects "Equipment: Bodyweight" filter
+    ↓
+23. useExerciseFilter matches exercise via tags
+    ↓
+24. Exercise appears in filtered results
+    ↓
+25. User clicks exercise to view details
+    ↓
+26. ExerciseBadgeDisplay extracts and shows badges:
+    📊 Category: Strength
+    🏋️ Equipment: Bodyweight
+    ⚡ Intensity: Moderate
+
+CONCURRENT EDIT SCENARIO (Conflict Resolution)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Device A (offline): Adds tag 'focus:upper-body'
+  → tags = ['category:strength', 'equipment:bodyweight', 'intensity:moderate', 'focus:upper-body']
+  → version: 2
+
+Device B (offline): Adds tag 'difficulty:beginner'
+  → tags = ['category:strength', 'equipment:bodyweight', 'intensity:moderate', 'difficulty:beginner']
+  → version: 2
+
+Both come online and sync:
+  ↓
+Conflict detected (both version 2)
+  ↓
+Tag array merge strategy (UNION):
+  → Final tags = ['category:strength', 'equipment:bodyweight', 'intensity:moderate', 'focus:upper-body', 'difficulty:beginner']
+  → version: 3
+  ↓
+Both devices receive merged result
+  ↓
+No data loss - both tags preserved ✓
+```
+
+---
+
+## Migration Strategy
+
+### Backward Compatibility
+
+1. **Category Field Migration**
+   ```typescript
+   // Exercise type change: category becomes optional
+   interface Exercise {
+     // ... other fields
+     category?: ExerciseCategory;  // DEPRECATED: Use category badge instead
+     tags: string[];               // Include 'category:X' tags
+   }
+   
+   // Backward compatibility in filtering
+   function getExerciseCategory(exercise: Exercise): string | null {
+     // First check tags for category badge
+     const categoryTag = exercise.tags?.find(tag => tag.startsWith('category:'));
+     if (categoryTag) {
+       return categoryTag.substring(9); // Remove 'category:' prefix
+     }
+     
+     // Fall back to legacy category field
+     return exercise.category || null;
+   }
+   ```
+
+2. **Saved Filter Preferences**
+   ```typescript
+   // Migrate old filter formats to badge system
+   function migrateFilterPreferences(parsed: any): ExerciseFilterState {
+     const selectedBadges: Record<string, Set<string | number>> = {};
+     
+     // Migrate old Kyu levels
+     if (parsed.selectedKyuLevels && Array.isArray(parsed.selectedKyuLevels)) {
+       selectedBadges.kyuLevel = new Set(parsed.selectedKyuLevels);
+     }
+     
+     // Migrate old categories
+     if (parsed.selectedCategories && Array.isArray(parsed.selectedCategories)) {
+       selectedBadges.category = new Set(parsed.selectedCategories);
+     }
+     
+     return { ...parsed, selectedBadges };
+   }
+   ```
+
+3. **Exercise Data Migration**
+   - All exercises keep existing `category` field for backward compatibility
+   - Add `category:X` tags to all exercises during Phase 3
+   - Filtering works with both category field and category badge
+   - Future exercises can omit `category` field and use only tags
+
+4. **UI Components**
+   - Remove CategoryFilter component references
+   - Remove old Kyu-specific components
+   - Generic badge components replace them
+   - No user-facing breaking changes - category filtering still works
+
+---
+
+## Gotchas & Best Practices
+
+### Critical Implementation Details
+
+#### 1. **AND vs OR Semantics** (Filtering Logic)
+```typescript
+// IMPORTANT: Badge filtering uses AND across badges, OR within a badge
+// Example: User selects:
+//   - Category: [Core, Strength]  (OR within badge)
+//   - Equipment: [Bodyweight]      (OR within badge)
+// Result: Show exercises that are:
+//   (Core OR Strength) AND (Bodyweight)
+
+// Implementation in useExerciseFilter:
+function matchesAllBadges(exercise: Exercise, selectedBadges: Record<string, Set<any>>): boolean {
+  // AND across different badges
+  for (const [badgeId, selectedValues] of Object.entries(selectedBadges)) {
+    if (selectedValues.size === 0) continue; // Skip if no selection
+    
+    const badge = getCatalogBadge(badgeId);
+    const matches = matchesBadgeFilter(exercise, badge, selectedValues); // OR within badge
+    
+    if (!matches) return false; // AND: Must match ALL badges
+  }
+  return true;
+}
+
+// Add explicit comments in code and tests documenting this behavior
+```
+
+#### 2. **Mixed Legacy + New Data** (Backward Compatibility)
+```typescript
+// ALWAYS check tags first, then fall back to legacy category field
+// Wire this helper EVERYWHERE: list views, detail views, filtering
+
+function getExerciseCategory(exercise: Exercise): string | null {
+  // 1. Check tags for category badge (NEW)
+  const categoryTag = exercise.tags?.find(tag => tag.startsWith('category:'));
+  if (categoryTag) {
+    return categoryTag.substring(9); // Remove 'category:' prefix
+  }
+  
+  // 2. Fall back to legacy category field (OLD)
+  return exercise.category || null;
+}
+
+// Use in filtering:
+const matchesCategory = (() => {
+  if (selectedBadges.category?.size === 0) return true;
+  const exerciseCategory = getExerciseCategory(exercise);
+  return exerciseCategory && selectedBadges.category.has(exerciseCategory);
+})();
+
+// Use in display:
+const ExerciseBadgeDisplay = ({ exercise }) => {
+  const category = getExerciseCategory(exercise);
+  // ... render category badge
+};
+```
+
+#### 3. **Form Catalog Switch** (State Management)
+```typescript
+// CRITICAL: Clear ALL badge selections when catalog changes
+// This is a classic footgun - test thoroughly!
+
+const ExerciseFormPage = () => {
+  const [selectedCatalog, setSelectedCatalog] = useState('general-fitness');
+  const [badgeSelections, setBadgeSelections] = useState<Record<string, Set<any>>>({});
+  
+  const handleCatalogChange = (newCatalogId: string) => {
+    setSelectedCatalog(newCatalogId);
+    
+    // IMPORTANT: Clear all badge selections
+    setBadgeSelections({});
+    
+    // Also clear form validation errors
+    setValidationErrors([]);
+  };
+  
+  // Add test case:
+  it('clears badge selections when catalog changes', () => {
+    // 1. Select General Fitness catalog
+    // 2. Select Category: Core, Equipment: Bodyweight
+    // 3. Switch to Aikido catalog
+    // 4. Verify badge selections are empty
+    // 5. Verify no stale tags from previous catalog
+  });
+};
+```
+
+#### 4. **Regex Compilation Cost** (Performance)
+```typescript
+// Compile regex ONCE per badge, reuse across all filtering operations
+// Store in useMemo keyed by badge.id
+
+const BadgeFilterGroup = ({ catalogId, exercises }) => {
+  const badges = getCatalogBadges(catalogId);
+  
+  // Compile all regexes once
+  const compiledRegexes = useMemo(() => {
+    return badges.reduce((acc, badge) => {
+      if (badge.tagPattern?.extractPattern) {
+        acc[badge.id] = badge.tagPattern.extractPattern;
+      }
+      return acc;
+    }, {} as Record<string, RegExp>);
+  }, [catalogId]); // Only recompile when catalog changes
+  
+  // Use in filtering without recompiling
+  const matchesTag = (tag: string, badgeId: string) => {
+    const regex = compiledRegexes[badgeId];
+    return regex ? regex.test(tag) : false;
+  };
+};
+```
+
+#### 5. **Computed Badge Handling** (Read-Only)
+```typescript
+// Computed badges are NOT editable in forms, only displayed/filterable
+// Examples: hasVideo, durationRange, difficultyLevel (derived)
+
+const ExerciseFormPage = () => {
+  const badges = getCatalogBadges(selectedCatalog);
+  
+  return (
+    <>
+      {badges.map(badge => {
+        // Skip computed badges in form
+        if (badge.computed) return null;
+        
+        return <BadgeSelector key={badge.id} badge={badge} />;
+      })}
+    </>
+  );
+};
+
+// But show them in filters and display
+const ExerciseBadgeDisplay = ({ exercise }) => {
+  const badges = getCatalogBadges(exercise.catalogId);
+  
+  return (
+    <>
+      {badges.map(badge => {
+        // Show ALL badges, including computed
+        const value = badge.computed 
+          ? computeBadgeValue(exercise, badge)
+          : extractBadgeFromTags(exercise, badge);
+        
+        return <Badge key={badge.id} label={badge.label} value={value} />;
+      })}
+    </>
+  );
+};
+```
+
+#### 6. **Mobile UX Density** (Progressive Disclosure)
+```typescript
+// Show first 3 badges, collapse rest under "More filters"
+const BadgeFilterGroup = ({ badges }) => {
+  const [showAll, setShowAll] = useState(false);
+  const visibleBadges = showAll ? badges : badges.slice(0, 3);
+  
+  return (
+    <>
+      {visibleBadges.map(badge => <BadgeFilter key={badge.id} badge={badge} />)}
+      
+      {badges.length > 3 && (
+        <button onClick={() => setShowAll(!showAll)}>
+          {showAll ? 'Show fewer filters' : `More filters (${badges.length - 3})`}
+        </button>
+      )}
+    </>
+  );
+};
+```
+
+---
+
+## Testing Strategy
+
+### Test Coverage Goals
+
+| Component | Target Coverage |
+|-----------|----------------|
+| Badge utilities | 90%+ |
+| Filter hook | 85%+ |
+| Badge components | 80%+ |
+| Page integrations | 70%+ |
+
+### Test Scenarios
+
+1. **Single Catalog, Single Badge**
+   - Select badge value
+   - Verify filtered results
+   - Clear selection
+   - Verify full results
+
+2. **Single Catalog, Multiple Badges (AND/OR Logic)**
+   - Select Category: [Core, Strength] + Equipment: [Bodyweight]
+   - Verify AND across badges: Must have (Core OR Strength) AND Bodyweight
+   - Add explicit test assertions for AND/OR semantics
+   - Clear one badge
+   - Verify partial filtering
+
+3. **Catalog Switching (State Management)**
+   - Select General Fitness catalog
+   - Select Category: Core, Equipment: Bodyweight
+   - Switch to Aikido catalog
+   - **Verify badge selections are EMPTY** (critical test!)
+   - Verify no stale tags from previous catalog
+   - Switch back to General Fitness
+   - Verify badge selections restored (if persisted)
+
+4. **Dynamic Discovery**
+   - Load catalog with dynamic badges
+   - Verify values discovered from exercises
+   - Create new exercise with new tag
+   - Verify new value appears in filter
+
+5. **User-Created Exercises with Validation**
+   - Create exercise with valid badge tags
+   - Verify client-side validation passes
+   - Try to create exercise with invalid tags (e.g., `invalid tag format`)
+   - Verify save is blocked
+   - Verify error message shown
+   - Fix tags and save successfully
+   - Verify filtering works
+   - Sync to server
+   - Verify tags preserved
+
+6. **Mixed Legacy + New Data**
+   - Exercise A: Has `category` field only (legacy)
+   - Exercise B: Has `category:core` tag only (new)
+   - Exercise C: Has both field and tag (migration state)
+   - Filter by Category: Core
+   - Verify ALL three exercises appear
+   - Verify display shows correct category for all
+
+7. **Computed Badges**
+   - Filter by hasVideo: Yes
+   - Verify only exercises with videos appear
+   - Open exercise form
+   - Verify hasVideo badge NOT editable
+   - Verify other badges ARE editable
+
+8. **Mobile UX Density**
+   - Load catalog with 5+ badges
+   - Verify only first 3 visible
+   - Click "More filters"
+   - Verify all badges visible
+   - Test on mobile viewport (375px width)
+
+9. **Regex Performance**
+   - Load catalog with regex-based badges
+   - Filter 1000+ exercises
+   - Verify filtering completes in <100ms
+   - Verify regex compiled once (check useMemo)
+
+10. **Accessibility**
+    - Navigate with keyboard
+    - Use screen reader
+    - Test ARIA labels
+    - Test focus management
+
+---
+
+## Rollout Plan
+
+### Development Phases
+
+**Total Estimated Effort**: ~47 hours (includes sync enhancements)
+
+1. **Week 1**: Core infrastructure (Phases 1-2)
+   - Phase 1: 4 hours (includes early integration test)
+   - Phase 2: 6 hours (functional UI first, styling later)
+2. **Week 2**: Catalog definitions and page integration (Phases 3-4)
+   - Phase 3: 8 hours (includes category-to-tag migration)
+   - Phase 4: 10 hours (includes ExerciseFormPage badge input UI)
+3. **Week 3**: Sync, testing, and English i18n (Phases 5-7)
+   - Phase 5: 8 hours (database schema + full sync support + conflict resolution)
+   - Phase 6: 3 hours (English only for MVP)
+   - Phase 7: 8 hours (includes dual-device sync tests)
+4. **Post-MVP**: Documentation and internationalization (Phase 8 + i18n)
+   - Phase 8: 4 hours
+   - Translation pipeline: 5 hours (automated + review)
+
+### Deployment Strategy
+
+1. **Feature Flag** (Optional)
+   ```typescript
+   export const FEATURES = {
+     CATALOG_BADGES: true  // Enable/disable badge system
+   };
+   ```
+
+2. **Staged Rollout**
+   - Deploy to development environment
+   - Internal testing (2 days)
+   - Deploy to production
+   - Monitor for issues
+
+3. **Monitoring**
+   - Track filter usage analytics
+   - Monitor sync performance with badges
+   - Watch for i18n errors
+   - Check for user feedback
+
+---
+
+## Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Performance impact with many badges | Medium | Medium | Implement memoization, limit badge count per catalog |
+| Sync conflicts with tag arrays | Low | High | Thorough testing of sync system, use array merge strategy |
+| i18n key explosion | Medium | Low | Use consistent naming patterns, automated validation |
+| Breaking changes for users | Low | Medium | Backward compatibility for saved filters |
+| Complex UI on mobile | Medium | Medium | Responsive design testing, collapsible badge groups |
+
+---
+
+## Success Metrics
+
+1. **Functionality**
+   - All catalogs have appropriate badges
+   - Badge filtering works on all pages
+   - Zero regressions in existing features
+
+2. **Performance**
+   - Filter operations complete in <100ms
+   - No impact on page load times
+   - Sync performance unchanged
+
+3. **User Experience**
+   - Intuitive badge selection
+   - Clear visual feedback
+   - Accessible to all users
+   - Works offline
+
+4. **Code Quality**
+   - 80%+ test coverage
+   - No linting errors
+   - Documentation complete
+   - i18n scan passes
+
+---
+
+## Future Enhancements
+
+1. **Badge Presets**
+   - Save common badge combinations
+   - Quick-select popular filters
+
+2. **Badge Analytics**
+   - Track most-used badges
+   - Optimize badge offerings
+
+3. **Advanced Badge Types**
+   - Range-based badges (e.g., duration 5-10 min)
+   - Hierarchical badges (parent-child relationships)
+   - Mutually exclusive badge groups
+
+4. **Badge Recommendations**
+   - Suggest badges based on user history
+   - Auto-tag exercises using ML
+
+5. **Community Badges**
+   - User-contributed badge values
+   - Voting on badge relevance
+
+---
+
+## Appendix
+
+### File Structure
+
+```
+apps/frontend/src/
+├── types/
+│   └── catalog.ts                    # NEW: Badge type definitions
+├── utils/
+│   └── catalogBadges.ts             # NEW: Badge utility functions
+├── hooks/
+│   └── useExerciseFilter.ts         # MODIFIED: Generic badge support
+├── components/
+│   ├── BadgeFilter.tsx              # NEW: Single badge filter component (for filtering)
+│   ├── BadgeFilterGroup.tsx         # NEW: Multi-badge group component (for filtering)
+│   ├── ExerciseBadgeDisplay.tsx     # NEW: Display badges of a single exercise
+│   ├── CategoryFilter.tsx           # DEPRECATED: Replaced by badge system (can be removed post-migration)
+│   ├── ExerciseSelector/
+│   │   └── ExerciseSelector.tsx     # MODIFIED: Remove Aikido hardcoding + CategoryFilter
+│   └── CatalogSelector.tsx          # NO CHANGES
+├── pages/
+│   ├── ExercisePage.tsx             # MODIFIED: Use BadgeFilterGroup for filtering
+│   ├── ExerciseDetailsPage.tsx      # MODIFIED: Use ExerciseBadgeDisplay to show exercise badges
+│   ├── ExerciseFormPage.tsx         # MODIFIED: Badge selection UI for create/edit
+│   └── StandaloneSharedExercise.tsx # MODIFIED: Use ExerciseBadgeDisplay to show exercise badges
+├── data/
+│   └── catalogs.ts                  # MODIFIED: Add badge definitions
+└── public/locales/
+    ├── en/catalogs.json             # MODIFIED: Add badge translations
+    ├── fr/catalogs.json             # MODIFIED: Add badge translations
+    ├── de/catalogs.json             # MODIFIED: Add badge translations
+    ├── es/catalogs.json             # MODIFIED: Add badge translations
+    ├── nl/catalogs.json             # MODIFIED: Add badge translations
+    ├── ar/catalogs.json             # MODIFIED: Add badge translations
+    ├── ar-EG/catalogs.json          # MODIFIED: Add badge translations
+    └── fy/catalogs.json             # MODIFIED: Add badge translations
+```
+
+### Key Dependencies
+
+- No new external dependencies required
+- Leverage existing i18n infrastructure
+- Use existing tag array support in sync system
+- Build on current catalog system
+
+---
+
+## Summary of Optimizations
+
+The implementation plan incorporates the following efficiency improvements:
+
+### 1. **Type System Simplification**
+- `filterType` is now optional and defaults to `'multiple'`
+- Reduces boilerplate in catalog definitions
+- Only need to specify `filterType: 'single'` for special cases (e.g., intensity level)
+
+### 2. **Performance Optimization**
+- New `useBadgeValues` hook with `useMemo` for cached discovery
+- Cache key: `[exercises, catalogId, badge.id, badge.values, badge.dynamicDiscovery]`
+- Prevents repeated regex scans on every render
+- Critical for catalogs with 50+ exercises and dynamic discovery
+
+### 3. **Accelerated Development Workflow**
+- Build `BadgeFilterGroup` first with minimal styling
+- Integrate into `ExerciseSelector` for functional testing
+- Refactor into polished `BadgeFilter` component after validation
+- Get working badge filtering in Week 1 instead of Week 2
+
+### 4. **i18n Iteration Efficiency**
+- MVP ships with English translations only
+- Other 7 locales generated via automated pipeline post-validation
+- Avoids 8× duplication during active development
+- Professional review of automated translations before release
+
+### 5. **Early Risk Detection**
+- Integration test built in Phase 1 (not Phase 7)
+- Tests: badge selection → filtering → persistence → catalog switching
+- Catches structural issues before UI implementation
+- Prevents costly refactoring later in development
+
+### 6. **Category System Unification**
+- Categories become a badge type instead of a separate field
+- `Exercise.category` field becomes optional (deprecated)
+- All catalogs define a `category` badge with their relevant categories
+- Backward compatibility maintained: existing category field still works
+- Eliminates duplicate filtering logic (CategoryFilter vs badge filtering)
+- Simplifies codebase by having one unified filtering system
+
+### Impact on Timeline
+- **Original estimate**: 54 hours over 4 weeks
+- **Optimized estimate**: 47 hours over 3 weeks (MVP with full sync)
+- **Post-MVP polish**: +5 hours (translations + final docs)
+- **Adjustment**: +2 hours for comprehensive sync support (schema, conflict resolution, validation)
+- **Net savings**: 7 hours of development time
+- **Additional benefits**: 
+  - Removes CategoryFilter component entirely
+  - Full offline-first + cross-device sync for user badges
+  - Unified filtering system reduces maintenance burden
+
+---
+
+**End of Implementation Plan**
+
+---
+
+## Summary: Badge System with Full Sync Support
+
+This comprehensive plan implements a flexible, catalog-specific badge system that:
+
+### ✅ Core Features
+- **Replaces hardcoded filtering** (Aikido Kyu, static categories) with flexible badge system
+- **Multiple badges per catalog** - each catalog defines 0+ badges relevant to its domain
+- **Three badge types**: Structured (numeric), Simple (categorical), Dynamic (discovered)
+- **Category unification** - categories become a badge type, eliminating CategoryFilter
+
+### ✅ Offline-First + Cross-Device Sync
+- **User creates exercise with badges offline** → Saved to IndexedDB immediately
+- **Automatic background sync** → Pushes to Supabase when online
+- **Cross-device propagation** → Exercise + badges appear on all user devices
+- **Conflict resolution** → Tag array merge (union) prevents data loss
+- **Schema support** → Both Supabase (GIN index) and IndexedDB handle tag arrays
+
+### ✅ Complete Data Flow
+1. User selects badges in ExerciseFormPage (Category, Equipment, Intensity, etc.)
+2. Badges convert to tags: `['category:strength', 'equipment:bodyweight']`
+3. Save to IndexedDB with `dirty: 1` flag
+4. Sync service pushes to Supabase via `sync_v2` edge function
+5. Server validates tags, stores in database
+6. Other devices pull exercise with tags
+7. Badge filters and display components work seamlessly
+
+### ✅ Backward Compatibility
+- Existing `category` field remains functional (deprecated)
+- Old filter preferences migrate automatically
+- Mixed exercises (field + badge) work together
+- No breaking changes for users
+
+### ✅ Security & Validation
+- Server-side tag validation (format, length, content)
+- Owner-based access control (existing RLS)
+- Sanitization prevents injection attacks
+- Max limits prevent abuse (50 tags per exercise, 100 chars per tag)
+
+This plan provides a complete roadmap for a production-ready badge system with full offline-first synchronization support across devices.
+

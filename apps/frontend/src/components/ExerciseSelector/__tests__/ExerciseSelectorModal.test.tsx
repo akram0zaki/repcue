@@ -126,8 +126,9 @@ describe('ExerciseSelectorModal', () => {
       />
     );
 
-    const backdrop = screen.getByRole('dialog').parentElement;
-    fireEvent.click(backdrop!);
+    // The backdrop div has role="dialog", clicking it should close
+    const backdrop = screen.getByRole('dialog');
+    fireEvent.click(backdrop);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
@@ -142,8 +143,9 @@ describe('ExerciseSelectorModal', () => {
       />
     );
 
-    const dialog = screen.getByRole('dialog');
-    fireEvent.click(dialog);
+    // Click the modal content (not the backdrop) - use the title as it's inside the modal content
+    const modalContent = screen.getByText('exercises:selectExercise');
+    fireEvent.click(modalContent);
 
     expect(mockOnClose).not.toHaveBeenCalled();
   });
@@ -175,10 +177,8 @@ describe('ExerciseSelectorModal', () => {
       />
     );
 
-    const backdrop = screen.getByRole('dialog').parentElement;
-    expect(backdrop).toHaveAttribute('aria-modal', 'true');
-
     const dialog = screen.getByRole('dialog');
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(dialog).toHaveAttribute('aria-labelledby', 'exercise-selector-title');
   });
 

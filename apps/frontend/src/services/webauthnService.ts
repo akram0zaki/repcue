@@ -8,15 +8,30 @@ import type {
 import { supabase } from '../config/supabase';
 import logger from '../utils/logger';
 
+export interface WebAuthnSession {
+  properties: {
+    hashed_token: string;
+    action_link: string;
+    email_otp: string;
+    redirect_to: string;
+    verification_type: string;
+  };
+  user: {
+    id: string;
+    email: string;
+    [key: string]: unknown;
+  };
+}
+
 export interface PasskeyRegistrationResult {
   success: boolean;
-  session?: unknown;
+  session?: WebAuthnSession;
   error?: string;
 }
 
 export interface PasskeyAuthenticationResult {
   success: boolean;
-  session?: unknown;
+  session?: WebAuthnSession;
   user?: {
     id: string;
     email: string;
@@ -304,7 +319,7 @@ export class WebAuthnService {
       const { data, error } = await supabase
         .from('user_authenticators')
         .select('id, device_name, created_at, last_used_at')
-        .eq('user_id', user.id)
+        .eq('owner_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -341,7 +356,7 @@ export class WebAuthnService {
         .from('user_authenticators')
         .delete()
         .eq('id', passkeyId)
-        .eq('user_id', user.id);
+        .eq('owner_id', user.id);
 
       if (error) {
         return { success: false, error: error.message };
@@ -370,7 +385,7 @@ export class WebAuthnService {
         .from('user_authenticators')
         .update({ device_name: deviceName })
         .eq('id', passkeyId)
-        .eq('user_id', user.id);
+        .eq('owner_id', user.id);
 
       if (error) {
         return { success: false, error: error.message };

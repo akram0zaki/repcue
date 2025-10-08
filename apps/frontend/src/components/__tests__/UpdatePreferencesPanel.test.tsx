@@ -402,8 +402,8 @@ describe('UpdatePreferencesPanel', () => {
       const meteredToggle = screen.getByRole('button', { name: /Allow updates on metered connections/ });
       const changelogToggle = screen.getByRole('button', { name: /Show what's new/ });
 
-      expect(meteredToggle).toHaveClass('bg-blue-600');
-      expect(changelogToggle).toHaveClass('bg-gray-200', 'dark:bg-gray-600');
+      expect(meteredToggle).toHaveClass('bg-primary-500');
+      expect(changelogToggle).toHaveClass('bg-gray-200');
     });
   });
 });

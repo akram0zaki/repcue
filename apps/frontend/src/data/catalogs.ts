@@ -33,12 +33,23 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     pictureUrl: '/images/catalogs/women-health-square.png'
   },
   {
+    id: 'aikido',
+    nameKey: 'aikido.name',
+    descriptionKey: 'aikido.description',
+    isDefault: false,
+    isPremium: true,
+    displayOrder: 2,
+    icon: 'aikido',
+    colorTheme: 'black',
+    pictureUrl: '/images/catalogs/aikido-square.png'
+  },
+  {
     id: 'tai-chi',
     nameKey: 'tai-chi.name',
     descriptionKey: 'tai-chi.description',
     isDefault: false,
     isPremium: true,
-    displayOrder: 2,
+    displayOrder: 3,
     icon: 'tai-chi',
     colorTheme: 'green',
     pictureUrl: '/images/catalogs/tai-chi-square.png'
@@ -49,7 +60,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     descriptionKey: 'zumba.description',
     isDefault: false,
     isPremium: true,
-    displayOrder: 3,
+    displayOrder: 4,
     icon: 'dance',
     colorTheme: 'purple',
     pictureUrl: '/images/catalogs/zumba-square.png'

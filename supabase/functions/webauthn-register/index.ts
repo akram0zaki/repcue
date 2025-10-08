@@ -68,11 +68,12 @@ serve(async (req) => {
       }
 
       // Check if user already exists
-      const { data: existingUser } = await supabase.auth.admin.getUserByEmail(body.email)
-      
+      const { data: existingUsers } = await supabase.auth.admin.listUsers()
+      const existingUser = existingUsers?.users?.find(user => user.email === body.email)
+
       let userID: string
-      if (existingUser?.user) {
-        userID = existingUser.user.id
+      if (existingUser) {
+        userID = existingUser.id
       } else {
         // Create new user for passkey registration
         const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
@@ -96,7 +97,23 @@ serve(async (req) => {
       const { data: existingAuthenticators } = await supabase
         .from('user_authenticators')
         .select('credential_id, credential_public_key, counter')
-        .eq('user_id', userID)
+        .eq('owner_id', userID)
+
+      console.log('Found existing authenticators:', existingAuthenticators?.length || 0)
+
+      // Check if user already has a passkey registered
+      if (existingAuthenticators && existingAuthenticators.length > 0) {
+        return new Response(
+          JSON.stringify({
+            error: 'Passkey already registered',
+            message: 'You already have a passkey registered for this account. Please sign in using your existing passkey.'
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        )
+      }
 
       // Use browser preferences if provided, otherwise use safe defaults
       const prefs = body.browserPreferences || {
@@ -119,9 +136,38 @@ serve(async (req) => {
       }
 
       // Use conservative transport list for better cross-browser compatibility
-      const transports: AuthenticatorTransport[] = prefs.authenticatorAttachment === 'platform' 
-        ? ['internal'] 
+      const transports: AuthenticatorTransport[] = prefs.authenticatorAttachment === 'platform'
+        ? ['internal']
         : ['usb', 'ble', 'nfc', 'internal'];
+
+      // Helper function to convert byte array to base64url
+      function arrayToBase64url(array: number[]): string {
+        const bytes = new Uint8Array(array);
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const base64 = btoa(binary);
+        // Convert base64 to base64url
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+      }
+
+      // Build excludeCredentials array safely
+      // SimpleWebAuthn v12+ expects credential IDs as base64url strings, not Uint8Arrays
+      const excludeCredentials = existingAuthenticators?.map((auth: { credential_id: string }) => {
+        try {
+          const credIdArray = JSON.parse(auth.credential_id);
+          return {
+            id: arrayToBase64url(credIdArray), // base64url string, not Uint8Array
+            transports
+          };
+        } catch (error) {
+          console.error('Failed to parse credential_id:', auth.credential_id, error);
+          return null;
+        }
+      }).filter((cred: { id: string; transports: AuthenticatorTransport[] } | null): cred is { id: string; transports: AuthenticatorTransport[] } => cred !== null) || [];
+
+      console.log('Exclude credentials count:', excludeCredentials.length)
 
       const options: GenerateRegistrationOptionsOpts = {
         rpName,
@@ -131,25 +177,40 @@ serve(async (req) => {
         userDisplayName: body.email.split('@')[0],
         timeout: 60000,
         attestationType: 'none',
-        excludeCredentials: existingAuthenticators?.map(auth => ({
-          id: new Uint8Array(JSON.parse(auth.credential_id)),
-          type: 'public-key',
-          transports
-        })) || [],
+        excludeCredentials,
         authenticatorSelection
       }
 
       const registrationOptions = await generateRegistrationOptions(options)
 
       // Store challenge in database for verification
+      // First delete any existing registration challenges for this user
       await supabase
         .from('webauthn_challenges')
-        .upsert({
-          user_id: userID,
+        .delete()
+        .eq('owner_id', userID)
+        .eq('type', 'registration')
+
+      // Insert new challenge
+      const { error: challengeError } = await supabase
+        .from('webauthn_challenges')
+        .insert({
+          owner_id: userID,
           challenge: registrationOptions.challenge,
           type: 'registration',
           expires_at: new Date(Date.now() + 5 * 60 * 1000).toISOString() // 5 minutes
         })
+
+      if (challengeError) {
+        console.error('Failed to store challenge:', challengeError)
+        return new Response(
+          JSON.stringify({ error: 'Failed to store challenge' }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        )
+      }
 
       return new Response(
         JSON.stringify({
@@ -176,44 +237,126 @@ serve(async (req) => {
       }
 
       // Get stored challenge
-      const { data: challengeRecord } = await supabase
+      const now = new Date().toISOString()
+      console.log('Looking up challenge for userID:', userID, 'at time:', now)
+
+      const { data: challengeRecord, error: lookupError } = await supabase
         .from('webauthn_challenges')
-        .select('challenge')
-        .eq('user_id', userID)
+        .select('challenge, expires_at')
+        .eq('owner_id', userID)
         .eq('type', 'registration')
-        .gt('expires_at', new Date().toISOString())
+        .gt('expires_at', now)
         .single()
 
+      if (lookupError) {
+        console.error('Challenge lookup error:', lookupError)
+      }
+
       if (!challengeRecord) {
+        // Try to see if there are any challenges at all for this user
+        const { data: allChallenges } = await supabase
+          .from('webauthn_challenges')
+          .select('*')
+          .eq('owner_id', userID)
+
+        console.log('No valid challenge found. All challenges for user:', allChallenges)
+
         return new Response(
-          JSON.stringify({ error: 'Invalid or expired challenge' }), 
-          { 
-            status: 400, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          JSON.stringify({
+            error: 'Invalid or expired challenge',
+            debug: { userID, allChallenges, lookupError: lookupError?.message }
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           }
         )
       }
 
+      console.log('Challenge found, expires at:', challengeRecord.expires_at)
+
+      // SimpleWebAuthn expects the credential response in RegistrationResponseJSON format
+      // The client already sends it in the correct format from startRegistration()
+      // We just need to pass it directly
+
+      // Use the origin array directly - SimpleWebAuthn will validate against it
       const opts: VerifyRegistrationResponseOpts = {
         response: body.response.credential,
         expectedChallenge: challengeRecord.challenge,
-        expectedOrigin: origin,
+        expectedOrigin: origin, // Use origin array
         expectedRPID: rpID,
       }
 
-      const verification = await verifyRegistrationResponse(opts)
+      let verification
+      try {
+        console.log('Calling verifyRegistrationResponse with opts:', {
+          hasResponse: !!opts.response,
+          expectedChallenge: opts.expectedChallenge,
+          expectedOrigin: opts.expectedOrigin,
+          expectedRPID: opts.expectedRPID
+        })
+        verification = await verifyRegistrationResponse(opts)
+        console.log('Verification result:', {
+          verified: verification.verified,
+          hasRegistrationInfo: !!verification.registrationInfo,
+          registrationInfo: verification.registrationInfo
+        })
+      } catch (error) {
+        console.error('Verification error:', error)
+        console.error('Credential structure:', JSON.stringify(body.response.credential))
+        return new Response(
+          JSON.stringify({
+            error: 'Passkey verification failed',
+            message: error instanceof Error ? error.message : 'Unknown error',
+            details: error instanceof Error ? error.stack : undefined
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400
+          }
+        )
+      }
+
+      console.log('Verification completed. verified:', verification.verified, 'hasRegistrationInfo:', !!verification.registrationInfo)
 
       if (verification.verified && verification.registrationInfo) {
-        const { credentialID, credentialPublicKey, counter } = verification.registrationInfo
+        // SimpleWebAuthn v12+ returns credential data in a nested structure
+        const { credential } = verification.registrationInfo
+
+        if (!credential?.publicKey) {
+          console.error('Missing credential data:', verification.registrationInfo)
+          return new Response(
+            JSON.stringify({
+              error: 'Invalid credential data',
+              details: 'Missing credential.publicKey'
+            }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 500
+            }
+          )
+        }
+
+        // Decode the credential ID from base64url
+        const credentialIdBase64url = credential.id
+        // Convert base64url to base64
+        const credentialIdBase64 = credentialIdBase64url.replace(/-/g, '+').replace(/_/g, '/')
+        // Decode to binary string
+        const credentialIdBinary = atob(credentialIdBase64)
+        // Convert to byte array
+        const credentialIdBytes = new Uint8Array(credentialIdBinary.length)
+        for (let i = 0; i < credentialIdBinary.length; i++) {
+          credentialIdBytes[i] = credentialIdBinary.charCodeAt(i)
+        }
 
         // Store authenticator
         await supabase
           .from('user_authenticators')
           .insert({
-            user_id: userID,
-            credential_id: JSON.stringify(Array.from(credentialID)),
-            credential_public_key: JSON.stringify(Array.from(credentialPublicKey)),
-            counter,
+            owner_id: userID,
+            credential_id: JSON.stringify(Array.from(credentialIdBytes)),
+            credential_public_key: JSON.stringify(Array.from(credential.publicKey)),
+            counter: credential.counter,
             created_at: new Date().toISOString()
           })
 
@@ -221,7 +364,7 @@ serve(async (req) => {
         await supabase
           .from('webauthn_challenges')
           .delete()
-          .eq('user_id', userID)
+          .eq('owner_id', userID)
           .eq('type', 'registration')
 
         // Generate session token
