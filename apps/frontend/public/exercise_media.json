@@ -264,37 +264,5 @@
     "video": {
       "landscape": "/videos/bird-dog_v1_848x480.mp4"
     }
-  },
-  {
-    "id": "ikkyo-omote",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "landscape": "/videos/ikkyo-omote_v1_854x480.mp4"
-    }
-  },
-  {
-    "id": "ikkyo-ura",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "landscape": "/videos/ikkyo-ura_v1_854x480.mp4"
-    }
-  },
-  {
-    "id": "iriminage",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "landscape": "/videos/iriminage_v1_1920x1080.mp4"
-    }
-  },
-  {
-    "id": "kaeshiwaza-intro",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "portrait": "/videos/kaeshiwaza-intro_v1_1080x1920.mp4"
-    }
   }
 ]

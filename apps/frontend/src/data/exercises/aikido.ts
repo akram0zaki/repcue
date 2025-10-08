@@ -38,7 +38,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Builds confidence, safety, and body coordination.',
     limitations: 'Avoid if you have acute neck, shoulder, or back injuries.',
     best_timing: 'Warm-up at the start of class.',
-    suggested_combinations: ['ai-tai-sabaki','ai-shikko'],
+    suggested_combinations: ['tai-sabaki','shikko'],
     notes: 'Focus on soft landings, chin tucked, smooth breathing.',
     exercise_references: []
   }),
@@ -56,7 +56,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Improves positioning, timing, and balance.',
     limitations: 'Mind knee alignment; avoid twisting on a sticky mat.',
     best_timing: 'Early in practice to set movement quality.',
-    suggested_combinations: ['ai-ukemi-basics','ai-ikkyo-omote'],
+    suggested_combinations: ['ukemi-basics','ikkyo-omote'],
     notes: 'Emphasize hip/center movement, not just feet.',
     exercise_references: []
   }),
@@ -74,7 +74,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Strengthens hips/posture and develops center movement.',
     limitations: 'Use knee pads if needed; avoid pain on kneecaps.',
     best_timing: 'After warm-up, before suwari-waza techniques.',
-    suggested_combinations: ['ai-ikkyo-omote'],
+    suggested_combinations: ['ikkyo-omote'],
     notes: 'Stay tall; move from the hips, not shoulders.',
     exercise_references: []
   }),
@@ -89,14 +89,14 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     catalogId: 'aikido',
     default_reps: 6,
     is_favorite: false,
-    has_video: true,
+    has_video: false,
     tags: ['aikido','kyu:5','kyu:6','stance:tachi','attack:shomen-uchi','waza:tachi-waza','variant:omote'],
     benefits: 'Kuzushi, posture control, and basic pin transitions.',
     limitations: 'Maintain shoulder safety for both nage and uke.',
     best_timing: 'After tai sabaki drills.',
-    suggested_combinations: ['ai-ikkyo-ura','ai-nikyo-omote'],
+    suggested_combinations: ['ikkyo-ura','nikyo-omote'],
     notes: 'Keep elbows heavy; control line through uke’s center.',
-    exercise_references: ['https://www.youtube.com/watch?v=p-vZmfcqFus']
+    exercise_references: []
   }),
   createExercise({
     id: 'ikkyo-ura',
@@ -107,14 +107,14 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     catalogId: 'aikido',
     default_reps: 6,
     is_favorite: false,
-    has_video: true,
+    has_video: false,
     tags: ['aikido','kyu:5','stance:tachi','attack:shomen-uchi','variant:ura'],
     benefits: 'Blending and off-axis control with tenkan.',
     limitations: 'Avoid cranking uke’s shoulder; move their whole frame.',
     best_timing: 'Paired with omote version for contrast.',
-    suggested_combinations: ['ai-tai-sabaki','ai-ikkyo-omote'],
+    suggested_combinations: ['tai-sabaki','ikkyo-omote'],
     notes: 'Lead with hips; hand path traces uke’s line.',
-    exercise_references: ['https://www.youtube.com/watch?v=cXDxOsopSzg']
+    exercise_references: []
   }),
   createExercise({
     id: 'nikyo-omote',
@@ -130,7 +130,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Wrist spiral control, connection, and off-balance.',
     limitations: 'Be gentle on wrists; tap early.',
     best_timing: 'After ikkyo to build control progression.',
-    suggested_combinations: ['ai-nikyo-ura','ai-sankyo-omote'],
+    suggested_combinations: ['nikyo-ura','sankyo-omote'],
     notes: 'Keep forearms connected; rotate through center.',
     exercise_references: []
   }),
@@ -150,7 +150,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Forearm rotation, posture control, pin transition.',
     limitations: 'Mind uke’s elbow/shoulder line; avoid compression.',
     best_timing: 'With nikyo to compare spiral directions.',
-    suggested_combinations: ['ai-yonkyo-omote','ai-kotegaeshi'],
+    suggested_combinations: ['yonkyo-omote','kotegaeshi'],
     notes: 'Lead with center, keep structure.',
     exercise_references: []
   }),
@@ -168,7 +168,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Precision control, pain compliance, posture breaking.',
     limitations: 'High sensitivity—train slowly; watch for numbness.',
     best_timing: 'After sankyo; same entry, different finish.',
-    suggested_combinations: ['ai-sankyo-omote'],
+    suggested_combinations: ['sankyo-omote'],
     notes: 'Placement over radial nerve; keep forearm alignment.',
     exercise_references: []
   }),
@@ -186,7 +186,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Rotation, timing, and safe projection mechanics.',
     limitations: 'Control uke’s fall path; protect their elbow/shoulder.',
     best_timing: 'Pair with nikyo to compare inside/outside spirals.',
-    suggested_combinations: ['ai-nikyo-omote'],
+    suggested_combinations: ['nikyo-omote'],
     notes: 'Keep elbow down; throw through the line, not the hand.',
     exercise_references: []
   }),
@@ -206,7 +206,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Axis control, shoulder line management, safe projection.',
     limitations: 'Respect uke’s shoulder; avoid hyperextension.',
     best_timing: 'Mid-class after sufficient warm-up.',
-    suggested_combinations: ['ai-iriminage','ai-tenchinage'],
+    suggested_combinations: ['iriminage','tenchinage'],
     notes: 'Turn around your center; don’t muscle the arms.',
     exercise_references: []
   }),
@@ -219,14 +219,14 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     catalogId: 'aikido',
     default_reps: 6,
     is_favorite: false,
-    has_video: true,
+    has_video: false,
     tags: ['aikido','kyu:3','stance:tachi','attack:yokomen-uchi'],
     benefits: 'Blending on the blind side; posture take.',
     limitations: 'Neck safety for uke; align head control gently.',
     best_timing: 'With shihonage for contrast of lines.',
-    suggested_combinations: ['ai-shihonage'],
+    suggested_combinations: ['shihonage'],
     notes: 'Cut the line with your center; keep spine tall.',
-    exercise_references: ['https://www.youtube.com/watch?v=ePgUUVuvdb4']
+    exercise_references: []
   }),
   createExercise({
     id: 'tenchinage',
@@ -242,7 +242,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Vertical separation, timing, and whole-body movement.',
     limitations: 'Watch lower back; use legs, not arms.',
     best_timing: 'With iriminage to study vertical vs. horizontal lines.',
-    suggested_combinations: ['ai-iriminage'],
+    suggested_combinations: ['iriminage'],
     notes: 'Hands separate from the center, not the shoulders.',
     exercise_references: []
   }),
@@ -262,7 +262,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Develops relaxed power and responsive blending.',
     limitations: 'High variance—choose safe fall options.',
     best_timing: 'Late class once bodies are warm.',
-    suggested_combinations: ['ai-iriminage','ai-tenchinage'],
+    suggested_combinations: ['iriminage','tenchinage'],
     notes: 'Lead with connection, not force.',
     exercise_references: []
   }),
@@ -280,7 +280,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Integration, timing, and adaptive footwork.',
     limitations: 'Keep intensity appropriate; focus on safety.',
     best_timing: 'End of class as integration.',
-    suggested_combinations: ['ai-kokyunage'],
+    suggested_combinations: ['kokyunage'],
     notes: 'Agree intensity with partner before starting.',
     exercise_references: []
   }),
@@ -295,14 +295,14 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     catalogId: 'aikido',
     default_duration: 120,
     is_favorite: false,
-    has_video: true,
+    has_video: false,
     tags: ['aikido','kyu:1','stance:mixed','theme:counters'],
     benefits: 'Awareness of vulnerabilities and recovery options.',
     limitations: 'Keep control; counters escalate risk quickly.',
     best_timing: 'Only with experienced partners; end of session.',
-    suggested_combinations: ['ai-iriminage','ai-shihonage'],
+    suggested_combinations: ['iriminage','shihonage'],
     notes: 'Agree on frames to stop/reverse; prioritize ukemi.',
-    exercise_references: ['https://www.youtube.com/shorts/CUo0llixW1A']
+    exercise_references: []
   }),
   createExercise({
     id: 'jiyuwaza-1',
@@ -318,7 +318,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     benefits: 'Stress-tests timing, distance, and composure.',
     limitations: 'Fatigue management; reduce intensity if form degrades.',
     best_timing: 'Capstone segment at the end of class.',
-    suggested_combinations: ['ai-kaeshiwaza-intro'],
+    suggested_combinations: ['kaeshiwaza-intro'],
     notes: 'Rotate partners to vary rhythm and size.',
     exercise_references: []
   })
