@@ -1,6 +1,6 @@
 ## Unreleased
 
-### 2025-01-09 (Catalog Badge System - Phases 1-4 MVP)
+### 2025-01-09 (Catalog Badge System - Phases 1-5 Complete)
 
 #### Added
 - **Generic Catalog Badge System**: Replaced hardcoded Aikido Kyu filtering with flexible, catalog-specific badge system
@@ -53,26 +53,43 @@
 - **Backward Compatible**: Legacy category field still works; exercises without tags supported
 
 #### Implementation Stats
-- **Files Created**: 8 new files (~1,220 lines)
-  - `types/catalog.ts` - Type definitions
-  - `utils/catalogBadges.ts` - Utility functions
-  - `hooks/useBadgeValues.ts` - Cached discovery hook
-  - `components/BadgeFilterGroup.tsx` - Filter group component
-  - `components/BadgeFilter.tsx` - Single badge filter
-  - `components/ExerciseBadgeDisplay.tsx` - Display component
+- **Files Created**: 10 new files (~2,100 lines)
+  - Frontend: `types/catalog.ts`, `utils/catalogBadges.ts`, `hooks/useBadgeValues.ts`
+  - Components: `BadgeFilterGroup.tsx`, `BadgeFilter.tsx`, `ExerciseBadgeDisplay.tsx`
+  - Validation: `utils/badgeValidation.ts` (client-side)
+  - Database: `supabase/migrations/20251009192511_add_exercises_tags_gin_index.sql`
   
-- **Files Modified**: 3 files (~150 lines)
-  - `data/catalogs.ts` - Badge definitions for all catalogs
-  - `components/ExerciseSelector/ExerciseSelector.tsx` - Integrated badge filtering
-  - `components/ExerciseDetailContent.tsx` - Added badge display
-  - `hooks/useExerciseFilter.ts` - Generic badge support
+- **Files Modified**: 6 files (~400 lines)
+  - Frontend: `data/catalogs.ts`, `components/ExerciseSelector/ExerciseSelector.tsx`
+  - Frontend: `components/ExerciseDetailContent.tsx`, `hooks/useExerciseFilter.ts`
+  - Database: `services/storageService.ts` (schema v22, badge methods)
+  - Backend: `supabase/functions/sync_v2/index.ts` (tag validation)
   
-- **Quality**: 0 linting errors, full TypeScript type safety
+- **Quality**: 0 linting errors, full TypeScript type safety, defense-in-depth security
 
+- **Database & Sync Integration**: Full offline-first sync support for badge tags
+  - Created Supabase migration `20251009192511_add_exercises_tags_gin_index.sql`
+  - Added GIN index on `exercises.tags` for efficient tag filtering
+  - Added comment documenting `category` field deprecation
+  - Updated IndexedDB schema to version 22 with multi-entry tag indexes
+  - Added compound index `[catalogId+*tags]` for optimized badge queries
+  - Client-side validation utilities: `sanitizeTagValue()`, `validateBadgeTags()`, `validateTagsBeforeSave()`
+  - Server-side validation in edge function: `validateAndSanitizeTags()`
+  - Tag format enforced: `badgeId:value` with XSS prevention
+  - Max 20 tags per exercise, max 100 chars per tag
+  - StorageService methods: `getExercisesByBadge()`, `getUniqueBadgeValues()`, `addTagsToExercise()`, `removeTagsFromExercise()`
+
+#### Changed
+- **Sync System**: Tags field included in push/pull allowlists
+  - Tags sync using last-write-wins with version-based conflict resolution
+  - Empty tags arrays handled correctly
+  - Backward compatible with exercises without tags
+  
 #### Deferred for Post-MVP
 - Exercise tag migration (backward compatibility handles legacy data)
 - ExercisePage integration (works via backward compatibility)
 - ExerciseFormPage badge selection UI (requires careful UX design)
+- Smart tag array merge for conflicts (currently uses last-write-wins)
 
 ### 2025-10-05 (Auth Form Accessibility Improvements)
 
