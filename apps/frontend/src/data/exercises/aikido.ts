@@ -34,7 +34,7 @@ export const AIKIDO_EXERCISES: Exercise[] = [
     default_reps: 10,
     is_favorite: false,
     has_video: false,
-    tags: ['aikido','kyu:6','stance:tachi','ukemi'],
+    tags: ['category:strength','aikido','kyu:6','stance:tachi','ukemi'],
     benefits: 'Builds confidence, safety, and body coordination.',
     limitations: 'Avoid if you have acute neck, shoulder, or back injuries.',
     best_timing: 'Warm-up at the start of class.',

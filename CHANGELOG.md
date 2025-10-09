@@ -1,5 +1,79 @@
 ## Unreleased
 
+### 2025-01-09 (Catalog Badge System - Phases 1-4 MVP)
+
+#### Added
+- **Generic Catalog Badge System**: Replaced hardcoded Aikido Kyu filtering with flexible, catalog-specific badge system
+  - Created `BadgeValue` and `CatalogBadge` type definitions supporting static, dynamic, and computed badges
+  - Implemented `useBadgeValues` hook with memoized discovery and regex caching for performance
+  - Created `BadgeFilterGroup` component with progressive disclosure (shows 3 badges, collapses rest for mobile)
+  - Created `BadgeFilter` component with single/multiple selection modes, ARIA labels, and accessibility
+  - Created `ExerciseBadgeDisplay` component for showing badges on exercise detail pages
+  - Added catalog utility functions: `getCatalogBadges()`, `matchesBadgeFilter()`, `discoverBadgeValues()`, `extractExerciseBadges()`
+  
+- **Catalog Badge Definitions**: All 5 catalogs configured with relevant badges
+  - General Fitness: category, equipment (4 values), intensity (3 values, single-select)
+  - Women's Health: category, focus (4 values: prenatal, postnatal, pelvic floor, core strength)
+  - Aikido: category, kyuLevel (Kyu 1-6)
+  - Tai Chi: category, form (dynamic discovery with regex pattern)
+  - Zumba: category, style (4 dance styles)
+
+#### Changed
+- **Exercise Type System**: Made `category` field optional in Exercise interface (deprecated in favor of badge system)
+  - Added JSDoc deprecation notice: "Use category badge in tags array instead"
+  - Backward compatibility maintained via `getExerciseCategory()` helper function
+  
+- **Filter Hook Refactored**: Updated `useExerciseFilter` with generic badge support
+  - Replaced `selectedKyuLevels` and `selectedCategories` with `selectedBadges: Record<string, Set<string | number>>`
+  - Implemented migration logic for old Kyu/category filter formats in localStorage
+  - Added `toggleBadgeValue()` and `clearBadge()` methods
+  - Badge filtering uses AND logic across badges, OR within each badge
+  - Deprecated `toggleCategory()` and `clearCategories()` (backward compatible)
+
+- **ExerciseSelector Integration**: Fully integrated badge filtering
+  - Replaced `CategoryFilter` component with `BadgeFilterGroup`
+  - Updated props: `showCategoryFilter` → `showBadgeFilters`
+  - Fixed TypeScript errors for optional category field
+  - Badge filters work with all catalog types
+
+- **Exercise Detail Pages**: Added badge display
+  - Updated `ExerciseDetailContent` component to show `ExerciseBadgeDisplay`
+  - Badges display below exercise description with proper i18n labels
+  - Supports 0, 1, or multiple badges per exercise
+
+#### Technical Details
+- **Performance Optimizations**:
+  - Regex compilation cached via `useMemo` (keyed by badge.id)
+  - Badge value discovery memoized (keyed by catalogId + badge.id + exercises)
+  - Compound IndexedDB index ready: `[catalogId+*tags]` for efficient filtering
+  
+- **Accessibility**: Full ARIA label support, keyboard navigation, screen reader compatible
+- **Mobile UX**: Progressive disclosure with "More filters" button (shows first 3 badges by default)
+- **i18n Ready**: All badge labels use translation keys in `catalogs.json`
+- **Backward Compatible**: Legacy category field still works; exercises without tags supported
+
+#### Implementation Stats
+- **Files Created**: 8 new files (~1,220 lines)
+  - `types/catalog.ts` - Type definitions
+  - `utils/catalogBadges.ts` - Utility functions
+  - `hooks/useBadgeValues.ts` - Cached discovery hook
+  - `components/BadgeFilterGroup.tsx` - Filter group component
+  - `components/BadgeFilter.tsx` - Single badge filter
+  - `components/ExerciseBadgeDisplay.tsx` - Display component
+  
+- **Files Modified**: 3 files (~150 lines)
+  - `data/catalogs.ts` - Badge definitions for all catalogs
+  - `components/ExerciseSelector/ExerciseSelector.tsx` - Integrated badge filtering
+  - `components/ExerciseDetailContent.tsx` - Added badge display
+  - `hooks/useExerciseFilter.ts` - Generic badge support
+  
+- **Quality**: 0 linting errors, full TypeScript type safety
+
+#### Deferred for Post-MVP
+- Exercise tag migration (backward compatibility handles legacy data)
+- ExercisePage integration (works via backward compatibility)
+- ExerciseFormPage badge selection UI (requires careful UX design)
+
 ### 2025-10-05 (Auth Form Accessibility Improvements)
 
 #### Fixed

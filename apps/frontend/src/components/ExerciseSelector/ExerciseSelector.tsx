@@ -4,7 +4,7 @@ import type { Exercise } from '../../types';
 import { useExerciseFilter, type ExerciseFilterOptions } from '../../hooks/useExerciseFilter';
 import { localizeExercise } from '../../utils/localizeExercise';
 import CatalogSelector from '../CatalogSelector';
-import CategoryFilter from '../CategoryFilter';
+import BadgeFilterGroup from '../BadgeFilterGroup';
 import { StarIcon, StarFilledIcon } from '../icons/NavigationIcons';
 
 export interface ExerciseSelectorProps {
@@ -23,8 +23,8 @@ export interface ExerciseSelectorProps {
   /** Show catalog selector */
   showCatalogSelector?: boolean;
 
-  /** Show category filter */
-  showCategoryFilter?: boolean;
+  /** Show badge filters */
+  showBadgeFilters?: boolean;
 
   /** Show exercise type filter (All/Built-in/Custom/Shared) */
   showTypeFilter?: boolean;
@@ -64,7 +64,7 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
   excludeExercises = [],
   onSelectExercise,
   showCatalogSelector = true,
-  showCategoryFilter = true,
+  showBadgeFilters = true,
   showTypeFilter = true,
   showFavoritesToggle = false,
   showSearch = true,
@@ -90,8 +90,8 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
     updateFilter,
     clearFilters,
     setCatalog,
-    toggleCategory,
-    clearCategories
+    toggleBadgeValue,
+    clearBadge
   } = useExerciseFilter(exercises, filterOptions);
 
   // Format exercise details for display
@@ -161,36 +161,34 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
 
       {/* Filters Row */}
       <div className="flex-shrink-0 mb-3 space-y-3">
-        {/* Category Filter and Sort */}
-        {(showCategoryFilter || showSort) && (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            {showCategoryFilter && (
-              <CategoryFilter
-                selectedCategories={filterState.selectedCategories}
-                onCategoryToggle={toggleCategory}
-                onClearAll={clearCategories}
-                style="dropdown"
-                label={t('exercises:category', { defaultValue: 'Category' })}
-              />
-            )}
+        {/* Badge Filters */}
+        {showBadgeFilters && (
+          <BadgeFilterGroup
+            catalogId={filterState.selectedCatalogId}
+            exercises={exercises}
+            selectedBadges={filterState.selectedBadges}
+            onToggleBadgeValue={toggleBadgeValue}
+            onClearBadge={clearBadge}
+            className="mb-3"
+          />
+        )}
 
-            {showSort && (
-              <div className="flex items-center gap-2">
-                <label htmlFor="sort-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t('exercises:sortBy', { defaultValue: 'Sort by:' })}
-                </label>
-                <select
-                  id="sort-select"
-                  value={filterState.sortBy}
-                  onChange={(e) => updateFilter({ sortBy: e.target.value as 'name' | 'type' | 'recently-added' })}
-                  className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
-                  <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>
-                  <option value="recently-added">{t('exercises:sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
-                </select>
-              </div>
-            )}
+        {/* Sort Options */}
+        {showSort && (
+          <div className="flex items-center gap-2">
+            <label htmlFor="sort-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('exercises:sortBy', { defaultValue: 'Sort by:' })}
+            </label>
+            <select
+              id="sort-select"
+              value={filterState.sortBy}
+              onChange={(e) => updateFilter({ sortBy: e.target.value as 'name' | 'type' | 'recently-added' })}
+              className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
+              <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>
+              <option value="recently-added">{t('exercises:sortRecentlyAdded', { defaultValue: 'Recently Added' })}</option>
+            </select>
           </div>
         )}
 
@@ -315,10 +313,14 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
                         </p>
                       )}
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                        <span className="capitalize">
-                          {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
-                        </span>
-                        <span>•</span>
+                        {exercise.category && (
+                          <>
+                            <span className="capitalize">
+                              {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
+                            </span>
+                            <span>•</span>
+                          </>
+                        )}
                         <span>{formatSimplifiedDetails(exercise)}</span>
                       </div>
                     </div>

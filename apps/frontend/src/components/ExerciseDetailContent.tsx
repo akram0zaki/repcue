@@ -12,6 +12,7 @@ import {
 import { ExerciseRating } from './ExerciseRating';
 import { localizeExercise } from '../utils/localizeExercise';
 import { getExerciseById } from '../data/exercises';
+import ExerciseBadgeDisplay from './ExerciseBadgeDisplay';
 
 interface ExerciseDetailContentProps {
   exercise: Exercise;
@@ -163,6 +164,8 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </p>
         )}
 
+        {/* Exercise Badges */}
+        <ExerciseBadgeDisplay exercise={exercise} className="mb-6" />
 
         {/* Action Buttons */}
         {showActions && (
