@@ -60,9 +60,11 @@ export const ExerciseBadgeDisplay: React.FC<ExerciseBadgeDisplayProps> = ({
               
               <div className="flex flex-wrap gap-2">
                 {values.map(value => {
-                  const valueLabel = value.labelParams
-                    ? t(value.label, value.labelParams)
-                    : t(value.label, { defaultValue: value.fallbackLabel || String(value.id) });
+                  const valueLabel = String(
+                    value.labelParams
+                      ? t(value.label, value.labelParams)
+                      : t(value.label, { defaultValue: value.fallbackLabel || String(value.id) })
+                  );
                   
                   return (
                     <span

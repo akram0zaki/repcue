@@ -22,6 +22,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     icon: 'fitness',
     colorTheme: 'blue',
     pictureUrl: '/images/catalogs/general-fitness-square.png',
+    groupByBadge: 'category', // Group exercises by category badge on listing page
     badges: [
       {
         id: 'category',
@@ -31,7 +32,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
           { id: 'strength', label: 'common:categories.strength' },
           { id: 'cardio', label: 'common:categories.cardio' },
           { id: 'flexibility', label: 'common:categories.flexibility' },
-          { id: 'balance', label: 'common:categories.balance' }
+          { id: 'balance', label: 'common:categories.balance' },
+          { id: 'hand-warmup', label: 'common:categories.handWarmup' }
         ],
         tagPattern: { prefix: 'category:' }
       },
@@ -69,6 +71,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     icon: 'woman',
     colorTheme: 'pink',
     pictureUrl: '/images/catalogs/women-health-square.png',
+    groupByBadge: 'category', // Group exercises by category badge on listing page
     badges: [
       {
         id: 'category',
@@ -104,6 +107,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     icon: 'aikido',
     colorTheme: 'black',
     pictureUrl: '/images/catalogs/aikido-square.png',
+    groupByBadge: 'kyuLevel', // Group exercises by Kyu level badge on listing page
     badges: [
       {
         id: 'category',
@@ -141,6 +145,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     icon: 'tai-chi',
     colorTheme: 'green',
     pictureUrl: '/images/catalogs/tai-chi-square.png',
+    groupByBadge: 'category', // Group exercises by form badge on listing page
     badges: [
       {
         id: 'category',
@@ -172,6 +177,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     icon: 'dance',
     colorTheme: 'purple',
     pictureUrl: '/images/catalogs/zumba-square.png',
+    groupByBadge: 'style', // Group exercises by dance style badge on listing page
     badges: [
       {
         id: 'category',

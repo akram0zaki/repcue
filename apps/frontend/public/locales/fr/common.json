@@ -59,7 +59,19 @@
     "noVideo": "Pas de vidéo",
     "pauseVideo": "Mettre en pause la vidéo",
     "playVideo": "Lire la vidéo",
-    "premium": "PRO"
+    "premium": "PRO",
+    "done": "Fait",
+    "addEquipment": "Ajouter l'équipement",
+    "removeEquipment": "Supprimer l'équipement",
+    "addMuscleGroup": "Ajouter le groupe musculaire",
+    "removeMuscleGroup": "Supprimer le groupe musculaire",
+    "addTag": "Ajouter la balise",
+    "removeTag": "Supprimer la balise",
+    "exerciseParameters": "Paramètres de l'exercice",
+    "exerciseVideo": "Vidéo de l'exercice",
+    "moreFilters": "Plus de filtres ({{count}})",
+    "moreFilters_other": "Plus de filtres ({{count}})",
+    "showFewerFilters": "Afficher moins de filtres"
   },
   "navigation": {
     "home": "Accueil",

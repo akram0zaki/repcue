@@ -60,7 +60,10 @@
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
     "premium": "مميز",
-    "done": "تم"
+    "done": "تم",
+    "moreFilters": "فلاتر أكتر ({{count}})",
+    "moreFilters_other": "فلاتر أكتر ({{count}})",
+    "showFewerFilters": "إظهار فلاتر أقل"
   },
   "categories": {
     "core": "الجذع",

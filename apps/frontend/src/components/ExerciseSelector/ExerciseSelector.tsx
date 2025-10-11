@@ -313,14 +313,6 @@ export const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({
                         </p>
                       )}
                       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                        {exercise.category && (
-                          <>
-                            <span className="capitalize">
-                              {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
-                            </span>
-                            <span>•</span>
-                          </>
-                        )}
                         <span>{formatSimplifiedDetails(exercise)}</span>
                       </div>
                     </div>

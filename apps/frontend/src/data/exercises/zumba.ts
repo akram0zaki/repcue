@@ -1,5 +1,5 @@
 import type { Exercise } from '../../types';
-import { ExerciseCategory, ExerciseType } from '../../types';
+import { ExerciseType } from '../../types';
 
 function createExercise(exerciseData: Omit<Exercise, 'id' | 'updated_at' | 'created_at' | 'deleted' | 'version' | 'dirty' | 'op' | 'synced_at' | 'owner_id'> & { id: string }): Exercise {
   return {
@@ -21,72 +21,66 @@ export const ZUMBA_EXERCISES: Exercise[] = [
     id: 'basic-merengue',
     name: 'Basic Merengue Step',
     description: 'March in place with hip movement and arm swings to music.',
-    category: ExerciseCategory.CARDIO,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'zumba',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['zumba', 'cardio', 'latin']
+    tags: ['category:cardio', 'zumba', 'latin']
   }),
   createExercise({
     id: 'salsa-step',
     name: 'Salsa Step',
     description: 'Step forward and back or side-to-side with rhythmic hip motion.',
-    category: ExerciseCategory.CARDIO,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'zumba',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['zumba', 'cardio', 'salsa']
+    tags: ['category:cardio', 'zumba', 'salsa']
   }),
   createExercise({
     id: 'cumbia-step',
     name: 'Cumbia Step',
     description: 'Step behind with one foot, alternating sides with hip sway.',
-    category: ExerciseCategory.CARDIO,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'zumba',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['zumba', 'latin', 'coordination']
+    tags: ['category:cardio', 'zumba', 'latin', 'coordination']
   }),
   createExercise({
     id: 'reggaeton-stomp',
     name: 'Reggaeton Stomp',
     description: 'Strong stomping and upper-body movements to urban beats.',
-    category: ExerciseCategory.CARDIO,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'zumba',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['zumba', 'reggaeton', 'hip-hop']
+    tags: ['category:cardio', 'zumba', 'reggaeton', 'hip-hop']
   }),
   createExercise({
     id: 'bachata-step',
     name: 'Bachata Step',
     description: 'Side steps with hip sway and a tap on every fourth beat.',
-    category: ExerciseCategory.CARDIO,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'zumba',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['zumba', 'bachata', 'latin']
+    tags: ['category:cardio', 'zumba', 'bachata', 'latin']
   }),
   createExercise({
     id: 'cooldown-latin',
     name: 'Latin Dance Cooldown',
     description: 'Gentle side-to-side steps with arm stretches and breathing.',
-    category: ExerciseCategory.FLEXIBILITY,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'zumba',
     default_duration: 45,
     is_favorite: false,
     has_video: false,
-    tags: ['zumba', 'stretch', 'cooldown']
+    tags: ['category:flexibility', 'zumba', 'stretch', 'cooldown']
   }),
 ];

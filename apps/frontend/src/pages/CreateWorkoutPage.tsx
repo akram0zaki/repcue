@@ -447,7 +447,7 @@ const CreateWorkoutPage: React.FC = () => {
                           {index + 1}. {exercise.name}
                         </h4>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {exercise.category} • {exercise.exercise_type}
+                          {exercise.exercise_type}
                         </p>
                       </div>
                       <div className="flex space-x-1 ml-2">
@@ -643,7 +643,7 @@ const CreateWorkoutPage: React.FC = () => {
           onClose={() => setShowExercisePicker(false)}
           title={t('workouts.addExerciseTitle')}
           showCatalogSelector={true}
-          showCategoryFilter={true}
+          showBadgeFilters={true}
           showTypeFilter={true}
           showSearch={true}
           showSort={true}

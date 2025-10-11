@@ -61,7 +61,10 @@
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
-    "premium": "مميز"
+    "premium": "مميز",
+    "moreFilters": "فلاتر أكتر ({{count}})",
+    "moreFilters_other": "فلاتر أكتر ({{count}})",
+    "showFewerFilters": "إظهار فلاتر أقل"
   },
   "navigation": {
     "home": "البيت",

@@ -32,12 +32,6 @@ export interface ExerciseInstruction {
 export interface Exercise extends SyncMetadata {
   name: string;
   description?: string;
-  /**
-   * @deprecated Use category badge in tags array instead (e.g., 'category:core')
-   * Kept for backward compatibility. New exercises should use the badge system.
-   * The category field will be migrated to optional as the badge system is adopted.
-   */
-  category?: ExerciseCategory;
   exercise_type: ExerciseType;
   catalogId: string;            // References ExerciseCatalog.id
   default_duration?: number; // in seconds - for time-based exercises
@@ -105,6 +99,13 @@ export interface ExerciseCatalog {
   pictureUrl?: string;          // Catalog header/preview image URL
   /** Catalog-specific badges for filtering exercises (zero or more per catalog) */
   badges?: import('./catalog').CatalogBadge[];
+  /** 
+   * Optional badge ID to use for grouping exercises on the listing page.
+   * If specified, exercises will be grouped by this badge's values.
+   * If omitted, exercises are displayed in a flat list.
+   * @example 'category' - groups by category badge
+   */
+  groupByBadge?: string;
 }
 
 // Workout structure

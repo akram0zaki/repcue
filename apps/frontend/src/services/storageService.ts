@@ -1772,6 +1772,15 @@ export class StorageService {
           if (key.startsWith('exercise_')) {
             exercises.push(this.convertStoredExercise(value as StoredExercise));
           }
+        });
+        // Try to get preferences for favorites, but don't wait if database is unavailable
+        const prefs = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
+        const favorites = prefs?.favorite_exercises || [];
+        const merged = exercises.map(ex => ({ ...ex, is_favorite: favorites.includes(ex.id) }));
+        return filterActiveRecords(merged);
+      }
+    );
+  }
 
   /**
    * Get exercises by badge tag
@@ -1894,7 +1903,7 @@ export class StorageService {
           tags: uniqueTags,
           updated_at: new Date().toISOString(),
           version: (exercise.version || 1) + 1,
-          dirty: true
+          dirty: 1 // Mark as dirty for sync
         });
 
         logger.log('addTagsToExercise: Tags added successfully', {
@@ -1943,7 +1952,7 @@ export class StorageService {
           tags: filteredTags,
           updated_at: new Date().toISOString(),
           version: (exercise.version || 1) + 1,
-          dirty: true
+          dirty: 1 // Mark as dirty for sync
         });
 
         logger.log('removeTagsFromExercise: Tags removed successfully', {
@@ -1955,16 +1964,6 @@ export class StorageService {
         return true;
       },
       () => false
-    );
-  }
-
-        });
-        // Try to get preferences for favorites, but don't wait if database is unavailable
-        const prefs = this.fallbackStorage.get('user_preferences') as UserPreferences | undefined;
-        const favorites = prefs?.favorite_exercises || [];
-        const merged = exercises.map(ex => ({ ...ex, is_favorite: favorites.includes(ex.id) }));
-        return filterActiveRecords(merged);
-      }
     );
   }
 

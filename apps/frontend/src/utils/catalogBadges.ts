@@ -57,8 +57,11 @@ export function getCatalogBadge(catalogId: string, badgeId: string): CatalogBadg
  * getExerciseCategory({ category: 'strength', tags: [] })
  * // Returns: 'strength'
  */
+/**
+ * Get the category value from an exercise's tags
+ * @deprecated Use getExerciseBadgeValues with badgeId='category' instead
+ */
 export function getExerciseCategory(exercise: Exercise): string | null {
-  // 1. Check tags for category badge (NEW - takes precedence)
   if (exercise.tags && exercise.tags.length > 0) {
     const categoryTag = exercise.tags.find(tag => tag.startsWith('category:'));
     if (categoryTag) {
@@ -66,8 +69,52 @@ export function getExerciseCategory(exercise: Exercise): string | null {
     }
   }
   
-  // 2. Fall back to legacy category field (OLD)
-  return exercise.category || null;
+  return null;
+}
+
+/**
+ * Get the badge value(s) for a specific badge from an exercise's tags
+ * @param exercise - The exercise to extract badge values from
+ * @param badgeId - The badge ID to look for (e.g., 'category', 'kyuLevel')
+ * @param tagPattern - The tag pattern for the badge (e.g., { prefix: 'category:' })
+ * @returns Array of badge value IDs found in the exercise's tags
+ * 
+ * @example
+ * getExerciseBadgeValues(exercise, 'category', { prefix: 'category:' })
+ * // Returns: ['core']
+ */
+export function getExerciseBadgeValues(
+  exercise: Exercise,
+  _badgeId: string,
+  tagPattern: { prefix?: string; suffix?: string; extractPattern?: RegExp }
+): Array<string | number> {
+  const values: Array<string | number> = [];
+  
+  if (!exercise.tags || exercise.tags.length === 0) {
+    return values;
+  }
+  
+  const { prefix = '', suffix = '', extractPattern } = tagPattern;
+  
+  for (const tag of exercise.tags) {
+    if (extractPattern) {
+      const match = tag.match(extractPattern);
+      if (match && match[1]) {
+        values.push(match[1]);
+      }
+    } else if (prefix) {
+      if (tag.startsWith(prefix)) {
+        const value = tag.substring(prefix.length);
+        if (suffix && value.endsWith(suffix)) {
+          values.push(value.substring(0, value.length - suffix.length));
+        } else {
+          values.push(value);
+        }
+      }
+    }
+  }
+  
+  return values;
 }
 
 /**
@@ -103,13 +150,7 @@ export function matchesBadgeFilter(
   const { prefix = '', suffix = '', extractPattern } = tagPattern;
   const exerciseTags = new Set(exercise.tags || []);
   
-  // Special case: category badge with backward compatibility
-  if (badge.id === 'category') {
-    const exerciseCategory = getExerciseCategory(exercise);
-    if (exerciseCategory && selectedValues.has(exerciseCategory)) {
-      return true;
-    }
-  }
+  // Check badge values from tags
   
   // Try to find at least one matching tag (OR logic within badge)
   for (const value of selectedValues) {
@@ -255,16 +296,6 @@ export function extractExerciseBadges(
   const result: Array<{ badge: CatalogBadge; values: BadgeValue[] }> = [];
   
   if (!exercise.tags || exercise.tags.length === 0) {
-    // Handle legacy category field for backward compatibility
-    if (exercise.category) {
-      const categoryBadge = catalogBadges.find(b => b.id === 'category');
-      if (categoryBadge) {
-        const categoryValue = categoryBadge.values?.find(v => v.id === exercise.category);
-        if (categoryValue) {
-          result.push({ badge: categoryBadge, values: [categoryValue] });
-        }
-      }
-    }
     return result;
   }
   
@@ -280,14 +311,6 @@ export function extractExerciseBadges(
     
     // Get all badge values (predefined or discovered)
     const availableValues = badge.values || [];
-    
-    // Special case: category badge with backward compatibility
-    if (badge.id === 'category' && exercise.category) {
-      const categoryValue = availableValues.find(v => v.id === exercise.category);
-      if (categoryValue) {
-        matchedValues.push(categoryValue);
-      }
-    }
     
     for (const value of availableValues) {
       let matches = false;

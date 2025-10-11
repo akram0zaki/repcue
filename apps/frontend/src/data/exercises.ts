@@ -19,9 +19,14 @@ export const INITIAL_EXERCISES: Exercise[] = [
 ];
 
 
-// Helper functions for exercise management (backward compatible)
+// Helper functions for exercise management
+/**
+ * @deprecated Use badge-based filtering instead with getExerciseBadgeValues
+ */
 export const getExercisesByCategory = (category: ExerciseCategory): Exercise[] => {
-  return INITIAL_EXERCISES.filter(exercise => exercise.category === category);
+  return INITIAL_EXERCISES.filter(exercise => 
+    exercise.tags?.includes(`category:${category}`)
+  );
 };
 
 export const getFavoriteExercises = (exercises: Exercise[]): Exercise[] => {
@@ -46,9 +51,12 @@ export const getExercisesByCatalog = (catalogId: string): Exercise[] => {
   return INITIAL_EXERCISES.filter(exercise => exercise.catalogId === catalogId);
 };
 
+/**
+ * @deprecated Use badge-based filtering instead with getExerciseBadgeValues
+ */
 export const getExercisesByCatalogAndCategory = (catalogId: string, category: ExerciseCategory): Exercise[] => {
   return INITIAL_EXERCISES.filter(exercise =>
-    exercise.catalogId === catalogId && exercise.category === category
+    exercise.catalogId === catalogId && exercise.tags?.includes(`category:${category}`)
   );
 };
 

@@ -68,7 +68,10 @@
     "addTag": "Tag hinzufügen",
     "removeTag": "Tag entfernen",
     "exerciseParameters": "Übungsparameter",
-    "exerciseVideo": "Übungsvideo"
+    "exerciseVideo": "Übungsvideo",
+    "moreFilters": "Weitere Filter ({{count}})",
+    "moreFilters_other": "Weitere Filter ({{count}})",
+    "showFewerFilters": "Weniger Filter anzeigen"
   },
   "navigation": {
     "home": "Startseite",

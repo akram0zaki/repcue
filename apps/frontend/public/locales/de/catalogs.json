@@ -1,24 +1,99 @@
 {
-  "selectCatalog": "Übungsauswahl",
-  "selectDescription": "Wählen Sie einen Übungskatalog aus, um Übungen anzuzeigen",
+  "selectCatalog": "Übungskatalog",
+  "selectDescription": "Wähle einen Übungskatalog aus, um verfügbare Übungen anzuzeigen",
   "general-fitness": {
     "name": "Allgemeine Fitness",
-    "description": "Grundübungen für allgemeine Fitness und Krafttraining"
+    "description": "Grundübungen zur Verbesserung der allgemeinen Fitness und Kraft",
+    "badges": {
+      "category": {
+        "label": "Kategorie"
+      },
+      "equipment": {
+        "label": "Ausrüstung",
+        "values": {
+          "bodyweight": "Nur mit Körpergewicht",
+          "dumbbells": "Kurzhanteln",
+          "resistance-band": "Widerstandsband",
+          "none": "Keine Ausrüstung"
+        }
+      },
+      "intensity": {
+        "label": "Intensität",
+        "values": {
+          "low": "Niedrige Intensität",
+          "moderate": "Mittlere Intensität",
+          "high": "Hohe Intensität"
+        }
+      }
+    }
   },
   "tai-chi": {
     "name": "Tai Chi",
-    "description": "Sanfte, fließende Bewegungen für Balance, Flexibilität und Achtsamkeit"
+    "description": "Sanfte, fließende Bewegungen für Gleichgewicht, Flexibilität und Achtsamkeit",
+    "badges": {
+      "category": {
+        "label": "Kategorie"
+      },
+      "form": {
+        "label": "Form",
+        "values": {}
+      }
+    }
   },
   "zumba": {
     "name": "Zumba",
-    "description": "Energiegeladene tanzbasierte Cardio-Übungen für spaßige Fitness"
+    "description": "Energiegeladene, tanzbasierte Cardio-Übungen für Spaß und Fitness",
+    "badges": {
+      "category": {
+        "label": "Kategorie"
+      },
+      "style": {
+        "label": "Tanzstil",
+        "values": {
+          "salsa": "Salsa",
+          "merengue": "Merengue",
+          "reggaeton": "Reggaeton",
+          "cumbia": "Cumbia"
+        }
+      }
+    }
   },
   "women-health": {
     "name": "Frauengesundheit",
-    "description": "Spezialisierte Übungen für Frauengesundheit und Wohlbefinden"
+    "description": "Spezialisierte Übungen für die Gesundheit und das Wohlbefinden von Frauen",
+    "badges": {
+      "category": {
+        "label": "Kategorie"
+      },
+      "focus": {
+        "label": "Fokusbereich",
+        "values": {
+          "prenatal": "Pränatal",
+          "postnatal": "Postnatal",
+          "pelvic-floor": "Beckenboden",
+          "core-strength": "Rumpfkraft"
+        }
+      }
+    }
   },
-    "aikido": {
+  "aikido": {
     "name": "Aikido",
-    "description": "Traditionelle japanische Kampfkunst, die sich auf Harmonie, Gleichgewicht und fließende Bewegungen durch Hebel und Würfe konzentriert"
+    "description": "Traditionelle japanische Kampfkunst, die sich auf Harmonie, Gleichgewicht und fließende Bewegungen durch Hebel- und Wurftechniken konzentriert",
+    "badges": {
+      "category": {
+        "label": "Kategorie"
+      },
+      "kyuLevel": {
+        "label": "Kyu-Stufe",
+        "values": {
+          "6": "6. Kyu (Anfänger)",
+          "5": "5. Kyu",
+          "4": "4. Kyu (Mittelstufe)",
+          "3": "3. Kyu",
+          "2": "2. Kyu (Fortgeschritten)",
+          "1": "1. Kyu (Vor Schwarzgurt)"
+        }
+      }
+    }
   }
 }

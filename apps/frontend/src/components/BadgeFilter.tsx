@@ -115,9 +115,11 @@ export const BadgeFilter: React.FC<BadgeFilterProps> = ({
       <div className="flex flex-wrap gap-2" role={isSingleSelect ? 'radiogroup' : 'group'}>
         {badgeValues.map(value => {
           const isSelected = selectedValues.has(value.id);
-          const valueLabel = value.labelParams
-            ? t(value.label, value.labelParams)
-            : t(value.label, { defaultValue: value.fallbackLabel || String(value.id) });
+          const valueLabel = String(
+            value.labelParams
+              ? t(value.label, value.labelParams)
+              : t(value.label, { defaultValue: value.fallbackLabel || String(value.id) })
+          );
           
           return (
             <button

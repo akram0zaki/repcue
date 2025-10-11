@@ -1,5 +1,5 @@
 import type { Exercise } from '../../types';
-import { ExerciseCategory, ExerciseType } from '../../types';
+import { ExerciseType } from '../../types';
 
 function createExercise(exerciseData: Omit<Exercise, 'id' | 'updated_at' | 'created_at' | 'deleted' | 'version' | 'dirty' | 'op' | 'synced_at' | 'owner_id'> & { id: string }): Exercise {
   return {
@@ -21,72 +21,66 @@ export const TAI_CHI_EXERCISES: Exercise[] = [
     id: 'commencing-form',
     name: 'Commencing Form',
     description: 'Start position with feet shoulder-width apart, arms slowly raising and lowering.',
-    category: ExerciseCategory.BALANCE,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'tai-chi',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['tai-chi', 'balance', 'breathing']
+    tags: ['category:balance', 'tai-chi', 'breathing']
   }),
   createExercise({
     id: 'parting-wild-horses-mane',
     name: "Parting the Wild Horse’s Mane",
     description: 'Step forward with arms moving in flowing diagonal motions.',
-    category: ExerciseCategory.BALANCE,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'tai-chi',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['tai-chi', 'mobility', 'grace']
+    tags: ['category:balance', 'tai-chi', 'mobility', 'grace']
   }),
   createExercise({
     id: 'white-crane-spreads-wings',
     name: 'White Crane Spreads Its Wings',
     description: 'Shift weight and raise arms in a wing-like motion.',
-    category: ExerciseCategory.BALANCE,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'tai-chi',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['tai-chi', 'posture', 'upper-body']
+    tags: ['category:balance', 'tai-chi', 'posture', 'upper-body']
   }),
   createExercise({
     id: 'brush-knee',
     name: 'Brush Knee and Push',
     description: 'Step forward, one hand pushes forward while the other brushes past the knee.',
-    category: ExerciseCategory.BALANCE,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'tai-chi',
     default_duration: 30,
     is_favorite: false,
     has_video: false,
-    tags: ['tai-chi', 'coordination', 'lower-body']
+    tags: ['category:balance', 'tai-chi', 'coordination', 'lower-body']
   }),
   createExercise({
     id: 'wave-hands-clouds',
     name: 'Wave Hands Like Clouds',
     description: 'Side step while arms make circular cloud-like motions.',
-    category: ExerciseCategory.BALANCE,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'tai-chi',
     default_duration: 45,
     is_favorite: false,
     has_video: false,
-    tags: ['tai-chi', 'flow', 'mobility']
+    tags: ['category:balance', 'tai-chi', 'flow', 'mobility']
   }),
   createExercise({
     id: 'golden-rooster-stand',
     name: 'Golden Rooster Stands on One Leg',
     description: 'Stand on one leg while lifting the opposite knee and arm.',
-    category: ExerciseCategory.BALANCE,
     exercise_type: ExerciseType.TIME_BASED,
     catalogId: 'tai-chi',
     default_duration: 20,
     is_favorite: false,
     has_video: false,
-    tags: ['tai-chi', 'balance', 'focus']
+    tags: ['category:balance', 'tai-chi', 'focus']
   }),
 ];

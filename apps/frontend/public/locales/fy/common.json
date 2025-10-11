@@ -59,7 +59,7 @@
     "noVideo": "Gjin Fideo",
     "pauseVideo": "Pause Fideo",
     "playVideo": "Spylje Fideo",
-        "premium": "PRO",
+    "premium": "PRO",
     "done": "Klear",
     "addEquipment": "Materiaal tafoegje",
     "removeEquipment": "Materiaal wiskje",
@@ -68,7 +68,10 @@
     "addTag": "Label tafoegje",
     "removeTag": "Label wiskje",
     "exerciseParameters": "Oefeningsparameters",
-    "exerciseVideo": "Oefeningsfideo"
+    "exerciseVideo": "Oefeningsfideo",
+    "moreFilters": "Mear filters ({{count}})",
+    "moreFilters_other": "Mear filters ({{count}})",
+    "showFewerFilters": "Minder filters sjen litte"
   },
   "navigation": {
     "home": "Thús",

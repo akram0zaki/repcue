@@ -30,7 +30,6 @@ export const CreateExercisePage: React.FC = () => {
         // Set owner and required fields
         owner_id: user?.id || null, // Allow null for offline creation
         name: exerciseData.name || '',
-        category: exerciseData.category || 'core',
         exercise_type: exerciseData.exercise_type || 'repetition_based',
         catalogId: 'general-fitness', // Default to general fitness catalog for user-created exercises
         // Optional fields with defaults
@@ -140,6 +139,7 @@ export const CreateExercisePage: React.FC = () => {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             loading={loading}
+            catalogId="general-fitness"
           />
         </div>
       </div>

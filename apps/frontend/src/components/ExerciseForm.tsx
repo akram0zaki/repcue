@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Exercise, ExerciseCategory, ExerciseType, ExerciseInstruction } from '../types';
-import { ExerciseCategory as Categories, ExerciseType as Types } from '../types';
+import type { Exercise, ExerciseType, ExerciseInstruction } from '../types';
+import { ExerciseType as Types } from '../types';
 import { PlusIcon, MinusIcon, MoveUpIcon, MoveDownIcon } from '../components/icons/NavigationIcons';
 import { VideoUploadWidget } from './VideoUploadWidget';
 import { ConfirmationModal } from './ui/ConfirmationModal';
 import { useFeatureFlag } from '../hooks/useFeatureFlags';
+import { getCatalogBadges } from '../utils/catalogBadges';
+import { sanitizeTagValue } from '../utils/badgeValidation';
 import logger from '../utils/logger';
 
 interface ExerciseFormProps {
@@ -14,6 +16,7 @@ interface ExerciseFormProps {
   onCancel: () => void;
   isEditing?: boolean;
   loading?: boolean;
+  catalogId?: string; // For badge-based tag suggestions
 }
 
 interface InstructionItemProps {
@@ -138,14 +141,17 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   onCancel,
   isEditing = false,
   loading = false,
+  catalogId = 'general-fitness', // Default catalog for user-created exercises
 }) => {
-  const { t } = useTranslation(['common', 'exercises']);
+  const { t } = useTranslation(['common', 'exercises', 'catalogs']);
   const [canUploadVideos] = useFeatureFlag('canUploadVideos');
+
+  // Get badge definitions for the current catalog
+  const catalogBadges = useMemo(() => getCatalogBadges(catalogId), [catalogId]);
 
   // Form state
   const [name, setName] = useState(exercise?.name || '');
   const [description, setDescription] = useState(exercise?.description || '');
-  const [category, setCategory] = useState<ExerciseCategory>(exercise?.category || Categories.CORE);
   const [exerciseType, setExerciseType] = useState<ExerciseType>(exercise?.exercise_type || Types.TIME_BASED);
   const [defaultDuration, setDefaultDuration] = useState(exercise?.default_duration?.toString() || '');
   const [defaultSets, setDefaultSets] = useState(exercise?.default_sets?.toString() || '');
@@ -177,7 +183,6 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     const formState = {
       name,
       description,
-      category,
       exerciseType,
       defaultDuration,
       defaultSets,
@@ -200,7 +205,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       localStorage.setItem(persistenceKey, JSON.stringify(formState));
     }
   }, [
-    name, description, category, exerciseType, defaultDuration, defaultSets, 
+    name, description, exerciseType, defaultDuration, defaultSets, 
     defaultReps, repDurationSeconds, difficultyLevel, equipmentNeeded, 
     muscleGroups, tags, instructions, isPublic, customVideoUrl,
     newEquipment, newMuscleGroup, newTag, persistenceKey, canUploadVideos
@@ -211,7 +216,6 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     if (isEditing && exercise) {
       setName(exercise.name || '');
       setDescription(exercise.description || '');
-      setCategory(exercise.category || Categories.CORE);
       setExerciseType(exercise.exercise_type || Types.TIME_BASED);
       setDefaultDuration(exercise.default_duration?.toString() || '');
       setDefaultSets(exercise.default_sets?.toString() || '');
@@ -263,7 +267,6 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         const parsedState = JSON.parse(savedState);
         setName(parsedState.name || '');
         setDescription(parsedState.description || '');
-        setCategory(parsedState.category || Categories.CORE);
         setExerciseType(parsedState.exerciseType || Types.TIME_BASED);
         setDefaultDuration(parsedState.defaultDuration || '');
         setDefaultSets(parsedState.defaultSets || '');
@@ -301,7 +304,6 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     clearFormState();
     setName('');
     setDescription('');
-    setCategory(Categories.CORE);
     setExerciseType(Types.TIME_BASED);
     setDefaultDuration('');
     setDefaultSets('');
@@ -450,6 +452,20 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       return;
     }
     
+    // Sanitize and validate tags
+    const sanitizedTags = tags
+      .map(tag => {
+        // For structured badge tags (e.g., "category:core"), sanitize the value part only
+        if (tag.includes(':')) {
+          const [prefix, ...valueParts] = tag.split(':');
+          const value = valueParts.join(':'); // Handle multiple colons
+          return `${prefix}:${sanitizeTagValue(value)}`;
+        }
+        // For free-form tags, sanitize the whole tag
+        return sanitizeTagValue(tag);
+      })
+      .filter(tag => tag.length > 0); // Remove empty tags after sanitization
+    
     // Filter out empty instructions
     const validInstructions = instructions
       .filter(inst => inst.text.trim())
@@ -458,13 +474,12 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     const exerciseData: Partial<Exercise> = {
       name: name.trim(),
       description: description.trim() || undefined,
-      category,
       exercise_type: exerciseType,
       instructions: validInstructions.length > 0 ? validInstructions : undefined,
       difficulty_level: difficultyLevel,
       equipment_needed: equipmentNeeded,
       muscle_groups: muscleGroups,
-      tags: tags,
+      tags: sanitizedTags,
       is_public: isPublic,
     };
 
@@ -535,47 +550,26 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="exercise-category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('exercises:category', 'Category')} *
-                </label>
-                <select
-                  id="exercise-category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as ExerciseCategory)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                  required
-                  disabled={loading}
-                >
-                  {Object.values(Categories).map(cat => (
-                    <option key={cat} value={cat}>
-                      {t(`exercises:categories.${cat}`, cat)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="exercise-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('exercises:type', 'Type')} *
-                </label>
-                <select
-                  id="exercise-type"
-                  value={exerciseType}
-                  onChange={(e) => setExerciseType(e.target.value as ExerciseType)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                  required
-                  disabled={loading}
-                >
-                  <option value={Types.TIME_BASED}>
-                    {t('exercises:types.time_based', 'Time Based')}
-                  </option>
-                  <option value={Types.REPETITION_BASED}>
-                    {t('exercises:types.repetition_based', 'Repetition Based')}
-                  </option>
-                </select>
-              </div>
+            <div>
+              {/* Note: Category is now managed via tags (e.g., 'category:core') in the Tags section below */}
+              <label htmlFor="exercise-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('exercises:type', 'Type')} *
+              </label>
+              <select
+                id="exercise-type"
+                value={exerciseType}
+                onChange={(e) => setExerciseType(e.target.value as ExerciseType)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                required
+                disabled={loading}
+              >
+                <option value={Types.TIME_BASED}>
+                  {t('exercises:types.time_based', 'Time Based')}
+                </option>
+                <option value={Types.REPETITION_BASED}>
+                  {t('exercises:types.repetition_based', 'Repetition Based')}
+                </option>
+              </select>
             </div>
 
             <div>
@@ -595,6 +589,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               </select>
             </div>
           </div>
+          {/* End of basic information */}
 
           {/* Type-specific fields */}
           <div className="space-y-4">
@@ -667,6 +662,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               </div>
             )}
           </div>
+          {/* End of type-specific fields */}
 
           {/* Instructions Section */}
           <div className="space-y-4">
@@ -703,6 +699,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               </div>
             </div>
           </div>
+          {/* End of instructions section */}
 
           {/* Equipment Section */}
           <div className="space-y-4">
@@ -768,6 +765,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               )}
             </div>
           </div>
+          {/* End of equipment section */}
 
           {/* Muscle Groups Section */}
           <div className="space-y-4">
@@ -833,13 +831,90 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               )}
             </div>
           </div>
+          {/* End of muscle groups section */}
 
-          {/* Tags Section */}
+          {/* Tags Section with Badge Helpers */}
           <div className="space-y-4">
-            {/* Use tagsHeading to avoid colliding with nested tags object; Arabic file provides tagsHeading */}
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:tagsHeading', t('exercises:tagsLabel', 'Tags'))}</h3>
             
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p className="text-sm text-blue-700 dark:text-blue-300 mb-2">
+                💡 <strong>{t('exercises:badgeTagsHelp', 'Badge Tags:')}</strong> {t('exercises:badgeTagsDescription', 'Use structured tags like category:core or equipment:bodyweight for filtering. Quick-add buttons below.')}
+              </p>
+            </div>
+
+            {/* Badge Quick-Add Buttons */}
+            {catalogBadges.length > 0 && (
+              <div className="space-y-3">
+                {catalogBadges
+                  .filter(badge => !badge.computed && !badge.dynamicDiscovery) // Only show predefined, editable badges
+                  .map(badge => {
+                    const badgeLabel = t(badge.label, { defaultValue: badge.id });
+                    const prefix = badge.tagPattern?.prefix || '';
+                    
+                    return (
+                      <div key={badge.id} className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {badgeLabel}
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {badge.values?.map(value => {
+                            const tagValue = `${prefix}${value.id}`;
+                            const isSelected = tags.includes(tagValue);
+                            const valueLabel = String(
+                              value.labelParams
+                                ? t(value.label, value.labelParams)
+                                : t(value.label, { defaultValue: value.fallbackLabel || String(value.id) })
+                            );
+                            
+                            return (
+                              <button
+                                key={value.id}
+                                type="button"
+                                onClick={() => {
+                                  if (isSelected) {
+                                    // Remove tag
+                                    const index = tags.indexOf(tagValue);
+                                    if (index > -1) {
+                                      handleRemoveArrayItem('tags', index);
+                                    }
+                                  } else {
+                                    // Add tag
+                                    if (badge.filterType === 'single') {
+                                      // For single-select badges, remove other values of this badge first
+                                      const updatedTags = tags.filter(t => !t.startsWith(prefix));
+                                      setTags([...updatedTags, tagValue]);
+                                    } else {
+                                      setTags([...tags, tagValue]);
+                                    }
+                                  }
+                                }}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                                  isSelected
+                                    ? 'bg-primary-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
+                                disabled={loading}
+                              >
+                                {valueLabel}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+
+            {/* Free-form Tags Input */}
             <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('exercises:freeFormTags', 'Additional Tags (Free-form)')}
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('exercises:freeFormTagsHint', 'Add custom tags for search (e.g., warmup, advanced, home)')}
+              </p>
               <div className="flex gap-2">
                 <div className="flex-1 min-w-0">
                   <input
@@ -847,7 +922,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                    placeholder={t('exercises:tagPlaceholder', 'e.g., beginner, quick, home (comma-separated)')}
+                    placeholder={t('exercises:tagPlaceholder', 'e.g., warmup, quick, home (comma-separated)')}
                     disabled={loading}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -878,23 +953,37 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                 </div>
               </div>
               
+              {/* All Tags Display */}
               {tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag, index) => (
-                    <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-sm bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveArrayItem('tags', index)}
-                        className="ml-1 inline-flex items-center p-0.5 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200"
-                        disabled={loading}
-                        aria-label={t('exercises:removeTag', 'Remove tag')}
-                        title={t('exercises:removeTag', 'Remove tag')}
-                      >
-                        <MinusIcon className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('exercises:allTags', 'All Tags')} ({tags.length})
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => {
+                      // Check if this is a structured badge tag
+                      const isStructuredTag = tag.includes(':');
+                      const tagColor = isStructuredTag
+                        ? 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200'
+                        : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+                      
+                      return (
+                        <span key={index} className={`inline-flex items-center px-2 py-1 rounded-full text-sm ${tagColor}`}>
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveArrayItem('tags', index)}
+                            className="ml-1 inline-flex items-center p-0.5 hover:opacity-80"
+                            disabled={loading}
+                            aria-label={t('exercises:removeTag', 'Remove tag')}
+                            title={t('exercises:removeTag', 'Remove tag')}
+                          >
+                            <MinusIcon className="w-3 h-3" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
@@ -919,6 +1008,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               )}
             </div>
           )}
+          {/* End of video upload section */}
 
           {/* Sharing Options */}
           <div className="space-y-4">
@@ -942,6 +1032,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
               </p>
             </div>
           </div>
+          {/* End of sharing options section */}
 
           {/* Form Actions */}
           <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -986,7 +1077,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                   }
                 </button>
               </div>
+
             </div>
+            {/* End of form actions */}
+            
           </div>
         </form>
       </div>

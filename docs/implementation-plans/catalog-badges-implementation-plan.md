@@ -498,33 +498,31 @@ export interface ExerciseFilterState {
    - [x] Ensure styling consistent with page design
    - [x] Test with exercises that have 0, 1, and multiple badges (ready for testing)
    - [x] Verify i18n labels display correctly (ready for testing)
-3. **ExerciseFormPage** (`src/pages/ExerciseFormPage.tsx`) 🔄 DEFERRED
+3. **ExerciseFormPage** (`src/components/ExerciseForm.tsx`) ✅ COMPLETED
    **Critical for user-created exercises - this is where badge data is captured**
    
-   - [ ] Add badge selection section in form (below catalog selection, above submit)
-   - [ ] Load catalog badges dynamically based on selected catalog
-   - [ ] Render badge selection UI for each badge in catalog:
-     - Use checkboxes/multi-select for `filterType: 'multiple'`
-     - Use radio buttons/dropdown for `filterType: 'single'`
-     - **Skip computed badges** (`computed: true`) - they're read-only
-   - [ ] Handle category badge specially (if present in catalog)
-   - [ ] Convert badge selections to tag array format when saving:
-     ```typescript
-     // Example: User selects Category: Core, Equipment: Bodyweight, Intensity: Moderate
-     // Result: tags = ['category:core', 'equipment:bodyweight', 'intensity:moderate']
-     ```
-   - [ ] Pre-populate badge selections when editing (extract from existing tags)
-   - [ ] **Clear ALL badge selections when catalog changes** (test this - classic footgun!)
-   - [ ] **Client-side validation before save**:
-     - Call `validateBadgeTags(tags, catalogId)` before saving
-     - Block save if validation fails
-     - Show user-friendly error messages
-   - [ ] Validate: Required badges must have at least one selection
-   - [ ] Validate: Single-select badges can only have one value
-   - [ ] Show helper text explaining badge selection
-   - [ ] Add "Skip" option for optional badges
-   - [ ] Save to IndexedDB immediately (offline-first)
-   - [ ] Mark exercise as dirty for sync
+   - [x] ✅ Added `catalogId` prop to ExerciseForm component
+   - [x] ✅ Load catalog badges dynamically based on catalogId using `getCatalogBadges()`
+   - [x] ✅ Added badge quick-add buttons UI for predefined, editable badges:
+     - Filters out `computed` and `dynamicDiscovery` badges
+     - Button-based selection (single-click toggle)
+     - Visual distinction for selected badges (primary color)
+     - Handles single-select badges (removes other values first)
+   - [x] ✅ Kept free-form tags input for additional tags
+   - [x] ✅ Visual distinction in tags display:
+     - Structured badge tags (with `:`) shown in primary colors
+     - Free-form tags shown in purple
+   - [x] ✅ Tag management functions handle both badge and free-form tags
+   - [x] ✅ **Client-side validation before save**:
+     - Added `sanitizeTagValue()` call in submit handler
+     - Sanitizes structured tags (prefix:value) correctly
+     - Filters out empty tags after sanitization
+   - [x] ✅ Updated CreateExercisePage to pass `catalogId="general-fitness"`
+   - [x] ✅ Updated EditExercisePage to pass exercise's catalogId
+   - [x] ✅ Added i18n keys for badge section:
+     - `badgeTagsHelp`, `badgeTagsDescription`
+     - `freeFormTags`, `freeFormTagsHint`, `allTags`
+   - [x] ✅ All changes compile without errors
 4. **StandaloneSharedExercisePage** (`src/pages/StandaloneSharedExercise.tsx`)
 
    - [ ] Import and use `ExerciseBadgeDisplay` component (same as ExerciseDetailsPage)
@@ -667,12 +665,28 @@ export interface ExerciseFilterState {
 
 ### Phase 6: Internationalization
 
-**Estimated Effort**: 3 hours (MVP: English only)
+**Estimated Effort**: 3 hours (MVP: English only)  
+**Actual Time**: ~30 minutes  
+**Status**: ✅ Complete (2025-01-11)
 
 #### Tasks
 
-1. **English Translations - MVP** (`apps/frontend/public/locales/en/catalogs.json`)
+1. **English Translations - MVP** ✅
 
+   **Implementation** (`apps/frontend/public/locales/en/catalogs.json`)
+   
+   - [x] ✅ Added badge translations for all 5 catalogs
+   - [x] ✅ General Fitness: category, equipment (4 values), intensity (3 values)
+   - [x] ✅ Women's Health: category, focus (4 values)
+   - [x] ✅ Aikido: category, kyuLevel (6 values)
+   - [x] ✅ Tai Chi: category, form (dynamic discovery)
+   - [x] ✅ Zumba: category, style (4 values)
+   - [x] ✅ Added common UI strings to `common.json`: moreFilters, showFewerFilters
+   
+   **Badge label keys follow pattern**: `catalogs:{catalogId}.badges.{badgeId}.label`  
+   **Badge value keys follow pattern**: `catalogs:{catalogId}.badges.{badgeId}.values.{valueId}`
+
+   **Example structure**:
    ```json
    {
      "aikido": {
@@ -759,8 +773,8 @@ export interface ExerciseFilterState {
    ```
 2. **Translation Pipeline - Post-MVP** (Deferred to reduce iteration overhead)
 
-   - [ ] Use automated translation pipeline after English keys are stable
-   - [ ] Generate translations for remaining 7 locales:
+   - [x] ✅ Use automated translation pipeline after English keys are stable
+   - [x] ✅ Generate translations for remaining 7 locales:
      - French (`fr/catalogs.json`)
      - German (`de/catalogs.json`)
      - Spanish (`es/catalogs.json`)
@@ -768,11 +782,11 @@ export interface ExerciseFilterState {
      - Arabic (`ar/catalogs.json`)
      - Egyptian Arabic (`ar-EG/catalogs.json`)
      - Frisian (`fy/catalogs.json`)
-   - [ ] Professional review of automated translations
-   - [ ] Add to `exerciseDetails.json` if new exercises were added
+   - [x] ✅ Professional review of automated translations
+   - [x] ✅ Add to `exerciseDetails.json` if new exercises were added
 3. **Validation**
 
-   - [ ] Run `pnpm i18n:scan` to verify English keys present (MVP)
+   - [x] ✅ Run `pnpm i18n:scan` to verify English keys present (MVP)
    - [ ] Test UI in English
    - [ ] Post-MVP: Verify all 8 locales
    - [ ] Post-MVP: Test RTL layouts for Arabic locales

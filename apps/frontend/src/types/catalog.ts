@@ -5,7 +5,7 @@
  * that replaces hardcoded filtering (e.g., Aikido Kyu levels, static categories).
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * Represents a single value for a catalog badge
@@ -30,7 +30,7 @@ export interface BadgeValue {
   label: string;
   
   /** Optional parameters for i18n interpolation */
-  labelParams?: Record<string, any>;
+  labelParams?: Record<string, string | number>;
   
   /** Optional icon component to display with the badge */
   icon?: ReactNode;

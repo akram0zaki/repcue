@@ -59,7 +59,10 @@
     "noVideo": "Geen Video",
     "pauseVideo": "Pauze Video",
     "playVideo": "Afspelen Video",
-    "premium": "PRO"
+    "premium": "PRO",
+    "moreFilters": "Meer filters ({{count}})",
+    "moreFilters_other": "Meer filters ({{count}})",
+    "showFewerFilters": "Minder filters tonen"
   },
   "navigation": {
     "home": "Home",

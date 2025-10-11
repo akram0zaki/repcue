@@ -200,11 +200,6 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       );
     }
 
-    // Apply category filter
-    if (filters.category !== 'all') {
-      filteredExercises = filteredExercises.filter(ex => ex.category === filters.category);
-    }
-
     // Apply difficulty filter
     if (filters.difficulty !== 'all') {
       filteredExercises = filteredExercises.filter(ex => ex.difficulty_level === filters.difficulty);
@@ -339,9 +334,6 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
-          {t(`exercises.categories.${exercise.category}`)}
-        </span>
         {exercise.difficulty_level && (
           <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
             {t(`exercises.difficulty.${exercise.difficulty_level}`)}

@@ -59,7 +59,7 @@
     "noVideo": "Sin video",
     "pauseVideo": "Pausar video",
     "playVideo": "Reproducir video",
-        "premium": "PRO",
+    "premium": "PRO",
     "done": "Hecho",
     "addEquipment": "Agregar equipo",
     "removeEquipment": "Eliminar equipo",
@@ -68,7 +68,10 @@
     "addTag": "Agregar etiqueta",
     "removeTag": "Eliminar etiqueta",
     "exerciseParameters": "Parámetros del ejercicio",
-    "exerciseVideo": "Video del ejercicio"
+    "exerciseVideo": "Video del ejercicio",
+    "moreFilters": "Más filtros ({{count}})",
+    "moreFilters_other": "Más filtros ({{count}})",
+    "showFewerFilters": "Mostrar menos filtros"
   },
   "navigation": {
     "home": "Inicio",

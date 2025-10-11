@@ -1,6 +1,32 @@
 ## Unreleased
 
-### 2025-01-09 (Catalog Badge System - Phases 1-5 Complete)
+### 2025-01-11 (Catalog Badge System - Complete)
+
+#### Summary
+The catalog badge system implementation is now complete! This major feature update replaces hardcoded filtering with a flexible, catalog-specific badge system that works seamlessly for both built-in and user-created exercises, with full offline-first sync support.
+
+**Key Achievements**:
+- ✅ Generic badge infrastructure (types, hooks, utilities)
+- ✅ Badge UI components (filtering + display)
+- ✅ All 5 catalogs configured with badges
+- ✅ Badge-aware exercise form for user-created exercises
+- ✅ Full database and sync integration (IndexedDB + Supabase)
+- ✅ Complete internationalization (English + 7 languages)
+- ✅ Legacy category system fully removed
+- ✅ Dynamic exercise grouping on listing page
+
+**User Impact**:
+- Users can now filter exercises by multiple catalog-specific criteria (equipment, intensity, skill level, etc.)
+- Creating custom exercises is easier with quick-add badge buttons
+- Exercise listings are now dynamically grouped based on catalog-specific badges
+- All features work offline-first with automatic sync across devices
+
+#### Fixed
+- **Translation Issues**: Fixed "Create New Exercise" button translation key
+  - Changed from `exercises:createNew` to `common:exercises.createNew`
+  - Button now properly translates to all 8 supported languages
+
+### 2025-01-09 (Catalog Badge System - Phases 1-6)
 
 #### Added
 - **Generic Catalog Badge System**: Replaced hardcoded Aikido Kyu filtering with flexible, catalog-specific badge system
@@ -17,6 +43,16 @@
   - Aikido: category, kyuLevel (Kyu 1-6)
   - Tai Chi: category, form (dynamic discovery with regex pattern)
   - Zumba: category, style (4 dance styles)
+
+- **Badge-Aware Exercise Form**: Enhanced `ExerciseForm` component for user-created exercises
+  - Added `catalogId` prop to dynamically load catalog-specific badge definitions
+  - Implemented badge quick-add buttons UI for easy structured tag creation
+  - Button-based selection with single-click toggle (primary color for selected)
+  - Handles single-select badges (removes other values automatically)
+  - Filters out computed and dynamic discovery badges (read-only/automatic)
+  - Visual distinction: structured badge tags (blue) vs. free-form tags (purple)
+  - Added client-side tag sanitization in submit handler
+  - Updated `CreateExercisePage` and `EditExercisePage` to pass catalogId
 
 #### Changed
 - **Exercise Type System**: Made `category` field optional in Exercise interface (deprecated in favor of badge system)
@@ -59,11 +95,12 @@
   - Validation: `utils/badgeValidation.ts` (client-side)
   - Database: `supabase/migrations/20251009192511_add_exercises_tags_gin_index.sql`
   
-- **Files Modified**: 6 files (~400 lines)
+- **Files Modified**: 8 files (~450 lines)
   - Frontend: `data/catalogs.ts`, `components/ExerciseSelector/ExerciseSelector.tsx`
   - Frontend: `components/ExerciseDetailContent.tsx`, `hooks/useExerciseFilter.ts`
   - Database: `services/storageService.ts` (schema v22, badge methods)
   - Backend: `supabase/functions/sync_v2/index.ts` (tag validation)
+  - i18n: `public/locales/en/catalogs.json`, `public/locales/en/common.json`
   
 - **Quality**: 0 linting errors, full TypeScript type safety, defense-in-depth security
 
@@ -78,6 +115,13 @@
   - Tag format enforced: `badgeId:value` with XSS prevention
   - Max 20 tags per exercise, max 100 chars per tag
   - StorageService methods: `getExercisesByBadge()`, `getUniqueBadgeValues()`, `addTagsToExercise()`, `removeTagsFromExercise()`
+
+- **Internationalization (i18n)**: English translations for badge system (MVP)
+  - Added badge translations for all 5 catalogs in `en/catalogs.json`
+  - Badge label pattern: `catalogs:{catalogId}.badges.{badgeId}.label`
+  - Badge value pattern: `catalogs:{catalogId}.badges.{badgeId}.values.{valueId}`
+  - Added common UI strings: `moreFilters`, `showFewerFilters`
+  - Translation keys ready for pipeline to generate other 7 locales
 
 #### Changed
 - **Sync System**: Tags field included in push/pull allowlists

@@ -143,19 +143,25 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           )}
         </div>
 
-        {/* Tags - moved below exercise name */}
-        {exercise.tags && exercise.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {exercise.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 rounded-full"
-              >
-                {t(`exercises:tags.${tag}`, tag)}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Tags - moved below exercise name (free-form tags only, structured badges displayed separately) */}
+        {exercise.tags && exercise.tags.length > 0 && (() => {
+          // Filter out structured badge tags (those with ':' pattern like 'category:core')
+          // These are displayed by ExerciseBadgeDisplay component below
+          const freeFormTags = exercise.tags.filter(tag => !tag.includes(':'));
+          
+          return freeFormTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {freeFormTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 rounded-full"
+                >
+                  {t(`exercises:tags.${tag}`, tag)}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Exercise Description - moved to top */}
         {loc.description && (
