@@ -1,5 +1,16 @@
 ## Unreleased
 
+### 2025-01-12
+
+#### Fixed
+- **WebAuthn Authentication**: Fixed biometric authentication failing when email is provided
+  - Issue: Edge function returned 500 error "r.replace is not a function" when authenticating with email
+  - Root cause: SimpleWebAuthn v12+ expects credential IDs as base64url strings, but was receiving Uint8Array objects
+  - Solution: Added `uint8ArrayToBase64url()` helper to convert stored credential IDs before passing to `generateAuthenticationOptions()`
+  - Affected: `webauthn-authenticate` edge function
+  - Status: ✅ Deployed to both development (v13) and production (v9) environments
+  - Files: [supabase/functions/webauthn-authenticate/index.ts](supabase/functions/webauthn-authenticate/index.ts#L93-L111)
+
 ### 2025-01-11 (Catalog Badge System - Complete)
 
 #### Summary
