@@ -1,5 +1,54 @@
 ## Unreleased
 
+### 2025-10-12
+
+#### Fixed
+- **Sync System - DML Operations**: Fixed workout and exercise deletion failing during sync
+  - Issue: Users experienced "syntax error at or near SET" when deleting workouts/exercises
+  - Root cause: `exec_sql` RPC function only supported SELECT queries, wrapped all SQL in `SELECT array_to_json`
+  - Solution: Enhanced `exec_sql` to detect query type and handle UPDATE/DELETE/INSERT separately, returning affected row counts
+  - Affected: All sync delete/update operations via edge functions
+  - Status: ✅ Deployed to both development and production environments
+  - Files: [supabase/migrations/20251012-01-fix-exec-sql-for-dml.sql](supabase/migrations/20251012-01-fix-exec-sql-for-dml.sql)
+
+- **Architecture - Offline-First Violation**: Fixed ExerciseDetailPage making direct Supabase API calls
+  - Issue: Clicking custom exercises resulted in 406 errors and "Cannot coerce to single JSON object" errors
+  - Root cause: `ExerciseDetailPage` was bypassing IndexedDB and querying Supabase REST API directly
+  - Solution: Replaced direct queries with `storageService.getExerciseById()` for offline-first data access
+  - Added new method: `StorageService.getExerciseById()` with favorite enrichment and video URL resolution
+  - Benefits: Instant loading, works offline, consistent with app architecture
+  - Status: ✅ Fixed and built
+  - Files: [apps/frontend/src/pages/ExerciseDetailPage.tsx](apps/frontend/src/pages/ExerciseDetailPage.tsx), [apps/frontend/src/services/storageService.ts](apps/frontend/src/services/storageService.ts#L1792-L1825)
+
+- **Video Upload - Incorrect Sync Status**: Fixed synced videos still showing "pending sync" message
+  - Issue: After successful video upload to cloud storage, UI continued displaying "الفيديو في انتظار المزامنة" (Video pending sync)
+  - Root cause: Edge function kept `custom_video_url` as `blob-pending-sync://` instead of changing to `blob-video://` after successful upload
+  - Solution: Updated sync_v2 edge function to change URL scheme after upload, updated VideoUploadWidget to only show pending message for `blob-pending-sync://` URLs
+  - Status: ✅ Deployed to both environments and built
+  - Files: [supabase/functions/sync_v2/index.ts](supabase/functions/sync_v2/index.ts#L292), [apps/frontend/src/components/VideoUploadWidget.tsx](apps/frontend/src/components/VideoUploadWidget.tsx#L342)
+
+- **Database Schema - Category Constraint**: Made exercises.category column nullable
+  - Issue: Exercise creation/sync failed with "null value in column category violates not-null constraint"
+  - Root cause: Tag-based architecture doesn't require separate category field, but database enforced NOT NULL
+  - Solution: Applied migration to make category optional, removed category extraction from ExerciseForm
+  - Benefits: Aligns with tag-based architecture (e.g., `category:core` in tags array), maintains backward compatibility
+  - Status: ✅ Applied to both environments
+  - Files: [supabase/migrations/20251012-02-make-category-optional.sql](supabase/migrations/20251012-02-make-category-optional.sql), [apps/frontend/src/components/ExerciseForm.tsx](apps/frontend/src/components/ExerciseForm.tsx)
+
+#### Documentation
+- **Sync System**: Enhanced video upload documentation with URL scheme lifecycle
+  - Added comprehensive table explaining `blob-pending-sync://`, `blob-video://`, and HTTP URL schemes
+  - Documented URL lifecycle: upload → pending → sync success → video scheme change
+  - Added implementation notes on IndexedDB lookup behavior and cross-device sync
+  - Files: [docs/sync-system.md](docs/sync-system.md#L398-L421)
+
+- **Migration Tracking**: Complete documentation of all October 12 changes
+  - Detailed root cause analysis for each issue
+  - Code examples showing before/after changes
+  - Testing checklist and verification steps
+  - Production deployment confirmation
+  - Files: [docs/migration-tracking/supabase-changes_20251012.md](docs/migration-tracking/supabase-changes_20251012.md)
+
 ### 2025-01-12
 
 #### Fixed

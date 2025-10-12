@@ -1783,11 +1783,57 @@ export class StorageService {
   }
 
   /**
+   * Get a single exercise by ID from IndexedDB (offline-first).
+   * Handles both user-created exercises (UUID) and built-in exercises.
+   *
+   * @param exerciseId - Exercise ID (UUID for user-created, slug for built-in)
+   * @returns Exercise or null if not found
+   */
+  public async getExerciseById(exerciseId: string): Promise<Exercise | null> {
+    if (!this.canStoreData()) {
+      return null;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const userId = authService.getCurrentUser()?.id;
+
+        // Fetch the exercise and related data
+        const [storedExercise, prefs, userCreatedFavorites] = await Promise.all([
+          this.db.exercises.get(exerciseId),
+          this.getUserPreferences().catch(() => null),
+          userId ? this.db.user_favorites
+            .where('owner_id').equals(userId)
+            .and(f => f.item_type === 'exercise' && f.item_id === exerciseId && !f.deleted)
+            .first() : Promise.resolve(undefined)
+        ]);
+
+        if (!storedExercise || storedExercise.deleted) {
+          return null;
+        }
+
+        const favorites = prefs?.favorite_exercises || [];
+        const isFavorite = favorites.includes(exerciseId) || !!userCreatedFavorites;
+
+        const exercise = {
+          ...this.convertStoredExercise(storedExercise),
+          is_favorite: isFavorite
+        };
+
+        // Enrich with video URL if it has a video
+        const enriched = await this.enrichExercisesWithVideoUrls([exercise]);
+        return enriched[0] || null;
+      },
+      () => null
+    );
+  }
+
+  /**
    * Get exercises by badge tag
-   * 
+   *
    * Efficiently queries exercises that have a specific badge tag
    * using the multi-entry index on tags field.
-   * 
+   *
    * @param catalogId - Catalog ID to filter exercises
    * @param badgeId - Badge identifier (e.g., 'category', 'kyuLevel')
    * @param value - Badge value (e.g., 'core', '5')

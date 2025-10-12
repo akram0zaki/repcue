@@ -470,7 +470,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     const validInstructions = instructions
       .filter(inst => inst.text.trim())
       .map((inst, i) => ({ ...inst, step: i + 1 }));
-    
+
     const exerciseData: Partial<Exercise> = {
       name: name.trim(),
       description: description.trim() || undefined,

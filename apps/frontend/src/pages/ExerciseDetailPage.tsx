@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '../config/supabase';
 import type { Exercise } from '../types';
 import { Routes as AppRoutes } from '../types';
 import { ExerciseDetailContent } from '../components/ExerciseDetailContent';
@@ -94,38 +93,24 @@ const ExerciseDetailPage: React.FC = () => {
     setError(null);
 
     try {
-      if (!supabase) {
-        throw new Error('Supabase not available');
-      }
-
       // Check if this is a user-created exercise (UUID) or builtin (slug)
       const isUUID = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 
       let exerciseData;
-      
-      if (isUUID) {
-        // Load user-created exercise from database
-        const { data, error } = await supabase
-          .from('exercises')
-          .select(`
-            *,
-            profiles!owner_id(display_name)
-          `)
-          .eq('id', id)
-          .eq('deleted', false)
-          .single();
 
-        if (error) throw error;
-        exerciseData = data;
+      if (isUUID) {
+        // Load user-created exercise from IndexedDB (offline-first)
+        exerciseData = await storageService.getExerciseById(id);
+
+        if (!exerciseData) {
+          throw new Error(`User exercise not found: ${id}`);
+        }
 
         // Check if current user owns this exercise
-        const { data: { user } } = await supabase.auth.getUser();
         setIsOwner(user?.id === exerciseData.owner_id);
       } else {
         // For built-in exercises, load from the exercises data
-        // logger.log('Loading built-in exercise with ID:', id);
         const builtInExercise = getExerciseById(id);
-        // logger.log('Found built-in exercise:', builtInExercise ? builtInExercise.name : 'null');
         if (!builtInExercise) {
           throw new Error(`Built-in exercise not found: ${id}`);
         }

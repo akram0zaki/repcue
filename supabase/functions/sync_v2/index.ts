@@ -284,12 +284,12 @@ async function processVideoFileUpload(supabase: any, record: any, userId: string
       version: (record.version || 0) + 1
     };
 
-    // Update exercise's custom_video_url to reference the uploaded file
+    // Update exercise's custom_video_url to indicate video is synced
     try {
       const { error: exerciseError } = await supabase
         .from('exercises')
         .update({
-          custom_video_url: `blob-pending-sync://${exercise_id}/${file_name}`,
+          custom_video_url: `blob-video://${exercise_id}/${file_name}`,
           updated_at: new Date().toISOString()
         })
         .eq('id', exercise_id)
@@ -298,6 +298,8 @@ async function processVideoFileUpload(supabase: any, record: any, userId: string
       if (exerciseError) {
         logWithContext(correlationId, 'WARN', 'Failed to update exercise custom_video_url', { error: exerciseError.message });
         // Don't fail the entire operation for this
+      } else {
+        logWithContext(correlationId, 'INFO', `Updated exercise custom_video_url to blob-video:// scheme indicating sync complete`);
       }
     } catch (e) {
       logWithContext(correlationId, 'WARN', 'Exception updating exercise custom_video_url', { error: e.message });

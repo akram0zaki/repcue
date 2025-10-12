@@ -1,6 +1,6 @@
--- exec_sql function for dynamic SQL execution in edge functions
--- This function allows edge functions to execute parameterized queries safely
--- Updated 2025-10-12: Added support for DML (UPDATE/DELETE/INSERT) queries
+-- Fix exec_sql function to support both SELECT and DML (UPDATE/DELETE/INSERT) queries
+-- The previous version only worked with SELECT queries because it wrapped everything in SELECT array_to_json
+-- This version detects the query type and handles it appropriately
 
 CREATE OR REPLACE FUNCTION public.exec_sql(sql text, params text[] DEFAULT '{}'::text[])
  RETURNS json
