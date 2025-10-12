@@ -364,7 +364,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
               >
                 <PlusIcon size={20} />
                 <span className="hidden sm:inline">{t('exercises:createNew', 'Create New Exercise')}</span>
-                <span className="sm:hidden">{t('common.create', 'Create')}</span>
+                <span className="sm:hidden">{t('common:common.create', 'Create')}</span>
               </button>
             )}
           </div>

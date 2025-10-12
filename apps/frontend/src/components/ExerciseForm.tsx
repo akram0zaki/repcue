@@ -1102,10 +1102,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         isOpen={clearFormModalOpen}
         onClose={() => setClearFormModalOpen(false)}
         onConfirm={handleConfirmClearForm}
-        title={t('clearFormTitle', 'Clear Form')}
-        message={t('confirmClearForm', 'Are you sure you want to clear the form? This will delete your draft.')}
-        confirmText={t('clear', 'Clear Form')}
-        cancelText={t('common.cancel', 'Cancel')}
+        title={t('common:common.clearFormTitle', 'Clear Form')}
+        message={t('common:common.confirmClearForm', 'Are you sure you want to clear the form? This will delete your draft.')}
+        confirmText={t('common:common.clear', 'Clear Form')}
+        cancelText={t('common:common.cancel', 'Cancel')}
         variant="danger"
       />
     </div>

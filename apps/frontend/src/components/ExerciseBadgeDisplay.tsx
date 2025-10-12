@@ -45,7 +45,7 @@ export const ExerciseBadgeDisplay: React.FC<ExerciseBadgeDisplayProps> = ({
   return (
     <div className={`exercise-badge-display ${className}`}>
       <h3 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">
-        {t('common:badges', { defaultValue: 'Exercise Details' })}
+        {t('common:common.badges', { defaultValue: 'Badges' })}
       </h3>
       
       <div className="space-y-3">

@@ -128,10 +128,10 @@ export const CreateExercisePage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              {t('exercises.createExercise', 'Create Exercise')}
+              {t('exercises:createExercise', 'Create Exercise')}
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              {t('exercises.createDescription', 'Create a custom exercise that you can use in your workouts')}
+              {t('exercises:createDescription', 'Create a custom exercise that you can use in your workouts')}
             </p>
           </div>
 
