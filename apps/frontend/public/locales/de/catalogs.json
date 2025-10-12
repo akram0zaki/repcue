@@ -13,7 +13,7 @@
         "values": {
           "bodyweight": "Nur mit Körpergewicht",
           "dumbbells": "Kurzhanteln",
-          "resistance-band": "Widerstandsband",
+          "resistanceBand": "Widerstandsband",
           "none": "Keine Ausrüstung"
         }
       },

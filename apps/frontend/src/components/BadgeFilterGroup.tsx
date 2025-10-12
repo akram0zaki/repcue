@@ -49,7 +49,7 @@ const BadgeFilter: React.FC<BadgeFilterProps> = ({
   onToggleValue,
   onClear
 }) => {
-  const { t } = useTranslation(['catalogs', 'common']);
+  const { t } = useTranslation(['catalogs', 'exercises', 'common']);
   
   // Get badge values (memoized with caching)
   const badgeValues = useBadgeValues(exercises, catalogId, badge);
@@ -128,7 +128,7 @@ export const BadgeFilterGroup: React.FC<BadgeFilterGroupProps> = ({
   className = '',
   maxVisibleBadges = 3
 }) => {
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['catalogs', 'exercises', 'common']);
   const [showAllBadges, setShowAllBadges] = useState(false);
   
   // Get all badges for this catalog

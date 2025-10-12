@@ -16,7 +16,9 @@
     "messageShort": "يرجى الاتصال بالإنترنت لاستخدام منشئ التمارين بالذكاء الاصطناعي."
   },
   "progress": {
-    "step": "الخطوة {{current}} من {{total}}"
+    "step": "الخطوة {{current}} من {{total}}",
+    "current": "الخطوة الحالية {{step}}",
+    "label": "التقدم"
   },
   "screen1": {
     "title": "أخبرنا عن نفسك",
@@ -44,7 +46,10 @@
       "placeholderCm": "سنتيمترات",
       "placeholderFeet": "أقدام",
       "placeholderInches": "بوصات",
-      "error": "يرجى إدخال طول صحيح"
+      "error": "يرجى إدخال طول صحيح",
+      "unitLabel": "وحدة الطول",
+      "valueLabel": "قيمة الطول",
+      "inchesLabel": "بوصات"
     },
     "weight": {
       "label": "الوزن",
@@ -54,7 +59,9 @@
       "unitLbs": "رطل",
       "placeholderKg": "كيلوغرامات",
       "placeholderLbs": "أرطال",
-      "error": "يرجى إدخال وزن صحيح"
+      "error": "يرجى إدخال وزن صحيح",
+      "unitLabel": "وحدة الوزن",
+      "valueLabel": "قيمة الوزن"
     },
     "next": "التالي"
   },
@@ -153,8 +160,9 @@
     "title": "تمارينك الشخصية",
     "subtitle": "تمارين مُنشأة بالذكاء الاصطناعي مصممة لأهدافك",
     "aiGeneratedBadge": "مُنشأ بالذكاء الاصطناعي",
-    "exercises": "{{count}} تمرين",
-    "duration": "~{{minutes}} دقيقة",
+    "exerciseCount": "{{count}} تمرين",
+    "durationSeconds": "~{{seconds}} ثانية",
+    "durationMinutes": "~{{minutes}} دقيقة",
     "scheduledDays": "مجدولة ليوم {{days}}",
     "viewWorkouts": "عرض التمارين",
     "generateAgain": "إنشاء مرة أخرى",
@@ -188,6 +196,7 @@
     "exitButton": "خروج",
     "backButton": "رجوع",
     "nextButton": "التالي",
+    "skip": "تخطي",
     "generateButton": "إنشاء تمارينني",
     "exitConfirmation": {
       "title": "هل أنت متأكد أنك تريد الخروج؟",

@@ -1,0 +1,17 @@
+{
+    "copy": "Copier",
+    "copying": "Copie...",
+    "copied": "Copié!",
+    "loginRequired": "Connectez-vous pour copier",
+    "tooltip": "Copier {{name}} dans votre bibliothèque",
+
+    "genericError": "Échec de la copie de l'exercice",
+    "error": "Erreur: {{error}}",
+    "copyToLibrary": "Copier dans la bibliothèque",
+    "copyExercise": "Copier l'exercice",
+    "copyComplete": "Copie terminée",
+    "copySuccess": "Exercice copié avec succès!",
+    "copyError": "Échec de la copie: {{error}}",
+    "copyErrorNetwork": "Erreur réseau - veuillez réessayer",
+    "copyErrorGeneric": "Une erreur s'est produite lors de la copie"
+}

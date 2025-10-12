@@ -787,7 +787,7 @@ export interface ExerciseFilterState {
 3. **Validation**
 
    - [x] ✅ Run `pnpm i18n:scan` to verify English keys present (MVP)
-   - [ ] Test UI in English
+   - [x] Test UI in English
    - [ ] Post-MVP: Verify all 8 locales
    - [ ] Post-MVP: Test RTL layouts for Arabic locales
 

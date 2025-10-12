@@ -530,9 +530,9 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
                   className="w-full p-2 border border-border-300 dark:border-border-600 rounded bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50"
                 >
                   <option value="all">{t('community.allDifficulties')}</option>
-                  <option value="beginner">{t('exercises.difficulty.beginner')}</option>
-                  <option value="intermediate">{t('exercises.difficulty.intermediate')}</option>
-                  <option value="advanced">{t('exercises.difficulty.advanced')}</option>
+                  <option value="beginner">{t('exercises.difficulties.beginner')}</option>
+                  <option value="intermediate">{t('exercises.difficulties.intermediate')}</option>
+                  <option value="advanced">{t('exercises.difficulties.advanced')}</option>
                 </select>
               </div>
 

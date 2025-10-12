@@ -5,5 +5,13 @@
   "error": "Error al copiar",
   "genericError": "Ocurrió un error al copiar",
   "loginRequired": "[es] Por favor, inicie sesión para copiar contenido",
-  "tooltip": "Copiar a tu biblioteca"
+  "tooltip": "Copiar {{name}} a tu biblioteca",
+
+  "copyToLibrary": "Copiar a la biblioteca",
+  "copyExercise": "Copiar ejercicio",
+  "copyComplete": "Copia completa",
+  "copySuccess": "¡Ejercicio copiado con éxito!",
+  "copyError": "Error al copiar: {{error}}",
+  "copyErrorNetwork": "Error de red - por favor, inténtelo de nuevo",
+  "copyErrorGeneric": "Ocurrió un error al copiar"
 }

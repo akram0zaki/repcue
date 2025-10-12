@@ -13,7 +13,7 @@
         "values": {
           "bodyweight": "Solo peso corporal",
           "dumbbells": "Mancuernas",
-          "resistance-band": "Banda de resistencia",
+          "resistanceBand": "Banda de resistencia",
           "none": "Sin equipo"
         }
       },

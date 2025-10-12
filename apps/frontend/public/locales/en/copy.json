@@ -1,0 +1,17 @@
+{
+    "copy": "Copy",
+    "copying": "Copying...",
+    "copied": "Copied!",
+    "loginRequired": "Please log in to copy content",
+
+    "tooltip": "Copy {{name}} to your library",
+    "error": "Error: {{error}}",
+    "genericError": "Failed to copy exercise",
+    "copyToLibrary": "Copy to Library",
+    "copyExercise": "Copy Exercise",
+    "copyComplete": "Copy Complete",
+    "copySuccess": "Exercise copied successfully!",
+    "copyError": "Copy failed: {{error}}",
+    "copyErrorNetwork": "Network error - please try again",
+    "copyErrorGeneric": "An error occurred while copying"
+}

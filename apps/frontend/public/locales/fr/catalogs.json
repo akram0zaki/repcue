@@ -13,7 +13,7 @@
         "values": {
           "bodyweight": "Poids du corps uniquement",
           "dumbbells": "Haltères",
-          "resistance-band": "Bande de résistance",
+          "resistanceBand": "Bande de résistance",
           "none": "Aucun équipement"
         }
       },

@@ -28,12 +28,12 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
         id: 'category',
         label: 'catalogs:general-fitness.badges.category.label',
         values: [
-          { id: 'core', label: 'common:categories.core' },
-          { id: 'strength', label: 'common:categories.strength' },
-          { id: 'cardio', label: 'common:categories.cardio' },
-          { id: 'flexibility', label: 'common:categories.flexibility' },
-          { id: 'balance', label: 'common:categories.balance' },
-          { id: 'hand-warmup', label: 'common:categories.handWarmup' }
+          { id: 'core', label: 'exercises:categories.core' },
+          { id: 'strength', label: 'exercises:categories.strength' },
+          { id: 'cardio', label: 'exercises:categories.cardio' },
+          { id: 'flexibility', label: 'exercises:categories.flexibility' },
+          { id: 'balance', label: 'exercises:categories.balance' },
+          { id: 'hand-warmup', label: 'exercises:categories.hand-warmup' }
         ],
         tagPattern: { prefix: 'category:' }
       },
@@ -77,10 +77,10 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
         id: 'category',
         label: 'catalogs:women-health.badges.category.label',
         values: [
-          { id: 'core', label: 'common:categories.core' },
-          { id: 'strength', label: 'common:categories.strength' },
-          { id: 'flexibility', label: 'common:categories.flexibility' },
-          { id: 'balance', label: 'common:categories.balance' }
+          { id: 'core', label: 'exercises:categories.core' },
+          { id: 'strength', label: 'exercises:categories.strength' },
+          { id: 'flexibility', label: 'exercises:categories.flexibility' },
+          { id: 'balance', label: 'exercises:categories.balance' }
         ],
         tagPattern: { prefix: 'category:' }
       },
@@ -113,10 +113,10 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
         id: 'category',
         label: 'catalogs:aikido.badges.category.label',
         values: [
-          { id: 'core', label: 'common:categories.core' },
-          { id: 'strength', label: 'common:categories.strength' },
-          { id: 'flexibility', label: 'common:categories.flexibility' },
-          { id: 'balance', label: 'common:categories.balance' }
+          { id: 'core', label: 'exercises:categories.core' },
+          { id: 'strength', label: 'exercises:categories.strength' },
+          { id: 'flexibility', label: 'exercises:categories.flexibility' },
+          { id: 'balance', label: 'exercises:categories.balance' }
         ],
         tagPattern: { prefix: 'category:' }
       },
@@ -151,8 +151,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
         id: 'category',
         label: 'catalogs:tai-chi.badges.category.label',
         values: [
-          { id: 'flexibility', label: 'common:categories.flexibility' },
-          { id: 'balance', label: 'common:categories.balance' }
+          { id: 'flexibility', label: 'exercises:categories.flexibility' },
+          { id: 'balance', label: 'exercises:categories.balance' }
         ],
         tagPattern: { prefix: 'category:' }
       },
@@ -183,7 +183,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
         id: 'category',
         label: 'catalogs:zumba.badges.category.label',
         values: [
-          { id: 'cardio', label: 'common:categories.cardio' }
+          { id: 'cardio', label: 'exercises:categories.cardio' }
         ],
         tagPattern: { prefix: 'category:' }
       },

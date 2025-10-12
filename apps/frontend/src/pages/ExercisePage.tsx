@@ -49,7 +49,7 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails', 'catalogs']);
+  const { t } = useTranslation(['exercises', 'common', 'exerciseDetails', 'catalogs']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
@@ -354,23 +354,23 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-text-900 dark:text-text-50 flex items-center gap-2">
               <WorkoutIcon size={24} className="text-primary-600 dark:text-primary-400" />
-              {t('common:exercises.title')}
+              {t('exercises:title')}
             </h1>
             {flags.canCreateExercises && (
               <button
                 onClick={() => navigate('/exercises/create')}
                 className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
-                aria-label={t('common:exercises.createNew', 'Create New Exercise')}
+                aria-label={t('exercises:createNew', 'Create New Exercise')}
               >
                 <PlusIcon size={20} />
-                <span className="hidden sm:inline">{t('common:exercises.createNew', 'Create New Exercise')}</span>
-                <span className="sm:hidden">{t('common:create', 'Create')}</span>
+                <span className="hidden sm:inline">{t('exercises:createNew', 'Create New Exercise')}</span>
+                <span className="sm:hidden">{t('common.create', 'Create')}</span>
               </button>
             )}
           </div>
           
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {t('common:exercises.subtitle')}
+            {t('exercises:subtitle')}
           </p>
         </div>
 
@@ -727,16 +727,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-base sm:text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
-              {t('common:exercises.emptyTitle')}
+              {t('exercises:emptyTitle')}
             </h3>
             <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mb-4">
-              {t('common:exercises.emptyBody')}
+              {t('exercises:emptyBody')}
             </p>
             <button
               onClick={clearAllFilters}
               className="px-4 py-2.5 bg-primary-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-primary-600 transition-colors min-h-[44px]"
             >
-              {t('common:exercises.clearFilters')}
+              {t('exercises:clearFilters')}
             </button>
           </div>
         )}

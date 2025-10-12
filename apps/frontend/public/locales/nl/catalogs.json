@@ -13,7 +13,7 @@
         "values": {
           "bodyweight": "Alleen lichaamsgewicht",
           "dumbbells": "Dumbbells",
-          "resistance-band": "Weerstandsband",
+          "resistanceBand": "Weerstandsband",
           "none": "Geen apparatuur"
         }
       },

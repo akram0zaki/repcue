@@ -13,7 +13,7 @@
         "values": {
           "bodyweight": "Bodyweight Only",
           "dumbbells": "Dumbbells",
-          "resistance-band": "Resistance Band",
+          "resistanceBand": "Resistance Band",
           "none": "No Equipment"
         }
       },

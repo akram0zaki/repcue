@@ -50,8 +50,8 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'common:exercises.title': 'Exercises',
-        'common:exercises.subtitle': 'Browse, filter, and start exercises. Mark favorites for quick access.',
+        'exercises:title': 'Exercises',
+        'exercises:subtitle': 'Browse, filter, and start exercises. Mark favorites for quick access.',
         'exercises:createNew': 'Create New Exercise',
         'common.create': 'Create',
         'selectCatalog': 'Exercise Catalog',

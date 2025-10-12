@@ -1,9 +1,17 @@
 {
   "copied": "In Ihre Bibliothek kopiert",
   "copy": "Kopieren",
-  "copying": "Kopierening...",
-  "error": "Kopieren fehlgeschlagen",
-  "genericError": "Beim Kopieren ist ein Fehler aufgetreten",
+  "copying": "Kopieren...",
   "loginRequired": "Bitte loggen Sie sich ein, um Inhalte zu kopieren",
-  "tooltip": "Kopieren to your library"
+  "tooltip": "Kopieren {{name}} in Ihre Bibliothek",
+
+  "error": "Fehler: {{error}}",
+  "genericError": "Fehler beim Kopieren der Übung",
+  "copyToLibrary": "In die Bibliothek kopieren",
+  "copyExercise": "Übung kopieren",
+  "copyComplete": "Kopieren abgeschlossen",
+  "copySuccess": "Übung erfolgreich kopiert!",
+  "copyError": "Kopieren fehlgeschlagen: {{error}}",
+  "copyErrorNetwork": "Netzwerkfehler - bitte erneut versuchen",
+  "copyErrorGeneric": "Beim Kopieren ist ein Fehler aufgetreten"
 }

@@ -1,9 +1,17 @@
 {
   "copied": "تم النسخ إلى مكتبتك",
   "copy": "نسخ",
-  "copying": "نسخing...",
-  "error": "فشل النسخ",
-  "genericError": "حدث خطأ أثناء النسخ",
+  "copying": "نسخ ...",
   "loginRequired": "يرجى تسجيل الدخول لنسخ المحتوى",
-  "tooltip": "نسخ إلى مكتبتك"
+
+  "tooltip": "نسخ {{name}} إلى مكتبتك",
+  "error": "خطأ: {{error}}",
+  "genericError": "خطأ في نسخ التمرين",
+  "copyToLibrary": "نسخ إلى المكتبة",
+  "copyExercise": "نسخ التمرين",
+  "copyComplete": "نسخ مكتمل",
+  "copySuccess": "تم نسخ التمرين بنجاح!",
+  "copyError": "فشل النسخ: {{error}}",
+  "copyErrorNetwork": "خطأ في الشبكة - يرجى المحاولة مرة أخرى",
+  "copyErrorGeneric": "حدث خطأ أثناء النسخ"
 }

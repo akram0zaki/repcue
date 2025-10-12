@@ -13,7 +13,7 @@
         "values": {
           "bodyweight": "الوزن الذاتي بس",
           "dumbbells": "دامبلز",
-          "resistance-band": "شريط مقاومة",
+          "resistanceBand": "شريط مقاومة",
           "none": "من غير معدات"
         }
       },

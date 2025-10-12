@@ -1,9 +1,17 @@
 {
   "copied": "Gekopieerd naar je bibliotheek",
   "copy": "Kopiëren",
-  "copying": "Kopiërening...",
-  "error": "Kopiëren mislukt",
-  "genericError": "Er is een fout opgetreden bij het kopiëren",
+  "copying": "Kopiëren...",
   "loginRequired": "Log alstublieft in om inhoud te kopiëren",
-  "tooltip": "Kopieer naar je bibliotheek"
+  "tooltip": "Kopieer {{name}} naar je bibliotheek",
+
+  "error": "Kopiëren mislukt: {{error}}",
+  "genericError": "Kopiëren van oefening mislukt",
+  "copyToLibrary": "Kopieer naar bibliotheek",
+  "copyExercise": "Kopieer oefening",
+  "copyComplete": "Kopieer voltooid",
+  "copySuccess": "Oefening succesvol gekopieerd!",
+  "copyError": "Kopiëren mislukt: {{error}}",
+  "copyErrorNetwork": "Netwerkfout - probeer het opnieuw",
+  "copyErrorGeneric": "Er is een fout opgetreden bij het kopiëren"
 }
