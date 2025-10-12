@@ -90,8 +90,13 @@ serve(async (req: Request) => {
           equipment_needed,
           exercise_type,
           difficulty_level,
+          default_sets,
+          default_reps,
+          default_duration,
           rep_duration_seconds,
           custom_video_url,
+          is_public,
+          tags,
           instructions,
           version,
           created_at,
@@ -162,7 +167,8 @@ serve(async (req: Request) => {
     let videoUrl = null;
     if (exercise.custom_video_url && (
       exercise.custom_video_url.startsWith('blob://') ||
-      exercise.custom_video_url.startsWith('blob-pending-sync://')
+      exercise.custom_video_url.startsWith('blob-pending-sync://') ||
+      exercise.custom_video_url.startsWith('blob-video://')
     )) {
       // Look up the actual video file in storage
       const { data: videoFile } = await supabase
@@ -280,15 +286,24 @@ serve(async (req: Request) => {
       name: exercise.name,
       description: exercise.description,
       category: exercise.category,
+      catalogId: 'user-exercises', // User-created exercises belong to user-exercises catalog
       muscle_groups: exercise.muscle_groups,
       equipment_needed: exercise.equipment_needed,
       exercise_type: exercise.exercise_type,
       difficulty_level: exercise.difficulty_level,
+      default_sets: exercise.default_sets,
+      default_reps: exercise.default_reps,
+      default_duration: exercise.default_duration,
       rep_duration_seconds: exercise.rep_duration_seconds,
       custom_video_url: videoUrl,
+      has_video: !!videoUrl, // Set has_video to true if we have a video URL
+      is_favorite: false, // Shared exercises are not favorited by default
+      is_public: exercise.is_public || false,
+      tags: exercise.tags || [],
       instructions: exercise.instructions,
       created_at: exercise.created_at,
-      updated_at: exercise.updated_at
+      updated_at: exercise.updated_at,
+      owner_id: shareData.owner_id
     };
 
     // Prepare share information
@@ -300,7 +315,8 @@ serve(async (req: Request) => {
       expiresAt: shareData.expires_at,
       videoRecoveryTriggered: !videoUrl && exercise.custom_video_url && (
         exercise.custom_video_url.startsWith('blob://') ||
-        exercise.custom_video_url.startsWith('blob-pending-sync://')
+        exercise.custom_video_url.startsWith('blob-pending-sync://') ||
+        exercise.custom_video_url.startsWith('blob-video://')
       )
     };
 

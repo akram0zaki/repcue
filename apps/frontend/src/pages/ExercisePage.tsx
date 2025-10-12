@@ -882,30 +882,28 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
       <div className="p-2 sm:p-3">
         {/* Top Row - Exercise Details (Left) and Action Buttons (Right) */}
         <div className="mb-1">
-          <div className="flex items-center justify-between">
-            {/* Left Side - Exercise Details and Tags */}
-            <div className="flex items-center gap-2">
+          <div className="flex items-start justify-between gap-3">
+            {/* Left Side - Exercise Details and Tags - Allow wrapping */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0">
               {/* Exercise Details - Left-aligned */}
               <span className="text-sm font-medium text-text-800 dark:text-text-100">
                 {formatSimplifiedDetails(exercise)}
               </span>
               {/* Custom/Shared Tags */}
-              <div className="flex items-center gap-1">
-                {isUserCreated && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 rounded-full">
-                    {t('exercises:custom', { defaultValue: 'Custom' })}
-                  </span>
-                )}
-                {currentUser && isSharedExerciseCard && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
-                    {t('exercises:shared', { defaultValue: 'Shared' })}
-                  </span>
-                )}
-              </div>
+              {isUserCreated && (
+                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 rounded-full whitespace-nowrap">
+                  {t('exercises:custom', { defaultValue: 'Custom' })}
+                </span>
+              )}
+              {currentUser && isSharedExerciseCard && (
+                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full whitespace-nowrap">
+                  {t('exercises:shared', { defaultValue: 'Shared' })}
+                </span>
+              )}
             </div>
 
             {/* Right Side - Action Buttons */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0 flex-nowrap">
 
               {/* Edit Button - Only for user-created */}
               {isUserCreated && onEdit && (

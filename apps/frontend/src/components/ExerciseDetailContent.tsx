@@ -13,6 +13,7 @@ import { ExerciseRating } from './ExerciseRating';
 import { localizeExercise } from '../utils/localizeExercise';
 import { getExerciseById } from '../data/exercises';
 import ExerciseBadgeDisplay from './ExerciseBadgeDisplay';
+import { ShareButton } from './ShareButton';
 
 interface ExerciseDetailContentProps {
   exercise: Exercise;
@@ -115,7 +116,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </h1>
 
           {showActions && (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               {onToggleFavorite && (
                 <button
                   onClick={onToggleFavorite}
@@ -131,13 +132,22 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               )}
 
               {isOwner && (
-                <button
-                  onClick={handleEdit}
-                  className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                  title={t('exercises:edit')}
-                >
-                  <EditIcon className="h-6 w-6" />
-                </button>
+                <>
+                  <button
+                    onClick={handleEdit}
+                    className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                    title={t('exercises:edit')}
+                  >
+                    <EditIcon className="h-6 w-6" />
+                  </button>
+
+                  <ShareButton
+                    exerciseId={exercise.id}
+                    exerciseName={loc.name}
+                    ownerId={exercise.owner_id}
+                    className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                  />
+                </>
               )}
             </div>
           )}

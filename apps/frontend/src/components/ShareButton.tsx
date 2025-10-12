@@ -133,19 +133,19 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
 
       setShareUrl(data.shareUrl);
 
-      showSnackbar(t('exercises.shareLinkGenerated', 'Share link generated successfully!'), {
+      showSnackbar(t('exercises:shareLinkGenerated', 'Share link generated successfully!'), {
         type: 'success'
       });
     } catch (error) {
       const errMessage = error instanceof Error ? error.message : String(error);
       if (errMessage === 'offline') {
-        showSnackbar(t('exercises.shareErrorOffline', 'You are offline. Connect to the internet to generate a share link.'), { type: 'error' });
+        showSnackbar(t('exercises:shareErrorOffline', 'You are offline. Connect to the internet to generate a share link.'), { type: 'error' });
       } else if (errMessage === 'not_synced') {
-        showSnackbar(t('exercises.shareErrorNotSynced', 'Exercise not yet synced to the cloud. Please wait a moment and try again.'), { type: 'warning' });
+        showSnackbar(t('exercises:shareErrorNotSynced', 'Exercise not yet synced to the cloud. Please wait a moment and try again.'), { type: 'warning' });
       } else if (errMessage === 'No authentication token') {
-        showSnackbar(t('exercises.shareErrorAuth', 'You must be signed in to share an exercise.'), { type: 'error' });
+        showSnackbar(t('exercises:shareErrorAuth', 'You must be signed in to share an exercise.'), { type: 'error' });
       } else {
-        showSnackbar(t('exercises.shareError', 'Failed to generate share link'), { type: 'error' });
+        showSnackbar(t('exercises:shareError', 'Failed to generate share link'), { type: 'error' });
       }
       logger.error('🔗 [ShareButton] Failed to generate share link:', error);
     } finally {
@@ -173,7 +173,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 id="share-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {t('exercises.shareExercise', 'Share Exercise')}
+              {t('exercises:shareExercise', 'Share Exercise')}
             </h3>
             <button
               onClick={handleClose}
@@ -184,7 +184,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
           </div>
 
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            {t('exercises.shareDescription', 'Create a shareable link for "{{name}}"', { name: exerciseName })}
+            {t('exercises:shareDescription', 'Create a shareable link for "{{name}}"', { name: exerciseName })}
           </p>
 
           {/* Share URL Generation */}
@@ -192,10 +192,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
             <div className="space-y-4">
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-                  {t('exercises.generateShareLink', 'Generate Share Link')}
+                  {t('exercises:generateShareLink', 'Generate Share Link')}
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  {t('exercises.generateShareLinkDesc', 'Anyone with this link will be able to view and save your exercise')}
+                  {t('exercises:generateShareLinkDesc', 'Anyone with this link will be able to view and save your exercise')}
                 </p>
 
                 <div className="space-y-3">
@@ -203,7 +203,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
                     type="email"
                     value={shareWithEmail}
                     onChange={(e) => setShareWithEmail(e.target.value)}
-                    placeholder={t('exercises.optionalEmailPlaceholder', 'Optional: Recipient email')}
+                    placeholder={t('exercises:optionalEmailPlaceholder', 'Optional: Recipient email')}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                   />
                   <button
@@ -211,7 +211,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
                     disabled={isGeneratingUrl}
                     className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md transition-colors"
                   >
-                    {isGeneratingUrl ? t('common.generating', 'Generating...') : t('exercises.generateLink', 'Generate Share Link')}
+                    {isGeneratingUrl ? t('common.generating', 'Generating...') : t('exercises:generateLink', 'Generate Share Link')}
                   </button>
                 </div>
               </div>
@@ -221,10 +221,10 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
             <div className="space-y-4">
               <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
                 <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">
-                  {t('exercises.shareLinkReady', 'Share Link Ready!')}
+                  {t('exercises:shareLinkReady', 'Share Link Ready!')}
                 </h4>
                 <p className="text-sm text-green-700 dark:text-green-300 mb-3">
-                  {t('exercises.shareLinkReadyDesc', 'Copy this link to share your exercise with others')}
+                  {t('exercises:shareLinkReadyDesc', 'Copy this link to share your exercise with others')}
                 </p>
 
                 <div className="bg-white dark:bg-gray-800 border rounded-md p-3 mb-3">

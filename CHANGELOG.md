@@ -35,6 +35,24 @@
   - Status: ✅ Applied to both environments
   - Files: [supabase/migrations/20251012-02-make-category-optional.sql](supabase/migrations/20251012-02-make-category-optional.sql), [apps/frontend/src/components/ExerciseForm.tsx](apps/frontend/src/components/ExerciseForm.tsx)
 
+- **UI - RTL Layout**: Fixed action buttons (share, favorite) missing/overlapping in Arabic layout
+  - Issue: Share and favorite buttons were not visible or overlapping with "متخصص" (Custom) badge in RTL layout
+  - Root cause: Flexbox layout with `justify-between` and insufficient flex constraints caused button overflow in RTL
+  - Solution: Modified exercise card layout with proper flex wrapping, gap spacing, and flex-shrink constraints
+  - Changes: Added `flex-wrap`, `gap-3`, `flex-nowrap` for proper RTL button clustering; removed `overflow-hidden` to prevent badge hiding
+  - Status: ✅ Built and ready for testing
+  - Files: [apps/frontend/src/pages/ExercisePage.tsx](apps/frontend/src/pages/ExercisePage.tsx#L885-L906)
+
+- **Exercise Sharing - Video Thumbnail**: Fixed shared exercise links showing "No video" for synced videos
+  - Issue: Shared exercise links displayed "No video" placeholder even when exercise video was fully synced to Supabase
+  - Root cause: `get-shared-exercise` edge function didn't recognize `blob-video://` URL scheme and was missing required fields
+  - Solution:
+    - Added `blob-video://` support alongside `blob://` and `blob-pending-sync://` schemes
+    - Added missing Exercise interface fields: `has_video`, `catalogId`, `default_sets/reps/duration`, `is_favorite`, `tags`, `is_public`, `owner_id`
+    - Edge function now generates signed URLs (1 hour expiry) and sets `has_video: true` for VideoThumbnail component
+  - Status: ✅ Deployed to development environment only (awaiting testing before production)
+  - Files: [supabase/functions/get-shared-exercise/index.ts](supabase/functions/get-shared-exercise/index.ts#L168-L171), [supabase/functions/get-shared-exercise/index.ts](supabase/functions/get-shared-exercise/index.ts#L277-L301)
+
 #### Documentation
 - **Sync System**: Enhanced video upload documentation with URL scheme lifecycle
   - Added comprehensive table explaining `blob-pending-sync://`, `blob-video://`, and HTTP URL schemes

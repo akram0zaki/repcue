@@ -58,7 +58,7 @@ RepCue implements an **offline-first synchronization architecture** that ensures
 |-----------|----------|----------------|
 | **sync_v2 Edge Function** | `supabase/functions/sync_v2/index.ts` | Main sync endpoint with per-table pagination |
 | **save-shared-exercise** | `supabase/functions/save-shared-exercise/` | Creates exercise references for sharing |
-| **get-shared-exercise** | `supabase/functions/get-shared-exercise/` | Anonymous access to shared exercises |
+| **get-shared-exercise** | `supabase/functions/get-shared-exercise/` | Anonymous access to shared exercises with signed video URLs |
 | **download-shared-video** | `supabase/functions/download-shared-video/` | Permission-based video access |
 | **RLS Policies** | Database | Row-level security for data isolation |
 
@@ -230,7 +230,13 @@ RepCue implements a **reference-based sharing system** that maintains data integ
    ↓
    Extract token → Call get-shared-exercise?token={token}
    ↓
-   Validate token → Fetch exercise data → Generate video signed URL
+   Edge function validates token → Looks up exercise
+   ↓
+   Detects blob-video:// URL → Queries video_files table
+   ↓
+   Retrieves storage_path → Creates signed URL (1 hour expiry)
+   ↓
+   Returns exercise with signed URL + has_video: true
    ↓
    Display exercise with temporary video access
 
@@ -304,6 +310,42 @@ const { isSharedExercise, sharedExerciseIds } = useSharedExercises();
 const showSharedBadge = isSharedExercise(exercise.id);
 const canEdit = !isSharedExercise(exercise.id) && exercise.owner_id === user.id;
 ```
+
+#### Video URL Handling for Shared Exercises
+
+The `get-shared-exercise` edge function handles multiple video URL schemes:
+
+```typescript
+// Supported URL schemes for video resolution
+if (exercise.custom_video_url && (
+  exercise.custom_video_url.startsWith('blob://') ||
+  exercise.custom_video_url.startsWith('blob-pending-sync://') ||
+  exercise.custom_video_url.startsWith('blob-video://')  // Synced videos
+)) {
+  // Look up video in video_files table
+  const videoFile = await getVideoFile(exercise.id);
+
+  // Generate signed URL from Supabase Storage
+  const signedUrl = await storage
+    .from('exercise-videos')
+    .createSignedUrl(videoFile.storage_path, 3600); // 1 hour
+
+  // Return exercise with signed URL and has_video: true
+  return {
+    exercise: {
+      ...exercise,
+      custom_video_url: signedUrl,
+      has_video: true  // Critical for VideoThumbnail component
+    }
+  };
+}
+```
+
+**Key Requirements**:
+- Edge function must query additional fields: `default_sets`, `default_reps`, `default_duration`, `is_public`, `tags`
+- Must set `has_video: true` when video URL is generated
+- Must set `catalogId: 'user-exercises'` for user-created exercises
+- Must include `is_favorite: false` and `owner_id` for proper client-side handling
 
 ---
 
