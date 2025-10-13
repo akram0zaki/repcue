@@ -156,59 +156,31 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
 
   return (
     <div 
-      className={`bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none`}
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none`}
       role="article"
       aria-labelledby={titleId}
       aria-describedby={messageId}
       aria-live="polite"
       aria-atomic="true"
     >
-      <div className="flex items-start gap-3">
-        {/* Icon */}
-        <div 
-          className="flex-shrink-0 mt-0.5" 
-          aria-hidden="true"
-        >
-          <IconComponent className={`w-6 h-6 ${insight.iconColor || 'text-gray-500 dark:text-gray-400'}`} />
-        </div>
+      {/* Section 1: Header with icon, title, and dismiss button */}
+      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-2">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {/* Icon */}
+          <div 
+            className="flex-shrink-0" 
+            aria-hidden="true"
+          >
+            <IconComponent className={`w-6 h-6 ${insight.iconColor || 'text-gray-500 dark:text-gray-400'}`} />
+          </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
           {/* Title */}
           <h4 
             id={titleId}
-            className="text-base font-semibold text-text-900 dark:text-text-50 mb-1"
+            className="text-base font-semibold text-text-900 dark:text-text-50 truncate"
           >
             {t(titleKey, titleParams)}
           </h4>
-
-          {/* Message */}
-          <p 
-            id={messageId}
-            className="text-sm text-text-600 dark:text-text-300 mb-3"
-          >
-            {t(messageKey, messageParams)}
-          </p>
-
-          {/* Actions */}
-          {insight.actions && insight.actions.length > 0 && (
-            <div 
-              className="flex flex-wrap gap-2"
-              role="group"
-              aria-label={t('coaching:actionsLabel', 'Available actions')}
-            >
-              {insight.actions.map((action, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleAction(action.action, action.data)}
-                  className="px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 rounded-lg transition-colors motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                  aria-label={`${t(action.label)} - ${t(titleKey, titleParams)}`}
-                >
-                  {t(action.label)}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Dismiss button */}
@@ -225,6 +197,38 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
           </button>
         )}
       </div>
+
+      {/* Section 2: Message/Description */}
+      <div className="px-4 py-3">
+        <p 
+          id={messageId}
+          className="text-body"
+        >
+          {t(messageKey, messageParams)}
+        </p>
+      </div>
+
+      {/* Section 3: Action buttons */}
+      {insight.actions && insight.actions.length > 0 && (
+        <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div 
+            className="flex flex-wrap gap-2"
+            role="group"
+            aria-label={t('coaching:actionsLabel', 'Available actions')}
+          >
+            {insight.actions.map((action, index) => (
+              <button
+                key={index}
+                onClick={() => handleAction(action.action, action.data)}
+                className="px-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 rounded-lg transition-colors motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                aria-label={`${t(action.label)} - ${t(titleKey, titleParams)}`}
+              >
+                {t(action.label)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

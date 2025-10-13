@@ -72,6 +72,7 @@
 7. **Development Workstation**
 
   * The development workstation is VSCode set up on a Windows 11 PC.
+  * Use Powershell syntax for all terminal commands.
   * There are two MCP servers configured: `supabase` points to the dev supabase project ref xwzrsfkzqxdybjrkkkvh, and `supabase-prod` points to the prod supabase project ref zumzzuvfsuzvvymhpymk.
 
 ---

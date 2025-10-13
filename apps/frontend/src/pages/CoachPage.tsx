@@ -183,7 +183,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
             <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-2">
               {t('coaching:title', { defaultValue: 'Your Coach' })}
             </h1>
-            <p className="text-text-600 dark:text-text-300">
+            <p className="text-body">
               {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
             </p>
           </div>
@@ -196,7 +196,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
             <h3 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
               {t('coaching:empty.title', { defaultValue: 'No Insights Yet' })}
             </h3>
-            <p className="text-text-600 dark:text-text-300 mb-6">
+            <p className="text-body mb-6">
               {t('coaching:empty.message', { defaultValue: 'Start working out to get personalized coaching insights!' })}
             </p>
             <button
@@ -238,7 +238,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
             <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-2">
               {t('coaching:title', { defaultValue: 'Your Coach' })}
             </h1>
-            <p className="text-text-600 dark:text-text-300">
+            <p className="text-body">
               {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
             </p>
           </div>
