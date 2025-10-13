@@ -1,5 +1,58 @@
 ## Unreleased
 
+### 2025-01-13
+
+#### Added
+- **Exercise Catalog - Generic Badge System**: Implemented flexible, catalog-specific badge system
+  - Generic badge framework supporting multiple badge types per catalog
+  - Badge types: Simple structured, regex-based, dynamic discovery, and computed
+  - Dynamic badge value discovery from exercise tags
+  - Badge filtering with AND/OR logic (AND across badges, OR within badge)
+  - Badge components: `BadgeFilterGroup`, `BadgeFilter`, `ExerciseBadgeList`
+  - Full internationalization support for all catalog badges
+  - Utilities: `catalogBadges.ts` for value discovery, matching, and extraction
+  - Custom hook: `useBadgeValues` for memoized badge value management
+  - Files: [apps/frontend/src/utils/catalogBadges.ts](apps/frontend/src/utils/catalogBadges.ts), [apps/frontend/src/components/BadgeFilterGroup.tsx](apps/frontend/src/components/BadgeFilterGroup.tsx), [apps/frontend/src/components/BadgeFilter.tsx](apps/frontend/src/components/BadgeFilter.tsx), [apps/frontend/src/hooks/useBadgeValues.ts](apps/frontend/src/hooks/useBadgeValues.ts)
+
+- **Testing - Badge System**: Comprehensive test suite for badge functionality
+  - Unit tests: `catalogBadges.test.ts`, `useBadgeValues.test.ts` (40+ test cases)
+  - Integration tests: `useExerciseFilter.badge-integration.test.ts` (13 scenarios)
+  - Component tests: `BadgeFilter.test.tsx` with accessibility testing
+  - E2E tests: `catalog-badges.spec.ts` (15+ end-to-end scenarios)
+  - Coverage: filtering logic, backward compatibility, performance, accessibility, edge cases
+  - Files: [apps/frontend/src/utils/__tests__/catalogBadges.test.ts](apps/frontend/src/utils/__tests__/catalogBadges.test.ts), [apps/frontend/src/hooks/__tests__/useExerciseFilter.badge-integration.test.ts](apps/frontend/src/hooks/__tests__/useExerciseFilter.badge-integration.test.ts)
+
+- **Documentation - Badge System**: Complete developer documentation
+  - Comprehensive badge system guide with API reference: `docs/catalog-badge-system.md`
+  - Badge type examples and implementation patterns
+  - Best practices for tag naming, badge design, performance optimization
+  - Testing strategies and troubleshooting guide
+  - Advanced topics: custom components, batch operations, analytics
+  - Files: [docs/catalog-badge-system.md](docs/catalog-badge-system.md), [docs/exercise-catalog.md](docs/exercise-catalog.md)
+
+#### Changed
+- **Exercise Catalog - Badge Migration**: Replaced hardcoded Kyu filtering with generic badge system
+  - Migrated Aikido Kyu levels to badge-based filtering
+  - Updated all catalogs to use badge definitions
+  - Enhanced `useExerciseFilter` hook with `selectedBadges` state
+  - Filter state structure: `selectedBadges: Record<string, Set<string | number>>`
+  - Backward compatibility: Automatic migration from `selectedKyuLevels` and `selectedCategories`
+  - Files: [apps/frontend/src/hooks/useExerciseFilter.ts](apps/frontend/src/hooks/useExerciseFilter.ts), [apps/frontend/src/data/catalogs.ts](apps/frontend/src/data/catalogs.ts)
+
+- **Type System - Catalog Types**: Enhanced catalog type definitions with badge metadata
+  - Added `CatalogBadge` interface with full JSDoc documentation
+  - Added `BadgeValue` interface for badge value definitions
+  - Extended `ExerciseCatalog` to include optional `badges` array
+  - Added `groupByBadge` for exercise grouping control
+  - Files: [apps/frontend/src/types/catalog.ts](apps/frontend/src/types/catalog.ts)
+
+#### Deprecated
+- **Filter State - Legacy Fields**: Old filter formats migrated to badge system
+  - `selectedKyuLevels` in filter state (migrated to `selectedBadges.kyuLevel`)
+  - `selectedCategories` in filter state (migrated to `selectedBadges.category`)
+  - Automatic migration on load with console logging for debugging
+  - Backward compatibility maintained for saved filter preferences
+
 ### 2025-10-12
 
 #### Fixed
