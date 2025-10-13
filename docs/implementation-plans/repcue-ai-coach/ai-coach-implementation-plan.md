@@ -5,7 +5,15 @@
 - **Date**: 2025-10-13
 - **Status**: Draft - Updated with Gap Analysis
 - **Related PRD**: [AI Coach PRD](ai-coach-prd.md)
-- **Related Gap Analysis**: [Gap Analysis](gap-analysis.md)
+- **Technical Requirements**: [Technical Requirements](technical-requirements-addendum.md)
+- **Enhancements**: [Enhancements](enhancements-addendum.md)
+
+---
+
+## Rules
+
+- Any supabase schema migrations or edge function changes must be written to workspace first before deploying to server to maintain version control.
+- Supabase changes should be tracked in a new file placed in docs\migration-tracking filename mask [supabase-changes_yyyyMMdd.md].
 
 ---
 
