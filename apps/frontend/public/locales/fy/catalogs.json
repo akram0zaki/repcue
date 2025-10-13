@@ -1,24 +1,99 @@
 {
   "selectCatalog": "Oefenkatalogus",
-  "selectDescription": "Kies in oefenkatalogus om oefeningen te besjen",
+  "selectDescription": "Kies in oefenkatalogus om de beskikbere oefeningen te sjen",
   "general-fitness": {
-    "name": "Algemiene Fitness",
-    "description": "Kern­oefeningen foar algemiene fitens en krachtoefening"
+    "name": "Algemiene fitness",
+    "description": "Kernoefeningen foar algemiene kondysje en krêfttraining",
+    "badges": {
+      "category": {
+        "label": "Kategory"
+      },
+      "equipment": {
+        "label": "Apparatuer",
+        "values": {
+          "bodyweight": "Allinnich lichemgewicht",
+          "dumbbells": "Hantels",
+          "resistanceBand": "Weerstandsband",
+          "none": "Gjin apparatuer"
+        }
+      },
+      "intensity": {
+        "label": "Yntinsiteit",
+        "values": {
+          "low": "Lege yntinsiteit",
+          "moderate": "Gemiddelde yntinsiteit",
+          "high": "Hege yntinsiteit"
+        }
+      }
+    }
   },
   "tai-chi": {
     "name": "Tai Chi",
-    "description": "Sêfte, streamende bewegingen foar balâns, fleksibiliteit en bewustwêzen"
+    "description": "Sêfte, streamende bewegingen foar lykwicht, fleksibiliteit en bewustwêzen",
+    "badges": {
+      "category": {
+        "label": "Kategory"
+      },
+      "form": {
+        "label": "Foarm",
+        "values": {}
+      }
+    }
   },
   "zumba": {
     "name": "Zumba",
-    "description": "Enerzjike dûnsbasearre kardio-oefeningen foar noflike fitness"
+    "description": "Enerzjike, dûnsbasearre cardio-oefeningen foar wille en fitness",
+    "badges": {
+      "category": {
+        "label": "Kategory"
+      },
+      "style": {
+        "label": "Dûnsstyl",
+        "values": {
+          "salsa": "Salsa",
+          "merengue": "Merengue",
+          "reggaeton": "Reggaeton",
+          "cumbia": "Cumbia"
+        }
+      }
+    }
   },
   "women-health": {
     "name": "Frouljus­sûnens",
-    "description": "Spesjalisearre oefeningen foar de sûnens en it wolwêzen fan froulju"
+    "description": "Spesjalisearre oefeningen foar de sûnens en it wolwêzen fan froulju",
+    "badges": {
+      "category": {
+        "label": "Kategory"
+      },
+      "focus": {
+        "label": "Fokusgebiet",
+        "values": {
+          "prenatal": "Foar de berte",
+          "postnatal": "Nei de berte",
+          "pelvic-floor": "Bekkenflier",
+          "core-strength": "Kearnkrêft"
+        }
+      }
+    }
   },
   "aikido": {
     "name": "Aikido",
-    "description": "Tradisjonele Japanske fjochtskeunst rjochte op harmony, balâns en floeiende bewegingen mei klemmen en smiten"
+    "description": "Tradisjonele Japanske ferdigeningskeunst rjochte op harmony, lykwicht en floeibere bewegingen mei grippen en smiten",
+    "badges": {
+      "category": {
+        "label": "Kategory"
+      },
+      "kyuLevel": {
+        "label": "Kyu-nivo",
+        "values": {
+          "6": "6e Kyu (Begjinner)",
+          "5": "5e Kyu",
+          "4": "4e Kyu (Middennivo)",
+          "3": "3e Kyu",
+          "2": "2e Kyu (Avansearre)",
+          "1": "1e Kyu (Foar swarte riem)"
+        }
+      }
+    }
   }
 }

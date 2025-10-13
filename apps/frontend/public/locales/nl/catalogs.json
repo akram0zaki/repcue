@@ -1,26 +1,99 @@
 {
-  "catalogs": {
-    "selectCatalog": "Oefencatalogus",
-    "selectDescription": "Kies een oefencatalogus om oefeningen te bekijken",
-    "general-fitness": {
-      "name": "Algemene Fitness",
-      "description": "Kern­oefeningen voor algehele fitheid en krachttraining"
-    },
-    "tai-chi": {
-      "name": "Tai Chi",
-      "description": "Zachte, vloeiende bewegingen voor balans, flexibiliteit en mindfulness"
-    },
-    "zumba": {
-      "name": "Zumba",
-      "description": "Energieke dansgebaseerde cardio-oefeningen voor plezierige fitness"
-    },
-    "women-health": {
-      "name": "Vrouwen­gezondheid",
-      "description": "Gespecialiseerde oefeningen voor de gezondheid en het welzijn van vrouwen"
+  "selectCatalog": "Oefencatalogus",
+  "selectDescription": "Kies een oefencatalogus om de beschikbare oefeningen te bekijken",
+  "general-fitness": {
+    "name": "Algemene fitness",
+    "description": "Kern­oefeningen voor algemene fitheid en krachttraining",
+    "badges": {
+      "category": {
+        "label": "Categorie"
+      },
+      "equipment": {
+        "label": "Apparatuur",
+        "values": {
+          "bodyweight": "Alleen lichaamsgewicht",
+          "dumbbells": "Dumbbells",
+          "resistanceBand": "Weerstandsband",
+          "none": "Geen apparatuur"
+        }
+      },
+      "intensity": {
+        "label": "Intensiteit",
+        "values": {
+          "low": "Lage intensiteit",
+          "moderate": "Gemiddelde intensiteit",
+          "high": "Hoge intensiteit"
+        }
+      }
     }
   },
-    "aikido": {
+  "tai-chi": {
+    "name": "Tai Chi",
+    "description": "Zachte, vloeiende bewegingen voor balans, flexibiliteit en mindfulness",
+    "badges": {
+      "category": {
+        "label": "Categorie"
+      },
+      "form": {
+        "label": "Vorm",
+        "values": {}
+      }
+    }
+  },
+  "zumba": {
+    "name": "Zumba",
+    "description": "Energieke dans­work­outs voor plezier en conditie",
+    "badges": {
+      "category": {
+        "label": "Categorie"
+      },
+      "style": {
+        "label": "Dansstijl",
+        "values": {
+          "salsa": "Salsa",
+          "merengue": "Merengue",
+          "reggaeton": "Reggaeton",
+          "cumbia": "Cumbia"
+        }
+      }
+    }
+  },
+  "women-health": {
+    "name": "Vrouwen­gezondheid",
+    "description": "Gespecialiseerde oefeningen voor de gezondheid en het welzijn van vrouwen",
+    "badges": {
+      "category": {
+        "label": "Categorie"
+      },
+      "focus": {
+        "label": "Focusgebied",
+        "values": {
+          "prenatal": "Zwangerschap",
+          "postnatal": "Na de bevalling",
+          "pelvic-floor": "Bekkenbodem",
+          "core-strength": "Kernversterking"
+        }
+      }
+    }
+  },
+  "aikido": {
     "name": "Aikido",
-    "description": "Traditionele Japanse krijgskunst gericht op harmonie, balans en vloeiende bewegingen met grepen en worpen"
+    "description": "Traditionele Japanse vechtkunst gericht op harmonie, balans en vloeiende bewegingen met grepen en worpen",
+    "badges": {
+      "category": {
+        "label": "Categorie"
+      },
+      "kyuLevel": {
+        "label": "Kyu-niveau",
+        "values": {
+          "6": "6e Kyu (Beginner)",
+          "5": "5e Kyu",
+          "4": "4e Kyu (Gemiddeld)",
+          "3": "3e Kyu",
+          "2": "2e Kyu (Gevorderd)",
+          "1": "1e Kyu (Voor zwarte band)"
+        }
+      }
+    }
   }
 }

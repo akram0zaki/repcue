@@ -16,7 +16,9 @@
     "messageShort": "Ferbyn mei it ynternet om de AI-trainingsbouwer te brûken."
   },
   "progress": {
-    "step": "Stap {{current}} fan {{total}}"
+    "step": "Stap {{current}} fan {{total}}",
+    "current": "Aktueller Schritt {{step}}",
+    "label": "Fortschritt"
   },
   "screen1": {
     "title": "Fertel ús oer dysels",
@@ -43,7 +45,10 @@
       "placeholderCm": "Sintimeters",
       "placeholderFeet": "Fuotten",
       "placeholderInches": "Ynches",
-      "error": "Fier in jildige lingte yn"
+      "error": "Fier in jildige lingte yn",
+      "unitLabel": "Lingte ienheid",
+      "valueLabel": "Lingte waarde",
+      "inchesLabel": "Ynches"
     },
     "weight": {
       "label": "Gewicht",
@@ -53,7 +58,9 @@
       "unitLbs": "lbs",
       "placeholderKg": "Kilogrammen",
       "placeholderLbs": "Ponnen",
-      "error": "Fier in jildich gewicht yn"
+      "error": "Fier in jildich gewicht yn",
+      "unitLabel": "Gewichtseenheid",
+      "valueLabel": "Gewicht waarde"
     },
     "next": "Folgjende"
   },
@@ -116,6 +123,8 @@
     },
     "timeAvailability": {
       "label": "Beskikbere tiid per sesje",
+      "description": "Hoefolle tiid kinne jo oan elke trainingssesje besteegje?",
+      "select": "Kies beskikbere tiid",
       "15-30": "15-30 minuten",
       "30-45": "30-45 minuten",
       "45-60": "45-60 minuten",
@@ -148,8 +157,9 @@
     "title": "Dyn persoanlike trainingen",
     "subtitle": "AI-makke trainingen oanpast oan dyn doelen",
     "aiGeneratedBadge": "AI-makke",
-    "exercises": "{{count}} oefeningen",
-    "duration": "~{{minutes}} min",
+    "exerciseCount": "{{count}} oefeningen",
+    "durationSeconds": "~{{seconds}} sek",
+    "durationMinutes": "~{{minutes}} min",
     "scheduledDays": "Plend foar {{days}}",
     "viewWorkouts": "Sjoch trainingen",
     "generateAgain": "Opnij oanmeitsje",
@@ -175,11 +185,21 @@
     "dismiss": "Slute"
   },
   "onboarding": {
+    "title": "AI Training Programma Bouwer",
+    "subtitle": "Beäntwurdzje in pear fragen en wy meitsje personalisearre trainingsplannen spesjaal foar jo.",
+    "exitTitle": "Programma Bouwer Ferlitte?",
+    "exitConfirm": "Binne jo wis dat jo ferlitte wolle? Jo foarútgong giet ferlern.",
+    "stayButton": "Bliuwe",
+    "exitButton": "Ferlitte",
+    "backButton": "Werom",
+    "nextButton": "Folgjende",
+    "skip": "Oerslaan",
+    "generateButton": "Generearje Myn Trainingen",
     "exitConfirmation": {
-      "title": "Wolst echt ôfslute?",
-      "message": "Dyn foarútgong giet ferlern as do no ôfslutst.",
-      "continue": "Trochgean",
-      "exit": "Ofslute"
+      "title": "Binne jo wis dat jo ferlitte wolle?",
+      "message": "Jo foarútgong giet ferlern as jo no fuortgean.",
+      "continue": "Fierdergean",
+      "exit": "Ferlitte"
     }
   },
   "days": {

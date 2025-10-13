@@ -125,8 +125,74 @@ interface TableSyncStatus {
   error_messages: string[];
 }
 
+// Badge tag validation constants
+const MAX_TAG_LENGTH = 100;
+const MAX_TAGS_PER_EXERCISE = 20;
+const TAG_FORMAT_REGEX = /^[a-z0-9-]{1,30}:[a-z0-9-_]{1,50}$/i;
+
+/**
+ * Validate and sanitize badge tags array
+ * Server-side defense-in-depth validation
+ */
+function validateAndSanitizeTags(tags: any, correlationId: string): string[] {
+  if (!tags) return [];
+  
+  if (!Array.isArray(tags)) {
+    logWithContext(correlationId, 'WARN', 'Tags field is not an array, converting to empty array');
+    return [];
+  }
+
+  const validTags: string[] = [];
+
+  for (const tag of tags) {
+    // Type check
+    if (typeof tag !== 'string') {
+      logWithContext(correlationId, 'WARN', `Skipping non-string tag`, { tag });
+      continue;
+    }
+
+    // Length check
+    if (tag.length > MAX_TAG_LENGTH) {
+      logWithContext(correlationId, 'WARN', `Tag exceeds max length, skipping`, { 
+        tag: tag.substring(0, 50) + '...', 
+        length: tag.length 
+      });
+      continue;
+    }
+
+    // Format validation (badgeId:value)
+    if (!TAG_FORMAT_REGEX.test(tag)) {
+      logWithContext(correlationId, 'WARN', `Tag has invalid format, skipping`, { tag });
+      continue;
+    }
+
+    // XSS prevention - reject tags with dangerous patterns
+    const dangerous = /<script|javascript:|on\w+=|data:text\/html|<iframe|eval\(|expression\(/i;
+    if (dangerous.test(tag)) {
+      logWithContext(correlationId, 'ERROR', `Dangerous pattern detected in tag, rejecting`, { tag });
+      continue;
+    }
+
+    validTags.push(tag.trim().toLowerCase());
+  }
+
+  // Remove duplicates
+  const uniqueTags = Array.from(new Set(validTags));
+
+  // Enforce max tag count
+  if (uniqueTags.length > MAX_TAGS_PER_EXERCISE) {
+    logWithContext(correlationId, 'WARN', `Too many tags, truncating to max`, {
+      original: uniqueTags.length,
+      max: MAX_TAGS_PER_EXERCISE
+    });
+    return uniqueTags.slice(0, MAX_TAGS_PER_EXERCISE);
+  }
+
+  return uniqueTags;
+}
+
 // Filter fields using allow-list for security
-function filterAllowedFields(table: string, record: any): any {
+function filterAllowedFields(table: string, record: any, correlationId: string): any {
   const allowlist = MUTABLE_FIELD_ALLOWLIST[table];
   if (!allowlist) {
     console.warn(`No allowlist found for table '${table}', rejecting record`);
@@ -135,7 +201,12 @@ function filterAllowedFields(table: string, record: any): any {
   const scrubbed: any = {};
   for (const [key, value] of Object.entries(record)) {
     if (allowlist.has(key)) {
-      scrubbed[key] = value;
+      // Special handling for tags array in exercises table
+      if (table === 'exercises' && key === 'tags') {
+        scrubbed[key] = validateAndSanitizeTags(value, correlationId);
+      } else {
+        scrubbed[key] = value;
+      }
     } else {
       console.warn(`Filtered disallowed field '${key}' from ${table} record`);
     }
@@ -213,12 +284,12 @@ async function processVideoFileUpload(supabase: any, record: any, userId: string
       version: (record.version || 0) + 1
     };
 
-    // Update exercise's custom_video_url to reference the uploaded file
+    // Update exercise's custom_video_url to indicate video is synced
     try {
       const { error: exerciseError } = await supabase
         .from('exercises')
         .update({
-          custom_video_url: `blob-pending-sync://${exercise_id}/${file_name}`,
+          custom_video_url: `blob-video://${exercise_id}/${file_name}`,
           updated_at: new Date().toISOString()
         })
         .eq('id', exercise_id)
@@ -227,6 +298,8 @@ async function processVideoFileUpload(supabase: any, record: any, userId: string
       if (exerciseError) {
         logWithContext(correlationId, 'WARN', 'Failed to update exercise custom_video_url', { error: exerciseError.message });
         // Don't fail the entire operation for this
+      } else {
+        logWithContext(correlationId, 'INFO', `Updated exercise custom_video_url to blob-video:// scheme indicating sync complete`);
       }
     } catch (e) {
       logWithContext(correlationId, 'WARN', 'Exception updating exercise custom_video_url', { error: e.message });
@@ -703,7 +776,7 @@ serve(async (req) => {
           }
 
           // Filter fields for security
-          const filteredRecord = filterAllowedFields(table, record);
+          const filteredRecord = filterAllowedFields(table, record, correlationId);
           if (Object.keys(filteredRecord).length === 0) {
             logWithContext(correlationId, 'WARN', `All fields filtered out for ${table}:${id}`);
             detailedErrors.push({

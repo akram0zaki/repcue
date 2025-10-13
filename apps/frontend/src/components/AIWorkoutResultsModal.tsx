@@ -163,7 +163,7 @@ export default function AIWorkoutResultsModal({
                   </div>
                   {/* AI badge */}
                   <span className="flex-shrink-0 px-2 py-1 bg-accent-surface text-accent-primary text-small font-medium rounded">
-                    {t('results.aiBadge', 'AI-Generated')}
+                    {t('results.aiGeneratedBadge', 'AI-Generated')}
                   </span>
                 </div>
 
@@ -243,7 +243,7 @@ export default function AIWorkoutResultsModal({
             className="btn-neutral w-full mt-3"
             data-testid="results-close-action-button"
           >
-            {t('results.closeAction', 'Close')}
+            {t('results.close', 'Close')}
           </button>
         </div>
       </div>

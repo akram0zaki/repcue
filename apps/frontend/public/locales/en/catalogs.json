@@ -3,22 +3,97 @@
   "selectDescription": "Choose an exercise catalog to view exercises",
   "general-fitness": {
     "name": "General Fitness",
-    "description": "Core exercises for overall fitness and strength training"
+    "description": "Core exercises for overall fitness and strength training",
+    "badges": {
+      "category": {
+        "label": "Category"
+      },
+      "equipment": {
+        "label": "Equipment",
+        "values": {
+          "bodyweight": "Bodyweight Only",
+          "dumbbells": "Dumbbells",
+          "resistanceBand": "Resistance Band",
+          "none": "No Equipment"
+        }
+      },
+      "intensity": {
+        "label": "Intensity",
+        "values": {
+          "low": "Low Intensity",
+          "moderate": "Moderate Intensity",
+          "high": "High Intensity"
+        }
+      }
+    }
   },
   "tai-chi": {
     "name": "Tai Chi",
-    "description": "Gentle, flowing movements for balance, flexibility, and mindfulness"
+    "description": "Gentle, flowing movements for balance, flexibility, and mindfulness",
+    "badges": {
+      "category": {
+        "label": "Category"
+      },
+      "form": {
+        "label": "Form",
+        "values": {}
+      }
+    }
   },
   "zumba": {
     "name": "Zumba",
-    "description": "High-energy dance-based cardio exercises for fun fitness"
+    "description": "High-energy dance-based cardio exercises for fun fitness",
+    "badges": {
+      "category": {
+        "label": "Category"
+      },
+      "style": {
+        "label": "Dance Style",
+        "values": {
+          "salsa": "Salsa",
+          "merengue": "Merengue",
+          "reggaeton": "Reggaeton",
+          "cumbia": "Cumbia"
+        }
+      }
+    }
   },
   "women-health": {
     "name": "Women's Health",
-    "description": "Specialized exercises for women's health and wellness"
+    "description": "Specialized exercises for women's health and wellness",
+    "badges": {
+      "category": {
+        "label": "Category"
+      },
+      "focus": {
+        "label": "Focus Area",
+        "values": {
+          "prenatal": "Prenatal",
+          "postnatal": "Postnatal",
+          "pelvic-floor": "Pelvic Floor",
+          "core-strength": "Core Strength"
+        }
+      }
+    }
   },
   "aikido": {
     "name": "Aikido",
-    "description": "Traditional Japanese martial art focused on harmony, balance, and fluid movement through joint locks and throws"
+    "description": "Traditional Japanese martial art focused on harmony, balance, and fluid movement through joint locks and throws",
+    "badges": {
+      "category": {
+        "label": "Category"
+      },
+      "kyuLevel": {
+        "label": "Kyu Level",
+        "values": {
+          "6": "6th Kyu (Beginner)",
+          "5": "5th Kyu",
+          "4": "4th Kyu (Intermediate)",
+          "3": "3rd Kyu",
+          "2": "2nd Kyu (Advanced)",
+          "1": "1st Kyu (Pre-Black Belt)"
+        }
+      }
+    }
   }
 }

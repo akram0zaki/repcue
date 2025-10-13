@@ -90,14 +90,25 @@ serve(async (req) => {
           )
         }
 
+        // Helper function to convert bytes to base64url
+        function uint8ArrayToBase64url(bytes: Uint8Array): string {
+          const binaryString = String.fromCharCode(...bytes);
+          const base64 = btoa(binaryString);
+          // Convert base64 to base64url
+          return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+
         // Use conservative transport list for better cross-browser compatibility
         const transports: AuthenticatorTransport[] = ['internal', 'usb', 'ble', 'nfc'];
-        
-        allowCredentials = userAuthenticators.map(auth => ({
-          id: new Uint8Array(JSON.parse(auth.credential_id)),
-          type: 'public-key',
-          transports
-        }))
+
+        allowCredentials = userAuthenticators.map(auth => {
+          const credentialBytes = new Uint8Array(JSON.parse(auth.credential_id));
+          return {
+            id: uint8ArrayToBase64url(credentialBytes),
+            type: 'public-key' as const,
+            transports
+          };
+        })
       }
       // If no email provided, allow any credential (discoverable credentials)
 

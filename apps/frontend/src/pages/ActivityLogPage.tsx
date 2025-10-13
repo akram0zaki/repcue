@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Exercise, ActivityLog, Workout } from '../types';
 import { storageService } from '../services/storageService';
-import { ExerciseCategory } from '../types';
-import CategoryFilter from '../components/CategoryFilter';
 import WeeklyStreakCalendar from '../components/WeeklyStreakCalendar';
 import ProgressChart from '../components/ProgressChart';
 import logger from '../utils/logger';
@@ -21,27 +19,9 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   const { t, i18n } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(new Set());
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [workoutNameMap, setWorkoutNameMap] = useState<Record<string, string>>({});
-
-  // Category filter handlers
-  const handleCategoryToggle = (category: ExerciseCategory) => {
-    setSelectedCategories(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
-  };
-
-  const handleClearCategories = () => {
-    setSelectedCategories(new Set());
-  };
 
   // Load activity logs once on mount
   useEffect(() => {
@@ -104,22 +84,8 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
     });
   };
 
-  // Filter logs based on selected categories
-  const filteredLogs = activityLogs.filter(log => {
-    if (selectedCategories.size === 0) return true;
-    
-    // For workout entries, check if any exercise in the workout matches the filter
-    if (log.is_workout && log.exercises) {
-      return log.exercises.some(ex => {
-        const exercise = exercises.find(e => e.id === ex.exercise_id);
-        return exercise && selectedCategories.has(exercise.category);
-      });
-    }
-    
-    // For individual exercise entries
-    const exercise = exercises.find(ex => ex.id === log.exercise_id);
-    return exercise && selectedCategories.has(exercise.category);
-  });
+  // All logs (no category filtering anymore)
+  const filteredLogs = activityLogs;
 
   // Group logs by date
   const groupedLogs: GroupedLogs = filteredLogs.reduce((groups, log) => {
@@ -153,33 +119,9 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
   };
 
   // Get exercise category color per style guide
-  const getCategoryColor = (exercise_id: string): string => {
-    const exercise = exercises.find(ex => ex.id === exercise_id);
-    if (!exercise) return 'bg-gray-100 dark:bg-gray-200';
-
-    switch (exercise.category) {
-      case ExerciseCategory.CORE: return 'bg-blue-100 dark:bg-blue-200';
-      case ExerciseCategory.STRENGTH: return 'bg-red-100 dark:bg-red-200';
-      case ExerciseCategory.CARDIO: return 'bg-green-100 dark:bg-green-200';
-      case ExerciseCategory.FLEXIBILITY: return 'bg-purple-100 dark:bg-purple-200';
-      case ExerciseCategory.BALANCE: return 'bg-yellow-100 dark:bg-yellow-200';
-      default: return 'bg-gray-100 dark:bg-gray-200';
-    }
-  };
-
-  // Get exercise category text color per style guide
-  const getCategoryTextColor = (exercise_id: string): string => {
-    const exercise = exercises.find(ex => ex.id === exercise_id);
-    if (!exercise) return 'text-gray-800 dark:text-gray-900';
-
-    switch (exercise.category) {
-      case ExerciseCategory.CORE: return 'text-blue-800 dark:text-blue-900';
-      case ExerciseCategory.STRENGTH: return 'text-red-800 dark:text-red-900';
-      case ExerciseCategory.CARDIO: return 'text-green-800 dark:text-green-900';
-      case ExerciseCategory.FLEXIBILITY: return 'text-purple-800 dark:text-purple-900';
-      case ExerciseCategory.BALANCE: return 'text-yellow-800 dark:text-yellow-900';
-      default: return 'text-gray-800 dark:text-gray-900';
-    }
+  // Simple activity indicator colors (no longer category-based)
+  const getActivityIndicatorColor = (): string => {
+    return 'bg-primary-500';
   };
 
   // Localize legacy English notes generated at log creation time
@@ -255,18 +197,6 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
           </div>
         )}
 
-        {/* Category Filter */}
-        <div className="mb-6">
-          <CategoryFilter
-            selectedCategories={selectedCategories}
-            onCategoryToggle={handleCategoryToggle}
-            onClearAll={handleClearCategories}
-            style="dropdown"
-            size="md"
-            allowMultiple={true}
-          />
-        </div>
-
         {/* Activity Logs */}
         {filteredLogs.length === 0 ? (
           <div className="text-center py-12">
@@ -276,13 +206,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
               </svg>
             </div>
             <h3 className="text-h3 font-medium text-text-900 dark:text-text-50 mb-2">
-              {selectedCategories.size === 0
-                ? t('activity.noWorkoutsYet') 
-                : t('activity.noCategoryWorkoutsYet', { 
-                    category: Array.from(selectedCategories)
-                      .map(cat => t(`common:categories.${String(cat)}`, { defaultValue: cat.replace('-', ' ') }))
-                      .join(', ')
-                  })}
+              {t('activity.noWorkoutsYet')}
             </h3>
             <p className="text-text-600 dark:text-text-400 mb-4">
               {t('activity.emptySubtitle')}
@@ -390,7 +314,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                     {log.exercises.map((exercise, index) => (
                                       <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-3">
                                         <div className="flex items-center gap-2 mb-2">
-                                          <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${getCategoryColor(exercise.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}></span>
+                                          <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${getActivityIndicatorColor()}`}></span>
                                           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words flex-1">{(() => {
                                             const ex = exercises.find(e => e.id === exercise.exercise_id);
                                             if (!ex) return exercise.exercise_name;
@@ -425,7 +349,7 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span
-                                      className={`inline-block w-3 h-3 rounded-full ${getCategoryColor(log.exercise_id).replace('bg-', 'bg-').replace('/30', '')}`}
+                                      className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}
                                     ></span>
                                     <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
                                       {(() => {
@@ -452,10 +376,6 @@ const ActivityLogPage: React.FC<ActivityLogPageProps> = ({ exercises }) => {
                                       {formatDuration(log.duration)}
                                     </div>
                                   </div>
-                                </div>
-                                
-                                <div className={`px-2 py-1 rounded-full text-small font-medium ${getCategoryColor(log.exercise_id)} ${getCategoryTextColor(log.exercise_id)}`}>
-                                  {t(`common:categories.${exercises.find(ex => ex.id === log.exercise_id)?.category || ''}`, { defaultValue: (exercises.find(ex => ex.id === log.exercise_id)?.category || '').replace('-', ' ') })}
                                 </div>
                               </div>
                               

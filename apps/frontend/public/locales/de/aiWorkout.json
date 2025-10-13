@@ -16,7 +16,9 @@
     "messageShort": "Bitte verbinden Sie sich mit dem Internet, um den KI-Workout-Builder zu verwenden."
   },
   "progress": {
-    "step": "Schritt {{current}} von {{total}}"
+    "step": "Schritt {{current}} von {{total}}",
+    "current": "Aktueller Schritt {{step}}",
+    "label": "Fortschritt"
   },
   "screen1": {
     "title": "Erzählen Sie uns von sich",
@@ -44,7 +46,10 @@
       "placeholderCm": "Zentimeter",
       "placeholderFeet": "Fuß",
       "placeholderInches": "Zoll",
-      "error": "Bitte geben Sie eine gültige Größe ein"
+      "error": "Bitte geben Sie eine gültige Größe ein",
+      "unitLabel": "Höhenmaß",
+      "valueLabel": "Höhenwert",
+      "inchesLabel": "Zoll"
     },
     "weight": {
       "label": "Gewicht",
@@ -54,7 +59,9 @@
       "unitLbs": "lbs",
       "placeholderKg": "Kilogramm",
       "placeholderLbs": "Pfund",
-      "error": "Bitte geben Sie ein gültiges Gewicht ein"
+      "error": "Bitte geben Sie ein gültiges Gewicht ein",
+      "unitLabel": "Gewichtseinheit",
+      "valueLabel": "Gewichtswert"
     },
     "next": "Weiter"
   },
@@ -153,8 +160,9 @@
     "title": "Ihre personalisierten Workouts",
     "subtitle": "KI-generierte Workouts für Ihre Ziele",
     "aiGeneratedBadge": "KI-generiert",
-    "exercises": "{{count}} Übungen",
-    "duration": "~{{minutes}} Min",
+    "exerciseCount": "{{count}} Übungen",
+    "durationSeconds": "~{{seconds}} sec",
+    "durationMinutes": "~{{minutes}} min",
     "scheduledDays": "Geplant für {{days}}",
     "viewWorkouts": "Workouts ansehen",
     "generateAgain": "Erneut erstellen",
@@ -188,6 +196,7 @@
     "exitButton": "Verlassen",
     "backButton": "Zurück",
     "nextButton": "Weiter",
+    "skip": "Überspringen",
     "generateButton": "Meine Workouts erstellen",
     "exitConfirmation": {
       "title": "Sind Sie sicher, dass Sie verlassen möchten?",

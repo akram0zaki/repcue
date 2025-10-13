@@ -1,6 +1,11 @@
 {
   "a11y": {
     "skipToMain": "Oerspringe nei haadynhâld",
-    "mainRegion": "Haadynhâld"
+    "mainRegion": "Haadynhâld",
+    "moreOptions": "Mear opsjes",
+    "navigateTo": "Gean nei",
+    "scrollLeft": "Nei lofts skowe",
+    "scrollRight": "Nei rjochts skowe",
+    "skipOnboarding": "Ynlieding oerslaan"
   }
 }

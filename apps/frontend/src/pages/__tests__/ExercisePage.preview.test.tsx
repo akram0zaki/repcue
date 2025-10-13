@@ -27,8 +27,8 @@ const mockI18n = {
     const translations: Record<string, string> = {
       'common.playVideo': 'Play video',
       'common.pauseVideo': 'Pause video',
-      'common:exercises.title': 'Exercises',
-      'common:exercises.subtitle': 'Browse, filter, and start exercises. Mark favorites for quick access.',
+      'exercises:title': 'Exercises',
+      'exercises:subtitle': 'Browse, filter, and start exercises. Mark favorites for quick access.',
       'exercises:createNew': 'Create New Exercise',
       'common.create': 'Create',
       'selectCatalog': 'Exercise Catalog',

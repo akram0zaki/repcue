@@ -658,7 +658,7 @@ const EditWorkoutPage: React.FC = () => {
           onClose={() => setShowExercisePicker(false)}
           title={t('workouts.addExerciseTitle')}
           showCatalogSelector={true}
-          showCategoryFilter={true}
+          showBadgeFilters={true}
           showTypeFilter={true}
           showSearch={true}
           showSort={true}

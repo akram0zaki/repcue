@@ -16,7 +16,9 @@
     "messageShort": "Conéctate a Internet para usar el generador de entrenamientos con IA."
   },
   "progress": {
-    "step": "Paso {{current}} de {{total}}"
+    "step": "Paso {{current}} de {{total}}",
+    "current": "Paso actual {{step}}",
+    "label": "Progreso"
   },
   "screen1": {
     "title": "Cuéntanos sobre ti",
@@ -43,7 +45,10 @@
       "placeholderCm": "Centímetros",
       "placeholderFeet": "Pies",
       "placeholderInches": "Pulgadas",
-      "error": "Introduce una altura válida"
+      "error": "Introduce una altura válida",
+      "unitLabel": "Unidad de altura",
+      "valueLabel": "Valor de altura",
+      "inchesLabel": "Pulgadas"
     },
     "weight": {
       "label": "Peso",
@@ -53,7 +58,9 @@
       "unitLbs": "lbs",
       "placeholderKg": "Kilogramos",
       "placeholderLbs": "Libras",
-      "error": "Introduce un peso válido"
+      "error": "Introduce un peso válido",
+      "unitLabel": "Unidad de peso",
+      "valueLabel": "Valor de peso"
     },
     "next": "Siguiente"
   },
@@ -116,6 +123,8 @@
     },
     "timeAvailability": {
       "label": "Tiempo disponible por sesión",
+      "description": "¿Cuánto tiempo puedes dedicar a cada sesión de entrenamiento?",
+      "select": "Seleccionar tiempo disponible",
       "15-30": "15-30 minutos",
       "30-45": "30-45 minutos",
       "45-60": "45-60 minutos",
@@ -148,8 +157,9 @@
     "title": "Tus entrenamientos personalizados",
     "subtitle": "Entrenamientos generados por IA adaptados a tus objetivos",
     "aiGeneratedBadge": "Generado por IA",
-    "exercises": "{{count}} ejercicios",
-    "duration": "~{{minutes}} min",
+    "exerciseCount": "{{count}} ejercicios",
+    "durationSeconds": "~{{seconds}} sec",
+    "durationMinutes": "~{{minutes}} min",
     "scheduledDays": "Programado para {{days}}",
     "viewWorkouts": "Ver entrenamientos",
     "generateAgain": "Generar de nuevo",
@@ -175,9 +185,19 @@
     "dismiss": "Cerrar"
   },
   "onboarding": {
+    "title": "Creador de Entrenamientos con IA",
+    "subtitle": "Responde a unas pocas preguntas y crearemos planes de entrenamiento personalizados solo para ti.",
+    "exitTitle": "¿Salir del Creador de Entrenamientos?",
+    "exitConfirm": "¿Estás seguro de que quieres salir? Tu progreso se perderá.",
+    "stayButton": "Quedarme",
+    "exitButton": "Salir",
+    "backButton": "Atrás",
+    "nextButton": "Siguiente",
+    "skip": "Saltar",
+    "generateButton": "Generar Mis Entrenamientos",
     "exitConfirmation": {
-      "title": "¿Seguro que quieres salir?",
-      "message": "Tu progreso se perderá si sales ahora.",
+      "title": "¿Estás seguro de que quieres salir?",
+      "message": "Tu progreso se perderá si te vas ahora.",
       "continue": "Continuar",
       "exit": "Salir"
     }

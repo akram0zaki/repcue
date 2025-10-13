@@ -1,3 +1,15 @@
+/**
+ * @deprecated This component is deprecated as of the badge system implementation.
+ * Use BadgeFilter component with catalog-specific badges instead.
+ * 
+ * The legacy category system has been replaced with a flexible badge system.
+ * Categories are now defined per-catalog in the catalog.badges array.
+ * 
+ * Migration path:
+ * - Replace CategorySelector with BadgeFilter or BadgeFilterGroup
+ * - Use catalog-specific badge definitions
+ * - Categories are now just one type of badge among many (equipment, intensity, etc.)
+ */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCategory } from '../types';

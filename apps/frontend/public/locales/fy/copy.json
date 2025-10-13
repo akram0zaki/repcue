@@ -2,8 +2,16 @@
   "copied": "Kopiearre nei jo bibleteek",
   "copy": "Kopiearje",
   "copying": "Kopiearjeing...",
-  "error": "Kopiearjen mislearre",
-  "genericError": "Der barde in flater by it kopiearjen",
   "loginRequired": "Log asjebleaft yn om de ynhâld te kopiearjen",
-  "tooltip": "Kopiearje nei jo bibleteek"
+  "tooltip": "Kopiearje {{name}} nei jo bibleteek",
+
+  "error": "Kopiearjen mislearre: {{error}}",
+  "genericError": "Kopiëren fan oefening mislearre",
+  "copyToLibrary": "Kopiearje nei biblioteek",
+  "copyExercise": "Kopiearje oefening",
+  "copyComplete": "Kopiearje foltôge",
+  "copySuccess": "Oefening suksesfol kopiearre!",
+  "copyError": "Kopiearjen mislearre: {{error}}",
+  "copyErrorNetwork": "Netwerkfout - probeer it opnieuw",
+  "copyErrorGeneric": "Der is in flater optrden by it kopiearjen"
 }

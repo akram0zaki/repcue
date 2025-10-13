@@ -12,6 +12,8 @@ import {
 import { ExerciseRating } from './ExerciseRating';
 import { localizeExercise } from '../utils/localizeExercise';
 import { getExerciseById } from '../data/exercises';
+import ExerciseBadgeDisplay from './ExerciseBadgeDisplay';
+import { ShareButton } from './ShareButton';
 
 interface ExerciseDetailContentProps {
   exercise: Exercise;
@@ -114,7 +116,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </h1>
 
           {showActions && (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center gap-3">
               {onToggleFavorite && (
                 <button
                   onClick={onToggleFavorite}
@@ -130,31 +132,46 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               )}
 
               {isOwner && (
-                <button
-                  onClick={handleEdit}
-                  className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                  title={t('exercises:edit')}
-                >
-                  <EditIcon className="h-6 w-6" />
-                </button>
+                <>
+                  <button
+                    onClick={handleEdit}
+                    className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                    title={t('exercises:edit')}
+                  >
+                    <EditIcon className="h-6 w-6" />
+                  </button>
+
+                  <ShareButton
+                    exerciseId={exercise.id}
+                    exerciseName={loc.name}
+                    ownerId={exercise.owner_id}
+                    className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                  />
+                </>
               )}
             </div>
           )}
         </div>
 
-        {/* Tags - moved below exercise name */}
-        {exercise.tags && exercise.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {exercise.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 rounded-full"
-              >
-                {t(`exercises:tags.${tag}`, tag)}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Tags - moved below exercise name (free-form tags only, structured badges displayed separately) */}
+        {exercise.tags && exercise.tags.length > 0 && (() => {
+          // Filter out structured badge tags (those with ':' pattern like 'category:core')
+          // These are displayed by ExerciseBadgeDisplay component below
+          const freeFormTags = exercise.tags.filter(tag => !tag.includes(':'));
+          
+          return freeFormTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {freeFormTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 rounded-full"
+                >
+                  {t(`exercises:tags.${tag}`, tag)}
+                </span>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Exercise Description - moved to top */}
         {loc.description && (
@@ -163,6 +180,8 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </p>
         )}
 
+        {/* Exercise Badges */}
+        <ExerciseBadgeDisplay exercise={exercise} className="mb-6" />
 
         {/* Action Buttons */}
         {showActions && (

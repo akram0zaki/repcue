@@ -927,7 +927,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
           onClose={() => onSetShowExerciseSelector(false)}
           title={t('timer.selectExercise')}
           showCatalogSelector={true}
-          showCategoryFilter={true}
+          showBadgeFilters={true}
           showTypeFilter={true}
           showFavoritesToggle={true}
           showSearch={true}

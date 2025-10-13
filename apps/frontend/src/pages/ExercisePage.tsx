@@ -35,8 +35,10 @@ import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import logger from '../utils/logger';
 import { ShareButton } from '../components/ShareButton';
 import CatalogSelector from '../components/CatalogSelector';
-import CategoryFilter from '../components/CategoryFilter';
-import { getDefaultCatalog, EXERCISE_CATALOGS } from '../data/catalogs';
+import BadgeFilterGroup from '../components/BadgeFilterGroup';
+import { EXERCISE_CATALOGS } from '../data/catalogs';
+import { useExerciseFilter } from '../hooks/useExerciseFilter';
+import { getCatalogBadges, getExerciseBadgeValues } from '../utils/catalogBadges';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -47,51 +49,35 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'exercises', 'exerciseDetails', 'catalogs']);
+  const { t } = useTranslation(['exercises', 'common', 'exerciseDetails', 'catalogs']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
   const { isSharedExercise } = useSharedExercises();
 
-  // Filter state with persistence
-  const FILTER_STORAGE_KEY = 'exercise-page-filters';
-  
-  // Helper to load saved filter state
-  const loadSavedFilters = () => {
-    try {
-      const saved = localStorage.getItem(FILTER_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return {
-          selectedCatalogId: parsed.selectedCatalogId || getDefaultCatalog().id,
-          selectedCategories: new Set<ExerciseCategory>(parsed.selectedCategories || []),
-          searchTerm: parsed.searchTerm || '',
-          showFavoritesOnly: parsed.showFavoritesOnly || false,
-          exerciseFilter: parsed.exerciseFilter || 'all',
-          sortBy: parsed.sortBy || 'name'
-        };
-      }
-    } catch (error) {
-      logger.warn('[ExercisePage] Failed to load saved filter state:', error);
-    }
-    return {
-      selectedCatalogId: getDefaultCatalog().id,
-      selectedCategories: new Set<ExerciseCategory>(),
-      searchTerm: '',
-      showFavoritesOnly: false,
-      exerciseFilter: 'all' as const,
-      sortBy: 'name' as const
-    };
-  };
+  // Use the centralized exercise filter hook with badge support
+  const {
+    filteredExercises: hookFilteredExercises,
+    filterState,
+    updateFilter,
+    setCatalog,
+    toggleBadgeValue,
+    clearBadge,
+    clearFilters
+  } = useExerciseFilter(exercises, {
+    persistFilters: true,
+    storageKey: 'exercise-page-filters'
+  });
 
-  // Initialize state with saved values
-  const savedFilters = loadSavedFilters();
-  const [selectedCatalogId, setSelectedCatalogId] = useState(savedFilters.selectedCatalogId);
-  const [selectedCategories, setSelectedCategories] = useState<Set<ExerciseCategory>>(savedFilters.selectedCategories);
-  const [searchTerm, setSearchTerm] = useState(savedFilters.searchTerm);
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(savedFilters.showFavoritesOnly);
-  const [exerciseFilter, setExerciseFilter] = useState<'all' | 'built-in' | 'custom' | 'shared'>(savedFilters.exerciseFilter);
-  const [sortBy, setSortBy] = useState<'name' | 'type' | 'recently-added'>(savedFilters.sortBy);
+  // Destructure filter state for easier access
+  const {
+    selectedCatalogId,
+    selectedBadges,
+    searchTerm,
+    showFavoritesOnly,
+    exerciseFilter,
+    sortBy
+  } = filterState;
   // Filter collapse state - collapsed by default
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   // Video preview state
@@ -126,57 +112,20 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
 
-
-  // Save filter state whenever it changes
-  useEffect(() => {
-    try {
-      const filterState = {
-        selectedCatalogId,
-        selectedCategories: Array.from(selectedCategories),
-        searchTerm,
-        showFavoritesOnly,
-        exerciseFilter,
-        sortBy
-      };
-      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filterState));
-    } catch (error) {
-      logger.warn('[ExercisePage] Failed to save filter state:', error);
-    }
-  }, [selectedCatalogId, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy]);
+  // Count active badge selections for UI display
+  const badgeSelectionCount = Object.values(selectedBadges).reduce(
+    (sum: number, badgeSet) => sum + (badgeSet as Set<string | number>).size,
+    0
+  );
 
   // Clear all filters and reset to defaults (except catalog)
   const clearAllFilters = () => {
-    setSelectedCategories(new Set());
-    setSearchTerm('');
-    setShowFavoritesOnly(false);
-    setExerciseFilter('all');
-    setSortBy('name');
-    // Don't reset catalog - let user keep their catalog selection
-  };
-
-  // Category selector handlers
-  const handleCategoryToggle = (category: ExerciseCategory) => {
-    const newSelected = new Set(selectedCategories);
-    if (newSelected.has(category)) {
-      newSelected.delete(category);
-    } else {
-      newSelected.add(category);
-    }
-    setSelectedCategories(newSelected);
-  };
-
-  const handleClearCategories = () => {
-    setSelectedCategories(new Set());
+    clearFilters(); // Clear all filters (catalog is preserved by the hook)
   };
 
   // Handle catalog change with optional filter reset
   const handleCatalogChange = (catalogId: string) => {
-    setSelectedCatalogId(catalogId);
-    // Clear other filters when switching catalogs to start fresh
-    setSelectedCategories(new Set());
-    setSearchTerm('');
-    setShowFavoritesOnly(false);
-    setExerciseFilter('all');
+    setCatalog(catalogId, true); // Reset other filters when switching catalogs
   };
 
   const closePreview = () => {
@@ -229,123 +178,64 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
     return () => { v.removeEventListener('error', handleError); };
   }, [previewOpen, previewUrl, previewExercise, showSnackbar, t]);
 
-  // Helper function to check if exercise is user-created
-  const isUserCreatedExercise = (exercise: Exercise): boolean => {
-    const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(exercise.id);
+  // Use the filtered exercises from the hook (filtering is now handled by useExerciseFilter)
+  const filteredExercises = hookFilteredExercises;
 
-    // Exclude shared copies from being considered user-created
-    if (isSharedExercise(exercise.id)) {
-      return false;
+  // Get the current catalog configuration
+  const currentCatalog = useMemo(() => 
+    EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId),
+    [selectedCatalogId]
+  );
+
+  // Get the grouping badge if specified
+  const groupingBadge = useMemo(() => {
+    if (!currentCatalog?.groupByBadge) return null;
+    const catalogBadges = getCatalogBadges(selectedCatalogId);
+    return catalogBadges.find(b => b.id === currentCatalog.groupByBadge) || null;
+  }, [currentCatalog, selectedCatalogId]);
+
+  // Group exercises dynamically by the specified badge (or flat list if no grouping)
+  const exercisesByGroup = useMemo(() => {
+    if (!groupingBadge) {
+      // No grouping specified - return flat list
+      return { ungrouped: filteredExercises };
     }
 
-    // For UUID exercises (user-created)
-    if (isUUIDFormat) {
-      // If user is logged in
-      if (user?.id) {
-        // If exercise has owner_id, check it matches current user
-        if (exercise.owner_id) {
-          return exercise.owner_id === user.id;
-        }
-        // If exercise has no owner_id but is UUID format, assume it belongs to current user
-        // This handles exercises created before the ownership fix or created offline
-        return true;
-      } else {
-        // If user is not logged in, only show orphaned exercises (created offline)
-        return exercise.owner_id === null;
-      }
-    }
-
-    return false;
-  };
-
-  // Helper function to check if exercise is shared with current user
-  const isSharedExerciseHelper = (exercise: Exercise): boolean => {
-    if (!user?.id) return false;
-
-    // Use the hook to check if exercise ID is in shared references
-    return isSharedExercise(exercise.id);
-  };
-
-  // Filter exercises based on selected criteria
-  const filteredExercises = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-
-    // Debug: Log exercise catalog distribution (removed unused catalogCounts)
-
-
-    const filtered = exercises.filter(exercise => {
-      // Filter by catalog first
-      const matchesCatalog = exercise.catalogId === selectedCatalogId;
-
-      const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(exercise.category);
-      // Use localized name/description for search while preserving canonical tags
-      const loc = localizeExercise(exercise, t);
-      const matchesSearch = term.length === 0
-        || loc.name.toLowerCase().includes(term)
-        || (loc.description || '').toLowerCase().includes(term)
-        || (exercise.tags || []).some(tag => tag.toLowerCase().includes(term));
-      const matchesFavorites = !showFavoritesOnly || exercise.is_favorite;
-
-      // Apply exercise type filter
-      const isUserCreated = isUserCreatedExercise(exercise);
-      const isShared = isSharedExerciseHelper(exercise);
-
-      const matchesExerciseFilter = exerciseFilter === 'all' ||
-        (exerciseFilter === 'built-in' && !isUserCreated && !isShared) ||
-        (exerciseFilter === 'custom' && isUserCreated) ||
-        (exerciseFilter === 'shared' && isShared);
-
-      return matchesCatalog && matchesCategory && matchesSearch && matchesFavorites && matchesExerciseFilter;
-    });
+    const grouped: Record<string, Exercise[]> = {};
     
-    // Apply sorting
-    filtered.sort((a, b) => {
-      const aLoc = localizeExercise(a, t);
-      const bLoc = localizeExercise(b, t);
-      
-      switch (sortBy) {
-        case 'name':
-          return aLoc.name.localeCompare(bLoc.name);
-        case 'type':
-          // Sort by exercise type, then by name
-          if (a.exercise_type !== b.exercise_type) {
-            return a.exercise_type.localeCompare(b.exercise_type);
-          }
-          return aLoc.name.localeCompare(bLoc.name);
-        case 'recently-added': {
-          // Sort by created_at (newest first), fallback to name
-          const aDate = new Date(a.created_at).getTime();
-          const bDate = new Date(b.created_at).getTime();
-          if (aDate !== bDate) {
-            return bDate - aDate; // newest first
-          }
-          return aLoc.name.localeCompare(bLoc.name);
-        }
-        default:
-          return aLoc.name.localeCompare(bLoc.name);
-      }
+    // Initialize groups from badge values
+    groupingBadge.values?.forEach(value => {
+      grouped[String(value.id)] = [];
     });
-    
-    return filtered;
-  }, [exercises, selectedCatalogId, selectedCategories, searchTerm, showFavoritesOnly, exerciseFilter, sortBy, t]);
 
-  // Group exercises by category for better organization
-  const exercisesByCategory = useMemo(() => {
-    const grouped: Record<ExerciseCategory, Exercise[]> = {
-      [Categories.CORE]: [],
-      [Categories.STRENGTH]: [],
-      [Categories.CARDIO]: [],
-      [Categories.FLEXIBILITY]: [],
-      [Categories.BALANCE]: [],
-      [Categories.HAND_WARMUP]: []
-    };
-
+    // Assign exercises to groups
     filteredExercises.forEach(exercise => {
-      grouped[exercise.category].push(exercise);
+      const badgeValues = getExerciseBadgeValues(
+        exercise,
+        groupingBadge.id,
+        groupingBadge.tagPattern || {}
+      );
+
+      if (badgeValues.length > 0) {
+        // Add exercise to all matching groups (an exercise can belong to multiple groups)
+        badgeValues.forEach(value => {
+          const groupKey = String(value);
+          if (!grouped[groupKey]) {
+            grouped[groupKey] = [];
+          }
+          grouped[groupKey].push(exercise);
+        });
+      } else {
+        // Exercise has no badge value - add to 'other' group
+        if (!grouped.other) {
+          grouped.other = [];
+        }
+        grouped.other.push(exercise);
+      }
     });
 
     return grouped;
-  }, [filteredExercises]);
+  }, [filteredExercises, groupingBadge]);
 
   const formatDuration = (seconds?: number): string => {
     if (!seconds) return t('exercises:variable');
@@ -365,6 +255,32 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
       const reps = exercise.default_reps || 1;
       return `${sets}x${reps}`;
     }
+  };
+
+  // Get display info for a group (label and icon)
+  const getGroupDisplayInfo = (groupKey: string) => {
+    if (!groupingBadge) {
+      return { label: t('exercises:allExercises', { defaultValue: 'All Exercises' }), icon: null };
+    }
+
+    // Find the badge value for this group
+    const badgeValue = groupingBadge.values?.find(v => String(v.id) === groupKey);
+    
+    if (badgeValue) {
+      const label = t(badgeValue.label, { defaultValue: badgeValue.fallbackLabel || String(groupKey) });
+      const icon = badgeValue.icon || null;
+      return { label, icon };
+    }
+
+    // Fallback for 'other' or ungrouped
+    return {
+      label: groupKey === 'other' 
+        ? t('common:other', { defaultValue: 'Other' })
+        : groupKey === 'ungrouped'
+        ? t('exercises:allExercises', { defaultValue: 'All Exercises' })
+        : String(groupKey).replace('-', ' '),
+      icon: null
+    };
   };
 
   const getCategoryIcon = (category: ExerciseCategory) => {
@@ -438,7 +354,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-text-900 dark:text-text-50 flex items-center gap-2">
               <WorkoutIcon size={24} className="text-primary-600 dark:text-primary-400" />
-              {t('common:exercises.title')}
+              {t('exercises:title')}
             </h1>
             {flags.canCreateExercises && (
               <button
@@ -448,13 +364,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
               >
                 <PlusIcon size={20} />
                 <span className="hidden sm:inline">{t('exercises:createNew', 'Create New Exercise')}</span>
-                <span className="sm:hidden">{t('common.create', 'Create')}</span>
+                <span className="sm:hidden">{t('common:common.create', 'Create')}</span>
               </button>
             )}
           </div>
           
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {t('common:exercises.subtitle')}
+            {t('exercises:subtitle')}
           </p>
         </div>
 
@@ -486,14 +402,14 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 {/* Active filter count indicator - only show when non-default filters are active */}
                 {(() => {
                   const activeFilterCount = [
-                    selectedCategories.size, // Count each selected category
+                    badgeSelectionCount, // Count all selected badge values
                     searchTerm ? 1 : 0, // Count search if present
                     showFavoritesOnly ? 1 : 0, // Count favorites toggle if active
                     // Do NOT count exerciseFilter when it's 'all' (default state)
                     (exerciseFilter !== 'all') ? 1 : 0,
                     // Do NOT count sortBy when it's 'name' (default state)  
                     (sortBy !== 'name') ? 1 : 0
-                  ].reduce((sum, count) => sum + count, 0);
+                  ].reduce((sum: number, count: number) => sum + count, 0);
                   
                   return activeFilterCount > 0 && (
                     <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold bg-primary-500 text-white rounded-full">
@@ -535,12 +451,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     type="text"
                     placeholder={t('exercises:searchPlaceholder')}
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => updateFilter({ searchTerm: e.target.value })}
                     className="block w-full pl-14 sm:pl-16 pr-10 sm:pr-12 py-2.5 sm:py-2 border border-surface-300 dark:border-surface-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                   {searchTerm && (
                     <button
-                      onClick={() => setSearchTerm('')}
+                      onClick={() => updateFilter({ searchTerm: '' })}
                       className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                       aria-label="Clear search"
                     >
@@ -552,15 +468,17 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 </div>
               </div>
 
-              {/* Category Filter Selector and Sort */}
+              {/* Badge Filter Group and Sort */}
               <div className="mb-2 sm:mb-3">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                  <CategoryFilter
-                    selectedCategories={selectedCategories}
-                    onCategoryToggle={handleCategoryToggle}
-                    onClearAll={handleClearCategories}
-                    style="dropdown"
-                    label={t('exercises:category', { defaultValue: 'Category' })}
+                  <BadgeFilterGroup
+                    catalogId={selectedCatalogId}
+                    exercises={exercises}
+                    selectedBadges={selectedBadges}
+                    onToggleBadgeValue={toggleBadgeValue}
+                    onClearBadge={clearBadge}
+                    className="flex-1"
+                    maxVisibleBadges={3}
                   />
 
                   {/* Sort Dropdown */}
@@ -572,7 +490,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     <select
                       id="sort-select"
                       value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as 'name' | 'type' | 'recently-added')}
+                      onChange={(e) => updateFilter({ sortBy: e.target.value as 'name' | 'type' | 'recently-added' })}
                       className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px] rtl:text-right rtl:pr-8 rtl:pl-2.5"
                     >
                       <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
@@ -588,7 +506,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 {/* Exercise Type Filter */}
                 <div className="flex gap-1 flex-wrap justify-start">
                   <button
-                    onClick={() => setExerciseFilter('all')}
+                    onClick={() => updateFilter({ exerciseFilter: 'all' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'all'
                         ? 'bg-primary-500 text-white'
@@ -598,7 +516,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     {t('exercises:filterAll', { defaultValue: 'All' })}
                   </button>
                   <button
-                    onClick={() => setExerciseFilter('built-in')}
+                    onClick={() => updateFilter({ exerciseFilter: 'built-in' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'built-in'
                         ? 'bg-primary-500 text-white'
@@ -608,7 +526,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     {t('exercises:filterBuiltIn', { defaultValue: 'Built-in' })}
                   </button>
                   <button
-                    onClick={() => setExerciseFilter('custom')}
+                    onClick={() => updateFilter({ exerciseFilter: 'custom' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'custom'
                         ? 'bg-primary-500 text-white'
@@ -618,7 +536,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     {t('exercises:filterCustom', { defaultValue: 'Custom' })}
                   </button>
                   <button
-                    onClick={() => setExerciseFilter('shared')}
+                    onClick={() => updateFilter({ exerciseFilter: 'shared' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'shared'
                         ? 'bg-primary-500 text-white'
@@ -632,7 +550,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 {/* Favorites Toggle */}
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                    onClick={() => updateFilter({ showFavoritesOnly: !showFavoritesOnly })}
                     className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       showFavoritesOnly
                         ? 'bg-yellow-500 text-white'
@@ -664,29 +582,31 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
         </div>
 
         {/* Exercise Grid */}
-        {selectedCategories.size === 0 ? (
-          // Show by category when viewing all
+        {badgeSelectionCount === 0 ? (
+          // Show by group (badge-based) when viewing all
           appSettings.horizontal_exercise_layout ? (
-            // Netflix-style horizontal category layout
+            // Netflix-style horizontal group layout
             <div className="space-y-6 sm:space-y-8">
-              {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
-                if (categoryExercises.length === 0) return null;
+              {Object.entries(exercisesByGroup).map(([groupKey, groupExercises]) => {
+                if (groupExercises.length === 0) return null;
+                const { label: groupLabel, icon: groupIcon } = getGroupDisplayInfo(groupKey);
 
                 return (
-                  <div key={category}>
+                  <div key={groupKey}>
                     <h2 className="text-lg sm:text-xl font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4 flex items-center gap-2">
-                      <span>{getCategoryIcon(category as ExerciseCategory)}</span>
-                      <span className="capitalize">{t(`common:categories.${String(category)}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
+                      {groupIcon && <span>{groupIcon}</span>}
+                      {!groupIcon && groupingBadge?.id === 'category' && <span>{getCategoryIcon(groupKey as ExerciseCategory)}</span>}
+                      <span className="capitalize">{groupLabel}</span>
                       <span className="text-sm font-normal text-text-500 dark:text-text-400">
-                        ({categoryExercises.length})
+                        ({groupExercises.length})
                       </span>
                     </h2>
                     {/* Horizontal scrollable container with navigation */}
                     <div className="relative group -mx-3 sm:-mx-4">
                       {/* Left navigation button */}
-                      {categoryExercises.length > 1 && (
+                      {groupExercises.length > 1 && (
                         <button
-                          onClick={() => scrollCategory(category, 'left')}
+                          onClick={() => scrollCategory(groupKey, 'left')}
                           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
                           aria-label={t('a11y.scrollLeft', 'Scroll left')}
                         >
@@ -697,9 +617,9 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       )}
 
                       {/* Right navigation button */}
-                      {categoryExercises.length > 1 && (
+                      {groupExercises.length > 1 && (
                         <button
-                          onClick={() => scrollCategory(category, 'right')}
+                          onClick={() => scrollCategory(groupKey, 'right')}
                           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
                           aria-label={t('a11y.scrollRight', 'Scroll right')}
                         >
@@ -711,12 +631,12 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
 
                       <div
                         ref={(el) => {
-                          categoryScrollRefs.current[category] = el;
+                          categoryScrollRefs.current[groupKey] = el;
                         }}
                         className="overflow-x-auto scrollbar-hide px-3 sm:px-4"
                       >
                         <div className="flex gap-3 sm:gap-4 pb-2 w-max">
-                          {categoryExercises.map((exercise) => (
+                          {groupExercises.map((exercise) => (
                             <div key={exercise.id} className="flex-none w-64 sm:w-72">
                               <ExerciseCard
                                 exercise={exercise}
@@ -743,20 +663,22 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           ) : (
             // Traditional grid layout
             <div className="space-y-6 sm:space-y-8">
-              {(Object.entries(exercisesByCategory) as [ExerciseCategory, Exercise[]][]).map(([category, categoryExercises]) => {
-                if (categoryExercises.length === 0) return null;
+              {Object.entries(exercisesByGroup).map(([groupKey, groupExercises]) => {
+                if (groupExercises.length === 0) return null;
+                const { label: groupLabel, icon: groupIcon } = getGroupDisplayInfo(groupKey);
 
                 return (
-                  <div key={category}>
+                  <div key={groupKey}>
                     <h2 className="text-lg sm:text-xl font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4 flex items-center gap-2">
-                      <span>{getCategoryIcon(category as ExerciseCategory)}</span>
-                      <span className="capitalize">{t(`common:categories.${String(category)}` as const, { defaultValue: String(category).replace('-', ' ') })}</span>
+                      {groupIcon && <span>{groupIcon}</span>}
+                      {!groupIcon && groupingBadge?.id === 'category' && <span>{getCategoryIcon(groupKey as ExerciseCategory)}</span>}
+                      <span className="capitalize">{groupLabel}</span>
                       <span className="text-sm font-normal text-text-500 dark:text-text-400">
-                        ({categoryExercises.length})
+                        ({groupExercises.length})
                       </span>
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                      {categoryExercises.map((exercise) => (
+                      {groupExercises.map((exercise) => (
                         <ExerciseCard
                           key={exercise.id}
                           exercise={exercise}
@@ -805,16 +727,16 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
           <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🔍</div>
             <h3 className="text-base sm:text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
-              {t('common:exercises.emptyTitle')}
+              {t('exercises:emptyTitle')}
             </h3>
             <p className="text-sm sm:text-base text-text-600 dark:text-text-400 mb-4">
-              {t('common:exercises.emptyBody')}
+              {t('exercises:emptyBody')}
             </p>
             <button
               onClick={clearAllFilters}
               className="px-4 py-2.5 bg-primary-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-primary-600 transition-colors min-h-[44px]"
             >
-              {t('common:exercises.clearFilters')}
+              {t('exercises:clearFilters')}
             </button>
           </div>
         )}
@@ -960,30 +882,28 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
       <div className="p-2 sm:p-3">
         {/* Top Row - Exercise Details (Left) and Action Buttons (Right) */}
         <div className="mb-1">
-          <div className="flex items-center justify-between">
-            {/* Left Side - Exercise Details and Tags */}
-            <div className="flex items-center gap-2">
+          <div className="flex items-start justify-between gap-3">
+            {/* Left Side - Exercise Details and Tags - Allow wrapping */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0">
               {/* Exercise Details - Left-aligned */}
               <span className="text-sm font-medium text-text-800 dark:text-text-100">
                 {formatSimplifiedDetails(exercise)}
               </span>
               {/* Custom/Shared Tags */}
-              <div className="flex items-center gap-1">
-                {isUserCreated && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 rounded-full">
-                    {t('exercises:custom', { defaultValue: 'Custom' })}
-                  </span>
-                )}
-                {currentUser && isSharedExerciseCard && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
-                    {t('exercises:shared', { defaultValue: 'Shared' })}
-                  </span>
-                )}
-              </div>
+              {isUserCreated && (
+                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 rounded-full whitespace-nowrap">
+                  {t('exercises:custom', { defaultValue: 'Custom' })}
+                </span>
+              )}
+              {currentUser && isSharedExerciseCard && (
+                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full whitespace-nowrap">
+                  {t('exercises:shared', { defaultValue: 'Shared' })}
+                </span>
+              )}
             </div>
 
             {/* Right Side - Action Buttons */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0 flex-nowrap">
 
               {/* Edit Button - Only for user-created */}
               {isUserCreated && onEdit && (

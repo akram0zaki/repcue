@@ -335,6 +335,23 @@ class RepCueDatabase extends Dexie {
       // Clean up old sharing-related fields from exercises
       logger.log('[Migration v21] Removing old sharing columns from exercises for reference-based sharing');
 
+    // Version 22: Add tags support for catalog badge system
+    // Add multiEntry index on tags array for efficient badge filtering
+    this.version(22).stores({
+      // Added *tags for multi-entry index (allows querying individual tags in the array)
+      // Added [catalogId+*tags] for compound index (catalog + tag queries)
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, *tags, [catalogId+*tags], updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    });
+
       await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
         // Remove old sharing fields that are no longer used
         delete exercise.shared_from_exercise_id;
@@ -1762,6 +1779,237 @@ export class StorageService {
         const merged = exercises.map(ex => ({ ...ex, is_favorite: favorites.includes(ex.id) }));
         return filterActiveRecords(merged);
       }
+    );
+  }
+
+  /**
+   * Get a single exercise by ID from IndexedDB (offline-first).
+   * Handles both user-created exercises (UUID) and built-in exercises.
+   *
+   * @param exerciseId - Exercise ID (UUID for user-created, slug for built-in)
+   * @returns Exercise or null if not found
+   */
+  public async getExerciseById(exerciseId: string): Promise<Exercise | null> {
+    if (!this.canStoreData()) {
+      return null;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const userId = authService.getCurrentUser()?.id;
+
+        // Fetch the exercise and related data
+        const [storedExercise, prefs, userCreatedFavorites] = await Promise.all([
+          this.db.exercises.get(exerciseId),
+          this.getUserPreferences().catch(() => null),
+          userId ? this.db.user_favorites
+            .where('owner_id').equals(userId)
+            .and(f => f.item_type === 'exercise' && f.item_id === exerciseId && !f.deleted)
+            .first() : Promise.resolve(undefined)
+        ]);
+
+        if (!storedExercise || storedExercise.deleted) {
+          return null;
+        }
+
+        const favorites = prefs?.favorite_exercises || [];
+        const isFavorite = favorites.includes(exerciseId) || !!userCreatedFavorites;
+
+        const exercise = {
+          ...this.convertStoredExercise(storedExercise),
+          is_favorite: isFavorite
+        };
+
+        // Enrich with video URL if it has a video
+        const enriched = await this.enrichExercisesWithVideoUrls([exercise]);
+        return enriched[0] || null;
+      },
+      () => null
+    );
+  }
+
+  /**
+   * Get exercises by badge tag
+   *
+   * Efficiently queries exercises that have a specific badge tag
+   * using the multi-entry index on tags field.
+   *
+   * @param catalogId - Catalog ID to filter exercises
+   * @param badgeId - Badge identifier (e.g., 'category', 'kyuLevel')
+   * @param value - Badge value (e.g., 'core', '5')
+   * @returns Array of exercises matching the badge tag
+   */
+  public async getExercisesByBadge(
+    catalogId: string,
+    badgeId: string,
+    value: string | number
+  ): Promise<Exercise[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const tag = `${badgeId}:${value}`;
+        
+        // Use compound index [catalogId+*tags] for efficient filtering
+        const exercises = await this.db.exercises
+          .where('[catalogId+*tags]')
+          .equals([catalogId, tag])
+          .and(ex => !ex.deleted)
+          .toArray();
+
+        return exercises.map(this.convertStoredExercise);
+      },
+      () => []
+    );
+  }
+
+  /**
+   * Get unique badge values for a catalog
+   * 
+   * Discovers all unique values for a specific badge within a catalog
+   * by scanning exercise tags.
+   * 
+   * @param catalogId - Catalog ID to filter exercises
+   * @param badgeId - Badge identifier to extract values for
+   * @returns Array of unique badge values found
+   */
+  public async getUniqueBadgeValues(
+    catalogId: string,
+    badgeId: string
+  ): Promise<Array<string | number>> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        // Get all exercises for the catalog
+        const exercises = await this.db.exercises
+          .where('catalogId')
+          .equals(catalogId)
+          .and(ex => !ex.deleted)
+          .toArray();
+
+        const uniqueValues = new Set<string | number>();
+        const tagPrefix = `${badgeId}:`;
+
+        for (const exercise of exercises) {
+          if (!exercise.tags || !Array.isArray(exercise.tags)) {
+            continue;
+          }
+
+          for (const tag of exercise.tags) {
+            if (typeof tag === 'string' && tag.startsWith(tagPrefix)) {
+              const value = tag.substring(tagPrefix.length);
+              // Try to parse as number if possible
+              const numValue = Number(value);
+              uniqueValues.add(isNaN(numValue) ? value : numValue);
+            }
+          }
+        }
+
+        return Array.from(uniqueValues).sort();
+      },
+      () => []
+    );
+  }
+
+  /**
+   * Add tags to an exercise
+   * 
+   * Appends new tags to an exercise's tags array, avoiding duplicates.
+   * Marks the exercise as dirty for sync.
+   * 
+   * @param exerciseId - Exercise ID
+   * @param newTags - Array of tags to add
+   * @returns True if successful
+   */
+  public async addTagsToExercise(
+    exerciseId: string,
+    newTags: string[]
+  ): Promise<boolean> {
+    if (!this.canStoreData()) {
+      return false;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const exercise = await this.db.exercises.get(exerciseId);
+        if (!exercise) {
+          logger.warn('addTagsToExercise: Exercise not found', { exerciseId });
+          return false;
+        }
+
+        const currentTags = exercise.tags || [];
+        const uniqueTags = Array.from(new Set([...currentTags, ...newTags]));
+
+        await this.db.exercises.update(exerciseId, {
+          tags: uniqueTags,
+          updated_at: new Date().toISOString(),
+          version: (exercise.version || 1) + 1,
+          dirty: 1 // Mark as dirty for sync
+        });
+
+        logger.log('addTagsToExercise: Tags added successfully', {
+          exerciseId,
+          addedCount: newTags.length,
+          totalCount: uniqueTags.length
+        });
+
+        return true;
+      },
+      () => false
+    );
+  }
+
+  /**
+   * Remove tags from an exercise
+   * 
+   * Removes specified tags from an exercise's tags array.
+   * Marks the exercise as dirty for sync.
+   * 
+   * @param exerciseId - Exercise ID
+   * @param tagsToRemove - Array of tags to remove
+   * @returns True if successful
+   */
+  public async removeTagsFromExercise(
+    exerciseId: string,
+    tagsToRemove: string[]
+  ): Promise<boolean> {
+    if (!this.canStoreData()) {
+      return false;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const exercise = await this.db.exercises.get(exerciseId);
+        if (!exercise) {
+          logger.warn('removeTagsFromExercise: Exercise not found', { exerciseId });
+          return false;
+        }
+
+        const currentTags = exercise.tags || [];
+        const tagsToRemoveSet = new Set(tagsToRemove);
+        const filteredTags = currentTags.filter(tag => !tagsToRemoveSet.has(tag));
+
+        await this.db.exercises.update(exerciseId, {
+          tags: filteredTags,
+          updated_at: new Date().toISOString(),
+          version: (exercise.version || 1) + 1,
+          dirty: 1 // Mark as dirty for sync
+        });
+
+        logger.log('removeTagsFromExercise: Tags removed successfully', {
+          exerciseId,
+          removedCount: currentTags.length - filteredTags.length,
+          totalCount: filteredTags.length
+        });
+
+        return true;
+      },
+      () => false
     );
   }
 

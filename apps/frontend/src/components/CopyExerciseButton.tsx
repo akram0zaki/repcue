@@ -82,13 +82,13 @@ export const CopyExerciseButton: React.FC<CopyExerciseButtonProps> = ({
 
     } catch (err) {
       logger.error('Error copying exercise:', err);
-      const errorMessage = err instanceof Error ? err.message : t('genericError');
+      const errorMessage = err instanceof Error ? err.message : t('copyErrorGeneric');
 
       if (onCopyError) {
         onCopyError(errorMessage);
       } else {
         // Show error as alert if no custom handler
-        alert(t('error', { error: errorMessage }));
+        alert(t('copyError', { error: errorMessage }));
       }
     } finally {
       setIsCoying(false);

@@ -1,6 +1,11 @@
 {
   "a11y": {
     "skipToMain": "روح للحاجة الأساسية",
-    "mainRegion": "الحاجة الأساسية"
+    "mainRegion": "الحاجة الأساسية",
+    "moreOptions": "اختيارات أكتر",
+    "navigateTo": "روح لـ",
+    "scrollLeft": "اسحب/مرّر شمال",
+    "scrollRight": "اسحب/مرّر يمين",
+    "skipOnboarding": "سكيب الإعداد الأولي / فوت الخطوات دي"
   }
 }

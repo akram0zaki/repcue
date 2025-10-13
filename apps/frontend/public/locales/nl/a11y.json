@@ -1,6 +1,11 @@
 {
   "a11y": {
     "skipToMain": "Ga naar hoofdinhoud",
-    "mainRegion": "Hoofdinhoud"
-  }
+    "mainRegion": "Hoofdinhoud",
+    "moreOptions": "Meer opties",
+    "navigateTo": "Ga naar",
+    "scrollLeft": "Naar links scrollen",
+    "scrollRight": "Naar rechts scrollen",
+    "skipOnboarding": "Introductie overslaan"
+   }
 }

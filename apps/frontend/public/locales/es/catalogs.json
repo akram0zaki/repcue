@@ -1,24 +1,99 @@
 {
-  "selectCatalog": "Catálogo de Ejercicios",
-  "selectDescription": "Elige un catálogo de ejercicios para ver ejercicios",
+  "selectCatalog": "Catálogo de ejercicios",
+  "selectDescription": "Elige un catálogo de ejercicios para ver las rutinas disponibles",
   "general-fitness": {
-    "name": "Fitness General",
-    "description": "Ejercicios básicos para fitness general y entrenamiento de fuerza"
+    "name": "Acondicionamiento general",
+    "description": "Ejercicios básicos para mejorar la condición física y fortalecer el cuerpo",
+    "badges": {
+      "category": {
+        "label": "Categoría"
+      },
+      "equipment": {
+        "label": "Equipo",
+        "values": {
+          "bodyweight": "Solo peso corporal",
+          "dumbbells": "Mancuernas",
+          "resistanceBand": "Banda de resistencia",
+          "none": "Sin equipo"
+        }
+      },
+      "intensity": {
+        "label": "Intensidad",
+        "values": {
+          "low": "Baja intensidad",
+          "moderate": "Intensidad moderada",
+          "high": "Alta intensidad"
+        }
+      }
+    }
   },
   "tai-chi": {
     "name": "Tai Chi",
-    "description": "Movimientos suaves y fluidos para equilibrio, flexibilidad y atención plena"
+    "description": "Movimientos suaves y fluidos para mejorar el equilibrio, la flexibilidad y la concentración mental",
+    "badges": {
+      "category": {
+        "label": "Categoría"
+      },
+      "form": {
+        "label": "Forma",
+        "values": {}
+      }
+    }
   },
   "zumba": {
     "name": "Zumba",
-    "description": "Ejercicios de cardio basados en baile de alta energía para fitness divertido"
+    "description": "Ejercicios de cardio basados en el baile, llenos de energía y diversión",
+    "badges": {
+      "category": {
+        "label": "Categoría"
+      },
+      "style": {
+        "label": "Estilo de baile",
+        "values": {
+          "salsa": "Salsa",
+          "merengue": "Merengue",
+          "reggaeton": "Reguetón",
+          "cumbia": "Cumbia"
+        }
+      }
+    }
   },
   "women-health": {
-    "name": "Salud de la Mujer",
-    "description": "Ejercicios especializados para la salud y bienestar de la mujer"
+    "name": "Salud de la mujer",
+    "description": "Ejercicios especializados para el bienestar y la salud de la mujer",
+    "badges": {
+      "category": {
+        "label": "Categoría"
+      },
+      "focus": {
+        "label": "Área de enfoque",
+        "values": {
+          "prenatal": "Prenatal",
+          "postnatal": "Postnatal",
+          "pelvic-floor": "Suelo pélvico",
+          "core-strength": "Fortalecimiento del core"
+        }
+      }
+    }
   },
   "aikido": {
     "name": "Aikido",
-    "description": "Arte marcial japonés tradicional enfocado en la armonía, el equilibrio y los movimientos fluidos mediante llaves y proyecciones"
+    "description": "Arte marcial japonés tradicional enfocado en la armonía, el equilibrio y el movimiento fluido a través de bloqueos y proyecciones",
+    "badges": {
+      "category": {
+        "label": "Categoría"
+      },
+      "kyuLevel": {
+        "label": "Nivel Kyu",
+        "values": {
+          "6": "6º Kyu (Principiante)",
+          "5": "5º Kyu",
+          "4": "4º Kyu (Intermedio)",
+          "3": "3º Kyu",
+          "2": "2º Kyu (Avanzado)",
+          "1": "1º Kyu (Pre Cinturón Negro)"
+        }
+      }
+    }
   }
 }

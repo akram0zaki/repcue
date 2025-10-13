@@ -16,7 +16,9 @@
     "messageShort": "Please connect to the internet to use the AI Workout Builder."
   },
   "progress": {
-    "step": "Step {{current}} of {{total}}"
+    "step": "Step {{current}} of {{total}}",
+    "current": "Current step {{step}}",
+    "label": "Progress"
   },
   "screen1": {
     "title": "Tell Us About Yourself",
@@ -43,7 +45,10 @@
       "placeholderCm": "Centimeters",
       "placeholderFeet": "Feet",
       "placeholderInches": "Inches",
-      "error": "Please enter a valid height"
+      "error": "Please enter a valid height",
+      "unitLabel": "Height unit",
+      "valueLabel": "Height value",
+      "inchesLabel": "Inches"
     },
     "weight": {
       "label": "Weight",
@@ -53,7 +58,9 @@
       "unitLbs": "lbs",
       "placeholderKg": "Kilograms",
       "placeholderLbs": "Pounds",
-      "error": "Please enter a valid weight"
+      "error": "Please enter a valid weight",
+      "unitLabel": "Weight unit",
+      "valueLabel": "Weight value"
     },
     "next": "Next"
   },
@@ -116,6 +123,8 @@
     },
     "timeAvailability": {
       "label": "Time Available per Session",
+      "description": "How much time can you dedicate to each workout session?",
+      "select": "Select available time",
       "15-30": "15-30 minutes",
       "30-45": "30-45 minutes",
       "45-60": "45-60 minutes",
@@ -148,8 +157,9 @@
     "title": "Your Personalized Workouts",
     "subtitle": "AI-generated workouts tailored to your goals",
     "aiGeneratedBadge": "AI-Generated",
-    "exercises": "{{count}} exercises",
-    "duration": "~{{minutes}} min",
+    "exerciseCount": "{{count}} exercises",
+    "durationSeconds": "~{{seconds}} sec",
+    "durationMinutes": "~{{minutes}} min",
     "scheduledDays": "Scheduled for {{days}}",
     "viewWorkouts": "View Workouts",
     "generateAgain": "Generate Again",
@@ -183,6 +193,7 @@
     "exitButton": "Exit",
     "backButton": "Back",
     "nextButton": "Next",
+    "skip": "Skip",
     "generateButton": "Generate My Workouts",
     "exitConfirmation": {
       "title": "Are you sure you want to exit?",

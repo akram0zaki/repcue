@@ -16,7 +16,9 @@
     "messageShort": "Verbind met het internet om de AI-trainingsbouwer te gebruiken."
   },
   "progress": {
-    "step": "Stap {{current}} van {{total}}"
+    "step": "Stap {{current}} van {{total}}",
+    "current": "Huidige stap {{step}}",
+    "label": "Voortgang"
   },
   "screen1": {
     "title": "Vertel ons iets over jezelf",
@@ -43,7 +45,10 @@
       "placeholderCm": "Centimeters",
       "placeholderFeet": "Voeten",
       "placeholderInches": "Inches",
-      "error": "Voer een geldige lengte in"
+      "error": "Voer een geldige lengte in",
+      "unitLabel": "Lengte eenheid",
+      "valueLabel": "Lengte waarde",
+      "inchesLabel": "Inches"
     },
     "weight": {
       "label": "Gewicht",
@@ -53,7 +58,9 @@
       "unitLbs": "lbs",
       "placeholderKg": "Kilogrammen",
       "placeholderLbs": "Ponden",
-      "error": "Voer een geldig gewicht in"
+      "error": "Voer een geldig gewicht in",
+      "unitLabel": "Gewichtseenheid",
+      "valueLabel": "Gewicht waarde"
     },
     "next": "Volgende"
   },
@@ -116,6 +123,8 @@
     },
     "timeAvailability": {
       "label": "Beschikbare tijd per sessie",
+      "description": "Hoeveel tijd kun je aan elke trainingssessie besteden?",
+      "select": "Selecteer beschikbare tijd",
       "15-30": "15-30 minuten",
       "30-45": "30-45 minuten",
       "45-60": "45-60 minuten",
@@ -148,8 +157,9 @@
     "title": "Jouw gepersonaliseerde trainingen",
     "subtitle": "AI-gegenereerde trainingen afgestemd op jouw doelen",
     "aiGeneratedBadge": "AI-gegenereerd",
-    "exercises": "{{count}} oefeningen",
-    "duration": "~{{minutes}} min",
+    "exerciseCount": "{{count}} oefeningen",
+    "durationSeconds": "~{{seconds}} sec",
+    "durationMinutes": "~{{minutes}} min",
     "scheduledDays": "Gepland voor {{days}}",
     "viewWorkouts": "Bekijk trainingen",
     "generateAgain": "Opnieuw genereren",
@@ -175,9 +185,19 @@
     "dismiss": "Sluiten"
   },
   "onboarding": {
+    "title": "AI Training Programma Maker",
+    "subtitle": "Beantwoord een paar vragen en wij stellen gepersonaliseerde trainingsplannen speciaal voor jou samen.",
+    "exitTitle": "Programma Maker Afsluiten?",
+    "exitConfirm": "Weet je zeker dat je wilt afsluiten? Je voortgang gaat verloren.",
+    "stayButton": "Blijven",
+    "exitButton": "Afsluiten",
+    "backButton": "Terug",
+    "nextButton": "Volgende",
+    "skip": "Overslaan",
+    "generateButton": "Genereer Mijn Trainingen",
     "exitConfirmation": {
       "title": "Weet je zeker dat je wilt afsluiten?",
-      "message": "Je voortgang gaat verloren als je nu afsluit.",
+      "message": "Je voortgang gaat verloren als je nu vertrekt.",
       "continue": "Doorgaan",
       "exit": "Afsluiten"
     }

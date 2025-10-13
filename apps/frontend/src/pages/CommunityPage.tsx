@@ -200,11 +200,6 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       );
     }
 
-    // Apply category filter
-    if (filters.category !== 'all') {
-      filteredExercises = filteredExercises.filter(ex => ex.category === filters.category);
-    }
-
     // Apply difficulty filter
     if (filters.difficulty !== 'all') {
       filteredExercises = filteredExercises.filter(ex => ex.difficulty_level === filters.difficulty);
@@ -339,9 +334,6 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
       )}
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
-          {t(`exercises.categories.${exercise.category}`)}
-        </span>
         {exercise.difficulty_level && (
           <span className="px-2 py-1 bg-gray-100 dark:bg-gray-200 text-gray-800 dark:text-gray-900 text-xs rounded">
             {t(`exercises.difficulty.${exercise.difficulty_level}`)}
@@ -538,9 +530,9 @@ const CommunityPage: React.FC<CommunityPageProps> = () => {
                   className="w-full p-2 border border-border-300 dark:border-border-600 rounded bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50"
                 >
                   <option value="all">{t('community.allDifficulties')}</option>
-                  <option value="beginner">{t('exercises.difficulty.beginner')}</option>
-                  <option value="intermediate">{t('exercises.difficulty.intermediate')}</option>
-                  <option value="advanced">{t('exercises.difficulty.advanced')}</option>
+                  <option value="beginner">{t('exercises.difficulties.beginner')}</option>
+                  <option value="intermediate">{t('exercises.difficulties.intermediate')}</option>
+                  <option value="advanced">{t('exercises.difficulties.advanced')}</option>
                 </select>
               </div>
 

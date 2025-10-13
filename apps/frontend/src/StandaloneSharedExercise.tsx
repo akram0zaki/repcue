@@ -7,7 +7,6 @@ import {
 } from './components/icons/NavigationIcons';
 import { VideoThumbnail } from './components/VideoThumbnail';
 import { ExercisePlaceholder } from './components/ExercisePlaceholder';
-import { ExerciseCategory as Categories } from './types';
 import { localizeExercise } from './utils/localizeExercise';
 import { getExerciseById } from './data/exercises';
 
@@ -120,19 +119,6 @@ const StandaloneSharedExercise: React.FC = () => {
     window.location.href = mainAppUrl.toString();
   };
 
-
-  const getCategoryColor = (category: string): string => {
-    switch (category) {
-      case Categories.CORE: return 'bg-red-500';
-      case Categories.STRENGTH: return 'bg-blue-500';
-      case Categories.CARDIO: return 'bg-green-500';
-      case Categories.FLEXIBILITY: return 'bg-purple-500';
-      case Categories.BALANCE: return 'bg-yellow-500';
-      case Categories.HAND_WARMUP: return 'bg-orange-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
   const formatDuration = (seconds?: number): string => {
   if (!seconds) return t('exercises:variable', 'Variable');
     const minutes = Math.floor(seconds / 60);
@@ -199,8 +185,6 @@ const StandaloneSharedExercise: React.FC = () => {
         {/* Exercise Card */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6">
           <div className="p-6">
-            {/* Category Indicator */}
-            <div className={`${getCategoryColor(exercise.category)} h-1 w-full rounded-full mb-4`}></div>
             {/* Top Row - Shared Tag (Left) and Debug Play Button (Right) */}
             <div className="mb-4">
               <div className="flex items-center justify-between">
@@ -256,10 +240,6 @@ const StandaloneSharedExercise: React.FC = () => {
                       {t('exercises:types.repetition_based', 'Repetition Based')}
                     </>
                   )}
-                </span>
-
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 rounded-full">
-                  {t(`exercises:categories.${exercise.category.replace('-', '')}`, { defaultValue: exercise.category.replace('-', ' ') })}
                 </span>
 
                 {/* Difficulty Badge */}

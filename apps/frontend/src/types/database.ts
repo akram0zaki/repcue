@@ -24,7 +24,6 @@ export const prepareExerciseForInsert = (exercise: Partial<Exercise>): ExerciseI
   const baseExercise = {
     id: exercise.id ?? crypto.randomUUID(),
     name: exercise.name ?? '',
-    category: exercise.category ?? 'core' as const,
     exercise_type: exercise.exercise_type ?? 'repetition_based' as const,
     catalogId: exercise.catalogId ?? 'general-fitness',
     is_favorite: exercise.is_favorite ?? false,

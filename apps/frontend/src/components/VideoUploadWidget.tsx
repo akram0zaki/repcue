@@ -326,9 +326,6 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       {currentVideoUrl && !currentVideoUrl.startsWith('placeholder://') ? (
         <div className="current-video bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
           {(() => {
-            // Check if this is a local blob video (pending or stable scheme)
-            const isLocalBlob = currentVideoUrl.startsWith('blob-pending-sync://') || currentVideoUrl.startsWith('blob-video://');
-            
             return !videoLoadError && actualVideoUrl ? (
               <>
                 <video 
@@ -339,7 +336,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                   onLoadedData={handleVideoLoaded}
                   onCanPlay={handleVideoLoaded}
                 />
-                {isLocalBlob && (
+                {currentVideoUrl.startsWith('blob-pending-sync://') && (
                   <div className="mb-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>

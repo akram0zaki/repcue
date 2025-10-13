@@ -130,7 +130,6 @@ export const EditExercisePage: React.FC = () => {
         created_at: exercise.created_at,
         // Update with new data
         name: exerciseData.name || exercise.name,
-        category: exerciseData.category || exercise.category,
         exercise_type: exerciseData.exercise_type || exercise.exercise_type,
         catalogId: exercise.catalogId || 'general-fitness', // Preserve existing catalogId
         description: exerciseData.description ?? exercise.description,
@@ -237,6 +236,7 @@ export const EditExercisePage: React.FC = () => {
             onCancel={handleCancel}
             isEditing={true}
             loading={loading}
+            catalogId={exercise?.catalogId || 'general-fitness'}
           />
         </div>
       </div>

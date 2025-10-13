@@ -1,6 +1,11 @@
 {
   "a11y": {
     "skipToMain": "Zum Hauptinhalt springen",
-    "mainRegion": "Hauptinhalt"
+    "mainRegion": "Hauptinhalt",
+    "moreOptions": "Mehr Optionen",
+    "navigateTo": "Navigieren zu",
+    "scrollLeft": "Nach links scrollen",
+    "scrollRight": "Nach rechts scrollen",
+    "skipOnboarding": "Einführung überspringen"
   }
 }
