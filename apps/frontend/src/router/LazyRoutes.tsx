@@ -222,6 +222,12 @@ export const AIWorkoutOnboardingPage = lazy(() =>
   }))
 );
 
+export const CoachPage = lazy(() =>
+  import('../pages/CoachPage').catch(() => ({
+    default: () => <div>Error loading Coach page</div>
+  }))
+);
+
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule
 // See: src/router/routeUtils.tsx

@@ -1,0 +1,84 @@
+{
+  "title": "Ihr Coach",
+  "subtitle": "Personalisierte Einblicke, die Ihnen helfen, Ihre Ziele zu erreichen",
+  "empty": {
+    "title": "Noch keine Einblicke",
+    "message": "Beginnen Sie mit dem Training, um personalisierte Coaching-Einblicke zu erhalten!",
+    "startWorkout": "Starten Sie Ihr Erstes Training"
+  },
+  "error": {
+    "title": "Einblicke konnten nicht geladen werden"
+  },
+  "progress": {
+    "title": "Ihr Fortschritt"
+  },
+  "actionsLabel": "Verfügbare Aktionen",
+  "settings": {
+    "title": "KI-Coach",
+    "enabled": "KI-Coach aktivieren",
+    "enabledHelp": "Erhalten Sie personalisierte Einblicke basierend auf Ihrer Trainingshistorie",
+    "showOnHome": "Auf Startseite anzeigen",
+    "showOnHomeHelp": "Top-Einsicht auf Ihrer Startseite anzeigen",
+    "autoRefresh": "Automatische Aktualisierung",
+    "autoRefreshHelp": "Einblicke automatisch alle 5 Minuten aktualisieren",
+    "insightTypes": "Einsichtstypen",
+    "showStreak": "Trainingssträhnen",
+    "showMuscleBalance": "Muskelbalance",
+    "showProgression": "Progressive Überlastung",
+    "showRecovery": "Erholungszeit",
+    "showSuggestions": "Trainingsvorschläge"
+  },
+  "streak": {
+    "title": "Trainingssträhne",
+    "milestone": "Fantastisch! Sie haben eine Strähne von **{{param0}}** Tagen erreicht!",
+    "almostMilestone": "Fast geschafft! Nur noch 1 Tag, um **{{param0}}** Tage zu erreichen!",
+    "maintain": "Bleiben Sie dran! Sie haben eine Strähne von **{{param0}}** Tagen.",
+    "newRecord": "Neuer persönlicher Rekord! Das ist Ihre längste Strähne bisher!",
+    "building": "Toller Schwung! Sie sind bei Tag **{{param0}}** Ihrer Strähne.",
+    "justStarted": "Super! Sie haben Ihre Trainingssträhne begonnen. Machen Sie weiter so!",
+    "noStreak": "Starten Sie noch heute Ihre Trainingssträhne!",
+    "atRisk": "Strähne in Gefahr",
+    "atRiskMessage": "Ihre **{{param0}}**-Tage-Strähne ist in Gefahr! Trainieren Sie heute, um sie aufrechtzuerhalten."
+  },
+  "muscleBalance": {
+    "underTrained": "Bringen Sie Balance ins Training",
+    "underTrainedMessage": "Ihr/e **{{param0}}** braucht mehr Aufmerksamkeit. Erwägen Sie, Übungen für diese Bereiche hinzuzufügen.",
+    "overTrained": "Erholung erforderlich",
+    "overTrainedMessage": "Sie haben sich stark auf **{{param0}}** konzentriert. Erwägen Sie einen Ausgleich mit anderen Muskelgruppen.",
+    "neglected": "Zeit, **{{param0}}** zu trainieren",
+    "neglectedMessage": "Es ist **{{param1}}** Tage her, seit Sie Ihr/e **{{param0}}** trainiert haben. Zeit, sich darum zu kümmern!"
+  },
+  "progression": {
+    "ready": "Bereit für Fortschritt",
+    "readyTitle": "Bereit für das nächste Level!",
+    "readyMessage": "Sie sind bereit, bei **{{param0}}** Fortschritte zu machen! Versuchen Sie beim nächsten Mal **{{param1}}** Sätze mit **{{param2}}** Wiederholungen.",
+    "readyDurationMessage": "Sie sind bereit, bei **{{param0}}** Fortschritte zu machen! Versuchen Sie beim nächsten Mal **{{param1}}** Sätze à **{{param2}}** Sekunden.",
+    "highCompletionRate": "Eine hohe Abschlussrate deutet auf die Bereitschaft zum Fortschritt hin"
+  },
+  "recovery": {
+    "title": "Erholungstag",
+    "needed": "Ihr Körper braucht Ruhe. Erwägen Sie einen Erholungstag oder leichte Aktivität.",
+    "recommended": "Sie haben hart trainiert. Ein Erholungstag hilft, Übertraining zu vermeiden.",
+    "consecutiveDays": "**{{param0}}** aufeinanderfolgende Tage trainiert"
+  },
+  "suggestion": {
+    "title": "Trainingsvorschlag",
+    "message": "Basierend auf Ihrer Historie haben wir einen Trainingsvorschlag für Sie."
+  },
+  "suggestions": {
+    "startJourney": "Bereit für Ihre Fitnessreise? Beginnen wir mit Ihrem ersten Training!",
+    "longGap": "Es ist eine Weile her! Zeit, mit einem Training wieder auf Kurs zu kommen.",
+    "neglectedMuscles": "Einige Muskelgruppen brauchen Aufmerksamkeit! Lassen Sie uns daran arbeiten.",
+    "improveBalance": "Lassen Sie uns Ihr Training mit Übungen für untertrainierte Muskeln ausbalancieren!",
+    "keepGoing": "Weiter so! Hier ist eine vorgeschlagene Übung für Ihre nächste Einheit."
+  },
+  "actions": {
+    "viewProgress": "Fortschritt anzeigen",
+    "workoutNow": "Jetzt trainieren",
+    "findExercises": "Übungen finden",
+    "startWorkout": "Training starten",
+    "startExercise": "Beginnen Sie mit **{{param0}}**",
+    "viewCoach": "Coach anzeigen",
+    "tryIt": "Ausprobieren"
+  }
+}

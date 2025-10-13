@@ -48,6 +48,7 @@ import {
   CreateWorkoutPage,
   EditWorkoutPage,
   CommunityPage,
+  CoachPage,
   AuthCallbackPage,
   ProfilePage,
   AIWorkoutOnboardingPage,
@@ -2579,6 +2580,14 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('Community')}>
                     <CommunityPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.COACH} 
+                element={
+                  <Suspense fallback={createRouteLoader('Coach')}>
+                    <CoachPage appSettings={appSettings} />
                   </Suspense>
                 } 
               />

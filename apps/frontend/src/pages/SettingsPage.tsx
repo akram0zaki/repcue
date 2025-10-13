@@ -408,8 +408,172 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </p>
         </div>
 
+        {/* AI Coach Settings */}
+        <section 
+          className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6"
+          aria-labelledby="coach-settings-heading"
+        >
+          <h2 
+            id="coach-settings-heading"
+            className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2"
+          >
+            <svg 
+              className="section-icon" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            {t('coaching:settings.title', 'AI Coach')}
+          </h2>
+          
+          {/* Master Toggle */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex-1">
+              <label htmlFor="coach-enabled" className="label-text">
+                {t('coaching:settings.enabled', 'Enable AI Coach')}
+              </label>
+              <p 
+                id="coach-enabled-help"
+                className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+              >
+                {t('coaching:settings.enabledHelp', 'Get personalized insights and recommendations based on your workout history')}
+              </p>
+            </div>
+            <ToggleSwitch
+              id="coach-enabled"
+              checked={appSettings.coach_enabled === true}
+              onChange={() => onUpdateSettings({ coach_enabled: !appSettings.coach_enabled })}
+              dataTestId="toggle-coach-enabled"
+              aria-describedby="coach-enabled-help"
+            />
+          </div>
+
+          {/* Show on Home Page */}
+          {appSettings.coach_enabled && (
+            <>
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-show-on-home" className="label-text">
+                    {t('coaching:settings.showOnHome', 'Show on Home Page')}
+                  </label>
+                  <p 
+                    id="coach-show-on-home-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.showOnHomeHelp', 'Display top insight on your home page')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="coach-show-on-home"
+                  checked={appSettings.coach_show_on_home === true}
+                  onChange={() => onUpdateSettings({ coach_show_on_home: !appSettings.coach_show_on_home })}
+                  dataTestId="toggle-coach-show-on-home"
+                  aria-describedby="coach-show-on-home-help"
+                />
+              </div>
+
+              {/* Auto-Refresh */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-auto-refresh" className="label-text">
+                    {t('coaching:settings.autoRefresh', 'Auto-Refresh Insights')}
+                  </label>
+                  <p 
+                    id="coach-auto-refresh-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.autoRefreshHelp', 'Automatically refresh insights every 5 minutes')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="coach-auto-refresh"
+                  checked={appSettings.coach_auto_refresh === true}
+                  onChange={() => onUpdateSettings({ coach_auto_refresh: !appSettings.coach_auto_refresh })}
+                  dataTestId="toggle-coach-auto-refresh"
+                  aria-describedby="coach-auto-refresh-help"
+                />
+              </div>
+
+              {/* Insight Type Filters */}
+              <fieldset className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <legend className="text-sm font-medium text-text-700 dark:text-text-300 mb-3">
+                  {t('coaching:settings.insightTypes', 'Insight Types')}
+                </legend>
+
+                {/* Streak Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-streak" className="label-text text-sm">
+                    {t('coaching:settings.showStreak', 'Workout Streaks')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-streak"
+                    checked={appSettings.coach_show_streak === true}
+                    onChange={() => onUpdateSettings({ coach_show_streak: !appSettings.coach_show_streak })}
+                    dataTestId="toggle-coach-show-streak"
+                  />
+                </div>
+
+                {/* Muscle Balance Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-muscle-balance" className="label-text text-sm">
+                    {t('coaching:settings.showMuscleBalance', 'Muscle Balance')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-muscle-balance"
+                    checked={appSettings.coach_show_muscle_balance === true}
+                    onChange={() => onUpdateSettings({ coach_show_muscle_balance: !appSettings.coach_show_muscle_balance })}
+                    dataTestId="toggle-coach-show-muscle-balance"
+                  />
+                </div>
+
+                {/* Progression Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-progression" className="label-text text-sm">
+                    {t('coaching:settings.showProgression', 'Progressive Overload')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-progression"
+                    checked={appSettings.coach_show_progression === true}
+                    onChange={() => onUpdateSettings({ coach_show_progression: !appSettings.coach_show_progression })}
+                    dataTestId="toggle-coach-show-progression"
+                  />
+                </div>
+
+                {/* Recovery Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-recovery" className="label-text text-sm">
+                    {t('coaching:settings.showRecovery', 'Recovery Time')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-recovery"
+                    checked={appSettings.coach_show_recovery === true}
+                    onChange={() => onUpdateSettings({ coach_show_recovery: !appSettings.coach_show_recovery })}
+                    dataTestId="toggle-coach-show-recovery"
+                  />
+                </div>
+
+                {/* Suggestion Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-suggestions" className="label-text text-sm">
+                    {t('coaching:settings.showSuggestions', 'Workout Suggestions')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-suggestions"
+                    checked={appSettings.coach_show_suggestions === true}
+                    onChange={() => onUpdateSettings({ coach_show_suggestions: !appSettings.coach_show_suggestions })}
+                    dataTestId="toggle-coach-show-suggestions"
+                  />
+                </div>
+              </fieldset>
+            </>
+          )}
+        </section>
+
         {/* Language Settings */}
-  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
           <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
             <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />

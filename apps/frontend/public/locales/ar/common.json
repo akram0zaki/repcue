@@ -61,6 +61,7 @@
     "playVideo": "تشغيل الفيديو",
     "premium": "مميز",
     "done": "تم",
+    "refresh": "تحديث",
     "moreFilters": "فلاتر أكتر ({{count}})",
     "moreFilters_other": "فلاتر أكتر ({{count}})",
     "showFewerFilters": "إظهار فلاتر أقل",
@@ -80,6 +81,7 @@
     "timer": "المؤقت",
     "activityLog": "السجل",
     "progress": "التقدم",
+    "coach": "المدرب",
     "settings": "الإعدادات"
   },
   "settings": {

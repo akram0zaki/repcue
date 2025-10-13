@@ -1,0 +1,84 @@
+{
+  "title": "Your Coach",
+  "subtitle": "Personalized insights to help you reach your goals",
+  "empty": {
+    "title": "No Insights Yet",
+    "message": "Start working out to get personalized coaching insights!",
+    "startWorkout": "Start Your First Workout"
+  },
+  "error": {
+    "title": "Unable to Load Insights"
+  },
+  "progress": {
+    "title": "Your Progress"
+  },
+  "actionsLabel": "Available actions",
+  "settings": {
+    "title": "AI Coach",
+    "enabled": "Enable AI Coach",
+    "enabledHelp": "Get personalized insights and recommendations based on your workout history",
+    "showOnHome": "Show on Home Page",
+    "showOnHomeHelp": "Display top insight on your home page",
+    "autoRefresh": "Auto-Refresh Insights",
+    "autoRefreshHelp": "Automatically refresh insights every 5 minutes",
+    "insightTypes": "Insight Types",
+    "showStreak": "Workout Streaks",
+    "showMuscleBalance": "Muscle Balance",
+    "showProgression": "Progressive Overload",
+    "showRecovery": "Recovery Time",
+    "showSuggestions": "Workout Suggestions"
+  },
+  "streak": {
+    "title": "Workout Streak",
+    "milestone": "Amazing! You've reached a {{param0}}-day streak!",
+    "almostMilestone": "Almost there! 1 more day to reach {{param0}} days!",
+    "maintain": "Keep it going! You're on a {{param0}}-day streak.",
+    "newRecord": "New personal record! This is your longest streak yet!",
+    "building": "Great momentum! You're on day {{param0}} of your streak.",
+    "justStarted": "Nice! You've started your workout streak. Keep it up!",
+    "noStreak": "Start your workout streak today!",
+    "atRisk": "Streak at Risk",
+    "atRiskMessage": "Your {{param0}}-day streak is at risk! Work out today to keep it going."
+  },
+  "muscleBalance": {
+    "underTrained": "Balance Your Training",
+    "underTrainedMessage": "Your {{param0}} needs more attention. Consider adding exercises targeting these areas.",
+    "overTrained": "Recovery Needed",
+    "overTrainedMessage": "You've been focusing heavily on {{param0}}. Consider balancing with other muscle groups.",
+    "neglected": "Time to Train {{param0}}",
+    "neglectedMessage": "It's been {{param1}} days since you trained your {{param0}}. Time to give it some attention!"
+  },
+  "progression": {
+    "ready": "Ready for Progression",
+    "readyTitle": "Ready to Level Up!",
+    "readyMessage": "You're ready to progress on {{param0}}! Try {{param1}} sets of {{param2}} reps next time.",
+    "readyDurationMessage": "You're ready to progress on {{param0}}! Try {{param1}} sets of {{param2}} seconds next time.",
+    "highCompletionRate": "High completion rate indicates readiness for progression"
+  },
+  "recovery": {
+    "title": "Recovery Day",
+    "needed": "Your body needs rest. Consider taking a recovery day or doing light activity.",
+    "recommended": "You've been training hard. A recovery day would help prevent overtraining.",
+    "consecutiveDays": "Trained {{param0}} consecutive days"
+  },
+  "suggestion": {
+    "title": "Workout Suggestion",
+    "message": "Based on your history, here's a workout suggestion for you."
+  },
+  "suggestions": {
+    "startJourney": "Ready to start your fitness journey? Let's begin with your first workout!",
+    "longGap": "It's been a while! Time to get back on track with a workout.",
+    "neglectedMuscles": "Some muscle groups need attention! Let's work on them.",
+    "improveBalance": "Let's balance your training with exercises for undertrained muscles!",
+    "keepGoing": "Keep up the great work! Here's a suggested exercise for your next session."
+  },
+  "actions": {
+    "viewProgress": "View Progress",
+    "workoutNow": "Workout Now",
+    "findExercises": "Find Exercises",
+    "startWorkout": "Start Workout",
+    "startExercise": "Start {{param0}}",
+    "viewCoach": "View Coach",
+    "tryIt": "Try It"
+  }
+}

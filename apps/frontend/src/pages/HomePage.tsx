@@ -15,6 +15,8 @@ import { AuthModal } from '../components/auth/AuthModal';
 import { useAuth } from '../hooks/useAuth';
 import { VideoThumbnail } from '../components/VideoThumbnail';
 import AIWorkoutButton from '../components/AIWorkoutButton';
+import { useTopInsight } from '../hooks/useCoachingInsights';
+import CoachingCard from '../components/CoachingCard';
 import logger from '../utils/logger';
 
 interface HomePageProps {
@@ -23,10 +25,17 @@ interface HomePageProps {
   onToggleFavorite: (exercise_id: string) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
+const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFavorite }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['common', 'exerciseDetails']);
   const { isAuthenticated } = useAuth();
+  
+  // Coaching insight for home page (conditional on settings)
+  const shouldShowCoachOnHome = appSettings.coach_enabled && appSettings.coach_show_on_home;
+  const { insight: topInsight, isLoading: isLoadingInsight } = useTopInsight(
+    shouldShowCoachOnHome ? appSettings : undefined
+  );
+  
   const [upcomingWorkout, setUpcomingWorkout] = useState<{
     workout: Workout;
     weekday: string;
@@ -170,6 +179,50 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             </div>
           </div>
         </div>
+
+        {/* AI Coach Top Insight */}
+        {shouldShowCoachOnHome && topInsight && !isLoadingInsight && (
+          <section className="mb-4">
+            <CoachingCard
+              insight={topInsight}
+              onAction={(action, data) => {
+                logger.log('HomePage: Coaching action triggered:', action, data);
+                
+                // Handle different actions
+                switch (action) {
+                  case 'start-workout':
+                    navigate(Routes.TIMER);
+                    break;
+                  case 'start-exercise':
+                    if (data && typeof data === 'object' && 'exerciseId' in data) {
+                      navigate(Routes.TIMER, { state: { exerciseId: data.exerciseId } });
+                    }
+                    break;
+                  case 'find-exercises':
+                    if (data && typeof data === 'object' && 'muscleGroup' in data) {
+                      navigate(Routes.EXERCISES, { state: { filterMuscleGroup: data.muscleGroup } });
+                    } else {
+                      navigate(Routes.EXERCISES);
+                    }
+                    break;
+                  case 'view-progress':
+                    navigate(Routes.ACTIVITY_LOG);
+                    break;
+                  case 'view-coach':
+                    navigate(Routes.COACH);
+                    break;
+                  default:
+                    logger.warn('Unknown coaching action:', action);
+                }
+              }}
+              onDismiss={() => {
+                // Insight will be dismissed through the hook's dismissInsight function
+                // The topInsight state will update automatically
+                logger.log('Insight dismissed on HomePage');
+              }}
+            />
+          </section>
+        )}
 
         <header className="text-center mb-3">
           <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-1">

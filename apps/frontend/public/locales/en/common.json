@@ -49,6 +49,7 @@
     "cancelTitle": "Cancel",
     "clear": "Clear",
     "done": "Done",
+    "refresh": "Refresh",
     "clearFormTitle": "Clear Form",
     "confirmClearForm": "Are you sure you want to clear the form? This will delete your draft.",
     "noVideo": "No Video",
@@ -81,6 +82,7 @@
     "timer": "Timer",
     "activityLog": "Log",
     "progress": "Progress",
+    "coach": "Coach",
     "settings": "Settings"
   },
   "settings": {

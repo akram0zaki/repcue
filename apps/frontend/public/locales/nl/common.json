@@ -71,7 +71,8 @@
     "clearFilter": "Filter wissen",
     "other": "Overige",
     "selectOne": "Selecteer één",
-    "done": "Klaar"
+    "done": "Klaar",
+    "refresh": "Vernieuwen"
   },
   "navigation": {
     "home": "Home",
@@ -80,6 +81,7 @@
     "timer": "Timer",
     "activityLog": "Logboek",
     "progress": "Voortgang",
+    "coach": "Coach",
     "settings": "Instellingen"
   },
   "settings": {

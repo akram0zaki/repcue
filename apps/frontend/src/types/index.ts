@@ -354,6 +354,17 @@ export interface AppSettings extends SyncMetadata {
   update_on_metered?: boolean; // allow updates on metered connections
   // Version tracking
   app_version?: string | null; // currently installed app version, null for new installations
+  // AI Coach settings
+  coach_enabled?: boolean; // Master toggle for AI Coach
+  coach_show_on_home?: boolean; // Display top insight on home page
+  coach_auto_refresh?: boolean; // Auto-refresh insights
+  coach_refresh_interval?: number; // Auto-refresh interval in milliseconds (default: 5 minutes)
+  coach_show_streak?: boolean; // Show streak insights
+  coach_show_muscle_balance?: boolean; // Show muscle balance insights
+  coach_show_progression?: boolean; // Show progression insights
+  coach_show_recovery?: boolean; // Show recovery insights
+  coach_show_suggestions?: boolean; // Show workout suggestions
+  coach_intro_seen?: boolean; // User has seen the coach introduction dialog
 }
 
 // Navigation routes
@@ -375,6 +386,7 @@ export const Routes = {
   CREATE_WORKOUT: '/workout/create',
   EDIT_WORKOUT: '/workout/edit',
   COMMUNITY: '/community',
+  COACH: '/coach',
   AUTH_CALLBACK: '/auth/callback'
 } as const;
 

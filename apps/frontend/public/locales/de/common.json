@@ -61,6 +61,7 @@
     "playVideo": "Video abspielen",
     "premium": "PRO",
     "done": "Fertig",
+    "refresh": "Aktualisieren",
     "addEquipment": "Ausrüstung hinzufügen",
     "removeEquipment": "Ausrüstung entfernen",
     "addMuscleGroup": "Muskelgruppe hinzufügen",
@@ -88,6 +89,7 @@
     "timer": "Timer",
     "activityLog": "Protokoll",
     "progress": "Fortschritt",
+    "coach": "Coach",
     "settings": "Einstellungen"
   },
   "settings": {

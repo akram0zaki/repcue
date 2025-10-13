@@ -61,6 +61,7 @@
     "playVideo": "Reproducir video",
     "premium": "PRO",
     "done": "Hecho",
+    "refresh": "Actualizar",
     "addEquipment": "Agregar equipo",
     "removeEquipment": "Eliminar equipo",
     "addMuscleGroup": "Agregar grupo muscular",
@@ -88,6 +89,7 @@
     "timer": "Cronómetro",
     "activityLog": "Registro",
     "progress": "Progreso",
+    "coach": "Entrenador",
     "settings": "Configuración"
   },
   "settings": {

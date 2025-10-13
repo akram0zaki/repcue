@@ -9,7 +9,9 @@ import {
   TimerIcon,
   LogIcon,
   ScheduleIcon,
-  MoreIcon
+  MoreIcon,
+  CoachIcon,
+  SettingsIcon
 } from './icons/NavigationIcons';
 import { useRTLDetection } from '../hooks/useRTLDetection';
 
@@ -129,18 +131,34 @@ const Navigation: React.FC = () => {
               }`}
               dir={isRTL ? 'rtl' : 'ltr'}
             >
+              {/* Coach */}
+              <button
+                onClick={() => {
+                  navigate(Routes.COACH);
+                  setShowMoreMenu(false);
+                }}
+                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-t-lg ${
+                  isRTL ? 'flex-row-reverse justify-end' : ''
+                } ${isActive(Routes.COACH) ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600' : ''}`}
+                data-testid="nav-coach"
+              >
+                <CoachIcon size={18} />
+                <span>{t('navigation.coach')}</span>
+              </button>
+
               {/* Settings */}
               <button
                 onClick={() => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
-                  isRTL ? 'text-right' : 'text-left'
-                }`}
+                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-b-lg ${
+                  isRTL ? 'flex-row-reverse justify-end' : ''
+                } ${isActive(Routes.SETTINGS) ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600' : ''}`}
                 data-testid="nav-settings"
               >
-                {t('navigation.settings')}
+                <SettingsIcon size={18} />
+                <span>{t('navigation.settings')}</span>
               </button>
             </div>
           )}

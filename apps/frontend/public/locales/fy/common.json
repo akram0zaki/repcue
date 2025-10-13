@@ -61,6 +61,7 @@
     "playVideo": "Spylje Fideo",
     "premium": "PRO",
     "done": "Klear",
+    "refresh": "Ferfarskje",
     "addEquipment": "Materiaal tafoegje",
     "removeEquipment": "Materiaal wiskje",
     "addMuscleGroup": "Spiergroep tafoegje",
@@ -88,6 +89,7 @@
     "timer": "Timer",
     "activityLog": "Lochboek",
     "progress": "Foardering",
+    "coach": "Coach",
     "settings": "Ynstellingen"
   },
   "settings": {

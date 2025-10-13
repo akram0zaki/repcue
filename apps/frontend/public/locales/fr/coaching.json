@@ -1,0 +1,80 @@
+{
+  "title": "Votre Coach",
+  "subtitle": "Informations personnalisées pour vous aider à atteindre vos objectifs",
+  "empty": {
+    "title": "Aucune Information pour l'instant",
+    "message": "Commencez à vous entraîner pour recevoir des informations de coaching personnalisées !",
+    "startWorkout": "Démarrer Votre Premier Entraînement"
+  },
+  "error": {
+    "title": "Impossible de Charger les Informations"
+  },
+  "progress": {
+    "title": "Votre Progression"
+  },
+  "actionsLabel": "Actions disponibles",
+  "settings": {
+    "title": "Coach IA",
+    "enabled": "Activer le Coach IA",
+    "enabledHelp": "Recevez des informations et des recommandations personnalisées basées sur votre historique d'entraînement",
+    "showOnHome": "Afficher sur la page d'accueil",
+    "showOnHomeHelp": "Afficher l'information principale sur votre page d'accueil",
+    "autoRefresh": "Actualisation automatique",
+    "autoRefreshHelp": "Actualiser automatiquement les informations toutes les 5 minutes",
+    "insightTypes": "Types d'Informations",
+    "showStreak": "Séries d'Entraînement (Streaks)",
+    "showMuscleBalance": "Équilibre Musculaire",
+    "showProgression": "Surcharge Progressive",
+    "showRecovery": "Temps de Récupération",
+    "showSuggestions": "Suggestions d'Entraînement"
+  },
+  "streak": {
+    "title": "Série d'Entraînement",
+    "milestone": "Incroyable ! Vous avez atteint une série de **{{param0}}** jours !",
+    "almostMilestone": "Presque ! Encore 1 jour pour atteindre **{{param0}}** jours !",
+    "maintain": "Continuez comme ça ! Vous êtes sur une série de **{{param0}}** jours.",
+    "newRecord": "Nouveau record personnel ! C'est votre plus longue série jusqu'à présent !",
+    "building": "Excellent élan ! Vous êtes au jour **{{param0}}** de votre série.",
+    "justStarted": "Bien ! Vous avez commencé votre série d'entraînement. Maintenez le rythme !",
+    "noStreak": "Commencez votre série d'entraînement aujourd'hui !",
+    "atRisk": "Série en Danger",
+    "atRiskMessage": "Votre série de **{{param0}}** jours est en danger ! Entraînez-vous aujourd'hui pour la maintenir."
+  },
+  "muscleBalance": {
+    "underTrained": "Équilibrez Votre Entraînement",
+    "underTrainedMessage": "Votre **{{param0}}** a besoin de plus d'attention. Envisagez d'ajouter des exercices ciblant ces zones.",
+    "overTrained": "Récupération Nécessaire",
+    "overTrainedMessage": "Vous vous êtes beaucoup concentré(e) sur **{{param0}}**. Pensez à équilibrer avec d'autres groupes musculaires.",
+    "neglected": "Il est Temps d'Entraîner **{{param0}}**",
+    "neglectedMessage": "Cela fait **{{param1}}** jours que vous n'avez pas entraîné votre **{{param0}}**. Il est temps de lui accorder de l'attention !"
+  },
+  "progression": {
+    "ready": "Prêt pour la Progression",
+    "readyTitle": "Prêt(e) à Passer au Niveau Supérieur !",
+    "readyMessage": "Vous êtes prêt(e) à progresser sur **{{param0}}** ! Essayez **{{param1}}** séries de **{{param2}}** répétitions la prochaine fois.",
+    "readyDurationMessage": "Vous êtes prêt(e) à progresser sur **{{param0}}** ! Essayez **{{param1}}** séries de **{{param2}}** secondes la prochaine fois.",
+    "highCompletionRate": "Un taux de complétion élevé indique une préparation à la progression"
+  },
+  "recovery": {
+    "title": "Jour de Récupération",
+    "needed": "Votre corps a besoin de repos. Envisagez de prendre un jour de récupération ou de faire une activité légère.",
+    "recommended": "Vous vous êtes beaucoup entraîné(e). Un jour de récupération aiderait à prévenir le surentraînement.",
+    "consecutiveDays": "Entraîné **{{param0}}** jours consécutifs"
+  },
+  "suggestion": {
+    "title": "Suggestion d'Entraînement",
+    "message": "Basé sur votre historique, voici une suggestion d'entraînement pour vous."
+  },
+  "suggestions": {
+    "startJourney": "Prêt(e) à commencer votre parcours de fitness ? Commençons par votre premier entraînement !",
+    "longGap": "Cela fait un moment ! Il est temps de reprendre le rythme avec un entraînement.",
+    "neglectedMuscles": "Certains groupes musculaires ont besoin d'attention ! Travaillons-les.",
+    "improveBalance": "Équilibrons votre entraînement avec des exercices pour les muscles sous-entraînés !",
+    "keepGoing": "Continuez l'excellent travail ! Voici un exercice suggéré pour votre prochaine session.",
+    "findExercises": "Trouver des Exercices",
+    "startWorkout": "Démarrer l'Entraînement",
+    "startExercise": "Démarrer **{{param0}}**",
+    "viewCoach": "Voir le Coach",
+    "tryIt": "Essayer"
+  }
+}

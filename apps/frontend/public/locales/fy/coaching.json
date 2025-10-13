@@ -1,0 +1,84 @@
+{
+  "title": "Jo Coach",
+  "subtitle": "Personalisearre ynsichten om jo te helpen jo doelen te berikken",
+  "empty": {
+    "title": "Noch Gjin Ynsichten",
+    "message": "Begjin mei trainen om personalisearre coachingsynzichten te krijen!",
+    "startWorkout": "Start Jo Earste Training"
+  },
+  "error": {
+    "title": "Ynsichten Koene Net Laden Wurde"
+  },
+  "progress": {
+    "title": "Jo Foarútgong"
+  },
+  "actionsLabel": "Beskikbere aksjes",
+  "settings": {
+    "title": "AI Coach",
+    "enabled": "AI Coach ynskeakelje",
+    "enabledHelp": "Krij personalisearre ynsichten en oanbefellings basearre op jo trainingshistoarje",
+    "showOnHome": "Toan op thússide",
+    "showOnHomeHelp": "Toan top-ynzicht op jo thússide",
+    "autoRefresh": "Automatysk ferfarskje",
+    "autoRefreshHelp": "Ynsichten automatysk elke 5 minuten ferfarskje",
+    "insightTypes": "Ynsichttipes",
+    "showStreak": "Trainingsreeksen (Streaks)",
+    "showMuscleBalance": "Spierbalâns",
+    "showProgression": "Progressive Oerbelêsting",
+    "showRecovery": "Hersteltiid",
+    "showSuggestions": "Trainingssuggestjes"
+  },
+  "streak": {
+    "title": "Trainingsreeks (Streak)",
+    "milestone": "Geweldich! Jo hawwe in rige fan **{{param0}}** dagen berikt!",
+    "almostMilestone": "Hast dêr! Noch 1 dei om **{{param0}}** dagen te berikken!",
+    "maintain": "Hâld it fol! Jo sitte op in rige fan **{{param0}}** dagen.",
+    "newRecord": "Nij persoanlik rekord! Dit is jo langste rige oant no ta!",
+    "building": "Geweldige 'flow'! Jo binne op dei **{{param0}}** fan jo rige.",
+    "justStarted": "Mooi! Jo binne jo trainingsrige begûn. Hâld it fol!",
+    "noStreak": "Start hjoed noch jo trainingsrige!",
+    "atRisk": "Rige yn gefaar",
+    "atRiskMessage": "Jo **{{param0}}**-dagenrige is yn gefaar! Train hjoed om it fol te hâlden."
+  },
+  "muscleBalance": {
+    "underTrained": "Balâns yn Jo Training",
+    "underTrainedMessage": "Jo **{{param0}}** hat mear omtinken nedich. Tink derom om oefeningen foar dizze gebieten ta te foegjen.",
+    "overTrained": "Herstel Nedich",
+    "overTrainedMessage": "Jo hawwe jo bot rjochte op **{{param0}}**. Tink derom om te balansearjen mei oare spiergroepen.",
+    "neglected": "Tiid om **{{param0}}** te Trainen",
+    "neglectedMessage": "It is **{{param1}}** dagen lyn dat jo jo **{{param0}}** trainden. Tiid om it wat omtinken te jaan!"
+  },
+  "progression": {
+    "ready": "Klear foar Progressie",
+    "readyTitle": "Klear foar in heger nivo!",
+    "readyMessage": "Jo binne klear om foarútgong te meitsjen mei **{{param0}}**! Besykje de folgjende kear **{{param1}}** sets fan **{{param2}}** werhellingen.",
+    "readyDurationMessage": "Jo binne klear om foarútgong te meitsjen mei **{{param0}}**! Besykje de folgjende kear **{{param1}}** sets fan **{{param2}}** sekonden.",
+    "highCompletionRate": "Hege foltôgingsgraad wiist op reewilligens foar progressie"
+  },
+  "recovery": {
+    "title": "Hersteldei",
+    "needed": "Jo lichem hat rêst nedich. Tink derom om in hersteldei te nimmen of lichte aktiviteit te dwaan.",
+    "recommended": "Jo hawwe hurd traind. In hersteldei soe helpe om oertraining te foarkommen.",
+    "consecutiveDays": "**{{param0}}** opienfolgjende dagen traind"
+  },
+  "suggestion": {
+    "title": "Trainingssuggestje",
+    "message": "Op grûn fan jo histoarje hawwe wy in trainingssuggestje foar jo."
+  },
+  "suggestions": {
+    "startJourney": "Klear om jo fitnessreis te begjinnen? Litte wy begjinne mei jo earste training!",
+    "longGap": "It is in skoft lyn! Tiid om wer op koers te kommen mei in training.",
+    "neglectedMuscles": "Guon spiergroepen hawwe omtinken nedich! Litte wy deroan wurkje.",
+    "improveBalance": "Litte wy jo training yn balâns bringe mei oefeningen foar ûndertrainde spieren!",
+    "keepGoing": "Hâld it goede wurk fol! Hjir is in foarstelde oefening foar jo folgjende sesje."
+  },
+  "actions": {
+    "viewProgress": "Foarútgong besjen",
+    "workoutNow": "No traine",
+    "findExercises": "Oefeningen fine",
+    "startWorkout": "Start Training",
+    "startExercise": "Start **{{param0}}**",
+    "viewCoach": "Sjoch Coach",
+    "tryIt": "Besykje it"
+  }
+}
