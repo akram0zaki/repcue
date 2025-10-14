@@ -1,6 +1,12 @@
 {
   "title": "Jo Coach",
   "subtitle": "Personalisearre ynsichten om jo te helpen jo doelen te berikken",
+  "aiEnabled": "AI-oandreaun",
+  "aiPowered": "AI",
+  "aiInsights": "AI-oandreaune Ynsichten",
+  "additionalInsights": "Oanfoljende Ynsichten",
+  "aiUnavailable": "AI-ynsichten Tydlik Net Beskikber",
+  "aiUnavailableMessage": "Wy hawwe op it stuit problemen mei it krijen fan AI-ynsichten. Jo krije noch altyd ús standert coachingsynzichten.",
   "empty": {
     "title": "Noch Gjin Ynsichten",
     "message": "Begjin mei trainen om personalisearre coachingsynzichten te krijen!",
@@ -21,6 +27,10 @@
     "showOnHomeHelp": "Toan top-ynzicht op jo thússide",
     "autoRefresh": "Automatysk ferfarskje",
     "autoRefreshHelp": "Ynsichten automatysk elke 5 minuten ferfarskje",
+    "aiInsightsEnabled": "AI-oandreaune Ynsichten Ynskeakelje",
+    "aiInsightsHelp": "Krij avansearre AI-analyze fan jo foarútgong, trends en personalisearre oanbefellings. Jo gegevens wurde feilich ferwurke en allinnich brûkt om ynsichten te generearjen.",
+    "aiInsightsAuthRequired": "Meld jo oan om AI-oandreaune ynsichten yn te skeakeljen.",
+    "aiInsightsDataUsage": "Beheind ta 10 AI-fersiken per oere. 24 oeren yn cache opslein.",
     "insightTypes": "Ynsichttipes",
     "showStreak": "Trainingsreeksen (Streaks)",
     "showMuscleBalance": "Spierbalâns",
@@ -53,13 +63,25 @@
     "readyTitle": "Klear foar in heger nivo!",
     "readyMessage": "Jo binne klear om foarútgong te meitsjen mei **{{param0}}**! Besykje de folgjende kear **{{param1}}** sets fan **{{param2}}** werhellingen.",
     "readyDurationMessage": "Jo binne klear om foarútgong te meitsjen mei **{{param0}}**! Besykje de folgjende kear **{{param1}}** sets fan **{{param2}}** sekonden.",
-    "highCompletionRate": "Hege foltôgingsgraad wiist op reewilligens foar progressie"
+    "highCompletionRate": "Hege foltôgingsgraad wiist op reewilligens foar progressie",
+    "plateau_detected": "Prestaasjeplateau detektearre - tiid om folume of yntinsiteit te ferheegjen",
+    "volume_increase": "Konsistinte foltôging suggerearret reewilligens foar folumeferhegeing",
+    "intensity_increase": "Sterke prestaasjepetroanen wize op reewilligens foar yntinsiteitsferhegeing",
+    "optimal_rest": "Goede rêstpatroanen stypje feilige progressie"
   },
   "recovery": {
     "title": "Hersteldei",
     "needed": "Jo lichem hat rêst nedich. Tink derom om in hersteldei te nimmen of lichte aktiviteit te dwaan.",
     "recommended": "Jo hawwe hurd traind. In hersteldei soe helpe om oertraining te foarkommen.",
-    "consecutiveDays": "**{{param0}}** opienfolgjende dagen traind"
+    "consecutiveDays": "**{{param0}}** opienfolgjende dagen traind",
+    "consecutive_high": "**{{param0}}** opienfolgjende trainingsdagen detektearre - heech muoiensrisiko",
+    "consecutive_medium": "**{{param0}}** opienfolgjende trainingsdagen - matich herstel nedich",
+    "consecutive_low": "**{{param0}}** opienfolgjende trainingsdagen - licht herstel oanrikkemandearre",
+    "fatigue_high": "Meardere muoiensyndikatoren detektearre - rêst is essensjeel",
+    "fatigue_medium": "Mattige muoienssinjalen detektearre - herstel oanrikkemandearre",
+    "volume_spike": "Plotselinge tanimming yn trainingsfolume detektearre - ekstra herstel nedich",
+    "muscle_overuse": "Guon spiergroepen faak traind - tink oan rotaasje",
+    "high_intensity": "Hege yntinsiteit training detektearre - genôch rêst is wichtich"
   },
   "suggestion": {
     "title": "Trainingssuggestje",
@@ -80,5 +102,49 @@
     "startExercise": "Start **{{param0}}**",
     "viewCoach": "Sjoch Coach",
     "tryIt": "Besykje it"
+  },
+  "pr": {
+    "title": "Persoanlike Rekords",
+    "subtitle": "Dyn bêste prestaasjes foar elke oefening",
+    "newRecord": "Nij persoanlik rekord!",
+    "awesome": "Geweldich! 🎉",
+    "keepGoing": "Gean sa troch!",
+    "close": "Slute",
+    "autoDismiss": "Automatysk slute oer {{param0}} sekonden",
+    "previousBest": "Foarige bêste",
+    "improvement": "Ferbettering",
+    "milestone": "Mylpeal",
+    "share": "Diel prestaasje",
+    "type": {
+      "maxReps": "Maks. herhellingen",
+      "maxSets": "Maks. sets",
+      "maxDuration": "Maks. doer",
+      "maxWeight": "Maks. gewicht"
+    },
+    "unit": {
+      "reps": "herhellingen",
+      "sets": "sets"
+    },
+    "search": "Sykje",
+    "searchPlaceholder": "Sykje oefeningen...",
+    "filterType": "Rekordtype",
+    "filterMuscle": "Spiergroep",
+    "allTypes": "Alle typen",
+    "allMuscles": "Alle spieren",
+    "sortBy": "Sortearje op",
+    "sortNewest": "Nijste earst",
+    "sortOldest": "Aldste earst",
+    "sortHighest": "Heechste wearde",
+    "sortLowest": "Leechste wearde",
+    "showingCount": "{{count}} rekord(en) werjûn",
+    "today": "Hjoed",
+    "yesterday": "Juster",
+    "daysAgo": "{{count}} dagen lyn",
+    "loading": "Dyn rekords wurde laden...",
+    "noRecordsYet": "Noch gjin persoanlike rekords",
+    "emptyMessage": "Doch workouts om dyn earste persoanlike rekords te setten en dyn foarútgong te folgjen!",
+    "noMatching": "Gjin oerienkommende rekords",
+    "tryDifferentFilter": "Besykje dyn sykaksje of filters oan te passen om rekords te finen.",
+    "startWorkout": "Start in workout"
   }
 }

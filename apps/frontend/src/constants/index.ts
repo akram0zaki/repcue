@@ -45,6 +45,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   coach_show_recovery: true,
   coach_show_suggestions: true,
   coach_intro_seen: false, // Show intro dialog on first CoachPage visit
+  coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

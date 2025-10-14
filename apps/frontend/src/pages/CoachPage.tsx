@@ -33,7 +33,10 @@ interface CoachPageProps {
 export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
   const { t } = useTranslation(['coaching', 'common']);
   const navigate = useNavigate();
-  const { insights, isLoading, error, refresh, dismissInsight } = useCoachingInsights({ settings: appSettings });
+  const { insights, isLoading, error, refresh, dismissInsight } = useCoachingInsights({ 
+    settings: appSettings,
+    enableAI: appSettings.coach_ai_insights_enabled || false
+  });
   
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
@@ -238,9 +241,16 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
             <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-2">
               {t('coaching:title', { defaultValue: 'Your Coach' })}
             </h1>
-            <p className="text-body">
-              {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-body">
+                {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
+              </p>
+              {appSettings.coach_ai_insights_enabled && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                  {t('coaching:aiEnabled', { defaultValue: 'AI-Powered' })}
+                </span>
+              )}
+            </div>
           </div>
           
           {/* Refresh button */}
@@ -264,14 +274,56 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
 
         {/* Insights list */}
         <div className="space-y-4 mb-6">
-          {insights.map(insight => (
-            <CoachingCard
-              key={insight.id}
-              insight={insight}
-              onAction={handleAction}
-              onDismiss={dismissInsight}
-            />
-          ))}
+          {(() => {
+            // Group insights by source
+            const aiInsights = insights.filter(i => i.source === 'ai');
+            const ruleInsights = insights.filter(i => i.source === 'rule' || !i.source);
+            
+            return (
+              <>
+                {/* AI-powered insights section */}
+                {aiInsights.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <h2 className="text-lg font-semibold text-text-900 dark:text-text-50">
+                        {t('coaching:aiInsights', { defaultValue: 'AI-Powered Insights' })}
+                      </h2>
+                    </div>
+                    {aiInsights.map(insight => (
+                      <CoachingCard
+                        key={insight.id}
+                        insight={insight}
+                        onAction={handleAction}
+                        onDismiss={dismissInsight}
+                      />
+                    ))}
+                  </div>
+                )}
+                
+                {/* Rule-based insights section */}
+                {ruleInsights.length > 0 && (
+                  <div className="space-y-3">
+                    {aiInsights.length > 0 && (
+                      <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mt-6">
+                        {t('coaching:additionalInsights', { defaultValue: 'Additional Insights' })}
+                      </h2>
+                    )}
+                    {ruleInsights.map(insight => (
+                      <CoachingCard
+                        key={insight.id}
+                        insight={insight}
+                        onAction={handleAction}
+                        onDismiss={dismissInsight}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
 
         {/* Progress section */}

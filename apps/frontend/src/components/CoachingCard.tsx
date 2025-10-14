@@ -105,11 +105,25 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
   );
 
   // Memoize priority-based border color calculation
-  const borderColor = useMemo(() => ({
-    high: 'border-red-400 dark:border-red-600',
-    medium: 'border-amber-400 dark:border-amber-600',
-    low: 'border-blue-400 dark:border-blue-600'
-  }[insight.priority]), [insight.priority]);
+  // AI insights get purple accent, rule-based insights get priority colors
+  const borderColor = useMemo(() => {
+    if (insight.source === 'ai') {
+      return 'border-purple-400 dark:border-purple-600';
+    }
+    return {
+      high: 'border-red-400 dark:border-red-600',
+      medium: 'border-amber-400 dark:border-amber-600',
+      low: 'border-blue-400 dark:border-blue-600'
+    }[insight.priority];
+  }, [insight.priority, insight.source]);
+
+  // Memoize background color for AI insights
+  const bgColor = useMemo(() => {
+    if (insight.source === 'ai') {
+      return 'bg-purple-50/50 dark:bg-purple-900/10';
+    }
+    return 'bg-white dark:bg-gray-800';
+  }, [insight.source]);
 
   // Parse message with interpolation support (memoized)
   const parseMessage = useCallback((messageKey: string): { key: string; params: Record<string, string> } => {
@@ -156,7 +170,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
 
   return (
     <div 
-      className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none`}
+      className={`${bgColor} rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none`}
       role="article"
       aria-labelledby={titleId}
       aria-describedby={messageId}
@@ -181,6 +195,20 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
           >
             {t(titleKey, titleParams)}
           </h4>
+
+          {/* AI Badge */}
+          {insight.source === 'ai' && (
+            <span 
+              className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+              aria-label={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
+              title={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
+            >
+              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              {t('coaching:aiPowered', { defaultValue: 'AI' })}
+            </span>
+          )}
         </div>
 
         {/* Dismiss button */}
@@ -244,6 +272,7 @@ export default React.memo(CoachingCard, (prevProps, nextProps) => {
     prevProps.insight.title === nextProps.insight.title &&
     prevProps.insight.message === nextProps.insight.message &&
     prevProps.insight.priority === nextProps.insight.priority &&
+    prevProps.insight.source === nextProps.insight.source &&
     prevProps.insight.icon === nextProps.insight.icon &&
     prevProps.insight.dismissible === nextProps.insight.dismissible &&
     prevProps.onAction === nextProps.onAction &&

@@ -17,7 +17,8 @@ import type {
   WorkoutStatistics,
   StreakData,
   MuscleGroupBalance,
-  AnalyticsSummary
+  AnalyticsSummary,
+  PersonalRecord
 } from '../types/coaching';
 import {
   calculateCurrentStreak,
@@ -369,6 +370,164 @@ export class AnalyticsService {
     } catch (error) {
       logger.error('Error generating analytics summary:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Get all personal records for a user
+   * 
+   * @returns Array of all personal records
+   */
+  public async getPersonalRecords(): Promise<PersonalRecord[]> {
+    try {
+      return await this.storageService.getPersonalRecords();
+    } catch (error) {
+      logger.error('Error fetching personal records:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check if a workout activity sets a new personal record
+   * 
+   * @param exerciseId - Exercise ID
+   * @param reps - Number of repetitions performed
+   * @param sets - Number of sets performed
+   * @param duration - Duration in seconds (optional)
+   * @param weight - Weight in kg (optional, for future)
+   * @param workoutId - Optional workout ID to associate with the PR
+   * @returns PersonalRecord if new PR was set, null otherwise
+   */
+  public async checkForNewPR(
+    exerciseId: string,
+    reps: number,
+    sets: number,
+    duration?: number,
+    weight?: number,
+    workoutId?: string
+  ): Promise<PersonalRecord | null> {
+    try {
+      // Get exercise details
+      const exercises = await this.storageService.getExercises();
+      const exercise = exercises.find(ex => ex.id === exerciseId);
+      
+      if (!exercise) {
+        logger.warn(`Exercise not found for PR check: ${exerciseId}`);
+        return null;
+      }
+
+      // Get existing PRs for this exercise
+      const allPRs = await this.storageService.getPersonalRecords();
+      const exercisePRs = allPRs.filter(pr => pr.exerciseId === exerciseId);
+
+      // Check each record type
+      const newPRs: PersonalRecord[] = [];
+
+      // Check max reps (single set)
+      const maxRepsPR = exercisePRs.find(pr => pr.recordType === 'max-reps');
+      if (!maxRepsPR || reps > maxRepsPR.value) {
+        const improvementPercentage = maxRepsPR 
+          ? Math.round(((reps - maxRepsPR.value) / maxRepsPR.value) * 100)
+          : undefined;
+        
+        newPRs.push({
+          id: crypto.randomUUID(),
+          exerciseId,
+          exerciseName: exercise.name,
+          recordType: 'max-reps',
+          value: reps,
+          achievedAt: new Date().toISOString(),
+          workoutId,
+          previousRecord: maxRepsPR?.value,
+          improvementPercentage
+        });
+      }
+
+      // Check max sets
+      const maxSetsPR = exercisePRs.find(pr => pr.recordType === 'max-sets');
+      if (!maxSetsPR || sets > maxSetsPR.value) {
+        const improvementPercentage = maxSetsPR
+          ? Math.round(((sets - maxSetsPR.value) / maxSetsPR.value) * 100)
+          : undefined;
+        
+        newPRs.push({
+          id: crypto.randomUUID(),
+          exerciseId,
+          exerciseName: exercise.name,
+          recordType: 'max-sets',
+          value: sets,
+          achievedAt: new Date().toISOString(),
+          workoutId,
+          previousRecord: maxSetsPR?.value,
+          improvementPercentage
+        });
+      }
+
+      // Check max duration (if provided)
+      if (duration && duration > 0) {
+        const maxDurationPR = exercisePRs.find(pr => pr.recordType === 'max-duration');
+        if (!maxDurationPR || duration > maxDurationPR.value) {
+          const improvementPercentage = maxDurationPR
+            ? Math.round(((duration - maxDurationPR.value) / maxDurationPR.value) * 100)
+            : undefined;
+          
+          newPRs.push({
+            id: crypto.randomUUID(),
+            exerciseId,
+            exerciseName: exercise.name,
+            recordType: 'max-duration',
+            value: duration,
+            achievedAt: new Date().toISOString(),
+            workoutId,
+            previousRecord: maxDurationPR?.value,
+            improvementPercentage
+          });
+        }
+      }
+
+      // Check max weight (if provided, for future implementation)
+      if (weight && weight > 0) {
+        const maxWeightPR = exercisePRs.find(pr => pr.recordType === 'max-weight');
+        if (!maxWeightPR || weight > maxWeightPR.value) {
+          const improvementPercentage = maxWeightPR
+            ? Math.round(((weight - maxWeightPR.value) / maxWeightPR.value) * 100)
+            : undefined;
+          
+          newPRs.push({
+            id: crypto.randomUUID(),
+            exerciseId,
+            exerciseName: exercise.name,
+            recordType: 'max-weight',
+            value: weight,
+            achievedAt: new Date().toISOString(),
+            workoutId,
+            previousRecord: maxWeightPR?.value,
+            improvementPercentage
+          });
+        }
+      }
+
+      // Save new PRs to database
+      if (newPRs.length > 0) {
+        for (const pr of newPRs) {
+          await this.storageService.savePersonalRecord(pr);
+        }
+        
+        // Return the most significant PR (highest improvement percentage or first one)
+        const mostSignificant = newPRs.reduce((best, current) => {
+          if (!best.improvementPercentage) return current;
+          if (!current.improvementPercentage) return best;
+          return current.improvementPercentage > best.improvementPercentage ? current : best;
+        });
+
+        logger.log(`New PR set for ${exercise.name}: ${mostSignificant.recordType} = ${mostSignificant.value}`);
+        return mostSignificant;
+      }
+
+      return null;
+    } catch (error) {
+      logger.error('Error checking for new PR:', error);
+      return null;
     }
   }
 

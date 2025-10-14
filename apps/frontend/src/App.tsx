@@ -49,6 +49,7 @@ import {
   EditWorkoutPage,
   CommunityPage,
   CoachPage,
+  PRHistoryPage,
   AuthCallbackPage,
   ProfilePage,
   AIWorkoutOnboardingPage,
@@ -2588,6 +2589,14 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('Coach')}>
                     <CoachPage appSettings={appSettings} />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.PR_HISTORY} 
+                element={
+                  <Suspense fallback={createRouteLoader('Personal Records')}>
+                    <PRHistoryPage />
                   </Suspense>
                 } 
               />

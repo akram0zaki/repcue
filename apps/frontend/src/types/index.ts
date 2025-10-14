@@ -365,6 +365,7 @@ export interface AppSettings extends SyncMetadata {
   coach_show_recovery?: boolean; // Show recovery insights
   coach_show_suggestions?: boolean; // Show workout suggestions
   coach_intro_seen?: boolean; // User has seen the coach introduction dialog
+  coach_ai_insights_enabled?: boolean; // Enable AI-powered insights (requires authentication)
 }
 
 // Navigation routes
@@ -387,6 +388,7 @@ export const Routes = {
   EDIT_WORKOUT: '/workout/edit',
   COMMUNITY: '/community',
   COACH: '/coach',
+  PR_HISTORY: '/personal-records',
   AUTH_CALLBACK: '/auth/callback'
 } as const;
 

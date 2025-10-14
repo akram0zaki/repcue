@@ -23,6 +23,7 @@ interface UseCoachingInsightsOptions {
   autoRefresh?: boolean;
   refreshInterval?: number; // in milliseconds
   settings?: AppSettings; // App settings for filtering
+  enableAI?: boolean; // Enable AI-powered insights (requires authentication)
 }
 
 interface UseCoachingInsightsReturn {
@@ -40,7 +41,7 @@ interface UseCoachingInsightsReturn {
 export const useCoachingInsights = (
   options: UseCoachingInsightsOptions = {}
 ): UseCoachingInsightsReturn => {
-  const { type, autoRefresh = false, refreshInterval = 5 * 60 * 1000, settings } = options;
+  const { type, autoRefresh = false, refreshInterval = 5 * 60 * 1000, settings, enableAI = false } = options;
 
   const [insights, setInsights] = useState<CoachingInsight[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -119,15 +120,19 @@ export const useCoachingInsights = (
         // Fetch specific type (this will use cached data from getAllInsights)
         fetchedInsights = await coachingService.getInsightsByType(type);
       } else {
-        // Fetch all insights
-        fetchedInsights = await coachingService.getAllInsights(forceRefresh);
+        // Fetch all insights - use AI-enhanced if enabled
+        if (enableAI) {
+          fetchedInsights = await coachingService.getAIEnhancedInsights(forceRefresh, true);
+        } else {
+          fetchedInsights = await coachingService.getAllInsights(forceRefresh);
+        }
       }
 
       // Apply settings-based filtering
       const filteredInsights = filterInsightsBySettings(fetchedInsights);
 
       setInsights(filteredInsights);
-      logger.log(`Fetched ${filteredInsights.length} coaching insights${type ? ` of type ${type}` : ''} (${fetchedInsights.length} before filtering)`);
+      logger.log(`Fetched ${filteredInsights.length} coaching insights${type ? ` of type ${type}` : ''}${enableAI ? ' (AI-enhanced)' : ''} (${fetchedInsights.length} before filtering)`);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch insights');
       setError(error);
@@ -135,7 +140,7 @@ export const useCoachingInsights = (
     } finally {
       setIsLoading(false);
     }
-  }, [type, coachingService, filterInsightsBySettings]);
+  }, [type, coachingService, filterInsightsBySettings, enableAI]);
 
   /**
    * Refresh insights (force refresh)

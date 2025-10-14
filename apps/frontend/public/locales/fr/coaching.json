@@ -1,6 +1,12 @@
 {
   "title": "Votre Coach",
   "subtitle": "Informations personnalisées pour vous aider à atteindre vos objectifs",
+  "aiEnabled": "Propulsé par l'IA",
+  "aiPowered": "IA",
+  "aiInsights": "Informations Propulsées par l'IA",
+  "additionalInsights": "Informations Supplémentaires",
+  "aiUnavailable": "Informations IA Temporairement Indisponibles",
+  "aiUnavailableMessage": "Nous avons des difficultés à obtenir des informations IA pour le moment. Vous recevez toujours nos informations de coaching standard.",
   "empty": {
     "title": "Aucune Information pour l'instant",
     "message": "Commencez à vous entraîner pour recevoir des informations de coaching personnalisées !",
@@ -21,6 +27,10 @@
     "showOnHomeHelp": "Afficher l'information principale sur votre page d'accueil",
     "autoRefresh": "Actualisation automatique",
     "autoRefreshHelp": "Actualiser automatiquement les informations toutes les 5 minutes",
+    "aiInsightsEnabled": "Activer les Informations Propulsées par l'IA",
+    "aiInsightsHelp": "Obtenez une analyse IA avancée de vos progrès, tendances et recommandations personnalisées. Vos données sont traitées de manière sécurisée et utilisées uniquement pour générer des informations.",
+    "aiInsightsAuthRequired": "Connectez-vous pour activer les informations propulsées par l'IA.",
+    "aiInsightsDataUsage": "Limité à 10 demandes IA par heure. Mise en cache pendant 24 heures.",
     "insightTypes": "Types d'Informations",
     "showStreak": "Séries d'Entraînement (Streaks)",
     "showMuscleBalance": "Équilibre Musculaire",
@@ -53,13 +63,25 @@
     "readyTitle": "Prêt(e) à Passer au Niveau Supérieur !",
     "readyMessage": "Vous êtes prêt(e) à progresser sur **{{param0}}** ! Essayez **{{param1}}** séries de **{{param2}}** répétitions la prochaine fois.",
     "readyDurationMessage": "Vous êtes prêt(e) à progresser sur **{{param0}}** ! Essayez **{{param1}}** séries de **{{param2}}** secondes la prochaine fois.",
-    "highCompletionRate": "Un taux de complétion élevé indique une préparation à la progression"
+    "highCompletionRate": "Un taux de complétion élevé indique une préparation à la progression",
+    "plateau_detected": "Plateau de performance détecté - il est temps d'augmenter le volume ou l'intensité",
+    "volume_increase": "L'achèvement constant suggère une préparation pour une augmentation du volume",
+    "intensity_increase": "De solides schémas de performance indiquent une préparation pour un boost d'intensité",
+    "optimal_rest": "De bons schémas de repos soutiennent une progression sûre"
   },
   "recovery": {
     "title": "Jour de Récupération",
     "needed": "Votre corps a besoin de repos. Envisagez de prendre un jour de récupération ou de faire une activité légère.",
     "recommended": "Vous vous êtes beaucoup entraîné(e). Un jour de récupération aiderait à prévenir le surentraînement.",
-    "consecutiveDays": "Entraîné **{{param0}}** jours consécutifs"
+    "consecutiveDays": "Entraîné **{{param0}}** jours consécutifs",
+    "consecutive_high": "**{{param0}}** jours d'entraînement consécutifs détectés - risque de fatigue élevé",
+    "consecutive_medium": "**{{param0}}** jours d'entraînement consécutifs - récupération modérée nécessaire",
+    "consecutive_low": "**{{param0}}** jours d'entraînement consécutifs - récupération légère recommandée",
+    "fatigue_high": "Plusieurs indicateurs de fatigue détectés - le repos est essentiel",
+    "fatigue_medium": "Signaux de fatigue modérés détectés - récupération recommandée",
+    "volume_spike": "Augmentation soudaine du volume d'entraînement détectée - récupération supplémentaire nécessaire",
+    "muscle_overuse": "Certains groupes musculaires entraînés fréquemment - envisagez la rotation",
+    "high_intensity": "Entraînement haute intensité détecté - un repos adéquat est important"
   },
   "suggestion": {
     "title": "Suggestion d'Entraînement",
@@ -76,5 +98,49 @@
     "startExercise": "Démarrer **{{param0}}**",
     "viewCoach": "Voir le Coach",
     "tryIt": "Essayer"
+  },
+  "pr": {
+    "title": "Records Personnels",
+    "subtitle": "Tes meilleures performances pour chaque exercice",
+    "newRecord": "Nouveau record personnel !",
+    "awesome": "Génial ! 🎉",
+    "keepGoing": "Continue comme ça !",
+    "close": "Fermer",
+    "autoDismiss": "Fermeture automatique dans {{param0}} s",
+    "previousBest": "Meilleur précédent",
+    "improvement": "Amélioration",
+    "milestone": "Étape importante",
+    "share": "Partager l’exploit",
+    "type": {
+      "maxReps": "Max de répétitions",
+      "maxSets": "Max de séries",
+      "maxDuration": "Durée max",
+      "maxWeight": "Poids max"
+    },
+    "unit": {
+      "reps": "répétitions",
+      "sets": "séries"
+    },
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher des exercices...",
+    "filterType": "Type de record",
+    "filterMuscle": "Groupe musculaire",
+    "allTypes": "Tous les types",
+    "allMuscles": "Tous les muscles",
+    "sortBy": "Trier par",
+    "sortNewest": "Les plus récents",
+    "sortOldest": "Les plus anciens",
+    "sortHighest": "Valeur la plus élevée",
+    "sortLowest": "Valeur la plus basse",
+    "showingCount": "Affichage de {{count}} record(s)",
+    "today": "Aujourd’hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{count}} jour(s)",
+    "loading": "Chargement de tes records...",
+    "noRecordsYet": "Pas encore de records personnels",
+    "emptyMessage": "Fais quelques entraînements pour enregistrer tes premiers records personnels et suivre ta progression !",
+    "noMatching": "Aucun record correspondant",
+    "tryDifferentFilter": "Essaie de modifier ta recherche ou tes filtres pour trouver des records.",
+    "startWorkout": "Commencer un entraînement"
   }
 }

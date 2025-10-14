@@ -11,6 +11,7 @@ import type {
   SyncMetadata,
   ExerciseCatalog
 } from '../types';
+import type { PersonalRecord } from '../types/coaching';
 import { consentService } from './consentService';
 import { authService } from './authService';
 import { SYNC_DEBUG } from '../config/features';
@@ -40,6 +41,9 @@ type StoredWorkout = Workout;
 
 type StoredWorkoutSession = WorkoutSession;
 
+// Personal records for tracking exercise achievements
+type StoredPersonalRecord = PersonalRecord;
+
 // Video file storage for offline-first approach
 interface StoredVideoFile extends SyncMetadata {
   exercise_id: string;
@@ -65,6 +69,7 @@ class RepCueDatabase extends Dexie {
   workout_sessions!: Table<StoredWorkoutSession>;
   video_files!: Table<StoredVideoFile>;
   exercise_catalogs!: Table<ExerciseCatalog>;
+  personal_records!: Table<StoredPersonalRecord>;
 
   constructor() {
     super('RepCueDB');
@@ -350,6 +355,22 @@ class RepCueDatabase extends Dexie {
       sync_state: 'user_id',
       video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
       exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    });
+
+    // Version 23: Add personal_records table for tracking exercise achievements
+    this.version(23).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, *tags, [catalogId+*tags], updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty',
+      // NEW: Personal records for tracking exercise achievements (max reps, sets, duration, weight)
+      personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId'
     });
 
       await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
@@ -4002,6 +4023,86 @@ export class StorageService {
     // Import here to avoid circular dependencies
     const { getDefaultCatalog } = await import('../data/catalogs');
     return getDefaultCatalog();
+  }
+
+  // =============== Personal Records Methods ===============
+
+  /**
+   * Get all personal records from IndexedDB
+   * 
+   * @returns Array of all personal records
+   */
+  public async getPersonalRecords(): Promise<PersonalRecord[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const records = await this.db.personal_records.toArray();
+      return records;
+    } catch (error) {
+      logger.error('Failed to get personal records from IndexedDB:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save a personal record to IndexedDB
+   * 
+   * @param record - Personal record to save
+   */
+  public async savePersonalRecord(record: PersonalRecord): Promise<void> {
+    if (!this.canStoreData()) {
+      logger.warn('Cannot save personal record without user consent');
+      return;
+    }
+
+    try {
+      // Use put() to handle both insert and update operations
+      await this.db.personal_records.put(record);
+      logger.log(`✅ Saved personal record: ${record.exerciseName} ${record.recordType} = ${record.value}`);
+    } catch (error) {
+      logger.error('Failed to save personal record to IndexedDB:', error);
+    }
+  }
+
+  /**
+   * Delete a personal record from IndexedDB
+   * 
+   * @param recordId - ID of the personal record to delete
+   */
+  public async deletePersonalRecord(recordId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      logger.warn('Cannot delete personal record without user consent');
+      return;
+    }
+
+    try {
+      await this.db.personal_records.delete(recordId);
+      logger.log(`🗑️ Deleted personal record: ${recordId}`);
+    } catch (error) {
+      logger.error('Failed to delete personal record from IndexedDB:', error);
+    }
+  }
+
+  /**
+   * Get personal records for a specific exercise
+   * 
+   * @param exerciseId - Exercise ID to filter by
+   * @returns Array of personal records for the exercise
+   */
+  public async getPersonalRecordsByExercise(exerciseId: string): Promise<PersonalRecord[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      const allRecords = await this.db.personal_records.toArray();
+      return allRecords.filter(record => record.exerciseId === exerciseId);
+    } catch (error) {
+      logger.error('Failed to get personal records by exercise from IndexedDB:', error);
+      return [];
+    }
   }
 }
 

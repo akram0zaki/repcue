@@ -228,6 +228,12 @@ export const CoachPage = lazy(() =>
   }))
 );
 
+export const PRHistoryPage = lazy(() =>
+  import('../pages/PRHistoryPage').catch(() => ({
+    default: () => <div>Error loading PR History page</div>
+  }))
+);
+
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule
 // See: src/router/routeUtils.tsx

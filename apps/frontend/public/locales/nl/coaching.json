@@ -1,6 +1,12 @@
 {
   "title": "Jouw Coach",
   "subtitle": "Gepersonaliseerde inzichten om je te helpen je doelen te bereiken",
+  "aiEnabled": "AI-aangedreven",
+  "aiPowered": "AI",
+  "aiInsights": "AI-aangedreven Inzichten",
+  "additionalInsights": "Aanvullende Inzichten",
+  "aiUnavailable": "AI-inzichten Tijdelijk Niet Beschikbaar",
+  "aiUnavailableMessage": "We hebben momenteel problemen met het verkrijgen van AI-inzichten. Je ontvangt nog steeds onze standaard coaching-inzichten.",
   "empty": {
     "title": "Nog Geen Inzichten",
     "message": "Start met trainen om gepersonaliseerde coachingsinzichten te ontvangen!",
@@ -21,6 +27,10 @@
     "showOnHomeHelp": "Toon top-inzicht op je startpagina",
     "autoRefresh": "Automatisch verversen",
     "autoRefreshHelp": "Inzichten elke 5 minuten automatisch verversen",
+    "aiInsightsEnabled": "AI-aangedreven Inzichten Inschakelen",
+    "aiInsightsHelp": "Ontvang geavanceerde AI-analyse van je voortgang, trends en gepersonaliseerde aanbevelingen. Je gegevens worden veilig verwerkt en alleen gebruikt om inzichten te genereren.",
+    "aiInsightsAuthRequired": "Meld je aan om AI-aangedreven inzichten in te schakelen.",
+    "aiInsightsDataUsage": "Beperkt tot 10 AI-verzoeken per uur. 24 uur in cache opgeslagen.",
     "insightTypes": "Inzichttypes",
     "showStreak": "Trainingsreeksen (Streaks)",
     "showMuscleBalance": "Spierbalans",
@@ -53,13 +63,25 @@
     "readyTitle": "Klaar voor een hoger niveau!",
     "readyMessage": "Je bent klaar om progressie te boeken met **{{param0}}**! Probeer de volgende keer **{{param1}}** sets van **{{param2}}** herhalingen.",
     "readyDurationMessage": "Je bent klaar om progressie te boeken met **{{param0}}**! Probeer de volgende keer **{{param1}}** sets van **{{param2}}** seconden.",
-    "highCompletionRate": "Hoge voltooiingsgraad wijst op gereedheid voor progressie"
+    "highCompletionRate": "Hoge voltooiingsgraad wijst op gereedheid voor progressie",
+    "plateau_detected": "Prestatieplateau gedetecteerd - tijd om volume of intensiteit te verhogen",
+    "volume_increase": "Consistente voltooiing suggereert gereedheid voor volumeverhoging",
+    "intensity_increase": "Sterke prestatiepatronen wijzen op gereedheid voor intensiteitsverhoging",
+    "optimal_rest": "Goede rustpatronen ondersteunen veilige progressie"
   },
   "recovery": {
     "title": "Hersteldag",
     "needed": "Je lichaam heeft rust nodig. Overweeg een hersteldag te nemen of lichte activiteit te doen.",
     "recommended": "Je hebt hard getraind. Een hersteldag helpt overtraining te voorkomen.",
-    "consecutiveDays": "**{{param0}}** opeenvolgende dagen getraind"
+    "consecutiveDays": "**{{param0}}** opeenvolgende dagen getraind",
+    "consecutive_high": "**{{param0}}** opeenvolgende trainingsdagen gedetecteerd - hoog vermoeidheidsrisico",
+    "consecutive_medium": "**{{param0}}** opeenvolgende trainingsdagen - matig herstel nodig",
+    "consecutive_low": "**{{param0}}** opeenvolgende trainingsdagen - licht herstel aanbevolen",
+    "fatigue_high": "Meerdere vermoeidheidsindicatoren gedetecteerd - rust is essentieel",
+    "fatigue_medium": "Matige vermoeidheidssignalen gedetecteerd - herstel aanbevolen",
+    "volume_spike": "Plotselinge toename in trainingsvolume gedetecteerd - extra herstel nodig",
+    "muscle_overuse": "Sommige spiergroepen vaak getraind - overweeg rotatie",
+    "high_intensity": "Hoge intensiteit training gedetecteerd - voldoende rust is belangrijk"
   },
   "suggestion": {
     "title": "Trainingssuggestie",
@@ -80,5 +102,49 @@
     "startExercise": "Start **{{param0}}**",
     "viewCoach": "Bekijk Coach",
     "tryIt": "Probeer het"
+  },
+  "pr": {
+    "title": "Persoonlijke Records",
+    "subtitle": "Je beste prestaties per oefening",
+    "newRecord": "Nieuw persoonlijk record!",
+    "awesome": "Geweldig! 🎉",
+    "keepGoing": "Ga zo door!",
+    "close": "Sluiten",
+    "autoDismiss": "Automatisch sluiten over {{param0}} sec",
+    "previousBest": "Vorige beste",
+    "improvement": "Verbetering",
+    "milestone": "Mijlpaal",
+    "share": "Deel prestatie",
+    "type": {
+      "maxReps": "Max herhalingen",
+      "maxSets": "Max sets",
+      "maxDuration": "Max duur",
+      "maxWeight": "Max gewicht"
+    },
+    "unit": {
+      "reps": "herhalingen",
+      "sets": "sets"
+    },
+    "search": "Zoeken",
+    "searchPlaceholder": "Zoek oefeningen...",
+    "filterType": "Recordtype",
+    "filterMuscle": "Spiergroep",
+    "allTypes": "Alle typen",
+    "allMuscles": "Alle spieren",
+    "sortBy": "Sorteren op",
+    "sortNewest": "Nieuwste eerst",
+    "sortOldest": "Oudste eerst",
+    "sortHighest": "Hoogste waarde",
+    "sortLowest": "Laagste waarde",
+    "showingCount": "{{count}} record(s) weergegeven",
+    "today": "Vandaag",
+    "yesterday": "Gisteren",
+    "daysAgo": "{{count}} dagen geleden",
+    "loading": "Je records worden geladen...",
+    "noRecordsYet": "Nog geen persoonlijke records",
+    "emptyMessage": "Voltooi workouts om je eerste persoonlijke records vast te leggen en je vooruitgang bij te houden!",
+    "noMatching": "Geen overeenkomende records",
+    "tryDifferentFilter": "Probeer je zoekopdracht of filters aan te passen om records te vinden.",
+    "startWorkout": "Start een workout"
   }
 }

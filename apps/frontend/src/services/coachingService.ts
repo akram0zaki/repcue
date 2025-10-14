@@ -21,16 +21,17 @@ import type {
 import type { ActivityLog } from '../types';
 import { AnalyticsService } from './analyticsService';
 import { StorageService } from './storageService';
+import { insightsService, InsightsServiceError } from './insightsService';
 import {
   analyzeMuscleGroupBalance,
   suggestNeglectedMuscleGroups,
   generateStreakMotivation,
   isStreakAtRisk,
   suggestWorkout,
-  findReadyForProgression,
   findReadyForDurationProgression,
-  analyzeRecoveryNeeds,
-  getDaysSinceLastTrained
+  getDaysSinceLastTrained,
+  detectProgressionOpportunities,
+  calculateRecoveryRecommendations
 } from '../utils/recommendationEngine';
 import logger from '../utils/logger';
 
@@ -125,6 +126,112 @@ export class CoachingService {
   public async getInsightsByType(type: InsightType): Promise<CoachingInsight[]> {
     const allInsights = await this.getAllInsights();
     return allInsights.filter(insight => insight.type === type);
+  }
+
+  /**
+   * Get AI-enhanced coaching insights
+   * Combines rule-based insights with AI-powered insights for a richer experience
+   * 
+   * Features:
+   * - Fetches AI insights if user has enabled AI features
+   * - Merges rule-based and AI insights
+   * - Falls back gracefully to rule-based only if AI fails
+   * - Deduplicates similar insights
+   * - Prioritizes combined insights
+   * 
+   * @param forceRefresh - Bypass cache and regenerate insights
+   * @param enableAI - Whether to fetch AI insights (typically from user settings)
+   * @returns Array of coaching insights (rule-based + AI), sorted by priority
+   */
+  public async getAIEnhancedInsights(
+    forceRefresh: boolean = false,
+    enableAI: boolean = false
+  ): Promise<CoachingInsight[]> {
+    try {
+      // Always get rule-based insights as baseline
+      const ruleBasedInsights = await this.getAllInsights(forceRefresh);
+
+      // If AI is disabled, return rule-based insights only
+      if (!enableAI) {
+        logger.log('[CoachingService] AI insights disabled, returning rule-based only');
+        return ruleBasedInsights;
+      }
+
+      // Check if user can fetch AI insights (authenticated, online)
+      const { canFetch, reason } = insightsService.canFetchInsights();
+      if (!canFetch) {
+        logger.log('[CoachingService] Cannot fetch AI insights:', reason);
+        return ruleBasedInsights;
+      }
+
+      // Attempt to fetch AI insights
+      try {
+        logger.log('[CoachingService] Fetching AI-enhanced insights');
+        
+        const aiResponse = await insightsService.getAIInsights(forceRefresh);
+        const aiInsights = aiResponse.insights;
+
+        logger.log('[CoachingService] AI insights fetched successfully', {
+          aiCount: aiInsights.length,
+          ruleCount: ruleBasedInsights.length,
+          cached: aiResponse.metadata.cached
+        });
+
+        // Merge and deduplicate insights
+        const mergedInsights = this.mergeInsights(ruleBasedInsights, aiInsights);
+
+        // Prioritize combined insights
+        const sortedInsights = this.prioritizeInsights(mergedInsights);
+
+        logger.log('[CoachingService] Merged insights', {
+          total: sortedInsights.length,
+          aiInsights: aiInsights.length,
+          ruleInsights: ruleBasedInsights.length
+        });
+
+        return sortedInsights;
+
+      } catch (error) {
+        // Handle AI fetch errors gracefully - fall back to rule-based
+        if (error instanceof InsightsServiceError) {
+          logger.warn('[CoachingService] AI insights fetch failed, using rule-based fallback', {
+            code: error.code,
+            message: error.message
+          });
+
+          // Add a notification insight about AI failure (user-friendly)
+          if (error.code !== 'RATE_LIMIT') {
+            // Don't show error for rate limits (expected behavior)
+            const errorInsight: CoachingInsight = {
+              id: `ai-error-${Date.now()}`,
+              type: 'motivation',
+              priority: 'low',
+              source: 'rule',
+              title: 'coach.aiUnavailable',
+              message: 'coach.aiUnavailableMessage',
+              icon: 'info',
+              iconColor: 'text-blue-500',
+              createdAt: new Date().toISOString(),
+              dismissible: true,
+              metadata: {
+                errorCode: error.code
+              }
+            };
+            return [errorInsight, ...ruleBasedInsights];
+          }
+        } else {
+          logger.error('[CoachingService] Unexpected error fetching AI insights', error);
+        }
+
+        // Return rule-based insights as fallback
+        return ruleBasedInsights;
+      }
+
+    } catch (error) {
+      logger.error('[CoachingService] Error in getAIEnhancedInsights', error);
+      // Final fallback - return empty array
+      return [];
+    }
   }
 
   /**
@@ -310,38 +417,53 @@ export class CoachingService {
   }
 
   /**
-   * Generate progressive overload insights
-   */
-  /**
-   * Generate progression insights (rep-based and duration-based)
+   * Generate progressive overload insights using advanced multi-factor analysis
+   * 
+   * Uses detectProgressionOpportunities() for sophisticated progression detection
+   * that considers completion trends, plateaus, rest quality, and volume patterns.
+   * Falls back to simpler detection for duration-based exercises.
    */
   private async generateProgressionInsights(logs: ActivityLog[]): Promise<CoachingInsight[]> {
     const insights: CoachingInsight[] = [];
 
-    // Find rep-based exercises ready for progression
-    const progressionMap = findReadyForProgression(logs, 14);
+    // Use advanced progression detection for rep-based exercises
+    const progressionMap = detectProgressionOpportunities(logs, 21);
     const repRecommendations = Array.from(progressionMap.values());
 
-    // Find duration-based exercises ready for progression
+    // Find duration-based exercises ready for progression (simpler logic)
     const durationProgressionMap = findReadyForDurationProgression(logs, 14);
     const durationRecommendations = Array.from(durationProgressionMap.values());
 
-    // Combine and limit to top 3 recommendations
+    // Sort rep recommendations by confidence (highest first) and take top 2
+    const topRepRecommendations = repRecommendations
+      .sort((a, b) => b.confidence - a.confidence)
+      .slice(0, 2);
+
+    // Take top 1 duration recommendation
+    const topDurationRecommendations = durationRecommendations.slice(0, 1);
+
+    // Combine recommendations (max 3 total)
     const allRecommendations = [
-      ...repRecommendations.map(r => ({ type: 'rep' as const, data: r })),
-      ...durationRecommendations.map(r => ({ type: 'duration' as const, data: r }))
+      ...topRepRecommendations.map(r => ({ type: 'rep' as const, data: r })),
+      ...topDurationRecommendations.map(r => ({ type: 'duration' as const, data: r }))
     ].slice(0, 3);
 
     allRecommendations.forEach(rec => {
       if (rec.type === 'rep') {
-        // Rep-based progression insight
+        // Rep-based progression insight with confidence score
+        const confidenceLevel = rec.data.confidence >= 0.9 
+          ? 'high' 
+          : rec.data.confidence >= 0.7 
+            ? 'medium' 
+            : 'low';
+
         insights.push({
           id: `progression-${rec.data.exerciseId}-${Date.now()}`,
           type: 'progression',
-          priority: 'medium',
+          priority: confidenceLevel === 'high' ? 'high' : 'medium',
           source: 'rule',
           title: 'progression.readyTitle',
-          message: `progression.readyMessage:${rec.data.exerciseId}:${rec.data.recommendedSets}:${rec.data.recommendedReps}`,
+          message: rec.data.reasoning,
           icon: 'trending-up',
           iconColor: 'text-green-500',
           createdAt: new Date().toISOString(),
@@ -352,7 +474,10 @@ export class CoachingService {
             currentSets: rec.data.currentSets,
             currentReps: rec.data.currentReps,
             recommendedSets: rec.data.recommendedSets,
-            recommendedReps: rec.data.recommendedReps
+            recommendedReps: rec.data.recommendedReps,
+            confidence: rec.data.confidence,
+            confidenceLevel,
+            completionRate: rec.data.completionRate
           },
           actions: [
             {
@@ -367,7 +492,7 @@ export class CoachingService {
           ]
         });
       } else {
-        // Duration-based progression insight
+        // Duration-based progression insight (simpler detection)
         insights.push({
           id: `progression-duration-${rec.data.exerciseId}-${Date.now()}`,
           type: 'progression',
@@ -385,7 +510,9 @@ export class CoachingService {
             currentSets: rec.data.currentSets,
             currentDuration: rec.data.currentDuration,
             recommendedSets: rec.data.recommendedSets,
-            recommendedDuration: rec.data.recommendedDuration
+            recommendedDuration: rec.data.recommendedDuration,
+            confidence: rec.data.confidence,
+            completionRate: rec.data.completionRate
           },
           actions: [
             {
@@ -406,17 +533,17 @@ export class CoachingService {
   }
 
   /**
-   * Generate recovery insights
+   * Generate recovery insights using advanced multi-factor analysis
+   * 
+   * Uses calculateRecoveryRecommendations() for sophisticated recovery detection
+   * that considers consecutive training days, workout intensity, volume spikes,
+   * muscle group fatigue, and overall fatigue scoring.
    */
   private async generateRecoveryInsights(logs: ActivityLog[]): Promise<CoachingInsight[]> {
     const insights: CoachingInsight[] = [];
 
-    // Get logs from last 7 days
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - 7);
-    const recentLogs = logs.filter(log => new Date(log.timestamp) >= cutoffDate);
-
-    const recovery = analyzeRecoveryNeeds(recentLogs);
+    // Use advanced recovery analysis (analyzes last 14 days by default)
+    const recovery = calculateRecoveryRecommendations(logs, 14);
 
     if (recovery) {
       const priorityMap: Record<typeof recovery.severity, InsightPriority> = {
@@ -425,6 +552,19 @@ export class CoachingService {
         high: 'high'
       };
 
+      // Determine icon and color based on severity
+      const iconMap = {
+        low: 'info',
+        medium: 'alert-triangle',
+        high: 'alert-circle'
+      } as const;
+
+      const colorMap = {
+        low: 'text-blue-500',
+        medium: 'text-amber-500',
+        high: 'text-red-500'
+      } as const;
+
       insights.push({
         id: `recovery-${Date.now()}`,
         type: 'recovery',
@@ -432,14 +572,15 @@ export class CoachingService {
         source: 'rule',
         title: 'recovery.title',
         message: recovery.reasoning,
-        icon: recovery.severity === 'high' ? 'alert-circle' : 'info',
-        iconColor: recovery.severity === 'high' ? 'text-red-500' : 'text-blue-500',
+        icon: iconMap[recovery.severity],
+        iconColor: colorMap[recovery.severity],
         createdAt: new Date().toISOString(),
         dismissible: true,
         metadata: {
           daysTraining: recovery.daysTraining,
           recommendedRestDays: recovery.recommendedRestDays,
-          severity: recovery.severity
+          severity: recovery.severity,
+          affectedMuscleGroups: recovery.affectedMuscleGroups
         }
       });
     }
@@ -518,6 +659,53 @@ export class CoachingService {
       // Then by creation time (newer first)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+  }
+
+  /**
+   * Merge rule-based and AI insights, removing duplicates
+   * 
+   * Deduplication strategy:
+   * - If insights have the same type and similar content, keep the AI version
+   * - AI insights get priority for progressive overload and recovery suggestions
+   * - Rule-based insights retained for streaks and muscle balance
+   * 
+   * @param ruleInsights - Rule-based insights
+   * @param aiInsights - AI-generated insights
+   * @returns Merged array of insights without duplicates
+   */
+  private mergeInsights(
+    ruleInsights: CoachingInsight[],
+    aiInsights: CoachingInsight[]
+  ): CoachingInsight[] {
+    // Start with all AI insights (they take priority)
+    const merged = [...aiInsights];
+
+    // Track insight types we've seen from AI
+    const aiInsightTypes = new Set(aiInsights.map(insight => insight.type));
+
+    // Add rule-based insights that don't conflict with AI insights
+    for (const ruleInsight of ruleInsights) {
+      // For these types, AI insights replace rule-based ones
+      const aiReplacesRule = ['progression', 'recovery', 'motivation'].includes(ruleInsight.type);
+
+      if (aiReplacesRule && aiInsightTypes.has(ruleInsight.type)) {
+        // Skip this rule-based insight - AI version already included
+        logger.log(`[CoachingService] Skipping rule-based ${ruleInsight.type} insight (AI version available)`);
+        continue;
+      }
+
+      // For streak and muscle-balance insights, keep rule-based (more reliable)
+      // Also keep rule-based insights when no AI equivalent exists
+      merged.push(ruleInsight);
+    }
+
+    logger.log('[CoachingService] Merged insights', {
+      aiCount: aiInsights.length,
+      ruleCount: ruleInsights.length,
+      mergedCount: merged.length
+    });
+
+    return merged;
   }
 
   /**

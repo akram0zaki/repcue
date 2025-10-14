@@ -41,8 +41,87 @@ RepCue is your personal interval training companion that:
 - ⏳ **Pre-Timer Countdown**: Optional 0-10 second countdown before timer starts
 - 💪 **20 Core Exercises**: Across 5 categories (Core, Strength, Cardio, Flexibility, Balance)
 - 🎥 **Exercise Demo Videos (Experimental)**: Inline circular instructional loop (feature & setting gated, reduced‑motion aware, fully optional)
+- 🤖 **AI Coach (Phase 2)**: Intelligent workout insights powered by Mistral AI
+- 📊 **Smart Recommendations**: Advanced progression and recovery algorithms
 - 📱 **Mobile-First**: Responsive design optimized for phones and tablets
 - ♿ **Accessible**: WCAG 2.1 compliant for all users
+
+---
+
+## 🤖 AI Coach - Intelligent Workout Insights
+
+RepCue's AI Coach combines rule-based algorithms with Mistral AI to provide personalized, data-driven coaching insights.
+
+### Features
+
+**📈 Progression Detection**
+- Multi-factor analysis of your workout history
+- Detects when you're ready for increased reps or sets
+- Confidence-scored recommendations (conservative, injury-prevention focused)
+- Analyzes: completion rates, plateaus, rest quality, volume trends
+
+**💆 Recovery Recommendations**
+- Fatigue scoring system (0-10 scale) based on training patterns
+- Detects overtraining risks (consecutive days, volume spikes, muscle overuse)
+- Smart rest day recommendations (1-4 days based on fatigue severity)
+- Severity levels: Low (info), Medium (caution), High (critical)
+
+**🧠 AI-Enhanced Insights**
+- Combines rule-based + AI-powered analysis
+- Natural language explanations for all recommendations
+- Graceful fallback to rule-based when AI unavailable
+- Rate limited (100 requests/day) with 5-minute caching
+
+### How to Enable
+
+1. **Sign In**: AI insights require authentication (Settings → Sign In)
+2. **Enable Toggle**: Settings → AI Coach → "Enable AI-Powered Insights"
+3. **View Insights**: Navigate to Coach page to see personalized recommendations
+
+### Settings
+
+- **Rate Limit**: 100 AI requests per day (resets at midnight UTC)
+- **Caching**: Insights cached for 5 minutes for performance
+- **Privacy**: Your data is processed securely and used only to generate insights
+- **Fallback**: Always falls back to rule-based insights if AI fails
+- **Default**: Opt-in (disabled by default, requires user activation)
+
+### AI Insights vs Rule-Based
+
+| Feature | AI Insights | Rule-Based |
+|---------|-------------|------------|
+| **Progression** | Context-aware, multi-factor | Volume-based |
+| **Recovery** | Fatigue scoring with reasoning | Consecutive days |
+| **Motivation** | Personalized messages | Generic encouragement |
+| **Availability** | Requires auth + rate limits | Always available |
+| **Speed** | ~1-2s (with cache: <100ms) | Instant |
+| **Privacy** | Sent to Mistral AI | Local only |
+
+### Technical Details
+
+- **AI Model**: Mistral AI (via Supabase Edge Function)
+- **Algorithms**: See `apps/frontend/src/utils/coachingAlgorithms.ts`
+- **Service**: `apps/frontend/src/services/insightsService.ts` (452 lines)
+- **Testing**: 95/95 tests passing (unit + integration)
+- **i18n**: Fully translated across 8 languages
+
+### Troubleshooting
+
+**"Sign in to enable AI-powered insights"**
+- You must be authenticated to use AI features
+- Go to Settings → Sign In with your account
+
+**"Rate limit exceeded"**
+- You've reached the daily limit of 100 requests
+- Try again after midnight UTC
+- Rule-based insights are still available
+
+**"AI insights unavailable"**
+- Network connection issue or Edge Function down
+- App automatically falls back to rule-based insights
+- Your experience is not degraded
+
+For more details, see [`docs/ai-coach-user-guide.md`](./docs/ai-coach-user-guide.md) (coming soon).
 
 ---
 - **Disk Space**: ~200MB for dependencies + ~50MB for built app

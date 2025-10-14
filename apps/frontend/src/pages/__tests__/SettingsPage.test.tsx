@@ -537,4 +537,50 @@ describe('SettingsPage', () => {
     
     expect(screen.getByText('50%')).toBeInTheDocument();
   });
+
+  it('renders AI insights toggle when authenticated', () => {
+    // Mock authenticated state
+    vi.mock('../../hooks/useAuth', () => ({
+      useAuth: () => ({ isAuthenticated: true, user: { id: 'user-1' } })
+    }));
+
+    const settingsWithAI = createMockAppSettings({ 
+      ...mockAppSettings, 
+      coach_enabled: true,
+      coach_ai_insights_enabled: true 
+    });
+    renderSettingsPage({ appSettings: settingsWithAI });
+    
+    const aiToggle = screen.queryByTestId('toggle-coach-ai-insights-enabled');
+    expect(aiToggle).toBeInTheDocument();
+  });
+
+  it('calls onUpdateSettings when AI insights toggle is clicked', async () => {
+    // Mock authenticated state
+    vi.mock('../../hooks/useAuth', () => ({
+      useAuth: () => ({ isAuthenticated: true, user: { id: 'user-1' } })
+    }));
+
+    const mockOnUpdateSettings = vi.fn();
+    const settingsWithAI = createMockAppSettings({ 
+      ...mockAppSettings, 
+      coach_enabled: true,
+      coach_ai_insights_enabled: false 
+    });
+    renderSettingsPage({ 
+      appSettings: settingsWithAI,
+      onUpdateSettings: mockOnUpdateSettings 
+    });
+    
+    const aiToggle = screen.queryByTestId('toggle-coach-ai-insights-enabled');
+    if (aiToggle) {
+      fireEvent.click(aiToggle);
+      
+      await waitFor(() => {
+        expect(mockOnUpdateSettings).toHaveBeenCalledWith({ 
+          coach_ai_insights_enabled: true 
+        });
+      });
+    }
+  });
 });

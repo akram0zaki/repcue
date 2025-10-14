@@ -497,6 +497,40 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 />
               </div>
 
+              {/* AI-Powered Insights */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-ai-insights-enabled" className="label-text">
+                    {t('coaching:settings.aiInsightsEnabled', 'Enable AI-Powered Insights')}
+                  </label>
+                  <p 
+                    id="coach-ai-insights-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {isAuthenticated 
+                      ? t('coaching:settings.aiInsightsHelp', 'Get advanced AI analysis of your progress, trends, and personalized recommendations. Your data is processed securely and used only to generate insights.')
+                      : t('coaching:settings.aiInsightsAuthRequired', 'Sign in to enable AI-powered insights.')
+                    }
+                  </p>
+                  {isAuthenticated && (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {t('coaching:settings.aiInsightsDataUsage', 'Limited to 10 AI requests per hour. Cached for 24 hours.')}
+                    </p>
+                  )}
+                </div>
+                <ToggleSwitch
+                  id="coach-ai-insights-enabled"
+                  checked={appSettings.coach_ai_insights_enabled === true}
+                  onChange={() => onUpdateSettings({ coach_ai_insights_enabled: !appSettings.coach_ai_insights_enabled })}
+                  dataTestId="toggle-coach-ai-insights-enabled"
+                  aria-describedby="coach-ai-insights-help"
+                  disabled={!isAuthenticated}
+                />
+              </div>
+
               {/* Insight Type Filters */}
               <fieldset className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <legend className="text-sm font-medium text-text-700 dark:text-text-300 mb-3">
