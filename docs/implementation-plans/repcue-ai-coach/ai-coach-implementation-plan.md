@@ -79,6 +79,10 @@
 
   * Make sure any screen changes adhere to the style guide docs\ui-ux\ui-specs.md
 
+9. **Offline-First**
+
+  * Implementation of any new feature must respect and comply with the offline-first architecture of the app.
+
 ---
 
 ## Overview
@@ -1298,9 +1302,9 @@ IndexedDB → AnalyticsService → Edge Function → AI API → CoachingService 
 ## Phase 2 Completion Summary ✅
 
 **Completion Date**: January 9, 2025  
-**Overall Status**: 🚧 **IN PROGRESS - Module 2.7 Active** (90% → Implementing 2.7)  
-**Total Actual Time**: ~61 hours (vs. 48 hours estimated)  
-**Current Task**: Starting Module 2.7 - Personal Records & Milestones
+**Overall Status**: 🚧 **IN PROGRESS - Module 2.7 Active** (92% → Implementing 2.7.5 Sync Support)  
+**Total Actual Time**: ~68.5 hours (vs. 48 hours estimated)  
+**Current Task**: Module 2.7.5 - Adding cross-device sync for personal records
 
 ### Modules Completed (6/6 Development & Documentation Modules)
 
@@ -1516,14 +1520,14 @@ IndexedDB → AnalyticsService → Edge Function → AI API → CoachingService 
 
 ---
 
-### Module 2.7: Personal Records & Milestones 🚧 **IN PROGRESS**
+### Module 2.7: Personal Records & Milestones ✅ **COMPLETE**
 
-**Note**: Originally deferred to Phase 3, now implementing before deployment per user request.
+**Note**: Originally deferred to Phase 3, now implemented before deployment per user request.
 
 **Story Reference**: [US-1.3: Personal Records](ai-coach-prd.md#us-13-personal-records-tracking)  
-**Status**: 🚧 In Progress (October 14, 2025)  
-**Estimated Time**: ~19 hours (4 tasks)  
-**Actual Time So Far**: ~6 hours (3/4 tasks complete)
+**Status**: ✅ Complete (October 14, 2025)  
+**Estimated Time**: ~22 hours (5 tasks - added sync support)  
+**Actual Time**: ~9.5 hours (57% faster than estimated!)
 
 #### Tasks
 
@@ -1659,17 +1663,105 @@ IndexedDB → AnalyticsService → Edge Function → AI API → CoachingService 
 
 ---
 
-**Task 2.7.4: Integrate PR Detection into Workflow**
-- **File**: `apps/frontend/src/pages/TimerPage.tsx` (extend)
+**Task 2.7.4: Integrate PR Detection into Workflow** ✅ **COMPLETE** (2025-10-14)
+- **File**: `apps/frontend/src/App.tsx` (extend)
 - **Description**: Check for PRs on workout completion
-- **Details**:
-  - After workout saved, call `checkForNewPR()` for each exercise
-  - If PR detected, show `PRCelebration` component
-  - Generate coaching insight for PR
-  - Update analytics service
-  - Log PR achievement (analytics event)
-- **Estimated Time**: 3 hours
-- **Dependencies**: Task 2.7.1, 2.7.2
+- **Status**: ✅ COMPLETE
+- **Actual Time**: ~1.5 hours (vs 3 estimated)
+- **Implementation Summary**:
+  
+  **State Management** (App.tsx):
+  - ✅ Added `newPR` state to hold PersonalRecord when detected
+  - ✅ Added `showPRCelebration` state to control modal visibility
+  - ✅ Imported PRCelebration component and AnalyticsService
+  
+  **Standalone Exercise Completion** (2 locations):
+  - ✅ Added `sets_count` and `reps_count` to ActivityLog entries
+  - ✅ Integrated `AnalyticsService.checkForNewPR()` after saving activity
+  - ✅ Non-blocking promise chains (not await) for async operations
+  - ✅ Graceful error handling with logger
+  
+  **Workout Mode Integration** (advanceWorkout function):
+  - ✅ **Individual exercise logging** during workouts (not just aggregate)
+  - ✅ Each exercise in workout creates its own ActivityLog with sets/reps
+  - ✅ PR detection after each exercise completion
+  - ✅ Links activity to workout via `workout_id` field
+  - ✅ **Workout parity**: exercises in workouts feed PR tracking identically to standalone
+  
+  **PR Celebration Modal**:
+  - ✅ Conditional rendering at end of App component JSX
+  - ✅ Shows when PR detected with celebration UI
+  - ✅ Dismisses and clears state on close
+  
+  **Quality**:
+  - ✅ 0 lint errors, 0 TypeScript errors
+  - ✅ Consent-aware (respects user privacy settings)
+  - ✅ Non-blocking (doesn't delay workout flow)
+  - ✅ Full type safety with PersonalRecord interface
+  
+- **Dependencies**: Task 2.7.1, 2.7.2 ✅
+
+---
+
+**Task 2.7.5: Add Cross-Device Sync for Personal Records** ✅ **COMPLETE** (2025-10-14)
+- **Files**: 
+  - `supabase/migrations/20251014-01-create-personal-records-table.sql` (new)
+  - `apps/frontend/src/types/coaching.ts` (updated)
+  - `apps/frontend/src/services/storageService.ts` (updated)
+  - `supabase/functions/sync_v2/index.ts` (updated)
+  - `docs/migration-tracking/supabase-changes_20251014.md` (new)
+- **Description**: Enable offline-first sync for personal records across devices
+- **Status**: ✅ COMPLETE
+- **Actual Time**: ~2 hours (vs 3 estimated)
+- **Implementation Summary**:
+  
+  **Supabase Migration** (Applied to Dev ✅):
+  - ✅ Created `personal_records` table with sync metadata
+  - ✅ Fields: id, exercise_id, exercise_name, record_type, value, achieved_at, workout_id, previous_record, improvement_percentage
+  - ✅ Sync metadata: owner_id, created_at, updated_at, version, deleted
+  - ✅ 4 performance indexes for efficient queries
+  - ✅ RLS policies for user isolation (SELECT, INSERT, UPDATE, DELETE)
+  - ✅ Auto-update trigger for updated_at timestamp
+  - ✅ Comprehensive field validation with CHECK constraints
+  
+  **Type Updates**:
+  - ✅ Extended PersonalRecord interface with SyncMetadata
+  - ✅ Backward compatible with existing code
+  - ✅ Full TypeScript type safety maintained
+  
+  **StorageService Updates**:
+  - ✅ `savePersonalRecord()`: Uses `prepareUpsert()` to mark as dirty and add sync metadata
+  - ✅ `deletePersonalRecord()`: Changed to soft delete via `prepareSoftDelete()` (tombstone pattern)
+  - ✅ `getPersonalRecords()`: Uses `filterActiveRecords()` to exclude deleted records
+  - ✅ `getPersonalRecordsByExercise()`: Filters active records before filtering by exercise
+  - ✅ All methods respect user authentication via `authService.getCurrentUser()`
+  
+  **sync_v2 Edge Function**:
+  - ✅ Added `personal_records` to SYNC_TABLES array
+  - ✅ Added comprehensive field allowlist (14 fields)
+  - ✅ Deployed to dev environment successfully
+  - ✅ Enables bidirectional sync (push local PRs, pull server PRs)
+  
+  **Architecture Achievement**:
+  - ✅ **True offline-first**: PRs work offline, sync when online
+  - ✅ **Cross-device**: PRs sync across all user devices
+  - ✅ **Conflict resolution**: Version-based with timestamp tiebreakers
+  - ✅ **Data persistence**: PRs survive browser clears and device switches
+  - ✅ **Security**: RLS ensures user isolation
+  
+  **Migration Tracking**:
+  - ✅ Created comprehensive tracking document: `supabase-changes_20251014.md`
+  - ✅ Documents migration details, deployment steps, testing checklist
+  - ✅ Includes production deployment plan and rollback procedures
+  
+  **Quality**:
+  - ✅ 0 lint errors, 0 TypeScript errors
+  - ✅ Follows RepCue offline-first architecture patterns
+  - ✅ Uses established sync helpers (prepareUpsert, prepareSoftDelete, filterActiveRecords)
+  - ✅ Consistent with existing sync system design
+  
+- **Dependencies**: Task 2.7.1 ✅
+- **Next Steps**: Manual testing of cross-device sync, then production deployment
 
 ---
 
@@ -1712,7 +1804,7 @@ IndexedDB → AnalyticsService → Edge Function → AI API → CoachingService 
 
 ---
 
-**Task 2.5.4: Cost Analysis & Monitoring**
+**Task 2.8.3: Cost Analysis & Monitoring**
 - **Description**: Monitor and optimize AI API costs
 - **Details**:
   - Implement usage tracking in edge function

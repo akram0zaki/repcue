@@ -4039,7 +4039,8 @@ export class StorageService {
 
     try {
       const records = await this.db.personal_records.toArray();
-      return records;
+      // Return only active records (filter out soft-deleted)
+      return filterActiveRecords(records);
     } catch (error) {
       logger.error('Failed to get personal records from IndexedDB:', error);
       return [];
@@ -4058,8 +4059,11 @@ export class StorageService {
     }
 
     try {
+      const user = authService.getCurrentUser();
+      const preparedRecord = prepareUpsert(record, user?.id);
+      
       // Use put() to handle both insert and update operations
-      await this.db.personal_records.put(record);
+      await this.db.personal_records.put(preparedRecord);
       logger.log(`✅ Saved personal record: ${record.exerciseName} ${record.recordType} = ${record.value}`);
     } catch (error) {
       logger.error('Failed to save personal record to IndexedDB:', error);
@@ -4067,7 +4071,7 @@ export class StorageService {
   }
 
   /**
-   * Delete a personal record from IndexedDB
+   * Delete a personal record from IndexedDB (soft delete for sync)
    * 
    * @param recordId - ID of the personal record to delete
    */
@@ -4078,15 +4082,25 @@ export class StorageService {
     }
 
     try {
-      await this.db.personal_records.delete(recordId);
-      logger.log(`🗑️ Deleted personal record: ${recordId}`);
+      const user = authService.getCurrentUser();
+      const record = await this.db.personal_records.get(recordId);
+      
+      if (!record) {
+        logger.warn(`Personal record not found for deletion: ${recordId}`);
+        return;
+      }
+      
+      // Use soft delete (tombstone pattern) for sync compatibility
+      const tombstone = prepareSoftDelete(record, user?.id);
+      await this.db.personal_records.put(tombstone);
+      logger.log(`🗑️ Soft deleted personal record: ${recordId}`);
     } catch (error) {
       logger.error('Failed to delete personal record from IndexedDB:', error);
     }
   }
 
   /**
-   * Get personal records for a specific exercise
+   * Get personal records for a specific exercise (active records only)
    * 
    * @param exerciseId - Exercise ID to filter by
    * @returns Array of personal records for the exercise
@@ -4098,7 +4112,8 @@ export class StorageService {
 
     try {
       const allRecords = await this.db.personal_records.toArray();
-      return allRecords.filter(record => record.exerciseId === exerciseId);
+      // Filter active records (not deleted) for the specific exercise
+      return filterActiveRecords(allRecords).filter(record => record.exerciseId === exerciseId);
     } catch (error) {
       logger.error('Failed to get personal records by exercise from IndexedDB:', error);
       return [];

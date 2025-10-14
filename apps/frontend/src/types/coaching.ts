@@ -74,7 +74,13 @@ export interface WorkoutStatistics {
 /**
  * Personal record for a specific exercise
  */
-export interface PersonalRecord {
+import type { SyncMetadata } from './index';
+
+/**
+ * Personal record for an exercise
+ * Extends SyncMetadata for offline-first cross-device sync
+ */
+export interface PersonalRecord extends SyncMetadata {
   id: string;                    // Unique identifier
   exerciseId: string;            // Exercise ID
   exerciseName: string;          // Exercise name (for display)
@@ -84,6 +90,7 @@ export interface PersonalRecord {
   workoutId?: string;            // Optional reference to workout
   previousRecord?: number;       // Previous record value (for comparison)
   improvementPercentage?: number; // Percentage improvement over previous
+  // SyncMetadata provides: owner_id, created_at, updated_at, version, deleted
 }
 
 /**

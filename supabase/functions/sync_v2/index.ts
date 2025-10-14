@@ -49,7 +49,8 @@ const SYNC_TABLES = [
   'workouts',
   'activity_logs',
   'workout_sessions',
-  'video_files'
+  'video_files',
+  'personal_records'
 ];
 
 // Shared UUID validation pattern (defense-in-depth: prevents any slug / built-in IDs from being processed server-side)
@@ -108,6 +109,11 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'id', 'owner_id', 'exercise_id', 'file_name', 'file_data', 'file_size',
     'mime_type', 'upload_pending', 'storage_path', 'created_at', 'updated_at',
     'deleted', 'version'
+  ]),
+  personal_records: new Set([
+    'id', 'exercise_id', 'exercise_name', 'record_type', 'value',
+    'achieved_at', 'workout_id', 'previous_record', 'improvement_percentage',
+    'owner_id', 'created_at', 'updated_at', 'version', 'deleted'
   ])
 };
 
