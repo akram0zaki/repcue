@@ -146,5 +146,48 @@
     "noMatching": "No matching records",
     "tryDifferentFilter": "Try adjusting your search or filters to find records.",
     "startWorkout": "Start a Workout"
-  }
+  },
+  "survey": {
+    "title": "How was your workout?",
+    "subtitle": "Help us personalize your coaching insights",
+    "thankYou": "Thank You!",
+    "feedbackHelps": "Your feedback helps us provide better coaching insights.",
+    "great": "Felt great!",
+    "greatDesc": "Strong energy, good form",
+    "good": "Felt good",
+    "goodDesc": "Solid workout, no issues",
+    "okay": "It was okay",
+    "okayDesc": "Got through it",
+    "tired": "Felt tired",
+    "tiredDesc": "Low energy, challenging",
+    "difficulty": "Difficulty Level",
+    "veryEasy": "Very Easy",
+    "veryHard": "Very Hard",
+    "energy": "Energy Level After",
+    "exhausted": "Exhausted",
+    "energized": "Energized",
+    "notes": "Notes (Optional)",
+    "notesPlaceholder": "Any thoughts about this workout?",
+    "moreDetails": "Add more details"
+  },
+  "persona": {
+    "title": "Coach Personality",
+    "description": "Choose how your coach communicates with you",
+    "zen": {
+      "name": "Zen Coach",
+      "description": "Calm, mindful, holistic approach"
+    },
+    "energy": {
+      "name": "Energy Coach",
+      "description": "Enthusiastic, motivational, high-energy"
+    },
+    "logic": {
+      "name": "Logic Coach",
+      "description": "Data-driven, analytical, precise"
+    }
+  },
+  "insights": "Coach Insights",
+  "insightsCarousel": "Coaching insights carousel",
+  "carouselNavigation": "Carousel navigation",
+  "goToInsight": "Go to insight {{number}}"
 }

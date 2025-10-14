@@ -530,4 +530,31 @@ body.rtl .truncate {
   .float-end-rtl {
     @apply float-right rtl:float-left;
   }
+
+  /* ========================================
+     MICRO-INTERACTIONS (AI Coach Enhancement)
+     ======================================== */
+
+  /* Pulsing animation for attention-grabbing elements */
+  @keyframes pulse-animation {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  .pulse-animation {
+    animation: pulse-animation 2s ease-in-out infinite;
+  }
+
+  /* Respect reduced motion preference - disable pulse animation */
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-animation {
+      animation: none !important;
+    }
+  }
 }

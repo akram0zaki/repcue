@@ -59,6 +59,11 @@ const IconMap: Record<string, React.FC<{ className?: string }>> = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
+  'alert-triangle': ({ className }) => (
+    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
   calendar: ({ className }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -189,9 +194,9 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
           </div>
 
           {/* Title */}
-          <h4 
+          <h4
             id={titleId}
-            className="text-base font-semibold text-text-900 dark:text-text-50 truncate"
+            className="text-base font-semibold text-text-900 dark:text-text-50 break-words"
           >
             {t(titleKey, titleParams)}
           </h4>

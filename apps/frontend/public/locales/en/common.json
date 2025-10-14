@@ -91,6 +91,8 @@
     "beepVolume": "Beep Volume",
     "beepIntervalHelp": "Play a short beep every N seconds during time-based exercises.",
     "enableVibration": "Enable Vibration",
+    "celebrationSounds": "Celebration Sounds",
+    "celebrationSoundsHelp": "Play sound effects when you set personal records or reach milestones",
     "timerSettings": "Timer Settings",
     "preTimerCountdown": "Pre-Timer Countdown",
     "preTimerCountdownHelp": "Countdown before the timer starts to help you get into position",

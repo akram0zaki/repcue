@@ -69,8 +69,27 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
       
       case 'start-exercise':
         if (data && typeof data === 'object' && 'exerciseId' in data) {
-          const exerciseData = data as { exerciseId: string };
-          navigate(`/timer?exerciseId=${exerciseData.exerciseId}`);
+          const exerciseData = data as {
+            exerciseId: string;
+            sets?: number;
+            reps?: number;
+            duration?: number;
+          };
+
+          // Build query string with all provided parameters
+          const params = new URLSearchParams({ exerciseId: exerciseData.exerciseId });
+
+          if (exerciseData.sets !== undefined) {
+            params.append('sets', String(exerciseData.sets));
+          }
+          if (exerciseData.reps !== undefined) {
+            params.append('reps', String(exerciseData.reps));
+          }
+          if (exerciseData.duration !== undefined) {
+            params.append('duration', String(exerciseData.duration));
+          }
+
+          navigate(`/timer?${params.toString()}`);
         } else {
           navigate('/timer');
         }

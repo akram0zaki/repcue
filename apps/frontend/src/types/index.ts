@@ -201,6 +201,14 @@ export interface ActivityLog extends SyncMetadata {
   }[];
   sets_count?: number;
   reps_count?: number;
+  // Personalization metadata (Enhancement E3.1)
+  metadata?: {
+    perceived_difficulty?: 1 | 2 | 3 | 4 | 5; // 1=Very Easy, 5=Very Hard
+    perceived_energy?: 1 | 2 | 3 | 4 | 5; // 1=Exhausted, 5=Energized
+    mood?: 'great' | 'good' | 'okay' | 'tired'; // Post-workout mood
+    quality?: 'excellent' | 'good' | 'average' | 'struggled'; // Workout quality
+    notes_from_survey?: string; // Optional user notes from post-workout survey
+  };
 }
 
 // Timer state
@@ -366,6 +374,8 @@ export interface AppSettings extends SyncMetadata {
   coach_show_suggestions?: boolean; // Show workout suggestions
   coach_intro_seen?: boolean; // User has seen the coach introduction dialog
   coach_ai_insights_enabled?: boolean; // Enable AI-powered insights (requires authentication)
+  coach_persona?: 'zen' | 'energy' | 'logic'; // Coach personality style (Enhancement E1.2)
+  celebration_sounds_enabled?: boolean; // Enable celebration sounds for PRs and milestones (Enhancement E1.1)
 }
 
 // Navigation routes

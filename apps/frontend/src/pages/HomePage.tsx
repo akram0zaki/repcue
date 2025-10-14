@@ -32,7 +32,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   
   // Coaching insight for home page (conditional on settings)
   const shouldShowCoachOnHome = appSettings.coach_enabled && appSettings.coach_show_on_home;
-  const { insight: topInsight, isLoading: isLoadingInsight } = useTopInsight(
+  const { insight: topInsight, isLoading: isLoadingInsight, dismissInsight } = useTopInsight(
     shouldShowCoachOnHome ? appSettings : undefined
   );
   
@@ -195,7 +195,27 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                     break;
                   case 'start-exercise':
                     if (data && typeof data === 'object' && 'exerciseId' in data) {
-                      navigate(Routes.TIMER, { state: { exerciseId: data.exerciseId } });
+                      const exerciseData = data as {
+                        exerciseId: string;
+                        sets?: number;
+                        reps?: number;
+                        duration?: number;
+                      };
+
+                      // Build query string with all provided parameters
+                      const params = new URLSearchParams({ exerciseId: exerciseData.exerciseId });
+
+                      if (exerciseData.sets !== undefined) {
+                        params.append('sets', String(exerciseData.sets));
+                      }
+                      if (exerciseData.reps !== undefined) {
+                        params.append('reps', String(exerciseData.reps));
+                      }
+                      if (exerciseData.duration !== undefined) {
+                        params.append('duration', String(exerciseData.duration));
+                      }
+
+                      navigate(`${Routes.TIMER}?${params.toString()}`);
                     }
                     break;
                   case 'find-exercises':
@@ -215,10 +235,9 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                     logger.warn('Unknown coaching action:', action);
                 }
               }}
-              onDismiss={() => {
-                // Insight will be dismissed through the hook's dismissInsight function
-                // The topInsight state will update automatically
-                logger.log('Insight dismissed on HomePage');
+              onDismiss={(insightId) => {
+                logger.log('Dismissing insight on HomePage:', insightId);
+                dismissInsight(insightId);
               }}
             />
           </section>

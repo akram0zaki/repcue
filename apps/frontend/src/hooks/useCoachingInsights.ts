@@ -218,6 +218,7 @@ export const useTopInsight = (settings?: AppSettings): {
   isLoading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
+  dismissInsight: (insightId: string) => void;
 } => {
   const [insight, setInsight] = useState<CoachingInsight | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -297,6 +298,18 @@ export const useTopInsight = (settings?: AppSettings): {
     await fetchTopInsight(true);
   }, [fetchTopInsight]);
 
+  /**
+   * Dismiss the current top insight
+   */
+  const dismissInsight = useCallback((insightId: string) => {
+    coachingService.dismissInsight(insightId);
+
+    // Clear the insight from local state
+    setInsight(null);
+
+    logger.log(`Dismissed top insight: ${insightId}`);
+  }, [coachingService]);
+
   useEffect(() => {
     fetchTopInsight(false);
   }, [fetchTopInsight]);
@@ -305,7 +318,8 @@ export const useTopInsight = (settings?: AppSettings): {
     insight,
     isLoading,
     error,
-    refresh
+    refresh,
+    dismissInsight
   };
 };
 
