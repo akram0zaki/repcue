@@ -18,7 +18,8 @@ import type {
   StreakData,
   MuscleGroupBalance,
   AnalyticsSummary,
-  PersonalRecord
+  PersonalRecord,
+  NewPersonalRecord
 } from '../types/coaching';
 import {
   calculateCurrentStreak,
@@ -421,7 +422,7 @@ export class AnalyticsService {
       const exercisePRs = allPRs.filter(pr => pr.exerciseId === exerciseId);
 
       // Check each record type
-      const newPRs: PersonalRecord[] = [];
+      const newPRs: NewPersonalRecord[] = [];
 
       // Check max reps (single set)
       const maxRepsPR = exercisePRs.find(pr => pr.recordType === 'max-reps');
@@ -513,15 +514,18 @@ export class AnalyticsService {
           await this.storageService.savePersonalRecord(pr);
         }
         
-        // Return the most significant PR (highest improvement percentage or first one)
-        const mostSignificant = newPRs.reduce((best, current) => {
-          if (!best.improvementPercentage) return current;
-          if (!current.improvementPercentage) return best;
-          return current.improvementPercentage > best.improvementPercentage ? current : best;
-        });
+        // Fetch the saved records to get full PersonalRecord with sync metadata
+        const savedPRs = await this.storageService.getPersonalRecordsByExercise(exerciseId);
+        
+        // Find the most recently saved PR (by achievedAt timestamp)
+        const mostRecent = savedPRs
+          .filter(pr => newPRs.some(newPR => newPR.id === pr.id))
+          .reduce((latest, current) => {
+            return new Date(current.achievedAt) > new Date(latest.achievedAt) ? current : latest;
+          });
 
-        logger.log(`New PR set for ${exercise.name}: ${mostSignificant.recordType} = ${mostSignificant.value}`);
-        return mostSignificant;
+        logger.log(`New PR set for ${exercise.name}: ${mostRecent.recordType} = ${mostRecent.value}`);
+        return mostRecent;
       }
 
       return null;

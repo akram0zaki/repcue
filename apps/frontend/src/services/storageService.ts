@@ -4052,7 +4052,14 @@ export class StorageService {
    * 
    * @param record - Personal record to save
    */
-  public async savePersonalRecord(record: PersonalRecord): Promise<void> {
+  /**
+   * Save a personal record to IndexedDB (consent-aware)
+   * Accepts either a new record (NewPersonalRecord) or a full record (PersonalRecord)
+   * prepareUpsert will add sync metadata for new records
+   * 
+   * @param record - Personal record to save
+   */
+  public async savePersonalRecord(record: PersonalRecord | Partial<PersonalRecord>): Promise<void> {
     if (!this.canStoreData()) {
       logger.warn('Cannot save personal record without user consent');
       return;
@@ -4060,7 +4067,7 @@ export class StorageService {
 
     try {
       const user = authService.getCurrentUser();
-      const preparedRecord = prepareUpsert(record, user?.id);
+      const preparedRecord = prepareUpsert(record as PersonalRecord, user?.id);
       
       // Use put() to handle both insert and update operations
       await this.db.personal_records.put(preparedRecord);

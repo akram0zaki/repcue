@@ -1,5 +1,19 @@
 ## Unreleased
 
+### 2025-10-15
+
+#### 🐛 Bug Fixes
+
+**TypeScript Build Errors - Personal Records Sync** (`apps/frontend/src/types/coaching.ts`, `analyticsService.ts`, `storageService.ts`):
+- **Problem**: Build failing with TypeScript errors after extending `PersonalRecord` with `SyncMetadata` - missing required sync fields when creating new PRs
+- **Root Cause**: `PersonalRecord` interface now extends `SyncMetadata`, requiring `created_at`, `updated_at`, `version`, `deleted` fields that shouldn't be present when creating new records
+- **Solution**:
+  1. Created `NewPersonalRecord` type in `coaching.ts` - omits sync metadata fields for creation
+  2. Updated `analyticsService.checkForNewPR()` to use `NewPersonalRecord[]` internally
+  3. Changed `storageService.savePersonalRecord()` to accept `PersonalRecord | Partial<PersonalRecord>`
+  4. Modified return logic to fetch saved records with full sync metadata after persistence
+- **Impact**: Build now compiles successfully, maintains type safety, proper separation between record creation and persistence
+
 ### 2025-10-14
 
 #### 🐛 Bug Fixes

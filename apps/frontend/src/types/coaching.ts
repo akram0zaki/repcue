@@ -94,6 +94,14 @@ export interface PersonalRecord extends SyncMetadata {
 }
 
 /**
+ * Input type for creating a new personal record (before sync metadata is added)
+ * Use this when creating new PRs in analyticsService
+ */
+export type NewPersonalRecord = Omit<PersonalRecord, keyof SyncMetadata> & {
+  id: string; // UUID is required even for new records
+};
+
+/**
  * Muscle group training balance
  */
 export interface MuscleGroupBalance {
