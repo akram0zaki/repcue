@@ -80,8 +80,57 @@ const TimerPageWrapper: React.FC<{
 }> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, onStartWorkoutMode, timerState } = props;
+  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, onStartWorkoutMode, timerState, exercises } = props;
   const processedStateRef = React.useRef<string | null>(null);
+  const processedUrlParamsRef = React.useRef<string | null>(null);
+
+  // Handle URL search params (from coaching recommendations)
+  useEffect(() => {
+    if (timerState.isRunning) return; // Don't change settings while timer is running
+
+    const searchParams = new URLSearchParams(location.search);
+    const exerciseId = searchParams.get('exerciseId');
+    const sets = searchParams.get('sets');
+    const reps = searchParams.get('reps');
+    const duration = searchParams.get('duration');
+
+    // Create a unique key for these params
+    const paramsKey = `${exerciseId}-${sets}-${reps}-${duration}`;
+
+    // Only process if we have an exerciseId and haven't processed these params yet
+    if (exerciseId && processedUrlParamsRef.current !== paramsKey) {
+      processedUrlParamsRef.current = paramsKey;
+
+      // Find the exercise
+      const exercise = exercises.find(ex => ex.id === exerciseId);
+      if (exercise) {
+        logger.log('[TimerPageWrapper] Setting exercise from URL params:', {
+          exerciseId,
+          sets,
+          reps,
+          duration
+        });
+
+        // Set the exercise
+        onSetSelectedExercise(exercise);
+
+        // Set duration if provided (for time-based exercises)
+        if (duration) {
+          const durationNum = parseInt(duration, 10);
+          if (!isNaN(durationNum)) {
+            onSetSelectedDuration(durationNum as TimerPreset);
+          }
+        }
+
+        // Auto-start timer after a brief delay
+        const timer = setTimeout(() => {
+          onStartTimer();
+        }, 200);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [location.search, exercises, onSetSelectedExercise, onSetSelectedDuration, onStartTimer, timerState.isRunning]);
 
   // Handle navigation state from ExercisePage or HomePage
   useEffect(() => {
