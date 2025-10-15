@@ -132,7 +132,6 @@
   "saveFailed": "Opslaan van oefening mislukt",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standaard Duur",
-
   "copies": "Kopieën",
   "created": "Gemaakt",
   "duration": "Duur",
@@ -141,7 +140,6 @@
   "ratingsAndReviews": "Beoordelingen & recensies",
   "stats": "Statistieken",
   "filtersAndSearch": "Filters & Zoeken",
-
   "title": "Oefeningen",
   "subtitle": "Bekijk, filter en start oefeningen. Markeer favorieten voor snelle toegang.",
   "searchLabel": "Oefeningen zoeken",
@@ -261,5 +259,26 @@
   "stepLabel": "Stap",
   "shareErrorAuth": "Je moet ingelogd zijn om oefeningen te delen",
   "shareErrorNotSynced": "Oefening moet gesynchroniseerd zijn voordat je deze kunt delen",
-  "shareErrorOffline": "Kan niet delen terwijl je offline bent"
+  "shareErrorOffline": "Kan niet delen terwijl je offline bent",
+  "muscleGroupsList": {
+    "core": "Core",
+    "abs": "Abs",
+    "obliques": "Obliques",
+    "shoulders": "Shoulders",
+    "chest": "Chest",
+    "triceps": "Triceps",
+    "quads": "Quads",
+    "glutes": "Glutes",
+    "hamstrings": "Hamstrings",
+    "calves": "Calves",
+    "cardio": "Cardio",
+    "legs": "Legs",
+    "flexibility": "Flexibility",
+    "back": "Back",
+    "hips": "Hips",
+    "balance": "Balance",
+    "full-body": "Full Body",
+    "hands": "Hands",
+    "mobility": "Mobility"
+  }
 }

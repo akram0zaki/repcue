@@ -58,6 +58,27 @@
     "intermediate": "Intermediate",
     "advanced": "Advanced"
   },
+  "muscleGroupsList": {
+    "core": "Core",
+    "abs": "Abs",
+    "obliques": "Obliques",
+    "shoulders": "Shoulders",
+    "chest": "Chest",
+    "triceps": "Triceps",
+    "quads": "Quads",
+    "glutes": "Glutes",
+    "hamstrings": "Hamstrings",
+    "calves": "Calves",
+    "cardio": "Cardio",
+    "legs": "Legs",
+    "flexibility": "Flexibility",
+    "back": "Back",
+    "hips": "Hips",
+    "balance": "Balance",
+    "full-body": "Full Body",
+    "hands": "Hands",
+    "mobility": "Mobility"
+  },
   "tags": {
     "isometric": "Isometric",
     "dynamic": "Dynamic",

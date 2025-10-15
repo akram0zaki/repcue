@@ -162,8 +162,6 @@
   "saveFailed": "It opslaan fan de oefening is mislearre",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standaard Duur",
-
-
   "addToFavorites": "Foegje ta oan Favoriten",
   "addEquipment": "Apparatuer tafoegje",
   "removeEquipment": "Apparatuer fuortsmite",
@@ -194,7 +192,6 @@
   "notes": "Opmerkings",
   "references": "Referinsjes",
   "filtersAndSearch": "Filters & Sykje",
-
   "title": "Oefeningen",
   "subtitle": "Blêdzje troch, filterje en start oefeningen. Markearje favoriten foar flugge tagong.",
   "searchLabel": "Oefeningen sykje",
@@ -264,5 +261,26 @@
   "stepLabel": "Stap",
   "shareErrorAuth": "Jo moatte ynlogd wêze om oefeningen te diele",
   "shareErrorNotSynced": "De oefening moat synkronisearre wêze foar't jo dizze diele kinne",
-  "shareErrorOffline": "Net mooglik om te diele wylst jo offline binne"
+  "shareErrorOffline": "Net mooglik om te diele wylst jo offline binne",
+  "muscleGroupsList": {
+    "core": "Core",
+    "abs": "Abs",
+    "obliques": "Obliques",
+    "shoulders": "Shoulders",
+    "chest": "Chest",
+    "triceps": "Triceps",
+    "quads": "Quads",
+    "glutes": "Glutes",
+    "hamstrings": "Hamstrings",
+    "calves": "Calves",
+    "cardio": "Cardio",
+    "legs": "Legs",
+    "flexibility": "Flexibility",
+    "back": "Back",
+    "hips": "Hips",
+    "balance": "Balance",
+    "full-body": "Full Body",
+    "hands": "Hands",
+    "mobility": "Mobility"
+  }
 }

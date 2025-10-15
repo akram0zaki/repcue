@@ -1,13 +1,11 @@
 {
   "_meta": "ترجمة التمارين المدمجة",
-
   "variable": "مدة متغيّرة",
   "notFound": "تمرين غير موجود",
   "loadError": "فشل في تحميل التمرين",
   "backToExercises": "العودة إلى التمارين",
   "description": "وصف",
   "instructions": "تعليمات",
-
   "details": "تفاصيل",
   "type": "نوع",
   "difficulty": "صعوبة",
@@ -33,7 +31,6 @@
   "addTag": "إضافة علامة",
   "removeTag": "إزالة علامة",
   "durationSeconds": "المدة (ثوان)",
-
   "benefits": "الفوايد",
   "limitations": "الحدود",
   "bestTiming": "أحسن وقت",
@@ -137,7 +134,6 @@
   "defaultDurationLabel": "المدة الافتراضية",
   "defaultSets": "المجموعات الافتراضية",
   "defaultReps": "التكرارات الافتراضية",
-
   "customVideo": "فيديو مخصص",
   "defaultSettings": "الإعدادات الافتراضية",
   "demonstrationVideo": "فيديو توضيحي",
@@ -159,9 +155,6 @@
   "viewDetails": "عرض التفاصيل",
   "viewDetailsAria": "عرض تفاصيل التمرين",
   "visibility": "الخصوصية",
-
-
-
   "copies": "نسخ",
   "created": "تم الإنشاء",
   "error": "خطأ في تحميل التمرين",
@@ -201,7 +194,6 @@
   "viewOnly": "عرض فقط",
   "custom": "مخصص",
   "filtersAndSearch": "الفلاتر والبحث",
-
   "title": "التمارين",
   "subtitle": "اتصفح ودوّر وابدأ التمارين. حط علامة على المفضلة للوصول السريع.",
   "searchLabel": "دوّر في التمارين",
@@ -269,5 +261,26 @@
   "stepLabel": "خطوة",
   "shareErrorAuth": "يجب أن تكون مسجلاً للدخول لمشاركة التمارين",
   "shareErrorNotSynced": "يجب مزامنة التمرين قبل المشاركة",
-  "shareErrorOffline": "لا يمكن المشاركة أثناء عدم الاتصال بالإنترنت"
+  "shareErrorOffline": "لا يمكن المشاركة أثناء عدم الاتصال بالإنترنت",
+  "muscleGroupsList": {
+    "core": "Core",
+    "abs": "Abs",
+    "obliques": "Obliques",
+    "shoulders": "Shoulders",
+    "chest": "Chest",
+    "triceps": "Triceps",
+    "quads": "Quads",
+    "glutes": "Glutes",
+    "hamstrings": "Hamstrings",
+    "calves": "Calves",
+    "cardio": "Cardio",
+    "legs": "Legs",
+    "flexibility": "Flexibility",
+    "back": "Back",
+    "hips": "Hips",
+    "balance": "Balance",
+    "full-body": "Full Body",
+    "hands": "Hands",
+    "mobility": "Mobility"
+  }
 }

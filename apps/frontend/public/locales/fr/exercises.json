@@ -132,8 +132,6 @@
   "saveFailed": "Échec de l'enregistrement de l'exercice",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Durée par défaut",
-
-
   "copies": "Copies",
   "created": "Créé",
   "duration": "Durée",
@@ -142,7 +140,6 @@
   "ratingsAndReviews": "Évaluations & Avis",
   "stats": "Statistiques",
   "filtersAndSearch": "Filtres et Recherche",
-
   "title": "Exercices",
   "subtitle": "Parcourez, filtrez et démarrez des exercices. Marquez les favoris pour un accès rapide.",
   "searchLabel": "Rechercher des exercices",
@@ -262,5 +259,26 @@
   "stepLabel": "Étape",
   "shareErrorAuth": "Vous devez être connecté pour partager des exercices",
   "shareErrorNotSynced": "L'exercice doit être synchronisé avant de le partager",
-  "shareErrorOffline": "Impossible de partager hors ligne"
+  "shareErrorOffline": "Impossible de partager hors ligne",
+  "muscleGroupsList": {
+    "core": "Core",
+    "abs": "Abs",
+    "obliques": "Obliques",
+    "shoulders": "Shoulders",
+    "chest": "Chest",
+    "triceps": "Triceps",
+    "quads": "Quads",
+    "glutes": "Glutes",
+    "hamstrings": "Hamstrings",
+    "calves": "Calves",
+    "cardio": "Cardio",
+    "legs": "Legs",
+    "flexibility": "Flexibility",
+    "back": "Back",
+    "hips": "Hips",
+    "balance": "Balance",
+    "full-body": "Full Body",
+    "hands": "Hands",
+    "mobility": "Mobility"
+  }
 }
