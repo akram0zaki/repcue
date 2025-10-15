@@ -28,6 +28,29 @@
 
 **Result**: Muscle balance analytics now correctly tracks which muscle groups are trained and generates accurate coaching recommendations for under-trained muscle groups.
 
+#### 🌍 i18n Enhancement - Muscle Group Translations
+
+**Feature**: Complete localization of muscle group names across all UI elements
+
+**Implementation**:
+- ✅ Added `muscleGroupsList` translations to all 8 language files (en, ar, ar-EG, de, es, fr, fy, nl)
+- ✅ Updated [ExerciseDetailContent.tsx](apps/frontend/src/components/ExerciseDetailContent.tsx) to translate muscle group badges
+- ✅ Enhanced [CoachingCard.tsx](apps/frontend/src/components/CoachingCard.tsx) to translate muscle groups in coaching messages
+- ✅ Handles both comma-separated lists and single muscle groups
+
+**Translations Added** (19 muscle groups per language):
+- **Arabic**: الجذع (core), البطن (abs), الأكتاف (shoulders), etc.
+- **German**: Rumpf, Bauch, Schultern, etc.
+- **Spanish**: Núcleo, Abdominales, Hombros, etc.
+- **French**: Tronc, Abdominaux, Épaules, etc.
+- **Frisian**: Romp, Buikspieren, Skouders, etc.
+- **Dutch**: Romp, Buikspieren, Schouders, etc.
+
+**Result**: Users see muscle group names in their native language throughout the app:
+- Exercise detail pages show translated muscle group badges
+- Coaching insights display "الجذع, الأكتاف" instead of "core, shoulders" in Arabic
+- All 7 languages fully supported with proper translations
+
 #### 🎨 AI Coach - UX Enhancements (Phase 1) ✅
 
 **Enhancement Implementation** (~17 hours actual vs 22 hours estimated)
