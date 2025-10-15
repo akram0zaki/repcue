@@ -411,7 +411,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
                 key={muscle}
                 className="inline-block px-3 py-1 text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full"
               >
-                {muscle}
+                {t(`exercises:muscleGroupsList.${muscle}`, muscle)}
               </span>
             ))}
           </div>

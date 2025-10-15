@@ -87,7 +87,7 @@ const IconMap: Record<string, React.FC<{ className?: string }>> = {
 };
 
 export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, onDismiss }) => {
-  const { t } = useTranslation(['coaching', 'common', 'exerciseDetails']);
+  const { t } = useTranslation(['coaching', 'common', 'exerciseDetails', 'exercises']);
 
   // Memoize action handler to prevent recreating on every render
   const handleAction = useCallback((actionId: string, data?: unknown) => {
@@ -139,7 +139,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
 
     const key = parts[0];
     const paramValues = parts.slice(1);
-    
+
     // Create params object with generic param names
     const params: Record<string, string> = {};
     paramValues.forEach((value, index) => {
@@ -150,7 +150,23 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
         // Use the exercise ID as fallback if translation fails
         const translatedName = t(`exerciseDetails:${value}.name`, { defaultValue: value });
         params[`param${index}`] = translatedName || value;
-      } else {
+      }
+      // Check if this is a muscle balance message with comma-separated muscle groups
+      else if ((key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage' || key === 'muscleBalance.neglectedMessage') && index === 0 && value.includes(',')) {
+        // Split the comma-separated muscle groups and translate each one
+        const muscleGroups = value.split(',');
+        const translatedGroups = muscleGroups.map(muscle =>
+          t(`exercises:muscleGroupsList.${muscle.trim()}`, { defaultValue: muscle.trim() })
+        );
+        params[`param${index}`] = translatedGroups.join(', ');
+      }
+      // Check if this is a single muscle group (neglected message)
+      else if (key === 'muscleBalance.neglectedMessage' && index === 0) {
+        // Translate single muscle group
+        const translatedMuscle = t(`exercises:muscleGroupsList.${value}`, { defaultValue: value });
+        params[`param${index}`] = translatedMuscle;
+      }
+      else {
         params[`param${index}`] = value;
       }
     });
