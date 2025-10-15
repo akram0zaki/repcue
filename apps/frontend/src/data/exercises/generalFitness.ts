@@ -31,6 +31,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Beginner-friendly: 30 seconds (research shows 20-60s range)
     is_favorite: false,
     has_video: true,
+    muscle_groups: ['core', 'abs', 'shoulders'],
     tags: ['equipment:bodyweight', 'category:core', 'isometric', 'stability'],
     benefits: 'Strengthens core muscles (abs, obliques, etc.), helping to protect the spine and improve posture. Also convenient with no equipment needed, and builds stability for everyday movements.',
     limitations: 'Isometric holds beyond ~2 minutes yield diminishing returns. Poor form (sagging hips or shoulders) can cause pain. People with high blood pressure should avoid very long plank holds as they can raise blood pressure. Modify if you have wrist or shoulder issues (drop to knees or use an incline).',
@@ -48,6 +49,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 20, // Harder than regular plank, shorter duration
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['core', 'obliques', 'shoulders'],
     tags: ['equipment:bodyweight', 'category:core', 'isometric', 'obliques'],
     benefits: 'Emphasizes the oblique muscles and lateral core stability. Helps stabilize the spine and address side-to-side muscle imbalances. Also improves shoulder and hip endurance on each side.',
     limitations: 'Puts more pressure on one shoulder – if you have shoulder pain, start on your knees or avoid. Keep hips from dropping; a weak core may make it hard to hold, so build up gradually. Avoid if you feel sharp shoulder or arm pain.',
@@ -65,6 +67,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // High intensity cardio movement
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['core', 'shoulders', 'legs', 'cardio'],
     tags: ['equipment:bodyweight', 'category:core', 'dynamic', 'cardio'],
     benefits: 'Full-body movement that elevates your heart rate, improving cardiovascular fitness. Strengthens core and shoulders (holding plank position) and legs (due to rapid knee drives). Regular practice can enhance agility and coordination.',
     limitations: 'High-impact on wrists and toes – use a mat or incline if wrists hurt. Keep back flat; if hips pike up or sag, slow down. Avoid if you have uncontrolled lower back or shoulder pain. Those with knee issues should step instead of jump to reduce impact.',
@@ -84,6 +87,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 1.1, // Slightly slower controlled reps
+    muscle_groups: ['core', 'abs', 'obliques'],
     tags: ['equipment:bodyweight', 'category:core', 'dynamic', 'obliques'],
     benefits: 'One of the most effective abdominal exercises – it ranks top for activating the rectus abdominis and obliques. Builds core strength and stability, and improves coordination with its cross-body motion. Also helps train the muscles for rotational movements, benefiting functional core use.',
     limitations: 'Can strain the neck if done improperly (avoid pulling on your neck). Keep lower back pressed to the floor; if it arches, slow down or shorten range. Individuals with lower back issues should proceed with caution or opt for gentler core moves.',
@@ -105,6 +109,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 2.86,
+    muscle_groups: ['chest', 'shoulders', 'triceps', 'core'],
     tags: ['equipment:bodyweight', 'category:strength', 'upper-body', 'chest', 'arms'],
     benefits: 'Strengthens the chest, shoulders, and triceps, while engaging the core for stability. It’s a foundational upper-body exercise that also improves functional strength for pushing motions. Can even support heart health – higher push-up capacity has been linked to lower cardiac risk:.',
     limitations: 'Doing too many without variation can lead to a plateau in strength gains. Poor form (such as flared elbows or sagging hips) can strain shoulders or lower back. If you experience wrist pain, use push-up bars or do them on your knuckles. Individuals with shoulder injuries should use a reduced range or skip if painful.',
@@ -124,6 +129,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['quads', 'glutes', 'hamstrings', 'core'],
     tags: ['equipment:bodyweight', 'category:strength', 'lower-body', 'glutes', 'legs'],
     benefits: 'Engages most major leg muscles (glutes, quadriceps, hamstrings) and core, making it a highly functional exercise. Helps build lower-body strength for daily activities like lifting or climbing stairs. Also improves balance and flexibility when done through a full range of motion, and can boost calorie burn due to using large muscle groups:.',
     limitations: 'Proper form is crucial – knees should track over toes, not cave inward, and heels stay down. Going too heavy or too deep without flexibility can strain knees or back. Those with knee or back issues should squat to a comfortable depth (or use a chair as a guide) and keep the back neutral. If any sharp pain occurs, stop and check your form or consult a trainer.',
@@ -143,6 +149,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['quads', 'glutes', 'hamstrings', 'calves'],
     tags: ['equipment:bodyweight', 'category:strength', 'lower-body', 'glutes', 'legs', 'balance'],
     benefits: 'Works all major muscles of the legs (glutes, quads, hamstrings) and improves balance through its unilateral nature. Lunges help correct strength imbalances between legs and enhance hip mobility. They also engage core and stabilizer muscles to keep you upright, benefiting overall stability and coordination.',
     limitations: 'Ensure your front knee does not extend beyond your toes to protect the joint. People with knee problems might find forward lunges difficult – they can try reverse lunges which are easier on the knees. Keep your torso upright and avoid leaning forward excessively. If balance is an issue, perform lunges next to a wall or hold onto something for support initially.',
@@ -160,6 +167,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Beginner-friendly isometric hold
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['quads', 'glutes', 'calves', 'core'],
     tags: ['equipment:bodyweight', 'category:strength', 'isometric', 'lower-body', 'quads'],
     benefits: 'Isometric exercise that builds endurance in the quadriceps, glutes, and calves. Great for strengthening the legs without movement, and it also engages the core and lower back for stabilization. Wall sits can improve muscular stamina useful for skiing or hiking, and have been shown to help lower blood pressure when practiced regularly:.',
     limitations: 'If you have knee pain, start with a higher “seat” (less bend) or shorter hold. Do not drop below a 90° knee angle, as that increases knee stress. Ensure your lower back is against the wall to avoid strain. People with uncontrolled hypertension should still be cautious (don’t hold your breath) despite long-term benefits; exhale slowly while holding.',
@@ -179,6 +187,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 4.2, // Slightly longer due to complexity
+    muscle_groups: ['full-body', 'chest', 'shoulders', 'legs', 'core', 'cardio'],
     tags: ['equipment:bodyweight', 'category:strength', 'full-body', 'cardio', 'explosive'],
     benefits: 'A vigorous full-body exercise that combines strength and cardio. Burpees work your legs, core, chest, and shoulders, and they rapidly increase heart rate to improve cardiovascular endurance. They burn a lot of calories and can enhance explosive power (through the jump) and overall agility.',
     limitations: 'Burpees are very intense; beginners should start with fewer reps or step-back variations to avoid injury. They can put stress on wrists, shoulders, and knees due to the quick transitions. Maintain a controlled pace to ensure good form – sloppy burpees can strain the lower back or shoulders. If you have joint issues, consider modifying (e.g., no jump, or step instead of jump back).',
@@ -199,6 +208,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: true,
     rep_duration_seconds: 1.5,
+    muscle_groups: ['cardio', 'legs', 'shoulders'],
     tags: ['equipment:bodyweight', 'category:cardio', 'full-body', 'coordination'],
     benefits: 'Simple but effective full-body cardio exercise. Jumping jacks raise your heart rate, burn calories, and can improve aerobic endurance. They engage the legs (calves, thighs) and shoulders, and over time can even help bone density due to the impact from jumping. They also boost coordination by moving arms and legs together.',
     limitations: 'As a high-impact move, they may aggravate knee or ankle issues if done excessively or on a hard surface. If you have joint pain, do a lower impact version by stepping side to side instead of jumping. Wear supportive shoes and exercise on a shock-absorbing surface to protect your joints. Those with very low fitness should start with short sets since jacks can be surprisingly strenuous.',
@@ -216,6 +226,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // High intensity, shorter duration
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['cardio', 'legs', 'core'],
     tags: ['equipment:bodyweight', 'category:cardio', 'lower-body', 'explosive'],
     benefits: 'A quick-paced cardio drill that elevates heart rate and improves lower-body power. High knees engage the hip flexors, quadriceps, hamstrings, calves, and glutes, building muscular endurance and coordination in these areas. They also strengthen the core (keeping you upright) and can enhance running speed and form by training an exaggerated knee lift.',
     limitations: 'This exercise is high-impact (essentially running in place), so it can strain ankles or shins if done on a very hard surface. Wear supportive footwear and choose softer ground if possible. If you have balance issues or are very new to exercise, start with a marching-in-place to build up. As always, maintain good posture; do not lean back, which could strain the lower back.',
@@ -233,6 +244,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Consistent with other high-intensity cardio
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['cardio', 'hamstrings', 'calves'],
     tags: ['equipment:bodyweight', 'category:cardio', 'lower-body', 'hamstrings'],
     benefits: 'Focuses on the hamstrings by having you kick your heels up. Butt kicks serve as a dynamic stretch for the quadriceps and an activation for the hamstrings, improving their flexibility and strength. Like high knees, it’s also a cardio move that will raise your heart rate and warm up the body. Regular practice can aid running form by encouraging a quicker heel recovery under the body.',
     limitations: 'Maintain an upright posture; avoid leaning too far forward, which can strain the lower back. If you have knee issues, perform the movement gently (don’t force your heel to hit your butt). People with very tight quads should ease into it to prevent muscle pulls. As a lower-impact drill, it is generally safe, but if balance is a concern, do it marching in place rather than fast jumping.',
@@ -252,6 +264,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard yoga pose hold
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['flexibility', 'hamstrings', 'shoulders', 'back'],
     tags: ['equipment:bodyweight', 'category:flexibility', 'yoga', 'stretch', 'shoulders', 'hamstrings'],
     benefits: 'A staple yoga pose that stretches the entire back side of your body. Downward Dog lengthens the hamstrings and calves, opens the shoulders and chest, and traction on the spine helps relieve back tension. It also builds strength in the arms and shoulders by supporting part of your body weight, and improves blood circulation with the head lowered slightly (mild inversion):.',
     limitations: 'Those with very tight hamstrings or shoulders might find it challenging – it’s okay to bend your knees and elbows slightly to maintain a straight back. If you have wrist issues, you can do the pose on your forearms (Dolphin pose) or prop your hands on blocks. Individuals with uncontrolled high blood pressure or glaucoma should be cautious with any inverted position. Come out of the pose if you feel any dizziness or sharp pain.',
@@ -269,6 +282,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 45, // Relaxation pose, longer hold
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['flexibility', 'back', 'hips'],
     tags: ['equipment:bodyweight', 'category:flexibility', 'yoga', 'stretch', 'relaxation', 'back'],
     benefits: 'A gentle, restorative pose that stretches the lower back, hips, thighs, and ankles. It helps to relax both the body and mind by activating the parasympathetic nervous system (promoting stress relief and better sleep). Child’s Pose can alleviate lower back pressure by elongating the spine and is often used as a resting or calming posture in yoga.',
     limitations: 'If you have knee problems, widen your knees or place a cushion under your hips to reduce pressure. Those with very limited ankle mobility might feel discomfort – a rolled towel under the ankles can help. Pregnant women or people with a large midsection should take a wider stance with the knees to avoid compression on the abdomen. Otherwise, it’s generally safe; just avoid forcing your buttocks all the way to the heels if it causes pain.',
@@ -288,6 +302,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['flexibility', 'back', 'core'],
     tags: ['equipment:bodyweight', 'category:flexibility', 'yoga', 'stretch', 'spine', 'mobility'],
     benefits: 'Gently mobilizes the spine, increasing flexibility and relieving tension in the back and neck. Cat-Cow helps you become more aware of spinal movement and can improve posture by training each vertebra to move. It also promotes blood flow to the spinal muscles and engages the core in a mild, controlled way. Often used to ease stiffness in the morning or before more strenuous activity.',
     limitations: 'This is a very low-risk movement. However, if you have a spinal injury or severe pain, move within a pain-free range only. It’s safe to let the back round fully in Cat and arch in Cow, but do not force any position. People with wrist discomfort can perform it on fists or with wrists slightly ahead of shoulders. Remember to move slowly and breathe; rushing through can reduce the effectiveness of the stretch:.',
@@ -307,6 +322,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Per leg
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['balance', 'legs', 'core'],
     tags: ['equipment:bodyweight', 'category:balance', 'stability', 'proprioception'],
     benefits: 'A fundamental balance exercise that improves proprioception and ankle stability. Regular practice can enhance your overall balance and reduce the risk of falls by strengthening the muscles around the ankles, knees, and hips that keep you upright. It engages the core as well, since you must stabilize your trunk on one leg. There’s even research suggesting that better one-leg balance is correlated with longer life expectancy: (likely reflecting overall health).',
     limitations: 'For safety, stand near a support (wall or chair) when you first try it, in case you lose balance. If you have significant balance issues or neurological conditions affecting balance, consult a professional for guidance. It’s a gentle exercise, but avoid doing it with eyes closed or on unstable surfaces until you have mastered a stable stance. Always practice on both legs to ensure balanced development.',
@@ -324,6 +340,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard yoga balance pose
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['balance', 'legs', 'core', 'hips'],
     tags: ['equipment:bodyweight', 'category:balance', 'yoga', 'stability', 'focus'],
     benefits: 'Classic yoga balance pose that develops single-leg stability and focus. Tree Pose strengthens the standing leg (ankle, calf, thigh) and the core and hip stabilizers that keep you upright. The lifted leg also opens the hip of that side, improving hip flexibility. Mentally, it builds concentration and a sense of grounding as you practice steadying yourself.',
     limitations: 'Avoid pressing the foot against the knee joint of the standing leg – place it either below or above the knee to prevent strain. If you have trouble balancing, start with your foot lower (ankle or calf) and/or do it near a wall for support. People with ankle instability should be cautious; they can do a modified version with toes of the raised foot touching the ground. As with any balance pose, step out of it slowly if you start to fall to avoid injury.',
@@ -341,6 +358,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 20, // More challenging, shorter hold
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['balance', 'legs', 'glutes', 'back', 'core'],
     tags: ['equipment:bodyweight', 'category:balance', 'yoga', 'strength', 'core'],
     benefits: 'Advanced balance pose that strengthens the entire posterior chain (back, glutes, hamstrings) as well as the core and shoulders. Warrior III greatly improves balance and coordination, making you stabilize with one leg and torso parallel to the ground. It stretches the hamstring of the standing leg and requires engagement of the back muscles to keep your chest lifted. Overall, it builds core strength and back-body engagement while honing focus.',
     limitations: 'This pose is challenging; beginners should use a wall or blocks under the hands for support while learning the balance. Maintain a neutral neck (don’t crane upward) to avoid neck strain. If you have lower back problems, be cautious with the forward-leaning position – ensure you engage your core to avoid sagging. It’s okay to keep a slight bend in the standing knee to ease hamstring tension. Come out of the pose if you feel your form collapsing, as continuing while unstable might lead to a fall.',
@@ -362,6 +380,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['core', 'abs'],
     tags: ['equipment:bodyweight', 'category:core', 'stability', 'coordination'],
     benefits: 'Highly effective for core stabilization. The dead bug teaches you to keep your ribcage down and lower back flat while moving your arms and legs – strengthening the deep core muscles that protect your spine. It improves coordination between opposite limbs (neuromuscular control) and can help alleviate lower back discomfort by training proper spinal alignment during movement. Overall, it builds a strong, stable core foundation for other exercises.',
     limitations: 'It’s generally very safe. The main error is letting your lower back arch off the floor – if you can’t keep it down, limit your range of motion or bend your knees more. If you feel neck strain, support your head on a small pillow or towel. People with severe lower back pain should start with caution and perhaps with one limb at a time until the core is stronger.',
@@ -381,6 +400,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['glutes', 'hamstrings', 'core'],
     tags: ['equipment:bodyweight', 'category:strength', 'glutes', 'lower-body', 'posterior-chain'],
     benefits: 'Isolates and strengthens the gluteal muscles, which are often underused due to sitting. Strong glutes contribute to better pelvic alignment and can help alleviate lower back pain by taking strain off the spine. Glute bridges also engage the hamstrings and core, making them a great posterior-chain exercise. They improve hip extension, which can enhance posture and athletic movements (like jumping and running).',
     limitations: 'If you hyperextend (arch) your lower back at the top, you may feel discomfort – focus on squeezing the glutes, not arching the spine. People with very tight hip flexors might find it hard to lift hips high; a gentle stretch of hip flexors beforehand can help. Generally low-impact, but those with certain spine conditions should ensure they don’t push through pain. Also, avoid pushing your head into the ground; the force should be through shoulders and feet.',
@@ -400,6 +420,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard mobility/warmup duration
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['hands', 'mobility'],
     tags: ['equipment:bodyweight', 'category:hand-warmup', 'hands', 'fingers', 'warmup', 'mobility', 'dexterity'],
     benefits: 'Increases flexibility and blood circulation in the fingers and hands. Finger rolls help maintain range of motion in the finger joints and can improve dexterity and coordination of the fingers. Useful for warming up the hands before fine motor tasks or relieving stiffness after long periods of computer use. Over time, such exercises can help keep your hands nimble and may reduce risk of issues like tendonitis by gently working the tendons through their motion.',
     limitations: 'Virtually no risk when done gently. Avoid aggressive or fast snapping movements – the exercise should be smooth. If you have arthritis or very stiff fingers, do the motion slowly and in warm water to further ease joint movement. Stop if you feel any sharp pain in a particular finger joint.',
@@ -421,6 +442,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['triceps', 'shoulders', 'chest'],
     tags: ['equipment:bodyweight', 'category:strength', 'upper-body', 'triceps', 'arms', 'bodyweight'],
     benefits: 'Primarily targets the triceps on the back of the upper arm, contributing to stronger, toned arms. Dips also involve the chest and anterior shoulders as secondary muscles. They can help improve upper-body pushing strength and can be done almost anywhere with a sturdy chair or bench. Over time, dips can lead to better arm definition and functional strength for pushing motions (like getting up from a seated position).',
     limitations: 'Bench dips can put significant stress on the shoulder joints due to the position of the arms behind the body. It’s important not to dip too low – lower until your elbows are about 90 degrees to reduce risk of shoulder injury. If you feel anterior shoulder pain, shorten the range or discontinue. Also keep your shoulders down (do not shrug) and close to your body during the dip. Those with previous shoulder issues should be cautious or opt for a different triceps exercise.',
@@ -440,6 +462,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['calves'],
     tags: ['equipment:bodyweight', 'category:strength', 'lower-body', 'calves', 'balance'],
     benefits: 'Strengthens the calf muscles (gastrocnemius and soleus) which power plantarflexion (rising on toes). Strong calves improve ankle stability and balance, reducing the risk of ankle sprains. They also contribute to better push-off in walking, running, and jumping. Regular calf raises can enhance muscle endurance in the lower legs and may help prevent Achilles tendon injuries by conditioning the tendon and muscles.',
     limitations: 'It’s generally a safe low-impact exercise. However, bouncing at the bottom or doing very fast reps might strain the Achilles tendon – perform raises in a controlled manner. People with tight calves should include stretching as well, as strengthening without stretching could increase tightness. If you feel a calf cramp, pause and gently stretch before continuing. Those with Achilles tendonitis should start with caution (maybe focusing on slow eccentric lowers).',
@@ -461,6 +484,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     is_favorite: false,
     has_video: false,
     rep_duration_seconds: 2,
+    muscle_groups: ['core', 'obliques', 'abs'],
     tags: ['equipment:bodyweight', 'category:core', 'obliques', 'rotation'],
     benefits: 'Targets the oblique muscles strongly, helping to tone the sides of your abdomen and improve rotational strength. Russian twists also engage the transverse abdominis and lower back to stabilize the spine as you rotate, contributing to a stronger core. Athletes benefit from this exercise due to its sports-specific rotational training (think swinging a bat or golf club). When done with control, it can enhance spinal mobility and core endurance.',
     limitations: 'Twisting with a rounded lower back or too heavy a weight can strain the lumbar spine or discs. It’s critical to keep your back at a 45° angle and chest up while performing the twist. If you have a history of lower back issues, consider avoiding weighted twists and keep the motion small and slow. Some trainers caution against this move for those with osteoporosis or disc problems due to the rotational stress. Always move deliberately – avoid sudden jerks.',
@@ -478,6 +502,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Full-body stability exercise
     is_favorite: false,
     has_video: true,
+    muscle_groups: ['full-body', 'core', 'shoulders', 'legs'],
     tags: ['equipment:bodyweight', 'category:core', 'full-body', 'stability', 'cardio'],
     benefits: 'A compound exercise that develops total-body strength and cardio. Bear crawls strengthen the shoulders and arms (as they support your body), core (as you stabilize your trunk in motion), and legs – all while training coordination and agility. It’s essentially a moving plank, forcing your core to work hard to prevent rotation as you move, and it raises your heart rate, improving endurance. It’s also great for building shoulder stability and improving hip and ankle mobility when done with proper form.',
     limitations: 'Can be tiring quickly – maintain form even when fatigued. If your knees start touching the ground or hips sag, take a break to avoid strain on the lower back. Those with wrist pain might need to crawl on fists or parallel bars to keep wrists neutral. Ensure a flat back; don’t let your head drop (to avoid neck strain). As it involves being bent over, individuals with high blood pressure or glaucoma should monitor for dizziness due to head position (though it’s not a full inversion).',
@@ -497,6 +522,7 @@ export const GENERAL_FITNESS_EXERCISES: Exercise[] = [
     default_duration: 30, // Standard stretch hold
     is_favorite: false,
     has_video: false,
+    muscle_groups: ['flexibility', 'hamstrings', 'back'],
     tags: ['equipment:bodyweight', 'category:flexibility', 'yoga', 'hamstrings', 'back', 'stretch'],
     benefits: 'A soothing stretch for the posterior chain. Standing Forward Fold deeply stretches the hamstrings, calves, and lower back. It gently decompresses the spine and can help relieve tension in the back and neck. Forward bends also have a calming effect on the nervous system – they often reduce stress and anxiety, leaving you feeling grounded and relaxed. Additionally, the slight inversion (head below heart) can improve circulation to the brain and face.',
     limitations: 'Avoid bouncing in the stretch – a static or slow dynamic approach is safer. People with tight hamstrings should bend their knees slightly to prevent strain or rounding of the lower back. If you have lower back issues or disc problems, hinge at the hips with a flat back until you feel a stretch, rather than fully collapsing forward. Those with very high blood pressure or glaucoma should rise back up slowly to prevent head rush or pressure spikes. Pregnant individuals should widen their stance to make space for the belly and not compress it.',

@@ -2,6 +2,32 @@
 
 ### 2025-01-15
 
+#### 🐛 Critical Bug Fix - Muscle Balance Feature
+
+**Issue**: Muscle balance coaching feature was completely non-functional
+- Analytics service was skipping ALL exercises during muscle group analysis
+- Root cause: Missing `muscle_groups` field on all 26 exercises in general-fitness catalog
+- Impact: Muscle balance suggestions were essentially random/incorrect
+
+**Fix Applied**:
+- ✅ Added `muscle_groups` field to all 26 exercises in [generalFitness.ts](apps/frontend/src/data/exercises/generalFitness.ts)
+- ✅ Anatomically correct muscle group mappings for each exercise:
+  - Core exercises: `['core', 'abs', 'shoulders']`
+  - Strength exercises: `['chest', 'shoulders', 'triceps']`, `['quads', 'glutes', 'hamstrings']`
+  - Cardio exercises: `['cardio', 'legs', 'shoulders']`
+  - Flexibility: `['flexibility', 'hamstrings', 'back']`
+  - Balance: `['balance', 'legs', 'core']`
+
+**Testing**:
+- ✅ Created comprehensive test suite: [muscleGroupsSchema.test.ts](apps/frontend/src/__tests__/muscleGroupsSchema.test.ts)
+- ✅ 20/20 tests passing - validates all exercises have muscle groups with correct values
+- ✅ Distribution analysis shows good coverage across all muscle groups
+
+**Documentation**:
+- 📄 [Muscle Balance Schema Fix Summary](docs/fixes/muscle-balance-schema-fix-summary.md)
+
+**Result**: Muscle balance analytics now correctly tracks which muscle groups are trained and generates accurate coaching recommendations for under-trained muscle groups.
+
 #### 🎨 AI Coach - UX Enhancements (Phase 1) ✅
 
 **Enhancement Implementation** (~17 hours actual vs 22 hours estimated)
