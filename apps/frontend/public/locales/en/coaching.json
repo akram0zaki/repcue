@@ -36,7 +36,11 @@
     "showMuscleBalance": "Muscle Balance",
     "showProgression": "Progressive Overload",
     "showRecovery": "Recovery Time",
-    "showSuggestions": "Workout Suggestions"
+    "showSuggestions": "Workout Suggestions",
+    "celebrationSounds": "Celebration Sounds",
+    "celebrationSoundsHelp": "Play celebration sounds for personal records and milestones",
+    "postWorkoutSurvey": "Post-Workout Survey",
+    "postWorkoutSurveyHelp": "Quick feedback after workouts helps personalize your coaching insights"
   },
   "streak": {
     "title": "Workout Streak",
@@ -187,6 +191,7 @@
     }
   },
   "insights": "Coach Insights",
+  "viewAll": "View All",
   "insightsCarousel": "Coaching insights carousel",
   "carouselNavigation": "Carousel navigation",
   "goToInsight": "Go to insight {{number}}"

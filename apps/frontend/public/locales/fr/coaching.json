@@ -36,7 +36,11 @@
     "showMuscleBalance": "Équilibre Musculaire",
     "showProgression": "Surcharge Progressive",
     "showRecovery": "Temps de Récupération",
-    "showSuggestions": "Suggestions d'Entraînement"
+    "showSuggestions": "Suggestions d'Entraînement",
+    "celebrationSounds": "Sons de Célébration",
+    "celebrationSoundsHelp": "Jouer des sons de célébration pour les records personnels et les jalons",
+    "postWorkoutSurvey": "Enquête Post-Entraînement",
+    "postWorkoutSurveyHelp": "Les commentaires rapides après l'entraînement aident à personnaliser vos conseils de coaching"
   },
   "streak": {
     "title": "Série d'Entraînement",
@@ -142,5 +146,7 @@
     "noMatching": "Aucun record correspondant",
     "tryDifferentFilter": "Essaie de modifier ta recherche ou tes filtres pour trouver des records.",
     "startWorkout": "Commencer un entraînement"
-  }
+  },
+  "insights": "Aperçus du Coach",
+  "viewAll": "Voir tout"
 }

@@ -72,7 +72,10 @@
     "other": "Overige",
     "selectOne": "Selecteer één",
     "done": "Klaar",
-    "refresh": "Vernieuwen"
+    "refresh": "Vernieuwen",
+    "streakMilestone": "🔥 Mijlpaal van {{days}} dagen reeks!",
+    "surveyThanks": "Bedankt voor je feedback!",
+    "surveyError": "Kon enquêteantwoord niet opslaan"
   },
   "navigation": {
     "home": "Home",

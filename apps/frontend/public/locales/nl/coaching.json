@@ -36,7 +36,11 @@
     "showMuscleBalance": "Spierbalans",
     "showProgression": "Progressieve Overbelasting",
     "showRecovery": "Hersteltijd",
-    "showSuggestions": "Trainingssuggesties"
+    "showSuggestions": "Trainingssuggesties",
+    "celebrationSounds": "Vieringsgeluiden",
+    "celebrationSoundsHelp": "Speel vieringsgeluiden af voor persoonlijke records en mijlpalen",
+    "postWorkoutSurvey": "Enquête na Training",
+    "postWorkoutSurveyHelp": "Snelle feedback na trainingen helpt je coaching-inzichten te personaliseren"
   },
   "streak": {
     "title": "Trainingsreeks (Streak)",
@@ -146,5 +150,7 @@
     "noMatching": "Geen overeenkomende records",
     "tryDifferentFilter": "Probeer je zoekopdracht of filters aan te passen om records te vinden.",
     "startWorkout": "Start een workout"
-  }
+  },
+  "insights": "Coach Inzichten",
+  "viewAll": "Bekijk alles"
 }

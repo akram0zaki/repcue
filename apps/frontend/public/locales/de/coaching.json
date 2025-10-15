@@ -36,7 +36,11 @@
     "showMuscleBalance": "Muskelbalance",
     "showProgression": "Progressive Überlastung",
     "showRecovery": "Erholungszeit",
-    "showSuggestions": "Trainingsvorschläge"
+    "showSuggestions": "Trainingsvorschläge",
+    "celebrationSounds": "Feierklänge",
+    "celebrationSoundsHelp": "Feierklänge für persönliche Rekorde und Meilensteine abspielen",
+    "postWorkoutSurvey": "Umfrage nach dem Training",
+    "postWorkoutSurveyHelp": "Schnelles Feedback nach dem Training hilft, Ihre Coaching-Einblicke zu personalisieren"
   },
   "streak": {
     "title": "Trainingssträhne",
@@ -145,6 +149,8 @@
     "emptyMessage": "Schließe Workouts ab, um deine ersten persönlichen Rekorde zu setzen und deinen Fortschritt zu verfolgen!",
     "noMatching": "Keine passenden Rekorde",
     "tryDifferentFilter": "Versuche, deine Suche oder Filter anzupassen, um Rekorde zu finden.",
-    "startWorkout": "Workout starten"
-  }
+    "startWorkout": "Ein Workout starten"
+  },
+  "insights": "Coach-Einblicke",
+  "viewAll": "Alle anzeigen"
 }

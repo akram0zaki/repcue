@@ -29,7 +29,7 @@ interface SettingsPageProps {
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettings }) => {
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['common', 'coaching']);
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
@@ -528,6 +528,50 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   dataTestId="toggle-coach-ai-insights-enabled"
                   aria-describedby="coach-ai-insights-help"
                   disabled={!isAuthenticated}
+                />
+              </div>
+
+              {/* Celebration Sounds */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="celebration-sounds-enabled" className="label-text">
+                    {t('coaching:settings.celebrationSounds', 'Celebration Sounds')}
+                  </label>
+                  <p
+                    id="celebration-sounds-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.celebrationSoundsHelp', 'Play celebration sounds for personal records and milestones')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="celebration-sounds-enabled"
+                  checked={appSettings.celebration_sounds_enabled === true}
+                  onChange={() => onUpdateSettings({ celebration_sounds_enabled: !appSettings.celebration_sounds_enabled })}
+                  dataTestId="toggle-celebration-sounds-enabled"
+                  aria-describedby="celebration-sounds-help"
+                />
+              </div>
+
+              {/* Post-Workout Survey */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-post-workout-survey-enabled" className="label-text">
+                    {t('coaching:settings.postWorkoutSurvey', 'Post-Workout Survey')}
+                  </label>
+                  <p
+                    id="coach-post-workout-survey-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.postWorkoutSurveyHelp', 'Quick feedback after workouts helps personalize your coaching insights')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="coach-post-workout-survey-enabled"
+                  checked={appSettings.coach_post_workout_survey_enabled === true}
+                  onChange={() => onUpdateSettings({ coach_post_workout_survey_enabled: !appSettings.coach_post_workout_survey_enabled })}
+                  dataTestId="toggle-coach-post-workout-survey-enabled"
+                  aria-describedby="coach-post-workout-survey-help"
                 />
               </div>
 

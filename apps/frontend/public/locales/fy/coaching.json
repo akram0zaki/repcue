@@ -36,7 +36,11 @@
     "showMuscleBalance": "Spierbalâns",
     "showProgression": "Progressive Oerbelêsting",
     "showRecovery": "Hersteltiid",
-    "showSuggestions": "Trainingssuggestjes"
+    "showSuggestions": "Trainingssuggestjes",
+    "celebrationSounds": "Fieringslûden",
+    "celebrationSoundsHelp": "Spylje fieringslûden ôf foar persoanlike rekords en mylpalen",
+    "postWorkoutSurvey": "Enkête nei Training",
+    "postWorkoutSurveyHelp": "Flugge feedback nei trainingen helpt jo coaching-ynsjoch te personalisearjen"
   },
   "streak": {
     "title": "Trainingsreeks (Streak)",
@@ -146,5 +150,7 @@
     "noMatching": "Gjin oerienkommende rekords",
     "tryDifferentFilter": "Besykje dyn sykaksje of filters oan te passen om rekords te finen.",
     "startWorkout": "Start in workout"
-  }
+  },
+  "insights": "Coach Ynsjoch",
+  "viewAll": "Alles sjen"
 }

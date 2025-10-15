@@ -191,20 +191,53 @@ async function generateAIInsights(
     promptLength: prompt.length
   });
 
-  // Call Mistral API
-  const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: 2048
-    })
-  });
+  // Call Mistral API with timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+  
+  let response;
+  try {
+    response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 2048
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      logError(correlationId, 'Mistral API timeout after 25 seconds');
+      
+      // Log failed AI usage
+      const processingTimeMs = Date.now() - startTime;
+      await logAIUsage({
+        correlationId,
+        userId,
+        provider: 'mistral',
+        model,
+        usage: { input_tokens: 0, output_tokens: 0, total_tokens: 0 },
+        processingTimeMs,
+        success: false,
+        requestType: 'coaching_insights',
+        errorCode: 'TIMEOUT',
+        logInfo,
+        logWarn,
+        logError
+      });
+      
+      throw new Error('Mistral API request timed out after 25 seconds');
+    }
+    throw error;
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -376,9 +409,9 @@ serve(async (req) => {
     }
 
     // Parse request body
-    let analyticsData: UserAnalyticsData;
+    let requestBody: any;
     try {
-      analyticsData = await req.json();
+      requestBody = await req.json();
     } catch (e) {
       return new Response(
         JSON.stringify({ error: 'Invalid JSON in request body', correlationId }),
@@ -386,13 +419,44 @@ serve(async (req) => {
       );
     }
 
-    // Set userId from auth
-    analyticsData.userId = userId;
+    // Extract analytics data from request body
+    // Frontend sends { analytics: AnalyticsSummary } where AnalyticsSummary contains
+    // statistics, streak, and muscleGroupBalance as separate properties
+    const analyticsPayload = requestBody.analytics || requestBody;
+    
+    // Transform AnalyticsSummary structure to flat UserAnalyticsData expected by prompt builder
+    const analyticsData: UserAnalyticsData = {
+      // From statistics object
+      totalWorkouts: analyticsPayload.statistics?.totalWorkouts || 0,
+      totalDuration: analyticsPayload.statistics?.totalDuration || 0,
+      totalExercises: analyticsPayload.statistics?.totalExercises || 0,
+      totalReps: analyticsPayload.statistics?.totalReps || 0,
+      averageWorkoutDuration: analyticsPayload.statistics?.averageWorkoutDuration || 0,
+      workoutsPerWeek: analyticsPayload.statistics?.workoutsPerWeek || 0,
+      mostActiveDay: analyticsPayload.statistics?.mostActiveDay || 'Unknown',
+      mostActiveCategory: analyticsPayload.statistics?.mostActiveCategory || null,
+      
+      // From streak object
+      currentStreak: analyticsPayload.streak?.currentStreak || 0,
+      longestStreak: analyticsPayload.streak?.longestStreak || 0,
+      isActiveToday: analyticsPayload.streak?.isActiveToday || false,
+      
+      // Muscle group balance (already in correct format)
+      muscleGroupBalance: analyticsPayload.muscleGroupBalance || [],
+      
+      // Week-over-week change (optional)
+      weekOverWeekChange: analyticsPayload.weekOverWeekChange,
+      
+      // User metadata
+      locale: analyticsPayload.locale || 'en',
+      userId: userId
+    };
 
     logInfo(correlationId, 'Generating AI insights', {
       userId,
       totalWorkouts: analyticsData.totalWorkouts,
-      currentStreak: analyticsData.currentStreak
+      currentStreak: analyticsData.currentStreak,
+      muscleGroups: analyticsData.muscleGroupBalance?.length || 0
     });
 
     // Generate insights

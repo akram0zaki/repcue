@@ -138,10 +138,11 @@ function buildAnalyticsSection(data: UserAnalyticsData): string {
   const avgMinutes = Math.floor(data.averageWorkoutDuration / 60);
 
   // Muscle group summary
-  const overtrainedGroups = data.muscleGroupBalance
+  const muscleBalance = data.muscleGroupBalance || [];
+  const overtrainedGroups = muscleBalance
     .filter(mg => mg.isOverTrained)
     .map(mg => mg.muscleGroup);
-  const undertrainedGroups = data.muscleGroupBalance
+  const undertrainedGroups = muscleBalance
     .filter(mg => mg.isUnderTrained)
     .map(mg => mg.muscleGroup);
   
@@ -179,7 +180,7 @@ CONSISTENCY:
 - Active Today: ${data.isActiveToday ? 'Yes ✓' : 'No'}
 
 MUSCLE GROUP BALANCE:
-${data.muscleGroupBalance.length > 0 ? data.muscleGroupBalance
+${muscleBalance.length > 0 ? muscleBalance
   .map(mg => `- ${mg.muscleGroup}: ${mg.workoutCount} workouts (${mg.percentage.toFixed(1)}%) ${mg.isOverTrained ? '[OVERTRAINED]' : mg.isUnderTrained ? '[UNDERTRAINED]' : ''}`)
   .join('\n') : '- No muscle group data available'}
 

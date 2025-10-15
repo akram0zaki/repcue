@@ -883,9 +883,17 @@ IndexedDB → AnalyticsService → Edge Function → AI API → CoachingService 
 ### Module 2.1: Edge Function Infrastructure ✅ **COMPLETE**
 
 **Story Reference**: [US-3.1: Weekly Progress Analysis](ai-coach-prd.md#us-31-weekly-progress-analysis-ai)
-**Status**: ✅ Complete (2025-10-13)
-**Actual Time**: ~3 hours
+**Status**: ✅ Complete (2025-10-13) | 🔧 Bug Fix Deployed (2025-10-16)
+**Actual Time**: ~3 hours (initial) + 1 hour (bug fix)
 **Files**: See `phase2-progress-report.md` for details
+
+**📋 Bug Fix (2025-10-16)**:
+- **Issue**: Edge function failing with HTTP 500 - TypeError reading undefined `muscleGroupBalance.length`
+- **Root Cause**: Frontend sends nested `{ analytics: { statistics, streak, muscleGroupBalance } }` but edge function expected flat structure
+- **Fix**: Added request body transformation in `index.ts` (lines 373-422) to unwrap nested structure + null-safety checks in `prompt-builder.ts`
+- **Deployment**: Version 4 deployed to dev (`xwzrsfkzqxdybjrkkkvh`)
+- **Testing**: ✅ Verified with real user data, handles empty workout history gracefully
+- **Documentation**: See `docs/migration-tracking/supabase-changes_20251016.md` for full details
 
 #### Tasks
 

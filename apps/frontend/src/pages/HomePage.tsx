@@ -15,8 +15,8 @@ import { AuthModal } from '../components/auth/AuthModal';
 import { useAuth } from '../hooks/useAuth';
 import { VideoThumbnail } from '../components/VideoThumbnail';
 import AIWorkoutButton from '../components/AIWorkoutButton';
-import { useTopInsight } from '../hooks/useCoachingInsights';
-import CoachingCard from '../components/CoachingCard';
+import { useCoachingInsights } from '../hooks/useCoachingInsights';
+import InsightsCarousel from '../components/InsightsCarousel';
 import logger from '../utils/logger';
 
 interface HomePageProps {
@@ -30,11 +30,27 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   const { t, i18n } = useTranslation(['common', 'exerciseDetails']);
   const { isAuthenticated } = useAuth();
   
-  // Coaching insight for home page (conditional on settings)
+  // Coaching insights for home page (conditional on settings)
   const shouldShowCoachOnHome = appSettings.coach_enabled && appSettings.coach_show_on_home;
-  const { insight: topInsight, isLoading: isLoadingInsight, dismissInsight } = useTopInsight(
-    shouldShowCoachOnHome ? appSettings : undefined
-  );
+  const { insights, isLoading: isLoadingInsights } = useCoachingInsights({
+    autoRefresh: false,
+    enableAI: appSettings.coach_ai_insights_enabled || false
+  });
+  
+  // Filter to top 3 high or medium priority insights for carousel
+  // High priority is preferred, but medium is shown if no high-priority insights exist
+  const topInsights = insights
+    .filter(i => i.priority === 'high' || i.priority === 'medium')
+    .sort((a, b) => {
+      // Sort by priority first (high > medium)
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // Then by creation time (newer first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })
+    .slice(0, 3);
   
   const [upcomingWorkout, setUpcomingWorkout] = useState<{
     workout: Workout;
@@ -180,69 +196,6 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
           </div>
         </div>
 
-        {/* AI Coach Top Insight */}
-        {shouldShowCoachOnHome && topInsight && !isLoadingInsight && (
-          <section className="mb-4">
-            <CoachingCard
-              insight={topInsight}
-              onAction={(action, data) => {
-                logger.log('HomePage: Coaching action triggered:', action, data);
-                
-                // Handle different actions
-                switch (action) {
-                  case 'start-workout':
-                    navigate(Routes.TIMER);
-                    break;
-                  case 'start-exercise':
-                    if (data && typeof data === 'object' && 'exerciseId' in data) {
-                      const exerciseData = data as {
-                        exerciseId: string;
-                        sets?: number;
-                        reps?: number;
-                        duration?: number;
-                      };
-
-                      // Build query string with all provided parameters
-                      const params = new URLSearchParams({ exerciseId: exerciseData.exerciseId });
-
-                      if (exerciseData.sets !== undefined) {
-                        params.append('sets', String(exerciseData.sets));
-                      }
-                      if (exerciseData.reps !== undefined) {
-                        params.append('reps', String(exerciseData.reps));
-                      }
-                      if (exerciseData.duration !== undefined) {
-                        params.append('duration', String(exerciseData.duration));
-                      }
-
-                      navigate(`${Routes.TIMER}?${params.toString()}`);
-                    }
-                    break;
-                  case 'find-exercises':
-                    if (data && typeof data === 'object' && 'muscleGroup' in data) {
-                      navigate(Routes.EXERCISES, { state: { filterMuscleGroup: data.muscleGroup } });
-                    } else {
-                      navigate(Routes.EXERCISES);
-                    }
-                    break;
-                  case 'view-progress':
-                    navigate(Routes.ACTIVITY_LOG);
-                    break;
-                  case 'view-coach':
-                    navigate(Routes.COACH);
-                    break;
-                  default:
-                    logger.warn('Unknown coaching action:', action);
-                }
-              }}
-              onDismiss={(insightId) => {
-                logger.log('Dismissing insight on HomePage:', insightId);
-                dismissInsight(insightId);
-              }}
-            />
-          </section>
-        )}
-
         <header className="text-center mb-3">
           <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-1">
             {APP_NAME}
@@ -251,6 +204,17 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
+
+        {/* AI Coach Insights Carousel */}
+        {shouldShowCoachOnHome && topInsights.length > 0 && !isLoadingInsights && (
+          <section className="mb-4">
+            <InsightsCarousel
+              insights={topInsights}
+              settings={appSettings}
+              onViewAll={() => navigate(Routes.COACH)}
+            />
+          </section>
+        )}
 
         {/* Sign-in prompt - only show if not authenticated */}
         {!isAuthenticated && (

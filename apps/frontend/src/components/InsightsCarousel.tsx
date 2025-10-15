@@ -46,7 +46,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
   onViewAll,
   autoRotateInterval = 8000,
 }) => {
-  const { t } = useTranslation(['coaching', 'common']);
+  const { t } = useTranslation(['coaching', 'common', 'exerciseDetails', 'exercises']);
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -227,7 +227,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
             onClick={onViewAll}
             className="text-sm text-primary-600 dark:text-primary-400 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-500 rounded px-2 py-1"
           >
-            {t('common:viewAll', { defaultValue: 'View All' })}
+            {t('coaching:viewAll', { defaultValue: 'View All' })}
           </button>
         )}
       </div>
@@ -262,11 +262,54 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-text-900 dark:text-text-50 mb-1 line-clamp-1">
+              <h3 className="font-semibold text-text-900 dark:text-text-50 mb-1">
                 {t(currentInsight.title, { defaultValue: currentInsight.title })}
               </h3>
-              <p className="text-sm text-body line-clamp-2">
-                {t(currentInsight.message, { defaultValue: currentInsight.message })}
+              <p className="text-sm text-body whitespace-normal break-words">
+                {(() => {
+                  // Parse message format: "key:param1:param2:param3"
+                  const parts = currentInsight.message.split(':');
+                  const key = parts[0];
+                  
+                  // If there are parameters, extract and translate them
+                  if (parts.length > 1) {
+                    const paramValues = parts.slice(1);
+                    const params: Record<string, string> = {};
+                    
+                    paramValues.forEach((value, index) => {
+                      // Check if this param looks like an exercise ID (contains dashes, lowercase)
+                      // and if we're in a progression message context
+                      if ((key === 'progression.readyMessage' || key === 'progression.readyDurationMessage') && index === 0 && value.includes('-')) {
+                        // Translate exercise name from exerciseDetails
+                        const translatedName = t(`exerciseDetails:${value}.name`, { defaultValue: value });
+                        params[`param${index}`] = translatedName || value;
+                      }
+                      // Check if this is a muscle balance message with comma-separated muscle groups
+                      else if ((key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage' || key === 'muscleBalance.neglectedMessage') && index === 0 && value.includes(',')) {
+                        // Split the comma-separated muscle groups and translate each one
+                        const muscleGroups = value.split(',');
+                        const translatedGroups = muscleGroups.map(muscle =>
+                          t(`exercises:muscleGroupsList.${muscle.trim()}`, { defaultValue: muscle.trim() })
+                        );
+                        params[`param${index}`] = translatedGroups.join(', ');
+                      }
+                      // Check if this is a single muscle group (neglected message)
+                      else if (key === 'muscleBalance.neglectedMessage' && index === 0) {
+                        // Translate single muscle group
+                        const translatedMuscle = t(`exercises:muscleGroupsList.${value}`, { defaultValue: value });
+                        params[`param${index}`] = translatedMuscle;
+                      }
+                      else {
+                        params[`param${index}`] = value;
+                      }
+                    });
+                    
+                    return t(`coaching:${key}`, { ...params, defaultValue: currentInsight.message });
+                  }
+                  
+                  // Otherwise, translate as-is
+                  return t(currentInsight.message, { defaultValue: currentInsight.message });
+                })()}
               </p>
 
               {/* AI badge */}

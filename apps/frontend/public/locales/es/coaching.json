@@ -36,7 +36,11 @@
     "showMuscleBalance": "Balance Muscular",
     "showProgression": "Sobrecarga Progresiva",
     "showRecovery": "Tiempo de Recuperación",
-    "showSuggestions": "Sugerencias de Entrenamiento"
+    "showSuggestions": "Sugerencias de Entrenamiento",
+    "celebrationSounds": "Sonidos de Celebración",
+    "celebrationSoundsHelp": "Reproducir sonidos de celebración para récords personales e hitos",
+    "postWorkoutSurvey": "Encuesta Post-Entrenamiento",
+    "postWorkoutSurveyHelp": "La retroalimentación rápida después del entrenamiento ayuda a personalizar tus consejos de coaching"
   },
   "streak": {
     "title": "Racha de Entrenamiento",
@@ -146,5 +150,7 @@
     "noMatching": "No hay récords que coincidan",
     "tryDifferentFilter": "Intenta ajustar tu búsqueda o los filtros para encontrar récords.",
     "startWorkout": "Comenzar entrenamiento"
-  }
+  },
+  "insights": "Perspectivas del Entrenador",
+  "viewAll": "Ver todo"
 }

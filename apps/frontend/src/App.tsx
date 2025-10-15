@@ -34,6 +34,8 @@ import { computeWorkoutDurations } from './utils/workoutDuration';
 import i18n from './i18n';
 import logger from './utils/logger';
 import { isCustom } from './utils/syncFilters';
+import { celebrateWorkoutComplete, celebrateMilestone } from './utils/microInteractions';
+import { calculateCurrentStreak } from './utils/activityCharts';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -59,6 +61,8 @@ import {
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
 import { PRCelebration } from './components/coaching/PRCelebration';
+import { PostWorkoutSurvey } from './components/PostWorkoutSurvey';
+import type { SurveyResponse } from './components/PostWorkoutSurvey';
 
 // Wrapper component to handle navigation state for TimerPage
 const TimerPageWrapper: React.FC<{
@@ -262,6 +266,13 @@ function App() {
   // PR celebration state
   const [newPR, setNewPR] = useState<PersonalRecord | null>(null);
   const [showPRCelebration, setShowPRCelebration] = useState(false);
+
+  // Streak milestone tracking state
+  const [lastCelebratedStreak, setLastCelebratedStreak] = useState<number>(0);
+  
+  // Post-workout survey state
+  const [showPostWorkoutSurvey, setShowPostWorkoutSurvey] = useState(false);
+  const [surveyActivityLog, setSurveyActivityLog] = useState<ActivityLog | null>(null);
 
   // Handle pending share token after authentication
   useEffect(() => {
@@ -870,6 +881,9 @@ function App() {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
 
+      // Celebrate workout completion with confetti
+      celebrateWorkoutComplete(appSettings.celebration_sounds_enabled);
+
       // Save workout session completion
       const hasConsent = consentService.hasConsent();
       const hasSessionId = !!workoutMode.sessionId;
@@ -935,6 +949,38 @@ function App() {
           
           logger.log(`📝 Saving workout activity log:`, workoutActivityLog);
           await storageService.saveActivityLog(workoutActivityLog);
+
+          // Check for streak milestones after saving activity log
+          try {
+            const activityLogs = await storageService.getActivityLogs();
+            const currentStreak = calculateCurrentStreak(activityLogs);
+            
+            // Check if reached new milestone
+            const MILESTONES = [3, 7, 14, 30, 60, 90, 100, 365];
+            if (MILESTONES.includes(currentStreak) && currentStreak > lastCelebratedStreak) {
+              logger.log(`🔥 Streak milestone reached: ${currentStreak} days!`);
+              celebrateMilestone(appSettings.celebration_sounds_enabled);
+              setLastCelebratedStreak(currentStreak);
+              
+              // Show snackbar notification
+              showSnackbar(
+                t('common:streakMilestone', { 
+                  defaultValue: '🔥 {{days}}-day streak milestone!', 
+                  days: currentStreak 
+                }),
+                { type: 'success' }
+              );
+            }
+          } catch (error) {
+            logger.error('Failed to check streak milestone:', error);
+          }
+
+          // Show post-workout survey if enabled
+          if (appSettings.coach_post_workout_survey_enabled) {
+            logger.log('📋 Showing post-workout survey');
+            setSurveyActivityLog(workoutActivityLog);
+            setShowPostWorkoutSurvey(true);
+          }
         } catch (error) {
           logger.error('❌ Failed to save workout session or activity logs:', error);
         }
@@ -2875,6 +2921,38 @@ useEffect(() => {
             setShowPRCelebration(false);
             setNewPR(null);
           }}
+        />
+      )}
+
+      {/* Post-Workout Survey Modal */}
+      {showPostWorkoutSurvey && surveyActivityLog && (
+        <PostWorkoutSurvey
+          activityLog={surveyActivityLog}
+          onSubmit={async (response: SurveyResponse) => {
+            try {
+              logger.log('📋 Saving survey response:', response);
+              // Update the activity log with survey metadata
+              const updatedLog = {
+                ...surveyActivityLog,
+                metadata: response
+              };
+              await storageService.saveActivityLog(updatedLog);
+              logger.log('✅ Survey response saved successfully');
+              showSnackbar(t('common:surveyThanks', { defaultValue: 'Thank you for your feedback!' }), { type: 'success' });
+            } catch (error) {
+              logger.error('❌ Failed to save survey response:', error);
+              showSnackbar(t('common:surveyError', { defaultValue: 'Failed to save survey response' }), { type: 'error' });
+            } finally {
+              setShowPostWorkoutSurvey(false);
+              setSurveyActivityLog(null);
+            }
+          }}
+          onSkip={() => {
+            logger.log('⏭️ Post-workout survey skipped');
+            setShowPostWorkoutSurvey(false);
+            setSurveyActivityLog(null);
+          }}
+          isSubmitting={false}
         />
       )}
     </>

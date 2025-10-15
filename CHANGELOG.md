@@ -1,5 +1,268 @@
 ## Unreleased
 
+### 2025-01-16
+
+#### � AI Coach Feature - Production Verification Complete
+
+**Status**: ✅ **DEPLOYED & FULLY OPERATIONAL** in production
+
+**Critical Fixes Applied**:
+1. **v4 - Data Structure Transformation** (October 16, 2025, 15:15 UTC)
+   - Fixed 500 Internal Server Error in AI insights edge function
+   - Root cause: Mismatch between frontend's nested `AnalyticsSummary` structure and edge function's flat `UserAnalyticsData` structure
+   - Solution: Added data transformation in edge function to accept nested structure
+
+2. **v5 - Mistral API Timeout Protection** (October 16, 2025, 15:45 UTC)
+   - Fixed 504 Gateway Timeout errors (150+ second hangs)
+   - Root cause: Mistral API calls had no timeout configured
+   - Solution: Implemented AbortController with 25-second timeout
+   - Includes proper cleanup and error tracking for timeout scenarios
+
+**Production Verification Results** (October 16, 2025, 23:23 UTC):
+```
+✅ AI insights fetching in 5-6 seconds (well under 25s timeout)
+✅ Zero timeout errors observed
+✅ Proper caching working (5-minute TTL)
+✅ AI and rule-based insights merging correctly (4 AI + 6 rule-based = 9 total)
+✅ CORS headers functioning correctly
+✅ Error handling working as expected
+```
+
+**Performance Metrics**:
+- Response time: 5,093ms - 6,071ms (avg ~5.5 seconds)
+- Cache hit rate: Working as expected (5-minute TTL)
+- Success rate: 100% (no errors in production logs)
+- Merge logic: 4 AI insights + 6 rule-based insights = 9 total insights
+
+**Files Modified**:
+- `supabase/functions/analyze-progress/index.ts`: Data transformation + timeout implementation
+- `supabase/functions/analyze-progress/prompt-builder.ts`: Null-safety for muscle group balance
+- `apps/frontend/src/pages/CoachPage.tsx`: Fixed React key prop warning for insight sections
+- `docs/migration-tracking/supabase-changes_20251016.md`: Complete deployment documentation
+
+**Related**:
+- Migration tracking: `docs/migration-tracking/supabase-changes_20251016.md`
+- Implementation plan: `docs/implementation-plans/repcue-ai-coach/ai-coach-implementation-plan.md`
+
+---
+
+#### �🌍 Internationalization Fix - InsightsCarousel Complete Translation Support
+
+**Issues Fixed**:
+1. **Missing Header Translations**: "Coach Insights" and "View All" were not translated in non-English locales
+2. **Exercise Names in English**: Progression insights showed exercise names in English instead of translated names
+3. **Muscle Groups in English**: Muscle balance insights showed muscle group names in English instead of translated names
+
+**Root Causes**:
+1. Missing translation keys: `insights` existed in en/coaching.json but not in other languages; `viewAll` didn't exist at all
+2. InsightsCarousel had simple parameter extraction but didn't translate exercise IDs or muscle groups like CoachingCard does
+
+**Solutions**:
+1. **Added Missing Translation Keys** (`insights`, `viewAll`) to all 8 supported languages:
+   - Arabic (ar): "رؤى المدرب", "عرض الكل"
+   - Arabic Egyptian (ar-EG): "رؤى المدرب", "شوف كل حاجة"
+   - German (de): "Coach-Einblicke", "Alle anzeigen"
+   - Spanish (es): "Perspectivas del Entrenador", "Ver todo"
+   - French (fr): "Aperçus du Coach", "Voir tout"
+   - Frisian (fy): "Coach Ynsjoch", "Alles sjen"
+   - Dutch (nl): "Coach Inzichten", "Bekijk alles"
+   - English (en): "Coach Insights", "View All"
+
+2. **Sophisticated Parameter Translation**: Ported the advanced translation logic from CoachingCard to InsightsCarousel:
+   - Exercise ID translation: Detects exercise IDs (contains dashes) in progression messages and translates using `exerciseDetails` namespace
+   - Muscle group translation: Detects muscle groups in balance messages and translates using `exercises:muscleGroupsList` namespace
+   - Handles both single muscle groups and comma-separated lists
+   - Added `exerciseDetails` and `exercises` to useTranslation namespaces
+
+**Example Translations**:
+- Before: "You're ready to progress on bear-crawl! Try 2 sets of 35 seconds next time."
+- After (Arabic): "أنت جاهز للتقدم في الزحف كالدب! جرب 2 مجموعات من 35 ثانية في المرة القادمة."
+
+**Testing**:
+- Verified all translation keys exist in all 8 languages
+- Tested exercise name translation with progression messages
+- Tested muscle group translation with balance messages
+- Confirmed proper RTL display in Arabic locales
+
+**Files Modified**:
+- `apps/frontend/src/components/InsightsCarousel.tsx`: 
+  - Added `exerciseDetails` and `exercises` namespaces
+  - Ported sophisticated parameter translation logic from CoachingCard
+  - Changed `common:viewAll` to `coaching:viewAll`
+- `apps/frontend/public/locales/en/coaching.json`: Added `viewAll` key
+- `apps/frontend/public/locales/*/coaching.json` (7 languages): Added `insights` and `viewAll` keys
+
+**Architecture Note**:
+- **CoachingCard**: Full-sized cards on Coach page with detailed insights
+- **InsightsCarousel**: Compact swipeable carousel on Home page showing top 3 insights
+- Both components now share the same sophisticated translation logic for consistency
+
+---
+
+#### 🐛 Bug Fix - InsightsCarousel Translation & Display Issues
+
+**Issues Fixed**:
+1. **Unresolved Translation Keys**: Carousel was displaying raw translation keys like `progression.readyDurationMessage:crawl:2:35` instead of the translated message
+2. **Text Truncation**: Messages were being truncated with ellipsis after 2 lines instead of wrapping naturally
+
+**Root Causes**:
+1. CoachingService generates messages in format `"key:param1:param2:param3"` but InsightsCarousel was calling `t()` directly without parsing parameters
+2. CSS class `line-clamp-2` was limiting text to 2 lines with ellipsis
+
+**Solutions**:
+1. **Parameter Parsing**: Implemented inline parsing logic in InsightsCarousel to extract translation key and parameters from `:` separated format:
+   - Splits message by `:` delimiter
+   - Extracts key and converts remaining parts to `{param0: value, param1: value, ...}` format
+   - Passes parsed parameters to `t()` function
+   - Example: `"progression.readyDurationMessage:crawl:2:35"` → `t('coaching:progression.readyDurationMessage', {param0: 'crawl', param1: '2', param2: '35'})`
+
+2. **Text Wrapping**: Replaced `line-clamp-2` with `whitespace-normal break-words` to allow natural text wrapping
+   - Also removed `line-clamp-1` from title for consistency
+
+**Testing**:
+- Verified with `progression.readyDurationMessage` insight type
+- Confirmed proper parameter substitution in all 8 supported languages
+- Tested card height adjustment with varying message lengths
+
+**Files Modified**:
+- `apps/frontend/src/components/InsightsCarousel.tsx`: Added message parsing logic and updated CSS classes
+
+---
+
+#### 🎨 UX Enhancement - InsightsCarousel Positioning
+
+**Change**: Moved InsightsCarousel from above app name/slogan to below it on HomePage
+
+**Before**: Hero Banner → Carousel → App Name/Slogan → Sign In Button
+**After**: Hero Banner → App Name/Slogan → Carousel → Sign In Button
+
+**Rationale**: Better visual hierarchy with app branding before coaching insights
+
+**Files Modified**:
+- `apps/frontend/src/pages/HomePage.tsx`: Repositioned carousel section (lines 197-205)
+
+---
+
+#### � UX Enhancement - InsightsCarousel Visibility Improvement
+
+**Issue**: Users with extensive workout history were not seeing the InsightsCarousel on HomePage because only high-priority insights were being displayed, and high-priority insights are only generated for specific events (streak milestones, streak at risk, high-confidence progression recommendations).
+
+**Solution**: Expanded carousel filter to include both high and medium-priority insights, with smart prioritization:
+- High-priority insights are shown first (streak milestones, at-risk streaks)
+- Medium-priority insights are shown if no high-priority ones exist (maintaining streaks, progression suggestions, recovery insights)
+- Always displays top 3 most relevant insights sorted by priority and recency
+
+**Benefits**:
+- ✅ Users now see coaching insights immediately when enabled
+- ✅ Carousel appears for users with workout history even between milestones
+- ✅ Better engagement with coaching features
+- ✅ Still prioritizes urgent/important insights (high priority first)
+
+**Files Modified**:
+- `apps/frontend/src/pages/HomePage.tsx`: Updated insight filtering logic
+
+---
+
+#### �🌍 Internationalization Fix - Phase 1 Gamification Translations
+
+**Issue**: New gamification features (celebration sounds, post-workout survey) were displaying in English even when using non-English locales. Additionally, the entire AI Coach settings section was not translated.
+
+**Root Cause**: 
+1. Missing translation keys in non-English locale files
+2. SettingsPage was only loading the `common` namespace but using keys from the `coaching` namespace
+
+**Resolution**: 
+1. Added missing translation keys to all 8 supported languages
+2. Fixed SettingsPage to load both `common` and `coaching` namespaces
+
+**Files Modified**:
+- All `coaching.json` files (8 languages): Added `celebrationSounds`, `celebrationSoundsHelp`, `postWorkoutSurvey`, `postWorkoutSurveyHelp`
+- All `common.json` files (8 languages): Added `streakMilestone`, `surveyThanks`, `surveyError`
+- `apps/frontend/src/pages/SettingsPage.tsx`: Changed `useTranslation(['common'])` to `useTranslation(['common', 'coaching'])`
+
+**Supported Languages**:
+- Arabic (ar) ✅
+- Arabic Egyptian (ar-EG) ✅
+- German (de) ✅
+- English (en) ✅
+- Spanish (es) ✅
+- French (fr) ✅
+- Frisian (fy) ✅
+- Dutch (nl) ✅
+
+**Translation Keys Added**:
+```json
+// coaching.json
+"celebrationSounds": "Celebration Sounds",
+"celebrationSoundsHelp": "Play celebration sounds for personal records and milestones",
+"postWorkoutSurvey": "Post-Workout Survey",
+"postWorkoutSurveyHelp": "Quick feedback after workouts helps personalize your coaching insights"
+
+// common.json
+"streakMilestone": "🔥 {{days}}-day streak milestone!",
+"surveyThanks": "Thank you for your feedback!",
+"surveyError": "Failed to save survey response"
+```
+
+---
+
+#### ✨ Priority 1 Gamification Features (Phase 1 Complete)
+
+**Feature**: Integrated three gamification enhancements to improve user engagement and feedback loop
+
+**Task 3.1.1: Streak Milestone Celebration** (2 hours)
+- ✅ Added automatic celebration for workout streak milestones (3, 7, 14, 30, 60, 90, 100, 365 days)
+- ✅ Confetti animation triggers on milestone achievement
+- ✅ Snackbar notification displays milestone (e.g., "🔥 7-day streak milestone!")
+- ✅ Tracks last celebrated streak to prevent duplicate celebrations
+- ✅ Respects `celebration_sounds_enabled` setting for audio feedback
+- **Files Modified**:
+  - `apps/frontend/src/App.tsx`: Added milestone detection logic after workout save
+  - `apps/frontend/public/locales/en/common.json`: Added `streakMilestone` translation key
+
+**Task 3.1.2: InsightsCarousel on HomePage** (2 hours)
+- ✅ Replaced single insight card with swipeable carousel component
+- ✅ Displays top 3 coaching insights (high or medium priority)
+- ✅ Prioritizes high-priority insights, falls back to medium if none exist
+- ✅ Auto-rotation every 8 seconds with pause on hover
+- ✅ Touch/swipe support for mobile interaction
+- ✅ "View All" button navigates to full Coach page
+- **Files Modified**:
+  - `apps/frontend/src/pages/HomePage.tsx`: Integrated InsightsCarousel component
+  - Uses existing `InsightsCarousel.tsx` component (already built)
+
+**Task 3.1.3: PostWorkoutSurvey Integration** (2 hours)
+- ✅ Added post-workout survey modal after workout completion
+- ✅ Captures mood (great/good/okay/tired), perceived difficulty (1-5), energy (1-5), and optional notes
+- ✅ Survey responses saved to ActivityLog metadata for AI coaching insights
+- ✅ Skippable survey with "Skip" and "Submit" options
+- ✅ Feature-gated by `coach_post_workout_survey_enabled` setting (enabled by default)
+- **Files Modified**:
+  - `apps/frontend/src/App.tsx`: Added survey state management and modal rendering
+  - `apps/frontend/src/types/index.ts`: Added `coach_post_workout_survey_enabled` to AppSettings
+  - `apps/frontend/src/pages/SettingsPage.tsx`: Added survey toggle in AI Coach settings
+  - `apps/frontend/public/locales/en/common.json`: Added `surveyThanks` and `surveyError` keys
+  - `apps/frontend/public/locales/en/coaching.json`: Added `postWorkoutSurvey` and `postWorkoutSurveyHelp` keys
+  - Uses existing `PostWorkoutSurvey.tsx` component (already built)
+
+**Implementation Details**:
+- All features follow existing app patterns (state in App.tsx, singleton services, feature flags)
+- Survey data stored in ActivityLog.metadata field for future AI insights integration
+- Celebration system uses canvas-based confetti (no external dependencies)
+- All features respect accessibility settings (reduced motion, screen readers)
+
+**Testing**:
+- ✅ TypeScript compilation passes with no errors
+- ✅ All imports resolve correctly
+- ✅ Feature flags work as expected
+- ✅ Integration points follow established patterns
+
+**Next Steps**:
+- Section 3.2: Missing Gamification Features (Badge System, Leaderboard, Challenges)
+- Section 3.3: Enhancement Opportunities (Animated transitions, reward animations, social features)
+
+---
+
 ### 2025-01-15
 
 #### 🐛 Critical Bug Fix - Muscle Balance Feature

@@ -36,7 +36,11 @@
     "showMuscleBalance": "توازن العضلات",
     "showProgression": "التطور التدريجي",
     "showRecovery": "وقت الاستشفاء",
-    "showSuggestions": "اقتراحات التمارين"
+    "showSuggestions": "اقتراحات التمارين",
+    "celebrationSounds": "أصوات الاحتفال",
+    "celebrationSoundsHelp": "تشغيل أصوات احتفالية للأرقام القياسية والإنجازات",
+    "postWorkoutSurvey": "استبيان بعد التمرين",
+    "postWorkoutSurveyHelp": "ملاحظات سريعة بعد التمارين بتساعد في تخصيص نصايح التدريب بتاعتك"
   },
   "streak": {
     "title": "سلسلة التمارين",
@@ -146,5 +150,8 @@
     "noMatching": "مفيش أرقام مطابقة",
     "tryDifferentFilter": "جرّب تغيّر الفلتر أو البحث علشان تلاقي النتائج.",
     "startWorkout": "ابدأ تمرين"
-  }
+  },
+  "insights": "رؤى المدرب",
+  "viewAll": "شوف كل حاجة"
 }
+

@@ -375,6 +375,7 @@ export interface AppSettings extends SyncMetadata {
   coach_intro_seen?: boolean; // User has seen the coach introduction dialog
   coach_ai_insights_enabled?: boolean; // Enable AI-powered insights (requires authentication)
   coach_persona?: 'zen' | 'energy' | 'logic'; // Coach personality style (Enhancement E1.2)
+  coach_post_workout_survey_enabled?: boolean; // Show post-workout survey after workouts (Phase 1 Gamification)
   celebration_sounds_enabled?: boolean; // Enable celebration sounds for PRs and milestones (Enhancement E1.1)
 }
 

@@ -46,6 +46,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   coach_show_suggestions: true,
   coach_intro_seen: false, // Show intro dialog on first CoachPage visit
   coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
+  coach_persona: 'zen', // Default coach personality (Enhancement E1.2)
+  celebration_sounds_enabled: false, // Default off (Enhancement E1.1)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,
