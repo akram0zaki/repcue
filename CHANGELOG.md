@@ -1,6 +1,6 @@
 ## Unreleased
 
-### 2025-01-16
+### 2025-10-16
 
 #### 🐛 Critical Bug Fixes - AI Coach & Translation
 
@@ -75,7 +75,7 @@
 
 ---
 
-### 2025-01-16
+### 2025-10-16
 
 #### � AI Coach Feature - Production Verification Complete
 
@@ -338,7 +338,7 @@
 
 ---
 
-### 2025-01-15
+### 2025-10-15
 
 #### 🐛 Critical Bug Fix - Muscle Balance Feature
 
