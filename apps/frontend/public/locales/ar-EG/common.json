@@ -77,8 +77,10 @@
     "badges": "الشارات",
     "clearFilter": "مسح الفلتر",
     "other": "أخرى",
-    "selectOne": "اختر واحدًا"
-
+    "selectOne": "اختر واحدًا",
+    "skip": "تخطي",
+    "submit": "إرسال",
+    "submitting": "جاري الإرسال..."
   },
   "navigation": {
     "home": "البيت",

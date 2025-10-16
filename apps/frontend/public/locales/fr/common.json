@@ -83,7 +83,10 @@
     "badges": " Insignias",
     "clearFilter": "Effacer le filtre",
     "other": "Autre",
-    "selectOne": "Sélectionner un"
+    "selectOne": "Sélectionner un",
+    "skip": "Omettre",
+    "submit": "Soumettre",
+    "submitting": "Soumission en cours..."
   },
   "navigation": {
     "home": "Accueil",

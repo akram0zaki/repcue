@@ -13,6 +13,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CoachingInsight, InsightType } from '../types/coaching';
 import type { AppSettings } from '../types';
 import { CoachingService } from '../services/coachingService';
@@ -42,12 +43,16 @@ export const useCoachingInsights = (
   options: UseCoachingInsightsOptions = {}
 ): UseCoachingInsightsReturn => {
   const { type, autoRefresh = false, refreshInterval = 5 * 60 * 1000, settings, enableAI = false } = options;
+  const { i18n } = useTranslation();
 
   const [insights, setInsights] = useState<CoachingInsight[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   const coachingService = CoachingService.getInstance();
+
+  // Get user's current language for AI responses
+  const userLocale = i18n.language || 'en';
 
   /**
    * Memoize settings-based filter criteria to avoid recalculating on every render
@@ -122,7 +127,7 @@ export const useCoachingInsights = (
       } else {
         // Fetch all insights - use AI-enhanced if enabled
         if (enableAI) {
-          fetchedInsights = await coachingService.getAIEnhancedInsights(forceRefresh, true);
+          fetchedInsights = await coachingService.getAIEnhancedInsights(forceRefresh, true, userLocale);
         } else {
           fetchedInsights = await coachingService.getAllInsights(forceRefresh);
         }
@@ -140,7 +145,7 @@ export const useCoachingInsights = (
     } finally {
       setIsLoading(false);
     }
-  }, [type, coachingService, filterInsightsBySettings, enableAI]);
+  }, [type, coachingService, filterInsightsBySettings, enableAI, userLocale]);
 
   /**
    * Refresh insights (force refresh)

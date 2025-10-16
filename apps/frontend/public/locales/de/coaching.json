@@ -151,6 +151,48 @@
     "tryDifferentFilter": "Versuche, deine Suche oder Filter anzupassen, um Rekorde zu finden.",
     "startWorkout": "Ein Workout starten"
   },
+"survey": {
+    "title": "Wie war dein Training?",
+    "subtitle": "Hilf uns, deine Coaching-Einblicke zu personalisieren",
+    "thankYou": "Vielen Dank!",
+    "feedbackHelps": "Dein Feedback hilft uns, bessere Coaching-Einblicke zu liefern.",
+    "great": "Fühlte sich großartig an!",
+    "greatDesc": "Viel Energie, gute Form",
+    "good": "Fühlte sich gut an",
+    "goodDesc": "Solides Training, keine Probleme",
+    "okay": "Es war okay",
+    "okayDesc": "Durchgezogen",
+    "tired": "Fühlte mich müde",
+    "tiredDesc": "Wenig Energie, anstrengend",
+    "difficulty": "Schwierigkeitsgrad",
+    "veryEasy": "Sehr Einfach",
+    "veryHard": "Sehr Schwer",
+    "energy": "Energielevel danach",
+    "exhausted": "Erschöpft",
+    "energized": "Voller Energie",
+    "notes": "Notizen (Optional)",
+    "notesPlaceholder": "Irgendwelche Gedanken zu diesem Training?",
+    "moreDetails": "Mehr Details hinzufügen"
+  },
+  "persona": {
+    "title": "Coach-Persönlichkeit",
+    "description": "Wähle, wie dein Coach mit dir kommuniziert",
+    "zen": {
+      "name": "Zen-Coach",
+      "description": "Ruhig, achtsam, ganzheitlicher Ansatz"
+    },
+    "energy": {
+      "name": "Energie-Coach",
+      "description": "Enthusiastisch, motivierend, voller Energie"
+    },
+    "logic": {
+      "name": "Logik-Coach",
+      "description": "Datengesteuert, analytisch, präzise"
+    }
+  },
   "insights": "Coach-Einblicke",
-  "viewAll": "Alle anzeigen"
+  "viewAll": "Alle ansehen",
+  "insightsCarousel": "Karussell mit Coaching-Einblicken",
+  "carouselNavigation": "Karussell-Navigation",
+  "goToInsight": "Gehe zu Einblick {{number}}"
 }

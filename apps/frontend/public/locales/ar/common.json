@@ -75,7 +75,9 @@
     "badges": "الشارات",
     "clearFilter": "مسح الفلتر",
     "other": "أخرى",
-    "selectOne": "اختر واحدًا"
+    "selectOne": "اختر واحدًا",
+    "skip": "تخطي",
+    "submit": "إرسال"
   },
   "navigation": {
     "home": "الرئيسية",

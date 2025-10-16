@@ -151,6 +151,48 @@
     "tryDifferentFilter": "Probeer je zoekopdracht of filters aan te passen om records te vinden.",
     "startWorkout": "Start een workout"
   },
+"survey": {
+    "title": "Hoe was je training?",
+    "subtitle": "Help ons je coachinzichten te personaliseren",
+    "thankYou": "Bedankt!",
+    "feedbackHelps": "Je feedback helpt ons om betere coachinzichten te bieden.",
+    "great": "Voelde geweldig!",
+    "greatDesc": "Veel energie, goede vorm",
+    "good": "Voelde goed",
+    "goodDesc": "Degelijke training, geen problemen",
+    "okay": "Het was oké",
+    "okayDesc": "Klaar gekregen",
+    "tired": "Voelde me moe",
+    "tiredDesc": "Weinig energie, uitdagend",
+    "difficulty": "Moeilijkheidsgraad",
+    "veryEasy": "Erg Makkelijk",
+    "veryHard": "Erg Moeilijk",
+    "energy": "Energieniveau Achteraf",
+    "exhausted": "Uitgeput",
+    "energized": "Vol energie",
+    "notes": "Notities (Optioneel)",
+    "notesPlaceholder": "Nog gedachten over deze training?",
+    "moreDetails": "Meer details toevoegen"
+  },
+  "persona": {
+    "title": "Coach Persoonlijkheid",
+    "description": "Kies hoe je coach met je communiceert",
+    "zen": {
+      "name": "Zen Coach",
+      "description": "Rustig, bedachtzaam, holistische aanpak"
+    },
+    "energy": {
+      "name": "Energieke Coach",
+      "description": "Enthousiast, motiverend, veel energie"
+    },
+    "logic": {
+      "name": "Logische Coach",
+      "description": "Datagedreven, analytisch, precies"
+    }
+  },
   "insights": "Coach Inzichten",
-  "viewAll": "Bekijk alles"
+  "viewAll": "Bekijk Alles",
+  "insightsCarousel": "Carrousel met coachinzichten",
+  "carouselNavigation": "Carrouselnavigatie",
+  "goToInsight": "Ga naar inzicht {{number}}"
 }

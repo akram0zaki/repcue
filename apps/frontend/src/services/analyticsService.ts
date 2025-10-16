@@ -309,11 +309,13 @@ export class AnalyticsService {
    * 
    * @param period - Time period ('week', 'month', 'all-time')
    * @param customStartDate - Optional custom start date (for 'all-time' period)
+   * @param locale - Optional user's preferred language for AI responses
    * @returns Complete analytics summary
    */
   public async getAnalyticsSummary(
     period: 'week' | 'month' | 'all-time',
-    customStartDate?: Date
+    customStartDate?: Date,
+    locale?: string
   ): Promise<AnalyticsSummary> {
     try {
       // Calculate date range based on period
@@ -366,7 +368,8 @@ export class AnalyticsService {
         streak,
         muscleGroupBalance,
         personalRecords: [], // Phase 2
-        trends
+        trends,
+        locale // Include user's preferred language for AI responses
       };
     } catch (error) {
       logger.error('Error generating analytics summary:', error);

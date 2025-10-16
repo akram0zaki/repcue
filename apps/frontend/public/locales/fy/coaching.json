@@ -151,6 +151,48 @@
     "tryDifferentFilter": "Besykje dyn sykaksje of filters oan te passen om rekords te finen.",
     "startWorkout": "Start in workout"
   },
-  "insights": "Coach Ynsjoch",
-  "viewAll": "Alles sjen"
+"survey": {
+    "title": "Hoe wie dyn training?",
+    "subtitle": "Help ús dyn coachynsichten te personalisearjen",
+    "thankYou": "Tankewol!",
+    "feedbackHelps": "Dyn feedback helpt ús om bettere coachynsichten te leverjen.",
+    "great": "Fielde geweldich!",
+    "greatDesc": "Folle enerzjy, goede foarm",
+    "good": "Fielde goed",
+    "goodDesc": "Degelike training, gjin problemen",
+    "okay": "It wie wol goed",
+    "okayDesc": "Krekt dien krigen",
+    "tired": "Fielde my wurch",
+    "tiredDesc": "Lytse enerzjy, útdagend",
+    "difficulty": "Swierrichheidsnivo",
+    "veryEasy": "Hiel Maklik",
+    "veryHard": "Hiel Swier",
+    "energy": "Enerzjynivo Neitiid",
+    "exhausted": "Utputte",
+    "energized": "Fol enerzjy",
+    "notes": "Notysjes (Fakultatyf)",
+    "notesPlaceholder": "Nog gedachten oer dizze training?",
+    "moreDetails": "Mear details taheakje"
+  },
+  "persona": {
+    "title": "Coach Persoanlikheid",
+    "description": "Kies hoe't dyn coach mei dy kommunisearret",
+    "zen": {
+      "name": "Zen Coach",
+      "description": "Rêstich, omtinken, holistyske oanpak"
+    },
+    "energy": {
+      "name": "Enerzjy Coach",
+      "description": "Entûsjast, motivearjend, hege enerzjy"
+    },
+    "logic": {
+      "name": "Logika Coach",
+      "description": "Datagedreaun, analytysk, sekuer"
+    }
+  },
+  "insights": "Coach Ynsichten",
+  "viewAll": "Alles besjen",
+  "insightsCarousel": "Karousel mei coachynsichten",
+  "carouselNavigation": "Karouselnavigaasje",
+  "goToInsight": "Gean nei ynsicht {{number}}"
 }

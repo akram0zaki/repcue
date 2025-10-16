@@ -95,10 +95,11 @@ class InsightsService {
    * Fetches AI-powered coaching insights for the current user
    *
    * @param forceRefresh - Bypass cache and fetch fresh insights
+   * @param locale - User's preferred language for AI responses (defaults to 'en')
    * @returns AI-generated coaching insights with metadata
    * @throws InsightsServiceError for all error cases
    */
-  async getAIInsights(forceRefresh: boolean = false): Promise<AIInsightsResponse> {
+  async getAIInsights(forceRefresh: boolean = false, locale: string = 'en'): Promise<AIInsightsResponse> {
     const startTime = Date.now();
 
     try {
@@ -123,7 +124,7 @@ class InsightsService {
 
       // Check cache unless force refresh
       if (!forceRefresh) {
-        const cachedInsights = this.getCachedInsights();
+        const cachedInsights = this.getCachedInsights(locale);
         if (cachedInsights) {
           logger.log('[InsightsService] Returning cached AI insights', {
             count: cachedInsights.insights.length,
@@ -137,12 +138,13 @@ class InsightsService {
       logger.log('[InsightsService] Fetching fresh AI insights');
 
       // Fetch user analytics data for the request
-      const analytics = await this.analyticsService.getAnalyticsSummary('month');
+      const analytics = await this.analyticsService.getAnalyticsSummary('month', undefined, locale);
 
       logger.log('[InsightsService] Analytics data prepared', {
         workouts: analytics.statistics.totalWorkouts,
         streak: analytics.streak.currentStreak,
-        muscleGroups: analytics.muscleGroupBalance.length
+        muscleGroups: analytics.muscleGroupBalance.length,
+        locale: analytics.locale
       });
 
       // Call Edge Function with timeout
@@ -391,8 +393,9 @@ class InsightsService {
 
   /**
    * Gets cached insights if available and not expired
+   * Cache is invalidated if locale has changed
    */
-  private getCachedInsights(): AIInsightsResponse | null {
+  private getCachedInsights(currentLocale?: string): AIInsightsResponse | null {
     if (!this.cache) return null;
 
     const now = new Date();
@@ -403,6 +406,16 @@ class InsightsService {
       logger.log('[InsightsService] Cache expired', {
         generatedAt: this.cache.generatedAt,
         expiresAt: this.cache.expiresAt
+      });
+      this.cache = null;
+      return null;
+    }
+
+    // Invalidate cache if locale has changed
+    if (currentLocale && this.cache.analytics.locale !== currentLocale) {
+      logger.log('[InsightsService] Cache invalidated due to locale change', {
+        cachedLocale: this.cache.analytics.locale,
+        currentLocale: currentLocale
       });
       this.cache = null;
       return null;

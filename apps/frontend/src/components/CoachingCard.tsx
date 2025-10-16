@@ -160,8 +160,8 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
         );
         params[`param${index}`] = translatedGroups.join(', ');
       }
-      // Check if this is a single muscle group (neglected message)
-      else if (key === 'muscleBalance.neglectedMessage' && index === 0) {
+      // Check if this is a single muscle group (all muscle balance messages)
+      else if ((key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage' || key === 'muscleBalance.neglectedMessage') && index === 0) {
         // Translate single muscle group
         const translatedMuscle = t(`exercises:muscleGroupsList.${value}`, { defaultValue: value });
         params[`param${index}`] = translatedMuscle;
@@ -198,39 +198,32 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
       aria-live="polite"
       aria-atomic="true"
     >
-      {/* Section 1: Header with icon, title, and dismiss button */}
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-2">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          {/* Icon */}
-          <div 
-            className="flex-shrink-0" 
-            aria-hidden="true"
-          >
-            <IconComponent className={`w-6 h-6 ${insight.iconColor || 'text-gray-500 dark:text-gray-400'}`} />
-          </div>
-
-          {/* Title */}
-          <h4
-            id={titleId}
-            className="text-base font-semibold text-text-900 dark:text-text-50 break-words"
-          >
-            {t(titleKey, titleParams)}
-          </h4>
-
-          {/* AI Badge */}
-          {insight.source === 'ai' && (
-            <span 
-              className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
-              aria-label={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
-              title={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
-            >
-              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              {t('coaching:aiPowered', { defaultValue: 'AI' })}
-            </span>
-          )}
+      {/* Row 1: Icon (left/right), AI Badge (center), Dismiss Button (right/left) - RTL aware */}
+      <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        {/* Icon */}
+        <div 
+          className="flex-shrink-0" 
+          aria-hidden="true"
+        >
+          <IconComponent className={`w-6 h-6 ${insight.iconColor || 'text-gray-500 dark:text-gray-400'}`} />
         </div>
+
+        {/* AI Badge - Centered */}
+        {insight.source === 'ai' && (
+          <span 
+            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+            aria-label={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
+            title={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
+          >
+            <svg className="w-3 h-3 ltr:mr-1 rtl:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            {t('coaching:aiPowered', { defaultValue: 'AI' })}
+          </span>
+        )}
+
+        {/* Spacer for non-AI insights to maintain layout */}
+        {insight.source !== 'ai' && <div className="flex-1" />}
 
         {/* Dismiss button */}
         {insight.dismissible && onDismiss && (
@@ -247,8 +240,18 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
         )}
       </div>
 
-      {/* Section 2: Message/Description */}
-      <div className="px-4 py-3">
+      {/* Row 2: Title/Heading */}
+      <div className="px-4 pb-2">
+        <h4
+          id={titleId}
+          className="text-base font-semibold text-text-900 dark:text-text-50 break-words"
+        >
+          {t(titleKey, titleParams)}
+        </h4>
+      </div>
+
+      {/* Row 3: Message/Description */}
+      <div className="px-4 pb-3">
         <p 
           id={messageId}
           className="text-body"

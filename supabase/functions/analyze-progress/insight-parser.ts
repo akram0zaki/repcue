@@ -281,19 +281,21 @@ export function parseInsights(
  */
 export function sanitizeInsight(insight: AIInsight): AIInsight {
   const sanitizeString = (str: string): string => {
-    // Remove HTML tags
+    // Remove HTML tags - this is the primary security measure
     let clean = str.replace(/<[^>]*>/g, '');
-    // Escape special characters
-    clean = clean.replace(/[<>&"']/g, (char) => {
+    
+    // Only escape characters that are actually dangerous in HTML/XML contexts
+    // Note: Apostrophes (') are safe in plain text and React handles them correctly
+    // We only escape <, >, and & to prevent any potential HTML injection
+    clean = clean.replace(/[<>&]/g, (char) => {
       const entities: Record<string, string> = {
         '<': '&lt;',
         '>': '&gt;',
-        '&': '&amp;',
-        '"': '&quot;',
-        "'": '&#x27;'
+        '&': '&amp;'
       };
       return entities[char] || char;
     });
+    
     return clean.trim();
   };
 

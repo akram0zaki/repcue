@@ -151,6 +151,48 @@
     "tryDifferentFilter": "Intenta ajustar tu búsqueda o los filtros para encontrar récords.",
     "startWorkout": "Comenzar entrenamiento"
   },
-  "insights": "Perspectivas del Entrenador",
-  "viewAll": "Ver todo"
+"survey": {
+    "title": "¿Qué tal tu entrenamiento?",
+    "subtitle": "Ayúdanos a personalizar tus consejos de entrenador",
+    "thankYou": "¡Gracias!",
+    "feedbackHelps": "Tu opinión nos ayuda a ofrecer mejores consejos de entrenador.",
+    "great": "¡Me sentí genial!",
+    "greatDesc": "Mucha energía, buena técnica",
+    "good": "Me sentí bien",
+    "goodDesc": "Entrenamiento sólido, sin problemas",
+    "okay": "Estuvo bien",
+    "okayDesc": "Lo terminé",
+    "tired": "Me sentí cansado",
+    "tiredDesc": "Baja energía, desafiante",
+    "difficulty": "Nivel de Dificultad",
+    "veryEasy": "Muy Fácil",
+    "veryHard": "Muy Difícil",
+    "energy": "Nivel de Energía Después",
+    "exhausted": "Agotado",
+    "energized": "Con energía",
+    "notes": "Notas (Opcional)",
+    "notesPlaceholder": "¿Algún comentario sobre este entrenamiento?",
+    "moreDetails": "Añadir más detalles"
+  },
+  "persona": {
+    "title": "Personalidad del Entrenador",
+    "description": "Elige cómo se comunica tu entrenador contigo",
+    "zen": {
+      "name": "Entrenador Zen",
+      "description": "Tranquilo, consciente, enfoque holístico"
+    },
+    "energy": {
+      "name": "Entrenador Energético",
+      "description": "Entusiasta, motivador, mucha energía"
+    },
+    "logic": {
+      "name": "Entrenador Lógico",
+      "description": "Basado en datos, analítico, preciso"
+    }
+  },
+  "insights": "Consejos del Entrenador",
+  "viewAll": "Ver Todo",
+  "insightsCarousel": "Carrusel de consejos de entrenamiento",
+  "carouselNavigation": "Navegación del carrusel",
+  "goToInsight": "Ir al consejo {{number}}"
 }

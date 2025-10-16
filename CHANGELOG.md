@@ -2,6 +2,81 @@
 
 ### 2025-01-16
 
+#### 🐛 Critical Bug Fixes - AI Coach & Translation
+
+**1. AI Insights Apostrophe Encoding Issue**
+- **Problem**: Apostrophes in AI-generated insights showing as HTML entities (e.g., "You&#x27;re" instead of "You're")
+- **Root Cause**: Over-aggressive HTML sanitization was escaping apostrophes and quotes unnecessarily
+- **Fix**: Removed apostrophe and quote escaping from sanitization - only escaping `<`, `>`, and `&` which are actually dangerous in HTML contexts
+- **Impact**: AI insights now display with proper punctuation and apostrophes
+- **Files Modified**:
+  - `supabase/functions/analyze-progress/insight-parser.ts` (lines 283-306):
+    - Removed `"` and `'` from character escaping regex
+    - Added comments explaining security rationale
+- **Example**:
+  - Before: "You&#x27;re on a 6-day workout streak"
+  - After: "You're on a 6-day workout streak"
+- **Testing**: Deployed to development (xwzrsfkzqxdybjrkkkvh) as v10
+
+**2. AI Insights Dismiss Button Missing**
+- **Problem**: AI-powered coaching insights were not dismissible (no X button), while rule-based insights had dismiss buttons
+- **Root Cause**: Edge Function was returning AI insights without the required `dismissible: boolean` field from the `CoachingInsight` interface
+- **Fix**: Added transformation in Edge Function to add `dismissible: true` and `source: 'ai'` to all AI insights (both fresh and cached)
+- **Impact**: All AI insights now show dismiss buttons, providing consistent UX with rule-based insights
+- **Files Modified**:
+  - `supabase/functions/analyze-progress/index.ts` (v9):
+    - Line ~470: Transform fresh AI insights
+    - Line ~410: Transform cached AI insights
+- **Testing**: Deployed to development (xwzrsfkzqxdybjrkkkvh)
+
+**3. Muscle Group Names Not Translating in Rule-Based Insights**
+- **Problem**: Single muscle groups in Arabic insights showing mixed languages (e.g., "عضلات cardio" instead of "عضلات كارديو")
+- **Root Cause**: `parseMessage()` function in CoachingCard only translated single muscle groups for `neglectedMessage`, not for `underTrainedMessage` or `overTrainedMessage`
+- **Fix**: Extended single muscle group translation condition to include all three muscle balance message types
+- **Impact**: Muscle groups now fully translated in all languages for all muscle balance insight types
+- **Files Modified**:
+  - `apps/frontend/src/components/CoachingCard.tsx` (line 164):
+    - Changed from: `else if (key === 'muscleBalance.neglectedMessage' && index === 0)`
+    - Changed to: `else if ((key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage' || key === 'muscleBalance.neglectedMessage') && index === 0)`
+- **Example**: 
+  - Before: "عضلات cardio تحتاج المزيد من الاهتمام" (mixed)
+  - After: "عضلات كارديو تحتاج المزيد من الاهتمام" (fully Arabic)
+
+**4. AI Badge Overlapping Dismiss Button**
+- **Problem**: AI badge (purple badge with lightning icon) was positioned in the header row next to the title, causing it to overlap with the dismiss (X) button on smaller screens
+- **Root Cause**: AI badge was placed in the horizontal flex layout with the title, competing for space with the dismiss button
+- **Fix**: Restructured header layout to use a clean 3-row design with proper RTL support
+  - Row 1: Icon (left/right), AI badge (center), Dismiss button (right/left) - direction based on RTL
+  - Row 2: Card title/heading
+  - Row 3: Card message/description
+- **Impact**: Clean, organized layout that works beautifully in both LTR and RTL languages, with no overlap issues
+- **Files Modified**:
+  - `apps/frontend/src/components/CoachingCard.tsx` (lines 201-250):
+    - Separated layout into 3 distinct rows
+    - Added RTL-aware spacing (`ltr:mr-1 rtl:ml-1` for icon)
+    - AI badge centered between icon and dismiss button
+    - Spacer div maintains layout for non-AI insights
+- **Visual Layout**:
+  - **English (LTR)**: [Icon] ← → [AI Badge] ← → [X]
+  - **Arabic (RTL)**: [X] ← → [AI Badge] ← → [Icon]
+  - **Row 2**: [Card Title]
+  - **Row 3**: [Card Message]
+
+**5. Internationalization Updates**
+- **Added**: Translation keys for AI Coach feature across all 8 supported languages
+- **Files Modified**:
+  - `apps/frontend/public/locales/*/coaching.json` - Added `aiPowered` key
+  - `apps/frontend/public/locales/*/common.json` - Added `dismiss` key
+- **Languages Updated**: English (en), Arabic (ar), Egyptian Arabic (ar-EG), German (de), Spanish (es), French (fr), Dutch (nl), Frisian (fy)
+- **Translation Keys**:
+  - `coaching:aiPowered` - "AI" badge label with localized translations
+  - `common:dismiss` - "Dismiss" button accessibility label
+- **Impact**: Complete i18n coverage for AI Coach UI elements in all supported languages
+
+---
+
+### 2025-01-16
+
 #### � AI Coach Feature - Production Verification Complete
 
 **Status**: ✅ **DEPLOYED & FULLY OPERATIONAL** in production

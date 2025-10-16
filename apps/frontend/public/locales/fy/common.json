@@ -83,7 +83,10 @@
     "badges": "Badges",
     "clearFilter": "Filter wiskje",
     "other": "Oar",
-    "selectOne": "Kies ien"
+    "selectOne": "Kies ien",
+    "skip": "Oerslaan",
+    "submit": "Ferstjoere",
+    "submitting": "Bezig mei ferstjoeren..."
   },
   "navigation": {
     "home": "Thús",

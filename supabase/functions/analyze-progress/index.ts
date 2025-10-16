@@ -89,6 +89,7 @@ async function validateJWT(jwt: string, correlationId: string): Promise<{ userId
  */
 async function getCachedInsights(
   userId: string,
+  locale: string,
   correlationId: string
 ): Promise<ParsedInsights | null> {
   try {
@@ -107,17 +108,18 @@ async function getCachedInsights(
       .from('coaching_ai_cache')
       .select('insights_data, created_at')
       .eq('user_id', userId)
+      .eq('locale', locale)
       .gt('expires_at', now)
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
 
     if (error || !data) {
-      logInfo(correlationId, 'No valid cache found', { userId });
+      logInfo(correlationId, 'No valid cache found', { userId, locale });
       return null;
     }
 
-    logInfo(correlationId, 'Cache hit', { userId, cacheAge: Date.now() - new Date(data.created_at).getTime() });
+    logInfo(correlationId, 'Cache hit', { userId, locale, cacheAge: Date.now() - new Date(data.created_at).getTime() });
     return data.insights_data as ParsedInsights;
 
   } catch (e) {
@@ -131,6 +133,7 @@ async function getCachedInsights(
  */
 async function cacheInsights(
   userId: string,
+  locale: string,
   insights: ParsedInsights,
   correlationId: string
 ): Promise<void> {
@@ -151,6 +154,7 @@ async function cacheInsights(
       .from('coaching_ai_cache')
       .insert({
         user_id: userId,
+        locale: locale,
         insights_data: insights,
         created_at: now.toISOString(),
         expires_at: expiresAt.toISOString()
@@ -159,7 +163,7 @@ async function cacheInsights(
     if (error) {
       logError(correlationId, 'Failed to cache insights', { error: error.message });
     } else {
-      logInfo(correlationId, 'Insights cached successfully', { userId, expiresAt: expiresAt.toISOString() });
+      logInfo(correlationId, 'Insights cached successfully', { userId, locale, expiresAt: expiresAt.toISOString() });
     }
 
   } catch (e) {
@@ -385,18 +389,43 @@ serve(async (req) => {
       );
     }
 
-    // Check cache first
-    const cachedInsights = await getCachedInsights(userId, correlationId);
+    // Parse request body first to get locale
+    let requestBody: any;
+    try {
+      requestBody = await req.json();
+    } catch (e) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body', correlationId }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Extract locale from request body
+    const analyticsPayload = requestBody.analytics || requestBody;
+    const userLocale = analyticsPayload.locale || 'en';
+
+    // Check cache with locale
+    const cachedInsights = await getCachedInsights(userId, userLocale, correlationId);
     if (cachedInsights) {
       const duration = Date.now() - startTime;
-      logInfo(correlationId, 'Returning cached insights', { userId, durationMs: duration });
+      logInfo(correlationId, 'Returning cached insights', { userId, locale: userLocale, durationMs: duration });
+      
+      // Transform cached AI insights to match CoachingInsight interface
+      const transformedCachedInsights = {
+        ...cachedInsights,
+        insights: cachedInsights.insights.map(insight => ({
+          ...insight,
+          source: 'ai' as const,
+          dismissible: true
+        }))
+      };
       
       return new Response(
         JSON.stringify({
-          ...cachedInsights,
-          cached: true,
+          ...transformedCachedInsights,
           metadata: {
             correlationId,
+            generatedAt: new Date().toISOString(),
             processingTimeMs: duration,
             cached: true
           }
@@ -408,21 +437,10 @@ serve(async (req) => {
       );
     }
 
-    // Parse request body
-    let requestBody: any;
-    try {
-      requestBody = await req.json();
-    } catch (e) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid JSON in request body', correlationId }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     // Extract analytics data from request body
     // Frontend sends { analytics: AnalyticsSummary } where AnalyticsSummary contains
     // statistics, streak, and muscleGroupBalance as separate properties
-    const analyticsPayload = requestBody.analytics || requestBody;
+    // Note: analyticsPayload already extracted above for locale
     
     // Transform AnalyticsSummary structure to flat UserAnalyticsData expected by prompt builder
     const analyticsData: UserAnalyticsData = {
@@ -462,19 +480,30 @@ serve(async (req) => {
     // Generate insights
     const insights = await generateAIInsights(analyticsData, correlationId, userId);
 
-    // Cache insights
-    await cacheInsights(userId, insights, correlationId);
+    // Transform AI insights to match CoachingInsight interface
+    // Add dismissible: true and source: 'ai' to all AI-generated insights
+    const transformedInsights = {
+      ...insights,
+      insights: insights.insights.map(insight => ({
+        ...insight,
+        source: 'ai' as const,
+        dismissible: true
+      }))
+    };
+
+    // Cache insights with locale
+    await cacheInsights(userId, analyticsData.locale, transformedInsights, correlationId);
 
     const duration = Date.now() - startTime;
     logInfo(correlationId, 'AI insights generated successfully', {
       userId,
-      insightCount: insights.insights.length,
+      insightCount: transformedInsights.insights.length,
       durationMs: duration
     });
 
     return new Response(
       JSON.stringify({
-        ...insights,
+        ...transformedInsights,
         metadata: {
           correlationId,
           generatedAt: new Date().toISOString(),

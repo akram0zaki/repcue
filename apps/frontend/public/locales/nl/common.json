@@ -75,7 +75,10 @@
     "refresh": "Vernieuwen",
     "streakMilestone": "🔥 Mijlpaal van {{days}} dagen reeks!",
     "surveyThanks": "Bedankt voor je feedback!",
-    "surveyError": "Kon enquêteantwoord niet opslaan"
+    "surveyError": "Kon enquêteantwoord niet opslaan",
+    "skip": "Overslaan",
+    "submit": "Indienen",
+    "submitting": "Indienen..."
   },
   "navigation": {
     "home": "Home",

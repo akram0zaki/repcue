@@ -71,7 +71,10 @@
     "badges": "Badges",
     "clearFilter": "Clear filter",
     "other": "Other",
-    "selectOne": "Select one"
+    "selectOne": "Select one",
+    "skip": "Skip",
+    "submit": "Submit",
+    "submitting": "Submitting..."
   },
   "difficultyLevel": "Difficulty Level",
   "equipment": "Equipment",

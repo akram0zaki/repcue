@@ -141,11 +141,13 @@ export class CoachingService {
    * 
    * @param forceRefresh - Bypass cache and regenerate insights
    * @param enableAI - Whether to fetch AI insights (typically from user settings)
+   * @param locale - User's preferred language for AI responses (defaults to 'en')
    * @returns Array of coaching insights (rule-based + AI), sorted by priority
    */
   public async getAIEnhancedInsights(
     forceRefresh: boolean = false,
-    enableAI: boolean = false
+    enableAI: boolean = false,
+    locale: string = 'en'
   ): Promise<CoachingInsight[]> {
     try {
       // Always get rule-based insights as baseline
@@ -168,7 +170,7 @@ export class CoachingService {
       try {
         logger.log('[CoachingService] Fetching AI-enhanced insights');
         
-        const aiResponse = await insightsService.getAIInsights(forceRefresh);
+        const aiResponse = await insightsService.getAIInsights(forceRefresh, locale);
         const aiInsights = aiResponse.insights;
 
         logger.log('[CoachingService] AI insights fetched successfully', {

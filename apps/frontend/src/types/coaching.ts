@@ -211,4 +211,5 @@ export interface AnalyticsSummary {
     consistency: number;         // 0-1 score
     variety: number;             // 0-1 score (exercise diversity)
   };
+  locale?: string;               // User's preferred language (for AI responses)
 }

@@ -255,40 +255,41 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
     <div className="min-h-screen bg-background-50 dark:bg-background-900 p-4 pb-20">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-6 flex items-start justify-between">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-2">
+        <div className="mb-6">
+          {/* Row 1: Title + Refresh button */}
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h1 className="text-2xl font-bold text-text-900 dark:text-text-50">
               {t('coaching:title', { defaultValue: 'Your Coach' })}
             </h1>
-            <div className="flex items-center gap-2">
-              <p className="text-body">
-                {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
-              </p>
-              {appSettings.coach_ai_insights_enabled && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                  {t('coaching:aiEnabled', { defaultValue: 'AI-Powered' })}
-                </span>
-              )}
-            </div>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50"
+              aria-label={t('common:refresh', { defaultValue: 'Refresh' })}
+            >
+              <svg 
+                className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
           </div>
           
-          {/* Refresh button */}
-          <button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="ml-4 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50"
-            aria-label={t('common:refresh', { defaultValue: 'Refresh' })}
-          >
-            <svg 
-              className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24" 
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+          {/* Row 2: Description + AI badge */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-body">
+              {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
+            </p>
+            {appSettings.coach_ai_insights_enabled && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 whitespace-nowrap">
+                {t('coaching:aiEnabled', { defaultValue: 'AI-Powered' })}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Insights list */}

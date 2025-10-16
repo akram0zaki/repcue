@@ -147,6 +147,48 @@
     "tryDifferentFilter": "Essaie de modifier ta recherche ou tes filtres pour trouver des records.",
     "startWorkout": "Commencer un entraînement"
   },
-  "insights": "Aperçus du Coach",
-  "viewAll": "Voir tout"
+"survey": {
+    "title": "Comment s'est passée votre séance d'entraînement ?",
+    "subtitle": "Aidez-nous à personnaliser vos conseils de coaching",
+    "thankYou": "Merci !",
+    "feedbackHelps": "Votre avis nous aide à vous fournir de meilleurs conseils de coaching.",
+    "great": "Je me suis senti(e) super bien !",
+    "greatDesc": "Beaucoup d'énergie, bonne forme",
+    "good": "Je me suis senti(e) bien",
+    "goodDesc": "Bonne séance, aucun problème",
+    "okay": "C'était correct",
+    "okayDesc": "J'ai réussi à le faire",
+    "tired": "Je me suis senti(e) fatigué(e)",
+    "tiredDesc": "Peu d'énergie, difficile",
+    "difficulty": "Niveau de difficulté",
+    "veryEasy": "Très facile",
+    "veryHard": "Très difficile",
+    "energy": "Niveau d'énergie après",
+    "exhausted": "Épuisé(e)",
+    "energized": "Plein(e) d'énergie",
+    "notes": "Notes (Facultatif)",
+    "notesPlaceholder": "Des réflexions sur cette séance d'entraînement ?",
+    "moreDetails": "Ajouter plus de détails"
+  },
+  "persona": {
+    "title": "Personnalité du Coach",
+    "description": "Choisissez la manière dont votre coach communique avec vous",
+    "zen": {
+      "name": "Coach Zen",
+      "description": "Calme, attentif, approche holistique"
+    },
+    "energy": {
+      "name": "Coach Énergique",
+      "description": "Enthousiaste, motivant, haute énergie"
+    },
+    "logic": {
+      "name": "Coach Logique",
+      "description": "Axé sur les données, analytique, précis"
+    }
+  },
+  "insights": "Conseils du Coach",
+  "viewAll": "Tout voir",
+  "insightsCarousel": "Carrousel de conseils de coaching",
+  "carouselNavigation": "Navigation du carrousel",
+  "goToInsight": "Aller au conseil {{number}}"
 }

@@ -83,7 +83,10 @@
     "badges": "Abzeichen",
     "clearFilter": "Filter zurücksetzen",
     "other": "Andere",
-    "selectOne": "Wählen Sie eine aus"
+    "selectOne": "Wählen Sie eine aus",
+    "skip": "Überspringen",
+    "submit": "Einreichen",
+    "submitting": "Wird eingereicht..."
   },
   "navigation": {
     "home": "Startseite",
