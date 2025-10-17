@@ -285,23 +285,23 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
    */
   if (isLoading && !isRefreshing) {
     return (
-      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-4">
+      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-3 sm:p-4">
         <div className="max-w-4xl mx-auto">
           {/* Header skeleton */}
           <div className="mb-6 animate-pulse">
-            <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
-            <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3"></div>
+            <div className="h-8 bg-surface-200 dark:bg-surface-600 rounded w-1/3 mb-2"></div>
+            <div className="h-4 bg-surface-200 dark:bg-surface-600 rounded w-2/3"></div>
           </div>
 
           {/* Card skeletons */}
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-4 animate-pulse">
+            <div key={i} className="bg-surface-0 dark:bg-surface-900 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700 mb-4 animate-pulse">
               <div className="flex gap-3">
-                <div className="w-6 h-6 bg-gray-300 dark:bg-gray-700 rounded-full flex-shrink-0"></div>
+                <div className="w-6 h-6 bg-surface-200 dark:bg-surface-600 rounded-full flex-shrink-0"></div>
                 <div className="flex-1">
-                  <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-5 bg-surface-200 dark:bg-surface-600 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-surface-200 dark:bg-surface-600 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-surface-200 dark:bg-surface-600 rounded w-3/4"></div>
                 </div>
               </div>
             </div>
@@ -316,21 +316,21 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
    */
   if (error && !isRefreshing) {
     return (
-      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-4">
+      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-3 sm:p-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
-            <svg className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="bg-error-soft border border-error rounded-xl p-4 sm:p-6 text-center">
+            <svg className="w-12 h-12 text-error mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
+            <h3 className="text-h3 text-error mb-2">
               {t('coaching:error.title', { defaultValue: 'Unable to Load Insights' })}
             </h3>
-            <p className="text-sm text-red-700 dark:text-red-300 mb-4">
+            <p className="text-body text-error mb-4">
               {error.message}
             </p>
             <button
               onClick={handleRefresh}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              className="btn-danger"
             >
               {t('common:retry', { defaultValue: 'Try Again' })}
             </button>
@@ -345,11 +345,11 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
    */
   if (insights.length === 0 && !isLoading) {
     return (
-      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-4">
+      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-3 sm:p-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-2">
+            <h1 className="text-h1 mb-2">
               {t('coaching:title', { defaultValue: 'Your Coach' })}
             </h1>
             <p className="text-body">
@@ -358,11 +358,11 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
           </div>
 
           {/* Empty state */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700 text-center">
-            <svg className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="bg-surface-0 dark:bg-surface-900 rounded-xl p-4 sm:p-6 shadow-sm border border-surface-200 dark:border-surface-700 text-center">
+            <svg className="w-16 h-16 text-surface-400 dark:text-surface-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
-            <h3 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
+            <h3 className="text-h3 mb-2">
               {t('coaching:empty.title', { defaultValue: 'No Insights Yet' })}
             </h3>
             <p className="text-body mb-6">
@@ -370,7 +370,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
             </p>
             <button
               onClick={() => navigate('/timer')}
-              className="px-6 py-3 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+              className="btn-primary"
             >
               {t('coaching:empty.startWorkout', { defaultValue: 'Start Your First Workout' })}
             </button>
@@ -380,7 +380,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
           {logs.length > 0 && (
             <>
               <div id="progress-section" className="mt-6 space-y-4">
-                <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+                <h2 className="text-h2">
                   {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
                 </h2>
                 <WeeklyStreakCalendar
@@ -393,7 +393,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
 
               {/* Activity Log section */}
               <div className="mt-6 space-y-4">
-                <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+                <h2 className="text-h2">
                   {t('common:activity.title', { defaultValue: 'Activity Log' })}
                 </h2>
                 
@@ -420,11 +420,11 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                               <div key={log.id}>
                                 {log.is_workout ? (
                                   // Workout entry - simplified version
-                                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
-                                    <div className="grid grid-cols-[1fr,auto] gap-3 items-start mb-2">
+                                  <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                                    <div className="grid grid-cols-[1fr,auto] gap-2 sm:gap-3 items-start mb-2">
                                       <div className="flex items-center gap-2 min-w-0">
-                                        <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
-                                        <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 break-words">
+                                        <span className="inline-block w-3 h-3 rounded-full bg-primary-500 shrink-0"></span>
+                                        <h4 className="text-h3 break-words">
                                           {(() => {
                                             const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
                                             if (nameFromMap) return nameFromMap;
@@ -438,28 +438,28 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                         </h4>
                                       </div>
                                       
-                                      <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900 whitespace-nowrap shrink-0">
+                                      <div className="px-2 py-1 rounded-full text-small font-medium bg-surface-100 dark:bg-surface-700 text-text-900 dark:text-text-50 whitespace-nowrap shrink-0">
                                           {t('common:activity.workoutBadge', { defaultValue: 'Workout' })}
                                       </div>
                                     </div>
                                         
-                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-caption text-text-tertiary">
                                       <div className="flex items-center gap-1 shrink-0">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         <span className="whitespace-nowrap">{formatTime(new Date(log.timestamp))}</span>
                                       </div>
                                       
                                       <div className="flex items-center gap-1 shrink-0">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
                                         <span className="whitespace-nowrap">{formatDuration(log.duration)}</span>
                                       </div>
                                       
                                       <div className="flex items-center gap-1 shrink-0">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                         <span className="whitespace-nowrap">{t('common:activity.exerciseCount', { count: log.exercises?.length || 0 })}</span>
@@ -468,12 +468,12 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                   </div>
                                 ) : (
                                   // Individual exercise entry
-                                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                                    <div className="flex items-start justify-between">
+                                  <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-2">
                                           <span className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}></span>
-                                          <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
+                                          <h4 className="text-h3 truncate">
                                             {(() => {
                                               const ex = exercises.find(e => e.id === log.exercise_id);
                                               if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('common:activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
@@ -483,16 +483,16 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                           </h4>
                                         </div>
                                         
-                                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                        <div className="flex items-center gap-4 text-small text-text-tertiary">
                                           <div className="flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             {formatTime(new Date(log.timestamp))}
                                           </div>
                                           
                                           <div className="flex items-center gap-1">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                             </svg>
                                             {formatDuration(log.duration)}
@@ -520,19 +520,20 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
    * Main content with insights
    */
   return (
-    <div className="min-h-screen bg-background-50 dark:bg-background-900 p-4 pb-20">
+    <div className="min-h-screen bg-background-50 dark:bg-background-900 p-3 sm:p-4 pb-16 sm:pb-20">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
           {/* Row 1: Title + Refresh button */}
           <div className="flex items-center justify-between gap-2 mb-2">
-            <h1 className="text-2xl font-bold text-text-900 dark:text-text-50">
+            <h1 className="text-h1">
               {t('coaching:title', { defaultValue: 'Your Coach' })}
             </h1>
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="flex-shrink-0 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50"
+              className="flex-shrink-0 p-2 text-text-tertiary dark:text-text-secondary hover:text-text-900 dark:hover:text-text-50 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors focus:outline-none focus:ring-2 focus:ring-text-secondary focus:ring-offset-2 dark:focus:ring-offset-surface-900 disabled:opacity-50"
+              style={{ direction: 'ltr' }}
               aria-label={t('common:refresh', { defaultValue: 'Refresh' })}
             >
               <svg 
@@ -541,6 +542,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                 stroke="currentColor" 
                 viewBox="0 0 24 24" 
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -553,7 +555,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
               {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
             </p>
             {appSettings.coach_ai_insights_enabled && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 whitespace-nowrap">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-small font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 whitespace-nowrap">
                 {t('coaching:aiEnabled', { defaultValue: 'AI-Powered' })}
               </span>
             )}
@@ -573,10 +575,10 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                 {aiInsights.length > 0 && (
                   <div key="ai-insights-section" className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      <h2 className="text-lg font-semibold text-text-900 dark:text-text-50">
+                      <h2 className="text-h3 font-semibold">
                         {t('coaching:aiInsights', { defaultValue: 'AI-Powered Insights' })}
                       </h2>
                     </div>
@@ -595,7 +597,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                 {ruleInsights.length > 0 && (
                   <div key="rule-insights-section" className="space-y-3">
                     {aiInsights.length > 0 && (
-                      <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mt-6">
+                      <h2 className="text-h3 font-semibold mt-6">
                         {t('coaching:additionalInsights', { defaultValue: 'Additional Insights' })}
                       </h2>
                     )}
@@ -617,7 +619,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
         {/* Progress section */}
         {logs.length > 0 && (
           <div id="progress-section" className="space-y-4 mb-6">
-            <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+            <h2 className="text-h2">
               {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
             </h2>
             <WeeklyStreakCalendar
@@ -632,7 +634,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
         {/* Activity Log section */}
         {logs.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+            <h2 className="text-h2">
               {t('common:activity.title', { defaultValue: 'Activity Log' })}
             </h2>
             
@@ -641,8 +643,8 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                 .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
                 .map(([date, dateLogs]) => (
                   <div key={date}>
-                    <div className="sticky top-0 bg-background-50 dark:bg-background-900 py-2 mb-3">
-                      <h3 className="text-caption font-semibold text-text-900 dark:text-text-50">
+                    <div className="sticky top-0 z-10 bg-background-50 dark:bg-background-900 py-2 mb-3 shadow-sm">
+                      <h3 className="text-small font-semibold">
                         {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
                           weekday: 'long', 
                           month: 'short', 
@@ -658,16 +660,16 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                           <div key={log.id}>
                             {log.is_workout ? (
                               // Workout entry with expandable exercises
-                              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
+                              <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
                                 <div 
                                   className="cursor-pointer"
                                   onClick={() => toggleWorkoutExpansion(log.id)}
                                 >
                                   {/* Title row with badge in top-right */}
-                                  <div className="grid grid-cols-[1fr,auto] gap-3 items-start mb-2">
+                                  <div className="grid grid-cols-[1fr,auto] gap-2 sm:gap-3 items-start mb-2">
                                     <div className="flex items-center gap-2 min-w-0">
-                                      <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
-                                      <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 break-words">
+                                      <span className="inline-block w-3 h-3 rounded-full bg-primary-500 shrink-0"></span>
+                                      <h4 className="text-h3 break-words">
                                         {(() => {
                                           // Prefer the known workout name if available
                                           const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
@@ -687,30 +689,30 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                       </h4>
                                     </div>
                                     
-                                    <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900 whitespace-nowrap shrink-0">
+                                    <div className="px-2 py-1 rounded-full text-small font-medium bg-surface-100 dark:bg-surface-700 text-text-900 dark:text-text-50 whitespace-nowrap shrink-0">
                                         {t('common:activity.workoutBadge', { defaultValue: 'Workout' })}
                                     </div>
                                   </div>
                                     
                                   {/* Metadata row with expand button */}
-                                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 dark:text-gray-400">
-                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 text-caption text-text-tertiary">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                                       <div className="flex items-center gap-1 shrink-0">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         <span className="whitespace-nowrap">{formatTime(new Date(log.timestamp))}</span>
                                       </div>
                                       
                                       <div className="flex items-center gap-1 shrink-0">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
                                         <span className="whitespace-nowrap">{formatDuration(log.duration)}</span>
                                       </div>
                                       
                                       <div className="flex items-center gap-1 shrink-0">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                         <span className="whitespace-nowrap">{t('common:activity.exerciseCount', { count: log.exercises?.length || 0 })}</span>
@@ -719,10 +721,12 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                     
                                     {/* Expand/collapse button */}
                                     <svg 
-                                      className={`w-5 h-5 text-gray-500 transition-transform shrink-0 ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
+                                      className={`w-5 h-5 text-text-tertiary transition-transform shrink-0 ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
                                       fill="none" 
                                       stroke="currentColor" 
                                       viewBox="0 0 24 24"
+                                      style={{ direction: 'ltr' }}
+                                      aria-hidden="true"
                                     >
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -731,21 +735,21 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                 
                                 {/* Expandable exercise list */}
                                 {expandedWorkouts.has(log.id) && log.exercises && (
-                                  <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
-                                      <h5 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2">{t('common:activity.exercisesHeading', { defaultValue: 'Exercises' })}</h5>
+                                  <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700">
+                                      <h5 className="text-body font-medium mb-2">{t('common:activity.exercisesHeading', { defaultValue: 'Exercises' })}</h5>
                                     <div className="space-y-2">
                                       {log.exercises.map((exercise, index) => (
-                                        <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                        <div key={index} className="bg-surface-0 dark:bg-surface-800 rounded-lg p-3 border border-surface-200 dark:border-surface-700">
                                           <div className="flex items-center gap-2 mb-2">
                                             <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${getActivityIndicatorColor()}`}></span>
-                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words flex-1">{(() => {
+                                            <span className="text-body font-medium break-words flex-1">{(() => {
                                               const ex = exercises.find(e => e.id === exercise.exercise_id);
                                               if (!ex) return exercise.exercise_name;
                                               const base = `${ex.id}`;
                                               return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                             })()}</span>
                                           </div>
-                                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-500 dark:text-gray-400">
+                                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-small text-text-tertiary">
                                             {exercise.sets && exercise.reps && (
                                               <span className="whitespace-nowrap">{exercise.sets}×{exercise.reps}</span>
                                             )}
@@ -758,8 +762,8 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                 )}
                                 
                                 {log.notes && (
-                                  <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-700">
+                                    <p className="text-small text-text-tertiary">
                                       {localizeNotes(log.notes) ?? log.notes}
                                     </p>
                                   </div>
@@ -767,14 +771,14 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                               </div>
                             ) : (
                               // Individual exercise entry
-                              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div className="flex items-start justify-between">
+                              <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-2">
                                       <span
                                         className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}
                                       ></span>
-                                      <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
+                                      <h4 className="text-h3 truncate">
                                         {(() => {
                                           const ex = exercises.find(e => e.id === log.exercise_id);
                                           if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('common:activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
@@ -784,16 +788,16 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                       </h4>
                                     </div>
                                     
-                                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-caption text-text-tertiary">
                                       <div className="flex items-center gap-1">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         {formatTime(new Date(log.timestamp))}
                                       </div>
                                       
                                       <div className="flex items-center gap-1">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
                                         {formatDuration(log.duration)}
@@ -803,8 +807,8 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                 </div>
                                 
                                 {log.notes && (
-                                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-700">
+                                    <p className="text-small text-text-tertiary">
                                       {localizeNotes(log.notes) ?? log.notes}
                                     </p>
                                   </div>
