@@ -387,8 +387,10 @@
     "exerciseCount_other": "{{count}} Übungen",
     "status": {
       "stoppedAfter": "Gestoppt nach {{duration}}",
-      "completedSetsReps": "{{sets}} Sätze von {{reps}} Wiederholungen abgeschlossen",
+      "completedSetsReps": "{{sets}} Sätze mit {{reps}} Wiederholungen abgeschlossen",
+      "completedSetsRepsInWorkout": "{{sets}} Sätze mit {{reps}} Wiederholungen im Training abgeschlossen: {{workoutName}}",
       "completedTime": "{{duration}} Intervall-Timer abgeschlossen",
+      "completedTimeInWorkout": "{{duration}} im Training abgeschlossen: {{workoutName}}",
       "completedWorkout": "Training mit {{count}} Übung abgeschlossen",
       "completedWorkout_plural": "Training mit {{count}} Übungen abgeschlossen"
     },

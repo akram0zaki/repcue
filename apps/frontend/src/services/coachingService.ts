@@ -86,7 +86,8 @@ export class CoachingService {
         const cached = this.getCachedInsights(cacheKey);
         if (cached) {
           logger.log('Returning cached coaching insights');
-          return cached;
+          // Filter out dismissed insights
+          return cached.filter(insight => !insight.dismissed);
         }
       }
 
@@ -113,7 +114,8 @@ export class CoachingService {
       // Cache the results
       this.cacheInsights(cacheKey, sortedInsights);
 
-      return sortedInsights;
+      // Filter out dismissed insights
+      return sortedInsights.filter(insight => !insight.dismissed);
     } catch (error) {
       logger.error('Error generating coaching insights:', error);
       return [];
@@ -248,11 +250,16 @@ export class CoachingService {
    * Dismiss an insight
    */
   public dismissInsight(insightId: string): void {
+    logger.log(`[CoachingService] Dismissing insight: ${insightId}`);
+    
     // Mark as dismissed in all cached entries
     this.insightCache.forEach((cache) => {
+      const beforeCount = cache.insights.filter(i => i.dismissed).length;
       cache.insights = cache.insights.map(insight =>
         insight.id === insightId ? { ...insight, dismissed: true } : insight
       );
+      const afterCount = cache.insights.filter(i => i.dismissed).length;
+      logger.log(`[CoachingService] Cache updated: ${beforeCount} -> ${afterCount} dismissed insights`);
     });
   }
 

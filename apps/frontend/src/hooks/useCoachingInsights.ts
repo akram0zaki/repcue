@@ -138,6 +138,7 @@ export const useCoachingInsights = (
 
       setInsights(filteredInsights);
       logger.log(`Fetched ${filteredInsights.length} coaching insights${type ? ` of type ${type}` : ''}${enableAI ? ' (AI-enhanced)' : ''} (${fetchedInsights.length} before filtering)`);
+      logger.log(`Insight IDs: ${filteredInsights.map(i => `${i.id} (${i.source})`).join(', ')}`);
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to fetch insights');
       setError(error);

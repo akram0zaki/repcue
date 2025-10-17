@@ -374,7 +374,9 @@
     "status": {
       "stoppedAfter": "Stopped after {{duration}}",
       "completedSetsReps": "Completed {{sets}} sets of {{reps}} reps",
+      "completedSetsRepsInWorkout": "Completed {{sets}} sets of {{reps}} reps in workout: {{workoutName}}",
       "completedTime": "Completed {{duration}} interval timer",
+      "completedTimeInWorkout": "Completed {{duration}} in workout: {{workoutName}}",
       "completedWorkout": "Workout completed with {{count}} exercise",
       "completedWorkout_plural": "Workout completed with {{count}} exercises"
     },

@@ -162,12 +162,6 @@ export const TimerPage = lazy(() =>
   }))
 );
 
-export const ActivityLogPage = lazy(() => 
-  import('../pages/ActivityLogPage').catch(() => ({
-    default: () => <div>Error loading Activity Log page</div>
-  }))
-);
-
 export const SettingsPage = lazy(() => 
   import('../pages/SettingsPage').catch(() => ({
     default: () => <div>Error loading Settings page</div>

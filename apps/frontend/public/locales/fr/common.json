@@ -388,7 +388,9 @@
     "status": {
       "stoppedAfter": "Arrêté après {{duration}}",
       "completedSetsReps": "{{sets}} séries de {{reps}} répétitions terminées",
-      "completedTime": "Minuteur d'intervalle de {{duration}} terminé",
+      "completedSetsRepsInWorkout": "{{sets}} séries de {{reps}} répétitions terminées dans l'entraînement : {{workoutName}}",
+      "completedTime": "Minuteur de {{duration}} terminé",
+      "completedTimeInWorkout": "{{duration}} terminé dans l'entraînement : {{workoutName}}",
       "completedWorkout": "Entraînement terminé avec {{count}} exercice",
       "completedWorkout_plural": "Entraînement terminé avec {{count}} exercices"
     },

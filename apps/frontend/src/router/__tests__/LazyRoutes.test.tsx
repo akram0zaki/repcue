@@ -158,12 +158,11 @@ describe('LazyRoutes', () => {
 
   describe('Lazy loaded components', () => {
     it('should be defined', async () => {
-      const { HomePage, ExercisePage, TimerPage, ActivityLogPage, SettingsPage } = await import('../LazyRoutes');
+      const { HomePage, ExercisePage, TimerPage, SettingsPage } = await import('../LazyRoutes');
       
       expect(HomePage).toBeDefined();
       expect(ExercisePage).toBeDefined();
       expect(TimerPage).toBeDefined();
-      expect(ActivityLogPage).toBeDefined();
       expect(SettingsPage).toBeDefined();
     });
   });

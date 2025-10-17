@@ -23,15 +23,16 @@ import WeeklyStreakCalendar from '../components/WeeklyStreakCalendar';
 import ProgressChart from '../components/ProgressChart';
 import { useCoachingInsights } from '../hooks/useCoachingInsights';
 import { StorageService } from '../services/storageService';
-import type { ActivityLog, AppSettings } from '../types';
+import type { ActivityLog, AppSettings, Exercise, Workout } from '../types';
 import logger from '../utils/logger';
 
 interface CoachPageProps {
   appSettings: AppSettings;
+  exercises: Exercise[];
 }
 
-export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
-  const { t } = useTranslation(['coaching', 'common']);
+export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) => {
+  const { t, i18n } = useTranslation(['coaching', 'common', 'exercises', 'exerciseDetails']);
   const navigate = useNavigate();
   const { insights, isLoading, error, refresh, dismissInsight } = useCoachingInsights({ 
     settings: appSettings,
@@ -41,6 +42,8 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
+  const [workoutNameMap, setWorkoutNameMap] = useState<Record<string, string>>({});
 
   // Load activity logs for charts
   React.useEffect(() => {
@@ -49,11 +52,44 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
         const storageService = StorageService.getInstance();
         const activityLogs = await storageService.getActivityLogs();
         setLogs(activityLogs);
+        
+        // Load workouts to resolve workout names for display
+        try {
+          const workouts: Workout[] = await storageService.getWorkouts();
+          const map: Record<string, string> = {};
+          for (const w of workouts) map[w.id] = w.name;
+          setWorkoutNameMap(map);
+        } catch (e) {
+          // Non-fatal; UI will fall back to log.exercise_name
+          logger.debug('Workout name map load failed (non-fatal):', e);
+        }
       } catch (err) {
         logger.error('Error loading activity logs:', err);
       }
     };
     loadLogs();
+    
+    // Refresh logs after a successful sync pull
+    const handleSyncApplied = async () => {
+      try {
+        const storageService = StorageService.getInstance();
+        const [activityLogs, workouts] = await Promise.all([
+          storageService.getActivityLogs(),
+          storageService.getWorkouts()
+        ]);
+        setLogs(activityLogs);
+        const map: Record<string, string> = {};
+        for (const w of workouts) map[w.id] = w.name;
+        setWorkoutNameMap(map);
+      } catch (e) {
+        logger.warn('Failed to refresh activity logs after sync:', e);
+      }
+    };
+    window.addEventListener('sync:applied', handleSyncApplied as EventListener);
+
+    return () => {
+      window.removeEventListener('sync:applied', handleSyncApplied as EventListener);
+    };
   }, []);
 
   /**
@@ -115,6 +151,97 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
   };
 
   /**
+   * Toggle workout expansion
+   */
+  const toggleWorkoutExpansion = (workout_id: string) => {
+    setExpandedWorkouts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(workout_id)) {
+        newSet.delete(workout_id);
+      } else {
+        newSet.add(workout_id);
+      }
+      return newSet;
+    });
+  };
+
+  /**
+   * Format duration to readable string
+   */
+  const formatDuration = (seconds: number): string => {
+    // Round to avoid floating-point precision issues
+    const roundedSeconds = Math.round(seconds);
+    
+    const secSuffix = t('common:common.secondsShortSuffix');
+    const minSuffix = t('common:common.minutesShortSuffix', { defaultValue: 'm' });
+    if (roundedSeconds < 60) return `${roundedSeconds}${secSuffix}`;
+    const minutes = Math.floor(roundedSeconds / 60);
+    const remainingSeconds = roundedSeconds % 60;
+    return remainingSeconds > 0
+      ? `${minutes}${minSuffix} ${remainingSeconds}${secSuffix}`
+      : `${minutes}${minSuffix}`;
+  };
+
+  /**
+   * Format time to readable string
+   */
+  const formatTime = (date: Date): string => {
+    const locale = i18n.resolvedLanguage || i18n.language || undefined;
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+  };
+
+  /**
+   * Get activity indicator color
+   */
+  const getActivityIndicatorColor = (): string => {
+    return 'bg-primary-500';
+  };
+
+  /**
+   * Localize legacy English notes generated at log creation time
+   */
+  const localizeNotes = (notes?: string): string | null => {
+    if (!notes) return null;
+    const workoutCompletedMatch = notes.match(/^Workout completed with (\d+) exercises?$/);
+    if (workoutCompletedMatch) {
+      const count = parseInt(workoutCompletedMatch[1], 10);
+      return t('common:activity.status.completedWorkout', { count });
+    }
+    const stoppedMatch = notes.match(/^Stopped after (\d+)s$/);
+    if (stoppedMatch) {
+      const seconds = parseInt(stoppedMatch[1], 10);
+      return t('common:activity.status.stoppedAfter', { duration: formatDuration(seconds) });
+    }
+    // Match "Completed Xs in workout: Name"
+    const completedTimeInWorkoutMatch = notes.match(/^Completed (\d+)s in workout: (.+)$/);
+    if (completedTimeInWorkoutMatch) {
+      const seconds = parseInt(completedTimeInWorkoutMatch[1], 10);
+      const workoutName = completedTimeInWorkoutMatch[2];
+      return t('common:activity.status.completedTimeInWorkout', { duration: formatDuration(seconds), workoutName });
+    }
+    // Match "Completed X sets of Y reps in workout: Name"
+    const completedSetsRepsInWorkoutMatch = notes.match(/^Completed (\d+) sets of (\d+) reps in workout: (.+)$/);
+    if (completedSetsRepsInWorkoutMatch) {
+      const sets = parseInt(completedSetsRepsInWorkoutMatch[1], 10);
+      const reps = parseInt(completedSetsRepsInWorkoutMatch[2], 10);
+      const workoutName = completedSetsRepsInWorkoutMatch[3];
+      return t('common:activity.status.completedSetsRepsInWorkout', { sets, reps, workoutName });
+    }
+    const completedSetsRepsMatch = notes.match(/^Completed (\d+) sets of (\d+) reps$/);
+    if (completedSetsRepsMatch) {
+      const sets = parseInt(completedSetsRepsMatch[1], 10);
+      const reps = parseInt(completedSetsRepsMatch[2], 10);
+      return t('common:activity.status.completedSetsReps', { sets, reps });
+    }
+    const completedTimerMatch = notes.match(/^Completed (\d+)s interval timer$/);
+    if (completedTimerMatch) {
+      const seconds = parseInt(completedTimerMatch[1], 10);
+      return t('common:activity.status.completedTime', { duration: formatDuration(seconds) });
+    }
+    return notes;
+  };
+
+  /**
    * Handle manual refresh
    */
   const handleRefresh = async () => {
@@ -124,14 +251,34 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
     // Reload activity logs
     try {
       const storageService = StorageService.getInstance();
-      const activityLogs = await storageService.getActivityLogs();
+      const [activityLogs, workouts] = await Promise.all([
+        storageService.getActivityLogs(),
+        storageService.getWorkouts()
+      ]);
       setLogs(activityLogs);
+      const map: Record<string, string> = {};
+      for (const w of workouts) map[w.id] = w.name;
+      setWorkoutNameMap(map);
     } catch (err) {
       logger.error('Error reloading activity logs:', err);
     }
     
     setIsRefreshing(false);
   };
+
+  // Group logs by date
+  interface GroupedLogs {
+    [key: string]: ActivityLog[];
+  }
+
+  const groupedLogs: GroupedLogs = logs.reduce((groups, log) => {
+    const date = new Date(log.timestamp).toDateString();
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(log);
+    return groups;
+  }, {} as GroupedLogs);
 
   /**
    * Loading state
@@ -231,17 +378,138 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
 
           {/* Show progress section even when no insights */}
           {logs.length > 0 && (
-            <div id="progress-section" className="mt-6 space-y-4">
-              <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
-                {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
-              </h2>
-              <WeeklyStreakCalendar
-                logs={logs}
-                currentWeek={currentWeek}
-                onWeekChange={setCurrentWeek}
-              />
-              <ProgressChart logs={logs} />
-            </div>
+            <>
+              <div id="progress-section" className="mt-6 space-y-4">
+                <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+                  {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
+                </h2>
+                <WeeklyStreakCalendar
+                  logs={logs}
+                  currentWeek={currentWeek}
+                  onWeekChange={setCurrentWeek}
+                />
+                <ProgressChart logs={logs} />
+              </div>
+
+              {/* Activity Log section */}
+              <div className="mt-6 space-y-4">
+                <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+                  {t('common:activity.title', { defaultValue: 'Activity Log' })}
+                </h2>
+                
+                <div className="space-y-6">
+                  {Object.entries(groupedLogs)
+                    .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
+                    .slice(0, 3) /* Show only last 3 days in empty state */
+                    .map(([date, dateLogs]) => (
+                      <div key={date}>
+                        <div className="sticky top-0 bg-background-50 dark:bg-background-900 py-2 mb-3">
+                          <h3 className="text-caption font-semibold text-text-900 dark:text-text-50">
+                            {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
+                              weekday: 'long', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </h3>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          {dateLogs
+                            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                            .map((log) => (
+                              <div key={log.id}>
+                                {log.is_workout ? (
+                                  // Workout entry - simplified version
+                                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
+                                    <div className="grid grid-cols-[1fr,auto] gap-3 items-start mb-2">
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
+                                        <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 break-words">
+                                          {(() => {
+                                            const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
+                                            if (nameFromMap) return nameFromMap;
+                                            const ex = exercises.find(e => e.id === log.exercise_id);
+                                            if (ex) {
+                                              const base = `${ex.id}`;
+                                              return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
+                                            }
+                                            return log.exercise_name && typeof log.exercise_name === 'string' ? log.exercise_name : t('common:activity.workoutBadge');
+                                          })()}
+                                        </h4>
+                                      </div>
+                                      
+                                      <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900 whitespace-nowrap shrink-0">
+                                          {t('common:activity.workoutBadge', { defaultValue: 'Workout' })}
+                                      </div>
+                                    </div>
+                                        
+                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span className="whitespace-nowrap">{formatTime(new Date(log.timestamp))}</span>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <span className="whitespace-nowrap">{formatDuration(log.duration)}</span>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        <span className="whitespace-nowrap">{t('common:activity.exerciseCount', { count: log.exercises?.length || 0 })}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  // Individual exercise entry
+                                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-start justify-between">
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <span className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}></span>
+                                          <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
+                                            {(() => {
+                                              const ex = exercises.find(e => e.id === log.exercise_id);
+                                              if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('common:activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
+                                              const base = `${ex.id}`;
+                                              return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
+                                            })()}
+                                          </h4>
+                                        </div>
+                                        
+                                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                          <div className="flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {formatTime(new Date(log.timestamp))}
+                                          </div>
+                                          
+                                          <div className="flex items-center gap-1">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            {formatDuration(log.duration)}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -348,7 +616,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
 
         {/* Progress section */}
         {logs.length > 0 && (
-          <div id="progress-section" className="space-y-4">
+          <div id="progress-section" className="space-y-4 mb-6">
             <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
               {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
             </h2>
@@ -358,6 +626,197 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings }) => {
               onWeekChange={setCurrentWeek}
             />
             <ProgressChart logs={logs} />
+          </div>
+        )}
+
+        {/* Activity Log section */}
+        {logs.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-text-900 dark:text-text-50">
+              {t('common:activity.title', { defaultValue: 'Activity Log' })}
+            </h2>
+            
+            <div className="space-y-6">
+              {Object.entries(groupedLogs)
+                .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
+                .map(([date, dateLogs]) => (
+                  <div key={date}>
+                    <div className="sticky top-0 bg-background-50 dark:bg-background-900 py-2 mb-3">
+                      <h3 className="text-caption font-semibold text-text-900 dark:text-text-50">
+                        {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
+                          weekday: 'long', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </h3>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {dateLogs
+                        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+                        .map((log) => (
+                          <div key={log.id}>
+                            {log.is_workout ? (
+                              // Workout entry with expandable exercises
+                              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 shadow-sm border border-blue-200 dark:border-blue-800">
+                                <div 
+                                  className="cursor-pointer"
+                                  onClick={() => toggleWorkoutExpansion(log.id)}
+                                >
+                                  {/* Title row with badge in top-right */}
+                                  <div className="grid grid-cols-[1fr,auto] gap-3 items-start mb-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className="inline-block w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
+                                      <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 break-words">
+                                        {(() => {
+                                          // Prefer the known workout name if available
+                                          const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
+                                          if (nameFromMap) {
+                                            return nameFromMap;
+                                          }
+                                          // Fallback to exercise lookup (legacy) or stored log name
+                                          const ex = exercises.find(e => e.id === log.exercise_id);
+                                          if (ex) {
+                                            const base = `${ex.id}`;
+                                            const name = t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
+                                            return name;
+                                          }
+                                          const fallback = log.exercise_name && typeof log.exercise_name === 'string' ? log.exercise_name : t('common:activity.workoutBadge');
+                                          return fallback;
+                                        })()}
+                                      </h4>
+                                    </div>
+                                    
+                                    <div className="px-2 py-1 rounded-full text-small font-medium bg-blue-100 dark:bg-blue-200 text-blue-800 dark:text-blue-900 whitespace-nowrap shrink-0">
+                                        {t('common:activity.workoutBadge', { defaultValue: 'Workout' })}
+                                    </div>
+                                  </div>
+                                    
+                                  {/* Metadata row with expand button */}
+                                  <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span className="whitespace-nowrap">{formatTime(new Date(log.timestamp))}</span>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        <span className="whitespace-nowrap">{formatDuration(log.duration)}</span>
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-1 shrink-0">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        <span className="whitespace-nowrap">{t('common:activity.exerciseCount', { count: log.exercises?.length || 0 })}</span>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Expand/collapse button */}
+                                    <svg 
+                                      className={`w-5 h-5 text-gray-500 transition-transform shrink-0 ${expandedWorkouts.has(log.id) ? 'rotate-180' : ''}`}
+                                      fill="none" 
+                                      stroke="currentColor" 
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                  </div>
+                                </div>
+                                
+                                {/* Expandable exercise list */}
+                                {expandedWorkouts.has(log.id) && log.exercises && (
+                                  <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
+                                      <h5 className="text-sm font-medium text-gray-800 dark:text-gray-100 mb-2">{t('common:activity.exercisesHeading', { defaultValue: 'Exercises' })}</h5>
+                                    <div className="space-y-2">
+                                      {log.exercises.map((exercise, index) => (
+                                        <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-3">
+                                          <div className="flex items-center gap-2 mb-2">
+                                            <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${getActivityIndicatorColor()}`}></span>
+                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words flex-1">{(() => {
+                                              const ex = exercises.find(e => e.id === exercise.exercise_id);
+                                              if (!ex) return exercise.exercise_name;
+                                              const base = `${ex.id}`;
+                                              return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
+                                            })()}</span>
+                                          </div>
+                                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-gray-500 dark:text-gray-400">
+                                            {exercise.sets && exercise.reps && (
+                                              <span className="whitespace-nowrap">{exercise.sets}×{exercise.reps}</span>
+                                            )}
+                                            <span className="whitespace-nowrap">{formatDuration(exercise.duration)}</span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {log.notes && (
+                                  <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                      {localizeNotes(log.notes) ?? log.notes}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              // Individual exercise entry
+                              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <span
+                                        className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}
+                                      ></span>
+                                      <h4 className="text-h3 font-semibold text-text-900 dark:text-text-50 truncate">
+                                        {(() => {
+                                          const ex = exercises.find(e => e.id === log.exercise_id);
+                                          if (!ex) return (log.exercise_name && typeof log.exercise_name === 'string') ? log.exercise_name : t('common:activity.unknownExercise', { defaultValue: 'Unknown Exercise' });
+                                          const base = `${ex.id}`;
+                                          return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
+                                        })()}
+                                      </h4>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                                      <div className="flex items-center gap-1">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {formatTime(new Date(log.timestamp))}
+                                      </div>
+                                      
+                                      <div className="flex items-center gap-1">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                        {formatDuration(log.duration)}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {log.notes && (
+                                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                      {localizeNotes(log.notes) ?? log.notes}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
           </div>
         )}
       </div>

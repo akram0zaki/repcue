@@ -380,7 +380,9 @@
     "status": {
       "stoppedAfter": "Gestopt na {{duration}}",
       "completedSetsReps": "{{sets}} sets van {{reps}} herhalingen voltooid",
-      "completedTime": "{{duration}} interval timer voltooid",
+      "completedSetsRepsInWorkout": "{{sets}} sets van {{reps}} herhalingen voltooid in training: {{workoutName}}",
+      "completedTime": "{{duration}} intervaltimer voltooid",
+      "completedTimeInWorkout": "{{duration}} voltooid in training: {{workoutName}}",
       "completedWorkout": "Training voltooid met {{count}} oefening",
       "completedWorkout_plural": "Training voltooid met {{count}} oefeningen"
     },

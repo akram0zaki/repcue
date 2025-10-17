@@ -1,5 +1,80 @@
 ## Unreleased
 
+### 2025-10-17
+
+#### 🐛 Bug Fixes - Coach Page & AI Insights
+
+**1. AI Insights Missing IDs**
+- **Problem**: Dismissing one AI insight would dismiss all AI insights at once
+- **Root Cause**: AI insights returned from backend Edge Function lacked unique `id` field, all had `id: undefined`. When dismissing an insight by ID, all undefined IDs matched, causing all AI insights to be filtered out.
+- **Fix**: Added ID generation in `InsightsService` to ensure all AI insights have stable, unique IDs
+  - Fresh insights: Generate IDs as `ai-{correlationId}-{index}` before caching
+  - Cached insights: Defensive check to generate IDs for legacy cached insights
+- **Impact**: Each AI insight now has a unique ID, dismiss functionality works correctly for individual insights
+- **Files Modified**:
+  - `apps/frontend/src/services/insightsService.ts`:
+    - Added ID generation after successful fetch (lines ~245-260)
+    - Added defensive ID check when retrieving cached insights (lines ~440-450)
+    - Added warning logs when IDs are missing
+- **Debug Process**:
+  - Added comprehensive logging to `coachingService.ts` and `useCoachingInsights.ts`
+  - Console logs revealed AI insights had `id: undefined` while rule-based insights had proper IDs
+  - Fixed at data transformation layer in `insightsService.ts`
+- **Testing**: TypeScript compilation verified
+
+**2. Activity Log Integration**
+- **Problem**: Activity log was on separate Progress page, requiring extra navigation
+- **Fix**: Consolidated activity log into Coach page below the progress section
+- **Impact**: Better UX with all coaching-related information in one place
+- **Files Modified**:
+  - `apps/frontend/src/pages/CoachPage.tsx`:
+    - Added activity log display with helper functions (formatDuration, formatTime, localizeNotes)
+    - Added exercises prop for displaying exercise names in activity log
+    - Added workoutNameMap state for workout name resolution
+    - Added expandedWorkouts state for accordion functionality
+  - `apps/frontend/src/App.tsx`:
+    - Added exercises prop to CoachPage route
+    - Removed ACTIVITY_LOG route
+  - `apps/frontend/src/components/Navigation.tsx`:
+    - Removed Progress navigation item from main nav
+  - `apps/frontend/src/utils/LazyRoutes.tsx`:
+    - Removed ActivityLogPage export
+  - `apps/frontend/src/utils/LazyRoutes.test.tsx`:
+    - Removed ActivityLogPage test assertion
+- **Files Deleted**:
+  - `apps/frontend/src/pages/ActivityLogPage.tsx`
+  - `apps/frontend/src/pages/__tests__/ActivityLogPage.test.tsx`
+  - `apps/frontend/src/pages/__tests__/duration-format-fix.test.tsx`
+
+**3. Exercise Completion Status Translation**
+- **Problem**: Exercise completion notes in activity log were not translated, showing raw text like "Completed 3 sets of 10 reps in workout: Morning Routine"
+- **Root Cause**: Translation keys were missing for exercise completion patterns with workout names
+- **Fix**: Added new i18n keys for both rep-based and time-based exercise completions in workout context
+- **Impact**: Exercise completion notes now fully translated in all 8 supported languages
+- **Translation Keys Added**:
+  - `common:activity.status.completedSetsRepsInWorkout` - "Completed {{sets}} sets of {{reps}} reps in workout: {{workoutName}}"
+  - `common:activity.status.completedTimeInWorkout` - "Completed {{duration}} in workout: {{workoutName}}"
+- **Languages Updated**: English (en), Arabic (ar), Egyptian Arabic (ar-EG), German (de), Spanish (es), French (fr), Dutch (nl), Frisian (fy)
+- **Files Modified**:
+  - `apps/frontend/public/locales/*/common.json` - Added new translation keys in all 8 languages
+  - `apps/frontend/src/pages/CoachPage.tsx`:
+    - Updated `localizeNotes` function to handle workout context patterns
+    - Added pattern matching for "in workout: Name" format
+
+#### ✨ UX Improvements
+
+**Coach Navigation Promoted to Main Nav**
+- **Change**: Moved Coach menu item from "More" dropdown to main navigation bar
+- **Position**: 5th item in main navigation (after Home, Exercises, Timer, Workouts)
+- **Rationale**: Coach page now contains both insights and activity log, making it a primary destination
+- **Impact**: Easier access to coaching features, reduced navigation friction
+- **Files Modified**:
+  - `apps/frontend/src/components/Navigation.tsx`:
+    - Moved Coach from `moreItems` array to `mainNavItems` array (5th position)
+    - More dropdown now only contains Settings
+
+---
+
 ### 2025-10-16
 
 #### 🐛 Critical Bug Fixes - AI Coach & Translation

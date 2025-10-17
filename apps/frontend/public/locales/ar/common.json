@@ -393,7 +393,9 @@
     "status": {
       "stoppedAfter": "توقف بعد {{duration}}",
       "completedSetsReps": "اكتمل {{sets}} مجموعة من {{reps}} تكرار",
+      "completedSetsRepsInWorkout": "اكتمل {{sets}} مجموعة من {{reps}} تكرار في التمرين: {{workoutName}}",
       "completedTime": "اكتمل مؤقت فاصل {{duration}}",
+      "completedTimeInWorkout": "اكتمل {{duration}} في التمرين: {{workoutName}}",
       "completedWorkout_zero": "اكتمل التمرين بـ {{count}} تمرين",
       "completedWorkout_one": "اكتمل التمرين بـ {{count}} تمرين",
       "completedWorkout_two": "اكتمل التمرين بـ {{count}} تمرينان",

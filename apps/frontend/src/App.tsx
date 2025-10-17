@@ -46,7 +46,6 @@ import {
   EditExercisePage,
   ExerciseDetailPage,
   TimerPage,
-  ActivityLogPage,
   SettingsPage,
   WorkoutsPage,
   CreateWorkoutPage,
@@ -2759,14 +2758,6 @@ useEffect(() => {
                 } 
               />
               <Route 
-                path={AppRoutes.ACTIVITY_LOG} 
-                element={
-                  <Suspense fallback={createRouteLoader('Activity Log')}>
-                    <ActivityLogPage exercises={exercises} />
-                  </Suspense>
-                } 
-              />
-              <Route 
                 path={AppRoutes.SETTINGS} 
                 element={
                   <Suspense fallback={createRouteLoader('Settings')}>
@@ -2789,7 +2780,7 @@ useEffect(() => {
                 path={AppRoutes.COACH} 
                 element={
                   <Suspense fallback={createRouteLoader('Coach')}>
-                    <CoachPage appSettings={appSettings} />
+                    <CoachPage appSettings={appSettings} exercises={exercises} />
                   </Suspense>
                 } 
               />

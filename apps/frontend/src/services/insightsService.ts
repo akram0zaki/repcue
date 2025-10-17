@@ -249,6 +249,21 @@ class InsightsService {
           cached: data.metadata?.cached
         });
 
+        // Ensure all AI insights have unique IDs (backend may not provide them)
+        // Generate stable IDs based on insight content + correlation ID
+        data.insights = data.insights.map((insight, index) => {
+          if (!insight.id) {
+            // Generate stable ID: ai-{correlationId}-{index}
+            const generatedId = `ai-${data.metadata.correlationId}-${index}`;
+            logger.warn('[InsightsService] AI insight missing ID, generated:', {
+              originalTitle: insight.title,
+              generatedId
+            });
+            return { ...insight, id: generatedId };
+          }
+          return insight;
+        });
+
         // Cache the response (24h TTL aligned with server cache)
         this.setCachedInsights(data, analytics);
 
@@ -421,9 +436,22 @@ class InsightsService {
       return null;
     }
 
+    // Ensure cached insights have IDs (defensive check for legacy cache)
+    const insights = this.cache.insights.map((insight, index) => {
+      if (!insight.id) {
+        const generatedId = `ai-${this.cache!.correlationId}-${index}`;
+        logger.warn('[InsightsService] Cached insight missing ID, generated:', {
+          originalTitle: insight.title,
+          generatedId
+        });
+        return { ...insight, id: generatedId };
+      }
+      return insight;
+    });
+
     // Return cached data in the expected response format
     return {
-      insights: this.cache.insights,
+      insights,
       metadata: {
         correlationId: this.cache.correlationId,
         generatedAt: this.cache.generatedAt,

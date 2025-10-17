@@ -7,7 +7,6 @@ import {
   HomeIcon,
   ExercisesIcon,
   TimerIcon,
-  LogIcon,
   ScheduleIcon,
   MoreIcon,
   CoachIcon,
@@ -64,16 +63,16 @@ const Navigation: React.FC = () => {
   testId: 'nav-timer'
     },
     {
-      path: Routes.WORKOUTS, // Changed from SCHEDULE
-      label: t('navigation.workouts'), // Changed from 'Schedule'
-      icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
+      path: Routes.WORKOUTS,
+      label: t('navigation.workouts'),
+      icon: ScheduleIcon,
   testId: 'nav-workouts'
     },
     {
-      path: Routes.ACTIVITY_LOG,
-      label: t('navigation.progress'), // Changed from activityLog to progress
-      icon: LogIcon,
-  testId: 'nav-progress' // Changed from nav-activity to nav-progress
+      path: Routes.COACH,
+      label: t('navigation.coach'),
+      icon: CoachIcon,
+  testId: 'nav-coach'
     },
   ];
 
@@ -131,28 +130,13 @@ const Navigation: React.FC = () => {
               }`}
               dir={isRTL ? 'rtl' : 'ltr'}
             >
-              {/* Coach */}
-              <button
-                onClick={() => {
-                  navigate(Routes.COACH);
-                  setShowMoreMenu(false);
-                }}
-                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-t-lg ${
-                  isRTL ? 'flex-row-reverse justify-end' : ''
-                } ${isActive(Routes.COACH) ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600' : ''}`}
-                data-testid="nav-coach"
-              >
-                <CoachIcon size={18} />
-                <span>{t('navigation.coach')}</span>
-              </button>
-
               {/* Settings */}
               <button
                 onClick={() => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-b-lg ${
+                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
                   isRTL ? 'flex-row-reverse justify-end' : ''
                 } ${isActive(Routes.SETTINGS) ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600' : ''}`}
                 data-testid="nav-settings"

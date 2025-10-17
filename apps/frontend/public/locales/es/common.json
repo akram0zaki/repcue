@@ -387,8 +387,10 @@
     "exerciseCount_other": "{{count}} ejercicios",
     "status": {
       "stoppedAfter": "Detenido después de {{duration}}",
-      "completedSetsReps": "Completado {{sets}} series de {{reps}} repeticiones",
-      "completedTime": "Completado temporizador de intervalo de {{duration}}",
+      "completedSetsReps": "Completadas {{sets}} series de {{reps}} repeticiones",
+      "completedSetsRepsInWorkout": "Completadas {{sets}} series de {{reps}} repeticiones en el entrenamiento: {{workoutName}}",
+      "completedTime": "Completado temporizador de {{duration}}",
+      "completedTimeInWorkout": "Completado {{duration}} en el entrenamiento: {{workoutName}}",
       "completedWorkout": "Entrenamiento completado con {{count}} ejercicio",
       "completedWorkout_plural": "Entrenamiento completado con {{count}} ejercicios"
     },
