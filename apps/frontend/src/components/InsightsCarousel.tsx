@@ -277,27 +277,35 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
                     const params: Record<string, string> = {};
                     
                     paramValues.forEach((value, index) => {
-                      // Check if this param looks like an exercise ID (contains dashes, lowercase)
-                      // and if we're in a progression message context
-                      if ((key === 'progression.readyMessage' || key === 'progression.readyDurationMessage') && index === 0 && value.includes('-')) {
-                        // Translate exercise name from exerciseDetails
+                      // Check if this is an exercise name in a progression message (first param)
+                      if ((key === 'progression.readyMessage' || key === 'progression.readyDurationMessage') && index === 0) {
+                        // Translate exercise name from exerciseDetails namespace
+                        // Try translation first, if not found, use the raw value (which might be already a name)
                         const translatedName = t(`exerciseDetails:${value}.name`, { defaultValue: value });
-                        params[`param${index}`] = translatedName || value;
+                        params[`param${index}`] = translatedName;
                       }
                       // Check if this is a muscle balance message with comma-separated muscle groups
-                      else if ((key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage' || key === 'muscleBalance.neglectedMessage') && index === 0 && value.includes(',')) {
+                      else if ((key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage') && index === 0 && value.includes(',')) {
                         // Split the comma-separated muscle groups and translate each one
-                        const muscleGroups = value.split(',');
+                        const muscleGroups = value.split(',').map(m => m.trim());
                         const translatedGroups = muscleGroups.map(muscle =>
-                          t(`exercises:muscleGroupsList.${muscle.trim()}`, { defaultValue: muscle.trim() })
+                          t(`exercises:muscleGroupsList.${muscle}`, { defaultValue: muscle })
                         );
-                        params[`param${index}`] = translatedGroups.join(', ');
+                        params[`param${index}`] = translatedGroups.join('، '); // Use Arabic comma for RTL
                       }
-                      // Check if this is a single muscle group (neglected message)
-                      else if (key === 'muscleBalance.neglectedMessage' && index === 0) {
-                        // Translate single muscle group
-                        const translatedMuscle = t(`exercises:muscleGroupsList.${value}`, { defaultValue: value });
-                        params[`param${index}`] = translatedMuscle;
+                      // Check if this is a single muscle group (neglected message or first param)
+                      else if ((key === 'muscleBalance.neglectedMessage' || key === 'muscleBalance.underTrainedMessage' || key === 'muscleBalance.overTrainedMessage') && index === 0) {
+                        // Translate single muscle group or comma-separated list
+                        if (value.includes(',')) {
+                          const muscleGroups = value.split(',').map(m => m.trim());
+                          const translatedGroups = muscleGroups.map(muscle =>
+                            t(`exercises:muscleGroupsList.${muscle}`, { defaultValue: muscle })
+                          );
+                          params[`param${index}`] = translatedGroups.join('، '); // Use Arabic comma for RTL
+                        } else {
+                          const translatedMuscle = t(`exercises:muscleGroupsList.${value}`, { defaultValue: value });
+                          params[`param${index}`] = translatedMuscle;
+                        }
                       }
                       else {
                         params[`param${index}`] = value;
@@ -333,7 +341,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
                   role="tab"
                   data-carousel-indicator="true"
                   aria-label={t('coaching:goToInsight', { defaultValue: 'Go to insight {{number}}', number: index + 1 })}
-                  aria-selected={isActive ? 'true' : 'false'}
+                  aria-selected={isActive}
                   onClick={(e) => {
                     e.stopPropagation();
                     goToIndex(index);
