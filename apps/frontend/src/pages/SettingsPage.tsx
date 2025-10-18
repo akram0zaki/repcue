@@ -595,18 +595,32 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   onChange={(e) => onUpdateSettings({ coach_persona: e.target.value as 'zen' | 'energy' | 'logic' })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   data-testid="select-coach-persona"
-                  aria-describedby="coach-persona-help"
+                  aria-describedby="coach-persona-help coach-persona-description"
                 >
                   <option value="zen">
-                    {t('coaching:persona.zen.name', 'Zen Coach')} - {t('coaching:persona.zen.description', 'Calm, mindful, holistic approach')}
+                    {t('coaching:persona.zen.name', 'Zen Coach')}
                   </option>
                   <option value="energy">
-                    {t('coaching:persona.energy.name', 'Energy Coach')} - {t('coaching:persona.energy.description', 'Enthusiastic, motivational, high-energy')}
+                    {t('coaching:persona.energy.name', 'Energy Coach')}
                   </option>
                   <option value="logic">
-                    {t('coaching:persona.logic.name', 'Logic Coach')} - {t('coaching:persona.logic.description', 'Data-driven, analytical, precise')}
+                    {t('coaching:persona.logic.name', 'Logic Coach')}
                   </option>
                 </select>
+                <p 
+                  id="coach-persona-description"
+                  className="text-xs text-gray-600 dark:text-gray-400 mt-2"
+                >
+                  {appSettings.coach_persona === 'energy' && (
+                    <span>🔥 {t('coaching:persona.energy.description', 'Enthusiastic, motivational, high-energy')}</span>
+                  )}
+                  {appSettings.coach_persona === 'logic' && (
+                    <span>📊 {t('coaching:persona.logic.description', 'Data-driven, analytical, precise')}</span>
+                  )}
+                  {(!appSettings.coach_persona || appSettings.coach_persona === 'zen') && (
+                    <span>🧘 {t('coaching:persona.zen.description', 'Calm, mindful, holistic approach')}</span>
+                  )}
+                </p>
               </div>
 
               {/* Post-Workout Survey */}
