@@ -578,6 +578,37 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 />
               </div>
 
+              {/* Coach Persona Selection */}
+              <div className="mt-6">
+                <label htmlFor="coach-persona" className="label-text">
+                  {t('coaching:persona.title', 'Coach Personality')}
+                </label>
+                <p 
+                  id="coach-persona-help"
+                  className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3"
+                >
+                  {t('coaching:persona.description', 'Choose how your coach communicates with you')}
+                </p>
+                <select
+                  id="coach-persona"
+                  value={appSettings.coach_persona || 'zen'}
+                  onChange={(e) => onUpdateSettings({ coach_persona: e.target.value as 'zen' | 'energy' | 'logic' })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  data-testid="select-coach-persona"
+                  aria-describedby="coach-persona-help"
+                >
+                  <option value="zen">
+                    {t('coaching:persona.zen.name', 'Zen Coach')} - {t('coaching:persona.zen.description', 'Calm, mindful, holistic approach')}
+                  </option>
+                  <option value="energy">
+                    {t('coaching:persona.energy.name', 'Energy Coach')} - {t('coaching:persona.energy.description', 'Enthusiastic, motivational, high-energy')}
+                  </option>
+                  <option value="logic">
+                    {t('coaching:persona.logic.name', 'Logic Coach')} - {t('coaching:persona.logic.description', 'Data-driven, analytical, precise')}
+                  </option>
+                </select>
+              </div>
+
               {/* Post-Workout Survey */}
               <div className="flex items-center justify-between mb-3 mt-6">
                 <div className="flex-1">
