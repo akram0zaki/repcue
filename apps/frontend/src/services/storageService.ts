@@ -712,6 +712,34 @@ export class StorageService {
     }
   }
 
+  /**
+   * Check if database needs upgrade and force it if necessary
+   * This is useful when new tables are added (like personal_records in v23)
+   * and existing users haven't had their database upgraded yet
+   */
+  public async checkAndUpgradeDatabase(): Promise<void> {
+    try {
+      const currentVersion = this.db.verno;
+      const latestVersion = 23; // Update this when adding new versions
+      
+      if (currentVersion < latestVersion) {
+        logger.log(`Database needs upgrade: current v${currentVersion}, latest v${latestVersion}`);
+        
+        // Close the database
+        this.db.close();
+        
+        // Reopen will trigger the upgrade
+        await this.db.open();
+        
+        logger.log(`Database upgraded to v${this.db.verno}`);
+      } else {
+        logger.log(`Database is up to date at v${currentVersion}`);
+      }
+    } catch (error) {
+      logger.error('Error checking/upgrading database:', error);
+    }
+  }
+
   // === v2 sync_state helpers ===
   public async getSyncState(userId: string): Promise<Record<string, unknown> | null> {
     try {
@@ -4038,6 +4066,12 @@ export class StorageService {
     }
 
     try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade.');
+        return [];
+      }
+      
       const records = await this.db.personal_records.toArray();
       // Return only active records (filter out soft-deleted)
       return filterActiveRecords(records);
@@ -4066,6 +4100,12 @@ export class StorageService {
     }
 
     try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade. Skipping save.');
+        return;
+      }
+      
       const user = authService.getCurrentUser();
       const preparedRecord = prepareUpsert(record as PersonalRecord, user?.id);
       
@@ -4089,6 +4129,12 @@ export class StorageService {
     }
 
     try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade. Skipping delete.');
+        return;
+      }
+      
       const user = authService.getCurrentUser();
       const record = await this.db.personal_records.get(recordId);
       
@@ -4118,6 +4164,12 @@ export class StorageService {
     }
 
     try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade.');
+        return [];
+      }
+      
       const allRecords = await this.db.personal_records.toArray();
       // Filter active records (not deleted) for the specific exercise
       return filterActiveRecords(allRecords).filter(record => record.exerciseId === exerciseId);

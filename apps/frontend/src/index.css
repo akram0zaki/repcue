@@ -62,7 +62,7 @@ body.rtl .gap-x-reverse > :not([hidden]) ~ :not([hidden]) {
 /* Improved button spacing for RTL - exclude navigation buttons */
 body.rtl .btn-primary,
 body.rtl .btn-secondary,
-body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]) {
+body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]):not([data-carousel-indicator]) {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }

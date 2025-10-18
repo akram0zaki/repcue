@@ -11,6 +11,7 @@ import { logError, logWarn, logInfo } from './logger.ts';
  * AI-generated insight structure
  */
 export interface AIInsight {
+  id?: string;  // Optional ID (added during transformation or from cache)
   type: 'streak' | 'balance' | 'progress' | 'suggestion' | 'celebration' | 'recovery';
   title: string;
   message: string;
@@ -18,6 +19,7 @@ export interface AIInsight {
   actionable: boolean;
   actionText?: string;
   data?: Record<string, any>;
+  createdAt?: string;  // Optional ISO timestamp (added during transformation or from cache)
 }
 
 /**

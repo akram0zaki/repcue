@@ -207,7 +207,7 @@ const ExerciseDetailPage: React.FC = () => {
 
   const handleEdit = () => {
     if (!exercise) return;
-    navigate(`${AppRoutes.EXERCISES}/${exercise.id}/edit`);
+    navigate(`/exercises/edit/${exercise.id}`);
   };
 
   if (loading) {

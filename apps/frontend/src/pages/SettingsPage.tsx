@@ -167,6 +167,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     }
   };
 
+  const handleUpgradeDatabase = async () => {
+    try {
+      await storageService.checkAndUpgradeDatabase();
+      alert(t('settings.databaseUpgradeSuccess', 'Database upgraded successfully! Please refresh the page.'));
+      window.location.reload();
+    } catch (error) {
+      logger.error('Failed to upgrade database:', error);
+      alert(t('settings.databaseUpgradeError', 'Failed to upgrade database. Please try again.'));
+    }
+  };
+
   const handleForceRefresh = () => {
     setShowForceRefreshToast(true);
   };
@@ -214,6 +225,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             window.location.href = '/profile';
           }}
         />
+
+        {/* Language Settings */}
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+            {t('settings.language')}
+          </h2>
+          
+          <div className="space-y-3">
+            <LanguageSwitcher compact={false} showLabel={false} />
+          </div>
+        </div>
 
         {/* Audio Settings */}
   <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
@@ -650,20 +675,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           )}
         </section>
 
-        {/* Language Settings */}
-        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
-          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
-            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-            </svg>
-            {t('settings.language')}
-          </h2>
-          
-          <div className="space-y-3">
-            <LanguageSwitcher compact={false} showLabel={false} />
-          </div>
-        </div>
-
         {/* Data Settings */}
   <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
           <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
@@ -769,6 +780,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t('settings.refreshExercisesHelp')}
+            </p>
+          </div>
+
+          {/* Upgrade Database Button */}
+          <div className="mb-3">
+            <button
+              onClick={handleUpgradeDatabase}
+              disabled={!hasConsent}
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            >
+              {t('settings.upgradeDatabase', 'Upgrade Database')}
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {t('settings.upgradeDatabaseHelp', 'Updates your local database to the latest version with new features like personal records tracking.')}
             </p>
           </div>
 

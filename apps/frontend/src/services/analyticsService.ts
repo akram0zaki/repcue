@@ -521,11 +521,18 @@ export class AnalyticsService {
         const savedPRs = await this.storageService.getPersonalRecordsByExercise(exerciseId);
         
         // Find the most recently saved PR (by achievedAt timestamp)
-        const mostRecent = savedPRs
-          .filter(pr => newPRs.some(newPR => newPR.id === pr.id))
-          .reduce((latest, current) => {
-            return new Date(current.achievedAt) > new Date(latest.achievedAt) ? current : latest;
-          });
+        const matchingPRs = savedPRs.filter(pr => newPRs.some(newPR => newPR.id === pr.id));
+        
+        // Handle case where no matching PRs found (table might not exist)
+        if (matchingPRs.length === 0) {
+          logger.warn('No matching PRs found after save. Database may need upgrade.');
+          // Return the first new PR we tried to save
+          return newPRs[0] as PersonalRecord;
+        }
+        
+        const mostRecent = matchingPRs.reduce((latest, current) => {
+          return new Date(current.achievedAt) > new Date(latest.achievedAt) ? current : latest;
+        });
 
         logger.log(`New PR set for ${exercise.name}: ${mostRecent.recordType} = ${mostRecent.value}`);
         return mostRecent;

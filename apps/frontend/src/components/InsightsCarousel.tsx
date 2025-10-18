@@ -325,23 +325,27 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
         {/* Navigation Dots */}
         {displayInsights.length > 1 && (
           <div className="flex items-center justify-center gap-2 mt-3" role="tablist" aria-label={t('coaching:carouselNavigation', { defaultValue: 'Carousel navigation' })}>
-            {displayInsights.map((_, index) => (
-              <button
-                key={index}
-                role="tab"
-                aria-label={t('coaching:goToInsight', { defaultValue: 'Go to insight {{number}}', number: index + 1 })}
-                aria-selected={index === currentIndex}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToIndex(index);
-                }}
-                className={`w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
-                  index === currentIndex
-                    ? 'bg-primary-600 dark:bg-primary-400 w-6'
-                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                }`}
-              />
-            ))}
+            {displayInsights.map((_, index) => {
+              const isActive = index === currentIndex;
+              return (
+                <button
+                  key={index}
+                  role="tab"
+                  data-carousel-indicator="true"
+                  aria-label={t('coaching:goToInsight', { defaultValue: 'Go to insight {{number}}', number: index + 1 })}
+                  aria-selected={isActive ? 'true' : 'false'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToIndex(index);
+                  }}
+                  className={
+                    isActive
+                      ? 'w-6 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 bg-primary-600 dark:bg-primary-400 p-0'
+                      : 'w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 p-0'
+                  }
+                />
+              );
+            })}
           </div>
         )}
       </div>

@@ -411,12 +411,16 @@ serve(async (req) => {
       logInfo(correlationId, 'Returning cached insights', { userId, locale: userLocale, durationMs: duration });
       
       // Transform cached AI insights to match CoachingInsight interface
+      // Ensure each insight has an ID (cached insights may already have IDs)
+      const timestamp = Date.now();
       const transformedCachedInsights = {
         ...cachedInsights,
-        insights: cachedInsights.insights.map(insight => ({
+        insights: cachedInsights.insights.map((insight, index) => ({
           ...insight,
+          id: insight.id || `ai-coach-cached-${timestamp}-${correlationId}-${index}`,
           source: 'ai' as const,
-          dismissible: true
+          dismissible: true,
+          createdAt: insight.createdAt || new Date().toISOString()
         }))
       };
       
@@ -481,13 +485,16 @@ serve(async (req) => {
     const insights = await generateAIInsights(analyticsData, correlationId, userId);
 
     // Transform AI insights to match CoachingInsight interface
-    // Add dismissible: true and source: 'ai' to all AI-generated insights
+    // Add dismissible: true, source: 'ai', and unique ID to all AI-generated insights
+    const timestamp = Date.now();
     const transformedInsights = {
       ...insights,
-      insights: insights.insights.map(insight => ({
+      insights: insights.insights.map((insight, index) => ({
+        id: `ai-coach-${timestamp}-${correlationId}-${index}`,
         ...insight,
         source: 'ai' as const,
-        dismissible: true
+        dismissible: true,
+        createdAt: new Date().toISOString()
       }))
     };
 

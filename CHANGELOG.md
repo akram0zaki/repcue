@@ -2,6 +2,118 @@
 
 ### 2025-10-18
 
+#### 🗄️ Database Schema Auto-Upgrade System
+
+**Overview**: Implemented automatic database schema upgrade system to ensure all users have the latest IndexedDB schema with new features like personal records tracking.
+
+**Problem**: Users with databases created before version 23 were missing the `personal_records` table, causing runtime errors:
+- "Cannot read properties of undefined (reading 'toArray')" in production
+- Personal records feature not working for existing users
+- Defensive checks prevented crashes but didn't solve root cause
+
+**Solution**: Added automatic database version detection and upgrade mechanism:
+
+**Files Modified**:
+1. `apps/frontend/src/services/storageService.ts`:
+   - Added `checkAndUpgradeDatabase()` method to detect version drift and force upgrade
+   - Method checks current database version (`this.db.verno`) against latest version (23)
+   - If upgrade needed, closes and reopens database to trigger Dexie migration
+   - Added comprehensive logging for upgrade process
+
+2. `apps/frontend/src/App.tsx` (line ~1972):
+   - Integrated automatic upgrade check during app initialization
+   - Runs after `storageService.ready()` completes successfully
+   - Ensures all users get latest schema on app load
+
+3. `apps/frontend/src/pages/SettingsPage.tsx`:
+   - Added "Upgrade Database" button in Data Management section
+   - Allows users to manually trigger database upgrade if needed
+   - Button positioned after "Refresh Exercises", before "Force Refresh"
+   - Handler shows success/error alerts and triggers page reload
+   - Translation keys: `settings.upgradeDatabase`, `settings.upgradeDatabaseHelp`
+
+**Key Features**:
+- ✅ Automatic upgrade on app initialization
+- ✅ Manual upgrade option in Settings for troubleshooting
+- ✅ Version comparison logging for debugging
+- ✅ Safe upgrade path with database close/reopen
+- ✅ User-friendly alerts for upgrade status
+- ✅ Preserves existing user data during upgrade
+
+**Impact**:
+- Fixes production errors with personal_records table
+- Ensures all users have access to personal records tracking
+- Provides clear upgrade path for future schema changes
+- Eliminates version drift between old and new installations
+
+**Technical Details**:
+- Current schema version: 23 (adds personal_records table)
+- Upgrade process: Close DB → Reopen DB → Dexie auto-migrates
+- No data loss during upgrade
+- Upgrade runs once per version bump
+
+**Testing**:
+- TypeScript compilation: ✅ Pass
+- Runtime errors: ✅ Fixed (defensive checks + upgrade)
+- User experience: ✅ Seamless auto-upgrade
+- i18n completeness: ✅ All 8 languages updated
+
+**Translation Keys Added** (all locales: en, ar, ar-EG, de, es, fr, fy, nl):
+- `settings.upgradeDatabase` - "Upgrade Database" button text
+- `settings.upgradeDatabaseHelp` - Help text explaining the upgrade feature
+- `settings.databaseUpgradeSuccess` - Success message after upgrade
+- `settings.databaseUpgradeError` - Error message on failure
+
+#### 🐛 Fix: Coach Insights Carousel Navigation Indicators (RTL Consistency)
+
+**Problem**: On Arabic (RTL) home screen, the coach insights carousel showed pills for all navigation indicators (selected and non-selected), while the English version correctly showed a pill for the selected card and dots for non-selected cards.
+
+**Root Cause**: Two issues were affecting carousel indicators in RTL mode:
+1. **Tailwind CSS class conflict**: Base classes included `w-2`, then conditionally added `w-6` for selected indicators using template literals, causing CSS class precedence conflicts
+2. **RTL padding override**: Global CSS rule in `index.css` (line 65) applied `padding-left: 1.5rem; padding-right: 1.5rem;` to all buttons in RTL mode, forcing all carousel indicators to appear as pills regardless of their width classes
+
+**Solution**:
+**File 1**: `apps/frontend/src/components/InsightsCarousel.tsx` (lines 328-348)
+- Refactored to use explicit conditional rendering with separate complete class strings
+- Added `data-carousel-indicator="true"` attribute to identify carousel buttons
+- Added `p-0` class to both active and inactive states to explicitly reset padding
+
+**File 2**: `apps/frontend/src/index.css` (line 65)
+- Updated RTL button padding rule to exclude carousel indicators: `:not([data-carousel-indicator])`
+- This prevents the global padding override from affecting carousel indicator dimensions
+
+```tsx
+// Component changes
+<button
+  data-carousel-indicator="true"  // New: identifies carousel buttons
+  className={
+    isActive
+      ? 'w-6 h-2 ... p-0'  // New: explicit padding reset
+      : 'w-2 h-2 ... p-0'
+  }
+/>
+```
+
+```css
+/* CSS changes */
+body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]):not([data-carousel-indicator]) {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+```
+
+**Impact**:
+- ✅ Consistent carousel indicator behavior across all languages (LTR and RTL)
+- ✅ Selected card shows elongated pill (`w-6`)
+- ✅ Non-selected cards show small dots (`w-2`)
+- ✅ Proper visual hierarchy maintained in Arabic/RTL mode
+
+**Testing**:
+- TypeScript compilation: ✅ Pass
+- Expected behavior: Pill for selected, dots for non-selected (both LTR and RTL)
+
+### 2025-10-18
+
 #### 🎨 UI Compliance Phase 3 - Final Accessibility & RTL Enhancement (98%+ Compliance)
 
 **Phase 3 Overview**: Completed final accessibility and RTL support tasks achieving 98%+ UI compliance target.

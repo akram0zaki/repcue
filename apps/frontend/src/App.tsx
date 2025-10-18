@@ -1969,6 +1969,9 @@ function App() {
             await Promise.race([storageService.ready(), storageReadyTimeout]);
             const readyMs = Date.now() - tReady;
             if (readyMs > 800) logger.warn(`[init] storageService.ready() took ${readyMs}ms`);
+            
+            // Check and upgrade database if needed (e.g., for personal_records table in v23)
+            await storageService.checkAndUpgradeDatabase();
           } catch (error) {
             logger.error(`[init] storageService.ready() failed or timed out after 3s:`, error);
             // Continue with fallback - try to load built-in exercises without storage
