@@ -45,6 +45,15 @@ interface InsightCache {
 }
 
 /**
+ * Dismissed insight tracking
+ */
+interface DismissedInsight {
+  id: string;
+  dismissedAt: string;
+  expiresAt: string; // Insights can reappear after 24 hours
+}
+
+/**
  * Coaching Service singleton
  */
 export class CoachingService {
@@ -53,11 +62,14 @@ export class CoachingService {
   private storageService: StorageService;
   private insightCache: Map<string, InsightCache>;
   private readonly CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+  private readonly DISMISSAL_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly DISMISSED_INSIGHTS_KEY = 'repcue_dismissed_insights';
 
   private constructor() {
     this.analyticsService = AnalyticsService.getInstance();
     this.storageService = StorageService.getInstance();
     this.insightCache = new Map();
+    this.cleanupExpiredDismissals();
   }
 
   /**
@@ -114,8 +126,10 @@ export class CoachingService {
       // Cache the results
       this.cacheInsights(cacheKey, sortedInsights);
 
-      // Filter out dismissed insights
-      return sortedInsights.filter(insight => !insight.dismissed);
+      // Filter out dismissed insights (both in-memory and persisted)
+      return sortedInsights.filter(insight => 
+        !insight.dismissed && !this.isInsightDismissed(insight.id)
+      );
     } catch (error) {
       logger.error('Error generating coaching insights:', error);
       return [];
@@ -206,8 +220,9 @@ export class CoachingService {
           // Add a notification insight about AI failure (user-friendly)
           if (error.code !== 'RATE_LIMIT') {
             // Don't show error for rate limits (expected behavior)
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
             const errorInsight: CoachingInsight = {
-              id: `ai-error-${Date.now()}`,
+              id: this.generateInsightId('motivation', `ai-error-${error.code}-${today}`),
               type: 'motivation',
               priority: 'low',
               source: 'rule',
@@ -261,6 +276,84 @@ export class CoachingService {
       const afterCount = cache.insights.filter(i => i.dismissed).length;
       logger.log(`[CoachingService] Cache updated: ${beforeCount} -> ${afterCount} dismissed insights`);
     });
+
+    // Persist dismissal to localStorage
+    this.persistDismissedInsight(insightId);
+  }
+
+  /**
+   * Persist dismissed insight to localStorage
+   */
+  private persistDismissedInsight(insightId: string): void {
+    try {
+      const dismissed = this.getDismissedInsights();
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + this.DISMISSAL_DURATION_MS);
+
+      // Add new dismissal (or update if already exists)
+      const existingIndex = dismissed.findIndex(d => d.id === insightId);
+      if (existingIndex >= 0) {
+        dismissed[existingIndex] = {
+          id: insightId,
+          dismissedAt: now.toISOString(),
+          expiresAt: expiresAt.toISOString()
+        };
+      } else {
+        dismissed.push({
+          id: insightId,
+          dismissedAt: now.toISOString(),
+          expiresAt: expiresAt.toISOString()
+        });
+      }
+
+      localStorage.setItem(this.DISMISSED_INSIGHTS_KEY, JSON.stringify(dismissed));
+      logger.log(`[CoachingService] Persisted dismissal for: ${insightId}`);
+    } catch (error) {
+      logger.warn('[CoachingService] Failed to persist dismissed insight:', error);
+    }
+  }
+
+  /**
+   * Get list of dismissed insights from localStorage
+   */
+  private getDismissedInsights(): DismissedInsight[] {
+    try {
+      const stored = localStorage.getItem(this.DISMISSED_INSIGHTS_KEY);
+      if (!stored) return [];
+
+      const dismissed = JSON.parse(stored) as DismissedInsight[];
+      return dismissed.filter(d => new Date(d.expiresAt) > new Date());
+    } catch (error) {
+      logger.warn('[CoachingService] Failed to read dismissed insights:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Check if an insight is dismissed
+   */
+  private isInsightDismissed(insightId: string): boolean {
+    const dismissed = this.getDismissedInsights();
+    return dismissed.some(d => d.id === insightId);
+  }
+
+  /**
+   * Clean up expired dismissals from localStorage
+   */
+  private cleanupExpiredDismissals(): void {
+    try {
+      const dismissed = this.getDismissedInsights(); // This already filters expired
+      localStorage.setItem(this.DISMISSED_INSIGHTS_KEY, JSON.stringify(dismissed));
+    } catch (error) {
+      logger.warn('[CoachingService] Failed to cleanup expired dismissals:', error);
+    }
+  }
+
+  /**
+   * Generate stable insight ID based on type and key characteristics
+   */
+  private generateInsightId(type: InsightType, key: string): string {
+    return `${type}-${key}`;
   }
 
   /**
@@ -284,7 +377,7 @@ export class CoachingService {
     
     if (motivation.type === 'milestone') {
       insights.push({
-        id: `streak-milestone-${Date.now()}`,
+        id: this.generateInsightId('streak', `milestone-${streakData.currentStreak}`),
         type: 'streak',
         priority: 'high',
         source: 'rule',
@@ -303,7 +396,7 @@ export class CoachingService {
       });
     } else if (motivation.type === 'maintain') {
       insights.push({
-        id: `streak-maintain-${Date.now()}`,
+        id: this.generateInsightId('streak', `maintain-${streakData.currentStreak}`),
         type: 'streak',
         priority: 'medium',
         source: 'rule',
@@ -319,8 +412,9 @@ export class CoachingService {
     // Check if streak is at risk
     const currentHour = new Date().getHours();
     if (isStreakAtRisk(streakData, currentHour)) {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       insights.push({
-        id: `streak-risk-${Date.now()}`,
+        id: this.generateInsightId('streak', `risk-${today}`),
         type: 'streak',
         priority: 'high',
         source: 'rule',
@@ -357,8 +451,9 @@ export class CoachingService {
     // Recommend under-trained groups
     if (analysis.underTrainedGroups.length > 0) {
       const groups = analysis.underTrainedGroups.slice(0, 2);
+      const groupsKey = groups.map(g => g.muscleGroup).sort().join('-');
       insights.push({
-        id: `muscle-undertrained-${Date.now()}`,
+        id: this.generateInsightId('muscle-balance', `undertrained-${groupsKey}`),
         type: 'muscle-balance',
         priority: 'medium',
         source: 'rule',
@@ -381,8 +476,9 @@ export class CoachingService {
     // Warn about over-trained groups
     if (analysis.overTrainedGroups.length > 0) {
       const groups = analysis.overTrainedGroups.slice(0, 2);
+      const groupsKey = groups.map(g => g.muscleGroup).sort().join('-');
       insights.push({
-        id: `muscle-overtrained-${Date.now()}`,
+        id: this.generateInsightId('muscle-balance', `overtrained-${groupsKey}`),
         type: 'muscle-balance',
         priority: 'low',
         source: 'rule',
@@ -402,7 +498,7 @@ export class CoachingService {
       const daysSince = getDaysSinceLastTrained(group.lastTrainedAt!);
       
       insights.push({
-        id: `muscle-neglected-${Date.now()}`,
+        id: this.generateInsightId('muscle-balance', `neglected-${group.muscleGroup}`),
         type: 'muscle-balance',
         priority: 'low',
         source: 'rule',
@@ -467,7 +563,7 @@ export class CoachingService {
             : 'low';
 
         insights.push({
-          id: `progression-${rec.data.exerciseId}-${Date.now()}`,
+          id: this.generateInsightId('progression', `rep-${rec.data.exerciseId}`),
           type: 'progression',
           priority: confidenceLevel === 'high' ? 'high' : 'medium',
           source: 'rule',
@@ -503,7 +599,7 @@ export class CoachingService {
       } else {
         // Duration-based progression insight (simpler detection)
         insights.push({
-          id: `progression-duration-${rec.data.exerciseId}-${Date.now()}`,
+          id: this.generateInsightId('progression', `duration-${rec.data.exerciseId}`),
           type: 'progression',
           priority: 'medium',
           source: 'rule',
@@ -574,8 +670,9 @@ export class CoachingService {
         high: 'text-red-500'
       } as const;
 
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       insights.push({
-        id: `recovery-${Date.now()}`,
+        id: this.generateInsightId('recovery', `${recovery.severity}-${today}`),
         type: 'recovery',
         priority: priorityMap[recovery.severity],
         source: 'rule',
@@ -612,9 +709,12 @@ export class CoachingService {
     );
 
     const suggestion = suggestWorkout(sortedLogs, balance);
+    const suggestionKey = suggestion.targetMuscleGroups 
+      ? suggestion.targetMuscleGroups.sort().join('-')
+      : 'general';
 
     insights.push({
-      id: `suggestion-${Date.now()}`,
+      id: this.generateInsightId('suggestion', suggestionKey),
       type: 'suggestion',
       priority: 'low',
       source: 'rule',
