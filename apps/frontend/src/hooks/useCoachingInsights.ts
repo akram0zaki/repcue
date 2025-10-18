@@ -114,7 +114,7 @@ export const useCoachingInsights = (
   /**
    * Fetch insights from service
    */
-  const fetchInsights = useCallback(async (forceRefresh: boolean = false) => {
+  const fetchInsights = useCallback(async (forceRefresh: boolean = false, clearDismissals: boolean = false) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -127,9 +127,9 @@ export const useCoachingInsights = (
       } else {
         // Fetch all insights - use AI-enhanced if enabled
         if (enableAI) {
-          fetchedInsights = await coachingService.getAIEnhancedInsights(forceRefresh, true, userLocale);
+          fetchedInsights = await coachingService.getAIEnhancedInsights(forceRefresh, true, userLocale, clearDismissals);
         } else {
-          fetchedInsights = await coachingService.getAllInsights(forceRefresh);
+          fetchedInsights = await coachingService.getAllInsights(forceRefresh, clearDismissals);
         }
       }
 
@@ -152,7 +152,7 @@ export const useCoachingInsights = (
    * Refresh insights (force refresh)
    */
   const refresh = useCallback(async () => {
-    await fetchInsights(true);
+    await fetchInsights(true, true); // Force refresh AND clear dismissals
   }, [fetchInsights]);
 
   /**
@@ -263,7 +263,7 @@ export const useTopInsight = (settings?: AppSettings): {
     settings?.coach_show_suggestions
   ]);
 
-  const fetchTopInsight = useCallback(async (forceRefresh: boolean = false) => {
+  const fetchTopInsight = useCallback(async (forceRefresh: boolean = false, clearDismissals: boolean = false) => {
     try {
       // If coach is disabled, don't fetch
       if (settings?.coach_enabled === false) {
@@ -277,7 +277,7 @@ export const useTopInsight = (settings?: AppSettings): {
 
       // First refresh cache if requested
       if (forceRefresh) {
-        await coachingService.getAllInsights(true);
+        await coachingService.getAllInsights(true, clearDismissals);
       }
 
       const topInsight = await coachingService.getTopInsight();
@@ -301,7 +301,7 @@ export const useTopInsight = (settings?: AppSettings): {
   }, [coachingService, settings?.coach_enabled, isTypeEnabled]);
 
   const refresh = useCallback(async () => {
-    await fetchTopInsight(true);
+    await fetchTopInsight(true, true); // Force refresh AND clear dismissals
   }, [fetchTopInsight]);
 
   /**

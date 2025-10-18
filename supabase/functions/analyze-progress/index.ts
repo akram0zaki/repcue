@@ -35,6 +35,31 @@ const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 const CACHE_TTL_HOURS = 24;
 
 /**
+ * Generates a simple hash from a string (for stable insight IDs)
+ * Uses the same algorithm as frontend for consistency
+ */
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  // Convert to base36 for shorter string
+  return Math.abs(hash).toString(36);
+}
+
+/**
+ * Generates stable ID for AI insight based on content
+ * Format: ai-{type}-{titleHash}
+ * This ensures same insight content gets same ID across requests (for dismissal persistence)
+ */
+function generateStableInsightId(insight: any): string {
+  const titleHash = simpleHash(insight.title.toLowerCase().trim());
+  return `ai-${insight.type}-${titleHash}`;
+}
+
+/**
  * Rate limit check
  */
 async function checkRateLimit(userId: string): Promise<{ allowed: boolean; limit: number; retryAfter?: number }> {
@@ -411,13 +436,12 @@ serve(async (req) => {
       logInfo(correlationId, 'Returning cached insights', { userId, locale: userLocale, durationMs: duration });
       
       // Transform cached AI insights to match CoachingInsight interface
-      // Ensure each insight has an ID (cached insights may already have IDs)
-      const timestamp = Date.now();
+      // Ensure each insight has a stable ID based on content (for dismissal persistence)
       const transformedCachedInsights = {
         ...cachedInsights,
-        insights: cachedInsights.insights.map((insight, index) => ({
+        insights: cachedInsights.insights.map((insight) => ({
           ...insight,
-          id: insight.id || `ai-coach-cached-${timestamp}-${correlationId}-${index}`,
+          id: insight.id || generateStableInsightId(insight),
           source: 'ai' as const,
           dismissible: true,
           createdAt: insight.createdAt || new Date().toISOString()
@@ -485,12 +509,11 @@ serve(async (req) => {
     const insights = await generateAIInsights(analyticsData, correlationId, userId);
 
     // Transform AI insights to match CoachingInsight interface
-    // Add dismissible: true, source: 'ai', and unique ID to all AI-generated insights
-    const timestamp = Date.now();
+    // Generate stable IDs based on content (for dismissal persistence)
     const transformedInsights = {
       ...insights,
-      insights: insights.insights.map((insight, index) => ({
-        id: `ai-coach-${timestamp}-${correlationId}-${index}`,
+      insights: insights.insights.map((insight) => ({
+        id: generateStableInsightId(insight),
         ...insight,
         source: 'ai' as const,
         dismissible: true,

@@ -87,10 +87,18 @@ export class CoachingService {
    * Combines insights from multiple sources and prioritizes them
    * 
    * @param forceRefresh - Bypass cache and regenerate insights
+   * @param clearDismissals - Clear all dismissed insights (useful for manual refresh)
    * @returns Array of coaching insights, sorted by priority
    */
-  public async getAllInsights(forceRefresh: boolean = false): Promise<CoachingInsight[]> {
+  public async getAllInsights(forceRefresh: boolean = false, clearDismissals: boolean = false): Promise<CoachingInsight[]> {
     try {
+      // Clear dismissed insights if requested (e.g., manual refresh button)
+      if (clearDismissals) {
+        this.clearAllDismissedInsights();
+        this.clearCache(); // Also clear the insights cache for truly fresh insights
+        logger.log('[CoachingService] Cleared dismissed insights and cache for manual refresh');
+      }
+
       const cacheKey = 'all-insights';
 
       // Check cache unless force refresh
@@ -127,9 +135,12 @@ export class CoachingService {
       this.cacheInsights(cacheKey, sortedInsights);
 
       // Filter out dismissed insights (both in-memory and persisted)
-      return sortedInsights.filter(insight => 
+      const filteredInsights = sortedInsights.filter(insight => 
         !insight.dismissed && !this.isInsightDismissed(insight.id)
       );
+      
+      logger.log(`[CoachingService] Returning ${filteredInsights.length} insights (${sortedInsights.length} before dismissal filter)`);
+      return filteredInsights;
     } catch (error) {
       logger.error('Error generating coaching insights:', error);
       return [];
@@ -158,20 +169,26 @@ export class CoachingService {
    * @param forceRefresh - Bypass cache and regenerate insights
    * @param enableAI - Whether to fetch AI insights (typically from user settings)
    * @param locale - User's preferred language for AI responses (defaults to 'en')
+   * @param clearDismissals - Clear all dismissed insights (useful for manual refresh)
    * @returns Array of coaching insights (rule-based + AI), sorted by priority
    */
   public async getAIEnhancedInsights(
     forceRefresh: boolean = false,
     enableAI: boolean = false,
-    locale: string = 'en'
+    locale: string = 'en',
+    clearDismissals: boolean = false
   ): Promise<CoachingInsight[]> {
     try {
+      logger.log(`[CoachingService] getAIEnhancedInsights called with forceRefresh=${forceRefresh}, clearDismissals=${clearDismissals}, enableAI=${enableAI}`);
+      
       // Always get rule-based insights as baseline
-      const ruleBasedInsights = await this.getAllInsights(forceRefresh);
+      // Get rule-based insights first (always needed as fallback)
+      const ruleBasedInsights = await this.getAllInsights(forceRefresh, clearDismissals);
 
       // If AI is disabled, return rule-based insights only
       if (!enableAI) {
         logger.log('[CoachingService] AI insights disabled, returning rule-based only');
+        logger.log('[CoachingService] To enable: Go to Settings > Coach > Enable AI Insights');
         return ruleBasedInsights;
       }
 
@@ -179,6 +196,9 @@ export class CoachingService {
       const { canFetch, reason } = insightsService.canFetchInsights();
       if (!canFetch) {
         logger.log('[CoachingService] Cannot fetch AI insights:', reason);
+        if (reason?.includes('not authenticated')) {
+          logger.log('[CoachingService] Please sign in to access AI-powered insights');
+        }
         return ruleBasedInsights;
       }
 
@@ -207,7 +227,13 @@ export class CoachingService {
           ruleInsights: ruleBasedInsights.length
         });
 
-        return sortedInsights;
+        // Filter out dismissed insights (same as getAllInsights)
+        const filteredInsights = sortedInsights.filter(insight => 
+          !insight.dismissed && !this.isInsightDismissed(insight.id)
+        );
+        
+        logger.log(`[CoachingService] Returning ${filteredInsights.length} AI-enhanced insights (${sortedInsights.length} before dismissal filter)`);
+        return filteredInsights;
 
       } catch (error) {
         // Handle AI fetch errors gracefully - fall back to rule-based
@@ -350,6 +376,19 @@ export class CoachingService {
   }
 
   /**
+   * Clear all dismissed insights from localStorage
+   * Used when user manually refreshes to get fresh insights
+   */
+  private clearAllDismissedInsights(): void {
+    try {
+      localStorage.removeItem(this.DISMISSED_INSIGHTS_KEY);
+      logger.log('[CoachingService] Cleared all dismissed insights');
+    } catch (error) {
+      logger.warn('[CoachingService] Failed to clear dismissed insights:', error);
+    }
+  }
+
+  /**
    * Generate stable insight ID based on type and key characteristics
    */
   private generateInsightId(type: InsightType, key: string): string {
@@ -357,11 +396,12 @@ export class CoachingService {
   }
 
   /**
-   * Clear all cached insights
+   * Clear all cached insights (both coaching service and AI insights service)
    */
   public clearCache(): void {
     this.insightCache.clear();
-    logger.log('Coaching insights cache cleared');
+    insightsService.clearCache(); // Also clear AI insights cache
+    logger.log('Coaching insights cache cleared (including AI insights cache)');
   }
 
   // ============= Private Insight Generation Methods =============

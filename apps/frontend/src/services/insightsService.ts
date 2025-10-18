@@ -249,14 +249,17 @@ class InsightsService {
           cached: data.metadata?.cached
         });
 
-        // Ensure all AI insights have unique IDs (backend may not provide them)
-        // Generate stable IDs based on insight content + correlation ID
-        data.insights = data.insights.map((insight, index) => {
+        // Ensure all AI insights have stable IDs based on content (for dismissal persistence)
+        // Generate stable IDs from insight content hash, not correlationId (which changes each request)
+        data.insights = data.insights.map((insight) => {
           if (!insight.id) {
-            // Generate stable ID: ai-{correlationId}-{index}
-            const generatedId = `ai-${data.metadata.correlationId}-${index}`;
-            logger.warn('[InsightsService] AI insight missing ID, generated:', {
-              originalTitle: insight.title,
+            // Generate stable ID based on content: ai-{type}-{titleHash}
+            // Use a simple hash of the title for stability across requests
+            const titleHash = this.simpleHash(insight.title.toLowerCase().trim());
+            const generatedId = `ai-${insight.type}-${titleHash}`;
+            logger.log('[InsightsService] Generated stable ID for AI insight:', {
+              title: insight.title,
+              type: insight.type,
               generatedId
             });
             return { ...insight, id: generatedId };
@@ -404,6 +407,23 @@ class InsightsService {
     return this.getCachedInsights() !== null;
   }
 
+  // ============= Private Helper Methods =============
+
+  /**
+   * Generates a simple hash from a string (for stable IDs)
+   * Uses a basic hash algorithm that produces consistent results
+   */
+  private simpleHash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    // Convert to base36 for shorter string
+    return Math.abs(hash).toString(36);
+  }
+
   // ============= Private Cache Management Methods =============
 
   /**
@@ -436,12 +456,15 @@ class InsightsService {
       return null;
     }
 
-    // Ensure cached insights have IDs (defensive check for legacy cache)
-    const insights = this.cache.insights.map((insight, index) => {
+    // Ensure cached insights have stable IDs (defensive check for legacy cache)
+    const insights = this.cache.insights.map((insight, _index) => {
       if (!insight.id) {
-        const generatedId = `ai-${this.cache!.correlationId}-${index}`;
-        logger.warn('[InsightsService] Cached insight missing ID, generated:', {
-          originalTitle: insight.title,
+        // Generate same stable ID as fresh insights (content-based, not correlationId)
+        const titleHash = this.simpleHash(insight.title.toLowerCase().trim());
+        const generatedId = `ai-${insight.type}-${titleHash}`;
+        logger.log('[InsightsService] Generated stable ID for cached insight:', {
+          title: insight.title,
+          type: insight.type,
           generatedId
         });
         return { ...insight, id: generatedId };

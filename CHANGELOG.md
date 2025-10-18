@@ -2,6 +2,91 @@
 
 ### 2025-10-18
 
+#### 🧠 AI Insight Dismissal Persistence Fix
+
+**Overview**: Fixed critical bug where dismissed AI-powered coaching insights reappeared after navigating to other pages. Implemented stable content-based IDs for AI insights to enable proper dismissal tracking.
+
+**Problem**:
+- AI insights were using timestamp + correlationId based IDs: `ai-coach-{timestamp}-{correlationId}-{index}`
+- Each API request generated new IDs for the same insight content
+- Dismissal system couldn't match IDs across requests
+- `getAIEnhancedInsights()` was bypassing dismissal filter entirely
+- Result: Dismissed insights reappeared immediately after page navigation
+
+**Solution**: Implemented stable content-based ID generation using hash of insight title + type:
+
+**Files Modified**:
+
+1. **Backend - Edge Function** (`supabase/functions/analyze-progress/index.ts`):
+   - Added `simpleHash(str)` function (lines 36-48) - same algorithm as frontend
+   - Added `generateStableInsightId(insight)` function (lines 50-61)
+   - Updated fresh insights ID generation (line ~489): `ai-${type}-${titleHash}`
+   - Updated cached insights ID generation (line ~427): same stable format
+   - Deployed to both dev and prod environments
+
+2. **Frontend Service** (`apps/frontend/src/services/insightsService.ts`):
+   - Added `simpleHash(str)` private method (lines ~425-436)
+   - Updated fresh AI insights ID generation (line ~254): content-based IDs
+   - Updated cached AI insights ID generation (line ~477): same stable format
+   - Both now use: `ai-${insight.type}-${titleHash}` format
+   - Removed unused `index` parameter from map callback
+
+3. **Frontend Service** (`apps/frontend/src/services/coachingService.ts`):
+   - **CRITICAL FIX**: Added dismissal filtering to `getAIEnhancedInsights()` return path
+   - Previously returned merged insights without applying dismissal filter
+   - Now filters out dismissed insights before returning (line ~226-233)
+   - Updated `clearCache()` to also clear `insightsService` cache
+   - Added optional chaining for `reason?.includes()` safety check
+
+**Deployment Steps**:
+```bash
+# Deploy edge function to both environments
+supabase functions deploy analyze-progress --project-ref xwzrsfkzqxdybjrkkkvh  # Dev
+supabase functions deploy analyze-progress --project-ref zumzzuvfsuzvvymhpymk  # Prod
+
+# Clear old cache with old-format IDs
+DELETE FROM coaching_ai_cache WHERE created_at < NOW();  # Both environments
+```
+
+**Key Features**:
+- ✅ Stable IDs based on insight content (title + type)
+- ✅ Same insight gets same ID across all requests
+- ✅ Dismissed AI insights stay dismissed for 24 hours
+- ✅ Works across page navigation and app sessions
+- ✅ Compatible with refresh button (clears dismissals on demand)
+- ✅ Consistent hash algorithm between frontend and backend
+- ✅ Proper dismissal filtering in AI-enhanced mode
+- ✅ Cache clearing includes both coaching and insights service
+
+**ID Format**:
+- **Old**: `ai-coach-1760784667695-ai-coach-1760784662539-dlh5ctk-0` (changes every request)
+- **New**: `ai-motivation-5f3a8b` (stable across requests)
+
+**Impact**:
+- Fixes dismissal persistence for AI insights
+- Matches behavior of rule-based insights
+- Improves user experience on Coach page
+- Reduces repetitive insight display
+- No breaking changes or data migration needed
+
+**Technical Details**:
+- Hash algorithm: `((hash << 5) - hash) + char` with base36 encoding
+- Collision probability: Extremely low given unique titles + type prefix
+- Storage: localStorage key `repcue_dismissed_insights`
+- Expiration: 24 hours from dismissal time
+- Cache: Cleared to force fresh insights with new IDs
+- Dismissal filter: Applied to both `getAllInsights()` and `getAIEnhancedInsights()`
+
+**Bug Fixes**:
+- Fixed TypeScript error: Added optional chaining for `reason?.includes()` check
+- Fixed TypeScript error: Removed unused `index` parameter from map callback
+- Fixed dismissal bypass: `getAIEnhancedInsights()` now properly filters dismissed insights
+
+**Related Documentation**:
+- See `docs/migration-tracking/supabase-changes_20251018_ai-insight-stable-ids.md` for full technical details
+
+---
+
 #### 🗄️ Database Schema Auto-Upgrade System
 
 **Overview**: Implemented automatic database schema upgrade system to ensure all users have the latest IndexedDB schema with new features like personal records tracking.
