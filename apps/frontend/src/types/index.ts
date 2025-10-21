@@ -201,6 +201,14 @@ export interface ActivityLog extends SyncMetadata {
   }[];
   sets_count?: number;
   reps_count?: number;
+  // Personalization metadata (Enhancement E3.1)
+  metadata?: {
+    perceived_difficulty?: 1 | 2 | 3 | 4 | 5; // 1=Very Easy, 5=Very Hard
+    perceived_energy?: 1 | 2 | 3 | 4 | 5; // 1=Exhausted, 5=Energized
+    mood?: 'great' | 'good' | 'okay' | 'tired'; // Post-workout mood
+    quality?: 'excellent' | 'good' | 'average' | 'struggled'; // Workout quality
+    notes_from_survey?: string; // Optional user notes from post-workout survey
+  };
 }
 
 // Timer state
@@ -354,6 +362,21 @@ export interface AppSettings extends SyncMetadata {
   update_on_metered?: boolean; // allow updates on metered connections
   // Version tracking
   app_version?: string | null; // currently installed app version, null for new installations
+  // AI Coach settings
+  coach_enabled?: boolean; // Master toggle for AI Coach
+  coach_show_on_home?: boolean; // Display top insight on home page
+  coach_auto_refresh?: boolean; // Auto-refresh insights
+  coach_refresh_interval?: number; // Auto-refresh interval in milliseconds (default: 5 minutes)
+  coach_show_streak?: boolean; // Show streak insights
+  coach_show_muscle_balance?: boolean; // Show muscle balance insights
+  coach_show_progression?: boolean; // Show progression insights
+  coach_show_recovery?: boolean; // Show recovery insights
+  coach_show_suggestions?: boolean; // Show workout suggestions
+  coach_intro_seen?: boolean; // User has seen the coach introduction dialog
+  coach_ai_insights_enabled?: boolean; // Enable AI-powered insights (requires authentication)
+  coach_persona?: 'zen' | 'energy' | 'logic'; // Coach personality style (Enhancement E1.2)
+  coach_post_workout_survey_enabled?: boolean; // Show post-workout survey after workouts (Phase 1 Gamification)
+  celebration_sounds_enabled?: boolean; // Enable celebration sounds for PRs and milestones (Enhancement E1.1)
 }
 
 // Navigation routes
@@ -375,6 +398,8 @@ export const Routes = {
   CREATE_WORKOUT: '/workout/create',
   EDIT_WORKOUT: '/workout/edit',
   COMMUNITY: '/community',
+  COACH: '/coach',
+  PR_HISTORY: '/personal-records',
   AUTH_CALLBACK: '/auth/callback'
 } as const;
 

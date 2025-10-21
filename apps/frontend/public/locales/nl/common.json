@@ -71,7 +71,14 @@
     "clearFilter": "Filter wissen",
     "other": "Overige",
     "selectOne": "Selecteer één",
-    "done": "Klaar"
+    "done": "Klaar",
+    "refresh": "Vernieuwen",
+    "streakMilestone": "🔥 Mijlpaal van {{days}} dagen reeks!",
+    "surveyThanks": "Bedankt voor je feedback!",
+    "surveyError": "Kon enquêteantwoord niet opslaan",
+    "skip": "Overslaan",
+    "submit": "Indienen",
+    "submitting": "Indienen..."
   },
   "navigation": {
     "home": "Home",
@@ -80,6 +87,7 @@
     "timer": "Timer",
     "activityLog": "Logboek",
     "progress": "Voortgang",
+    "coach": "Coach",
     "settings": "Instellingen"
   },
   "settings": {
@@ -125,6 +133,10 @@
     "syncNowHelp": "Wijzigingen handmatig met de server synchroniseren voor testen of troubleshooting.",
     "refreshExercises": "Oefeningen Vernieuwen",
     "refreshExercisesHelp": "Forceer vernieuwing van oefeningen van server en reset alle favorieten",
+    "upgradeDatabase": "Database Upgraden",
+    "upgradeDatabaseHelp": "Werk je lokale database bij naar de nieuwste versie met nieuwe functies zoals persoonlijke recordbijhouding.",
+    "databaseUpgradeSuccess": "Database succesvol geüpgraded! Ververs de pagina.",
+    "databaseUpgradeError": "Database upgraden mislukt. Probeer het opnieuw.",
     "forceRefreshApp": "App Forceren Verversen",
     "forceRefreshAppHelp": "Wis alle caches en laad de app vers vanaf de server. Gebruik wanneer de app verouderd lijkt of onverwacht gedrag vertoont.",
     "clearCachesOnly": "Alleen Caches Wissen",
@@ -260,7 +272,7 @@
     "heroTitle": "Blijf consistent, blijf sterk.",
     "heroSubtitle": "Uw trainingen, op uw manier.",
     "upcomingWorkout": "Aankomende Training",
-    "tagline": "Uw persoonlijke oefeningentimer",
+    "tagline": "Jouw persoonlijke AI-coach voor effectievere workouts",
     "signInMessage": "Je kunt ",
     "signInLink": "inloggen",
     "signInSuffix": " om je voortgang te volgen en te delen.",
@@ -372,7 +384,9 @@
     "status": {
       "stoppedAfter": "Gestopt na {{duration}}",
       "completedSetsReps": "{{sets}} sets van {{reps}} herhalingen voltooid",
-      "completedTime": "{{duration}} interval timer voltooid",
+      "completedSetsRepsInWorkout": "{{sets}} sets van {{reps}} herhalingen voltooid in training: {{workoutName}}",
+      "completedTime": "{{duration}} intervaltimer voltooid",
+      "completedTimeInWorkout": "{{duration}} voltooid in training: {{workoutName}}",
       "completedWorkout": "Training voltooid met {{count}} oefening",
       "completedWorkout_plural": "Training voltooid met {{count}} oefeningen"
     },

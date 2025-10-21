@@ -477,6 +477,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               >
                 {/* Inset the video slightly so progress ring(s) wrap AROUND, not over, the media */}
                 <video
+                  key={selectedExercise?.id || 'no-exercise'}
                   ref={exerciseVideo.videoRef}
                   autoPlay
                   muted
@@ -676,6 +677,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 >
                   {/* Video taking maximum space with minimal border for progress */}
                   <video
+                    key={selectedExercise?.id || 'no-exercise'}
                     ref={exerciseVideo.videoRef}
                     autoPlay
                     muted

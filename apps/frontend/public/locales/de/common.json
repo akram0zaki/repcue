@@ -61,6 +61,10 @@
     "playVideo": "Video abspielen",
     "premium": "PRO",
     "done": "Fertig",
+    "refresh": "Aktualisieren",
+    "streakMilestone": "🔥 {{days}}-Tage-Strähnen-Meilenstein!",
+    "surveyThanks": "Vielen Dank für Ihr Feedback!",
+    "surveyError": "Umfrageantwort konnte nicht gespeichert werden",
     "addEquipment": "Ausrüstung hinzufügen",
     "removeEquipment": "Ausrüstung entfernen",
     "addMuscleGroup": "Muskelgruppe hinzufügen",
@@ -79,7 +83,10 @@
     "badges": "Abzeichen",
     "clearFilter": "Filter zurücksetzen",
     "other": "Andere",
-    "selectOne": "Wählen Sie eine aus"
+    "selectOne": "Wählen Sie eine aus",
+    "skip": "Überspringen",
+    "submit": "Einreichen",
+    "submitting": "Wird eingereicht..."
   },
   "navigation": {
     "home": "Startseite",
@@ -88,6 +95,7 @@
     "timer": "Timer",
     "activityLog": "Protokoll",
     "progress": "Fortschritt",
+    "coach": "Coach",
     "settings": "Einstellungen"
   },
   "settings": {
@@ -133,7 +141,11 @@
     "syncNowHelp": "Änderungen manuell mit dem Server synchronisieren – hilfreich für Tests/Fehlersuche.",
     "refreshExercises": "Übungen aktualisieren",
     "refreshExercisesHelp": "Übungen vom Server neu laden und alle Favoriten zurücksetzen",
-    "forceRefreshApp": "App Zwangsweise Aktualisieren",
+    "upgradeDatabase": "Datenbank aktualisieren",
+    "upgradeDatabaseHelp": "Aktualisiert Ihre lokale Datenbank auf die neueste Version mit neuen Funktionen wie der Verfolgung persönlicher Rekorde.",
+    "databaseUpgradeSuccess": "Datenbank erfolgreich aktualisiert! Bitte aktualisieren Sie die Seite.",
+    "databaseUpgradeError": "Fehler beim Aktualisieren der Datenbank. Bitte versuchen Sie es erneut.",
+    "forceRefreshApp": "App zwangsweise aktualisieren",
     "forceRefreshAppHelp": "Alle Caches leeren und App frisch vom Server laden. Nutzen Sie dies, wenn die App veraltet erscheint oder unerwartetes Verhalten zeigt.",
     "clearCachesOnly": "Nur Caches Leeren",
     "clearCachesOnlyHelp": "PWA-Caches leeren ohne die App neu zu laden. Weniger störend als vollständige Aktualisierung.",
@@ -268,7 +280,7 @@
     "heroTitle": "Bleiben Sie konsequent, bleiben Sie stark.",
     "heroSubtitle": "Ihre Workouts, auf Ihre Art.",
     "upcomingWorkout": "Anstehendes Workout",
-    "tagline": "Ihr persönlicher Übungstimer",
+    "tagline": "Dein persönlicher KI-Coach für effektivere Workouts",
     "signInMessage": "Sie können sich ",
     "signInLink": "anmelden",
     "signInSuffix": " um Ihren Fortschritt zu verfolgen und zu teilen.",
@@ -379,8 +391,10 @@
     "exerciseCount_other": "{{count}} Übungen",
     "status": {
       "stoppedAfter": "Gestoppt nach {{duration}}",
-      "completedSetsReps": "{{sets}} Sätze von {{reps}} Wiederholungen abgeschlossen",
+      "completedSetsReps": "{{sets}} Sätze mit {{reps}} Wiederholungen abgeschlossen",
+      "completedSetsRepsInWorkout": "{{sets}} Sätze mit {{reps}} Wiederholungen im Training abgeschlossen: {{workoutName}}",
       "completedTime": "{{duration}} Intervall-Timer abgeschlossen",
+      "completedTimeInWorkout": "{{duration}} im Training abgeschlossen: {{workoutName}}",
       "completedWorkout": "Training mit {{count}} Übung abgeschlossen",
       "completedWorkout_plural": "Training mit {{count}} Übungen abgeschlossen"
     },

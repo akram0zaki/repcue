@@ -11,6 +11,7 @@ import type {
   SyncMetadata,
   ExerciseCatalog
 } from '../types';
+import type { PersonalRecord } from '../types/coaching';
 import { consentService } from './consentService';
 import { authService } from './authService';
 import { SYNC_DEBUG } from '../config/features';
@@ -40,6 +41,9 @@ type StoredWorkout = Workout;
 
 type StoredWorkoutSession = WorkoutSession;
 
+// Personal records for tracking exercise achievements
+type StoredPersonalRecord = PersonalRecord;
+
 // Video file storage for offline-first approach
 interface StoredVideoFile extends SyncMetadata {
   exercise_id: string;
@@ -65,6 +69,7 @@ class RepCueDatabase extends Dexie {
   workout_sessions!: Table<StoredWorkoutSession>;
   video_files!: Table<StoredVideoFile>;
   exercise_catalogs!: Table<ExerciseCatalog>;
+  personal_records!: Table<StoredPersonalRecord>;
 
   constructor() {
     super('RepCueDB');
@@ -350,6 +355,22 @@ class RepCueDatabase extends Dexie {
       sync_state: 'user_id',
       video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
       exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty'
+    });
+
+    // Version 23: Add personal_records table for tracking exercise achievements
+    this.version(23).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, *tags, [catalogId+*tags], updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty',
+      // NEW: Personal records for tracking exercise achievements (max reps, sets, duration, weight)
+      personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId'
     });
 
       await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
@@ -688,6 +709,34 @@ export class StorageService {
     } catch (error) { 
       logger.error('[StorageService] ready() failed:', error);
       /* ignore */ 
+    }
+  }
+
+  /**
+   * Check if database needs upgrade and force it if necessary
+   * This is useful when new tables are added (like personal_records in v23)
+   * and existing users haven't had their database upgraded yet
+   */
+  public async checkAndUpgradeDatabase(): Promise<void> {
+    try {
+      const currentVersion = this.db.verno;
+      const latestVersion = 23; // Update this when adding new versions
+      
+      if (currentVersion < latestVersion) {
+        logger.log(`Database needs upgrade: current v${currentVersion}, latest v${latestVersion}`);
+        
+        // Close the database
+        this.db.close();
+        
+        // Reopen will trigger the upgrade
+        await this.db.open();
+        
+        logger.log(`Database upgraded to v${this.db.verno}`);
+      } else {
+        logger.log(`Database is up to date at v${currentVersion}`);
+      }
+    } catch (error) {
+      logger.error('Error checking/upgrading database:', error);
     }
   }
 
@@ -4002,6 +4051,132 @@ export class StorageService {
     // Import here to avoid circular dependencies
     const { getDefaultCatalog } = await import('../data/catalogs');
     return getDefaultCatalog();
+  }
+
+  // =============== Personal Records Methods ===============
+
+  /**
+   * Get all personal records from IndexedDB
+   * 
+   * @returns Array of all personal records
+   */
+  public async getPersonalRecords(): Promise<PersonalRecord[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade.');
+        return [];
+      }
+      
+      const records = await this.db.personal_records.toArray();
+      // Return only active records (filter out soft-deleted)
+      return filterActiveRecords(records);
+    } catch (error) {
+      logger.error('Failed to get personal records from IndexedDB:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save a personal record to IndexedDB
+   * 
+   * @param record - Personal record to save
+   */
+  /**
+   * Save a personal record to IndexedDB (consent-aware)
+   * Accepts either a new record (NewPersonalRecord) or a full record (PersonalRecord)
+   * prepareUpsert will add sync metadata for new records
+   * 
+   * @param record - Personal record to save
+   */
+  public async savePersonalRecord(record: PersonalRecord | Partial<PersonalRecord>): Promise<void> {
+    if (!this.canStoreData()) {
+      logger.warn('Cannot save personal record without user consent');
+      return;
+    }
+
+    try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade. Skipping save.');
+        return;
+      }
+      
+      const user = authService.getCurrentUser();
+      const preparedRecord = prepareUpsert(record as PersonalRecord, user?.id);
+      
+      // Use put() to handle both insert and update operations
+      await this.db.personal_records.put(preparedRecord);
+      logger.log(`✅ Saved personal record: ${record.exerciseName} ${record.recordType} = ${record.value}`);
+    } catch (error) {
+      logger.error('Failed to save personal record to IndexedDB:', error);
+    }
+  }
+
+  /**
+   * Delete a personal record from IndexedDB (soft delete for sync)
+   * 
+   * @param recordId - ID of the personal record to delete
+   */
+  public async deletePersonalRecord(recordId: string): Promise<void> {
+    if (!this.canStoreData()) {
+      logger.warn('Cannot delete personal record without user consent');
+      return;
+    }
+
+    try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade. Skipping delete.');
+        return;
+      }
+      
+      const user = authService.getCurrentUser();
+      const record = await this.db.personal_records.get(recordId);
+      
+      if (!record) {
+        logger.warn(`Personal record not found for deletion: ${recordId}`);
+        return;
+      }
+      
+      // Use soft delete (tombstone pattern) for sync compatibility
+      const tombstone = prepareSoftDelete(record, user?.id);
+      await this.db.personal_records.put(tombstone);
+      logger.log(`🗑️ Soft deleted personal record: ${recordId}`);
+    } catch (error) {
+      logger.error('Failed to delete personal record from IndexedDB:', error);
+    }
+  }
+
+  /**
+   * Get personal records for a specific exercise (active records only)
+   * 
+   * @param exerciseId - Exercise ID to filter by
+   * @returns Array of personal records for the exercise
+   */
+  public async getPersonalRecordsByExercise(exerciseId: string): Promise<PersonalRecord[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    try {
+      // Check if table exists (defensive check for databases created before v23)
+      if (!this.db.personal_records) {
+        logger.warn('Personal records table does not exist in database. Database may need upgrade.');
+        return [];
+      }
+      
+      const allRecords = await this.db.personal_records.toArray();
+      // Filter active records (not deleted) for the specific exercise
+      return filterActiveRecords(allRecords).filter(record => record.exerciseId === exerciseId);
+    } catch (error) {
+      logger.error('Failed to get personal records by exercise from IndexedDB:', error);
+      return [];
+    }
   }
 }
 

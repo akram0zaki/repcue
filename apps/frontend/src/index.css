@@ -62,7 +62,7 @@ body.rtl .gap-x-reverse > :not([hidden]) ~ :not([hidden]) {
 /* Improved button spacing for RTL - exclude navigation buttons */
 body.rtl .btn-primary,
 body.rtl .btn-secondary,
-body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]) {
+body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]):not([data-carousel-indicator]) {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
@@ -529,5 +529,32 @@ body.rtl .truncate {
 
   .float-end-rtl {
     @apply float-right rtl:float-left;
+  }
+
+  /* ========================================
+     MICRO-INTERACTIONS (AI Coach Enhancement)
+     ======================================== */
+
+  /* Pulsing animation for attention-grabbing elements */
+  @keyframes pulse-animation {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  .pulse-animation {
+    animation: pulse-animation 2s ease-in-out infinite;
+  }
+
+  /* Respect reduced motion preference - disable pulse animation */
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-animation {
+      animation: none !important;
+    }
   }
 }

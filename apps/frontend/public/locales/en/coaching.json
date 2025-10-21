@@ -1,0 +1,198 @@
+{
+  "title": "Your Coach",
+  "subtitle": "Personalized insights to help you reach your goals",
+  "aiEnabled": "AI-Powered",
+  "aiPowered": "AI",
+  "aiInsights": "AI-Powered Insights",
+  "additionalInsights": "Additional Insights",
+  "aiUnavailable": "AI Insights Temporarily Unavailable",
+  "aiUnavailableMessage": "We're having trouble getting AI insights right now. You're still getting our standard coaching insights.",
+  "empty": {
+    "title": "No Insights Yet",
+    "message": "Start working out to get personalized coaching insights!",
+    "startWorkout": "Start Your First Workout"
+  },
+  "error": {
+    "title": "Unable to Load Insights"
+  },
+  "progress": {
+    "title": "Your Progress"
+  },
+  "actionsLabel": "Available actions",
+  "settings": {
+    "title": "AI Coach",
+    "enabled": "Enable AI Coach",
+    "enabledHelp": "Get personalized insights and recommendations based on your workout history",
+    "showOnHome": "Show on Home Page",
+    "showOnHomeHelp": "Display top insight on your home page",
+    "autoRefresh": "Auto-Refresh Insights",
+    "autoRefreshHelp": "Automatically refresh insights every 5 minutes",
+    "aiInsightsEnabled": "Enable AI-Powered Insights",
+    "aiInsightsHelp": "Get advanced AI analysis of your progress, trends, and personalized recommendations. Your data is processed securely and used only to generate insights.",
+    "aiInsightsAuthRequired": "Sign in to enable AI-powered insights.",
+    "aiInsightsDataUsage": "Limited to 10 AI requests per hour. Cached for 24 hours.",
+    "insightTypes": "Insight Types",
+    "showStreak": "Workout Streaks",
+    "showMuscleBalance": "Muscle Balance",
+    "showProgression": "Progressive Overload",
+    "showRecovery": "Recovery Time",
+    "showSuggestions": "Workout Suggestions",
+    "celebrationSounds": "Celebration Sounds",
+    "celebrationSoundsHelp": "Play celebration sounds for personal records and milestones",
+    "postWorkoutSurvey": "Post-Workout Survey",
+    "postWorkoutSurveyHelp": "Quick feedback after workouts helps personalize your coaching insights"
+  },
+  "streak": {
+    "title": "Workout Streak",
+    "milestone": "Amazing! You've reached a {{param0}}-day streak!",
+    "almostMilestone": "Almost there! 1 more day to reach {{param0}} days!",
+    "maintain": "Keep it going! You're on a {{param0}}-day streak.",
+    "newRecord": "New personal record! This is your longest streak yet!",
+    "building": "Great momentum! You're on day {{param0}} of your streak.",
+    "justStarted": "Nice! You've started your workout streak. Keep it up!",
+    "noStreak": "Start your workout streak today!",
+    "atRisk": "Streak at Risk",
+    "atRiskMessage": "Your {{param0}}-day streak is at risk! Work out today to keep it going."
+  },
+  "muscleBalance": {
+    "underTrained": "Balance Your Training",
+    "underTrainedMessage": "Your {{param0}} needs more attention. Consider adding exercises targeting these areas.",
+    "overTrained": "Recovery Needed",
+    "overTrainedMessage": "You've been focusing heavily on {{param0}}. Consider balancing with other muscle groups.",
+    "neglected": "Time to Train {{param0}}",
+    "neglectedMessage": "It's been {{param1}} days since you trained your {{param0}}. Time to give it some attention!"
+  },
+  "progression": {
+    "ready": "Ready for Progression",
+    "readyTitle": "Ready to Level Up!",
+    "readyMessage": "You're ready to progress on {{param0}}! Try {{param1}} sets of {{param2}} reps next time.",
+    "readyDurationMessage": "You're ready to progress on {{param0}}! Try {{param1}} sets of {{param2}} seconds next time.",
+    "highCompletionRate": "High completion rate indicates readiness for progression",
+    "plateau_detected": "Performance plateau detected - time to increase volume or intensity",
+    "volume_increase": "Consistent completion suggests readiness for volume increase",
+    "intensity_increase": "Strong performance patterns indicate readiness for intensity boost",
+    "optimal_rest": "Good rest patterns support safe progression"
+  },
+  "recovery": {
+    "title": "Recovery Day",
+    "needed": "Your body needs rest. Consider taking a recovery day or doing light activity.",
+    "recommended": "You've been training hard. A recovery day would help prevent overtraining.",
+    "consecutiveDays": "Trained {{param0}} consecutive days",
+    "consecutive_high": "{{param0}} consecutive training days detected - high fatigue risk",
+    "consecutive_medium": "{{param0}} consecutive training days - moderate recovery needed",
+    "consecutive_low": "{{param0}} consecutive training days - light recovery recommended",
+    "fatigue_high": "Multiple fatigue indicators detected - rest is essential",
+    "fatigue_medium": "Moderate fatigue signals detected - recovery recommended",
+    "volume_spike": "Sudden training volume increase detected - extra recovery needed",
+    "muscle_overuse": "Some muscle groups trained frequently - consider rotation",
+    "high_intensity": "High intensity training detected - adequate rest is important"
+  },
+  "suggestion": {
+    "title": "Workout Suggestion",
+    "message": "Based on your history, here's a workout suggestion for you."
+  },
+  "suggestions": {
+    "startJourney": "Ready to start your fitness journey? Let's begin with your first workout!",
+    "longGap": "It's been a while! Time to get back on track with a workout.",
+    "neglectedMuscles": "Some muscle groups need attention! Let's work on them.",
+    "improveBalance": "Let's balance your training with exercises for undertrained muscles!",
+    "keepGoing": "Keep up the great work! Here's a suggested exercise for your next session."
+  },
+  "actions": {
+    "viewProgress": "View Progress",
+    "workoutNow": "Workout Now",
+    "findExercises": "Find Exercises",
+    "startWorkout": "Start Workout",
+    "startExercise": "Start {{param0}}",
+    "viewCoach": "View Coach",
+    "tryIt": "Try It"
+  },
+  "pr": {
+    "title": "Personal Records",
+    "subtitle": "Your best performances for each exercise",
+    "newRecord": "New Personal Record!",
+    "awesome": "Awesome! 🎉",
+    "keepGoing": "Keep up the great work!",
+    "close": "Close",
+    "autoDismiss": "Auto-dismiss in {{param0}}s",
+    "previousBest": "Previous Best",
+    "improvement": "Improvement",
+    "milestone": "Milestone",
+    "share": "Share Achievement",
+    "type": {
+      "maxReps": "Max Reps",
+      "maxSets": "Max Sets",
+      "maxDuration": "Max Duration",
+      "maxWeight": "Max Weight"
+    },
+    "unit": {
+      "reps": "reps",
+      "sets": "sets"
+    },
+    "search": "Search",
+    "searchPlaceholder": "Search exercises...",
+    "filterType": "Record Type",
+    "filterMuscle": "Muscle Group",
+    "allTypes": "All Types",
+    "allMuscles": "All Muscles",
+    "sortBy": "Sort By",
+    "sortNewest": "Newest First",
+    "sortOldest": "Oldest First",
+    "sortHighest": "Highest Value",
+    "sortLowest": "Lowest Value",
+    "showingCount": "Showing {{count}} record(s)",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "loading": "Loading your records...",
+    "noRecordsYet": "No personal records yet",
+    "emptyMessage": "Complete workouts to set your first personal records and track your progress!",
+    "noMatching": "No matching records",
+    "tryDifferentFilter": "Try adjusting your search or filters to find records.",
+    "startWorkout": "Start a Workout"
+  },
+  "survey": {
+    "title": "How was your workout?",
+    "subtitle": "Help us personalize your coaching insights",
+    "thankYou": "Thank You!",
+    "feedbackHelps": "Your feedback helps us provide better coaching insights.",
+    "great": "Felt great!",
+    "greatDesc": "Strong energy, good form",
+    "good": "Felt good",
+    "goodDesc": "Solid workout, no issues",
+    "okay": "It was okay",
+    "okayDesc": "Got through it",
+    "tired": "Felt tired",
+    "tiredDesc": "Low energy, challenging",
+    "difficulty": "Difficulty Level",
+    "veryEasy": "Very Easy",
+    "veryHard": "Very Hard",
+    "energy": "Energy Level After",
+    "exhausted": "Exhausted",
+    "energized": "Energized",
+    "notes": "Notes (Optional)",
+    "notesPlaceholder": "Any thoughts about this workout?",
+    "moreDetails": "Add more details"
+  },
+  "persona": {
+    "title": "Coach Personality",
+    "description": "Choose how your coach communicates with you",
+    "zen": {
+      "name": "Zen Coach",
+      "description": "Calm, mindful, holistic approach"
+    },
+    "energy": {
+      "name": "Energy Coach",
+      "description": "Enthusiastic, motivational, high-energy"
+    },
+    "logic": {
+      "name": "Logic Coach",
+      "description": "Data-driven, analytical, precise"
+    }
+  },
+  "insights": "Coach Insights",
+  "viewAll": "View All",
+  "insightsCarousel": "Coaching insights carousel",
+  "carouselNavigation": "Carousel navigation",
+  "goToInsight": "Go to insight {{number}}"
+}

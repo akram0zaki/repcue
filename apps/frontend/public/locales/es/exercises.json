@@ -133,7 +133,7 @@
   "defaultSets": "Series Predeterminadas",
   "descriptionPlaceholder": "Describe el ejercicio",
   "instructionPlaceholder": "Introduce las instrucciones del paso",
-"customVideo": "Video Personalizado",
+  "customVideo": "Video Personalizado",
   "defaultSettings": "Configuraciones Predeterminadas",
   "demonstrationVideo": "Video de Demostración",
   "duration": "Duración",
@@ -156,7 +156,6 @@
   "viewDetails": "Ver Detalles",
   "viewDetailsAria": "Ver detalles del ejercicio",
   "visibility": "Visibilidad",
-
   "viewOnly": "Solo Vista",
   "filterShared": "Compartidos conmigo",
   "categoryShort": "Cat",
@@ -187,9 +186,6 @@
   "saveFailed": "Error al guardar el ejercicio",
   "tagsLabel": "Etiquetas",
   "defaultDurationLabel": "Duración Predeterminada",
-
-
-
   "copies": "Copias",
   "created": "Creado",
   "equipmentNeeded": "Equipo Necesario",
@@ -197,7 +193,6 @@
   "ratingsAndReviews": "Calificaciones & Reseñas",
   "stats": "Estadísticas",
   "filtersAndSearch": "Filtros y Búsqueda",
-
   "title": "Ejercicios",
   "subtitle": "Explora, filtra e inicia ejercicios. Marca favoritos para acceso rápido.",
   "searchLabel": "Buscar ejercicios",
@@ -266,5 +261,26 @@
   "stepLabel": "Paso",
   "shareErrorAuth": "Debes estar registrado para compartir ejercicios",
   "shareErrorNotSynced": "El ejercicio debe estar sincronizado antes de compartir",
-  "shareErrorOffline": "No se puede compartir mientras está desconectado"
+  "shareErrorOffline": "No se puede compartir mientras está desconectado",
+  "muscleGroupsList": {
+    "core": "Núcleo",
+    "abs": "Abdominales",
+    "obliques": "Oblicuos",
+    "shoulders": "Hombros",
+    "chest": "Pecho",
+    "triceps": "Tríceps",
+    "quads": "Cuádriceps",
+    "glutes": "Glúteos",
+    "hamstrings": "Isquiotibiales",
+    "calves": "Pantorrillas",
+    "cardio": "Cardio",
+    "legs": "Piernas",
+    "flexibility": "Flexibilidad",
+    "back": "Espalda",
+    "hips": "Caderas",
+    "balance": "Equilibrio",
+    "full-body": "Cuerpo Completo",
+    "hands": "Manos",
+    "mobility": "Movilidad"
+  }
 }

@@ -1,0 +1,198 @@
+{
+  "title": "Jo Coach",
+  "subtitle": "Personalisearre ynsichten om jo te helpen jo doelen te berikken",
+  "aiEnabled": "AI-oandreaun",
+  "aiPowered": "AI",
+  "aiInsights": "AI-oandreaune Ynsichten",
+  "additionalInsights": "Oanfoljende Ynsichten",
+  "aiUnavailable": "AI-ynsichten Tydlik Net Beskikber",
+  "aiUnavailableMessage": "Wy hawwe op it stuit problemen mei it krijen fan AI-ynsichten. Jo krije noch altyd ús standert coachingsynzichten.",
+  "empty": {
+    "title": "Noch Gjin Ynsichten",
+    "message": "Begjin mei trainen om personalisearre coachingsynzichten te krijen!",
+    "startWorkout": "Start Jo Earste Training"
+  },
+  "error": {
+    "title": "Ynsichten Koene Net Laden Wurde"
+  },
+  "progress": {
+    "title": "Jo Foarútgong"
+  },
+  "actionsLabel": "Beskikbere aksjes",
+  "settings": {
+    "title": "AI Coach",
+    "enabled": "AI Coach ynskeakelje",
+    "enabledHelp": "Krij personalisearre ynsichten en oanbefellings basearre op jo trainingshistoarje",
+    "showOnHome": "Toan op thússide",
+    "showOnHomeHelp": "Toan top-ynzicht op jo thússide",
+    "autoRefresh": "Automatysk ferfarskje",
+    "autoRefreshHelp": "Ynsichten automatysk elke 5 minuten ferfarskje",
+    "aiInsightsEnabled": "AI-oandreaune Ynsichten Ynskeakelje",
+    "aiInsightsHelp": "Krij avansearre AI-analyze fan jo foarútgong, trends en personalisearre oanbefellings. Jo gegevens wurde feilich ferwurke en allinnich brûkt om ynsichten te generearjen.",
+    "aiInsightsAuthRequired": "Meld jo oan om AI-oandreaune ynsichten yn te skeakeljen.",
+    "aiInsightsDataUsage": "Beheind ta 10 AI-fersiken per oere. 24 oeren yn cache opslein.",
+    "insightTypes": "Ynsichttipes",
+    "showStreak": "Trainingsreeksen (Streaks)",
+    "showMuscleBalance": "Spierbalâns",
+    "showProgression": "Progressive Oerbelêsting",
+    "showRecovery": "Hersteltiid",
+    "showSuggestions": "Trainingssuggestjes",
+    "celebrationSounds": "Fieringslûden",
+    "celebrationSoundsHelp": "Spylje fieringslûden ôf foar persoanlike rekords en mylpalen",
+    "postWorkoutSurvey": "Enkête nei Training",
+    "postWorkoutSurveyHelp": "Flugge feedback nei trainingen helpt jo coaching-ynsjoch te personalisearjen"
+  },
+  "streak": {
+    "title": "Trainingsreeks (Streak)",
+    "milestone": "Geweldich! Jo hawwe in rige fan **{{param0}}** dagen berikt!",
+    "almostMilestone": "Hast dêr! Noch 1 dei om **{{param0}}** dagen te berikken!",
+    "maintain": "Hâld it fol! Jo sitte op in rige fan **{{param0}}** dagen.",
+    "newRecord": "Nij persoanlik rekord! Dit is jo langste rige oant no ta!",
+    "building": "Geweldige 'flow'! Jo binne op dei **{{param0}}** fan jo rige.",
+    "justStarted": "Mooi! Jo binne jo trainingsrige begûn. Hâld it fol!",
+    "noStreak": "Start hjoed noch jo trainingsrige!",
+    "atRisk": "Rige yn gefaar",
+    "atRiskMessage": "Jo **{{param0}}**-dagenrige is yn gefaar! Train hjoed om it fol te hâlden."
+  },
+  "muscleBalance": {
+    "underTrained": "Balâns yn Jo Training",
+    "underTrainedMessage": "Jo **{{param0}}** hat mear omtinken nedich. Tink derom om oefeningen foar dizze gebieten ta te foegjen.",
+    "overTrained": "Herstel Nedich",
+    "overTrainedMessage": "Jo hawwe jo bot rjochte op **{{param0}}**. Tink derom om te balansearjen mei oare spiergroepen.",
+    "neglected": "Tiid om **{{param0}}** te Trainen",
+    "neglectedMessage": "It is **{{param1}}** dagen lyn dat jo jo **{{param0}}** trainden. Tiid om it wat omtinken te jaan!"
+  },
+  "progression": {
+    "ready": "Klear foar Progressie",
+    "readyTitle": "Klear foar in heger nivo!",
+    "readyMessage": "Jo binne klear om foarútgong te meitsjen mei **{{param0}}**! Besykje de folgjende kear **{{param1}}** sets fan **{{param2}}** werhellingen.",
+    "readyDurationMessage": "Jo binne klear om foarútgong te meitsjen mei **{{param0}}**! Besykje de folgjende kear **{{param1}}** sets fan **{{param2}}** sekonden.",
+    "highCompletionRate": "Hege foltôgingsgraad wiist op reewilligens foar progressie",
+    "plateau_detected": "Prestaasjeplateau detektearre - tiid om folume of yntinsiteit te ferheegjen",
+    "volume_increase": "Konsistinte foltôging suggerearret reewilligens foar folumeferhegeing",
+    "intensity_increase": "Sterke prestaasjepetroanen wize op reewilligens foar yntinsiteitsferhegeing",
+    "optimal_rest": "Goede rêstpatroanen stypje feilige progressie"
+  },
+  "recovery": {
+    "title": "Hersteldei",
+    "needed": "Jo lichem hat rêst nedich. Tink derom om in hersteldei te nimmen of lichte aktiviteit te dwaan.",
+    "recommended": "Jo hawwe hurd traind. In hersteldei soe helpe om oertraining te foarkommen.",
+    "consecutiveDays": "**{{param0}}** opienfolgjende dagen traind",
+    "consecutive_high": "**{{param0}}** opienfolgjende trainingsdagen detektearre - heech muoiensrisiko",
+    "consecutive_medium": "**{{param0}}** opienfolgjende trainingsdagen - matich herstel nedich",
+    "consecutive_low": "**{{param0}}** opienfolgjende trainingsdagen - licht herstel oanrikkemandearre",
+    "fatigue_high": "Meardere muoiensyndikatoren detektearre - rêst is essensjeel",
+    "fatigue_medium": "Mattige muoienssinjalen detektearre - herstel oanrikkemandearre",
+    "volume_spike": "Plotselinge tanimming yn trainingsfolume detektearre - ekstra herstel nedich",
+    "muscle_overuse": "Guon spiergroepen faak traind - tink oan rotaasje",
+    "high_intensity": "Hege yntinsiteit training detektearre - genôch rêst is wichtich"
+  },
+  "suggestion": {
+    "title": "Trainingssuggestje",
+    "message": "Op grûn fan jo histoarje hawwe wy in trainingssuggestje foar jo."
+  },
+  "suggestions": {
+    "startJourney": "Klear om jo fitnessreis te begjinnen? Litte wy begjinne mei jo earste training!",
+    "longGap": "It is in skoft lyn! Tiid om wer op koers te kommen mei in training.",
+    "neglectedMuscles": "Guon spiergroepen hawwe omtinken nedich! Litte wy deroan wurkje.",
+    "improveBalance": "Litte wy jo training yn balâns bringe mei oefeningen foar ûndertrainde spieren!",
+    "keepGoing": "Hâld it goede wurk fol! Hjir is in foarstelde oefening foar jo folgjende sesje."
+  },
+  "actions": {
+    "viewProgress": "Foarútgong besjen",
+    "workoutNow": "No traine",
+    "findExercises": "Oefeningen fine",
+    "startWorkout": "Start Training",
+    "startExercise": "Start **{{param0}}**",
+    "viewCoach": "Sjoch Coach",
+    "tryIt": "Besykje it"
+  },
+  "pr": {
+    "title": "Persoanlike Rekords",
+    "subtitle": "Dyn bêste prestaasjes foar elke oefening",
+    "newRecord": "Nij persoanlik rekord!",
+    "awesome": "Geweldich! 🎉",
+    "keepGoing": "Gean sa troch!",
+    "close": "Slute",
+    "autoDismiss": "Automatysk slute oer {{param0}} sekonden",
+    "previousBest": "Foarige bêste",
+    "improvement": "Ferbettering",
+    "milestone": "Mylpeal",
+    "share": "Diel prestaasje",
+    "type": {
+      "maxReps": "Maks. herhellingen",
+      "maxSets": "Maks. sets",
+      "maxDuration": "Maks. doer",
+      "maxWeight": "Maks. gewicht"
+    },
+    "unit": {
+      "reps": "herhellingen",
+      "sets": "sets"
+    },
+    "search": "Sykje",
+    "searchPlaceholder": "Sykje oefeningen...",
+    "filterType": "Rekordtype",
+    "filterMuscle": "Spiergroep",
+    "allTypes": "Alle typen",
+    "allMuscles": "Alle spieren",
+    "sortBy": "Sortearje op",
+    "sortNewest": "Nijste earst",
+    "sortOldest": "Aldste earst",
+    "sortHighest": "Heechste wearde",
+    "sortLowest": "Leechste wearde",
+    "showingCount": "{{count}} rekord(en) werjûn",
+    "today": "Hjoed",
+    "yesterday": "Juster",
+    "daysAgo": "{{count}} dagen lyn",
+    "loading": "Dyn rekords wurde laden...",
+    "noRecordsYet": "Noch gjin persoanlike rekords",
+    "emptyMessage": "Doch workouts om dyn earste persoanlike rekords te setten en dyn foarútgong te folgjen!",
+    "noMatching": "Gjin oerienkommende rekords",
+    "tryDifferentFilter": "Besykje dyn sykaksje of filters oan te passen om rekords te finen.",
+    "startWorkout": "Start in workout"
+  },
+"survey": {
+    "title": "Hoe wie dyn training?",
+    "subtitle": "Help ús dyn coachynsichten te personalisearjen",
+    "thankYou": "Tankewol!",
+    "feedbackHelps": "Dyn feedback helpt ús om bettere coachynsichten te leverjen.",
+    "great": "Fielde geweldich!",
+    "greatDesc": "Folle enerzjy, goede foarm",
+    "good": "Fielde goed",
+    "goodDesc": "Degelike training, gjin problemen",
+    "okay": "It wie wol goed",
+    "okayDesc": "Krekt dien krigen",
+    "tired": "Fielde my wurch",
+    "tiredDesc": "Lytse enerzjy, útdagend",
+    "difficulty": "Swierrichheidsnivo",
+    "veryEasy": "Hiel Maklik",
+    "veryHard": "Hiel Swier",
+    "energy": "Enerzjynivo Neitiid",
+    "exhausted": "Utputte",
+    "energized": "Fol enerzjy",
+    "notes": "Notysjes (Fakultatyf)",
+    "notesPlaceholder": "Nog gedachten oer dizze training?",
+    "moreDetails": "Mear details taheakje"
+  },
+  "persona": {
+    "title": "Coach Persoanlikheid",
+    "description": "Kies hoe't dyn coach mei dy kommunisearret",
+    "zen": {
+      "name": "Zen Coach",
+      "description": "Rêstich, omtinken, holistyske oanpak"
+    },
+    "energy": {
+      "name": "Enerzjy Coach",
+      "description": "Entûsjast, motivearjend, hege enerzjy"
+    },
+    "logic": {
+      "name": "Logika Coach",
+      "description": "Datagedreaun, analytysk, sekuer"
+    }
+  },
+  "insights": "Coach Ynsichten",
+  "viewAll": "Alles besjen",
+  "insightsCarousel": "Karousel mei coachynsichten",
+  "carouselNavigation": "Karouselnavigaasje",
+  "goToInsight": "Gean nei ynsicht {{number}}"
+}

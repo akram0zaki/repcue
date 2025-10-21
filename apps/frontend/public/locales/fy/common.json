@@ -61,6 +61,10 @@
     "playVideo": "Spylje Fideo",
     "premium": "PRO",
     "done": "Klear",
+    "refresh": "Ferfarskje",
+    "streakMilestone": "🔥 Mylpeal fan {{days}} dagen rige!",
+    "surveyThanks": "Tankewol foar jo feedback!",
+    "surveyError": "Koe enkêteäntwurd net bewarje",
     "addEquipment": "Materiaal tafoegje",
     "removeEquipment": "Materiaal wiskje",
     "addMuscleGroup": "Spiergroep tafoegje",
@@ -79,7 +83,10 @@
     "badges": "Badges",
     "clearFilter": "Filter wiskje",
     "other": "Oar",
-    "selectOne": "Kies ien"
+    "selectOne": "Kies ien",
+    "skip": "Oerslaan",
+    "submit": "Ferstjoere",
+    "submitting": "Bezig mei ferstjoeren..."
   },
   "navigation": {
     "home": "Thús",
@@ -88,6 +95,7 @@
     "timer": "Timer",
     "activityLog": "Lochboek",
     "progress": "Foardering",
+    "coach": "Coach",
     "settings": "Ynstellingen"
   },
   "settings": {
@@ -133,6 +141,10 @@
     "syncNowHelp": "Syngronisearje feroarings mei de server foar test of probleemoplossing.",
     "refreshExercises": "Oefeningen fernije",
     "refreshExercisesHelp": "Twing oefeningen fernije fan server en sette alle favoriten werom",
+    "upgradeDatabase": "Database bywurkje",
+    "upgradeDatabaseHelp": "Wurkje jo lokale database by nei de nijste ferzje mei nije funksjes lykas persoanlike rekordbehear.",
+    "databaseUpgradeSuccess": "Database mei sûkses bywurke! Ferfarskje asjebleaft de side.",
+    "databaseUpgradeError": "Database bywurkjen mislearre. Besykje it opnij.",
     "forceRefreshApp": "App twingend fernije",
     "forceRefreshAppHelp": "Alle caches wiskje en app opnij lade fan server. Brûk wannear app ferâldere liket of ûnferwachte gedrach toant.",
     "clearCachesOnly": "Allinnich caches wiskje",
@@ -268,7 +280,7 @@
     "heroTitle": "Bliuw konsekwint, bliuw sterk.",
     "heroSubtitle": "Jo trainingen, op jo manier.",
     "upcomingWorkout": "Komende training",
-    "tagline": "Jo persoanlike oefeningtimer",
+    "tagline": "Dyn persoanlike AI-coach foar effektivere workouts",
     "signInMessage": "Jo kinne ",
     "signInLink": "ynlogge",
     "signInSuffix": " om jo foarútgong te folgjen en te dielen.",
@@ -379,10 +391,12 @@
     "exerciseCount_other": "{{count}} oefeningen",
     "status": {
       "stoppedAfter": "Stoppe nei {{duration}}",
-      "completedSetsReps": "{{sets}} sets fan {{reps}} werhâldings foltóge",
-      "completedTime": "{{duration}} interval timer foltóge",
-      "completedWorkout": "Training foltóge mei {{count}} oefening",
-      "completedWorkout_plural": "Training foltóge mei {{count}} oefeningen"
+      "completedSetsReps": "{{sets}} sets fan {{reps}} werhellingen foltôge",
+      "completedSetsRepsInWorkout": "{{sets}} sets fan {{reps}} werhellingen foltôge yn training: {{workoutName}}",
+      "completedTime": "{{duration}} yntervaltimer foltôge",
+      "completedTimeInWorkout": "{{duration}} foltôge yn training: {{workoutName}}",
+      "completedWorkout": "Training foltôge mei {{count}} oefening",
+      "completedWorkout_plural": "Training foltôge mei {{count}} oefeningen"
     },
     "charts": {
       "weeklyStreak": "Wekelijkse rige",

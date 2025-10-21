@@ -34,6 +34,20 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   horizontal_exercise_layout: true, // default to horizontal category listing
   ring_timer: false, // default to rectangular timer layout
   app_version: null, // Will be set from server on first launch
+  // AI Coach settings (opt-in by default for Phase 1)
+  coach_enabled: true, // Default enabled for Phase 1 rollout
+  coach_show_on_home: true, // Show top insight on home page
+  coach_auto_refresh: false, // Manual refresh only by default
+  coach_refresh_interval: 5 * 60 * 1000, // 5 minutes
+  coach_show_streak: true, // Show all insight types by default
+  coach_show_muscle_balance: true,
+  coach_show_progression: true,
+  coach_show_recovery: true,
+  coach_show_suggestions: true,
+  coach_intro_seen: false, // Show intro dialog on first CoachPage visit
+  coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
+  coach_persona: 'zen', // Default coach personality (Enhancement E1.2)
+  celebration_sounds_enabled: false, // Default off (Enhancement E1.1)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

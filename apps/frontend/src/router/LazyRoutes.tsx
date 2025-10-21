@@ -162,12 +162,6 @@ export const TimerPage = lazy(() =>
   }))
 );
 
-export const ActivityLogPage = lazy(() => 
-  import('../pages/ActivityLogPage').catch(() => ({
-    default: () => <div>Error loading Activity Log page</div>
-  }))
-);
-
 export const SettingsPage = lazy(() => 
   import('../pages/SettingsPage').catch(() => ({
     default: () => <div>Error loading Settings page</div>
@@ -219,6 +213,18 @@ export const ProfilePage = lazy(() =>
 export const AIWorkoutOnboardingPage = lazy(() =>
   import('../pages/AIWorkoutOnboardingPage').catch(() => ({
     default: () => <div>Error loading AI Workout Onboarding page</div>
+  }))
+);
+
+export const CoachPage = lazy(() =>
+  import('../pages/CoachPage').catch(() => ({
+    default: () => <div>Error loading Coach page</div>
+  }))
+);
+
+export const PRHistoryPage = lazy(() =>
+  import('../pages/PRHistoryPage').catch(() => ({
+    default: () => <div>Error loading PR History page</div>
   }))
 );
 

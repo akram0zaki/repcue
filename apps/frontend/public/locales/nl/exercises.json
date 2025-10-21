@@ -132,7 +132,6 @@
   "saveFailed": "Opslaan van oefening mislukt",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standaard Duur",
-
   "copies": "Kopieën",
   "created": "Gemaakt",
   "duration": "Duur",
@@ -141,7 +140,6 @@
   "ratingsAndReviews": "Beoordelingen & recensies",
   "stats": "Statistieken",
   "filtersAndSearch": "Filters & Zoeken",
-
   "title": "Oefeningen",
   "subtitle": "Bekijk, filter en start oefeningen. Markeer favorieten voor snelle toegang.",
   "searchLabel": "Oefeningen zoeken",
@@ -261,5 +259,26 @@
   "stepLabel": "Stap",
   "shareErrorAuth": "Je moet ingelogd zijn om oefeningen te delen",
   "shareErrorNotSynced": "Oefening moet gesynchroniseerd zijn voordat je deze kunt delen",
-  "shareErrorOffline": "Kan niet delen terwijl je offline bent"
+  "shareErrorOffline": "Kan niet delen terwijl je offline bent",
+  "muscleGroupsList": {
+    "core": "Romp",
+    "abs": "Buikspieren",
+    "obliques": "Schuine Buikspieren",
+    "shoulders": "Schouders",
+    "chest": "Borst",
+    "triceps": "Triceps",
+    "quads": "Quadriceps",
+    "glutes": "Billen",
+    "hamstrings": "Hamstrings",
+    "calves": "Kuiten",
+    "cardio": "Cardio",
+    "legs": "Benen",
+    "flexibility": "Flexibiliteit",
+    "back": "Rug",
+    "hips": "Heupen",
+    "balance": "Balans",
+    "full-body": "Volledig Lichaam",
+    "hands": "Handen",
+    "mobility": "Mobiliteit"
+  }
 }

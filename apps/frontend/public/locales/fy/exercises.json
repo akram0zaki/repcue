@@ -162,8 +162,6 @@
   "saveFailed": "It opslaan fan de oefening is mislearre",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standaard Duur",
-
-
   "addToFavorites": "Foegje ta oan Favoriten",
   "addEquipment": "Apparatuer tafoegje",
   "removeEquipment": "Apparatuer fuortsmite",
@@ -194,7 +192,6 @@
   "notes": "Opmerkings",
   "references": "Referinsjes",
   "filtersAndSearch": "Filters & Sykje",
-
   "title": "Oefeningen",
   "subtitle": "Blêdzje troch, filterje en start oefeningen. Markearje favoriten foar flugge tagong.",
   "searchLabel": "Oefeningen sykje",
@@ -264,5 +261,26 @@
   "stepLabel": "Stap",
   "shareErrorAuth": "Jo moatte ynlogd wêze om oefeningen te diele",
   "shareErrorNotSynced": "De oefening moat synkronisearre wêze foar't jo dizze diele kinne",
-  "shareErrorOffline": "Net mooglik om te diele wylst jo offline binne"
+  "shareErrorOffline": "Net mooglik om te diele wylst jo offline binne",
+  "muscleGroupsList": {
+    "core": "Romp",
+    "abs": "Buikspieren",
+    "obliques": "Skeve Buikspieren",
+    "shoulders": "Skouders",
+    "chest": "Boarst",
+    "triceps": "Triceps",
+    "quads": "Quadriceps",
+    "glutes": "Billen",
+    "hamstrings": "Hamstrings",
+    "calves": "Kuiten",
+    "cardio": "Cardio",
+    "legs": "Skonken",
+    "flexibility": "Fleksibiliteit",
+    "back": "Rêch",
+    "hips": "Heupen",
+    "balance": "Balâns",
+    "full-body": "Folslein Lichem",
+    "hands": "Hannen",
+    "mobility": "Mobiliteit"
+  }
 }

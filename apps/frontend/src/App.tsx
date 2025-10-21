@@ -7,6 +7,7 @@ import { syncService } from './services/syncService';
 import { authService } from './services/authService';
 import { forceUpdateService } from './services/forceUpdateService';
 import { updateService } from './services/updateService';
+import { AnalyticsService } from './services/analyticsService';
 import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
@@ -26,12 +27,15 @@ import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
+import type { PersonalRecord } from './types/coaching';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 import { computeWorkoutDurations } from './utils/workoutDuration';
 import i18n from './i18n';
 import logger from './utils/logger';
 import { isCustom } from './utils/syncFilters';
+import { celebrateWorkoutComplete, celebrateMilestone } from './utils/microInteractions';
+import { calculateCurrentStreak } from './utils/activityCharts';
 
 // Enhanced lazy loading with error boundaries and preloading
 import { Suspense } from 'react';
@@ -42,18 +46,22 @@ import {
   EditExercisePage,
   ExerciseDetailPage,
   TimerPage,
-  ActivityLogPage,
   SettingsPage,
   WorkoutsPage,
   CreateWorkoutPage,
   EditWorkoutPage,
   CommunityPage,
+  CoachPage,
+  PRHistoryPage,
   AuthCallbackPage,
   ProfilePage,
   AIWorkoutOnboardingPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
+import { PRCelebration } from './components/coaching/PRCelebration';
+import { PostWorkoutSurvey } from './components/PostWorkoutSurvey';
+import type { SurveyResponse } from './components/PostWorkoutSurvey';
 
 // Wrapper component to handle navigation state for TimerPage
 const TimerPageWrapper: React.FC<{
@@ -75,8 +83,57 @@ const TimerPageWrapper: React.FC<{
 }> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, onStartWorkoutMode, timerState } = props;
+  const { onSetSelectedExercise, onSetSelectedDuration, onStartTimer, onStartWorkoutMode, timerState, exercises } = props;
   const processedStateRef = React.useRef<string | null>(null);
+  const processedUrlParamsRef = React.useRef<string | null>(null);
+
+  // Handle URL search params (from coaching recommendations)
+  useEffect(() => {
+    if (timerState.isRunning) return; // Don't change settings while timer is running
+
+    const searchParams = new URLSearchParams(location.search);
+    const exerciseId = searchParams.get('exerciseId');
+    const sets = searchParams.get('sets');
+    const reps = searchParams.get('reps');
+    const duration = searchParams.get('duration');
+
+    // Create a unique key for these params
+    const paramsKey = `${exerciseId}-${sets}-${reps}-${duration}`;
+
+    // Only process if we have an exerciseId and haven't processed these params yet
+    if (exerciseId && processedUrlParamsRef.current !== paramsKey) {
+      processedUrlParamsRef.current = paramsKey;
+
+      // Find the exercise
+      const exercise = exercises.find(ex => ex.id === exerciseId);
+      if (exercise) {
+        logger.log('[TimerPageWrapper] Setting exercise from URL params:', {
+          exerciseId,
+          sets,
+          reps,
+          duration
+        });
+
+        // Set the exercise
+        onSetSelectedExercise(exercise);
+
+        // Set duration if provided (for time-based exercises)
+        if (duration) {
+          const durationNum = parseInt(duration, 10);
+          if (!isNaN(durationNum)) {
+            onSetSelectedDuration(durationNum as TimerPreset);
+          }
+        }
+
+        // Auto-start timer after a brief delay
+        const timer = setTimeout(() => {
+          onStartTimer();
+        }, 200);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [location.search, exercises, onSetSelectedExercise, onSetSelectedDuration, onStartTimer, timerState.isRunning]);
 
   // Handle navigation state from ExercisePage or HomePage
   useEffect(() => {
@@ -204,6 +261,17 @@ function App() {
   const { isSharedExercise } = useSharedExercises();
   const { showSnackbar } = useSnackbar();
   const { t } = useTranslation(['common', 'exercises']);
+  
+  // PR celebration state
+  const [newPR, setNewPR] = useState<PersonalRecord | null>(null);
+  const [showPRCelebration, setShowPRCelebration] = useState(false);
+
+  // Streak milestone tracking state
+  const [lastCelebratedStreak, setLastCelebratedStreak] = useState<number>(0);
+  
+  // Post-workout survey state
+  const [showPostWorkoutSurvey, setShowPostWorkoutSurvey] = useState(false);
+  const [surveyActivityLog, setSurveyActivityLog] = useState<ActivityLog | null>(null);
 
   // Handle pending share token after authentication
   useEffect(() => {
@@ -742,6 +810,61 @@ function App() {
     const currentIndex = workoutMode.currentExerciseIndex;
     const isLastExercise = currentIndex >= workoutMode.exercises.length - 1;
     
+    // Log individual exercise completion before advancing
+    const currentWorkoutExercise = workoutMode.exercises[currentIndex];
+    const completedExercise = exercises.find(ex => ex.id === currentWorkoutExercise.exercise_id);
+    
+    if (completedExercise && consentService.hasConsent()) {
+      // Create individual activity log for this exercise
+      const sets = currentWorkoutExercise.custom_sets || completedExercise.default_sets || 1;
+      const reps = currentWorkoutExercise.custom_reps || completedExercise.default_reps || 10;
+      const duration = completedExercise.exercise_type === 'time_based'
+        ? (currentWorkoutExercise.custom_duration || completedExercise.default_duration || 30)
+        : Math.round(sets * reps * (completedExercise.rep_duration_seconds || BASE_REP_TIME));
+      
+      const activityLog: ActivityLog = {
+        id: crypto.randomUUID(),
+        exercise_id: completedExercise.id,
+        exercise_name: completedExercise.name,
+        catalog_id: completedExercise.catalogId,
+        duration,
+        timestamp: new Date().toISOString(),
+        notes: completedExercise.exercise_type === 'repetition_based'
+          ? `Completed ${sets} sets of ${reps} reps in workout: ${workoutMode.workoutName}`
+          : `Completed ${duration}s in workout: ${workoutMode.workoutName}`,
+        workout_id: workoutMode.workoutId,
+        sets_count: completedExercise.exercise_type === 'repetition_based' ? sets : undefined,
+        reps_count: completedExercise.exercise_type === 'repetition_based' ? reps : undefined,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        deleted: false,
+        version: 1
+      };
+      
+      // Save activity log and check for PR (non-blocking)
+      storageService.saveActivityLog(activityLog).then(() => {
+        // Check for new PR only for rep-based exercises
+        if (completedExercise.exercise_type === 'repetition_based') {
+          const analyticsService = AnalyticsService.getInstance();
+          analyticsService.checkForNewPR(
+            completedExercise.id,
+            reps,
+            sets,
+            duration
+          ).then(pr => {
+            if (pr) {
+              setNewPR(pr);
+              setShowPRCelebration(true);
+            }
+          }).catch(error => {
+            logger.error('Failed to check for PR in workout:', error);
+          });
+        }
+      }).catch(error => {
+        logger.error('Failed to save individual exercise activity log:', error);
+      });
+    }
+    
     // logger.log('advanceWorkout called:', {
     //   currentIndex,
     //   totalExercises: workoutMode.exercises.length,
@@ -756,6 +879,9 @@ function App() {
       if (appSettings.sound_enabled) {
         audioService.announceText(`Workout completed! Great job on ${workoutMode.workoutName}`);
       }
+
+      // Celebrate workout completion with confetti
+      celebrateWorkoutComplete(appSettings.celebration_sounds_enabled);
 
       // Save workout session completion
       const hasConsent = consentService.hasConsent();
@@ -822,6 +948,38 @@ function App() {
           
           logger.log(`📝 Saving workout activity log:`, workoutActivityLog);
           await storageService.saveActivityLog(workoutActivityLog);
+
+          // Check for streak milestones after saving activity log
+          try {
+            const activityLogs = await storageService.getActivityLogs();
+            const currentStreak = calculateCurrentStreak(activityLogs);
+            
+            // Check if reached new milestone
+            const MILESTONES = [3, 7, 14, 30, 60, 90, 100, 365];
+            if (MILESTONES.includes(currentStreak) && currentStreak > lastCelebratedStreak) {
+              logger.log(`🔥 Streak milestone reached: ${currentStreak} days!`);
+              celebrateMilestone(appSettings.celebration_sounds_enabled);
+              setLastCelebratedStreak(currentStreak);
+              
+              // Show snackbar notification
+              showSnackbar(
+                t('common:streakMilestone', { 
+                  defaultValue: '🔥 {{days}}-day streak milestone!', 
+                  days: currentStreak 
+                }),
+                { type: 'success' }
+              );
+            }
+          } catch (error) {
+            logger.error('Failed to check streak milestone:', error);
+          }
+
+          // Show post-workout survey if enabled
+          if (appSettings.coach_post_workout_survey_enabled) {
+            logger.log('📋 Showing post-workout survey');
+            setSurveyActivityLog(workoutActivityLog);
+            setShowPostWorkoutSurvey(true);
+          }
         } catch (error) {
           logger.error('❌ Failed to save workout session or activity logs:', error);
         }
@@ -1409,6 +1567,8 @@ function App() {
                     duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                     timestamp: new Date().toISOString(),
                     notes: `Completed ${totalSets} sets of ${totalReps} reps`,
+                    sets_count: totalSets,
+                    reps_count: totalReps,
                     updated_at: new Date().toISOString(),
                     created_at: new Date().toISOString(),
                     deleted: false,
@@ -1416,7 +1576,27 @@ function App() {
                   };
 
                   if (consentService.hasConsent()) {
-                    storageService.saveActivityLog(activityLog);
+                    // Save activity log and check for PR
+                    storageService.saveActivityLog(activityLog).then(() => {
+                      // Check for new PR (non-blocking)
+                      const analyticsService = AnalyticsService.getInstance();
+                      analyticsService.checkForNewPR(
+                        currentExercise.id,
+                        totalReps,
+                        totalSets,
+                        Math.round(totalSets * totalReps * (targetTime || 0))
+                      ).then(pr => {
+                        if (pr) {
+                          setNewPR(pr);
+                          setShowPRCelebration(true);
+                        }
+                      }).catch(error => {
+                        logger.error('Failed to check for PR:', error);
+                        // Non-blocking - continue workout flow
+                      });
+                    }).catch(error => {
+                      logger.error('Failed to save activity log:', error);
+                    });
                   }
                 }
                 
@@ -1528,6 +1708,8 @@ function App() {
                 duration: Math.round(totalSets * totalReps * (targetTime || 0)), // Total time for all reps/sets, rounded
                 timestamp: new Date().toISOString(),
                 notes: `Completed ${totalSets} sets of ${totalReps} reps`,
+                sets_count: totalSets,
+                reps_count: totalReps,
                 updated_at: new Date().toISOString(),
                 created_at: new Date().toISOString(),
                 deleted: false,
@@ -1535,7 +1717,27 @@ function App() {
               };
 
               if (consentService.hasConsent()) {
-                storageService.saveActivityLog(activityLog);
+                // Save activity log and check for PR
+                storageService.saveActivityLog(activityLog).then(() => {
+                  // Check for new PR (non-blocking)
+                  const analyticsService = AnalyticsService.getInstance();
+                  analyticsService.checkForNewPR(
+                    currentExercise.id,
+                    totalReps,
+                    totalSets,
+                    Math.round(totalSets * totalReps * (targetTime || 0))
+                  ).then(pr => {
+                    if (pr) {
+                      setNewPR(pr);
+                      setShowPRCelebration(true);
+                    }
+                  }).catch(error => {
+                    logger.error('Failed to check for PR:', error);
+                    // Non-blocking - continue workout flow
+                  });
+                }).catch(error => {
+                  logger.error('Failed to save activity log:', error);
+                });
               }
             }
             
@@ -1767,6 +1969,9 @@ function App() {
             await Promise.race([storageService.ready(), storageReadyTimeout]);
             const readyMs = Date.now() - tReady;
             if (readyMs > 800) logger.warn(`[init] storageService.ready() took ${readyMs}ms`);
+            
+            // Check and upgrade database if needed (e.g., for personal_records table in v23)
+            await storageService.checkAndUpgradeDatabase();
           } catch (error) {
             logger.error(`[init] storageService.ready() failed or timed out after 3s:`, error);
             // Continue with fallback - try to load built-in exercises without storage
@@ -2556,14 +2761,6 @@ useEffect(() => {
                 } 
               />
               <Route 
-                path={AppRoutes.ACTIVITY_LOG} 
-                element={
-                  <Suspense fallback={createRouteLoader('Activity Log')}>
-                    <ActivityLogPage exercises={exercises} />
-                  </Suspense>
-                } 
-              />
-              <Route 
                 path={AppRoutes.SETTINGS} 
                 element={
                   <Suspense fallback={createRouteLoader('Settings')}>
@@ -2579,6 +2776,22 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('Community')}>
                     <CommunityPage />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.COACH} 
+                element={
+                  <Suspense fallback={createRouteLoader('Coach')}>
+                    <CoachPage appSettings={appSettings} exercises={exercises} />
+                  </Suspense>
+                } 
+              />
+              <Route 
+                path={AppRoutes.PR_HISTORY} 
+                element={
+                  <Suspense fallback={createRouteLoader('Personal Records')}>
+                    <PRHistoryPage />
                   </Suspense>
                 } 
               />
@@ -2693,6 +2906,49 @@ useEffect(() => {
           setWorkoutForceUpdateData(null);
         }}
       />
+
+      {/* PR Celebration Modal */}
+      {showPRCelebration && newPR && (
+        <PRCelebration
+          record={newPR}
+          onDismiss={() => {
+            setShowPRCelebration(false);
+            setNewPR(null);
+          }}
+        />
+      )}
+
+      {/* Post-Workout Survey Modal */}
+      {showPostWorkoutSurvey && surveyActivityLog && (
+        <PostWorkoutSurvey
+          activityLog={surveyActivityLog}
+          onSubmit={async (response: SurveyResponse) => {
+            try {
+              logger.log('📋 Saving survey response:', response);
+              // Update the activity log with survey metadata
+              const updatedLog = {
+                ...surveyActivityLog,
+                metadata: response
+              };
+              await storageService.saveActivityLog(updatedLog);
+              logger.log('✅ Survey response saved successfully');
+              showSnackbar(t('common:surveyThanks', { defaultValue: 'Thank you for your feedback!' }), { type: 'success' });
+            } catch (error) {
+              logger.error('❌ Failed to save survey response:', error);
+              showSnackbar(t('common:surveyError', { defaultValue: 'Failed to save survey response' }), { type: 'error' });
+            } finally {
+              setShowPostWorkoutSurvey(false);
+              setSurveyActivityLog(null);
+            }
+          }}
+          onSkip={() => {
+            logger.log('⏭️ Post-workout survey skipped');
+            setShowPostWorkoutSurvey(false);
+            setSurveyActivityLog(null);
+          }}
+          isSubmitting={false}
+        />
+      )}
     </>
   );
 }

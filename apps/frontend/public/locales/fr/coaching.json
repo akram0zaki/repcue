@@ -1,0 +1,194 @@
+{
+  "title": "Votre Coach",
+  "subtitle": "Informations personnalisées pour vous aider à atteindre vos objectifs",
+  "aiEnabled": "Propulsé par l'IA",
+  "aiPowered": "IA",
+  "aiInsights": "Informations Propulsées par l'IA",
+  "additionalInsights": "Informations Supplémentaires",
+  "aiUnavailable": "Informations IA Temporairement Indisponibles",
+  "aiUnavailableMessage": "Nous avons des difficultés à obtenir des informations IA pour le moment. Vous recevez toujours nos informations de coaching standard.",
+  "empty": {
+    "title": "Aucune Information pour l'instant",
+    "message": "Commencez à vous entraîner pour recevoir des informations de coaching personnalisées !",
+    "startWorkout": "Démarrer Votre Premier Entraînement"
+  },
+  "error": {
+    "title": "Impossible de Charger les Informations"
+  },
+  "progress": {
+    "title": "Votre Progression"
+  },
+  "actionsLabel": "Actions disponibles",
+  "settings": {
+    "title": "Coach IA",
+    "enabled": "Activer le Coach IA",
+    "enabledHelp": "Recevez des informations et des recommandations personnalisées basées sur votre historique d'entraînement",
+    "showOnHome": "Afficher sur la page d'accueil",
+    "showOnHomeHelp": "Afficher l'information principale sur votre page d'accueil",
+    "autoRefresh": "Actualisation automatique",
+    "autoRefreshHelp": "Actualiser automatiquement les informations toutes les 5 minutes",
+    "aiInsightsEnabled": "Activer les Informations Propulsées par l'IA",
+    "aiInsightsHelp": "Obtenez une analyse IA avancée de vos progrès, tendances et recommandations personnalisées. Vos données sont traitées de manière sécurisée et utilisées uniquement pour générer des informations.",
+    "aiInsightsAuthRequired": "Connectez-vous pour activer les informations propulsées par l'IA.",
+    "aiInsightsDataUsage": "Limité à 10 demandes IA par heure. Mise en cache pendant 24 heures.",
+    "insightTypes": "Types d'Informations",
+    "showStreak": "Séries d'Entraînement (Streaks)",
+    "showMuscleBalance": "Équilibre Musculaire",
+    "showProgression": "Surcharge Progressive",
+    "showRecovery": "Temps de Récupération",
+    "showSuggestions": "Suggestions d'Entraînement",
+    "celebrationSounds": "Sons de Célébration",
+    "celebrationSoundsHelp": "Jouer des sons de célébration pour les records personnels et les jalons",
+    "postWorkoutSurvey": "Enquête Post-Entraînement",
+    "postWorkoutSurveyHelp": "Les commentaires rapides après l'entraînement aident à personnaliser vos conseils de coaching"
+  },
+  "streak": {
+    "title": "Série d'Entraînement",
+    "milestone": "Incroyable ! Vous avez atteint une série de **{{param0}}** jours !",
+    "almostMilestone": "Presque ! Encore 1 jour pour atteindre **{{param0}}** jours !",
+    "maintain": "Continuez comme ça ! Vous êtes sur une série de **{{param0}}** jours.",
+    "newRecord": "Nouveau record personnel ! C'est votre plus longue série jusqu'à présent !",
+    "building": "Excellent élan ! Vous êtes au jour **{{param0}}** de votre série.",
+    "justStarted": "Bien ! Vous avez commencé votre série d'entraînement. Maintenez le rythme !",
+    "noStreak": "Commencez votre série d'entraînement aujourd'hui !",
+    "atRisk": "Série en Danger",
+    "atRiskMessage": "Votre série de **{{param0}}** jours est en danger ! Entraînez-vous aujourd'hui pour la maintenir."
+  },
+  "muscleBalance": {
+    "underTrained": "Équilibrez Votre Entraînement",
+    "underTrainedMessage": "Votre **{{param0}}** a besoin de plus d'attention. Envisagez d'ajouter des exercices ciblant ces zones.",
+    "overTrained": "Récupération Nécessaire",
+    "overTrainedMessage": "Vous vous êtes beaucoup concentré(e) sur **{{param0}}**. Pensez à équilibrer avec d'autres groupes musculaires.",
+    "neglected": "Il est Temps d'Entraîner **{{param0}}**",
+    "neglectedMessage": "Cela fait **{{param1}}** jours que vous n'avez pas entraîné votre **{{param0}}**. Il est temps de lui accorder de l'attention !"
+  },
+  "progression": {
+    "ready": "Prêt pour la Progression",
+    "readyTitle": "Prêt(e) à Passer au Niveau Supérieur !",
+    "readyMessage": "Vous êtes prêt(e) à progresser sur **{{param0}}** ! Essayez **{{param1}}** séries de **{{param2}}** répétitions la prochaine fois.",
+    "readyDurationMessage": "Vous êtes prêt(e) à progresser sur **{{param0}}** ! Essayez **{{param1}}** séries de **{{param2}}** secondes la prochaine fois.",
+    "highCompletionRate": "Un taux de complétion élevé indique une préparation à la progression",
+    "plateau_detected": "Plateau de performance détecté - il est temps d'augmenter le volume ou l'intensité",
+    "volume_increase": "L'achèvement constant suggère une préparation pour une augmentation du volume",
+    "intensity_increase": "De solides schémas de performance indiquent une préparation pour un boost d'intensité",
+    "optimal_rest": "De bons schémas de repos soutiennent une progression sûre"
+  },
+  "recovery": {
+    "title": "Jour de Récupération",
+    "needed": "Votre corps a besoin de repos. Envisagez de prendre un jour de récupération ou de faire une activité légère.",
+    "recommended": "Vous vous êtes beaucoup entraîné(e). Un jour de récupération aiderait à prévenir le surentraînement.",
+    "consecutiveDays": "Entraîné **{{param0}}** jours consécutifs",
+    "consecutive_high": "**{{param0}}** jours d'entraînement consécutifs détectés - risque de fatigue élevé",
+    "consecutive_medium": "**{{param0}}** jours d'entraînement consécutifs - récupération modérée nécessaire",
+    "consecutive_low": "**{{param0}}** jours d'entraînement consécutifs - récupération légère recommandée",
+    "fatigue_high": "Plusieurs indicateurs de fatigue détectés - le repos est essentiel",
+    "fatigue_medium": "Signaux de fatigue modérés détectés - récupération recommandée",
+    "volume_spike": "Augmentation soudaine du volume d'entraînement détectée - récupération supplémentaire nécessaire",
+    "muscle_overuse": "Certains groupes musculaires entraînés fréquemment - envisagez la rotation",
+    "high_intensity": "Entraînement haute intensité détecté - un repos adéquat est important"
+  },
+  "suggestion": {
+    "title": "Suggestion d'Entraînement",
+    "message": "Basé sur votre historique, voici une suggestion d'entraînement pour vous."
+  },
+  "suggestions": {
+    "startJourney": "Prêt(e) à commencer votre parcours de fitness ? Commençons par votre premier entraînement !",
+    "longGap": "Cela fait un moment ! Il est temps de reprendre le rythme avec un entraînement.",
+    "neglectedMuscles": "Certains groupes musculaires ont besoin d'attention ! Travaillons-les.",
+    "improveBalance": "Équilibrons votre entraînement avec des exercices pour les muscles sous-entraînés !",
+    "keepGoing": "Continuez l'excellent travail ! Voici un exercice suggéré pour votre prochaine session.",
+    "findExercises": "Trouver des Exercices",
+    "startWorkout": "Démarrer l'Entraînement",
+    "startExercise": "Démarrer **{{param0}}**",
+    "viewCoach": "Voir le Coach",
+    "tryIt": "Essayer"
+  },
+  "pr": {
+    "title": "Records Personnels",
+    "subtitle": "Tes meilleures performances pour chaque exercice",
+    "newRecord": "Nouveau record personnel !",
+    "awesome": "Génial ! 🎉",
+    "keepGoing": "Continue comme ça !",
+    "close": "Fermer",
+    "autoDismiss": "Fermeture automatique dans {{param0}} s",
+    "previousBest": "Meilleur précédent",
+    "improvement": "Amélioration",
+    "milestone": "Étape importante",
+    "share": "Partager l’exploit",
+    "type": {
+      "maxReps": "Max de répétitions",
+      "maxSets": "Max de séries",
+      "maxDuration": "Durée max",
+      "maxWeight": "Poids max"
+    },
+    "unit": {
+      "reps": "répétitions",
+      "sets": "séries"
+    },
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher des exercices...",
+    "filterType": "Type de record",
+    "filterMuscle": "Groupe musculaire",
+    "allTypes": "Tous les types",
+    "allMuscles": "Tous les muscles",
+    "sortBy": "Trier par",
+    "sortNewest": "Les plus récents",
+    "sortOldest": "Les plus anciens",
+    "sortHighest": "Valeur la plus élevée",
+    "sortLowest": "Valeur la plus basse",
+    "showingCount": "Affichage de {{count}} record(s)",
+    "today": "Aujourd’hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{count}} jour(s)",
+    "loading": "Chargement de tes records...",
+    "noRecordsYet": "Pas encore de records personnels",
+    "emptyMessage": "Fais quelques entraînements pour enregistrer tes premiers records personnels et suivre ta progression !",
+    "noMatching": "Aucun record correspondant",
+    "tryDifferentFilter": "Essaie de modifier ta recherche ou tes filtres pour trouver des records.",
+    "startWorkout": "Commencer un entraînement"
+  },
+"survey": {
+    "title": "Comment s'est passée votre séance d'entraînement ?",
+    "subtitle": "Aidez-nous à personnaliser vos conseils de coaching",
+    "thankYou": "Merci !",
+    "feedbackHelps": "Votre avis nous aide à vous fournir de meilleurs conseils de coaching.",
+    "great": "Je me suis senti(e) super bien !",
+    "greatDesc": "Beaucoup d'énergie, bonne forme",
+    "good": "Je me suis senti(e) bien",
+    "goodDesc": "Bonne séance, aucun problème",
+    "okay": "C'était correct",
+    "okayDesc": "J'ai réussi à le faire",
+    "tired": "Je me suis senti(e) fatigué(e)",
+    "tiredDesc": "Peu d'énergie, difficile",
+    "difficulty": "Niveau de difficulté",
+    "veryEasy": "Très facile",
+    "veryHard": "Très difficile",
+    "energy": "Niveau d'énergie après",
+    "exhausted": "Épuisé(e)",
+    "energized": "Plein(e) d'énergie",
+    "notes": "Notes (Facultatif)",
+    "notesPlaceholder": "Des réflexions sur cette séance d'entraînement ?",
+    "moreDetails": "Ajouter plus de détails"
+  },
+  "persona": {
+    "title": "Personnalité du Coach",
+    "description": "Choisissez la manière dont votre coach communique avec vous",
+    "zen": {
+      "name": "Coach Zen",
+      "description": "Calme, attentif, approche holistique"
+    },
+    "energy": {
+      "name": "Coach Énergique",
+      "description": "Enthousiaste, motivant, haute énergie"
+    },
+    "logic": {
+      "name": "Coach Logique",
+      "description": "Axé sur les données, analytique, précis"
+    }
+  },
+  "insights": "Conseils du Coach",
+  "viewAll": "Tout voir",
+  "insightsCarousel": "Carrousel de conseils de coaching",
+  "carouselNavigation": "Navigation du carrousel",
+  "goToInsight": "Aller au conseil {{number}}"
+}

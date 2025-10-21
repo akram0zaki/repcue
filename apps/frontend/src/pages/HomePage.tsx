@@ -15,6 +15,8 @@ import { AuthModal } from '../components/auth/AuthModal';
 import { useAuth } from '../hooks/useAuth';
 import { VideoThumbnail } from '../components/VideoThumbnail';
 import AIWorkoutButton from '../components/AIWorkoutButton';
+import { useCoachingInsights } from '../hooks/useCoachingInsights';
+import InsightsCarousel from '../components/InsightsCarousel';
 import logger from '../utils/logger';
 
 interface HomePageProps {
@@ -23,10 +25,33 @@ interface HomePageProps {
   onToggleFavorite: (exercise_id: string) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
+const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFavorite }) => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['common', 'exerciseDetails']);
   const { isAuthenticated } = useAuth();
+  
+  // Coaching insights for home page (conditional on settings)
+  const shouldShowCoachOnHome = appSettings.coach_enabled && appSettings.coach_show_on_home;
+  const { insights, isLoading: isLoadingInsights } = useCoachingInsights({
+    autoRefresh: false,
+    enableAI: appSettings.coach_ai_insights_enabled || false
+  });
+  
+  // Filter to top 3 high or medium priority insights for carousel
+  // High priority is preferred, but medium is shown if no high-priority insights exist
+  const topInsights = insights
+    .filter(i => i.priority === 'high' || i.priority === 'medium')
+    .sort((a, b) => {
+      // Sort by priority first (high > medium)
+      const priorityOrder = { high: 0, medium: 1, low: 2 };
+      const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+      if (priorityDiff !== 0) return priorityDiff;
+      
+      // Then by creation time (newer first)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })
+    .slice(0, 3);
+  
   const [upcomingWorkout, setUpcomingWorkout] = useState<{
     workout: Workout;
     weekday: string;
@@ -179,6 +204,17 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, onToggleFavorite }) => {
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
+
+        {/* AI Coach Insights Carousel */}
+        {shouldShowCoachOnHome && topInsights.length > 0 && !isLoadingInsights && (
+          <section className="mb-4">
+            <InsightsCarousel
+              insights={topInsights}
+              settings={appSettings}
+              onViewAll={() => navigate(Routes.COACH)}
+            />
+          </section>
+        )}
 
         {/* Sign-in prompt - only show if not authenticated */}
         {!isAuthenticated && (

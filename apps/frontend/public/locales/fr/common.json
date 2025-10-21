@@ -61,6 +61,10 @@
     "playVideo": "Lire la vidéo",
     "premium": "PRO",
     "done": "Fait",
+    "refresh": "Actualiser",
+    "streakMilestone": "🔥 Jalon de série de {{days}} jours !",
+    "surveyThanks": "Merci pour vos commentaires !",
+    "surveyError": "Échec de l'enregistrement de la réponse à l'enquête",
     "addEquipment": "Ajouter l'équipement",
     "removeEquipment": "Supprimer l'équipement",
     "addMuscleGroup": "Ajouter le groupe musculaire",
@@ -79,7 +83,10 @@
     "badges": " Insignias",
     "clearFilter": "Effacer le filtre",
     "other": "Autre",
-    "selectOne": "Sélectionner un"
+    "selectOne": "Sélectionner un",
+    "skip": "Omettre",
+    "submit": "Soumettre",
+    "submitting": "Soumission en cours..."
   },
   "navigation": {
     "home": "Accueil",
@@ -88,6 +95,7 @@
     "timer": "Minuteur",
     "activityLog": "Journal",
     "progress": "Progrès",
+    "coach": "Coach",
     "settings": "Paramètres"
   },
   "settings": {
@@ -133,6 +141,10 @@
     "syncNowHelp": "Synchroniser manuellement les changements avec le serveur (tests/dépannage).",
     "refreshExercises": "Actualiser les exercices",
     "refreshExercisesHelp": "Forcer l'actualisation des exercices depuis le serveur et réinitialiser tous les favoris",
+    "upgradeDatabase": "Mettre à jour la base de données",
+    "upgradeDatabaseHelp": "Met à jour votre base de données locale vers la dernière version avec de nouvelles fonctionnalités comme le suivi des records personnels.",
+    "databaseUpgradeSuccess": "Base de données mise à jour avec succès ! Veuillez actualiser la page.",
+    "databaseUpgradeError": "Échec de la mise à jour de la base de données. Veuillez réessayer.",
     "forceRefreshApp": "Forcer l'Actualisation de l'App",
     "forceRefreshAppHelp": "Vider tous les caches et recharger l'app fraîche depuis le serveur. À utiliser quand l'app semble obsolète ou se comporte de façon inattendue.",
     "clearCachesOnly": "Vider Seulement les Caches",
@@ -268,7 +280,7 @@
     "heroTitle": "Restez constant, restez fort.",
     "heroSubtitle": "Vos entraînements, à votre façon.",
     "upcomingWorkout": "Entraînement à venir",
-    "tagline": "Votre minuteur d'exercices personnel",
+    "tagline": "Votre coach personnel alimenté par l’IA pour des entraînements plus efficaces",
     "signInMessage": "Vous pouvez vous ",
     "signInLink": "connecter",
     "signInSuffix": " pour suivre vos progrès et les partager.",
@@ -380,7 +392,9 @@
     "status": {
       "stoppedAfter": "Arrêté après {{duration}}",
       "completedSetsReps": "{{sets}} séries de {{reps}} répétitions terminées",
-      "completedTime": "Minuteur d'intervalle de {{duration}} terminé",
+      "completedSetsRepsInWorkout": "{{sets}} séries de {{reps}} répétitions terminées dans l'entraînement : {{workoutName}}",
+      "completedTime": "Minuteur de {{duration}} terminé",
+      "completedTimeInWorkout": "{{duration}} terminé dans l'entraînement : {{workoutName}}",
       "completedWorkout": "Entraînement terminé avec {{count}} exercice",
       "completedWorkout_plural": "Entraînement terminé avec {{count}} exercices"
     },

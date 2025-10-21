@@ -1,0 +1,198 @@
+{
+  "title": "Ihr Coach",
+  "subtitle": "Personalisierte Einblicke, die Ihnen helfen, Ihre Ziele zu erreichen",
+  "aiEnabled": "KI-gestützt",
+  "aiPowered": "KI",
+  "aiInsights": "KI-gestützte Einblicke",
+  "additionalInsights": "Zusätzliche Einblicke",
+  "aiUnavailable": "KI-Einblicke Vorübergehend Nicht Verfügbar",
+  "aiUnavailableMessage": "Wir haben momentan Schwierigkeiten, KI-Einblicke zu erhalten. Sie erhalten weiterhin unsere Standard-Coaching-Einblicke.",
+  "empty": {
+    "title": "Noch keine Einblicke",
+    "message": "Beginnen Sie mit dem Training, um personalisierte Coaching-Einblicke zu erhalten!",
+    "startWorkout": "Starten Sie Ihr Erstes Training"
+  },
+  "error": {
+    "title": "Einblicke konnten nicht geladen werden"
+  },
+  "progress": {
+    "title": "Ihr Fortschritt"
+  },
+  "actionsLabel": "Verfügbare Aktionen",
+  "settings": {
+    "title": "KI-Coach",
+    "enabled": "KI-Coach aktivieren",
+    "enabledHelp": "Erhalten Sie personalisierte Einblicke basierend auf Ihrer Trainingshistorie",
+    "showOnHome": "Auf Startseite anzeigen",
+    "showOnHomeHelp": "Top-Einsicht auf Ihrer Startseite anzeigen",
+    "autoRefresh": "Automatische Aktualisierung",
+    "autoRefreshHelp": "Einblicke automatisch alle 5 Minuten aktualisieren",
+    "aiInsightsEnabled": "KI-gestützte Einblicke aktivieren",
+    "aiInsightsHelp": "Erhalten Sie erweiterte KI-Analysen Ihrer Fortschritte, Trends und personalisierten Empfehlungen. Ihre Daten werden sicher verarbeitet und nur zur Generierung von Einblicken verwendet.",
+    "aiInsightsAuthRequired": "Melden Sie sich an, um KI-gestützte Einblicke zu aktivieren.",
+    "aiInsightsDataUsage": "Begrenzt auf 10 KI-Anfragen pro Stunde. 24 Stunden zwischengespeichert.",
+    "insightTypes": "Einsichtstypen",
+    "showStreak": "Trainingssträhnen",
+    "showMuscleBalance": "Muskelbalance",
+    "showProgression": "Progressive Überlastung",
+    "showRecovery": "Erholungszeit",
+    "showSuggestions": "Trainingsvorschläge",
+    "celebrationSounds": "Feierklänge",
+    "celebrationSoundsHelp": "Feierklänge für persönliche Rekorde und Meilensteine abspielen",
+    "postWorkoutSurvey": "Umfrage nach dem Training",
+    "postWorkoutSurveyHelp": "Schnelles Feedback nach dem Training hilft, Ihre Coaching-Einblicke zu personalisieren"
+  },
+  "streak": {
+    "title": "Trainingssträhne",
+    "milestone": "Fantastisch! Sie haben eine Strähne von **{{param0}}** Tagen erreicht!",
+    "almostMilestone": "Fast geschafft! Nur noch 1 Tag, um **{{param0}}** Tage zu erreichen!",
+    "maintain": "Bleiben Sie dran! Sie haben eine Strähne von **{{param0}}** Tagen.",
+    "newRecord": "Neuer persönlicher Rekord! Das ist Ihre längste Strähne bisher!",
+    "building": "Toller Schwung! Sie sind bei Tag **{{param0}}** Ihrer Strähne.",
+    "justStarted": "Super! Sie haben Ihre Trainingssträhne begonnen. Machen Sie weiter so!",
+    "noStreak": "Starten Sie noch heute Ihre Trainingssträhne!",
+    "atRisk": "Strähne in Gefahr",
+    "atRiskMessage": "Ihre **{{param0}}**-Tage-Strähne ist in Gefahr! Trainieren Sie heute, um sie aufrechtzuerhalten."
+  },
+  "muscleBalance": {
+    "underTrained": "Bringen Sie Balance ins Training",
+    "underTrainedMessage": "Ihr/e **{{param0}}** braucht mehr Aufmerksamkeit. Erwägen Sie, Übungen für diese Bereiche hinzuzufügen.",
+    "overTrained": "Erholung erforderlich",
+    "overTrainedMessage": "Sie haben sich stark auf **{{param0}}** konzentriert. Erwägen Sie einen Ausgleich mit anderen Muskelgruppen.",
+    "neglected": "Zeit, **{{param0}}** zu trainieren",
+    "neglectedMessage": "Es ist **{{param1}}** Tage her, seit Sie Ihr/e **{{param0}}** trainiert haben. Zeit, sich darum zu kümmern!"
+  },
+  "progression": {
+    "ready": "Bereit für Fortschritt",
+    "readyTitle": "Bereit für das nächste Level!",
+    "readyMessage": "Sie sind bereit, bei **{{param0}}** Fortschritte zu machen! Versuchen Sie beim nächsten Mal **{{param1}}** Sätze mit **{{param2}}** Wiederholungen.",
+    "readyDurationMessage": "Sie sind bereit, bei **{{param0}}** Fortschritte zu machen! Versuchen Sie beim nächsten Mal **{{param1}}** Sätze à **{{param2}}** Sekunden.",
+    "highCompletionRate": "Eine hohe Abschlussrate deutet auf die Bereitschaft zum Fortschritt hin",
+    "plateau_detected": "Leistungsplateau erkannt - Zeit, Volumen oder Intensität zu erhöhen",
+    "volume_increase": "Konstante Abschlussrate deutet auf Bereitschaft für Volumensteigerung hin",
+    "intensity_increase": "Starke Leistungsmuster zeigen Bereitschaft für Intensitätssteigerung",
+    "optimal_rest": "Gute Ruhemuster unterstützen sichere Progression"
+  },
+  "recovery": {
+    "title": "Erholungstag",
+    "needed": "Ihr Körper braucht Ruhe. Erwägen Sie einen Erholungstag oder leichte Aktivität.",
+    "recommended": "Sie haben hart trainiert. Ein Erholungstag hilft, Übertraining zu vermeiden.",
+    "consecutiveDays": "**{{param0}}** aufeinanderfolgende Tage trainiert",
+    "consecutive_high": "**{{param0}}** aufeinanderfolgende Trainingstage erkannt - hohes Ermüdungsrisiko",
+    "consecutive_medium": "**{{param0}}** aufeinanderfolgende Trainingstage - moderate Erholung erforderlich",
+    "consecutive_low": "**{{param0}}** aufeinanderfolgende Trainingstage - leichte Erholung empfohlen",
+    "fatigue_high": "Mehrere Ermüdungsindikatoren erkannt - Ruhe ist wichtig",
+    "fatigue_medium": "Moderate Ermüdungssignale erkannt - Erholung empfohlen",
+    "volume_spike": "Plötzliche Zunahme des Trainingsvolumens erkannt - zusätzliche Erholung erforderlich",
+    "muscle_overuse": "Einige Muskelgruppen häufig trainiert - Rotation in Betracht ziehen",
+    "high_intensity": "Hochintensives Training erkannt - ausreichende Ruhe ist wichtig"
+  },
+  "suggestion": {
+    "title": "Trainingsvorschlag",
+    "message": "Basierend auf Ihrer Historie haben wir einen Trainingsvorschlag für Sie."
+  },
+  "suggestions": {
+    "startJourney": "Bereit für Ihre Fitnessreise? Beginnen wir mit Ihrem ersten Training!",
+    "longGap": "Es ist eine Weile her! Zeit, mit einem Training wieder auf Kurs zu kommen.",
+    "neglectedMuscles": "Einige Muskelgruppen brauchen Aufmerksamkeit! Lassen Sie uns daran arbeiten.",
+    "improveBalance": "Lassen Sie uns Ihr Training mit Übungen für untertrainierte Muskeln ausbalancieren!",
+    "keepGoing": "Weiter so! Hier ist eine vorgeschlagene Übung für Ihre nächste Einheit."
+  },
+  "actions": {
+    "viewProgress": "Fortschritt anzeigen",
+    "workoutNow": "Jetzt trainieren",
+    "findExercises": "Übungen finden",
+    "startWorkout": "Training starten",
+    "startExercise": "Beginnen Sie mit **{{param0}}**",
+    "viewCoach": "Coach anzeigen",
+    "tryIt": "Ausprobieren"
+  },
+  "pr": {
+    "title": "Persönliche Rekorde",
+    "subtitle": "Deine besten Leistungen für jede Übung",
+    "newRecord": "Neuer persönlicher Rekord!",
+    "awesome": "Super! 🎉",
+    "keepGoing": "Mach weiter so!",
+    "close": "Schließen",
+    "autoDismiss": "Automatisches Ausblenden in {{param0}} s",
+    "previousBest": "Bisheriger Bestwert",
+    "improvement": "Verbesserung",
+    "milestone": "Meilenstein",
+    "share": "Erfolg teilen",
+    "type": {
+      "maxReps": "Max Wiederholungen",
+      "maxSets": "Max Sätze",
+      "maxDuration": "Max Dauer",
+      "maxWeight": "Max Gewicht"
+    },
+    "unit": {
+      "reps": "Wdh.",
+      "sets": "Sätze"
+    },
+    "search": "Suche",
+    "searchPlaceholder": "Übungen suchen...",
+    "filterType": "Rekordtyp",
+    "filterMuscle": "Muskelgruppe",
+    "allTypes": "Alle Typen",
+    "allMuscles": "Alle Muskeln",
+    "sortBy": "Sortieren nach",
+    "sortNewest": "Neueste zuerst",
+    "sortOldest": "Älteste zuerst",
+    "sortHighest": "Höchster Wert",
+    "sortLowest": "Niedrigster Wert",
+    "showingCount": "{{count}} Rekord(e) werden angezeigt",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "daysAgo": "Vor {{count}} Tag(en)",
+    "loading": "Lade deine Rekorde...",
+    "noRecordsYet": "Noch keine persönlichen Rekorde",
+    "emptyMessage": "Schließe Workouts ab, um deine ersten persönlichen Rekorde zu setzen und deinen Fortschritt zu verfolgen!",
+    "noMatching": "Keine passenden Rekorde",
+    "tryDifferentFilter": "Versuche, deine Suche oder Filter anzupassen, um Rekorde zu finden.",
+    "startWorkout": "Ein Workout starten"
+  },
+"survey": {
+    "title": "Wie war dein Training?",
+    "subtitle": "Hilf uns, deine Coaching-Einblicke zu personalisieren",
+    "thankYou": "Vielen Dank!",
+    "feedbackHelps": "Dein Feedback hilft uns, bessere Coaching-Einblicke zu liefern.",
+    "great": "Fühlte sich großartig an!",
+    "greatDesc": "Viel Energie, gute Form",
+    "good": "Fühlte sich gut an",
+    "goodDesc": "Solides Training, keine Probleme",
+    "okay": "Es war okay",
+    "okayDesc": "Durchgezogen",
+    "tired": "Fühlte mich müde",
+    "tiredDesc": "Wenig Energie, anstrengend",
+    "difficulty": "Schwierigkeitsgrad",
+    "veryEasy": "Sehr Einfach",
+    "veryHard": "Sehr Schwer",
+    "energy": "Energielevel danach",
+    "exhausted": "Erschöpft",
+    "energized": "Voller Energie",
+    "notes": "Notizen (Optional)",
+    "notesPlaceholder": "Irgendwelche Gedanken zu diesem Training?",
+    "moreDetails": "Mehr Details hinzufügen"
+  },
+  "persona": {
+    "title": "Coach-Persönlichkeit",
+    "description": "Wähle, wie dein Coach mit dir kommuniziert",
+    "zen": {
+      "name": "Zen-Coach",
+      "description": "Ruhig, achtsam, ganzheitlicher Ansatz"
+    },
+    "energy": {
+      "name": "Energie-Coach",
+      "description": "Enthusiastisch, motivierend, voller Energie"
+    },
+    "logic": {
+      "name": "Logik-Coach",
+      "description": "Datengesteuert, analytisch, präzise"
+    }
+  },
+  "insights": "Coach-Einblicke",
+  "viewAll": "Alle ansehen",
+  "insightsCarousel": "Karussell mit Coaching-Einblicken",
+  "carouselNavigation": "Karussell-Navigation",
+  "goToInsight": "Gehe zu Einblick {{number}}"
+}

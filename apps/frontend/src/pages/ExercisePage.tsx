@@ -818,8 +818,8 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
             })
           : ''
       }
-      confirmText={t('common.delete', { defaultValue: 'Delete' })}
-      cancelText={t('common.cancel')}
+      confirmText={t('common:common.delete', { defaultValue: 'Delete' })}
+      cancelText={t('common:common.cancel')}
       variant="danger"
     />
 

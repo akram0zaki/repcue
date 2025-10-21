@@ -202,7 +202,6 @@
   "showingCountInCatalog": "عرض {{count}} من {{total}} تمرين في {{catalog}}",
   "ratingsAndReviews": "التقييمات والمراجعات",
   "filtersAndSearch": "التصفية والبحث",
-
   "title": "التمارين",
   "subtitle": "تصفح وفلتر وابدأ التمارين. ضع علامة على المفضلة للوصول السريع.",
   "searchLabel": "بحث في التمارين",
@@ -257,5 +256,26 @@
   "noResultsDescription": "لا توجد تمارين تطابق معاييرك.",
   "shareErrorAuth": "يجب أن تكون مسجلاً للدخول لمشاركة التمارين",
   "shareErrorNotSynced": "يجب مزامنة التمرين قبل المشاركة",
-  "shareErrorOffline": "لا يمكن المشاركة أثناء عدم الاتصال بالإنترنت"
+  "shareErrorOffline": "لا يمكن المشاركة أثناء عدم الاتصال بالإنترنت",
+  "muscleGroupsList": {
+    "core": "الجذع",
+    "abs": "البطن",
+    "obliques": "مائلة",
+    "shoulders": "الأكتاف",
+    "chest": "صدر",
+    "triceps": "ثلاثية الرؤوس",
+    "quads": "رباعية",
+    "glutes": "أرداف",
+    "hamstrings": "أوتار خلفية",
+    "calves": "سمانة",
+    "cardio": "كارديو",
+    "legs": "ساقان",
+    "flexibility": "المرونة",
+    "back": "ظهر",
+    "hips": "الوركين",
+    "balance": "توازن",
+    "full-body": "جسم كامل",
+    "hands": "يدان",
+    "mobility": "مرونة حركة"
+  }
 }

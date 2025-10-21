@@ -14,7 +14,7 @@ import { fetchExerciseCatalog, filterExercisesForUser, type Exercise } from './e
 import { buildAIPrompt, type UserProfile } from './prompt-builder.ts';
 import { generateAICompletion } from './ai-client.ts';
 import { logError, logInfo, logDebug, logWarn } from './logger.ts';
-import { logAIUsage, type TokenUsage } from './usage-logger.ts';
+import { logAIUsage, type TokenUsage } from '../_shared/usage-logger.ts';
 
 /**
  * Generated workout structure (matches frontend Workout type)
@@ -324,6 +324,10 @@ export async function generateWorkouts(
       usage,
       processingTimeMs: aiProcessingTime,
       success: true,
+      requestType: 'workout_generation',
+      logInfo,
+      logWarn,
+      logError
     });
 
   } catch (error) {
@@ -347,6 +351,10 @@ export async function generateWorkouts(
         processingTimeMs: aiProcessingTime,
         success: false,
         errorCode: error.code || 'AI_GENERATION_ERROR',
+        requestType: 'workout_generation',
+        logInfo,
+        logWarn,
+        logError
       });
     }
 

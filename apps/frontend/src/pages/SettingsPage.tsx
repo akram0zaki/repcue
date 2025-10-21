@@ -29,7 +29,7 @@ interface SettingsPageProps {
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettings }) => {
-  const { t } = useTranslation(['common']);
+  const { t } = useTranslation(['common', 'coaching']);
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
@@ -167,6 +167,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
     }
   };
 
+  const handleUpgradeDatabase = async () => {
+    try {
+      await storageService.checkAndUpgradeDatabase();
+      alert(t('settings.databaseUpgradeSuccess', 'Database upgraded successfully! Please refresh the page.'));
+      window.location.reload();
+    } catch (error) {
+      logger.error('Failed to upgrade database:', error);
+      alert(t('settings.databaseUpgradeError', 'Failed to upgrade database. Please try again.'));
+    }
+  };
+
   const handleForceRefresh = () => {
     setShowForceRefreshToast(true);
   };
@@ -214,6 +225,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             window.location.href = '/profile';
           }}
         />
+
+        {/* Language Settings */}
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+            {t('settings.language')}
+          </h2>
+          
+          <div className="space-y-3">
+            <LanguageSwitcher compact={false} showLabel={false} />
+          </div>
+        </div>
 
         {/* Audio Settings */}
   <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
@@ -408,19 +433,292 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </p>
         </div>
 
-        {/* Language Settings */}
-  <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
-          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
-            <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+        {/* AI Coach Settings */}
+        <section 
+          className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6"
+          aria-labelledby="coach-settings-heading"
+        >
+          <h2 
+            id="coach-settings-heading"
+            className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2"
+          >
+            <svg 
+              className="section-icon" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
             </svg>
-            {t('settings.language')}
+            {t('coaching:settings.title', 'AI Coach')}
           </h2>
           
-          <div className="space-y-3">
-            <LanguageSwitcher compact={false} showLabel={false} />
+          {/* Master Toggle */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex-1">
+              <label htmlFor="coach-enabled" className="label-text">
+                {t('coaching:settings.enabled', 'Enable AI Coach')}
+              </label>
+              <p 
+                id="coach-enabled-help"
+                className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+              >
+                {t('coaching:settings.enabledHelp', 'Get personalized insights and recommendations based on your workout history')}
+              </p>
+            </div>
+            <ToggleSwitch
+              id="coach-enabled"
+              checked={appSettings.coach_enabled === true}
+              onChange={() => onUpdateSettings({ coach_enabled: !appSettings.coach_enabled })}
+              dataTestId="toggle-coach-enabled"
+              aria-describedby="coach-enabled-help"
+            />
           </div>
-        </div>
+
+          {/* Show on Home Page */}
+          {appSettings.coach_enabled && (
+            <>
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-show-on-home" className="label-text">
+                    {t('coaching:settings.showOnHome', 'Show on Home Page')}
+                  </label>
+                  <p 
+                    id="coach-show-on-home-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.showOnHomeHelp', 'Display top insight on your home page')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="coach-show-on-home"
+                  checked={appSettings.coach_show_on_home === true}
+                  onChange={() => onUpdateSettings({ coach_show_on_home: !appSettings.coach_show_on_home })}
+                  dataTestId="toggle-coach-show-on-home"
+                  aria-describedby="coach-show-on-home-help"
+                />
+              </div>
+
+              {/* Auto-Refresh */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-auto-refresh" className="label-text">
+                    {t('coaching:settings.autoRefresh', 'Auto-Refresh Insights')}
+                  </label>
+                  <p 
+                    id="coach-auto-refresh-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.autoRefreshHelp', 'Automatically refresh insights every 5 minutes')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="coach-auto-refresh"
+                  checked={appSettings.coach_auto_refresh === true}
+                  onChange={() => onUpdateSettings({ coach_auto_refresh: !appSettings.coach_auto_refresh })}
+                  dataTestId="toggle-coach-auto-refresh"
+                  aria-describedby="coach-auto-refresh-help"
+                />
+              </div>
+
+              {/* AI-Powered Insights */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-ai-insights-enabled" className="label-text">
+                    {t('coaching:settings.aiInsightsEnabled', 'Enable AI-Powered Insights')}
+                  </label>
+                  <p 
+                    id="coach-ai-insights-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {isAuthenticated 
+                      ? t('coaching:settings.aiInsightsHelp', 'Get advanced AI analysis of your progress, trends, and personalized recommendations. Your data is processed securely and used only to generate insights.')
+                      : t('coaching:settings.aiInsightsAuthRequired', 'Sign in to enable AI-powered insights.')
+                    }
+                  </p>
+                  {isAuthenticated && (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {t('coaching:settings.aiInsightsDataUsage', 'Limited to 10 AI requests per hour. Cached for 24 hours.')}
+                    </p>
+                  )}
+                </div>
+                <ToggleSwitch
+                  id="coach-ai-insights-enabled"
+                  checked={appSettings.coach_ai_insights_enabled === true}
+                  onChange={() => onUpdateSettings({ coach_ai_insights_enabled: !appSettings.coach_ai_insights_enabled })}
+                  dataTestId="toggle-coach-ai-insights-enabled"
+                  aria-describedby="coach-ai-insights-help"
+                  disabled={!isAuthenticated}
+                />
+              </div>
+
+              {/* Celebration Sounds */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="celebration-sounds-enabled" className="label-text">
+                    {t('coaching:settings.celebrationSounds', 'Celebration Sounds')}
+                  </label>
+                  <p
+                    id="celebration-sounds-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.celebrationSoundsHelp', 'Play celebration sounds for personal records and milestones')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="celebration-sounds-enabled"
+                  checked={appSettings.celebration_sounds_enabled === true}
+                  onChange={() => onUpdateSettings({ celebration_sounds_enabled: !appSettings.celebration_sounds_enabled })}
+                  dataTestId="toggle-celebration-sounds-enabled"
+                  aria-describedby="celebration-sounds-help"
+                />
+              </div>
+
+              {/* Coach Persona Selection */}
+              <div className="mt-6">
+                <label htmlFor="coach-persona" className="label-text">
+                  {t('coaching:persona.title', 'Coach Personality')}
+                </label>
+                <p 
+                  id="coach-persona-help"
+                  className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3"
+                >
+                  {t('coaching:persona.description', 'Choose how your coach communicates with you')}
+                </p>
+                <select
+                  id="coach-persona"
+                  value={appSettings.coach_persona || 'zen'}
+                  onChange={(e) => onUpdateSettings({ coach_persona: e.target.value as 'zen' | 'energy' | 'logic' })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  data-testid="select-coach-persona"
+                  aria-describedby="coach-persona-help coach-persona-description"
+                >
+                  <option value="zen">
+                    {t('coaching:persona.zen.name', 'Zen Coach')}
+                  </option>
+                  <option value="energy">
+                    {t('coaching:persona.energy.name', 'Energy Coach')}
+                  </option>
+                  <option value="logic">
+                    {t('coaching:persona.logic.name', 'Logic Coach')}
+                  </option>
+                </select>
+                <p 
+                  id="coach-persona-description"
+                  className="text-xs text-gray-600 dark:text-gray-400 mt-2"
+                >
+                  {appSettings.coach_persona === 'energy' && (
+                    <span>🔥 {t('coaching:persona.energy.description', 'Enthusiastic, motivational, high-energy')}</span>
+                  )}
+                  {appSettings.coach_persona === 'logic' && (
+                    <span>📊 {t('coaching:persona.logic.description', 'Data-driven, analytical, precise')}</span>
+                  )}
+                  {(!appSettings.coach_persona || appSettings.coach_persona === 'zen') && (
+                    <span>🧘 {t('coaching:persona.zen.description', 'Calm, mindful, holistic approach')}</span>
+                  )}
+                </p>
+              </div>
+
+              {/* Post-Workout Survey */}
+              <div className="flex items-center justify-between mb-3 mt-6">
+                <div className="flex-1">
+                  <label htmlFor="coach-post-workout-survey-enabled" className="label-text">
+                    {t('coaching:settings.postWorkoutSurvey', 'Post-Workout Survey')}
+                  </label>
+                  <p
+                    id="coach-post-workout-survey-help"
+                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                  >
+                    {t('coaching:settings.postWorkoutSurveyHelp', 'Quick feedback after workouts helps personalize your coaching insights')}
+                  </p>
+                </div>
+                <ToggleSwitch
+                  id="coach-post-workout-survey-enabled"
+                  checked={appSettings.coach_post_workout_survey_enabled === true}
+                  onChange={() => onUpdateSettings({ coach_post_workout_survey_enabled: !appSettings.coach_post_workout_survey_enabled })}
+                  dataTestId="toggle-coach-post-workout-survey-enabled"
+                  aria-describedby="coach-post-workout-survey-help"
+                />
+              </div>
+
+              {/* Insight Type Filters */}
+              <fieldset className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <legend className="text-sm font-medium text-text-700 dark:text-text-300 mb-3">
+                  {t('coaching:settings.insightTypes', 'Insight Types')}
+                </legend>
+
+                {/* Streak Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-streak" className="label-text text-sm">
+                    {t('coaching:settings.showStreak', 'Workout Streaks')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-streak"
+                    checked={appSettings.coach_show_streak === true}
+                    onChange={() => onUpdateSettings({ coach_show_streak: !appSettings.coach_show_streak })}
+                    dataTestId="toggle-coach-show-streak"
+                  />
+                </div>
+
+                {/* Muscle Balance Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-muscle-balance" className="label-text text-sm">
+                    {t('coaching:settings.showMuscleBalance', 'Muscle Balance')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-muscle-balance"
+                    checked={appSettings.coach_show_muscle_balance === true}
+                    onChange={() => onUpdateSettings({ coach_show_muscle_balance: !appSettings.coach_show_muscle_balance })}
+                    dataTestId="toggle-coach-show-muscle-balance"
+                  />
+                </div>
+
+                {/* Progression Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-progression" className="label-text text-sm">
+                    {t('coaching:settings.showProgression', 'Progressive Overload')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-progression"
+                    checked={appSettings.coach_show_progression === true}
+                    onChange={() => onUpdateSettings({ coach_show_progression: !appSettings.coach_show_progression })}
+                    dataTestId="toggle-coach-show-progression"
+                  />
+                </div>
+
+                {/* Recovery Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-recovery" className="label-text text-sm">
+                    {t('coaching:settings.showRecovery', 'Recovery Time')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-recovery"
+                    checked={appSettings.coach_show_recovery === true}
+                    onChange={() => onUpdateSettings({ coach_show_recovery: !appSettings.coach_show_recovery })}
+                    dataTestId="toggle-coach-show-recovery"
+                  />
+                </div>
+
+                {/* Suggestion Insights */}
+                <div className="flex items-center justify-between mb-3">
+                  <label htmlFor="coach-show-suggestions" className="label-text text-sm">
+                    {t('coaching:settings.showSuggestions', 'Workout Suggestions')}
+                  </label>
+                  <ToggleSwitch
+                    id="coach-show-suggestions"
+                    checked={appSettings.coach_show_suggestions === true}
+                    onChange={() => onUpdateSettings({ coach_show_suggestions: !appSettings.coach_show_suggestions })}
+                    dataTestId="toggle-coach-show-suggestions"
+                  />
+                </div>
+              </fieldset>
+            </>
+          )}
+        </section>
 
         {/* Data Settings */}
   <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
@@ -527,6 +825,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </button>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t('settings.refreshExercisesHelp')}
+            </p>
+          </div>
+
+          {/* Upgrade Database Button */}
+          <div className="mb-3">
+            <button
+              onClick={handleUpgradeDatabase}
+              disabled={!hasConsent}
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            >
+              {t('settings.upgradeDatabase', 'Upgrade Database')}
+            </button>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {t('settings.upgradeDatabaseHelp', 'Updates your local database to the latest version with new features like personal records tracking.')}
             </p>
           </div>
 

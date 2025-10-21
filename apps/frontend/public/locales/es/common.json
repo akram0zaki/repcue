@@ -61,6 +61,10 @@
     "playVideo": "Reproducir video",
     "premium": "PRO",
     "done": "Hecho",
+    "refresh": "Actualizar",
+    "streakMilestone": "🔥 ¡Hito de racha de {{days}} días!",
+    "surveyThanks": "¡Gracias por tus comentarios!",
+    "surveyError": "Error al guardar la respuesta de la encuesta",
     "addEquipment": "Agregar equipo",
     "removeEquipment": "Eliminar equipo",
     "addMuscleGroup": "Agregar grupo muscular",
@@ -79,7 +83,10 @@
     "badges": "Insignias",
     "clearFilter": "Borrar filtro",
     "other": "Otros",
-    "selectOne": "Seleccionar uno"
+    "selectOne": "Seleccionar uno",
+    "skip": "Omitir",
+    "submit": "Enviar",
+    "submitting": "Enviando..."
   },
   "navigation": {
     "home": "Inicio",
@@ -88,6 +95,7 @@
     "timer": "Cronómetro",
     "activityLog": "Registro",
     "progress": "Progreso",
+    "coach": "Entrenador",
     "settings": "Configuración"
   },
   "settings": {
@@ -133,6 +141,10 @@
     "syncNowHelp": "Sincroniza manualmente los cambios con el servidor para pruebas o resolución de problemas.",
     "refreshExercises": "Actualizar ejercicios",
     "refreshExercisesHelp": "Forzar actualización de ejercicios desde el servidor y reiniciar todos los favoritos",
+    "upgradeDatabase": "Actualizar base de datos",
+    "upgradeDatabaseHelp": "Actualiza tu base de datos local a la última versión con nuevas funciones como el seguimiento de récords personales.",
+    "databaseUpgradeSuccess": "¡Base de datos actualizada con éxito! Por favor, actualiza la página.",
+    "databaseUpgradeError": "Error al actualizar la base de datos. Por favor, inténtalo de nuevo.",
     "forceRefreshApp": "Forzar Actualización de App",
     "forceRefreshAppHelp": "Limpiar todas las cachés y recargar la app fresca del servidor. Usar cuando la app parece desactualizada o se comporta inesperadamente.",
     "clearCachesOnly": "Limpiar Solo Cachés",
@@ -268,7 +280,7 @@
     "heroTitle": "Mantente constante, mantente fuerte.",
     "heroSubtitle": "Tus entrenamientos, a tu manera.",
     "upcomingWorkout": "Próximo entrenamiento",
-    "tagline": "Tu temporizador personal de ejercicios",
+    "tagline": "Tu entrenador personal con IA para entrenamientos más efectivos",
     "signInMessage": "Puedes ",
     "signInLink": "iniciar sesión",
     "signInSuffix": " para hacer seguimiento de tu progreso y compartirlo.",
@@ -379,8 +391,10 @@
     "exerciseCount_other": "{{count}} ejercicios",
     "status": {
       "stoppedAfter": "Detenido después de {{duration}}",
-      "completedSetsReps": "Completado {{sets}} series de {{reps}} repeticiones",
-      "completedTime": "Completado temporizador de intervalo de {{duration}}",
+      "completedSetsReps": "Completadas {{sets}} series de {{reps}} repeticiones",
+      "completedSetsRepsInWorkout": "Completadas {{sets}} series de {{reps}} repeticiones en el entrenamiento: {{workoutName}}",
+      "completedTime": "Completado temporizador de {{duration}}",
+      "completedTimeInWorkout": "Completado {{duration}} en el entrenamiento: {{workoutName}}",
       "completedWorkout": "Entrenamiento completado con {{count}} ejercicio",
       "completedWorkout_plural": "Entrenamiento completado con {{count}} ejercicios"
     },

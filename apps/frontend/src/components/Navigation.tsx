@@ -7,9 +7,10 @@ import {
   HomeIcon,
   ExercisesIcon,
   TimerIcon,
-  LogIcon,
   ScheduleIcon,
-  MoreIcon
+  MoreIcon,
+  CoachIcon,
+  SettingsIcon
 } from './icons/NavigationIcons';
 import { useRTLDetection } from '../hooks/useRTLDetection';
 
@@ -62,16 +63,16 @@ const Navigation: React.FC = () => {
   testId: 'nav-timer'
     },
     {
-      path: Routes.WORKOUTS, // Changed from SCHEDULE
-      label: t('navigation.workouts'), // Changed from 'Schedule'
-      icon: ScheduleIcon, // Keep schedule icon for now as it represents calendar/planning
+      path: Routes.WORKOUTS,
+      label: t('navigation.workouts'),
+      icon: ScheduleIcon,
   testId: 'nav-workouts'
     },
     {
-      path: Routes.ACTIVITY_LOG,
-      label: t('navigation.progress'), // Changed from activityLog to progress
-      icon: LogIcon,
-  testId: 'nav-progress' // Changed from nav-activity to nav-progress
+      path: Routes.COACH,
+      label: t('navigation.coach'),
+      icon: CoachIcon,
+  testId: 'nav-coach'
     },
   ];
 
@@ -135,12 +136,13 @@ const Navigation: React.FC = () => {
                   navigate(Routes.SETTINGS);
                   setShowMoreMenu(false);
                 }}
-                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
-                  isRTL ? 'text-right' : 'text-left'
-                }`}
+                className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
+                  isRTL ? 'flex-row-reverse justify-end' : ''
+                } ${isActive(Routes.SETTINGS) ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600' : ''}`}
                 data-testid="nav-settings"
               >
-                {t('navigation.settings')}
+                <SettingsIcon size={18} />
+                <span>{t('navigation.settings')}</span>
               </button>
             </div>
           )}

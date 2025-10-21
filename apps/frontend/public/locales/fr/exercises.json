@@ -132,8 +132,6 @@
   "saveFailed": "Échec de l'enregistrement de l'exercice",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Durée par défaut",
-
-
   "copies": "Copies",
   "created": "Créé",
   "duration": "Durée",
@@ -142,7 +140,6 @@
   "ratingsAndReviews": "Évaluations & Avis",
   "stats": "Statistiques",
   "filtersAndSearch": "Filtres et Recherche",
-
   "title": "Exercices",
   "subtitle": "Parcourez, filtrez et démarrez des exercices. Marquez les favoris pour un accès rapide.",
   "searchLabel": "Rechercher des exercices",
@@ -262,5 +259,26 @@
   "stepLabel": "Étape",
   "shareErrorAuth": "Vous devez être connecté pour partager des exercices",
   "shareErrorNotSynced": "L'exercice doit être synchronisé avant de le partager",
-  "shareErrorOffline": "Impossible de partager hors ligne"
+  "shareErrorOffline": "Impossible de partager hors ligne",
+  "muscleGroupsList": {
+    "core": "Tronc",
+    "abs": "Abdominaux",
+    "obliques": "Obliques",
+    "shoulders": "Épaules",
+    "chest": "Pectoraux",
+    "triceps": "Triceps",
+    "quads": "Quadriceps",
+    "glutes": "Fessiers",
+    "hamstrings": "Ischio-jambiers",
+    "calves": "Mollets",
+    "cardio": "Cardio",
+    "legs": "Jambes",
+    "flexibility": "Flexibilité",
+    "back": "Dos",
+    "hips": "Hanches",
+    "balance": "Équilibre",
+    "full-body": "Corps Entier",
+    "hands": "Mains",
+    "mobility": "Mobilité"
+  }
 }

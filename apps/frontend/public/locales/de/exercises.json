@@ -180,10 +180,6 @@
   "saveFailed": "Fehler beim Speichern der Übung",
   "tagsLabel": "Tags",
   "defaultDurationLabel": "Standarddauer",
-
-
-
-
   "copies": "Kopien",
   "created": "Erstellend",
   "equipmentNeeded": "Ausrüstung benötigt",
@@ -191,7 +187,6 @@
   "ratingsAndReviews": "Bewertungen & Rezensionen",
   "stats": "Statistiken",
   "filtersAndSearch": "Filter & Suche",
-
   "title": "Übungen",
   "subtitle": "Durchsuchen, filtern und starten Sie Übungen. Markieren Sie Favoriten für schnellen Zugriff.",
   "searchLabel": "Übungen suchen",
@@ -260,5 +255,26 @@
   "stepLabel": "Schritt",
   "shareErrorAuth": "Sie müssen angemeldet sein, um Übungen zu teilen",
   "shareErrorNotSynced": "Übung muss vor dem Teilen synchronisiert werden",
-  "shareErrorOffline": "Kann nicht offline teilen"
+  "shareErrorOffline": "Kann nicht offline teilen",
+  "muscleGroupsList": {
+    "core": "Rumpf",
+    "abs": "Bauch",
+    "obliques": "Schräge Bauchmuskeln",
+    "shoulders": "Schultern",
+    "chest": "Brust",
+    "triceps": "Trizeps",
+    "quads": "Quadrizeps",
+    "glutes": "Gesäß",
+    "hamstrings": "Beinbeuger",
+    "calves": "Waden",
+    "cardio": "Cardio",
+    "legs": "Beine",
+    "flexibility": "Flexibilität",
+    "back": "Rücken",
+    "hips": "Hüften",
+    "balance": "Balance",
+    "full-body": "Ganzkörper",
+    "hands": "Hände",
+    "mobility": "Mobilität"
+  }
 }

@@ -149,21 +149,47 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
         className={`${config.bgColor} border ${config.borderColor} ${config.textColor} rounded-lg shadow-lg max-w-md w-full pointer-events-auto p-4 ${className}`}
         data-testid="update-notification-banner"
       >
-        <div className="flex items-start justify-between">
-        <div className="flex items-start flex-1">
-          <div className="flex-shrink-0 mr-3" aria-hidden="true">
-            <span className="text-2xl">{config.icon}</span>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h3 className="text-h3 mb-2">
+        {/* First row: Icon + Title + Dismiss button */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center flex-1 min-w-0">
+            <div className="flex-shrink-0 mr-3 rtl:ml-3 rtl:mr-0" aria-hidden="true">
+              <span className="text-2xl">{config.icon}</span>
+            </div>
+            <h3 className="text-h3 flex-1">
               {getUpdateTitle()}
             </h3>
+          </div>
 
-            <div className="space-y-2">
-              <p className="text-body">
-                {getUpdateMessage()}
-              </p>
+          {config.canDismiss && onDismiss && (
+            <button
+              onClick={handleDismiss}
+              className="ml-3 rtl:mr-3 rtl:ml-0 flex-shrink-0 p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current"
+              aria-label={t('update.dismiss', 'Dismiss update notification')}
+              data-testid="update-dismiss-button"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Second row: Alert text and additional content */}
+        <div className="space-y-2">
+          <p className="text-body">
+            {getUpdateMessage()}
+          </p>
 
               {updateInfo.version && updateInfo.version !== 'unknown' && (
                 <p className="text-small opacity-90">
@@ -260,66 +286,39 @@ export const UpdateNotificationBanner: React.FC<UpdateNotificationBannerProps> =
                   </div>
                 </div>
               )}
-            </div>
+        </div>
+
+        <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+          <button
+            onClick={handleApplyUpdate}
+            className={`${
+              updateInfo.policy === 'force'
+                ? 'btn-danger'
+                : 'btn-primary'
+            } w-full sm:w-auto touch-target`}
+            data-testid="update-apply-button"
+          >
+            {updateInfo.policy === 'force'
+              ? t('update.force.action', 'Update Now')
+              : t('update.action', 'Update')
+            }
+          </button>
+
+          {config.canDismiss && onDismiss && (
+            <button
+              onClick={handleDismiss}
+              className="btn-secondary w-full sm:w-auto touch-target"
+              data-testid="update-postpone-button"
+            >
+              {t('update.postpone', 'Later')}
+            </button>
+          )}
+
+          <div className="text-small opacity-75 flex items-center sm:ml-auto">
+            <span className="mr-2 rtl:ml-2 rtl:mr-0" aria-hidden="true">📊</span>
+            {t('update.estimatedSize', 'Est. {{size}}MB', { size: estimatedSize })}
           </div>
         </div>
-
-        {config.canDismiss && onDismiss && (
-          <button
-            onClick={handleDismiss}
-            className="ml-4 flex-shrink-0 p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-current"
-            aria-label={t('update.dismiss', 'Dismiss update notification')}
-            data-testid="update-dismiss-button"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
-
-      <div className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-center">
-        <button
-          onClick={handleApplyUpdate}
-          className={`${
-            updateInfo.policy === 'force'
-              ? 'btn-danger'
-              : 'btn-primary'
-          } w-full sm:w-auto touch-target`}
-          data-testid="update-apply-button"
-        >
-          {updateInfo.policy === 'force'
-            ? t('update.force.action', 'Update Now')
-            : t('update.action', 'Update')
-          }
-        </button>
-
-        {config.canDismiss && onDismiss && (
-          <button
-            onClick={handleDismiss}
-            className="btn-secondary w-full sm:w-auto touch-target"
-            data-testid="update-postpone-button"
-          >
-            {t('update.postpone', 'Later')}
-          </button>
-        )}
-
-        <div className="text-small opacity-75 flex items-center sm:ml-auto">
-          <span className="mr-2 rtl:ml-2 rtl:mr-0" aria-hidden="true">📊</span>
-          {t('update.estimatedSize', 'Est. {{size}}MB', { size: estimatedSize })}
-        </div>
-      </div>
       </div>
     </div>
   );

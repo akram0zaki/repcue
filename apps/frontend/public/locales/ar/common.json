@@ -61,6 +61,10 @@
     "playVideo": "تشغيل الفيديو",
     "premium": "مميز",
     "done": "تم",
+    "refresh": "تحديث",
+    "streakMilestone": "🔥 إنجاز سلسلة {{days}} يوم!",
+    "surveyThanks": "شكراً لملاحظاتك!",
+    "surveyError": "فشل حفظ إجابات الاستبيان",
     "moreFilters": "فلاتر أكتر ({{count}})",
     "moreFilters_other": "فلاتر أكتر ({{count}})",
     "showFewerFilters": "إظهار فلاتر أقل",
@@ -71,7 +75,9 @@
     "badges": "الشارات",
     "clearFilter": "مسح الفلتر",
     "other": "أخرى",
-    "selectOne": "اختر واحدًا"
+    "selectOne": "اختر واحدًا",
+    "skip": "تخطي",
+    "submit": "إرسال"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -80,6 +86,7 @@
     "timer": "المؤقت",
     "activityLog": "السجل",
     "progress": "التقدم",
+    "coach": "المدرب",
     "settings": "الإعدادات"
   },
   "settings": {
@@ -124,7 +131,11 @@
     "syncInProgress": "جاري المزامنة…",
     "syncNowHelp": "مزامنة التغييرات يدوياً مع الخادم لأغراض الاختبار أو استكشاف الأخطاء.",
     "refreshExercises": "تحديث التمارين",
-    "refreshExercisesHelp": "فرض تحديث التمارين من الخادم وإعادة تعيين جميع المفضلة",
+    "refreshExercisesHelp": "فرض تحديث التمارين من الخادم وإعادة تعيين جميع المفضلات",
+    "upgradeDatabase": "ترقية قاعدة البيانات",
+    "upgradeDatabaseHelp": "تحديث قاعدة البيانات المحلية إلى أحدث إصدار مع ميزات جديدة مثل تتبع الأرقام القياسية الشخصية.",
+    "databaseUpgradeSuccess": "تمت ترقية قاعدة البيانات بنجاح! يرجى تحديث الصفحة.",
+    "databaseUpgradeError": "فشل في ترقية قاعدة البيانات. يرجى المحاولة مرة أخرى.",
     "forceRefreshApp": "فرض تحديث التطبيق",
     "forceRefreshAppHelp": "مسح جميع التخزين المؤقت وإعادة تحميل التطبيق من الخادم. استخدم عندما يبدو التطبيق قديماً أو يتصرف بشكل غير متوقع.",
     "clearCachesOnly": "مسح التخزين المؤقت فقط",
@@ -262,7 +273,7 @@
     "heroTitle": "ابق ثابتاً، ابق قوياً.",
     "heroSubtitle": "تمارينك، بطريقتك.",
     "upcomingWorkout": "التمرين القادم",
-    "tagline": "مؤقت التمارين الشخصي",
+    "tagline": "مدربك الشخصي بالذكاء الاصطناعي لتمارين أكثر فعالية",
     "signInMessage": "يمكنك ",
     "signInLink": "تسجيل الدخول",
     "signInSuffix": " لتتبع نشاطك ومشاركة تقدمك.",
@@ -386,7 +397,9 @@
     "status": {
       "stoppedAfter": "توقف بعد {{duration}}",
       "completedSetsReps": "اكتمل {{sets}} مجموعة من {{reps}} تكرار",
+      "completedSetsRepsInWorkout": "اكتمل {{sets}} مجموعة من {{reps}} تكرار في التمرين: {{workoutName}}",
       "completedTime": "اكتمل مؤقت فاصل {{duration}}",
+      "completedTimeInWorkout": "اكتمل {{duration}} في التمرين: {{workoutName}}",
       "completedWorkout_zero": "اكتمل التمرين بـ {{count}} تمرين",
       "completedWorkout_one": "اكتمل التمرين بـ {{count}} تمرين",
       "completedWorkout_two": "اكتمل التمرين بـ {{count}} تمرينان",

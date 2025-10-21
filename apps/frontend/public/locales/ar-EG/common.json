@@ -63,6 +63,10 @@
     "playVideo": "تشغيل الفيديو",
     "premium": "مميز",
     "done": "تم",
+    "refresh": "حدّث",
+    "streakMilestone": "🔥 إنجاز سلسلة {{days}} يوم!",
+    "surveyThanks": "شكراً لملاحظاتك!",
+    "surveyError": "فشل حفظ إجابات الاستبيان",
     "moreFilters": "فلاتر أكتر ({{count}})",
     "moreFilters_other": "فلاتر أكتر ({{count}})",
     "showFewerFilters": "إظهار فلاتر أقل",
@@ -73,8 +77,10 @@
     "badges": "الشارات",
     "clearFilter": "مسح الفلتر",
     "other": "أخرى",
-    "selectOne": "اختر واحدًا"
-
+    "selectOne": "اختر واحدًا",
+    "skip": "تخطي",
+    "submit": "إرسال",
+    "submitting": "جاري الإرسال..."
   },
   "navigation": {
     "home": "البيت",
@@ -83,6 +89,7 @@
     "timer": "المؤقت",
     "activityLog": "السجل",
     "progress": "التقدم",
+    "coach": "الكوتش",
     "settings": "الإعدادات"
   },
   "settings": {
@@ -128,6 +135,10 @@
     "syncNowHelp": "زامِن التغييرات يدويًا مع السيرفر للتجربة أو الحلّ.",
     "refreshExercises": "حدّث التمارين",
     "refreshExercisesHelp": "اجبر تحديث التمارين من السيرفر وامسح كل المفضلة",
+    "upgradeDatabase": "ترقية قاعدة البيانات",
+    "upgradeDatabaseHelp": "تحديث قاعدة البيانات المحلية لآخر نسخة مع مميزات جديدة زي تتبع الأرقام القياسية الشخصية.",
+    "databaseUpgradeSuccess": "تمت ترقية قاعدة البيانات بنجاح! رجاءً حدّث الصفحة.",
+    "databaseUpgradeError": "فشلت ترقية قاعدة البيانات. حاول تاني.",
     "forceRefreshApp": "اجبر البرنامج يتحدث",
     "forceRefreshAppHelp": "امسح كل الكاش وحمّل البرنامج من جديد من السيرفر. استعملها لما البرنامج يبقى قديم أو مش شغال كويس.",
     "clearCachesOnly": "امسح الكاش بس",
@@ -265,7 +276,7 @@
     "heroTitle": "خليك ثابت، خليك قوي.",
     "heroSubtitle": "تمارينك، على طريقتك.",
     "upcomingWorkout": "التمرين الجاي",
-    "tagline": "مؤقت التمارين بتاعك",
+    "tagline": "مدربك الشخصي بالذكاء الاصطناعي لتمارين أكثر فعالية",
     "signInMessage": "تقدر ",
     "signInLink": "تسجل دخولك",
     "signInSuffix": " علشان تتابع نشاطك وتشارك تقدّمك.",
@@ -389,7 +400,9 @@
     "status": {
       "stoppedAfter": "اتوقف بعد {{duration}}",
       "completedSetsReps": "{{sets}} سيت من {{reps}} عدة خلصوا",
+      "completedSetsRepsInWorkout": "{{sets}} سيت من {{reps}} عدة خلصوا في التمرين: {{workoutName}}",
       "completedTime": "المؤقت {{duration}} خلص",
+      "completedTimeInWorkout": "{{duration}} خلص في التمرين: {{workoutName}}",
       "completedWorkout_zero": "التمرين خلص بـ {{count}} تمرين",
       "completedWorkout_one": "التمرين خلص بـ {{count}} تمرين",
       "completedWorkout_two": "التمرين خلص بـ {{count}} تمرينين",
