@@ -116,9 +116,41 @@ export interface LegalManifest {
 }
 
 /**
- * Status of a user's legal acceptance state
+ * Status of a user's legal acceptance state for a single document
  */
 export interface LegalAcceptanceStatus {
+  /** Document ID */
+  docId: string;
+  
+  /** Whether this document is accepted (version + hash match) */
+  accepted: boolean;
+  
+  /** Whether acceptance is required */
+  requiresAcceptance: boolean;
+  
+  /** Whether this document is blocking app usage */
+  isBlocking: boolean;
+  
+  /** Current version in manifest */
+  currentVersion: string;
+  
+  /** Version the user accepted (if any) */
+  acceptedVersion?: string;
+  
+  /** Current content hash in manifest */
+  currentHash: string;
+  
+  /** Hash the user accepted (if any) */
+  acceptedHash?: string;
+  
+  /** When the user accepted (if any) */
+  acceptedAt?: string;
+}
+
+/**
+ * Overall legal acceptance state
+ */
+export interface LegalAcceptanceOverallStatus {
   /** All required documents are accepted */
   allRequiredAccepted: boolean;
   

@@ -88,11 +88,41 @@ This plan references PRD requirement IDs (LA-REQ-xxx).
 **Phase 1 Status**: ✅ **COMPLETE** — All backend components created and deployed to dev environment
 
 ## Phase 2 — Frontend Services & Types
-1. Types: Add interfaces for ConsentV3, LegalAcceptance, LegalManifest, etc. (LA-REQ-012, 020).
-2. ConsentService: V2→V3 migration, new `legalAcceptances` field; boolean/null returns; logger usage (LA-REQ-026).
-3. LegalDocsService: load baseline + live manifest; diff logic; recordAcceptance API (LA-REQ-001, 004, 006–008, 020).
-4. LegalUpdateService: schedule checks on boot, 4h, reconnect; emit events (LA-REQ-016).
-5. Service Worker routes: runtime caching per spec (manifest network-first; docs stale-while-revalidate) (LA-REQ-004, 005, 015).
+1. [x] Types: Add interfaces for ConsentV3, LegalAcceptance, LegalManifest, etc. (LA-REQ-012, 020).
+   - **COMPLETED**: Extended consent types to V3 with legalAcceptances field
+   - File: `apps/frontend/src/types/consent.ts` - Added ConsentDataV3 interface
+   - File: `apps/frontend/src/types/legal.ts` - Updated LegalAcceptanceStatus interface
+2. [x] ConsentService: V2→V3 migration, new `legalAcceptances` field; boolean/null returns; logger usage (LA-REQ-026).
+   - **COMPLETED**: Added V2→V3 migration in ConsentService
+   - Migration creates empty legalAcceptances array
+   - Added methods: `getLegalAcceptances()`, `setLegalAcceptances()`, `updateLegalAcceptance()`
+   - All methods return boolean (success/failure) following project conventions
+3. [x] LegalDocsService: load baseline + live manifest; diff logic; recordAcceptance API (LA-REQ-001, 004, 006–008, 020).
+   - **COMPLETED**: Created `apps/frontend/src/services/legalDocsService.ts`
+   - Features:
+     - Load baseline manifest from `/legal/manifest.json`
+     - Load live manifest from Edge Function with ETag support
+     - Document retrieval with locale fallback (user locale → base locale → en)
+     - Acceptance tracking and status checking
+     - Diff logic to detect new/changed documents
+     - effectiveFrom date handling with isEffectiveNow() method
+4. [x] LegalUpdateService: schedule checks on boot, 4h, reconnect; emit events (LA-REQ-016).
+   - **COMPLETED**: Created `apps/frontend/src/services/legalUpdateService.ts`
+   - Features:
+     - Initialize on app boot
+     - Scheduled checks every 4 hours
+     - Network reconnection listener
+     - Custom events: `legal-updates-available`, `legal-check-completed`
+     - Workout-aware detection (checks if user on /timer page)
+     - Force check capability (bypasses cache)
+5. [x] Service Worker routes: runtime caching per spec (manifest network-first; docs stale-while-revalidate) (LA-REQ-004, 005, 015).
+   - **COMPLETED**: Updated `apps/frontend/vite.config.ts`
+   - Added caching strategies:
+     - Legal manifest: NetworkFirst (3s timeout, 1 hour expiration)
+     - Legal markdown docs: StaleWhileRevalidate (7 days expiration)
+     - Updated globPatterns to include `legal/**/*.{json,md}`
+
+**Phase 2 Status**: ✅ **COMPLETE** — All frontend services, types, and Service Worker configuration implemented
 
 ## Phase 3 — UI
 1. LegalCenterPage (`/legal`): list all docs with version, effectiveFrom, locale indicators (LA-REQ-013, 011).
