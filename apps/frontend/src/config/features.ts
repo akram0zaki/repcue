@@ -26,3 +26,8 @@ export const SYNC_DEBUG = false;
 export const AI_WORKOUT_BUILDER = true;
 // Beta testing mode - if true, restricts access to specific users (future use)
 export const AI_WORKOUT_BETA = false;
+
+// Legal Acceptance V3 feature flag
+// Enable versioned legal document acceptance system (Terms, Privacy Policy, etc.)
+// When enabled, users must accept current legal documents to use the app
+export const LEGAL_ACCEPTANCE_V3_ENABLED = true;

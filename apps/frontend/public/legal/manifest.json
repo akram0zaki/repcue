@@ -1,0 +1,151 @@
+{
+  "updatedAt": "2025-10-21T19:16:19.758Z",
+  "documents": [
+    {
+      "id": "terms_conditions",
+      "title": "Terms & Conditions",
+      "version": "1.0.0",
+      "required": true,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/01-terms_conditions.en.md",
+          "contentHash": "K1TZx5J2MCWBYrh61Q5xNKxaPO09HBNdxJPefYN3Fv8="
+        }
+      ],
+      "effectiveFrom": "2025-11-01T00:00:00Z"
+    },
+    {
+      "id": "privacy_policy",
+      "title": "Privacy Policy",
+      "version": "1.0.0",
+      "required": true,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/02-privacy_policy.en.md",
+          "contentHash": "eHojbMyhlJjt+tL5/oXsNkBZCWOnXVM6MUQ5yOHDS/Y="
+        }
+      ],
+      "effectiveFrom": "2025-11-01T00:00:00Z"
+    },
+    {
+      "id": "cookie_policy",
+      "title": "Cookie Policy",
+      "version": "1.0.0",
+      "required": true,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/03-cookie_policy.en.md",
+          "contentHash": "G57tNCiQ8Ut0/7+Z2aSRiIE8kJz5cpzpNXnP8G+7MT8="
+        }
+      ],
+      "effectiveFrom": "2025-11-01T00:00:00Z"
+    },
+    {
+      "id": "medical_disclaimer",
+      "title": "Medical Disclaimer",
+      "version": "1.0.0",
+      "required": true,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/04-medical_disclaimer.en.md",
+          "contentHash": "nBxN5ko619EHpaIn22Y7j1NWWhXOhd0wMt5Zi0K1MdU="
+        }
+      ],
+      "effectiveFrom": "2025-11-01T00:00:00Z"
+    },
+    {
+      "id": "liability_waiver",
+      "title": "Liability Waiver",
+      "version": "1.0.0",
+      "required": true,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/05-liability_waiver.en.md",
+          "contentHash": "xj6Rrt0/D3wHL75+6hA91NQQad+/ExsXdXjmscJ/IDg="
+        }
+      ],
+      "effectiveFrom": "2025-11-01T00:00:00Z"
+    },
+    {
+      "id": "dpa",
+      "title": "Data Processing Agreement",
+      "version": "1.0.0",
+      "required": false,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/06-dpa.en.md",
+          "contentHash": "G2WdKCY0EcAZrkQwqsG+7nyhFVkIf5kgqMpAjYl9IpM="
+        }
+      ]
+    },
+    {
+      "id": "subscription_policy",
+      "title": "Subscription & Payment Policy",
+      "version": "1.0.0",
+      "required": false,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/07-subscription_policy.en.md",
+          "contentHash": "Sx3vD//WZjRqUUQz8BdBfaDMYeyMZaKVZLIkEDLUbKc="
+        }
+      ]
+    },
+    {
+      "id": "community_guidelines",
+      "title": "Community Guidelines",
+      "version": "1.0.0",
+      "required": false,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/08-community_guidelines.en.md",
+          "contentHash": "Y3VKQUVwZDYoupvjXGvaqJuHZNnKtOcAf/wXt7G5/Ks="
+        }
+      ]
+    },
+    {
+      "id": "imprint",
+      "title": "Imprint",
+      "version": "1.0.0",
+      "required": true,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/09-imprint.en.md",
+          "contentHash": "O42PYlL2BvKXUnuw2sjZ04RSZvpstNev+79AyhyEvp0="
+        }
+      ],
+      "effectiveFrom": "2025-11-01T00:00:00Z"
+    },
+    {
+      "id": "appendices",
+      "title": "Appendices",
+      "version": "1.0.0",
+      "required": false,
+      "policy": "deferred",
+      "locales": [
+        {
+          "locale": "en",
+          "path": "/legal/10-appendices.en.md",
+          "contentHash": "zLvpNT9lnYFV5XKXsLYcJtC0gNCWB4TrY+5q+PKwq/o="
+        }
+      ]
+    }
+  ]
+}

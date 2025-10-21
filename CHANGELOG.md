@@ -1,5 +1,97 @@
 ## Unreleased
 
+### 2025-10-21
+
+#### 🔐 Legal Acceptance & Consent V3 - Phase 1 Backend Complete
+
+**Overview**: Completed Phase 1 of Legal Acceptance & Consent V3 system implementation. Successfully deployed backend infrastructure to dev environment including database schema, Edge Function, and baseline legal documents.
+
+**Phase 1 Achievements**:
+- ✅ Database migration: `legal_acceptances` table with RLS policies
+- ✅ Edge Function: `legal-manifest` (v1) with ETag support and cache validation
+- ✅ Baseline legal documents: 10 documents (6 required, 4 optional)
+- ✅ Hash generation script: SHA-256 base64 content hashes
+- ✅ TypeScript types: Complete type definitions for legal system
+- ✅ Feature flag: `LEGAL_ACCEPTANCE_V3_ENABLED = true`
+
+**Database Schema** (`legal_acceptances` table):
+- Composite primary key: (user_id, doc_id)
+- Fields: accepted_version, content_hash, locale, accepted_at
+- RLS policies: Users can only access own acceptance records
+- Performance indexes: user_id, doc_id, accepted_at DESC
+- Foreign key: user_id → auth.users(id) with CASCADE delete
+
+**Edge Function** (`legal-manifest`):
+- **Endpoint**: `GET /functions/v1/legal-manifest`
+- **Function ID**: d9b2a9d3-37c5-4e65-873d-060664ae2a70
+- **Status**: ACTIVE in dev environment
+- **Features**:
+  - ETag generation via crypto.subtle.digest (SHA-256 hex)
+  - Cache-Control: `max-age=60, stale-while-revalidate=86400`
+  - 304 Not Modified responses via If-None-Match header
+  - CORS headers for same-origin policy
+  - Graceful degradation with baseline manifest fallback
+  - Embedded baseline manifest (10 documents)
+
+**Legal Documents Created** (all v1.0.0, effective 2025-11-01):
+1. Terms & Conditions (required)
+2. Privacy Policy (required)
+3. Cookie Policy (required)
+4. Medical Disclaimer (required)
+5. Liability Waiver (required)
+6. Data Processing Agreement (optional)
+7. Subscription & Payment Policy (optional)
+8. Community Guidelines (optional)
+9. Imprint (required)
+10. Appendices (optional, reference only)
+
+**Technical Implementation**:
+- All documents stored in `apps/frontend/public/legal/` with numeric prefixes (01-10)
+- Manifest JSON: `apps/frontend/public/legal/manifest.json`
+- Hash script: `scripts/generate-legal-hashes.js` (ES module)
+- Types: `apps/frontend/src/types/legal.ts` (LegalAcceptance, ConsentV3, LegalManifest, etc.)
+
+**Architecture Highlights**:
+- Offline-first: Baseline manifest embedded in Edge Function
+- Security: RLS policies ensure data privacy
+- Performance: ETag-based cache validation reduces bandwidth
+- Reliability: Graceful degradation on error
+- Separation: Essential consent (cookies) = device-local; Legal acceptance = user-level synced
+
+**Files Created/Modified**:
+- `supabase/migrations/20251021-01-create-legal-acceptances-table.sql`
+- `supabase/functions/legal-manifest/index.ts`
+- `apps/frontend/public/legal/*.en.md` (10 files)
+- `apps/frontend/public/legal/manifest.json`
+- `scripts/generate-legal-hashes.js`
+- `apps/frontend/src/types/legal.ts`
+- `apps/frontend/src/config/features.ts` (added LEGAL_ACCEPTANCE_V3_ENABLED flag)
+- `docs/migration-tracking/supabase-changes_20251021.md`
+- `docs/implementation-plans/legal-acceptance/implementation-plan-legal-acceptance.md`
+- `docs/implementation-plans/legal-acceptance/PHASE1-DEPLOYMENT-SUMMARY.md`
+
+**Deployment Status**:
+- ✅ Dev environment: Migration applied, Edge Function v1 deployed
+- ⏳ Production: Pending Phase 2-6 completion
+
+**Known Issues & Resolutions**:
+- Fixed: Deno hash module error → Replaced with Web Crypto API (crypto.subtle.digest)
+
+**Next Steps (Phase 2)**:
+1. Extend ConsentService to V3 (add legalAcceptances field)
+2. Create LegalDocsService (manifest loading, diff logic, acceptance tracking)
+3. Create LegalUpdateService (scheduled checks, event emitting, workout deferral)
+4. Configure Service Worker (network-first for manifest, stale-while-revalidate for docs)
+
+**Documentation**:
+- PRD: `docs/implementation-plans/legal-acceptance/PRD-legal-acceptance.md`
+- Architecture: `docs/implementation-plans/legal-acceptance/architecture-spec-legal-acceptance.md`
+- Implementation Plan: `docs/implementation-plans/legal-acceptance/implementation-plan-legal-acceptance.md`
+- Migration Tracker: `docs/migration-tracking/supabase-changes_20251021.md`
+- Deployment Summary: `docs/implementation-plans/legal-acceptance/PHASE1-DEPLOYMENT-SUMMARY.md`
+
+---
+
 ### 2025-10-18
 
 #### 📊 AI Coach Feature - Progress Audit Complete

@@ -57,14 +57,35 @@ This plan references PRD requirement IDs (LA-REQ-xxx).
 ## Phase 0 — Preparation
 - [x] Confirm design choices (done in chat) — (LA-REQ-001..025)
 - [x] Folder structure confirmed: `docs/implementation-plans/legal-acceptance/docs` for authoring.
+- [x] Feature flag added: `LEGAL_ACCEPTANCE_V3_ENABLED = true` in `src/config/features.ts`
+- [x] Migration tracker created: `docs/migration-tracking/supabase-changes_20251021.md`
+- [x] Types created: `apps/frontend/src/types/legal.ts` with all interfaces
 
 ## Phase 1 — Backend Live Manifest (2A)
-1. Add Express route `GET /api/legal/manifest` serving a JSON manifest file from backend sources (LA-REQ-002, 3, 4):
+1. [x] Add Express route `GET /api/legal/manifest` serving a JSON manifest file from backend sources (LA-REQ-002, 3, 4):
+   - **CORRECTION**: Using Supabase Edge Function instead of Express (backend is 100% Supabase)
    - ETag support (hash of body) and `Cache-Control: max-age=60, stale-while-revalidate=86400`.
    - Serve same JSON schema as in Architecture Spec.
    - Security: same-origin only; no PII.
-2. Author baseline manifest and sample docs (EN/NL/AR) under `apps/frontend/public/legal/` (LA-REQ-004, 011, 012, 021).
-3. Add script to compute sha256 (base64) and update manifest.json (LA-REQ-021).
+   - **COMPLETED**: Created `supabase/functions/legal-manifest/index.ts`
+   - **DEPLOYED TO DEV**: v1 (2025-10-21) - Function ID: d9b2a9d3-37c5-4e65-873d-060664ae2a70
+2. [x] Author baseline manifest and sample docs (EN/NL/AR) under `apps/frontend/public/legal/` (LA-REQ-004, 011, 012, 021).
+   - **COMPLETED**: All 10 documents copied with numeric prefixes (01- through 10-)
+   - Files: 01-terms_conditions.en.md, 02-privacy_policy.en.md, 03-cookie_policy.en.md, 04-medical_disclaimer.en.md, 05-liability_waiver.en.md, 06-dpa.en.md, 07-subscription_policy.en.md, 08-community_guidelines.en.md, 09-imprint.en.md, 10-appendices.en.md
+3. [x] Add script to compute sha256 (base64) and update manifest.json (LA-REQ-021).
+   - **COMPLETED**: Created `scripts/generate-legal-hashes.js`
+   - Generated `apps/frontend/public/legal/manifest.json` with SHA-256 hashes
+   - 6 required documents, 4 optional, effective date 2025-11-01
+4. [x] Create Supabase migration for `legal_acceptances` table with RLS policies
+   - **COMPLETED**: Created `supabase/migrations/20251021-01-create-legal-acceptances-table.sql`
+   - Composite PK (user_id, doc_id), RLS policies, indexes for performance
+   - **APPLIED TO DEV**: ✅ Success (2025-10-21)
+5. [x] Create Supabase Edge Function for serving live legal manifest
+   - **COMPLETED**: Created `supabase/functions/legal-manifest/index.ts`
+   - ETag support, cache validation, graceful degradation, baseline manifest embedded
+   - **DEPLOYED TO DEV**: ✅ Success (2025-10-21) - v1 active
+
+**Phase 1 Status**: ✅ **COMPLETE** — All backend components created and deployed to dev environment
 
 ## Phase 2 — Frontend Services & Types
 1. Types: Add interfaces for ConsentV3, LegalAcceptance, LegalManifest, etc. (LA-REQ-012, 020).
