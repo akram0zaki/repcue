@@ -102,7 +102,8 @@
       "Bash(timeout:*)",
       "Bash(Select-Object -First 20)",
       "Read(//c/c/Users/akram/OneDrive/Documents/Workspace/repcue/**)",
-      "Bash(curl -s -w \"\\n%{http_code}\" https://api.mistral.ai/v1/models -H \"Authorization: Bearer Bfaa52QtIYiJnFqdafVmDqW9m3IZW15L\")"
+      "Bash(curl -s -w \"\\n%{http_code}\" https://api.mistral.ai/v1/models -H \"Authorization: Bearer Bfaa52QtIYiJnFqdafVmDqW9m3IZW15L\")",
+      "Read(//c/Users/akram/AppData/Roaming/Claude/**)"
     ],
     "deny": [],
     "ask": []
