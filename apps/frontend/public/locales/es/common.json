@@ -96,7 +96,8 @@
     "activityLog": "Registro",
     "progress": "Progreso",
     "coach": "Entrenador",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "legal": "Legal"
   },
   "settings": {
     "audioSettings": "Configuración de audio",

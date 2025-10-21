@@ -391,6 +391,7 @@ export const Routes = {
   ACTIVITY_LOG: '/activity',
   SETTINGS: '/settings',
   PRIVACY: '/privacy',
+  LEGAL: '/legal',
   PROFILE: '/profile',
   PROFILE_VIEW: '/profile/:userId',
   CONNECTIONS: '/connections',

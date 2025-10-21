@@ -1,0 +1,56 @@
+{
+  "title": "Juridyske dokuminten",
+  "required": "Fereaske dokuminten",
+  "optional": "Opsjonele dokuminten",
+  "version": "Ferzje",
+  "accept": "Akseptearje",
+  "loadError": "Kin dokumint net lade. Besykje it opnij.",
+  "scrollToAccept": "Scroll nei ûnderen om te akseptearjen",
+  "effectiveIn": "Jildich oer {{days}} dagen",
+  "acceptedOn": "Akseptearre: {{date}}",
+  "documents": {
+    "terms_conditions": "Algemiene foarwurden",
+    "privacy_policy": "Privacybelied",
+    "cookie_policy": "Cookiebelied",
+    "medical_disclaimer": "Medyske disclaimer",
+    "liability_waiver": "Oanspraaklikheidsferklearing",
+    "dpa": "Gegevensfergearkingsoerienkomst",
+    "subscription_policy": "Abonneminten betelbelied",
+    "community_guidelines": "Mienskipsrjochtlinen",
+    "imprint": "Kolofon",
+    "appendices": "Bylages"
+  },
+  "status": {
+    "accepted": "Akseptearre",
+    "required": "Akseptaasje fereaske",
+    "optional": "Opsjoneel"
+  },
+  "errors": {
+    "noManifest": "Manifest foar juridyske dokuminten net beskikber.",
+    "loadFailed": "Kin juridyske dokuminten net lade. Besykje it opnij.",
+    "noLocale": "Dokumint net beskikber yn jo taal.",
+    "acceptFailed": "Kin akseptaasje net registrearje. Besykje it opnij.",
+    "acceptAllFailed": "Kin net alle dokuminten akseptearje. Besykje it opnij."
+  },
+  "gate": {
+    "title": "Juridyske dokuminten akseptearje",
+    "subtitle": "Besjoch en akseptearje alle fereaske dokuminten om RepCue te brûken.",
+    "requiredSectionTitle": "Fereaske dokuminten",
+    "requiredSectionDescription": "Jo moatte alle fereaske dokuminten akseptearje om troch te gean.",
+    "optionalSectionTitle": "Opsjonele dokuminten",
+    "optionalSectionDescription": "Dizze dokuminten binne opsjoneel. Jo kinne se besjen, mar se binne net fereaske om troch te gean.",
+    "view": "Besjen",
+    "viewDocument": "{{title}} besjen",
+    "accept": "Akseptearje",
+    "accepted": "Akseptearre",
+    "acceptedStatus": "✓ Akseptearre",
+    "viewedStatus": "Besjoen - klik op fakje om te akseptearjen",
+    "notViewedStatus": "Noch net besjoen",
+    "optional": "Opsjoneel",
+    "acceptAllRequired": "Akseptearje alle fereaske",
+    "continue": "Trochgean",
+    "statusAllAccepted": "Alle fereaske dokuminten akseptearre. Klik op Trochgean om fierder te gean.",
+    "statusAllViewed": "Alle dokuminten besjoen. Akseptearje se om troch te gean.",
+    "statusPending": "{{accepted}}/{{total}} fereaske dokuminten akseptearre"
+  }
+}

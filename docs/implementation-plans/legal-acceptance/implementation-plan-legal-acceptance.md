@@ -125,11 +125,57 @@ This plan references PRD requirement IDs (LA-REQ-xxx).
 **Phase 2 Status**: ✅ **COMPLETE** — All frontend services, types, and Service Worker configuration implemented
 
 ## Phase 3 — UI
-1. LegalCenterPage (`/legal`): list all docs with version, effectiveFrom, locale indicators (LA-REQ-013, 011).
-2. LegalDocumentModal: render markdown via react-markdown + remark-gfm + rehype-sanitize; RTL for Arabic; a11y (LA-REQ-012, 018).
-3. LegalGate (full-screen): checklist of required docs with View buttons opening modals; accept-all and continue when all required are acknowledged (LA-REQ-014, 016).
-   - Optional docs (future): show unticked, non-blocking checkboxes; accept-all acts on required only (LA-REQ-015, 016).
-4. Integrate with UpdateNotificationManager for non-blocking notifications (future effectiveFrom or optional docs) (LA-REQ-006–008).
+
+**Deliverables:**
+1. ✅ **LegalCenterPage** (`apps/frontend/src/pages/LegalCenterPage.tsx`): 
+   - Lists all legal documents with version, effectiveFrom, locale indicators (LA-REQ-013, 011)
+   - Displays acceptance status with color-coded badges and icons
+   - Shows countdown to effectiveFrom dates
+   - Mobile-first responsive design with sticky header
+   - RTL support for Arabic locales
+   
+2. ✅ **LegalDocumentModal** (`apps/frontend/src/components/legal/LegalDocumentModal.tsx`):
+   - Renders markdown via react-markdown + remark-gfm + rehype-sanitize (LA-REQ-012)
+   - Full-screen modal with scroll-to-bottom requirement before acceptance
+   - RTL support for Arabic (LA-REQ-018)
+   - Accessibility compliant (WCAG 2.1 AA) with focus trap, ESC key handler
+   - Loading and error states
+   - Body scroll prevention when open
+
+3. ✅ **LegalGate** (`apps/frontend/src/components/legal/LegalGate.tsx`):
+   - Full-screen blocking modal with checklist of required documents (LA-REQ-014, 016)
+   - Individual "View" buttons opening LegalDocumentModal
+   - Individual checkboxes for each document
+   - "Accept All Required" button (enabled when all viewed)
+   - "Continue" button (enabled when all required accepted)
+   - Optional documents section (non-blocking) (LA-REQ-015, 016)
+   - Mobile-first responsive design
+   - RTL support for Arabic
+
+4. ✅ **Icon Support** (`apps/frontend/src/components/icons/NavigationIcons.tsx`):
+   - Added CheckCircleIcon, XCircleIcon, XMarkIcon, DocumentTextIcon, ClockIcon
+   - Consistent SVG icon style matching project conventions
+
+5. ✅ **Dependencies Installed**:
+   - react-markdown 10.1.0
+   - remark-gfm 4.0.1
+   - rehype-sanitize 6.0.0
+
+6. ✅ **Translation Files** (`apps/frontend/public/locales/*/legal.json`):
+   - Created legal.json for all 8 locales (en, fr, de, es, nl, ar, ar-EG, fy)
+   - All translation keys validated (i18n:scan shows no missing keys)
+
+7. ✅ **Router Integration** (LA-REQ-013, 014):
+   - Added `/legal` route to App.tsx for LegalCenterPage
+   - Initialized legalDocsService and legalUpdateService on app boot
+   - Integrated LegalGate into app flow (checks for blocking documents on boot)
+   - Added navigation link to Legal Center in More menu
+   - Added Routes.LEGAL constant to types
+   - LegalCenterPage lazy-loaded for optimal performance
+
+8. ⏳ **Pending**: Integrate with UpdateNotificationManager for non-blocking notifications (future effectiveFrom or optional docs) (LA-REQ-006–008) — deferred to later phase
+
+**Phase 3 Status**: ✅ **COMPLETE** — All UI components implemented, router integrated, navigation added, TypeScript compilation clean
 
 ## Phase 4 — Supabase Sync
 1. Migration SQL (workspace-first): `supabase/migrations/<ts>_create_legal_acceptances.sql` (LA-REQ-018, 024):

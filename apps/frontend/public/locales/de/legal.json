@@ -1,0 +1,56 @@
+{
+  "title": "Rechtliche Dokumente",
+  "required": "Erforderliche Dokumente",
+  "optional": "Optionale Dokumente",
+  "version": "Version",
+  "accept": "Akzeptieren",
+  "loadError": "Dokument konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "scrollToAccept": "Bitte scrollen Sie nach unten, um zu akzeptieren",
+  "effectiveIn": "Wirksam in {{days}} Tagen",
+  "acceptedOn": "Akzeptiert: {{date}}",
+  "documents": {
+    "terms_conditions": "Allgemeine Geschäftsbedingungen",
+    "privacy_policy": "Datenschutzerklärung",
+    "cookie_policy": "Cookie-Richtlinie",
+    "medical_disclaimer": "Medizinischer Haftungsausschluss",
+    "liability_waiver": "Haftungsverzicht",
+    "dpa": "Datenverarbeitungsvereinbarung",
+    "subscription_policy": "Abonnement- und Zahlungsrichtlinie",
+    "community_guidelines": "Community-Richtlinien",
+    "imprint": "Impressum",
+    "appendices": "Anhänge"
+  },
+  "status": {
+    "accepted": "Akzeptiert",
+    "required": "Akzeptierung erforderlich",
+    "optional": "Optional"
+  },
+  "errors": {
+    "noManifest": "Manifest für rechtliche Dokumente nicht verfügbar.",
+    "loadFailed": "Rechtliche Dokumente konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "noLocale": "Dokument nicht in Ihrer Sprache verfügbar.",
+    "acceptFailed": "Akzeptierung konnte nicht aufgezeichnet werden. Bitte versuchen Sie es erneut.",
+    "acceptAllFailed": "Alle Dokumente konnten nicht akzeptiert werden. Bitte versuchen Sie es erneut."
+  },
+  "gate": {
+    "title": "Rechtliche Dokumente akzeptieren",
+    "subtitle": "Bitte überprüfen und akzeptieren Sie alle erforderlichen Dokumente, um RepCue weiterhin zu nutzen.",
+    "requiredSectionTitle": "Erforderliche Dokumente",
+    "requiredSectionDescription": "Sie müssen alle erforderlichen Dokumente akzeptieren, um fortzufahren.",
+    "optionalSectionTitle": "Optionale Dokumente",
+    "optionalSectionDescription": "Diese Dokumente sind optional. Sie können sie überprüfen, aber sie sind nicht erforderlich, um fortzufahren.",
+    "view": "Ansehen",
+    "viewDocument": "{{title}} ansehen",
+    "accept": "Akzeptieren",
+    "accepted": "Akzeptiert",
+    "acceptedStatus": "✓ Akzeptiert",
+    "viewedStatus": "Angesehen - Kontrollkästchen klicken zum Akzeptieren",
+    "notViewedStatus": "Noch nicht angesehen",
+    "optional": "Optional",
+    "acceptAllRequired": "Alle erforderlichen akzeptieren",
+    "continue": "Weiter",
+    "statusAllAccepted": "Alle erforderlichen Dokumente akzeptiert. Klicken Sie auf Weiter, um fortzufahren.",
+    "statusAllViewed": "Alle Dokumente angesehen. Akzeptieren Sie sie, um fortzufahren.",
+    "statusPending": "{{accepted}}/{{total}} erforderliche Dokumente akzeptiert"
+  }
+}

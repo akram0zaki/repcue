@@ -112,6 +112,13 @@ export class LegalDocsService {
     try {
       const headers: HeadersInit = {};
       
+      // Add authentication headers for Supabase Edge Function
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      if (anonKey) {
+        headers['apikey'] = anonKey;
+        headers['Authorization'] = `Bearer ${anonKey}`;
+      }
+      
       // Add ETag for cache validation (unless forcing refresh)
       if (!force && this.lastETag) {
         headers['If-None-Match'] = this.lastETag;
@@ -182,25 +189,39 @@ export class LegalDocsService {
   public getDocument(docId: string, locale: string): LegalDoc | null {
     const manifest = this.getCurrentManifest();
     if (!manifest) {
+      logger.warn(`[getDocument] No manifest available`);
       return null;
     }
 
     const doc = manifest.documents.find(d => d.id === docId);
     if (!doc) {
+      logger.warn(`[getDocument] Document not found: ${docId}`);
       return null;
     }
+
+    logger.log(`[getDocument] Looking for docId: ${docId}, locale: ${locale}`);
+    logger.log(`[getDocument] Available locales:`, doc.locales.map(l => l.locale).join(', '));
 
     // Try exact locale match first
     let localeData = doc.locales.find(l => l.locale === locale);
     
+    if (localeData) {
+      logger.log(`[getDocument] ✅ Found exact locale match: ${locale}`);
+    }
+    
     // Try base locale (e.g., ar-EG → ar)
     if (!localeData && locale.includes('-')) {
       const baseLocale = locale.split('-')[0];
+      logger.log(`[getDocument] Trying base locale fallback: ${baseLocale}`);
       localeData = doc.locales.find(l => l.locale === baseLocale);
+      if (localeData) {
+        logger.log(`[getDocument] ✅ Found base locale match: ${baseLocale}`);
+      }
     }
     
     // Fallback to English
     if (!localeData) {
+      logger.log(`[getDocument] Falling back to English`);
       localeData = doc.locales.find(l => l.locale === 'en');
     }
 
@@ -208,6 +229,8 @@ export class LegalDocsService {
       logger.warn(`No locale data found for document ${docId} (locale: ${locale})`);
       return null;
     }
+
+    logger.log(`[getDocument] Returning document with locale: ${localeData.locale}, path: ${localeData.path}`);
 
     return {
       ...doc,
@@ -263,7 +286,9 @@ export class LegalDocsService {
         docId,
         accepted: false,
         requiresAcceptance: false,
-        isBlocking: false
+        isBlocking: false,
+        currentVersion: '0.0.0',
+        currentHash: ''
       };
     }
 

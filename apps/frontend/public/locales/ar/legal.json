@@ -1,0 +1,56 @@
+{
+  "title": "الوثائق القانونية",
+  "required": "الوثائق المطلوبة",
+  "optional": "الوثائق الاختيارية",
+  "version": "الإصدار",
+  "accept": "قبول",
+  "loadError": "فشل تحميل المستند. يرجى المحاولة مرة أخرى.",
+  "scrollToAccept": "يرجى التمرير إلى الأسفل للقبول",
+  "effectiveIn": "سيصبح ساريًا خلال {{days}} يوم",
+  "acceptedOn": "تم القبول: {{date}}",
+  "documents": {
+    "terms_conditions": "الشروط والأحكام",
+    "privacy_policy": "سياسة الخصوصية",
+    "cookie_policy": "سياسة ملفات تعريف الارتباط",
+    "medical_disclaimer": "إخلاء المسؤولية الطبية",
+    "liability_waiver": "التنازل عن المسؤولية",
+    "dpa": "اتفاقية معالجة البيانات",
+    "subscription_policy": "سياسة الاشتراك والدفع",
+    "community_guidelines": "إرشادات المجتمع",
+    "imprint": "بيانات الناشر",
+    "appendices": "الملاحق"
+  },
+  "status": {
+    "accepted": "مقبول",
+    "required": "القبول مطلوب",
+    "optional": "اختياري"
+  },
+  "errors": {
+    "noManifest": "بيان الوثائق القانونية غير متوفر.",
+    "loadFailed": "فشل تحميل الوثائق القانونية. يرجى المحاولة مرة أخرى.",
+    "noLocale": "المستند غير متوفر بلغتك.",
+    "acceptFailed": "فشل تسجيل القبول. يرجى المحاولة مرة أخرى.",
+    "acceptAllFailed": "فشل قبول جميع المستندات. يرجى المحاولة مرة أخرى."
+  },
+  "gate": {
+    "title": "قبول الوثائق القانونية",
+    "subtitle": "يرجى مراجعة وقبول جميع الوثائق المطلوبة لمواصلة استخدام RepCue.",
+    "requiredSectionTitle": "الوثائق المطلوبة",
+    "requiredSectionDescription": "يجب عليك قبول جميع الوثائق المطلوبة للمتابعة.",
+    "optionalSectionTitle": "الوثائق الاختيارية",
+    "optionalSectionDescription": "هذه الوثائق اختيارية. يمكنك مراجعتها لكنها غير مطلوبة للمتابعة.",
+    "view": "عرض",
+    "viewDocument": "عرض {{title}}",
+    "accept": "قبول",
+    "accepted": "مقبول",
+    "acceptedStatus": "✓ مقبول",
+    "viewedStatus": "تمت المشاهدة - انقر على خانة الاختيار للقبول",
+    "notViewedStatus": "لم يتم العرض بعد",
+    "optional": "اختياري",
+    "acceptAllRequired": "قبول جميع المطلوبة",
+    "continue": "متابعة",
+    "statusAllAccepted": "تم قبول جميع الوثائق المطلوبة. انقر فوق متابعة للمضي قدمًا.",
+    "statusAllViewed": "تمت مشاهدة جميع الوثائق. اقبلها للمتابعة.",
+    "statusPending": "{{accepted}}/{{total}} وثائق مطلوبة مقبولة"
+  }
+}

@@ -28,7 +28,7 @@ const corsHeaders = {
 // Baseline manifest (embedded for offline-first fallback)
 // In production, this will be sourced from Supabase database
 const BASELINE_MANIFEST = {
-  "updatedAt": "2025-10-21T19:16:19.758Z",
+  "updatedAt": "2025-10-21T21:32:17.147Z",
   "documents": [
     {
       "id": "terms_conditions",
@@ -42,6 +42,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/01-terms_conditions.en.md",
           "contentHash": "K1TZx5J2MCWBYrh61Q5xNKxaPO09HBNdxJPefYN3Fv8="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/01-terms_conditions.ar.md",
+          "contentHash": "O53l1/YOmqJsaEowAOjdJCpIXJwi/ikFbbDlO3B6+LI="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/01-terms_conditions.nl.md",
+          "contentHash": "o/pIVM633FZAO8h6EOQcVE76Me/dGTbn3k+cxY4vnSM="
         }
       ]
     },
@@ -57,6 +67,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/02-privacy_policy.en.md",
           "contentHash": "eHojbMyhlJjt+tL5/oXsNkBZCWOnXVM6MUQ5yOHDS/Y="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/02-privacy_policy.ar.md",
+          "contentHash": "6kWYH8jmaDVciMX0a6KjG3jD701JX/Pfp/rZEBZDyoQ="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/02-privacy_policy.nl.md",
+          "contentHash": "HsTCu51NNB3WHQGK7IwG9Mg0dYjFd0PNyedOP14dHWE="
         }
       ]
     },
@@ -72,6 +92,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/03-cookie_policy.en.md",
           "contentHash": "G57tNCiQ8Ut0/7+Z2aSRiIE8kJz5cpzpNXnP8G+7MT8="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/03-cookie_policy.ar.md",
+          "contentHash": "9lCvGtYjdCckN0tSGGhYKYC/gONeoSRWu1bIYSrbplU="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/03-cookie_policy.nl.md",
+          "contentHash": "58U9kB+MMuTbjnllc/792z18iESD0GFhvexcdJjYJbE="
         }
       ]
     },
@@ -87,6 +117,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/04-medical_disclaimer.en.md",
           "contentHash": "nBxN5ko619EHpaIn22Y7j1NWWhXOhd0wMt5Zi0K1MdU="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/04-medical_disclaimer.ar.md",
+          "contentHash": "sh/VcjkM2f7j8X+EtCOE/RdRI0d6oJd5GfoYi8HxBKI="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/04-medical_disclaimer.nl.md",
+          "contentHash": "nS7WMULZjutyrneM8/yZwXsFcG63BzEU9DeDdgZTUfE="
         }
       ]
     },
@@ -102,6 +142,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/05-liability_waiver.en.md",
           "contentHash": "xj6Rrt0/D3wHL75+6hA91NQQad+/ExsXdXjmscJ/IDg="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/05-liability_waiver.ar.md",
+          "contentHash": "UhqMaZ4I2nMAENudIsZ8yG0SbeulthYhlXtv8De/Tgk="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/05-liability_waiver.nl.md",
+          "contentHash": "Dbbp4YyeJlIyPmZLWblrgC4WLQU5ZZJkXGuncLhn5Fs="
         }
       ]
     },
@@ -116,6 +166,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/06-dpa.en.md",
           "contentHash": "G2WdKCY0EcAZrkQwqsG+7nyhFVkIf5kgqMpAjYl9IpM="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/06-dpa.ar.md",
+          "contentHash": "bk5BjXJg4FK6zZyfSPENSqH4FbasVwPgCUYd5evqD1A="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/06-dpa.nl.md",
+          "contentHash": "CLEdzCX85a9GQLyx3GTZEyo144e8oMbEATM4V4mpCSs="
         }
       ]
     },
@@ -130,6 +190,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/07-subscription_policy.en.md",
           "contentHash": "Sx3vD//WZjRqUUQz8BdBfaDMYeyMZaKVZLIkEDLUbKc="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/07-subscription_policy.ar.md",
+          "contentHash": "WYi+5HoG/czsEXE2yeANiAVkbXWbPTPCRpRoxXLcG9w="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/07-subscription_policy.nl.md",
+          "contentHash": "OFIek4HTjNdl8T/OH5199iyDouMCkSLjL+5KoStcZl8="
         }
       ]
     },
@@ -144,6 +214,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/08-community_guidelines.en.md",
           "contentHash": "Y3VKQUVwZDYoupvjXGvaqJuHZNnKtOcAf/wXt7G5/Ks="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/08-community_guidelines.ar.md",
+          "contentHash": "IInxre5APJkRwLVgwMD1+xMxzb3YLkTe6dxHh44/2so="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/08-community_guidelines.nl.md",
+          "contentHash": "thObx4nHgAsoOftcbh34Wk1RtbRjWhsdW0tOX6TrFJY="
         }
       ]
     },
@@ -159,6 +239,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/09-imprint.en.md",
           "contentHash": "O42PYlL2BvKXUnuw2sjZ04RSZvpstNev+79AyhyEvp0="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/09-imprint.ar.md",
+          "contentHash": "eXkp5zszSsrw+NZPFFqCAW0L91iZiGhFiVYCMOF9ZlQ="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/09-imprint.nl.md",
+          "contentHash": "zMeqr+a7Y65faGGIRiBPsCO/Act3X9vq9Dx3MzkE/BM="
         }
       ]
     },
@@ -173,6 +263,16 @@ const BASELINE_MANIFEST = {
           "locale": "en",
           "path": "/legal/10-appendices.en.md",
           "contentHash": "zLvpNT9lnYFV5XKXsLYcJtC0gNCWB4TrY+5q+PKwq/o="
+        },
+        {
+          "locale": "ar",
+          "path": "/legal/10-appendices.ar.md",
+          "contentHash": "qxM0h7tdF0zF2Qtemp19qFjc6bZQFj2UhWEHdLVFJoQ="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/10-appendices.nl.md",
+          "contentHash": "8WHQMZ0cfniRivkAL1TwJKLZwoBKTgAJRklAnSEkS3U="
         }
       ]
     }

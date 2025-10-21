@@ -1,6 +1,80 @@
 ## Unreleased
 
+### 2025-10-22
+
+#### ✅ Legal Acceptance & Consent V3 — Phase 3 UI Complete
+
+Highlights (mobile-first, RTL-safe, WCAG 2.1 AA):
+
+- LegalCenterPage
+  - Reflowed each card into four rows for clarity on small screens:
+    1) Row 1: status icon (left) + chevron (right)
+    2) Row 2: document title + version (wrap-safe: `min-w-0`, `break-words`, `hyphens-auto`; version `whitespace-nowrap`)
+    3) Row 3: acceptance badge (required/optional)
+    4) Row 4: “effective in N days” countdown
+  - Prevented overflow/overlap at 320px widths; preserved tap target and navigation behavior
+  - Kept sticky header, color-coded badges, and locale indicators
+
+- LegalDocumentModal
+  - Full-screen modal rendering markdown via `react-markdown` + `remark-gfm` + `rehype-sanitize`
+  - Title now wraps (no truncation); Cancel/Close localized (uses `common` + `legal` namespaces)
+  - Accessibility: focus trap, ESC to close, body scroll lock
+
+- LegalGate (blocking flow)
+  - Checklist of required docs with View buttons
+  - “Accept All Required” and “Continue” enablement logic
+  - Optional section is non-blocking
+
+- Routing & Navigation
+  - Added `/legal` route (lazy-loaded)
+  - Initialized legal services at app boot; integrated gating check
+  - Settings: moved “Legal Center” link into its own section just below Language
+
+- Assets & i18n
+  - Added consistent SVG icons (CheckCircle, XCircle, XMark, DocumentText, Clock)
+  - `legal.json` created for 8 locales; keys validated by i18n scan
+
+Notes:
+- Matches Implementation Plan Phase 3 deliverables; keeps offline-first (baseline docs cached) and respects reduced motion.
+
 ### 2025-10-21
+
+#### 🌍 Legal Documents Multilingual Support (Arabic + Dutch)
+
+**Overview**: Fixed Arabic legal documents displaying in English despite translation files existing. Root cause was multi-layered: UI component namespaces, manifest generation missing locales, and Edge Function baseline stale + 401 authentication error.
+
+**Changes**:
+- **UI Components**: Fixed i18next namespace in `LegalCenterPage`, `LegalDocumentModal`, `LegalGate` (added `'legal'` namespace)
+- **Locale Selection**: Fixed `LegalGate` to use `getDocument(doc.id, i18n.language)` instead of always showing English
+- **Manifest Generation**: 
+  - Created `apps/frontend/scripts/generate-legal-manifest.mjs` (replaces deprecated `scripts/generate-legal-hashes.js`)
+  - **Automated**: Now runs automatically during build (`pnpm build`, `pnpm build:dev`, `pnpm build:prod`)
+  - Generates manifest with all 3 locales: `['en', 'ar', 'nl']`
+  - Validates all 30 locale files present (10 docs × 3 locales)
+  - Fails build if locale files missing (prevents incomplete deployments)
+- **Edge Function**: 
+  - Updated BASELINE_MANIFEST in `legal-manifest/index.ts` with all 3 locales per document
+  - Fixed 401 authentication by adding anon key headers in `legalDocsService.ts`
+  - Added `verify_jwt = false` to `supabase/config.toml` for `legal-manifest` function
+  - Redeployed with `--no-verify-jwt` flag
+- **Debug Logging**: Added comprehensive locale fallback tracing in `legalDocsService.getDocument()`
+
+**Result**: 
+- Edge Function now returns 200 with all 3 locales (en, ar, nl) for all 10 documents
+- Locale fallback chain working: ar-EG → ar → en
+- Manifest updated: "2025-10-21T21:32:17.147Z" with 30 locale entries (10 docs × 3 locales)
+
+**Files Modified**:
+- `apps/frontend/src/pages/LegalCenterPage.tsx`
+- `apps/frontend/src/components/legal/LegalDocumentModal.tsx`
+- `apps/frontend/src/components/legal/LegalGate.tsx`
+- `apps/frontend/src/services/legalDocsService.ts`
+- `scripts/generate-legal-hashes.js`
+- `apps/frontend/public/legal/manifest.json`
+- `supabase/functions/legal-manifest/index.ts`
+- `supabase/config.toml`
+
+**Tracking**: `docs/migration-tracking/legal-localization-fix_20251021.md`
 
 #### 🔐 Legal Acceptance & Consent V3 - Phase 1 Backend Complete
 

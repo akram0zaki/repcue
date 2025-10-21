@@ -1,11 +1,19 @@
 /**
- * Generate Content Hashes for Legal Documents
+ * DEPRECATED: Generate Content Hashes for Legal Documents
+ * 
+ * @deprecated This script is deprecated. Use apps/frontend/scripts/generate-legal-manifest.mjs instead.
+ *             The new script is integrated into the build process via `pnpm generate-legal-manifest`.
  * 
  * This script computes SHA-256 base64 hashes for all legal markdown files
  * and generates/updates the legal manifest JSON.
  * 
- * Usage: node scripts/generate-legal-hashes.js
+ * Usage: node scripts/generate-legal-hashes.js (deprecated, use pnpm generate-legal-manifest instead)
  */
+
+console.warn('\n⚠️  WARNING: This script is DEPRECATED!');
+console.warn('   New location: apps/frontend/scripts/generate-legal-manifest.mjs');
+console.warn('   Usage: cd apps/frontend && pnpm generate-legal-manifest');
+console.warn('   The new script runs automatically during build.\n');
 
 import fs from 'fs';
 import path from 'path';
@@ -110,7 +118,7 @@ const DOCUMENT_METADATA = [
 ];
 
 // Supported locales
-const LOCALES = ['en']; // Start with EN only, add NL and AR later
+const LOCALES = ['en', 'ar', 'nl']; // English, Arabic, Dutch
 
 /**
  * Compute SHA-256 base64 hash of file content

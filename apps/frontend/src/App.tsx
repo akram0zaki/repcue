@@ -8,6 +8,8 @@ import { authService } from './services/authService';
 import { forceUpdateService } from './services/forceUpdateService';
 import { updateService } from './services/updateService';
 import { AnalyticsService } from './services/analyticsService';
+import { legalDocsService } from './services/legalDocsService';
+import { legalUpdateService } from './services/legalUpdateService';
 import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
@@ -22,6 +24,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { UpdateNotificationManager } from './components/UpdateNotificationManager';
+import { LegalGate } from './components/legal/LegalGate';
 import type { UpdateInfo, UpdateError } from './types';
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
@@ -56,6 +59,7 @@ import {
   AuthCallbackPage,
   ProfilePage,
   AIWorkoutOnboardingPage,
+  LegalCenterPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -272,6 +276,9 @@ function App() {
   // Post-workout survey state
   const [showPostWorkoutSurvey, setShowPostWorkoutSurvey] = useState(false);
   const [surveyActivityLog, setSurveyActivityLog] = useState<ActivityLog | null>(null);
+
+  // Legal gate state
+  const [showLegalGate, setShowLegalGate] = useState(false);
 
   // Handle pending share token after authentication
   useEffect(() => {
@@ -1957,6 +1964,16 @@ function App() {
               });
           }
 
+          // Initialize legal services
+          logger.log('📄 Initializing legal document services...');
+          try {
+            await legalDocsService.initialize();
+            legalUpdateService.initialize();
+            logger.log('✅ Legal services initialized');
+          } catch (error) {
+            logger.error('❌ Legal services initialization failed:', error);
+          }
+
           const tSeedStart = Date.now();
           const tReady = Date.now();
           
@@ -2141,6 +2158,27 @@ function App() {
     }
   }, 5000); // Check after 5 seconds
   }, [hasConsent, isPublicShareRoute]);
+
+  // Check for blocking legal documents
+  useEffect(() => {
+    const checkLegalGate = async () => {
+      if (!hasConsent || isLoading) return;
+
+      try {
+        const locale = i18n.language || 'en';
+        const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
+        
+        if (hasBlocking) {
+          logger.log('📄 Blocking legal documents detected, showing legal gate');
+          setShowLegalGate(true);
+        }
+      } catch (error) {
+        logger.error('❌ Failed to check legal gate:', error);
+      }
+    };
+
+    checkLegalGate();
+  }, [hasConsent, isLoading]);
 
   // Handle shared exercise save from redirect
   useEffect(() => {
@@ -2827,6 +2865,14 @@ useEffect(() => {
                   </Suspense>
                 }
               />
+              <Route
+                path={AppRoutes.LEGAL}
+                element={
+                  <Suspense fallback={createRouteLoader('Legal Documents')}>
+                    <LegalCenterPage />
+                  </Suspense>
+                }
+              />
               {/* Redirect any unknown routes to home */}
               <Route path="*" element={<Navigate to={AppRoutes.HOME} replace />} />
             </Routes>
@@ -2888,6 +2934,14 @@ useEffect(() => {
             await resetTimer();
           }
           setTimerState(prev => ({ ...prev, workoutMode: undefined }));
+        }}
+      />
+
+      <LegalGate
+        isOpen={showLegalGate}
+        onContinue={() => {
+          logger.log('📄 Legal gate accepted, continuing to app');
+          setShowLegalGate(false);
         }}
       />
 

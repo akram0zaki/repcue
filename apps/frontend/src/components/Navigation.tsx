@@ -144,6 +144,8 @@ const Navigation: React.FC = () => {
                 <SettingsIcon size={18} />
                 <span>{t('navigation.settings')}</span>
               </button>
+
+              {/* Legal link removed from main menu; moved to Settings page */}
             </div>
           )}
         </div>

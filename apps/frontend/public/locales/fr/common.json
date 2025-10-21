@@ -96,7 +96,8 @@
     "activityLog": "Journal",
     "progress": "Progrès",
     "coach": "Coach",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "legal": "Légal"
   },
   "settings": {
     "audioSettings": "Paramètres audio",

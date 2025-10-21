@@ -89,7 +89,8 @@
     "activityLog": "Log",
     "progress": "Progress",
     "coach": "Coach",
-    "settings": "Settings"
+    "settings": "Settings",
+    "legal": "Legal"
   },
   "settings": {
     "audioSettings": "Audio Settings",

@@ -1,12 +1,13 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: UI text comes from t(); remaining literals are units/IDs/tokens */
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ToggleSwitch from '../components/ToggleSwitch';
 import { useTranslation } from 'react-i18next';
 import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
-import { SpeakerIcon } from '../components/icons/NavigationIcons';
+import { SpeakerIcon, DocumentTextIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { useAuth } from '../hooks/useAuth';
@@ -29,7 +30,8 @@ interface SettingsPageProps {
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettings }) => {
-  const { t } = useTranslation(['common', 'coaching']);
+  const { t } = useTranslation(['common', 'coaching', 'legal']);
+  const navigate = useNavigate();
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
@@ -237,6 +239,31 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           <div className="space-y-3">
             <LanguageSwitcher compact={false} showLabel={false} />
+          </div>
+        </div>
+
+        {/* Legal Section (separate, directly below Language) */}
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <DocumentTextIcon size={20} className="section-icon" />
+            {t('legal:title')}
+          </h2>
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate('/legal')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+              data-testid="open-legal-center"
+              aria-label={t('a11y.navigateTo', { label: t('legal:title'), defaultValue: 'Navigate to {{label}}' })}
+            >
+              <span className="flex items-center gap-2 text-text-900 dark:text-text-50">
+                <DocumentTextIcon size={18} />
+                {t('legal:title')}
+              </span>
+              <svg className="w-5 h-5 text-text-500 dark:text-text-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
 
