@@ -87,7 +87,8 @@
     "activityLog": "السجل",
     "progress": "التقدم",
     "coach": "المدرب",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "legal": "الشروط القانونية"
   },
   "settings": {
     "audioSettings": "إعدادات الصوت",
@@ -784,5 +785,15 @@
       "hoursAgo": "منذ {{count}} ساعة",
       "daysAgo": "منذ {{count}} يوم"
     }
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "غرفة التجارة (KvK)",
+    "kvkNumber": "[رقم KvK]",
+    "vat": "الرقم الضريبي",
+    "vatNumber": "[الرقم الضريبي]",
+    "email": "البريد الإلكتروني",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "الاختصاص القضائي: هولندا"
   }
 }

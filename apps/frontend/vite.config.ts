@@ -34,7 +34,7 @@ export default defineConfig({
       workbox: {
         skipWaiting: false, // Let our updateService handle this
         clientsClaim: false, // Let our updateService handle this
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'splash/*.{png,svg}', 'images/*.{png,jpg,jpeg,svg}', 'locales/**/*.json', 'manifest.json'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', 'splash/*.{png,svg}', 'images/*.{png,jpg,jpeg,svg}', 'locales/**/*.json', 'legal/**/*.{json,md}', 'manifest.json'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
@@ -103,6 +103,34 @@ export default defineConfig({
               cacheName: 'i18n-locales-cache',
               expiration: {
                 maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              }
+            }
+          },
+          // Legal Acceptance V3: Cache legal manifest with network-first strategy
+          {
+            urlPattern: ({ url }) => url.pathname.endsWith('/functions/v1/legal-manifest') || url.pathname === '/legal/manifest.json',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'legal-manifest-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 60 // 1 hour
+              },
+              cacheableResponse: {
+                statuses: [0, 200, 304]
+              }
+            }
+          },
+          // Legal Acceptance V3: Cache legal documents (markdown) with stale-while-revalidate
+          {
+            urlPattern: /^\/legal\/.*\.md$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'legal-docs-cache',
+              expiration: {
+                maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
               }
             }

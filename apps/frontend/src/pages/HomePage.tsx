@@ -17,6 +17,7 @@ import { VideoThumbnail } from '../components/VideoThumbnail';
 import AIWorkoutButton from '../components/AIWorkoutButton';
 import { useCoachingInsights } from '../hooks/useCoachingInsights';
 import InsightsCarousel from '../components/InsightsCarousel';
+import Imprint from '../components/Imprint';
 import logger from '../utils/logger';
 
 interface HomePageProps {
@@ -436,11 +437,18 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
 
           {/* Language Selection Footer */}
           <footer className="mt-4 pt-3 border-t border-surface-200 dark:border-surface-700">
-            <div className="text-center">
-              <p className="text-sm secondary-label-text mb-2">
-                {t('home.changeLanguage')}
-              </p>
-              <LanguageSwitcher compact={true} className="justify-center" />
+            <div className="text-center space-y-4">
+              <div>
+                <p className="text-sm secondary-label-text mb-2">
+                  {t('home.changeLanguage')}
+                </p>
+                <LanguageSwitcher compact={true} className="justify-center" />
+              </div>
+              
+              {/* Imprint - Legal requirement for display */}
+              <div className="pt-3 border-t border-surface-200 dark:border-surface-700">
+                <Imprint />
+              </div>
             </div>
           </footer>
         </div>

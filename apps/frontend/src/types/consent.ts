@@ -1,6 +1,8 @@
 // Consent data versioning system for RepCue
 // This file handles different versions of consent data structure
 
+import type { LegalAcceptance } from './legal';
+
 export interface ConsentDataV1 {
   version: 1;
   timestamp: string;
@@ -21,12 +23,24 @@ export interface ConsentDataV2 {
   consentDate?: Date | string;
 }
 
+export interface ConsentDataV3 {
+  version: 3;
+  timestamp: string;
+  hasConsented: boolean;
+  cookiesAccepted: boolean;
+  analyticsAccepted: boolean;
+  marketingAccepted: boolean;
+  dataRetentionDays: number;
+  consentDate?: Date | string;
+  legalAcceptances: LegalAcceptance[];
+}
+
 // Union type for all consent versions
-export type ConsentData = ConsentDataV1 | ConsentDataV2;
+export type ConsentData = ConsentDataV1 | ConsentDataV2 | ConsentDataV3;
 
 // Current version (update this when adding new versions)
-export type CurrentConsentData = ConsentDataV2;
-export const CURRENT_CONSENT_VERSION = 2;
+export type CurrentConsentData = ConsentDataV3;
+export const CURRENT_CONSENT_VERSION = 3;
 
 // Migration interface for handling version upgrades
 export interface ConsentMigration {

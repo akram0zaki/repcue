@@ -254,14 +254,14 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
           onClick={handleInsightClick}
           className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-4 shadow-sm border border-primary-200 dark:border-primary-800 cursor-pointer transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
         >
-          <div className="flex items-start gap-3">
-            {/* Icon */}
-            <div className={`flex-shrink-0 ${currentInsight.iconColor || 'text-primary-600 dark:text-primary-400'}`}>
+          <div className="flex flex-col items-stretch">
+            {/* Top row: Icon centered */}
+            <div className={`flex justify-center ${currentInsight.iconColor || 'text-primary-600 dark:text-primary-400'}`}>
               {(currentInsight.icon && iconMap[currentInsight.icon]) || iconMap.default}
             </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
+            {/* Second row: Wrapped insight text (title + message) */}
+            <div className="flex-1 min-w-0 mt-2">
               <h3 className="font-semibold text-text-900 dark:text-text-50 mb-1">
                 {t(currentInsight.title, { defaultValue: currentInsight.title })}
               </h3>
@@ -319,7 +319,6 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
                   return t(currentInsight.message, { defaultValue: currentInsight.message });
                 })()}
               </p>
-
               {/* AI badge */}
               {currentInsight.source === 'ai' && (
                 <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
@@ -341,7 +340,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
                   role="tab"
                   data-carousel-indicator="true"
                   aria-label={t('coaching:goToInsight', { defaultValue: 'Go to insight {{number}}', number: index + 1 })}
-                  aria-selected={isActive}
+                  aria-selected={isActive ? 'true' : 'false'}
                   onClick={(e) => {
                     e.stopPropagation();
                     goToIndex(index);

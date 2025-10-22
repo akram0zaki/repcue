@@ -1,0 +1,58 @@
+{
+  "title": "Documentos legales",
+  "required": "Documentos requeridos",
+  "optional": "Documentos opcionales",
+  "version": "Versión",
+  "accept": "Aceptar",
+  "loadError": "Error al cargar el documento. Por favor, inténtelo de nuevo.",
+  "scrollToAccept": "Por favor, desplácese hasta el final para aceptar",
+  "effectiveIn": "Efectivo en {{days}} días",
+  "acceptedOn": "Aceptado: {{date}}",
+  "documents": {
+    "terms_conditions": "Términos y condiciones",
+    "privacy_policy": "Política de privacidad",
+    "cookie_policy": "Política de cookies",
+    "medical_disclaimer": "Descargo de responsabilidad médica",
+    "liability_waiver": "Exención de responsabilidad",
+    "dpa": "Acuerdo de procesamiento de datos",
+    "subscription_policy": "Política de suscripción y pago",
+    "community_guidelines": "Directrices de la comunidad",
+    "imprint": "Aviso legal",
+    "appendices": "Apéndices"
+  },
+  "status": {
+    "accepted": "Aceptado",
+    "required": "Aceptación requerida",
+    "optional": "Opcional"
+  },
+  "errors": {
+    "noManifest": "Manifiesto de documentos legales no disponible.",
+    "loadFailed": "Error al cargar documentos legales. Por favor, inténtelo de nuevo.",
+    "noLocale": "Documento no disponible en su idioma.",
+    "acceptFailed": "Error al registrar la aceptación. Por favor, inténtelo de nuevo.",
+    "acceptAllFailed": "Error al aceptar todos los documentos. Por favor, inténtelo de nuevo."
+  },
+  "gate": {
+    "title": "Aceptar documentos legales",
+    "subtitle": "Por favor, revise y acepte todos los documentos requeridos para continuar usando RepCue.",
+    "requiredSectionTitle": "Documentos requeridos",
+    "requiredSectionDescription": "Debe aceptar todos los documentos requeridos para continuar.",
+    "optionalSectionTitle": "Documentos opcionales",
+    "optionalSectionDescription": "Estos documentos son opcionales. Puede revisarlos pero no son necesarios para continuar.",
+    "view": "Ver",
+    "viewDocument": "Ver {{title}}",
+    "select": "Seleccionar para aceptar",
+    "selected": "Seleccionado para aceptación",
+    "accept": "Aceptar",
+    "accepted": "Aceptado",
+    "acceptedStatus": "✓ Aceptado",
+    "viewedStatus": "Visto - haga clic en la casilla para aceptar",
+    "notViewedStatus": "Aún no visto",
+    "optional": "Opcional",
+    "acceptAllRequired": "Aceptar todo lo requerido",
+    "continue": "Continuar",
+    "statusAllAccepted": "Todos los documentos requeridos aceptados. Haga clic en Continuar para proceder.",
+    "statusAllViewed": "Todos los documentos vistos. Acéptelos para continuar.",
+    "statusPending": "{{accepted}}/{{total}} documentos requeridos aceptados"
+  }
+}

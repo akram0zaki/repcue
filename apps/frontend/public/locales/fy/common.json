@@ -96,7 +96,8 @@
     "activityLog": "Lochboek",
     "progress": "Foardering",
     "coach": "Coach",
-    "settings": "Ynstellingen"
+    "settings": "Ynstellingen",
+    "legal": "Juridysk"
   },
   "settings": {
     "audioSettings": "Audioynstellingen",
@@ -773,4 +774,15 @@
       "security": " Beveiligingsupdate",
       "update": "Mise à jour"
     }
-  }}
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "Keamer fan Keaphandel (KvK)",
+    "kvkNumber": "[KvK-nûmer]",
+    "vat": "BTW-nûmer",
+    "vatNumber": "[BTW-nûmer]",
+    "email": "E-post",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "Rjochtsgebiet: Nederlân"
+  }
+}

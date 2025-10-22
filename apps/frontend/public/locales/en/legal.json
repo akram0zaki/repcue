@@ -1,0 +1,58 @@
+{
+  "title": "Legal Documents",
+  "required": "Required Documents",
+  "optional": "Optional Documents",
+  "version": "Version",
+  "accept": "Accept",
+  "loadError": "Failed to load document. Please try again.",
+  "scrollToAccept": "Please scroll to the bottom to accept",
+  "effectiveIn": "Effective in {{days}} days",
+  "acceptedOn": "Accepted: {{date}}",
+  "documents": {
+    "terms_conditions": "Terms & Conditions",
+    "privacy_policy": "Privacy Policy",
+    "cookie_policy": "Cookie Policy",
+    "medical_disclaimer": "Medical Disclaimer",
+    "liability_waiver": "Liability Waiver",
+    "dpa": "Data Processing Agreement",
+    "subscription_policy": "Subscription & Payment Policy",
+    "community_guidelines": "Community Guidelines",
+    "imprint": "Imprint",
+    "appendices": "Appendices"
+  },
+  "status": {
+    "accepted": "Accepted",
+    "required": "Acceptance Required",
+    "optional": "Optional"
+  },
+  "errors": {
+    "noManifest": "Legal documents manifest not available.",
+    "loadFailed": "Failed to load legal documents. Please try again.",
+    "noLocale": "Document not available in your language.",
+    "acceptFailed": "Failed to record acceptance. Please try again.",
+    "acceptAllFailed": "Failed to accept all documents. Please try again."
+  },
+  "gate": {
+    "title": "Accept Legal Documents",
+    "subtitle": "Please review and accept all required documents to continue using RepCue.",
+    "requiredSectionTitle": "Required Documents",
+    "requiredSectionDescription": "You must accept all required documents to continue.",
+    "optionalSectionTitle": "Optional Documents",
+    "optionalSectionDescription": "These documents are optional. You can review them but they are not required to continue.",
+    "view": "View",
+    "viewDocument": "View {{title}}",
+    "select": "Select to accept",
+    "selected": "Selected for acceptance",
+    "accept": "Accept",
+    "accepted": "Accepted",
+    "acceptedStatus": "✓ Accepted",
+    "viewedStatus": "Viewed - click checkbox to accept",
+    "notViewedStatus": "Not viewed yet",
+    "optional": "Optional",
+    "acceptAllRequired": "Accept All Required",
+    "continue": "Continue",
+    "statusAllAccepted": "All required documents accepted. Click Continue to proceed.",
+    "statusAllViewed": "All documents viewed. Accept them to continue.",
+    "statusPending": "{{accepted}}/{{total}} required documents accepted"
+  }
+}

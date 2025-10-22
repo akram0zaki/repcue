@@ -30,6 +30,19 @@ export class ConsentService {
         dataRetentionDays: 365,   // Default retention period
         timestamp: v1Data.timestamp || new Date().toISOString()
       })
+    },
+    {
+      from: 2,
+      to: 3,
+      migrate: (v2Data: ConsentData) => {
+        const v2 = v2Data as { version: 2; timestamp: string; hasConsented: boolean; cookiesAccepted: boolean; analyticsAccepted: boolean; marketingAccepted: boolean; dataRetentionDays: number; consentDate?: Date | string };
+        return {
+          ...v2,
+          version: 3,
+          legalAcceptances: [], // Empty array - will be populated by LegalDocsService
+          timestamp: v2.timestamp || new Date().toISOString()
+        };
+      }
     }
     // Future migrations can be added here
   ];
@@ -206,6 +219,7 @@ export class ConsentService {
       analyticsAccepted: false,
       marketingAccepted: false,
       dataRetentionDays: 365,
+      legalAcceptances: [],
       ...data
     };
 
@@ -245,7 +259,8 @@ export class ConsentService {
       cookiesAccepted: false,
       analyticsAccepted: false,
       marketingAccepted: false,
-      dataRetentionDays: 365
+      dataRetentionDays: 365,
+      legalAcceptances: []
     };
 
     this.saveConsentData();
@@ -289,6 +304,65 @@ export class ConsentService {
       data,
       requiresUpdate: data ? data.version < CURRENT_CONSENT_VERSION : false
     };
+  }
+
+  /**
+   * Get legal acceptances from consent data (V3+)
+   */
+  public getLegalAcceptances(): import('../types/legal').LegalAcceptance[] {
+    return this.consentData?.legalAcceptances || [];
+  }
+
+  /**
+   * Set legal acceptances in consent data (V3+)
+   * Used by LegalDocsService to persist acceptance records
+   */
+  public setLegalAcceptances(acceptances: import('../types/legal').LegalAcceptance[]): boolean {
+    try {
+      if (!this.consentData) {
+        logger.warn('Cannot set legal acceptances: no consent data');
+        return false;
+      }
+
+      this.consentData.legalAcceptances = acceptances;
+      this.saveConsentData();
+      
+      // Dispatch custom event for components to react
+      window.dispatchEvent(new CustomEvent('legal-acceptances-updated', {
+        detail: { acceptances }
+      }));
+      
+      return true;
+    } catch (error) {
+      logger.error('Failed to set legal acceptances:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Add or update a legal acceptance record (V3+)
+   */
+  public updateLegalAcceptance(acceptance: import('../types/legal').LegalAcceptance): boolean {
+    try {
+      if (!this.consentData) {
+        logger.warn('Cannot update legal acceptance: no consent data');
+        return false;
+      }
+
+      const acceptances = this.consentData.legalAcceptances || [];
+      const existingIndex = acceptances.findIndex(a => a.docId === acceptance.docId);
+      
+      if (existingIndex >= 0) {
+        acceptances[existingIndex] = acceptance;
+      } else {
+        acceptances.push(acceptance);
+      }
+      
+      return this.setLegalAcceptances(acceptances);
+    } catch (error) {
+      logger.error('Failed to update legal acceptance:', error);
+      return false;
+    }
   }
 
   /**

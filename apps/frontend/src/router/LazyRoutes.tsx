@@ -228,6 +228,12 @@ export const PRHistoryPage = lazy(() =>
   }))
 );
 
+export const LegalCenterPage = lazy(() =>
+  import('../pages/LegalCenterPage').catch(() => ({
+    default: () => <div>Error loading Legal Center page</div>
+  }))
+);
+
 // Preload critical routes
 // Non-component exports moved to separate util to satisfy react-refresh rule
 // See: src/router/routeUtils.tsx

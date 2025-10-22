@@ -96,7 +96,8 @@
     "activityLog": "Protokoll",
     "progress": "Fortschritt",
     "coach": "Coach",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "legal": "Rechtliches"
   },
   "settings": {
     "audioSettings": "Audio-Einstellungen",
@@ -765,5 +766,15 @@
       "security": "Sicherheitsupdate",
       "update": "Update"
     }
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "Handelskammer (KvK)",
+    "kvkNumber": "[KvK-Nummer]",
+    "vat": "USt-IdNr.",
+    "vatNumber": "[USt-IdNr.]",
+    "email": "E-Mail",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "Gerichtsstand: Niederlande"
   }
 }

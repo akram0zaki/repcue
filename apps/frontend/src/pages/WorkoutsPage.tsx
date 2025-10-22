@@ -260,37 +260,44 @@ const WorkoutsPage: React.FC = () => {
                   
                 </div>
                 
-                {/* Centered Action Buttons */}
-                <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-                  <button
-                    onClick={() => handleStartWorkout(workout)}
-                    disabled={!workout.is_active}
-                    className="btn-primary px-4 py-2 text-sm flex items-center gap-2 flex-shrink-0"
-                    title={workout.is_active ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" />
-                    </svg>
-                    {t('common.start')}
-                  </button>
-                  <button
-                    onClick={() => handleEditWorkout(workout.id)}
-                    className="btn-neutral p-2 flex-shrink-0"
-                    title={t('workouts.editWorkout')}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={() => setDeleteConfirm(workout.id)}
-                    className="btn-danger p-2 flex-shrink-0"
-                    title={t('workouts.deleteWorkout')}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                {/* Action Buttons - Two Rows */}
+                <div className="mt-3 space-y-2">
+                  {/* Start Button Row */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={() => handleStartWorkout(workout)}
+                      disabled={!workout.is_active}
+                      className="btn-primary px-4 py-2 text-sm flex items-center gap-2"
+                      title={workout.is_active ? t('workouts.startWorkout') : t('workouts.workoutPaused')}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" />
+                      </svg>
+                      {t('common.start')}
+                    </button>
+                  </div>
+                  
+                  {/* Edit/Delete Button Row */}
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => handleEditWorkout(workout.id)}
+                      className="btn-neutral p-2"
+                      title={t('workouts.editWorkout')}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirm(workout.id)}
+                      className="btn-danger p-2"
+                      title={t('workouts.deleteWorkout')}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 
                 {/* Workout Info */}

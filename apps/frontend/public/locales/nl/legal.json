@@ -1,0 +1,58 @@
+{
+  "title": "Juridische documenten",
+  "required": "Vereiste documenten",
+  "optional": "Optionele documenten",
+  "version": "Versie",
+  "accept": "Accepteren",
+  "loadError": "Kan document niet laden. Probeer het opnieuw.",
+  "scrollToAccept": "Scroll naar beneden om te accepteren",
+  "effectiveIn": "Van kracht over {{days}} dagen",
+  "acceptedOn": "Geaccepteerd: {{date}}",
+  "documents": {
+    "terms_conditions": "Algemene voorwaarden",
+    "privacy_policy": "Privacybeleid",
+    "cookie_policy": "Cookiebeleid",
+    "medical_disclaimer": "Medische disclaimer",
+    "liability_waiver": "Aansprakelijkheidsverklaring",
+    "dpa": "Gegevensverwerkingsovereenkomst",
+    "subscription_policy": "Abonnements- en betalingsbeleid",
+    "community_guidelines": "Gemeenschapsrichtlijnen",
+    "imprint": "Colofon",
+    "appendices": "Bijlagen"
+  },
+  "status": {
+    "accepted": "Geaccepteerd",
+    "required": "Acceptatie vereist",
+    "optional": "Optioneel"
+  },
+  "errors": {
+    "noManifest": "Manifest voor juridische documenten niet beschikbaar.",
+    "loadFailed": "Kan juridische documenten niet laden. Probeer het opnieuw.",
+    "noLocale": "Document niet beschikbaar in uw taal.",
+    "acceptFailed": "Kan acceptatie niet registreren. Probeer het opnieuw.",
+    "acceptAllFailed": "Kan niet alle documenten accepteren. Probeer het opnieuw."
+  },
+  "gate": {
+    "title": "Juridische documenten accepteren",
+    "subtitle": "Bekijk en accepteer alle vereiste documenten om RepCue te blijven gebruiken.",
+    "requiredSectionTitle": "Vereiste documenten",
+    "requiredSectionDescription": "U moet alle vereiste documenten accepteren om door te gaan.",
+    "optionalSectionTitle": "Optionele documenten",
+    "optionalSectionDescription": "Deze documenten zijn optioneel. U kunt ze bekijken, maar ze zijn niet vereist om door te gaan.",
+    "view": "Bekijken",
+    "viewDocument": "{{title}} bekijken",
+    "select": "Selecteren om te accepteren",
+    "selected": "Geselecteerd voor acceptatie",
+    "accept": "Accepteren",
+    "accepted": "Geaccepteerd",
+    "acceptedStatus": "✓ Geaccepteerd",
+    "viewedStatus": "Bekeken - klik op selectievakje om te accepteren",
+    "notViewedStatus": "Nog niet bekeken",
+    "optional": "Optioneel",
+    "acceptAllRequired": "Accepteer alle vereiste",
+    "continue": "Doorgaan",
+    "statusAllAccepted": "Alle vereiste documenten geaccepteerd. Klik op Doorgaan om verder te gaan.",
+    "statusAllViewed": "Alle documenten bekeken. Accepteer ze om door te gaan.",
+    "statusPending": "{{accepted}}/{{total}} vereiste documenten geaccepteerd"
+  }
+}

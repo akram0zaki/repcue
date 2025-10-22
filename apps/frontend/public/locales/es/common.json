@@ -96,7 +96,8 @@
     "activityLog": "Registro",
     "progress": "Progreso",
     "coach": "Entrenador",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "legal": "Legal"
   },
   "settings": {
     "audioSettings": "Configuración de audio",
@@ -773,5 +774,15 @@
       "security": " Actualización de Seguridad",
       "update": "Actualización"
     }
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "Cámara de Comercio (KvK)",
+    "kvkNumber": "[Número KvK]",
+    "vat": "NIF",
+    "vatNumber": "[NIF]",
+    "email": "Correo electrónico",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "Jurisdicción: Países Bajos"
   }
 }

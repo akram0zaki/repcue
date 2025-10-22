@@ -1,4 +1,4 @@
-# Imprint / Legal Notice
+# Company and Legal
 
 **Company:** RepCue B.V.  
 **Registered office:** [Company Address]  

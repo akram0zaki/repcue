@@ -17,7 +17,7 @@ export const SYNC_ENGINE = 'v2' as const;
 
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = false;
+export const DEBUG = true;
 // Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
 export const SYNC_DEBUG = false;
 
@@ -26,3 +26,8 @@ export const SYNC_DEBUG = false;
 export const AI_WORKOUT_BUILDER = true;
 // Beta testing mode - if true, restricts access to specific users (future use)
 export const AI_WORKOUT_BETA = false;
+
+// Legal Acceptance V3 feature flag
+// Enable versioned legal document acceptance system (Terms, Privacy Policy, etc.)
+// When enabled, users must accept current legal documents to use the app
+export const LEGAL_ACCEPTANCE_V3_ENABLED = true;

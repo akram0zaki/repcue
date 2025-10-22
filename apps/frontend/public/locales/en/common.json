@@ -89,7 +89,8 @@
     "activityLog": "Log",
     "progress": "Progress",
     "coach": "Coach",
-    "settings": "Settings"
+    "settings": "Settings",
+    "legal": "Legal"
   },
   "settings": {
     "audioSettings": "Audio Settings",
@@ -761,5 +762,15 @@
       "hoursAgo": "{{count}}h ago",
       "daysAgo": "{{count}}d ago"
     }
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "Chamber of Commerce (KvK)",
+    "kvkNumber": "[KvK Number]",
+    "vat": "VAT ID",
+    "vatNumber": "[VAT Number]",
+    "email": "Email",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "Jurisdiction: Netherlands"
   }
 }

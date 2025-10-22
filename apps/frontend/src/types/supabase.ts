@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       activity_logs: {
         Row: {
+          catalog_id: string | null
           created_at: string | null
           deleted: boolean | null
           duration: number
@@ -35,6 +36,7 @@ export type Database = {
           workout_name: string | null
         }
         Insert: {
+          catalog_id?: string | null
           created_at?: string | null
           deleted?: boolean | null
           duration: number
@@ -54,6 +56,7 @@ export type Database = {
           workout_name?: string | null
         }
         Update: {
+          catalog_id?: string | null
           created_at?: string | null
           deleted?: boolean | null
           duration?: number
@@ -74,8 +77,102 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_users: {
+        Row: {
+          created_at: string
+          email: string
+          granted_at: string
+          granted_by: string | null
+          id: string
+          is_active: boolean
+          permissions: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean
+          permissions?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean
+          permissions?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_usage_logs: {
+        Row: {
+          correlation_id: string
+          created_at: string
+          error_code: string | null
+          id: string
+          input_cost_usd: number
+          input_tokens: number
+          model: string
+          output_cost_usd: number
+          output_tokens: number
+          processing_time_ms: number
+          provider: string
+          request_type: string
+          success: boolean
+          total_cost_usd: number
+          total_tokens: number
+          user_id: string | null
+        }
+        Insert: {
+          correlation_id: string
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          input_cost_usd: number
+          input_tokens: number
+          model: string
+          output_cost_usd: number
+          output_tokens: number
+          processing_time_ms: number
+          provider: string
+          request_type?: string
+          success: boolean
+          total_cost_usd: number
+          total_tokens: number
+          user_id?: string | null
+        }
+        Update: {
+          correlation_id?: string
+          created_at?: string
+          error_code?: string | null
+          id?: string
+          input_cost_usd?: number
+          input_tokens?: number
+          model?: string
+          output_cost_usd?: number
+          output_tokens?: number
+          processing_time_ms?: number
+          provider?: string
+          request_type?: string
+          success?: boolean
+          total_cost_usd?: number
+          total_tokens?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
+          app_version: string | null
           auto_start_next: boolean | null
           beep_interval_seconds: number | null
           beep_sound_enabled: boolean | null
@@ -86,10 +183,12 @@ export type Database = {
           default_interval_duration: number | null
           default_rest_time: number | null
           deleted: boolean | null
+          horizontal_exercise_layout: boolean | null
           id: string
           owner_id: string | null
           pre_timer_countdown: number | null
           reduce_motion: boolean | null
+          ring_timer: boolean | null
           show_exercise_videos: boolean | null
           sound_enabled: boolean | null
           updated_at: string | null
@@ -97,6 +196,7 @@ export type Database = {
           vibration_enabled: boolean | null
         }
         Insert: {
+          app_version?: string | null
           auto_start_next?: boolean | null
           beep_interval_seconds?: number | null
           beep_sound_enabled?: boolean | null
@@ -107,10 +207,12 @@ export type Database = {
           default_interval_duration?: number | null
           default_rest_time?: number | null
           deleted?: boolean | null
+          horizontal_exercise_layout?: boolean | null
           id: string
           owner_id?: string | null
           pre_timer_countdown?: number | null
           reduce_motion?: boolean | null
+          ring_timer?: boolean | null
           show_exercise_videos?: boolean | null
           sound_enabled?: boolean | null
           updated_at?: string | null
@@ -118,6 +220,7 @@ export type Database = {
           vibration_enabled?: boolean | null
         }
         Update: {
+          app_version?: string | null
           auto_start_next?: boolean | null
           beep_interval_seconds?: number | null
           beep_sound_enabled?: boolean | null
@@ -128,15 +231,62 @@ export type Database = {
           default_interval_duration?: number | null
           default_rest_time?: number | null
           deleted?: boolean | null
+          horizontal_exercise_layout?: boolean | null
           id?: string
           owner_id?: string | null
           pre_timer_countdown?: number | null
           reduce_motion?: boolean | null
+          ring_timer?: boolean | null
           show_exercise_videos?: boolean | null
           sound_enabled?: boolean | null
           updated_at?: string | null
           version?: number | null
           vibration_enabled?: boolean | null
+        }
+        Relationships: []
+      }
+      app_versions: {
+        Row: {
+          build_number: string
+          changelog: Json | null
+          created_at: string
+          git_commit_hash: string | null
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          release_date: string
+          reviewer: string
+          update_policy: string
+          updated_at: string
+          version_number: string
+        }
+        Insert: {
+          build_number: string
+          changelog?: Json | null
+          created_at?: string
+          git_commit_hash?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          release_date?: string
+          reviewer: string
+          update_policy: string
+          updated_at?: string
+          version_number: string
+        }
+        Update: {
+          build_number?: string
+          changelog?: Json | null
+          created_at?: string
+          git_commit_hash?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          release_date?: string
+          reviewer?: string
+          update_policy?: string
+          updated_at?: string
+          version_number?: string
         }
         Relationships: []
       }
@@ -176,6 +326,33 @@ export type Database = {
           resource_type?: string
           success?: boolean | null
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      coaching_ai_cache: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          insights_data: Json
+          locale: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          insights_data: Json
+          locale?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          insights_data?: Json
+          locale?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -227,6 +404,48 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           version?: number | null
+        }
+        Relationships: []
+      }
+      exercise_catalogs: {
+        Row: {
+          color_theme: string
+          created_at: string
+          description_key: string
+          display_order: number
+          icon: string
+          id: string
+          is_default: boolean
+          is_premium: boolean
+          name_key: string
+          picture_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          color_theme: string
+          created_at?: string
+          description_key: string
+          display_order?: number
+          icon: string
+          id: string
+          is_default?: boolean
+          is_premium?: boolean
+          name_key: string
+          picture_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          color_theme?: string
+          created_at?: string
+          description_key?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          is_default?: boolean
+          is_premium?: boolean
+          name_key?: string
+          picture_url?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -379,7 +598,10 @@ export type Database = {
       }
       exercises: {
         Row: {
-          category: string
+          benefits: string | null
+          best_timing: string | null
+          catalog_id: string
+          category: string | null
           copy_count: number | null
           created_at: string | null
           custom_video_url: string | null
@@ -390,28 +612,32 @@ export type Database = {
           description: string | null
           difficulty_level: string | null
           equipment_needed: string[] | null
+          exercise_references: string[] | null
           exercise_type: string
           has_video: boolean | null
           id: string
           instructions: Json | null
           is_favorite: boolean | null
           is_public: boolean | null
-          is_shared_copy: boolean | null
           is_verified: boolean | null
+          limitations: string | null
           muscle_groups: string[] | null
           name: string
+          notes: string | null
           owner_id: string | null
           rating_average: number | null
           rating_count: number | null
           rep_duration_seconds: number | null
-          shared_from_exercise_id: string | null
-          shared_from_user_id: string | null
+          suggested_combinations: string[] | null
           tags: string[] | null
           updated_at: string | null
           version: number | null
         }
         Insert: {
-          category: string
+          benefits?: string | null
+          best_timing?: string | null
+          catalog_id: string
+          category?: string | null
           copy_count?: number | null
           created_at?: string | null
           custom_video_url?: string | null
@@ -422,28 +648,32 @@ export type Database = {
           description?: string | null
           difficulty_level?: string | null
           equipment_needed?: string[] | null
+          exercise_references?: string[] | null
           exercise_type: string
           has_video?: boolean | null
           id: string
           instructions?: Json | null
           is_favorite?: boolean | null
           is_public?: boolean | null
-          is_shared_copy?: boolean | null
           is_verified?: boolean | null
+          limitations?: string | null
           muscle_groups?: string[] | null
           name: string
+          notes?: string | null
           owner_id?: string | null
           rating_average?: number | null
           rating_count?: number | null
           rep_duration_seconds?: number | null
-          shared_from_exercise_id?: string | null
-          shared_from_user_id?: string | null
+          suggested_combinations?: string[] | null
           tags?: string[] | null
           updated_at?: string | null
           version?: number | null
         }
         Update: {
-          category?: string
+          benefits?: string | null
+          best_timing?: string | null
+          catalog_id?: string
+          category?: string | null
           copy_count?: number | null
           created_at?: string | null
           custom_video_url?: string | null
@@ -454,32 +684,40 @@ export type Database = {
           description?: string | null
           difficulty_level?: string | null
           equipment_needed?: string[] | null
+          exercise_references?: string[] | null
           exercise_type?: string
           has_video?: boolean | null
           id?: string
           instructions?: Json | null
           is_favorite?: boolean | null
           is_public?: boolean | null
-          is_shared_copy?: boolean | null
           is_verified?: boolean | null
+          limitations?: string | null
           muscle_groups?: string[] | null
           name?: string
+          notes?: string | null
           owner_id?: string | null
           rating_average?: number | null
           rating_count?: number | null
           rep_duration_seconds?: number | null
-          shared_from_exercise_id?: string | null
-          shared_from_user_id?: string | null
+          suggested_combinations?: string[] | null
           tags?: string[] | null
           updated_at?: string | null
           version?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "exercises_shared_from_exercise_id_fkey"
-            columns: ["shared_from_exercise_id"]
+            foreignKeyName: "exercises_profiles_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
-            referencedRelation: "exercises"
+            referencedRelation: "profiles"
+            referencedColumns: ["owner_id"]
+          },
+          {
+            foreignKeyName: "fk_exercises_catalog_id"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "exercise_catalogs"
             referencedColumns: ["id"]
           },
         ]
@@ -511,6 +749,33 @@ export type Database = {
           is_enabled?: boolean | null
           target_audience?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      legal_acceptances: {
+        Row: {
+          accepted_at: string
+          accepted_version: string
+          content_hash: string
+          doc_id: string
+          locale: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          accepted_version: string
+          content_hash: string
+          doc_id: string
+          locale: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          accepted_version?: string
+          content_hash?: string
+          doc_id?: string
+          locale?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -616,6 +881,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_catalog_access: {
+        Row: {
+          catalog_id: string
+          created_at: string | null
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          notes: string | null
+          owner_id: string
+        }
+        Insert: {
+          catalog_id: string
+          created_at?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          owner_id: string
+        }
+        Update: {
+          catalog_id?: string
+          created_at?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string | null
@@ -693,6 +991,47 @@ export type Database = {
           version?: number | null
         }
         Relationships: []
+      }
+      version_audit: {
+        Row: {
+          action: string
+          changed_by: string
+          changes: Json | null
+          created_at: string
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+          version_id: string
+        }
+        Insert: {
+          action: string
+          changed_by: string
+          changes?: Json | null
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          version_id: string
+        }
+        Update: {
+          action?: string
+          changed_by?: string
+          changes?: Json | null
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "version_audit_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "app_versions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_files: {
         Row: {
@@ -988,20 +1327,116 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ai_usage_daily: {
+        Row: {
+          avg_cost_per_request: number | null
+          avg_input_tokens: number | null
+          avg_output_tokens: number | null
+          avg_processing_time_ms: number | null
+          date: string | null
+          failed_requests: number | null
+          max_processing_time_ms: number | null
+          min_processing_time_ms: number | null
+          model: string | null
+          provider: string | null
+          success_rate_percent: number | null
+          successful_requests: number | null
+          total_cost_usd: number | null
+          total_input_tokens: number | null
+          total_output_tokens: number | null
+          total_requests: number | null
+          total_tokens: number | null
+        }
+        Relationships: []
+      }
+      ai_usage_errors: {
+        Row: {
+          avg_processing_time_ms: number | null
+          date: string | null
+          error_code: string | null
+          error_count: number | null
+          first_occurrence: string | null
+          last_occurrence: string | null
+          model: string | null
+          provider: string | null
+        }
+        Relationships: []
+      }
+      ai_usage_monthly: {
+        Row: {
+          avg_cost_per_request: number | null
+          avg_input_tokens: number | null
+          avg_output_tokens: number | null
+          avg_processing_time_ms: number | null
+          failed_requests: number | null
+          model: string | null
+          month: string | null
+          provider: string | null
+          success_rate_percent: number | null
+          successful_requests: number | null
+          total_cost_usd: number | null
+          total_input_tokens: number | null
+          total_output_tokens: number | null
+          total_requests: number | null
+          total_tokens: number | null
+        }
+        Relationships: []
+      }
+      ai_usage_per_user: {
+        Row: {
+          avg_cost_per_request: number | null
+          email: string | null
+          failed_requests: number | null
+          first_request_at: string | null
+          last_request_at: string | null
+          successful_requests: number | null
+          total_cost_usd: number | null
+          total_requests: number | null
+          total_tokens: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      ai_usage_summary: {
+        Row: {
+          avg_cost_per_request: number | null
+          avg_processing_time_ms: number | null
+          failed_requests: number | null
+          first_request_at: string | null
+          last_request_at: string | null
+          model: string | null
+          provider: string | null
+          success_rate_percent: number | null
+          successful_requests: number | null
+          total_cost_usd: number | null
+          total_requests: number | null
+          total_tokens: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      cleanup_expired_challenges: {
-        Args: Record<PropertyKey, never>
+      cleanup_expired_challenges: { Args: never; Returns: undefined }
+      cleanup_expired_coaching_cache: { Args: never; Returns: number }
+      cleanup_expired_shares: { Args: never; Returns: number }
+      exec_sql: { Args: { params?: string[]; sql: string }; Returns: Json }
+      generate_share_token: { Args: never; Returns: string }
+      get_avg_ai_cost_per_request: { Args: { days?: number }; Returns: number }
+      get_current_month_ai_cost: { Args: never; Returns: number }
+      get_today_ai_cost: { Args: never; Returns: number }
+      grant_catalog_access: {
+        Args: {
+          granted_by_email: string
+          p_catalog_id: string
+          p_expires_at?: string
+          p_notes?: string
+          user_email: string
+        }
         Returns: undefined
       }
-      cleanup_expired_shares: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      generate_share_token: {
-        Args: Record<PropertyKey, never>
-        Returns: string
+      revoke_catalog_access: {
+        Args: { p_catalog_id: string; user_email: string }
+        Returns: undefined
       }
     }
     Enums: {

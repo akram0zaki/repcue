@@ -8,6 +8,8 @@ import { authService } from './services/authService';
 import { forceUpdateService } from './services/forceUpdateService';
 import { updateService } from './services/updateService';
 import { AnalyticsService } from './services/analyticsService';
+import { legalDocsService } from './services/legalDocsService';
+import { legalUpdateService } from './services/legalUpdateService';
 import { supabase, supabaseFunctionBaseUrl } from './config/supabase';
 import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
@@ -22,6 +24,7 @@ import ScrollToTop from './components/ScrollToTop';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { UpdateNotificationManager } from './components/UpdateNotificationManager';
+import { LegalGate } from './components/legal/LegalGate';
 import type { UpdateInfo, UpdateError } from './types';
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
@@ -56,6 +59,7 @@ import {
   AuthCallbackPage,
   ProfilePage,
   AIWorkoutOnboardingPage,
+  LegalCenterPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
@@ -272,6 +276,9 @@ function App() {
   // Post-workout survey state
   const [showPostWorkoutSurvey, setShowPostWorkoutSurvey] = useState(false);
   const [surveyActivityLog, setSurveyActivityLog] = useState<ActivityLog | null>(null);
+
+  // Legal gate state
+  const [showLegalGate, setShowLegalGate] = useState(false);
 
   // Handle pending share token after authentication
   useEffect(() => {
@@ -1957,6 +1964,16 @@ function App() {
               });
           }
 
+          // Initialize legal services
+          logger.log('📄 Initializing legal document services...');
+          try {
+            await legalDocsService.initialize();
+            legalUpdateService.initialize();
+            logger.log('✅ Legal services initialized');
+          } catch (error) {
+            logger.error('❌ Legal services initialization failed:', error);
+          }
+
           const tSeedStart = Date.now();
           const tReady = Date.now();
           
@@ -2141,6 +2158,38 @@ function App() {
     }
   }, 5000); // Check after 5 seconds
   }, [hasConsent, isPublicShareRoute]);
+
+  // Check for blocking legal documents
+  useEffect(() => {
+    const checkLegalGate = async () => {
+      logger.log('[Legal Gate Check] Starting check - hasConsent:', hasConsent, 'isLoading:', isLoading);
+      
+      if (!hasConsent || isLoading) {
+        logger.log('[Legal Gate Check] Skipping - waiting for consent or app to load');
+        return;
+      }
+
+      try {
+        const locale = i18n.language || 'en';
+        logger.log('[Legal Gate Check] Checking for blocking documents in locale:', locale);
+        
+        const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
+        logger.log('[Legal Gate Check] Has blocking documents:', hasBlocking);
+        
+        if (hasBlocking) {
+          logger.log('📄 Blocking legal documents detected, showing legal gate');
+          setShowLegalGate(true);
+        } else {
+          logger.log('[Legal Gate Check] No blocking documents found');
+          setShowLegalGate(false);
+        }
+      } catch (error) {
+        logger.error('❌ Failed to check legal gate:', error);
+      }
+    };
+
+    checkLegalGate();
+  }, [hasConsent, isLoading, i18n.language]);
 
   // Handle shared exercise save from redirect
   useEffect(() => {
@@ -2650,6 +2699,21 @@ useEffect(() => {
     );
   }
 
+  // Block app rendering if Legal Gate is open (blocking documents must be accepted first)
+  if (showLegalGate) {
+    return (
+      <>
+        <LegalGate
+          isOpen={showLegalGate}
+          onContinue={() => {
+            logger.log('📄 Legal gate accepted, continuing to app');
+            setShowLegalGate(false);
+          }}
+        />
+      </>
+    );
+  }
+
   // JSDOM can miss origin/href; BrowserRouter will throw. Provide minimal fallback.
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
@@ -2824,6 +2888,14 @@ useEffect(() => {
                 element={
                   <Suspense fallback={createRouteLoader('AI Workout Onboarding')}>
                     <AIWorkoutOnboardingPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={AppRoutes.LEGAL}
+                element={
+                  <Suspense fallback={createRouteLoader('Legal Documents')}>
+                    <LegalCenterPage />
                   </Suspense>
                 }
               />
