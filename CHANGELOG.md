@@ -2,6 +2,108 @@
 
 ### 2025-10-22
 
+#### 📝 Enhanced Legal Document Markdown Rendering
+
+**Overview**: Improved markdown formatting in legal document modal with proper typography plugin and enhanced styling.
+
+**Changes**:
+- **Typography Plugin**: Installed `@tailwindcss/typography` for proper markdown rendering
+- **Enhanced Styling**: Added comprehensive prose classes for better formatting:
+  - Headers: Proper sizing and spacing (H1: 2xl, H2: xl, H3: lg)
+  - Paragraphs: Better line height and spacing
+  - Lists: Proper bullets/numbers and indentation
+  - Links: Blue color with underline
+  - Strong text: Semibold weight
+- **Dark Mode**: Full prose-invert support for dark theme
+- **Responsive**: Scales from prose-sm on mobile to prose-lg on large screens
+
+**Fixed**: Headers, spacing, and list formatting now render correctly in legal document modals.
+
+---
+
+#### 🏢 Imprint Display Component — Display-Only Legal Requirement
+
+**Overview**: Added imprint display component to HomePage footer. Imprint is a legal requirement for display but does not require user acceptance.
+
+**Changes**:
+- **Component**: Created `apps/frontend/src/components/Imprint.tsx`
+  - Displays company legal information (name, KvK, VAT, email, jurisdiction)
+  - Small, unobtrusive footer display
+  - Translation-ready with i18n keys
+- **HomePage Integration**: Added to footer section below language switcher
+- **Manifest Update**: Changed imprint from `required: true, policy: "deferred"` to `required: false, policy: "display-only"`
+- **Translations**: Added `imprint.*` keys to **all 8 locales**:
+  - English (en)
+  - Arabic (ar)
+  - Arabic Egyptian (ar-EG)
+  - Dutch (nl)
+  - German (de)
+  - Spanish (es)
+  - French (fr)
+  - Frisian (fy)
+
+**Clarification**: Imprint is for **display only** and is **not** part of the legal acceptance flow. It remains visible at all times without requiring user acknowledgment.
+
+---
+
+#### 🔄 Legal Acceptance & Consent V3 — Phase 4 Supabase Sync Complete
+
+**Overview**: Implemented complete Supabase synchronization for legal acceptances, enabling cross-device sync for authenticated users with last-write-wins conflict resolution.
+
+**Key Features**:
+- **Cross-Device Sync**: Legal acceptances sync across all user devices when authenticated
+- **Offline-First**: Local acceptances preserved and synced when user signs in
+- **Conflict Resolution**: Last-write-wins by `accepted_at` timestamp; tie-breaker by semver
+- **Privacy**: On sign-out, local records kept; server records never deleted
+- **Error Handling**: All sync methods return boolean (no throws); graceful degradation
+
+**Implementation Details**:
+
+1. **Supabase Types** (`apps/frontend/src/types/supabase.ts`):
+   - Added `Database` interface with `legal_acceptances` table types
+   - Proper Row/Insert/Update type definitions for type-safe database operations
+
+2. **LegalDocsService Sync Methods**:
+   - `fetchServerAcceptances()`: Fetches user's acceptances from Supabase (returns empty array if not authenticated)
+   - `upsertServerAcceptance()`: Upserts single acceptance to Supabase (auto-called on recordAcceptance)
+   - `mergeLegalAcceptances()`: Merges local + server with last-write-wins logic
+   - `syncLegalAcceptances()`: Orchestrates full sync flow (fetch → merge → update local)
+
+3. **Merge Logic** (Last-Write-Wins):
+   - Compare `accepted_at` timestamps for same doc_id
+   - If timestamps equal, use semver comparison as tie-breaker
+   - Preserves most recent acceptance from either source
+   - Handles missing acceptances (only in local or only in server)
+
+4. **Sync Triggers**:
+   - **On sign-in**: Automatic sync via `syncLegalAcceptances()` (planned integration in Phase 5)
+   - **On acceptance**: Automatic upsert to Supabase if authenticated
+   - **On sign-out**: Local acceptances retained for offline use
+
+**Technical Details**:
+- Database table: `legal_acceptances` (composite PK: user_id + doc_id)
+- RLS policies: Users can only access own acceptances
+- Field mapping: `acceptedLocale` ↔ `locale` (client ↔ database)
+- Type-safe operations with proper error handling
+- No breaking changes to existing local-only workflow
+
+**Files Modified**:
+- `apps/frontend/src/types/supabase.ts` - Added Database types
+- `apps/frontend/src/services/legalDocsService.ts` - Added sync methods (4 new methods, ~150 lines)
+- `docs/implementation-plans/legal-acceptance/implementation-plan-legal-acceptance.md` - Marked Phase 4 complete
+
+**Next Steps** (Phase 5 - Testing & Integration):
+- Integrate sync into auth flow (sign-in/sign-out handlers)
+- Add unit tests for merge logic (timestamp conflicts, semver tie-breaker)
+- E2E tests for sync scenarios (offline → online, conflicts)
+- Integration tests for auth flow
+
+**Related Documentation**:
+- Migration: `supabase/migrations/20251021-01-create-legal-acceptances-table.sql`
+- Implementation Plan: `docs/implementation-plans/legal-acceptance/implementation-plan-legal-acceptance.md`
+
+---
+
 #### ✅ Legal Acceptance & Consent V3 — Phase 3 UI Complete
 
 Highlights (mobile-first, RTL-safe, WCAG 2.1 AA):

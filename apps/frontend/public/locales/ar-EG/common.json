@@ -787,5 +787,15 @@
       "hoursAgo": "من {{count}} ساعة",
       "daysAgo": "من {{count}} يوم"
     }
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "غرفة التجارة (KvK)",
+    "kvkNumber": "[رقم KvK]",
+    "vat": "الرقم الضريبي",
+    "vatNumber": "[الرقم الضريبي]",
+    "email": "الإيميل",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "الاختصاص القضائي: هولندا"
   }
 }

@@ -760,4 +760,15 @@
       "security": "Beveiligingsupdate",
       "update": "Mise à jour"
     }
-  }}
+  },
+  "imprint": {
+    "company": "RepCue B.V.",
+    "kvk": "Kamer van Koophandel (KvK)",
+    "kvkNumber": "[KvK-nummer]",
+    "vat": "BTW-nummer",
+    "vatNumber": "[BTW-nummer]",
+    "email": "E-mail",
+    "contactEmail": "contact@repcue.com",
+    "jurisdiction": "Rechtsbevoegdheid: Nederland"
+  }
+}

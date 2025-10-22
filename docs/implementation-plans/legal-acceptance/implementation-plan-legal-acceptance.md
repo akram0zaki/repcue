@@ -72,10 +72,12 @@ This plan references PRD requirement IDs (LA-REQ-xxx).
 2. [x] Author baseline manifest and sample docs (EN/NL/AR) under `apps/frontend/public/legal/` (LA-REQ-004, 011, 012, 021).
    - **COMPLETED**: All 10 documents copied with numeric prefixes (01- through 10-)
    - Files: 01-terms_conditions.en.md, 02-privacy_policy.en.md, 03-cookie_policy.en.md, 04-medical_disclaimer.en.md, 05-liability_waiver.en.md, 06-dpa.en.md, 07-subscription_policy.en.md, 08-community_guidelines.en.md, 09-imprint.en.md, 10-appendices.en.md
+   - **NOTE**: Imprint (09-imprint) is a display-only legal requirement and does not require user acceptance
 3. [x] Add script to compute sha256 (base64) and update manifest.json (LA-REQ-021).
    - **COMPLETED**: Created `scripts/generate-legal-hashes.js`
    - Generated `apps/frontend/public/legal/manifest.json` with SHA-256 hashes
    - 6 required documents, 4 optional, effective date 2025-11-01
+   - **UPDATED**: Changed imprint policy from "deferred" to "display-only" (required: false)
 4. [x] Create Supabase migration for `legal_acceptances` table with RLS policies
    - **COMPLETED**: Created `supabase/migrations/20251021-01-create-legal-acceptances-table.sql`
    - Composite PK (user_id, doc_id), RLS policies, indexes for performance
@@ -121,6 +123,12 @@ This plan references PRD requirement IDs (LA-REQ-xxx).
      - Legal manifest: NetworkFirst (3s timeout, 1 hour expiration)
      - Legal markdown docs: StaleWhileRevalidate (7 days expiration)
      - Updated globPatterns to include `legal/**/*.{json,md}`
+6. [x] Imprint Display Component - Display-only legal requirement (no acceptance needed)
+   - **COMPLETED**: Created `apps/frontend/src/components/Imprint.tsx`
+   - Simple display component showing company legal information
+   - Added to HomePage footer with translation keys
+   - Manifest updated: imprint marked as `policy: "display-only"`, `required: false`
+   - Translation keys: `imprint.*` in `common.json`
 
 **Phase 2 Status**: ✅ **COMPLETE** — All frontend services, types, and Service Worker configuration implemented
 
@@ -178,14 +186,26 @@ This plan references PRD requirement IDs (LA-REQ-xxx).
 **Phase 3 Status**: ✅ **COMPLETE** — All UI components implemented, router integrated, navigation added, TypeScript compilation clean
 
 ## Phase 4 — Supabase Sync
-1. Migration SQL (workspace-first): `supabase/migrations/<ts>_create_legal_acceptances.sql` (LA-REQ-018, 024):
-   - Create table `legal_acceptances` with PK (user_id, doc_id).
-   - Enable RLS; add select/upsert/delete policies for auth.uid().
-   - Document in `docs/migration-tracking/supabase-changes_YYYYMMDD.md`.
-2. Client sync:
-   - On sign-in: fetch rows, merge with local via last-write-wins by `accepted_at`; tie-breaker: higher semver (LA-REQ-019).
-   - On acceptance: upsert to server.
-   - On sign-out: keep local record; do not delete server rows.
+1. [x] Migration SQL (workspace-first): `supabase/migrations/<ts>_create_legal_acceptances.sql` (LA-REQ-018, 024):
+   - **COMPLETED**: Created `supabase/migrations/20251021-01-create-legal-acceptances-table.sql`
+   - Table with composite PK (user_id, doc_id)
+   - RLS policies: select/upsert/delete for auth.uid()
+   - Performance indexes on user_id, doc_id, accepted_at
+   - **APPLIED TO DEV**: ✅ Success (2025-10-21)
+2. [x] Supabase types updated:
+   - **COMPLETED**: Created `apps/frontend/src/types/supabase.ts` with Database interface
+   - Added legal_acceptances table Row/Insert/Update types
+3. [x] Client sync implemented in LegalDocsService:
+   - **COMPLETED**: Added `fetchServerAcceptances()` - fetches from Supabase for authenticated users
+   - **COMPLETED**: Added `upsertServerAcceptance()` - upserts to Supabase on acceptance
+   - **COMPLETED**: Added `mergeLegalAcceptances()` - last-write-wins by accepted_at timestamp
+   - **COMPLETED**: Added `syncLegalAcceptances()` - orchestrates fetch, merge, and sync flow
+   - On sign-in: fetch rows, merge with local via last-write-wins by `accepted_at`; tie-breaker: higher semver (LA-REQ-019)
+   - On acceptance: upsert to server automatically when authenticated
+   - On sign-out: keep local record; do not delete server rows
+   - Proper error handling with boolean returns (no throws)
+
+**Phase 4 Status**: ✅ **COMPLETE** — All Supabase sync functionality implemented and type-safe
 
 ## Phase 5 — Testing & QA
 1. Unit tests:

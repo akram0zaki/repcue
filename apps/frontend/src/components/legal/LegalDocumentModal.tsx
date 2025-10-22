@@ -193,7 +193,7 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
           )}
 
           {!isLoading && !loadError && markdown && (
-            <div className="prose prose-sm sm:prose dark:prose-invert max-w-none">
+            <div className="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h1:mb-4 prose-h1:mt-6 prose-h2:text-xl prose-h2:mb-3 prose-h2:mt-5 prose-h3:text-lg prose-h3:mb-2 prose-h3:mt-4 prose-p:mb-4 prose-p:leading-relaxed prose-ul:mb-4 prose-ul:list-disc prose-ul:ml-6 prose-ol:mb-4 prose-ol:list-decimal prose-ol:ml-6 prose-li:mb-2 prose-strong:font-semibold prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:underline">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeSanitize]}

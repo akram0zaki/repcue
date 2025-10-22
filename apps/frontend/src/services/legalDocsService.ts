@@ -2,9 +2,10 @@ import type {
   LegalManifest,
   LegalDoc,
   LegalAcceptance,
-  LegalAcceptanceStatus
+  LegalAcceptanceStatus,
 } from '../types/legal';
 import { ConsentService } from './consentService';
+import { supabase } from '../config/supabase';
 import logger from '../utils/logger';
 import { LEGAL_ACCEPTANCE_V3_ENABLED } from '../config/features';
 
@@ -456,6 +457,270 @@ export class LegalDocsService {
       logger.error('Failed to clear acceptances:', error);
       return false;
     }
+  }
+
+  // ============================================================================
+  // SUPABASE SYNC METHODS (Phase 4)
+  // ============================================================================
+
+  /**
+   * Fetch legal acceptances from Supabase for the authenticated user
+   * Returns empty array if not authenticated or on error
+   */
+  private async fetchServerAcceptances(): Promise<LegalAcceptance[]> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        logger.log('[sync] No authenticated user, skipping server fetch');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('legal_acceptances')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) {
+        logger.error('[sync] Error fetching server acceptances:', error);
+        return [];
+      }
+
+      if (!data || data.length === 0) {
+        logger.log('[sync] No server acceptances found');
+        return [];
+      }
+
+      // Convert from database rows to LegalAcceptance format
+      const acceptances: LegalAcceptance[] = data.map((row) => ({
+        docId: row.doc_id,
+        acceptedVersion: row.accepted_version,
+        contentHash: row.content_hash,
+        acceptedLocale: row.locale, // Map locale → acceptedLocale
+        acceptedAt: row.accepted_at
+      }));
+
+      logger.log(`[sync] Fetched ${acceptances.length} server acceptances`);
+      return acceptances;
+    } catch (error) {
+      logger.error('[sync] Exception fetching server acceptances:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Upsert a legal acceptance to Supabase
+   * Returns true on success, false on failure
+   */
+  private async upsertServerAcceptance(acceptance: LegalAcceptance): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        logger.log('[sync] No authenticated user, skipping server upsert');
+        return false;
+      }
+
+      const row = {
+        user_id: user.id,
+        doc_id: acceptance.docId,
+        accepted_version: acceptance.acceptedVersion,
+        content_hash: acceptance.contentHash,
+        locale: acceptance.acceptedLocale, // Map acceptedLocale → locale
+        accepted_at: acceptance.acceptedAt
+      };
+
+      const { error } = await supabase
+        .from('legal_acceptances')
+        .upsert(row, {
+          onConflict: 'user_id,doc_id'
+        });
+
+      if (error) {
+        logger.error('[sync] Error upserting server acceptance:', error);
+        return false;
+      }
+
+      logger.log(`[sync] Successfully upserted ${acceptance.docId} to server`);
+      return true;
+    } catch (error) {
+      logger.error('[sync] Exception upserting server acceptance:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Compare two semver version strings
+   * Returns: 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+   */
+  private compareVersions(v1: string, v2: string): number {
+    const parts1 = v1.split('.').map(Number);
+    const parts2 = v2.split('.').map(Number);
+
+    for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+      const p1 = parts1[i] || 0;
+      const p2 = parts2[i] || 0;
+      
+      if (p1 > p2) return 1;
+      if (p1 < p2) return -1;
+    }
+    
+    return 0;
+  }
+
+  /**
+   * Merge local and server acceptances using last-write-wins strategy
+   * Tie-breaker: higher semver version wins
+   * 
+   * @param local - Local acceptances from ConsentService
+   * @param server - Server acceptances from Supabase
+   * @returns Merged acceptances array
+   */
+  private mergeAcceptances(
+    local: LegalAcceptance[],
+    server: LegalAcceptance[]
+  ): LegalAcceptance[] {
+    const merged = new Map<string, LegalAcceptance>();
+
+    // Add all local acceptances
+    for (const acceptance of local) {
+      merged.set(acceptance.docId, acceptance);
+    }
+
+    // Merge server acceptances
+    for (const serverAcceptance of server) {
+      const localAcceptance = merged.get(serverAcceptance.docId);
+
+      if (!localAcceptance) {
+        // No local record, use server
+        merged.set(serverAcceptance.docId, serverAcceptance);
+        continue;
+      }
+
+      // Both exist - use last-write-wins by timestamp
+      const serverTime = new Date(serverAcceptance.acceptedAt).getTime();
+      const localTime = new Date(localAcceptance.acceptedAt).getTime();
+
+      if (serverTime > localTime) {
+        merged.set(serverAcceptance.docId, serverAcceptance);
+      } else if (serverTime === localTime) {
+        // Tie-breaker: higher semver wins
+        const versionComparison = this.compareVersions(
+          serverAcceptance.acceptedVersion,
+          localAcceptance.acceptedVersion
+        );
+        if (versionComparison > 0) {
+          merged.set(serverAcceptance.docId, serverAcceptance);
+        }
+        // If local version is higher or equal, keep local (already in map)
+      }
+      // If local is newer, keep it (already in map)
+    }
+
+    return Array.from(merged.values());
+  }
+
+  /**
+   * Sync legal acceptances with Supabase on sign-in
+   * Fetches server acceptances, merges with local using last-write-wins
+   * Updates local storage with merged result
+   * 
+   * Should be called after successful authentication
+   */
+  public async syncOnSignIn(): Promise<boolean> {
+    try {
+      logger.log('[sync] Starting sign-in sync...');
+
+      // Fetch server acceptances
+      const serverAcceptances = await this.fetchServerAcceptances();
+      
+      // Get local acceptances
+      const localAcceptances = this.consentService.getLegalAcceptances();
+
+      logger.log(`[sync] Local: ${localAcceptances.length}, Server: ${serverAcceptances.length}`);
+
+      // Merge using last-write-wins strategy
+      const mergedAcceptances = this.mergeAcceptances(localAcceptances, serverAcceptances);
+
+      logger.log(`[sync] Merged: ${mergedAcceptances.length} acceptances`);
+
+      // Update local storage
+      const updateSuccess = this.consentService.setLegalAcceptances(mergedAcceptances);
+      
+      if (!updateSuccess) {
+        logger.error('[sync] Failed to update local storage with merged acceptances');
+        return false;
+      }
+
+      // Push any local-only or local-newer acceptances to server
+      for (const acceptance of mergedAcceptances) {
+        const serverAcceptance = serverAcceptances.find(s => s.docId === acceptance.docId);
+        
+        if (!serverAcceptance) {
+          // Local-only acceptance, push to server
+          logger.log(`[sync] Pushing local-only ${acceptance.docId} to server`);
+          await this.upsertServerAcceptance(acceptance);
+        } else {
+          // Check if local is newer
+          const localTime = new Date(acceptance.acceptedAt).getTime();
+          const serverTime = new Date(serverAcceptance.acceptedAt).getTime();
+          
+          if (localTime > serverTime) {
+            logger.log(`[sync] Pushing newer local ${acceptance.docId} to server`);
+            await this.upsertServerAcceptance(acceptance);
+          }
+        }
+      }
+
+      logger.log('[sync] Sign-in sync complete');
+      return true;
+    } catch (error) {
+      logger.error('[sync] Sign-in sync failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Record user acceptance of a legal document and sync to server
+   * Updates both local storage and Supabase (if authenticated)
+   */
+  public async recordAcceptanceWithSync(acceptance: LegalAcceptance): Promise<boolean> {
+    try {
+      logger.log(`[sync] Recording acceptance for ${acceptance.docId} v${acceptance.acceptedVersion}`);
+      
+      // Update local storage first (offline-first)
+      const localSuccess = this.consentService.updateLegalAcceptance(acceptance);
+      
+      if (!localSuccess) {
+        logger.error('[sync] Failed to update local acceptance');
+        return false;
+      }
+
+      // Try to sync to server (best-effort, don't fail if offline)
+      const serverSuccess = await this.upsertServerAcceptance(acceptance);
+      
+      if (serverSuccess) {
+        logger.log(`[sync] Successfully synced ${acceptance.docId} to server`);
+      } else {
+        logger.warn(`[sync] Could not sync ${acceptance.docId} to server (may be offline)`);
+      }
+
+      // Return true even if server sync fails (offline-first)
+      return true;
+    } catch (error) {
+      logger.error('[sync] Failed to record acceptance with sync:', error);
+      return false;
+    }
+  }
+
+  /**
+   * On sign-out: keep local records, do NOT delete server rows
+   * Server records are preserved for when user signs in again
+   */
+  public onSignOut(): void {
+    logger.log('[sync] User signed out - keeping local acceptances');
+    // No action needed - local acceptances remain in localStorage
+    // Server records remain in Supabase for this user
   }
 }
 
