@@ -101,23 +101,6 @@ const DOCUMENTS = [
     required: false,
     policy: 'deferred',
     filePrefix: '08-community_guidelines'
-  },
-  {
-    id: 'imprint',
-    title: 'Imprint',
-    version: '1.0.0',
-    required: true,
-    policy: 'deferred',
-    effectiveFrom: '2025-11-01T00:00:00Z',
-    filePrefix: '09-imprint'
-  },
-  {
-    id: 'appendices',
-    title: 'Appendices',
-    version: '1.0.0',
-    required: false,
-    policy: 'deferred',
-    filePrefix: '10-appendices'
   }
 ];
 

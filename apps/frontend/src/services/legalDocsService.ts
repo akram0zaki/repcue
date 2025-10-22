@@ -67,6 +67,13 @@ export class LegalDocsService {
       }
 
       logger.log(`Loaded baseline manifest with ${this.baselineManifest.documents.length} documents`);
+      logger.log('Baseline manifest updatedAt:', this.baselineManifest.updatedAt);
+      
+      // Log each document's details
+      this.baselineManifest.documents.forEach(doc => {
+        logger.log(`  - ${doc.id} v${doc.version} (required: ${doc.required}, policy: ${doc.policy}, effectiveFrom: ${doc.effectiveFrom || 'immediate'})`);
+      });
+      
       return true;
     } catch (error) {
       logger.error('Failed to initialize LegalDocsService:', error);
@@ -77,11 +84,17 @@ export class LegalDocsService {
   /**
    * Load baseline manifest from public directory
    * This is the offline-first fallback manifest
+   * In development, bypasses cache for easier testing
    */
   private async loadBaselineManifest(): Promise<LegalManifest | null> {
     try {
-      const response = await fetch(BASELINE_MANIFEST_PATH, {
-        cache: 'force-cache' // Use cached version
+      // In development, add cache-busting query param
+      const url = import.meta.env.DEV 
+        ? `${BASELINE_MANIFEST_PATH}?t=${Date.now()}`
+        : BASELINE_MANIFEST_PATH;
+      
+      const response = await fetch(url, {
+        cache: import.meta.env.DEV ? 'no-cache' : 'force-cache'
       });
 
       if (!response.ok) {
@@ -283,6 +296,7 @@ export class LegalDocsService {
   public getAcceptanceStatus(docId: string, locale: string): LegalAcceptanceStatus {
     const doc = this.getDocument(docId, locale);
     if (!doc) {
+      logger.log(`[getAcceptanceStatus] Document ${docId} not found for locale ${locale}`);
       return {
         docId,
         accepted: false,
@@ -296,24 +310,42 @@ export class LegalDocsService {
     const acceptance = this.getAcceptance(docId);
     const localeData = doc.locales[0]; // Already selected by getDocument
     
+    logger.log(`[getAcceptanceStatus] ${docId}:`, {
+      hasAcceptance: !!acceptance,
+      effectiveFrom: doc.effectiveFrom,
+      policy: doc.policy,
+      required: doc.required,
+      version: doc.version
+    });
+    
     if (!acceptance) {
       // Never accepted
       const isEffective = this.isEffectiveNow(doc.effectiveFrom);
       const policy = doc.policy || 'deferred';
+      const isBlocking = doc.required && isEffective && policy === 'force';
+      
+      logger.log(`[getAcceptanceStatus] ${docId} never accepted:`, {
+        isEffective,
+        policy,
+        isBlocking,
+        required: doc.required
+      });
+      
       return {
         docId,
         accepted: false,
         requiresAcceptance: doc.required,
-        isBlocking: doc.required && isEffective && policy === 'force',
+        isBlocking,
         currentVersion: doc.version,
         currentHash: localeData.contentHash
       };
     }
 
     // Check if accepted version matches current version
+    // Note: We only check version, not content hash across locales
+    // Different locales have different hashes, but acceptance is document-wide
     const versionMatch = acceptance.acceptedVersion === doc.version;
-    const hashMatch = acceptance.contentHash === localeData.contentHash;
-    const accepted = versionMatch && hashMatch;
+    const accepted = versionMatch;
 
     // If version/hash changed, check if re-acceptance is required
     const isEffective = this.isEffectiveNow(doc.effectiveFrom);
@@ -360,8 +392,25 @@ export class LegalDocsService {
    * Check if any required documents are blocking
    */
   public hasBlockingDocuments(locale: string): boolean {
+    logger.log('[legalDocsService] hasBlockingDocuments called with locale:', locale);
+    
     const statuses = this.getAllAcceptanceStatuses(locale);
-    return statuses.some(s => s.isBlocking);
+    logger.log('[legalDocsService] Got acceptance statuses:', statuses.length, 'documents');
+    
+    statuses.forEach(status => {
+      logger.log('[legalDocsService] Document:', status.docId, {
+        accepted: status.accepted,
+        requiresAcceptance: status.requiresAcceptance,
+        isBlocking: status.isBlocking,
+        currentVersion: status.currentVersion,
+        acceptedVersion: status.acceptedVersion
+      });
+    });
+    
+    const hasBlocking = statuses.some(s => s.isBlocking);
+    logger.log('[legalDocsService] Has blocking documents:', hasBlocking);
+    
+    return hasBlocking;
   }
 
   /**

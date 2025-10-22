@@ -4,7 +4,7 @@ import { legalDocsService } from '../../services/legalDocsService';
 import { consentService } from '../../services/consentService';
 import type { LegalDoc } from '../../types/legal';
 import { LegalDocumentModal } from './LegalDocumentModal';
-import { CheckIcon, DocumentTextIcon } from '../icons/NavigationIcons';
+import { DocumentTextIcon } from '../icons/NavigationIcons';
 import logger from '../../utils/logger';
 
 interface LegalGateProps {
@@ -37,6 +37,7 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
   const [optionalDocs, setOptionalDocs] = useState<LegalDoc[]>([]);
   const [viewedDocs, setViewedDocs] = useState<Set<string>>(new Set());
   const [acceptedDocs, setAcceptedDocs] = useState<Set<string>>(new Set());
+  const [selectedDocs, setSelectedDocs] = useState<Set<string>>(new Set()); // NEW: Track user's selection intent
   const [selectedDoc, setSelectedDoc] = useState<LegalDoc | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,12 +59,23 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
           return;
         }
         
-        // Separate required and optional documents
-        const required = manifest.documents.filter((doc: LegalDoc) => doc.required);
-        const optional = manifest.documents.filter((doc: LegalDoc) => !doc.required);
+        // Separate documents by acceptance status
+        // Get documents that are blocking (need immediate acceptance)
+        const allStatuses = legalDocsService.getAllAcceptanceStatuses(i18n.language);
+        const blockingDocIds = new Set(
+          allStatuses.filter(s => s.isBlocking).map(s => s.docId)
+        );
+        
+        // Filter out imprint (display-only document, shown in footer)
+        const documentsForGate = manifest.documents.filter((doc: LegalDoc) => doc.id !== 'imprint');
+        
+        const required = documentsForGate.filter((doc: LegalDoc) => blockingDocIds.has(doc.id));
+        const optional = documentsForGate.filter((doc: LegalDoc) => !blockingDocIds.has(doc.id));
         
         setRequiredDocs(required);
         setOptionalDocs(optional);
+        
+        logger.log('[LegalGate] Blocking documents:', Array.from(blockingDocIds));
         
         // Initialize accepted docs from consent service
         const existingAcceptances = consentService.getLegalAcceptances();
@@ -122,6 +134,18 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
     setSelectedDoc(null);
   };
 
+  const handleToggleSelection = (docId: string) => {
+    setSelectedDocs(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(docId)) {
+        newSet.delete(docId);
+      } else {
+        newSet.add(docId);
+      }
+      return newSet;
+    });
+  };
+
   const handleAcceptDocument = async (doc: LegalDoc) => {
     try {
       // Get the localized document
@@ -156,8 +180,9 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
 
   const handleAcceptAll = async () => {
     try {
+      // Accept all selected documents that haven't been accepted yet
       for (const doc of requiredDocs) {
-        if (!acceptedDocs.has(doc.id)) {
+        if (!acceptedDocs.has(doc.id) && selectedDocs.has(doc.id)) {
           const localizedDoc = legalDocsService.getDocument(doc.id, i18n.language);
           if (!localizedDoc || localizedDoc.locales.length === 0) continue;
           
@@ -172,9 +197,11 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
           setAcceptedDocs(prev => new Set(prev).add(doc.id));
         }
       }
-      logger.log('[LegalGate] Accepted all required documents');
+      // Clear selection after accepting
+      setSelectedDocs(new Set());
+      logger.log('[LegalGate] Accepted all selected documents');
     } catch (err) {
-      logger.error('[LegalGate] Error accepting all documents:', err);
+      logger.error('[LegalGate] Error accepting selected documents:', err);
       setError(t('errors.acceptAllFailed'));
     }
   };
@@ -184,8 +211,11 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
     onContinue();
   };
 
-  const allRequiredViewed = requiredDocs.length > 0 && requiredDocs.every(doc => viewedDocs.has(doc.id));
-  const allRequiredAccepted = requiredDocs.length > 0 && requiredDocs.every(doc => acceptedDocs.has(doc.id));
+  // Only count documents that require acceptance (not already accepted)
+  const documentsNeedingAcceptance = requiredDocs.filter(doc => !acceptedDocs.has(doc.id));
+  const allRequiredViewed = documentsNeedingAcceptance.length === 0 || documentsNeedingAcceptance.every(doc => viewedDocs.has(doc.id));
+  const allRequiredSelected = documentsNeedingAcceptance.length === 0 || documentsNeedingAcceptance.every(doc => selectedDocs.has(doc.id));
+  const allRequiredAccepted = requiredDocs.every(doc => acceptedDocs.has(doc.id));
 
   if (!isOpen) return null;
 
@@ -240,71 +270,86 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                     {requiredDocs.map((doc) => {
                       const isViewed = viewedDocs.has(doc.id);
                       const isAccepted = acceptedDocs.has(doc.id);
+                      const isSelected = selectedDocs.has(doc.id);
                       
                       return (
                         <div
                           key={doc.id}
-                          className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
+                          className="border-2 border-surface-300 rounded-lg p-3 bg-surface-200 shadow-md"
                         >
-                          <div className="flex items-start gap-3">
-                            {/* Checkbox */}
-                            <div className="flex-shrink-0 pt-1">
-                              <button
-                                type="button"
-                                onClick={() => !isAccepted && handleAcceptDocument(doc)}
-                                disabled={isAccepted}
-                                className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                                  isAccepted
-                                    ? 'bg-green-600 border-green-600'
-                                    : 'border-gray-300 dark:border-gray-600 hover:border-blue-500'
-                                }`}
-                                aria-label={isAccepted ? t('gate.accepted') : t('gate.accept')}
-                              >
-                                {isAccepted && <CheckIcon size={14} className="text-white" />}
-                              </button>
-                            </div>
+                          {/* First Row: View button and Checkbox */}
+                          <div className="flex items-center flex-wrap gap-2 mb-2">
+                            {/* View button */}
+                            <button
+                              type="button"
+                              onClick={() => handleViewDocument(doc)}
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors"
+                              aria-label={t('gate.viewDocument', { title: t(`documents.${doc.id}`, doc.title) })}
+                            >
+                              <DocumentTextIcon size={16} />
+                              <span>{t('gate.view')}</span>
+                            </button>
 
-                            {/* Document info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                    {t(`documents.${doc.id}`, doc.title)}
-                                  </h4>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {t('version')} {doc.version}
-                                  </p>
-                                </div>
-                                
-                                {/* View button */}
-                                <button
-                                  type="button"
-                                  onClick={() => handleViewDocument(doc)}
-                                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors flex-shrink-0"
-                                  aria-label={t('gate.viewDocument', { title: t(`documents.${doc.id}`, doc.title) })}
+                            {/* Spacer to push checkbox to the right on wider screens */}
+                            <div className="flex-1 min-w-[8px]" />
+
+                            {/* Checkbox */}
+                            <button
+                              type="button"
+                              onClick={() => !isAccepted && isViewed && handleToggleSelection(doc.id)}
+                              disabled={isAccepted || !isViewed}
+                              className={`w-7 h-7 min-w-[28px] rounded border-2 flex items-center justify-center transition-colors ${
+                                isAccepted
+                                  ? 'bg-green-600 border-green-600'
+                                  : isSelected
+                                  ? 'bg-blue-500 border-blue-500'
+                                  : isViewed
+                                  ? 'border-gray-300 dark:border-gray-600 hover:border-blue-500'
+                                  : 'border-gray-300 dark:border-gray-600 opacity-50 cursor-not-allowed'
+                              }`}
+                              aria-label={isAccepted ? t('gate.accepted') : isSelected ? t('gate.selected') : t('gate.select')}
+                            >
+                              {(isAccepted || isSelected) && (
+                                <svg 
+                                  viewBox="0 0 24 24" 
+                                  fill="none" 
+                                  stroke="currentColor" 
+                                  strokeWidth="3.5" 
+                                  strokeLinecap="round" 
+                                  strokeLinejoin="round"
+                                  className="w-4 h-4 text-white flex-shrink-0"
                                 >
-                                  <DocumentTextIcon size={16} />
-                                  <span>{t('gate.view')}</span>
-                                </button>
-                              </div>
-                              
-                              {/* Status indicator */}
-                              <div className="mt-2 flex items-center gap-2 text-xs">
-                                {isAccepted ? (
-                                  <span className="text-green-600 dark:text-green-400 font-medium">
-                                    {t('gate.acceptedStatus')}
-                                  </span>
-                                ) : isViewed ? (
-                                  <span className="text-amber-600 dark:text-amber-400">
-                                    {t('gate.viewedStatus')}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-500 dark:text-gray-400">
-                                    {t('gate.notViewedStatus')}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
+                                  <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Second Row: Document title and version */}
+                          <div className="mb-2">
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white break-words">
+                              {t(`documents.${doc.id}`, doc.title)}
+                            </h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                              {t('version')} {doc.version}
+                            </p>
+                          </div>
+                          
+                          {/* Third Row: Status indicator */}
+                          <div className="flex items-center gap-2 text-xs">
+                            {isAccepted ? (
+                              <span className="text-green-600 dark:text-green-400 font-medium">
+                                {t('gate.acceptedStatus')}
+                              </span>
+                            ) : isViewed ? (
+                              <span className="text-amber-600 dark:text-amber-400">
+                                {t('gate.viewedStatus')}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500 dark:text-gray-400">
+                                {t('gate.notViewedStatus')}
+                              </span>
+                            )}
                           </div>
                         </div>
                       );
@@ -324,52 +369,85 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                     
                     <div className="space-y-3">
                       {optionalDocs.map((doc) => {
+                        const isViewed = viewedDocs.has(doc.id);
                         const isAccepted = acceptedDocs.has(doc.id);
                         
                         return (
                           <div
                             key={doc.id}
-                            className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800 opacity-75"
+                            className="border-2 border-surface-300 rounded-lg p-3 bg-surface-200 shadow-md opacity-75"
                           >
-                            <div className="flex items-start gap-3">
-                              <div className="flex-shrink-0 pt-1">
-                                <button
-                                  type="button"
-                                  onClick={() => !isAccepted && handleAcceptDocument(doc)}
-                                  disabled={isAccepted}
-                                  className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                                    isAccepted
-                                      ? 'bg-green-600 border-green-600'
-                                      : 'border-gray-300 dark:border-gray-600 hover:border-blue-500'
-                                  }`}
-                                  aria-label={isAccepted ? t('gate.accepted') : t('gate.accept')}
-                                >
-                                  {isAccepted && <CheckIcon size={14} className="text-white" />}
-                                </button>
-                              </div>
+                            {/* First Row: View button and Checkbox */}
+                            <div className="flex items-center flex-wrap gap-2 mb-2">
+                              {/* View button */}
+                              <button
+                                type="button"
+                                onClick={() => handleViewDocument(doc)}
+                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors"
+                                aria-label={t('gate.viewDocument', { title: t(`documents.${doc.id}`, doc.title) })}
+                              >
+                                <DocumentTextIcon size={16} />
+                                <span>{t('gate.view')}</span>
+                              </button>
 
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="flex-1 min-w-0">
-                                    <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                      {t(`documents.${doc.id}`, doc.title)}
-                                    </h4>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                      {t('version')} {doc.version} • {t('gate.optional')}
-                                    </p>
-                                  </div>
-                                  
-                                  <button
-                                    type="button"
-                                    onClick={() => handleViewDocument(doc)}
-                                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors flex-shrink-0"
-                                    aria-label={t('gate.viewDocument', { title: t(`documents.${doc.id}`, doc.title) })}
+                              {/* Spacer to push checkbox to the right on wider screens */}
+                              <div className="flex-1 min-w-[8px]" />
+
+                              {/* Checkbox */}
+                              <button
+                                type="button"
+                                onClick={() => !isAccepted && isViewed && handleAcceptDocument(doc)}
+                                disabled={isAccepted || !isViewed}
+                                className={`w-7 h-7 min-w-[28px] rounded border-2 flex items-center justify-center transition-colors ${
+                                  isAccepted
+                                    ? 'bg-green-600 border-green-600'
+                                    : isViewed
+                                    ? 'border-gray-300 dark:border-gray-600 hover:border-blue-500'
+                                    : 'border-gray-300 dark:border-gray-600 opacity-50 cursor-not-allowed'
+                                }`}
+                                aria-label={isAccepted ? t('gate.accepted') : t('gate.accept')}
+                              >
+                                {isAccepted && (
+                                  <svg 
+                                    viewBox="0 0 24 24" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    strokeWidth="3.5" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round"
+                                    className="w-4 h-4 text-white flex-shrink-0"
                                   >
-                                    <DocumentTextIcon size={16} />
-                                    <span>{t('gate.view')}</span>
-                                  </button>
-                                </div>
-                              </div>
+                                    <polyline points="20 6 9 17 4 12" />
+                                  </svg>
+                                )}
+                              </button>
+                            </div>
+
+                            {/* Second Row: Document title and version */}
+                            <div className="mb-2">
+                              <h4 className="text-sm font-medium text-gray-900 dark:text-white break-words">
+                                {t(`documents.${doc.id}`, doc.title)}
+                              </h4>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                {t('version')} {doc.version} • {t('gate.optional')}
+                              </p>
+                            </div>
+                            
+                            {/* Third Row: Status indicator */}
+                            <div className="flex items-center gap-2 text-xs">
+                              {isAccepted ? (
+                                <span className="text-green-600 dark:text-green-400 font-medium">
+                                  {t('gate.acceptedStatus')}
+                                </span>
+                              ) : isViewed ? (
+                                <span className="text-amber-600 dark:text-amber-400">
+                                  {t('gate.viewedStatus')}
+                                </span>
+                              ) : (
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  {t('gate.notViewedStatus')}
+                                </span>
+                              )}
                             </div>
                           </div>
                         );
@@ -388,9 +466,9 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
               <button
                 type="button"
                 onClick={handleAcceptAll}
-                disabled={!allRequiredViewed || allRequiredAccepted}
+                disabled={!allRequiredViewed || !allRequiredSelected || allRequiredAccepted}
                 className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  !allRequiredViewed || allRequiredAccepted
+                  !allRequiredViewed || !allRequiredSelected || allRequiredAccepted
                     ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
                 }`}
@@ -422,8 +500,8 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                 : allRequiredViewed
                 ? t('gate.statusAllViewed')
                 : t('gate.statusPending', {
-                    accepted: Array.from(acceptedDocs).filter(id => requiredDocs.some(d => d.id === id)).length,
-                    total: requiredDocs.length
+                    accepted: documentsNeedingAcceptance.filter(doc => acceptedDocs.has(doc.id)).length,
+                    total: documentsNeedingAcceptance.length
                   })}
             </p>
           </div>
@@ -444,7 +522,7 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
           <LegalDocumentModal
             docId={selectedDoc.id}
             title={t(`documents.${selectedDoc.id}`, selectedDoc.title)}
-            markdownPath={`/legal/${currentLocale.path}`}
+            markdownPath={currentLocale.path}
             isRTL={isRTL}
             showAcceptButton={!acceptedDocs.has(selectedDoc.id)}
             onAccept={() => {

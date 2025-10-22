@@ -2,6 +2,34 @@
 
 ### 2025-10-22
 
+#### 🗑️ Legal Document Cleanup & Edge Function Synchronization
+
+**Overview**: Removed display-only and unused legal documents from acceptance flow, synchronized local and Supabase Edge Function manifests.
+
+**Changes**:
+- **Removed Documents**:
+  - `imprint` (09-imprint.*) - Display-only document, shown in footer, not part of acceptance flow
+  - `appendices` (10-appendices.*) - Unused supplementary document
+- **Manifest Updates**:
+  - Local manifest: `apps/frontend/public/legal/manifest.json` now contains 8 documents (down from 10)
+  - Edge Function: `supabase/functions/legal-manifest/index.ts` synchronized with local manifest
+  - Build script: `apps/frontend/scripts/generate-legal-manifest.mjs` updated to exclude removed documents
+- **LegalGate Filter**: Added explicit filter to exclude `imprint` from acceptance workflow
+- **Edge Function Deployment**: Deployed updated manifest to dev project (xwzrsfkzqxdybjrkkkvh)
+- **Testing Configuration**: Updated dates for Phase 4 testing:
+  - `terms_conditions`: effectiveFrom "2025-10-15", policy "force" (blocking now)
+  - `cookie_policy`: effectiveFrom "2025-10-22", policy "force" (blocking now)
+  - Others: effectiveFrom "2025-11-01", policy "deferred" (not blocking yet)
+
+**Files Changed**:
+- Deleted: All imprint and appendices markdown files (en, ar, nl)
+- Modified: manifest.json, generate-legal-manifest.mjs, LegalGate.tsx, legal-manifest Edge Function
+- Updated: Card styling in LegalGate for better visibility (bg-surface-200, border-2)
+
+**Result**: Streamlined legal acceptance flow with only 8 relevant documents, clear separation between display-only content and acceptance-required content.
+
+---
+
 #### 📝 Enhanced Legal Document Markdown Rendering
 
 **Overview**: Improved markdown formatting in legal document modal with proper typography plugin and enhanced styling.

@@ -41,6 +41,8 @@
     "optionalSectionDescription": "الوثائق دي اختيارية. ممكن تشوفها بس مش مطلوبة عشان تكمل.",
     "view": "عرض",
     "viewDocument": "عرض {{title}}",
+    "select": "اختار للقبول",
+    "selected": "مختار للقبول",
     "accept": "قبول",
     "accepted": "مقبول",
     "acceptedStatus": "✓ مقبول",

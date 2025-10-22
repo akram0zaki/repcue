@@ -41,6 +41,8 @@
     "optionalSectionDescription": "Deze documenten zijn optioneel. U kunt ze bekijken, maar ze zijn niet vereist om door te gaan.",
     "view": "Bekijken",
     "viewDocument": "{{title}} bekijken",
+    "select": "Selecteren om te accepteren",
+    "selected": "Geselecteerd voor acceptatie",
     "accept": "Accepteren",
     "accepted": "Geaccepteerd",
     "acceptedStatus": "✓ Geaccepteerd",

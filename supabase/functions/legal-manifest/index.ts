@@ -28,15 +28,15 @@ const corsHeaders = {
 // Baseline manifest (embedded for offline-first fallback)
 // In production, this will be sourced from Supabase database
 const BASELINE_MANIFEST = {
-  "updatedAt": "2025-10-21T21:32:17.147Z",
+  "updatedAt": "2025-10-22T18:06:23.559Z",
   "documents": [
     {
       "id": "terms_conditions",
       "title": "Terms & Conditions",
       "version": "1.0.0",
       "required": true,
-      "policy": "deferred",
-      "effectiveFrom": "2025-11-01T00:00:00Z",
+      "policy": "force",
+      "effectiveFrom": "2025-10-15T00:00:00Z",
       "locales": [
         {
           "locale": "en",
@@ -85,8 +85,8 @@ const BASELINE_MANIFEST = {
       "title": "Cookie Policy",
       "version": "1.0.0",
       "required": true,
-      "policy": "deferred",
-      "effectiveFrom": "2025-11-01T00:00:00Z",
+      "policy": "force",
+      "effectiveFrom": "2025-10-22T00:00:00Z",
       "locales": [
         {
           "locale": "en",
@@ -224,55 +224,6 @@ const BASELINE_MANIFEST = {
           "locale": "nl",
           "path": "/legal/08-community_guidelines.nl.md",
           "contentHash": "thObx4nHgAsoOftcbh34Wk1RtbRjWhsdW0tOX6TrFJY="
-        }
-      ]
-    },
-    {
-      "id": "imprint",
-      "title": "Imprint",
-      "version": "1.0.0",
-      "required": true,
-      "policy": "deferred",
-      "effectiveFrom": "2025-11-01T00:00:00Z",
-      "locales": [
-        {
-          "locale": "en",
-          "path": "/legal/09-imprint.en.md",
-          "contentHash": "O42PYlL2BvKXUnuw2sjZ04RSZvpstNev+79AyhyEvp0="
-        },
-        {
-          "locale": "ar",
-          "path": "/legal/09-imprint.ar.md",
-          "contentHash": "eXkp5zszSsrw+NZPFFqCAW0L91iZiGhFiVYCMOF9ZlQ="
-        },
-        {
-          "locale": "nl",
-          "path": "/legal/09-imprint.nl.md",
-          "contentHash": "zMeqr+a7Y65faGGIRiBPsCO/Act3X9vq9Dx3MzkE/BM="
-        }
-      ]
-    },
-    {
-      "id": "appendices",
-      "title": "Appendices",
-      "version": "1.0.0",
-      "required": false,
-      "policy": "deferred",
-      "locales": [
-        {
-          "locale": "en",
-          "path": "/legal/10-appendices.en.md",
-          "contentHash": "zLvpNT9lnYFV5XKXsLYcJtC0gNCWB4TrY+5q+PKwq/o="
-        },
-        {
-          "locale": "ar",
-          "path": "/legal/10-appendices.ar.md",
-          "contentHash": "qxM0h7tdF0zF2Qtemp19qFjc6bZQFj2UhWEHdLVFJoQ="
-        },
-        {
-          "locale": "nl",
-          "path": "/legal/10-appendices.nl.md",
-          "contentHash": "8WHQMZ0cfniRivkAL1TwJKLZwoBKTgAJRklAnSEkS3U="
         }
       ]
     }

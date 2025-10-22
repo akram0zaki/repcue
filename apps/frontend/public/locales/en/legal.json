@@ -41,6 +41,8 @@
     "optionalSectionDescription": "These documents are optional. You can review them but they are not required to continue.",
     "view": "View",
     "viewDocument": "View {{title}}",
+    "select": "Select to accept",
+    "selected": "Selected for acceptance",
     "accept": "Accept",
     "accepted": "Accepted",
     "acceptedStatus": "✓ Accepted",

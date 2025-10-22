@@ -2162,15 +2162,26 @@ function App() {
   // Check for blocking legal documents
   useEffect(() => {
     const checkLegalGate = async () => {
-      if (!hasConsent || isLoading) return;
+      logger.log('[Legal Gate Check] Starting check - hasConsent:', hasConsent, 'isLoading:', isLoading);
+      
+      if (!hasConsent || isLoading) {
+        logger.log('[Legal Gate Check] Skipping - waiting for consent or app to load');
+        return;
+      }
 
       try {
         const locale = i18n.language || 'en';
+        logger.log('[Legal Gate Check] Checking for blocking documents in locale:', locale);
+        
         const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
+        logger.log('[Legal Gate Check] Has blocking documents:', hasBlocking);
         
         if (hasBlocking) {
           logger.log('📄 Blocking legal documents detected, showing legal gate');
           setShowLegalGate(true);
+        } else {
+          logger.log('[Legal Gate Check] No blocking documents found');
+          setShowLegalGate(false);
         }
       } catch (error) {
         logger.error('❌ Failed to check legal gate:', error);
@@ -2178,7 +2189,7 @@ function App() {
     };
 
     checkLegalGate();
-  }, [hasConsent, isLoading]);
+  }, [hasConsent, isLoading, i18n.language]);
 
   // Handle shared exercise save from redirect
   useEffect(() => {
@@ -2688,6 +2699,21 @@ useEffect(() => {
     );
   }
 
+  // Block app rendering if Legal Gate is open (blocking documents must be accepted first)
+  if (showLegalGate) {
+    return (
+      <>
+        <LegalGate
+          isOpen={showLegalGate}
+          onContinue={() => {
+            logger.log('📄 Legal gate accepted, continuing to app');
+            setShowLegalGate(false);
+          }}
+        />
+      </>
+    );
+  }
+
   // JSDOM can miss origin/href; BrowserRouter will throw. Provide minimal fallback.
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
@@ -2934,14 +2960,6 @@ useEffect(() => {
             await resetTimer();
           }
           setTimerState(prev => ({ ...prev, workoutMode: undefined }));
-        }}
-      />
-
-      <LegalGate
-        isOpen={showLegalGate}
-        onContinue={() => {
-          logger.log('📄 Legal gate accepted, continuing to app');
-          setShowLegalGate(false);
         }}
       />
 

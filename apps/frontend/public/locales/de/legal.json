@@ -41,6 +41,8 @@
     "optionalSectionDescription": "Diese Dokumente sind optional. Sie können sie überprüfen, aber sie sind nicht erforderlich, um fortzufahren.",
     "view": "Ansehen",
     "viewDocument": "{{title}} ansehen",
+    "select": "Zum Akzeptieren auswählen",
+    "selected": "Zur Akzeptierung ausgewählt",
     "accept": "Akzeptieren",
     "accepted": "Akzeptiert",
     "acceptedStatus": "✓ Akzeptiert",
