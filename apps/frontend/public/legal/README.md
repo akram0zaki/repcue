@@ -310,9 +310,124 @@ if (anonKey) {
 - **Service Worker**: `docs/pwa-system.md`
 - **Supabase Migration**: `.github/instructions/supabase.instructions.md`
 
+## Maintenance Workflows
+
+### Adding a New Document
+
+1. **Create Markdown Files** for all supported locales:
+   ```bash
+   touch public/legal/11-new_document.en.md
+   touch public/legal/11-new_document.ar.md
+   touch public/legal/11-new_document.nl.md
+   ```
+
+2. **Write Content** with proper version headers:
+   ```markdown
+   # New Document Title
+   
+   Last Updated: October 22, 2025
+   Version: 1.0.0
+   
+   ## Content sections...
+   ```
+
+3. **Update Manifest Generator** (`scripts/generate-legal-manifest.mjs`):
+   ```javascript
+   {
+     id: 'new_document',
+     title: 'New Document Title',
+     version: '1.0.0',
+     required: false,
+     policy: 'defer',
+     filePrefix: '11-new_document'
+   }
+   ```
+
+4. **Regenerate Manifest**:
+   ```bash
+   pnpm generate-legal-manifest
+   ```
+
+5. **Test Locally**:
+   ```bash
+   pnpm dev
+   # Navigate to /legal and verify document appears
+   ```
+
+6. **Deploy**:
+   ```bash
+   pnpm build:prod
+   # Update Edge Function baseline if needed
+   ```
+
+### Updating an Existing Document
+
+1. **Modify Content** in markdown file(s)
+2. **Increment Version** in document header (follow semantic versioning)
+3. **Update Manifest Generator** with new version number
+4. **Regenerate Manifest** (`pnpm generate-legal-manifest`)
+5. **Choose Policy**:
+   - `force` - Blocks app until accepted
+   - `defer` - Shows notification, allows usage
+6. **Set Effective Date** (optional):
+   ```javascript
+   effectiveFrom: '2025-11-15T00:00:00Z'  // 30 days notice
+   ```
+7. **Test Update Detection**:
+   - Clear localStorage
+   - Set old acceptance
+   - Verify update detected
+8. **Deploy with Communication**
+
+### Version Incrementing Guidelines
+
+- **Patch** (1.0.x): Typo fixes, minor clarifications
+- **Minor** (1.x.0): New sections, policy clarifications
+- **Major** (x.0.0): Fundamental legal changes
+
+**Always increment** when:
+- ✅ Changing legal obligations or user rights
+- ✅ Adding/removing sections with legal implications
+- ✅ Responding to regulatory changes
+
+**Can skip** for:
+- ❌ Fixing typos with no meaning change
+- ❌ Formatting improvements only
+
+## Testing Checklist
+
+### After Adding/Updating Documents
+
+- [ ] Manifest generates without errors
+- [ ] All locales load correctly
+- [ ] Document displays in LegalGate
+- [ ] Version number shows correctly
+- [ ] Accept button works
+- [ ] Update detection triggers (for existing users)
+- [ ] Policy behavior correct (force vs defer)
+- [ ] Effective date displays correctly
+- [ ] RTL rendering works for Arabic
+- [ ] Mobile layout responsive
+- [ ] Keyboard navigation functional
+
+### Automated Tests
+
+```bash
+# Unit tests
+pnpm test legalDocsService
+
+# Integration tests
+pnpm test legalDocsService.integration
+
+# E2E tests
+pnpm build && pnpm preview
+cd tests/e2e && pnpm cypress:run --spec "cypress/e2e/legal-acceptance.cy.ts"
+```
+
 ---
 
-**Last Updated**: 2025-10-21  
+**Last Updated**: October 22, 2025  
 **System Version**: Legal Acceptance V3  
 **Locales Supported**: 3 (en, ar, nl)  
-**Documents**: 10 (6 required, 4 optional)
+**Documents**: 8 active (6 required, 2 optional)  
+**Phase 6 Documentation**: Complete
