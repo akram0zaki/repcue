@@ -14,7 +14,7 @@ Instead, RepCue stores data locally using `localStorage`, `IndexedDB` (via Dexie
 
 | Key | Purpose | Created When | TTL / Expiry | Removed When |
 | --- | --- | --- | --- | --- |
-| `repcue_consent` | Stores consent record (version, timestamps, flags for cookies/analytics/marketing, retention days). | On first run after you choose an option in the consent banner. | Until you revoke consent or clear browser storage. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_consent` | Stores consent record (version, timestamps, flags for cookies/analytics/marketing, retention days, and legal document acceptances array). | On first run after you accept legal documents and choose consent options. | Until you revoke consent or clear browser storage. | Settings → Clear All Data & Reset App, or browser storage clear. |
 | `i18nextLng` | Your chosen language so the app opens in the same language next time. | When you pick a language (or detector caches it). | Until cleared by you/browser. | Clearing site storage. |
 | `repcue_install_prompt_dismissed` | Timestamp to pause re‑showing the install prompt. | When you dismiss the PWA install prompt. | Install prompt is cooled down for 7 days; the key persists until replaced/cleared. | Clearing site storage. |
 | `repcue_install_analytics` | Local, privacy‑preserving install analytics (last ~50 entries). Never sent to a server. | When install prompt is shown/accepted/dismissed. | Until you clear app data; bounded to last 50 entries. | Settings → Clear All Data & Reset App, or browser storage clear. |
@@ -40,6 +40,8 @@ RepCue uses IndexedDB for your exercise data. All writes require storage consent
   - `workoutSessions`: completed workout session summaries
   - TTL: persists until you clear data (Settings → Clear All Data & Reset App) or clear site storage in your browser.
 
+Note: For authenticated users with cloud sync enabled, legal document acceptances are also synced to Supabase (`legal_acceptances` table) to provide cross-device consistency. This sync is automatic and secure with Row Level Security policies.
+
 - `RepCueQueue`
   - Offline operation queue for future sync features
   - TTL: persists until cleared; entries are automatically cleaned up over time by the app logic.
@@ -52,6 +54,8 @@ Managed by the Service Worker for offline use. Examples: static assets and optio
 - Exercise video runtime cache: up to ~60 entries, approximately 30 days retention with stale‑while‑revalidate strategy.
 
 ### What your first‑run choice means
+
+Before using RepCue, you'll first see a **Legal Gate** that requires you to accept legal documents (Terms & Conditions, Privacy Policy, Cookie Policy, etc.). After accepting the legal documents, you'll see the consent banner.
 
 When you see the consent banner:
 
@@ -69,6 +73,32 @@ You can change or revoke your choice anytime in `Settings`.
 
 ### How to erase everything
 
-- Go to `Settings` → `Clear All Data & Reset App` to delete IndexedDB tables and most localStorage keys while preserving just the minimal consent record needed for the reset; or clear site storage in your browser to remove everything, including consent.
+- Go to `Settings` → `Clear All Data & Reset App` to delete IndexedDB tables and most localStorage keys while preserving just the minimal consent record needed for the reset; or clear site storage in your browser to remove everything, including consent and legal acceptances.
+
+### Legal document acceptance
+
+RepCue implements a comprehensive Legal Acceptance System V3 that tracks your acceptance of various legal documents:
+
+- **Required Documents**: Terms & Conditions, Privacy Policy, Cookie Policy, Medical Disclaimer, Liability Waiver
+- **Optional Documents**: Data Processing Agreement, Subscription Policy, Community Guidelines
+
+**How it works:**
+1. On first run, you'll see a **Legal Gate** modal requiring acceptance of all required documents before accessing the app
+2. Your acceptance is recorded locally with document version, content hash, locale, and timestamp
+3. For authenticated users, acceptances sync to the cloud for cross-device consistency
+4. You can review all accepted documents and their versions in `Settings` → `Legal Center`
+
+**Document updates:**
+- When legal documents are updated, you'll be notified based on the update policy:
+  - **Force policy**: Requires immediate acceptance (blocks app access until accepted)
+  - **Deferred policy**: Allows you to continue using the app; acceptance required by the effective date
+
+**Your rights:**
+- View all legal documents at any time via `Settings` → `Legal Center`
+- See which versions you've accepted and when
+- Re-read documents before accepting updates
+- Your acceptance history is maintained for audit purposes
+
+All legal document acceptances are GDPR-compliant and include version tracking, content hashing for integrity, and timestamped acceptance records.
 
 
