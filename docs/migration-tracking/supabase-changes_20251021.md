@@ -70,7 +70,7 @@ CREATE INDEX idx_legal_acceptances_doc_id ON public.legal_acceptances(doc_id);
 ```
 
 **Applied to Dev:** ✅ Success (2025-10-21)  
-**Applied to Prod:** ⏳ Not yet
+**Applied to Prod:** ✅ Success (2025-10-22 via MCP)
 
 ---
 
@@ -99,7 +99,7 @@ CREATE INDEX idx_legal_acceptances_doc_id ON public.legal_acceptances(doc_id);
 - **JWT Verification:** Enabled
 
 **Deployed to Dev:** ✅ Success (2025-10-21)  
-**Deployed to Prod:** ⏳ Not yet
+**Deployed to Prod:** ✅ Success (2025-10-22 via MCP - Version 1)
 
 ---
 
@@ -112,7 +112,9 @@ Before production deployment, verify:
 - [x] RLS policies are properly configured
 - [x] Performance indexes are in place
 - [x] All migrations are idempotent (safe to re-run)
-- [ ] Backup strategy is in place
+- [x] Backup strategy is in place
+- [x] Migration applied to production (2025-10-22)
+- [x] Edge Function deployed to production (2025-10-22)
 
 ---
 
@@ -152,5 +154,5 @@ If issues arise after production deployment:
 | 2025-10-21 | Created Edge Function (workspace) | ✅ Done |
 | 2025-10-21 | Applied migration to dev | ✅ Done |
 | 2025-10-21 | Deployed Edge Function to dev (v1) | ✅ Done |
-| TBD | Applied migration to prod | ⏳ Pending |
-| TBD | Deployed Edge Function to prod | ⏳ Pending |
+| 2025-10-22 | Applied migration to prod (via MCP) | ✅ Done |
+| 2025-10-22 | Deployed Edge Function to prod (v1 via MCP) | ✅ Done |
