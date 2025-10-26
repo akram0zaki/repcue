@@ -147,9 +147,15 @@ export class WebAuthnService {
       });
 
       if (challengeError || !challengeData?.options) {
+        // Extract error message from response body if available
+        const errorMessage =
+          challengeData?.error || // Error in response body
+          challengeError?.message || // Supabase client error
+          'Failed to start passkey registration';
+
         return {
           success: false,
-          error: challengeError?.message || 'Failed to start passkey registration'
+          error: errorMessage
         };
       }
 
@@ -189,9 +195,15 @@ export class WebAuthnService {
       });
 
       if (verificationError || !verificationData?.verified) {
+        // Extract error message from response body if available
+        const errorMessage =
+          verificationData?.error || // Error in response body
+          verificationError?.message || // Supabase client error
+          'Passkey verification failed';
+
         return {
           success: false,
-          error: verificationError?.message || 'Passkey verification failed'
+          error: errorMessage
         };
       }
 
@@ -236,9 +248,15 @@ export class WebAuthnService {
       });
 
       if (challengeError || !challengeData?.options) {
+        // Extract error message from response body if available
+        const errorMessage =
+          challengeData?.error || // Error in response body
+          challengeError?.message || // Supabase client error
+          'Failed to start passkey authentication';
+
         return {
           success: false,
-          error: challengeError?.message || 'Failed to start passkey authentication'
+          error: errorMessage
         };
       }
 
@@ -277,9 +295,15 @@ export class WebAuthnService {
       });
 
       if (verificationError || !verificationData?.verified) {
+        // Extract error message from response body if available
+        const errorMessage =
+          verificationData?.error || // Error in response body
+          verificationError?.message || // Supabase client error
+          'Passkey authentication failed';
+
         return {
           success: false,
-          error: verificationError?.message || 'Passkey authentication failed'
+          error: errorMessage
         };
       }
 

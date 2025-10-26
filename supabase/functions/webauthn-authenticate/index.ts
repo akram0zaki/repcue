@@ -1,15 +1,13 @@
+// @ts-nocheck // Edge function executed in Deno runtime; Deno types provided at runtime
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
-import { 
-  generateAuthenticationOptions, 
+import {
+  generateAuthenticationOptions,
   verifyAuthenticationResponse,
   type GenerateAuthenticationOptionsOpts,
   type VerifyAuthenticationResponseOpts
 } from 'https://esm.sh/@simplewebauthn/server@12.0.0'
-
-const rpID = 'localhost' // Change to actual domain in production
-const origin = ['http://localhost:5173', 'http://localhost:5174'] // Add production URLs
 
 interface AuthenticationRequest {
   step: 'challenge' | 'verify';
@@ -18,6 +16,24 @@ interface AuthenticationRequest {
   browserPreferences?: {
     userVerification: 'required' | 'preferred' | 'discouraged';
   };
+}
+
+/**
+ * Extract the RP ID (Relying Party ID) from the origin URL
+ * For WebAuthn, the RP ID must be the domain (without protocol, port, or path)
+ * Examples:
+ *   - https://repcue.me -> repcue.me
+ *   - https://www.repcue.me -> www.repcue.me
+ *   - http://localhost:5173 -> localhost
+ */
+function extractRpId(originUrl: string): string {
+  try {
+    const url = new URL(originUrl)
+    return url.hostname
+  } catch (error) {
+    console.error('Failed to extract RP ID from origin:', originUrl, error)
+    throw new Error('Invalid origin URL')
+  }
 }
 
 serve(async (req) => {
@@ -30,13 +46,37 @@ serve(async (req) => {
     // Validate method
     if (req.method !== 'POST') {
       return new Response(
-        JSON.stringify({ error: 'Method not allowed' }), 
-        { 
-          status: 405, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        JSON.stringify({ error: 'Method not allowed' }),
+        {
+          status: 405,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
+
+    // Extract origin from request headers
+    // The Origin header is sent with POST requests, Referer is a fallback
+    const requestOrigin = req.headers.get('origin') || req.headers.get('referer')
+    if (!requestOrigin) {
+      return new Response(
+        JSON.stringify({ error: 'Missing origin header' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    // Extract RP ID and clean origin for WebAuthn
+    const rpID = extractRpId(requestOrigin)
+    // WebAuthn expects origin with protocol but without trailing slash
+    const expectedOrigin = requestOrigin.replace(/\/$/, '')
+
+    console.log('WebAuthn authentication request:', {
+      rpID,
+      expectedOrigin,
+      step: 'initial'
+    })
 
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
@@ -82,10 +122,10 @@ serve(async (req) => {
 
         if (!userAuthenticators || userAuthenticators.length === 0) {
           return new Response(
-            JSON.stringify({ error: 'No passkeys found for this account' }), 
-            { 
-              status: 404, 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            JSON.stringify({ error: 'Authentication failed. Make sure you\'re signed up and have registered a passkey for this email address.' }),
+            {
+              status: 404,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             }
           )
         }
@@ -248,7 +288,7 @@ serve(async (req) => {
       const opts: VerifyAuthenticationResponseOpts = {
         response: body.response.credential,
         expectedChallenge: challengeRecord.challenge,
-        expectedOrigin: origin,
+        expectedOrigin: expectedOrigin,
         expectedRPID: rpID,
         credential: {
           id: new Uint8Array(JSON.parse(authenticator.credential_id || '[]')),
