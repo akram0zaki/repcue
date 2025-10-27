@@ -1,0 +1,23 @@
+{
+  "theme": {
+    "label": "Farbschema",
+    "description": "Wählen Sie Ihr bevorzugtes Farbschema",
+    "applying": "Farbschema wird angewendet...",
+    "default": {
+      "name": "Ozean Türkis",
+      "description": "Klassisches Türkis-Schema mit ausgewogenem Kontrast"
+    },
+    "energetic": {
+      "name": "Energetisches Orange",
+      "description": "Lebendiges Orange für energiegeladene Workouts"
+    },
+    "professional": {
+      "name": "Professionelles Blau",
+      "description": "Kühles Blau für fokussiertes Training"
+    },
+    "calm": {
+      "name": "Ruhiger Lavendel",
+      "description": "Beruhigender Lavendel für entspannte Sitzungen"
+    }
+  }
+}

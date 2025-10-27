@@ -1,8 +1,9 @@
 /* Design Token System - Semantic Color Variables */
 /* This file defines semantic color tokens that automatically adapt to light/dark modes */
+/* Theme customization: CSS variables are dynamically updated by ThemeService */
 
 :root {
-  /* Primary Brand Colors - Light Mode Defaults */
+  /* Primary Brand Colors - Light Mode Defaults (Teal theme) */
   --color-primary: #0096C7;
   --color-primary-hover: #0077A5;
   --color-primary-focus: #005F84;
@@ -56,6 +57,49 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Theme Transition Configuration */
+  --theme-transition-duration: 200ms;
+  --theme-transition-timing: ease-in-out;
+}
+
+/* Smooth theme transitions for color properties */
+/* Only applies when user hasn't requested reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    transition: 
+      background-color var(--theme-transition-duration) var(--theme-transition-timing),
+      color var(--theme-transition-duration) var(--theme-transition-timing),
+      border-color var(--theme-transition-duration) var(--theme-transition-timing);
+  }
+
+  * {
+    transition: 
+      background-color var(--theme-transition-duration) var(--theme-transition-timing),
+      color var(--theme-transition-duration) var(--theme-transition-timing),
+      border-color var(--theme-transition-duration) var(--theme-transition-timing),
+      box-shadow var(--theme-transition-duration) var(--theme-transition-timing);
+  }
+
+  /* Preserve specific transitions for interactive elements */
+  button,
+  a,
+  .btn-primary,
+  .btn-secondary,
+  .btn-neutral,
+  .btn-danger,
+  .card {
+    transition: all var(--theme-transition-duration) var(--theme-transition-timing);
+  }
+}
+
+/* Reduced motion: Disable theme transitions */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 /* Dark Mode Overrides */

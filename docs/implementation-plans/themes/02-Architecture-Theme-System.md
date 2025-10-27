@@ -212,6 +212,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
 export const DEFAULT_THEME_ID = 'default' as const;
 
 // Enable/disable theme customization feature
+// Starting enabled (true) on feature branch for development and testing
 export const THEME_CUSTOMIZATION_ENABLED = true;
 ```
 
@@ -772,30 +773,35 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, isActive, onSelect }) => {
 
 **File:** `apps/frontend/src/pages/SettingsPage.tsx`
 
-**Add to settings sections (after dark mode toggle):**
+**Add to Appearance section (right after dark mode toggle):**
 ```typescript
-{/* Theme Customization Section - REQ-003 */}
-{THEME_CUSTOMIZATION_ENABLED && (
-  <section className="space-y-4">
-    <ThemeSelector />
-  </section>
-)}
-
-{/* Dark Mode Toggle - REQ-012 (preserved) */}
+{/* Appearance Section */}
 <section className="space-y-4">
-  <h3 className="text-h3">{t('settings.darkMode.title')}</h3>
-  <div className="flex items-center justify-between">
-    <label htmlFor="dark-mode-toggle" className="label-text">
-      {t('settings.darkMode.label')}
-    </label>
-    <input
-      id="dark-mode-toggle"
-      type="checkbox"
-      checked={appSettings.dark_mode}
-      onChange={(e) => onUpdateSettings({ dark_mode: e.target.checked })}
-      className="toggle"
-    />
+  <h2 className="text-h2">{t('settings.appearance.title')}</h2>
+  
+  {/* Dark Mode Toggle - REQ-012 (preserved) */}
+  <div className="space-y-4">
+    <h3 className="text-h3">{t('settings.darkMode.title')}</h3>
+    <div className="flex items-center justify-between">
+      <label htmlFor="dark-mode-toggle" className="label-text">
+        {t('settings.darkMode.label')}
+      </label>
+      <input
+        id="dark-mode-toggle"
+        type="checkbox"
+        checked={appSettings.dark_mode}
+        onChange={(e) => onUpdateSettings({ dark_mode: e.target.checked })}
+        className="toggle"
+      />
+    </div>
   </div>
+
+  {/* Theme Customization - REQ-003 (right after dark mode) */}
+  {THEME_CUSTOMIZATION_ENABLED && (
+    <div className="space-y-4 mt-6">
+      <ThemeSelector />
+    </div>
+  )}
 </section>
 ```
 
@@ -807,7 +813,7 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, isActive, onSelect }) => {
 
 **File:** `apps/frontend/src/styles/tokens.css`
 
-**Replace hardcoded color values with CSS variables:**
+**Strategy: Keep existing CSS variable names, update values dynamically**
 
 **Before (current):**
 ```css
@@ -823,11 +829,12 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, isActive, onSelect }) => {
 /**
  * Theme CSS Variables
  * Injected dynamically by ThemeService.applyTheme()
- * DO NOT hardcode values here - they are set at runtime
+ * Initial values serve as fallbacks for default theme
+ * All existing variable names preserved for backward compatibility
  */
 :root {
   /* Primary Brand - injected by theme system */
-  --color-primary: #0096C7;  /* Fallback only */
+  --color-primary: #0096C7;  /* Fallback for default theme */
   --color-primary-hover: #0077A5;
   --color-primary-focus: #005F84;
   --color-primary-disabled: #B3E0EF;
@@ -962,7 +969,11 @@ const ThemeCard: React.FC<ThemeCardProps> = ({ theme, isActive, onSelect }) => {
 }
 ```
 
-**Repeat for all supported locales:** ar, ar-EG, de, es, fr, fy, nl
+**Initial Implementation Strategy:**
+- **Phase 1 (Initial PR):** Full translations for English (en) and Arabic (ar)
+- **Phase 1 (Initial PR):** Placeholder keys for: ar-EG, de, es, fr, fy, nl (copy English text)
+- **Phase 2 (Follow-up):** Complete translations for remaining languages
+- **Validation:** Run `pnpm i18n:scan` after creating English + Arabic keys
 
 ---
 
@@ -1112,23 +1123,35 @@ describe('Theme Customization', () => {
 
 **Step 1:** Apply Supabase migration (development first)
 ```bash
-# Run migration on dev environment
-npx supabase migration up --db-url $SUPABASE_DEV_URL
+# Run migration on dev environment using MCP tools
+# Use mcp_supabase_apply_migration for dev environment
 
 # Verify column added
 npx supabase db diff --schema public
 ```
 
-**Step 2:** Verify RLS policies (should inherit from table)
+**Step 2:** Document changes in tracking file
+```
+# Create tracking document: docs/migration-tracking/supabase-changes_20251027.md
+# Document:
+# - Migration file name and SQL
+# - Reason for change
+# - Tables/columns affected
+# - Testing performed
+# - Rollback procedure
+```
+
+**Step 3:** Verify RLS policies (should inherit from table)
 ```sql
 -- Check existing policies cover new column
 SELECT * FROM pg_policies WHERE tablename = 'app_settings';
 ```
 
-**Step 3:** Apply to production (after testing)
+**Step 4:** Apply to production (ONLY after full feature verification)
 ```bash
-# Deploy to production Supabase
-npx supabase migration up --db-url $SUPABASE_PROD_URL
+# Deploy to production Supabase using mcp_supabase-prod_* tools
+# User will explicitly request production deployment
+# Never apply to prod automatically
 ```
 
 ### 10.2 IndexedDB Migration

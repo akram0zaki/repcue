@@ -1,0 +1,23 @@
+{
+  "theme": {
+    "label": "Kleurthema",
+    "description": "Kies je favoriete kleurthema",
+    "applying": "Thema toepassen...",
+    "default": {
+      "name": "Oceaan Turquoise",
+      "description": "Klassiek turquoise thema met gebalanceerd contrast"
+    },
+    "energetic": {
+      "name": "Energiek Oranje",
+      "description": "Levendig oranje voor energieke workouts"
+    },
+    "professional": {
+      "name": "Professioneel Blauw",
+      "description": "Koel blauw voor gefocuste training"
+    },
+    "calm": {
+      "name": "Kalme Lavendel",
+      "description": "Rustgevende lavendel voor ontspannen sessies"
+    }
+  }
+}

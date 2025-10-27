@@ -21,6 +21,7 @@ import ConsentBanner from './components/ConsentBanner';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import ScrollToTop from './components/ScrollToTop';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { UpdateNotificationManager } from './components/UpdateNotificationManager';
@@ -2718,7 +2719,7 @@ useEffect(() => {
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
   return (
-    <>
+    <ThemeProvider appSettings={appSettings} onSettingsChange={updateAppSettings}>
       {canUseBrowserRouter ? (
         <Router>
         <ScrollToTop />
@@ -3021,7 +3022,7 @@ useEffect(() => {
           isSubmitting={false}
         />
       )}
-    </>
+    </ThemeProvider>
   );
 }
 

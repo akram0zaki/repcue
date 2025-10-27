@@ -10,6 +10,7 @@ import { consentService } from '../services/consentService';
 import { SpeakerIcon, DocumentTextIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { ThemeSelector } from '../components/ThemeSelector';
 import { useAuth } from '../hooks/useAuth';
 import { syncService } from '../services/syncService';
 import { correctSyncService } from '../services/correctSyncService';
@@ -427,6 +428,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-dark-mode"
             />
           </div>
+
+          {/* Theme Selector */}
+          <ThemeSelector />
+
           {/* Exercise Demo Videos */}
           <div className="flex items-center justify-between mb-3" data-testid="setting-show-exercise-videos">
             <label htmlFor="exercise-videos" className="label-text">

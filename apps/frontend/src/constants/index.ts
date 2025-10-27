@@ -48,6 +48,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
   coach_persona: 'zen', // Default coach personality (Enhancement E1.2)
   celebration_sounds_enabled: false, // Default off (Enhancement E1.1)
+  theme_id: 'default', // Default theme for new users (Theme Customization Feature)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

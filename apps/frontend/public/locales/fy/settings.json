@@ -1,0 +1,23 @@
+{
+  "theme": {
+    "label": "Kleurskema",
+    "description": "Kies jo favorite kleurskema",
+    "applying": "Skema tapasse...",
+    "default": {
+      "name": "Oseaan Turkoois",
+      "description": "Klassyk turkoois skema mei balansearre kontrast"
+    },
+    "energetic": {
+      "name": "Enerzjyk Oranje",
+      "description": "Libbich oranje foar enerzjyke workouts"
+    },
+    "professional": {
+      "name": "Profesjoneel Blau",
+      "description": "Koel blau foar fokuste training"
+    },
+    "calm": {
+      "name": "Rêstich Lavendel",
+      "description": "Kalmearjende lavendel foar ûntspannen sesjes"
+    }
+  }
+}
