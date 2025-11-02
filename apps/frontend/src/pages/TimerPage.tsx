@@ -368,7 +368,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               {selectedExercise ? (
                 <button
                   onClick={() => onSetShowExerciseSelector(true)}
-                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline truncate max-w-48"
+                  className="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline truncate max-w-48"
                   data-testid="selected-exercise-button"
                 >
                   {localizeExercise(selectedExercise, t).name}
@@ -376,7 +376,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               ) : (
                 <button
                   onClick={() => onSetShowExerciseSelector(true)}
-                  className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                  className="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline"
                   data-testid="open-exercise-selector"
                 >
                   {t('common.choose')}
@@ -393,7 +393,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     <button
                       key={exercise.id}
                       onClick={() => onSetSelectedExercise(exercise)}
-                      className="text-xs py-2 px-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors truncate"
+                      className="text-xs py-2 px-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors truncate"
                     >
                       {localizeExercise(exercise, t).name}
                     </button>

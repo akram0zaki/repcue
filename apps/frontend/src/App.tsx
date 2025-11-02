@@ -1799,28 +1799,31 @@ function App() {
   const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
     if (!hasConsent) return;
 
-    // Compute next settings deterministically from current state to avoid relying on
-    // a variable mutated inside the state updater (which can be deferred in some modes).
-    const nextSettings: AppSettings = {
-      ...appSettings,
-      ...newSettings,
-      // Always bump version and mark dirty so sync pushes reliably
-      version: (appSettings.version || 1) + 1,
-      updated_at: new Date().toISOString(),
-      dirty: 1,
-      op: 'upsert'
-    };
-    setAppSettings(nextSettings);
-
-    // Persist the same object we set in state
-    try {
-  await storageService.saveAppSettings(nextSettings);
-  // Nudge sync so app_settings exist on server for other devices
-  void syncService.sync(true);
-    } catch (error) {
-      logger.error('Failed to save app settings:', error);
-    }
-  }, [hasConsent, appSettings]);
+    // Use functional update to avoid stale closure issues
+    setAppSettings(currentSettings => {
+      const nextSettings: AppSettings = {
+        ...currentSettings,
+        ...newSettings,
+        // Always bump version and mark dirty so sync pushes reliably
+        version: (currentSettings.version || 1) + 1,
+        updated_at: new Date().toISOString(),
+        dirty: 1,
+        op: 'upsert'
+      };
+      
+      // Persist asynchronously
+      storageService.saveAppSettings(nextSettings)
+        .then(() => {
+          // Nudge sync so app_settings exist on server for other devices
+          void syncService.sync(true);
+        })
+        .catch(error => {
+          logger.error('Failed to save app settings:', error);
+        });
+      
+      return nextSettings;
+    });
+  }, [hasConsent]);
 
   const handleSetSelectedExercise = React.useCallback((exercise: Exercise | null, settings?: AppSettings) => {
     logger.debug('🔧 handleSetSelectedExercise called:', {

@@ -61,7 +61,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   const getCategoryColors = (category: ExerciseCategory, isSelected: boolean) => {
     if (isSelected) {
       switch (category) {
-        case Categories.CORE: return 'bg-blue-500 text-white border-blue-500';
+        case Categories.CORE: return 'bg-primary-500 text-white border-primary-500';
         case Categories.STRENGTH: return 'bg-red-500 text-white border-red-500';
         case Categories.CARDIO: return 'bg-green-500 text-white border-green-500';
         case Categories.FLEXIBILITY: return 'bg-purple-500 text-white border-purple-500';

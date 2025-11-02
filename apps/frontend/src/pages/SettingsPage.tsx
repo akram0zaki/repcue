@@ -430,7 +430,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
 
           {/* Theme Selector */}
-          <ThemeSelector />
+          <div className="mb-6">
+            <ThemeSelector />
+          </div>
 
           {/* Exercise Demo Videos */}
           <div className="flex items-center justify-between mb-3" data-testid="setting-show-exercise-videos">

@@ -103,7 +103,7 @@ export const BadgeFilter: React.FC<BadgeFilterProps> = ({
           <button
             type="button"
             onClick={() => onClearValues(badge.id)}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+            className="text-xs text-primary-600 dark:text-primary-400 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-500 rounded"
             aria-label={t('common:clearFilter', { defaultValue: `Clear ${badgeLabel}` })}
           >
             {t('common:clear', { defaultValue: 'Clear' })}
@@ -132,11 +132,11 @@ export const BadgeFilter: React.FC<BadgeFilterProps> = ({
               className={`
                 inline-flex items-center px-3 py-1.5 text-sm rounded-full border 
                 transition-all duration-150 ease-in-out
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
                 dark:focus:ring-offset-gray-900
                 ${isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 shadow-sm'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow'
+                  ? 'bg-primary-600 text-white border-primary-600 hover:bg-primary-700 shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-primary-500 dark:hover:border-primary-400 hover:shadow'
                 }
               `}
             >

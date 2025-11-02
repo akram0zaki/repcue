@@ -1,5 +1,52 @@
 ## Unreleased
 
+### 2025-11-02
+
+#### 🐛 Bug Fixes
+
+**Theme System Improvements**:
+
+1. **Fixed Theme Persistence Bug** 🔧
+   - **Issue**: Theme selection would revert to default (Ocean Teal) after navigating between pages
+   - **Root Cause**: `updateAppSettings` callback in `App.tsx` used stale closure over `appSettings`, causing theme changes to be overwritten with old state during navigation
+   - **Solution**: Changed to functional `setState` pattern that always uses current state:
+     ```typescript
+     setAppSettings(currentSettings => {
+       const nextSettings = { ...currentSettings, ...newSettings };
+       // ... persistence logic
+       return nextSettings;
+     });
+     ```
+   - **Impact**: Theme selections now persist correctly across all navigation
+
+2. **Fixed Hardcoded Color Classes** 🎨
+   - Migrated multiple components from hardcoded blue/teal Tailwind classes to theme-aware CSS variables
+   - **Components Updated**:
+     - `TimerPage.tsx`: Exercise selector buttons and favorite quick access (3 instances)
+     - `PostWorkoutSurvey.tsx`: "Good" button styling (border, background, text colors)
+     - `BadgeFilter.tsx`: Filter buttons, clear button, focus rings (4 instances)
+     - `CategoryFilter.tsx`: Core category color and "All" selected state (2 instances)
+   - **Pattern**: Replaced `bg-blue-*`, `text-blue-*`, `border-blue-*` with `bg-primary-*`, `text-primary-*`, `border-primary-*`
+   - **Impact**: These components now correctly reflect selected theme colors
+
+3. **UI Spacing Fix**
+   - Added proper spacing (`mb-6`) between ThemeSelector and "Show Exercise Demo Videos" toggle in SettingsPage
+   - **Impact**: Improved visual consistency in Settings page layout
+
+**Remaining Work** (Documented in `docs/implementation-plans/themes/hardcoded-colors-migration.md`):
+- Additional modal components still have hardcoded colors (ForceUpdateModal, WhatsNewOverlay, etc.)
+- Estimated 4-5 hours to complete full migration
+- All remaining instances catalogued for systematic fix
+
+**Files Modified**:
+- `apps/frontend/src/App.tsx`: Fixed updateAppSettings closure bug
+- `apps/frontend/src/pages/TimerPage.tsx`: Updated button colors (3 instances)
+- `apps/frontend/src/pages/SettingsPage.tsx`: Added ThemeSelector spacing
+- `apps/frontend/src/components/PostWorkoutSurvey.tsx`: Updated "Good" button colors
+- `apps/frontend/src/components/BadgeFilter.tsx`: Updated filter button colors (4 instances)
+- `apps/frontend/src/components/CategoryFilter.tsx`: Updated category colors (2 instances)
+- `docs/implementation-plans/themes/hardcoded-colors-migration.md`: Created migration tracking document
+
 ### 2025-01-27
 
 #### ✨ Multi-Theme Customization System — Feature Complete
