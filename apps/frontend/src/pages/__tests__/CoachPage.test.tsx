@@ -63,6 +63,29 @@ const createMockReturn = (overrides?: {
   ...overrides
 });
 
+// Mock app settings
+const mockAppSettings = {
+  interval_duration: 30,
+  sound_enabled: true,
+  vibration_enabled: true,
+  beep_volume: 0.5,
+  dark_mode: false,
+  auto_save: true,
+  pre_timer_countdown: 3,
+  default_rest_time: 30,
+  rep_speed_factor: 1.0,
+  show_exercise_videos: true,
+  horizontal_exercise_layout: false,
+  ring_timer: false,
+  coach_ai_insights_enabled: false,
+  created_at: '2024-01-01T00:00:00.000Z',
+  updated_at: '2024-01-01T00:00:00.000Z',
+  id: 'test-settings',
+};
+
+// Mock exercises array
+const mockExercises: any[] = [];
+
 // Mock insights data
 const mockInsight: CoachingInsight = {
   id: 'test-insight-1',
@@ -111,6 +134,15 @@ const mockInsights: CoachingInsight[] = [
 describe('CoachPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Reset clipboard to fix userEvent.setup() issues
+    if (Object.getOwnPropertyDescriptor(navigator, 'clipboard')) {
+      Object.defineProperty(navigator, 'clipboard', {
+        writable: true,
+        configurable: true,
+        value: undefined
+      });
+    }
   });
 
   describe('Loading State', () => {
@@ -119,7 +151,7 @@ describe('CoachPage', () => {
         createMockReturn({ isLoading: true })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       // Check for loading state (component should handle this)
       expect(screen.queryByText(/coaching.title/)).toBeInTheDocument();
@@ -130,7 +162,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights, isLoading: true })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       // Insights should not be visible while loading
       // (Note: implementation may vary - this tests expected behavior)
@@ -146,7 +178,7 @@ describe('CoachPage', () => {
         createMockReturn({ error })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       expect(screen.getByText(/Failed to load insights/)).toBeInTheDocument();
     });
@@ -157,7 +189,7 @@ describe('CoachPage', () => {
         createMockReturn({ error })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const refreshButton = screen.getByRole('button', { name: /common.refresh/i });
       expect(refreshButton).toBeInTheDocument();
@@ -172,7 +204,7 @@ describe('CoachPage', () => {
         createMockReturn({ error, refresh: mockRefresh })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const refreshButton = screen.getByRole('button', { name: /common.refresh/i });
       await user.click(refreshButton);
@@ -187,7 +219,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       expect(screen.getByText(/coaching.empty.title/)).toBeInTheDocument();
       expect(screen.getByText(/coaching.empty.message/)).toBeInTheDocument();
@@ -198,7 +230,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const ctaButton = screen.getByRole('link', { name: /coaching.empty.startWorkout/i });
       expect(ctaButton).toBeInTheDocument();
@@ -212,7 +244,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       expect(screen.getByText(/coaching.title/)).toBeInTheDocument();
       expect(screen.getByText(/coaching.subtitle/)).toBeInTheDocument();
@@ -223,7 +255,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       // Check for insight titles
       expect(screen.getByText(/coaching.insights.streak.title/)).toBeInTheDocument();
@@ -236,7 +268,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const refreshButton = screen.getByRole('button', { name: /common.refresh/i });
       expect(refreshButton).toBeInTheDocument();
@@ -250,7 +282,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights, refresh: mockRefresh })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const refreshButton = screen.getByRole('button', { name: /common.refresh/i });
       await user.click(refreshButton);
@@ -268,7 +300,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [mockInsight], dismissInsight: mockDismissInsight })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const dismissButton = screen.getByRole('button', { name: /dismiss/i });
       await user.click(dismissButton);
@@ -287,7 +319,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [nonDismissibleInsight] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const dismissButtons = screen.queryAllByRole('button', { name: /dismiss/i });
       expect(dismissButtons).toHaveLength(0);
@@ -300,7 +332,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [mockInsight] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const actionButton = screen.getByRole('button', { name: /coaching.actions.startWorkout/i });
       expect(actionButton).toBeInTheDocument();
@@ -313,7 +345,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [mockInsight] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const actionButton = screen.getByRole('button', { name: /coaching.actions.startWorkout/i });
       await user.click(actionButton);
@@ -329,7 +361,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       // Check for progress section
       expect(screen.getByText(/coaching.progress.title/)).toBeInTheDocument();
@@ -353,7 +385,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const heading = screen.getByText(/coaching.title/);
       expect(heading).toBeInTheDocument();
@@ -366,7 +398,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [mockInsight] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const articles = screen.getAllByRole('article');
       expect(articles.length).toBeGreaterThanOrEqual(1);
@@ -392,7 +424,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: manyInsights })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const articles = screen.getAllByRole('article');
       expect(articles.length).toBeGreaterThanOrEqual(10);
@@ -409,7 +441,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: [insightWithoutActions] })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       // Should render without crashing
       expect(screen.getByText(/coaching.insights.streak.title/)).toBeInTheDocument();
@@ -423,7 +455,7 @@ describe('CoachPage', () => {
         createMockReturn({ insights: mockInsights, refresh: mockRefresh })
       );
 
-      renderWithRouter(<CoachPage />);
+      renderWithRouter(<CoachPage appSettings={mockAppSettings} exercises={mockExercises} />);
 
       const refreshButton = screen.getByRole('button', { name: /common.refresh/i });
       

@@ -107,12 +107,11 @@ vi.mock('../hooks/useRTLDetection', () => ({
 
 // Mock fetch HEAD precheck responses
 const originalFetch: typeof fetch | undefined = (global as any).fetch as any;
+const originalSetTimeout = global.setTimeout;
+
 beforeEach(() => {
-  // Mock setTimeout for test environment
-  global.setTimeout = vi.fn((fn: () => void) => {
-    fn();
-    return 0 as any;
-  }) as any;
+  // Use fake timers for this test suite
+  vi.useFakeTimers();
 
   // Default: 404 for our missing asset
   // @ts-expect-error node types
@@ -123,8 +122,10 @@ beforeEach(() => {
     return new Response('', { status: 200, headers: { 'content-type': 'text/plain' } });
   });
 });
+
 afterEach(() => {
   (global as any).fetch = originalFetch as any;
+  vi.useRealTimers();
   vi.restoreAllMocks();
 });
 
