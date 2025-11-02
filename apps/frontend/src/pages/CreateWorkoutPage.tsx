@@ -594,7 +594,7 @@ const CreateWorkoutPage: React.FC = () => {
 
                 <button
                   onClick={() => setShowExercisePicker(true)}
-                  className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                   disabled={saving}
                 >
                   + {t('workouts.addAnotherExercise')}

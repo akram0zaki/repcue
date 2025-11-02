@@ -49,7 +49,7 @@ const StandaloneSnackbar: React.FC<{ children: React.ReactNode }> = ({ children 
           snackbar.type === 'success' ? 'bg-green-600' :
           snackbar.type === 'error' ? 'bg-red-600' :
           snackbar.type === 'warning' ? 'bg-yellow-600' :
-          'bg-blue-600'
+          'bg-primary-600'
         }`}>
           {snackbar.message}
         </div>
@@ -137,7 +137,7 @@ const StandaloneSharedExercise: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">{t('common.loading', 'Loading...')}</p>
         </div>
       </div>
@@ -157,7 +157,7 @@ const StandaloneSharedExercise: React.FC = () => {
           </p>
           <button
             onClick={goToMainApp}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors"
+            className="btn-primary"
           >
             {t('common.goHome', 'Go to RepCue')}
           </button>
@@ -202,7 +202,7 @@ const StandaloneSharedExercise: React.FC = () => {
                 {(exercise.custom_video_url || shareInfo?.videoRecoveryTriggered) && (
                   <button
                     onClick={() => setShowVideo(true)}
-                    className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                    className="flex items-center justify-center w-12 h-12 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
                     title={t('common.playVideo', { defaultValue: 'Play video' })}
                     disabled={!exercise.custom_video_url}
                   >
@@ -403,7 +403,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   </span>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     exercise.is_public
-                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                   }`}>
                     {exercise.is_public
@@ -562,7 +562,7 @@ const StandaloneSharedExercise: React.FC = () => {
                             href={`${window.location.origin}/exercises/${exerciseId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
+                            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors"
                           >
                             {referencedExercise.name}
                             <span className="ml-1 text-xs text-gray-500">↗</span>
@@ -619,7 +619,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   {exercise.muscle_groups.map((muscle) => (
                     <span
                       key={muscle}
-                      className="inline-block px-3 py-1 text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full"
+                      className="inline-block px-3 py-1 text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full"
                     >
                       {muscle}
                     </span>
@@ -634,7 +634,7 @@ const StandaloneSharedExercise: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleSaveExercise}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors min-h-[48px] flex items-center justify-center gap-2"
+            className="flex-1 btn-primary min-h-[48px] flex items-center justify-center gap-2"
           >
             <>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -73,7 +73,7 @@ const BadgeFilter: React.FC<BadgeFilterProps> = ({
           <button
             type="button"
             onClick={() => onClear(badge.id)}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
             aria-label={t('common:clear')}
           >
             {t('common:clear', { defaultValue: 'Clear' })}
@@ -98,11 +98,11 @@ const BadgeFilter: React.FC<BadgeFilterProps> = ({
               className={`
                 px-3 py-1.5 text-sm rounded-full border transition-colors
                 ${isSelected
-                  ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400'
+                  ? 'bg-primary-600 text-white border-primary-600 hover:bg-primary-700'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-primary-500 dark:hover:border-primary-400'
                 }
               `}
-              aria-pressed={isSelected}
+              aria-pressed={String(isSelected)}
             >
               {value.icon && <span className="mr-1">{value.icon}</span>}
               {valueLabel}
@@ -167,7 +167,7 @@ export const BadgeFilterGroup: React.FC<BadgeFilterGroupProps> = ({
         <button
           type="button"
           onClick={() => setShowAllBadges(!showAllBadges)}
-          className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2"
+          className="text-sm text-primary-600 dark:text-primary-400 hover:underline mt-2"
         >
           {showAllBadges
             ? t('common:showFewerFilters', { defaultValue: 'Show fewer filters' })
