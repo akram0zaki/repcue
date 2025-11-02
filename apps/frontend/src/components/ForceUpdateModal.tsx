@@ -463,16 +463,16 @@ export const ForceUpdateModal: React.FC<ForceUpdateModalProps> = ({
 
             {/* Metered connection warning */}
             {connectionInfo && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4 mb-4">
+              <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-md p-4 mb-4">
                 <div className="flex items-start">
-                  <span className="text-blue-600 dark:text-blue-400 mr-3" aria-hidden="true">
+                  <span className="text-primary-600 dark:text-primary-400 mr-3" aria-hidden="true">
                     📱
                   </span>
                   <div className="text-sm">
-                    <p className="font-medium text-blue-800 dark:text-blue-200 mb-1">
+                    <p className="font-medium text-primary-800 dark:text-primary-200 mb-1">
                       {t('update.meteredConnection.title', 'Metered Connection Detected')}
                     </p>
-                    <p className="text-blue-700 dark:text-blue-300">
+                    <p className="text-primary-700 dark:text-primary-300">
                       {connectionInfo}
                     </p>
                   </div>

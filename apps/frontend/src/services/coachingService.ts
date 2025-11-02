@@ -255,7 +255,7 @@ export class CoachingService {
               title: 'coach.aiUnavailable',
               message: 'coach.aiUnavailableMessage',
               icon: 'info',
-              iconColor: 'text-blue-500',
+              iconColor: 'text-primary-500',
               createdAt: new Date().toISOString(),
               dismissible: true,
               metadata: {
@@ -500,7 +500,7 @@ export class CoachingService {
         title: 'muscleBalance.underTrained',
         message: `muscleBalance.underTrainedMessage:${groups.map(g => g.muscleGroup).join(',')}`,
         icon: 'target',
-        iconColor: 'text-blue-500',
+        iconColor: 'text-primary-500',
         createdAt: new Date().toISOString(),
         dismissible: true,
         actions: [
@@ -705,7 +705,7 @@ export class CoachingService {
       } as const;
 
       const colorMap = {
-        low: 'text-blue-500',
+        low: 'text-primary-500',
         medium: 'text-amber-500',
         high: 'text-red-500'
       } as const;
