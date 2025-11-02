@@ -19,33 +19,68 @@
      ```
    - **Impact**: Theme selections now persist correctly across all navigation
 
-2. **Fixed Hardcoded Color Classes** 🎨
-   - Migrated multiple components from hardcoded blue/teal Tailwind classes to theme-aware CSS variables
-   - **Components Updated**:
-     - `TimerPage.tsx`: Exercise selector buttons and favorite quick access (3 instances)
-     - `PostWorkoutSurvey.tsx`: "Good" button styling (border, background, text colors)
-     - `BadgeFilter.tsx`: Filter buttons, clear button, focus rings (4 instances)
-     - `CategoryFilter.tsx`: Core category color and "All" selected state (2 instances)
-   - **Pattern**: Replaced `bg-blue-*`, `text-blue-*`, `border-blue-*` with `bg-primary-*`, `text-primary-*`, `border-primary-*`
-   - **Impact**: These components now correctly reflect selected theme colors
+2. **Complete Hardcoded Color Migration** 🎨
+   - **Systematic Migration**: Fixed 65+ hardcoded blue/teal color instances across 23+ files
+   - **Pattern**: Replaced `bg-blue-*`, `text-blue-*`, `border-blue-*` with theme-aware `bg-primary-*`, `text-primary-*`, `border-primary-*`
+   - **Semantic Classes**: Used `btn-primary`, `btn-secondary` for consistent button styling across app
+   
+   **Components Updated (3 batches)**:
+   
+   **Batch 1** - High Priority Pages & Initial Components (5c10ce2):
+   - `TimerPage.tsx`: Exercise selector buttons, favorite quick access (3 instances)
+   - `SettingsPage.tsx`: Info text, buttons, spacing fix (3 instances)
+   - `PostWorkoutSurvey.tsx`: "Good" button styling (3 instances)
+   - `BadgeFilter.tsx`: Filter buttons, clear button, selected states (4 instances)
+   - `CategoryFilter.tsx`: Core category color, "All" selected state (2 instances)
+   - `StandaloneSharedExercise.tsx`: Spinner, buttons, badges, tags (8 instances)
+   - `catalogBadges.ts`: Fixed TypeScript error (removed non-existent category field)
+   
+   **Batch 2** - Auth, UI Components & Pages (dccbd82):
+   - **Auth Components**:
+     - `SignUpForm.tsx`: Input focus rings (email, name, username, password, confirm), magic link toggle (6 instances)
+     - `SignInForm.tsx`: Input focus rings (email, password), forgot password link (4 instances)
+     - `MagicLinkForm.tsx`: Submit button → `btn-primary` (1 instance)
+     - `UserProfile.tsx`: Avatar background (1 instance)
+     - `AuthGuard.tsx`: Loading spinner (1 instance)
+   - **UI Components**:
+     - `BadgeFilterGroup.tsx`: Clear buttons, badge states, hover colors + ARIA fix (5 instances)
+     - `ExerciseRating.tsx`: Review toggle link (1 instance)
+     - `LanguageSwitcher.tsx`: Select focus ring (1 instance)
+   - **Pages**:
+     - `CreateWorkoutPage.tsx`: Add exercise hover state (1 instance)
+     - `EditWorkoutPage.tsx`: Add exercise hover state (1 instance)
+     - `EditExercisePage.tsx`: Loading spinner (1 instance)
+     - `AuthCallbackPage.tsx`: Button, spinner, status badge (3 instances)
+     - `CreateExercisePage.tsx`: Save button (1 instance)
+     - `PRHistoryPage.tsx`: Spinner, stats, button (3 instances)
+     - `LegalCenterPage.tsx`: Spinner, card hover (2 instances)
+   - **Utilities**:
+     - `routeUtils.tsx`: Route loader spinner (1 instance)
+   
+   **Batch 3** - Modal Components & Services (223f876):
+   - **Modal Components**:
+     - `WhatsNewOverlay.tsx`: Carousel dots, focus rings, links, button (4 instances)
+     - `ForceUpdateModal.tsx`: Metered connection info box styling (5 instances)
+     - `UpdateErrorRecoveryModal.tsx`: Default severity config (1 instance)
+     - `WorkoutForceUpdateModal.tsx`: Info box, spinner (2 instances)
+   - **Service Layer**:
+     - `coachingService.ts`: Icon color definitions (3 instances)
+   
+   **Impact**: All UI elements now correctly reflect the selected theme (Ocean Teal, Energetic Orange, Professional Blue, or Calm Lavender) across light and dark modes
 
 3. **UI Spacing Fix**
    - Added proper spacing (`mb-6`) between ThemeSelector and "Show Exercise Demo Videos" toggle in SettingsPage
    - **Impact**: Improved visual consistency in Settings page layout
 
-**Remaining Work** (Documented in `docs/implementation-plans/themes/hardcoded-colors-migration.md`):
-- Additional modal components still have hardcoded colors (ForceUpdateModal, WhatsNewOverlay, etc.)
-- Estimated 4-5 hours to complete full migration
-- All remaining instances catalogued for systematic fix
-
-**Files Modified**:
+**Files Modified** (23 files total):
 - `apps/frontend/src/App.tsx`: Fixed updateAppSettings closure bug
-- `apps/frontend/src/pages/TimerPage.tsx`: Updated button colors (3 instances)
-- `apps/frontend/src/pages/SettingsPage.tsx`: Added ThemeSelector spacing
-- `apps/frontend/src/components/PostWorkoutSurvey.tsx`: Updated "Good" button colors
-- `apps/frontend/src/components/BadgeFilter.tsx`: Updated filter button colors (4 instances)
-- `apps/frontend/src/components/CategoryFilter.tsx`: Updated category colors (2 instances)
-- `docs/implementation-plans/themes/hardcoded-colors-migration.md`: Created migration tracking document
+- `apps/frontend/src/pages/`: TimerPage, SettingsPage, AuthCallbackPage, CreateExercisePage, PRHistoryPage, LegalCenterPage, EditExercisePage, CreateWorkoutPage, EditWorkoutPage
+- `apps/frontend/src/components/`: PostWorkoutSurvey, BadgeFilter, CategoryFilter, BadgeFilterGroup, ExerciseRating, LanguageSwitcher, WhatsNewOverlay, ForceUpdateModal, UpdateErrorRecoveryModal, WorkoutForceUpdateModal
+- `apps/frontend/src/components/auth/`: SignInForm, SignUpForm, MagicLinkForm, UserProfile, AuthGuard
+- `apps/frontend/src/services/coachingService.ts`: Icon color definitions
+- `apps/frontend/src/router/routeUtils.tsx`: Route loader styling
+- `apps/frontend/src/utils/catalogBadges.ts`: TypeScript fix
+- `apps/frontend/src/StandaloneSharedExercise.tsx`: Shared exercise page styling
 
 ### 2025-01-27
 
