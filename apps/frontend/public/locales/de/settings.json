@@ -16,8 +16,16 @@
       "description": "Kühles Blau für fokussiertes Training"
     },
     "calm": {
-      "name": "Ruhiger Lavendel",
-      "description": "Beruhigender Lavendel für entspannte Sitzungen"
+      "name": "Ruhiges Lavendel",
+      "description": "Beruhigendes Lavendel für entspannte Einheiten"
+    },
+    "winter-chill": {
+      "name": "Winterkälte",
+      "description": "Puderblau mit eisigen Tönen"
+    },
+    "elegant-minimal": {
+      "name": "Elegant Minimal",
+      "description": "Anspruchsvolle monochrome Palette"
     }
   }
 }

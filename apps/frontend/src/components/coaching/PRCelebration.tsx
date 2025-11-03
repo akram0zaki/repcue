@@ -151,7 +151,7 @@ export function PRCelebration({
           <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl" aria-hidden="true">
             {/* Generate confetti particles with Tailwind classes */}
             {Array.from({ length: 30 }).map((_, i) => {
-              const colors = ['bg-yellow-400', 'bg-red-400', 'bg-teal-400', 'bg-blue-400', 'bg-orange-400'];
+              const colors = ['bg-yellow-400', 'bg-red-400', 'bg-primary-400', 'bg-green-400', 'bg-orange-400'];
               const leftPositions = ['left-[10%]', 'left-[20%]', 'left-[30%]', 'left-[40%]', 'left-[50%]', 'left-[60%]', 'left-[70%]', 'left-[80%]', 'left-[90%]'];
               const delays = ['animation-delay-0', 'animation-delay-1', 'animation-delay-2'];
               

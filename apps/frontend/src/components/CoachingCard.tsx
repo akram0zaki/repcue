@@ -110,25 +110,20 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
   );
 
   // Memoize priority-based border color calculation
-  // AI insights get purple accent, rule-based insights get priority colors
-  const borderColor = useMemo(() => {
+  // AI insights use ai-insight-card class, rule-based insights get priority colors
+  const cardClasses = useMemo(() => {
     if (insight.source === 'ai') {
-      return 'border-purple-400 dark:border-purple-600';
+      return 'ai-insight-card rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none';
     }
-    return {
+    
+    const borderColor = {
       high: 'border-red-400 dark:border-red-600',
       medium: 'border-amber-400 dark:border-amber-600',
-      low: 'border-blue-400 dark:border-blue-600'
+      low: 'border-gray-400 dark:border-gray-600'
     }[insight.priority];
+    
+    return `bg-white dark:bg-gray-800 rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none`;
   }, [insight.priority, insight.source]);
-
-  // Memoize background color for AI insights
-  const bgColor = useMemo(() => {
-    if (insight.source === 'ai') {
-      return 'bg-purple-50/50 dark:bg-purple-900/10';
-    }
-    return 'bg-white dark:bg-gray-800';
-  }, [insight.source]);
 
   // Parse message with interpolation support (memoized)
   const parseMessage = useCallback((messageKey: string): { key: string; params: Record<string, string> } => {
@@ -191,7 +186,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
 
   return (
     <div 
-      className={`${bgColor} rounded-xl shadow-sm border-l-4 ${borderColor} border-t border-r border-b border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-shadow motion-reduce:transition-none`}
+      className={cardClasses}
       role="article"
       aria-labelledby={titleId}
       aria-describedby={messageId}
@@ -211,7 +206,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
         {/* AI Badge - Centered */}
         {insight.source === 'ai' && (
           <span 
-            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-200 dark:text-purple-900"
+            className="ai-badge inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
             aria-label={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
             title={t('coaching:aiPowered', { defaultValue: 'AI-Powered' })}
           >
@@ -244,7 +239,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
       <div className="px-4 pb-2">
         <h4
           id={titleId}
-          className="text-base font-semibold text-text-900 dark:text-text-50 break-words"
+          className="text-h3 break-words"
         >
           {t(titleKey, titleParams)}
         </h4>
@@ -272,7 +267,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
               <button
                 key={index}
                 onClick={() => handleAction(action.action, action.data)}
-                className="px-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 rounded-lg transition-colors motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                className="ai-action-btn px-4 py-2 text-sm font-medium rounded-lg transition-colors motion-reduce:transition-none focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 aria-label={`${t(action.label)} - ${t(titleKey, titleParams)}`}
               >
                 {t(action.label)}

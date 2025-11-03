@@ -18,6 +18,14 @@
     "calm": {
       "name": "Calm Lavender",
       "description": "Soothing lavender for relaxed sessions"
+    },
+    "winter-chill": {
+      "name": "Winter Chill",
+      "description": "Cool powder blue with icy tones"
+    },
+    "elegant-minimal": {
+      "name": "Elegant Minimal",
+      "description": "Sophisticated monochrome palette"
     }
   }
 }

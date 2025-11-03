@@ -643,6 +643,326 @@ const calmTheme: Theme = {
 };
 
 /**
+ * Winter Chill Theme (Powder Blue)
+ * Cool and icy tones for a winter wonderland aesthetic
+ * Based on Figma Color Combination 91: Winter Chill
+ * Palette: #B8E3E9 (icy), #93B1B5 (gray-blue), #4F7C82 (teal), #0B2E33 (dark teal)
+ */
+const winterChillTheme: Theme = {
+  id: 'winter-chill',
+  name: 'theme.winter-chill.name',
+  description: 'theme.winter-chill.description',
+  previewColors: ['#B8E3E9', '#93B1B5', '#4F7C82', '#0B2E33'],
+
+  light: {
+    // Primary Brand Colors - Using Figma palette colors
+    primary: '#4F7C82',        // Main teal-gray from palette
+    primaryHover: '#0B2E33',   // Darkest from palette
+    primaryFocus: '#0B2E33',   // Darkest from palette
+    primaryDisabled: '#B8E3E9', // Lightest from palette
+
+    // Background Colors
+    background: '#ffffff',
+    backgroundSecondary: '#f5fafb',    // Very light icy tint
+    backgroundTertiary: '#e8f3f5',     // Light icy tint
+
+    // Surface Colors - Built from Figma palette
+    surface0: '#ffffff',
+    surface50: '#f5fafb',
+    surface100: '#e8f3f5',
+    surface200: '#B8E3E9',    // Lightest from palette
+    surface300: '#a8d8de',    // Between lightest and gray-blue
+    surface400: '#93B1B5',    // Gray-blue from palette
+    surface500: '#729499',    // Between gray-blue and teal
+    surface600: '#4F7C82',    // Teal-gray from palette
+    surface700: '#2d5559',    // Between teal and dark
+    surface800: '#0B2E33',    // Darkest from palette
+    surface900: '#081f23',    // Deeper than darkest
+
+    // Text Colors - Using palette as key points
+    text50: '#f5fafb',
+    text100: '#e8f3f5',
+    text200: '#B8E3E9',      // Lightest from palette
+    text300: '#93B1B5',      // Gray-blue from palette
+    text400: '#729499',
+    text500: '#4F7C82',      // Teal-gray from palette
+    text600: '#2d5559',
+    text700: '#0B2E33',      // Darkest from palette
+    text800: '#081f23',
+    text900: '#051418',
+
+    // Border Colors
+    borderPrimary: '#e8f3f5',
+    borderSecondary: '#B8E3E9',
+    borderFocus: '#4F7C82',
+
+    // Status Colors
+    success: '#4ade80',
+    successHover: '#22c55e',
+    successFocus: '#16a34a',
+    successSoft: '#f0fdf4',
+
+    warning: '#fbbf24',
+    warningHover: '#f59e0b',
+    warningFocus: '#d97706',
+    warningSoft: '#fffbeb',
+
+    error: '#f87171',
+    errorHover: '#ef4444',
+    errorFocus: '#dc2626',
+    errorSoft: '#fef2f2',
+
+    // Shadows - Using dark teal from palette
+    shadowSm: 'rgba(11, 46, 51, 0.08)',
+    shadowMd: 'rgba(11, 46, 51, 0.12)',
+    shadowLg: 'rgba(11, 46, 51, 0.16)',
+
+    // Special Purpose
+    overlayBg: 'rgba(11, 46, 51, 0.5)',
+    metaThemeColor: '#4F7C82',
+  },
+
+  dark: {
+    // Primary Brand Colors - Dark Mode
+    primary: '#93B1B5',        // Gray-blue from palette
+    primaryHover: '#B8E3E9',   // Lightest from palette
+    primaryFocus: '#e8f3f5',   // Very light icy tint
+    primaryDisabled: '#2d5559', // Muted teal
+
+    // Background Colors - Dark Mode with dark teal
+    background: '#051418',     // Deeper than darkest
+    backgroundSecondary: '#081f23', // Just below darkest
+    backgroundTertiary: '#0B2E33',  // Darkest from palette
+
+    // Surface Colors - Dark Mode using palette
+    surface0: '#051418',
+    surface50: '#081f23',
+    surface100: '#0B2E33',     // Darkest from palette
+    surface200: '#1a3e44',     // Between dark and teal
+    surface300: '#2d5559',     // Between teal and mid
+    surface400: '#4F7C82',     // Teal-gray from palette
+    surface500: '#729499',     // Between teal and gray-blue
+    surface600: '#93B1B5',     // Gray-blue from palette
+    surface700: '#a8d8de',     // Between gray-blue and light
+    surface800: '#B8E3E9',     // Lightest from palette
+    surface900: '#f5fafb',
+
+    // Text Colors - Dark Mode using palette
+    text50: '#f5fafb',
+    text100: '#e8f3f5',
+    text200: '#B8E3E9',      // Lightest from palette
+    text300: '#a8d8de',
+    text400: '#93B1B5',      // Gray-blue from palette
+    text500: '#729499',
+    text600: '#4F7C82',      // Teal-gray from palette
+    text700: '#2d5559',
+    text800: '#0B2E33',      // Darkest from palette
+    text900: '#081f23',
+
+    // Border Colors - Dark Mode
+    borderPrimary: '#2d5559',
+    borderSecondary: '#4F7C82',
+    borderFocus: '#93B1B5',
+
+    // Status Colors - Dark Mode
+    success: '#4ade80',
+    successHover: '#22c55e',
+    successFocus: '#16a34a',
+    successSoft: '#052e16',
+
+    warning: '#fbbf24',
+    warningHover: '#f59e0b',
+    warningFocus: '#d97706',
+    warningSoft: '#422006',
+
+    error: '#f87171',
+    errorHover: '#ef4444',
+    errorFocus: '#dc2626',
+    errorSoft: '#450a0a',
+
+    // Shadows - Dark Mode with dark teal
+    shadowSm: 'rgba(11, 46, 51, 0.3)',
+    shadowMd: 'rgba(11, 46, 51, 0.4)',
+    shadowLg: 'rgba(11, 46, 51, 0.5)',
+
+    // Special Purpose
+    overlayBg: 'rgba(11, 46, 51, 0.7)',
+    metaThemeColor: '#051418',
+  },
+
+  contrastRatios: {
+    light: {
+      textOnBackground: 13.8,
+      primaryOnBackground: 4.5,
+    },
+    dark: {
+      textOnBackground: 14.2,
+      primaryOnBackground: 5.1,
+    },
+  },
+};
+
+/**
+ * Elegant Minimal Theme (Monochrome)
+ * Charcoal black, cool gray, and soft ivory for sophisticated minimalism
+ * Based on Figma Color Combination 8: Ink Wash
+ * Palette: #4A4A4A (charcoal), #CBCBCB (cool gray), #FFFFE3 (ivory), #6D8196 (slate)
+ */
+const elegantMinimalTheme: Theme = {
+  id: 'elegant-minimal',
+  name: 'theme.elegant-minimal.name',
+  description: 'theme.elegant-minimal.description',
+  previewColors: ['#4A4A4A', '#6D8196', '#CBCBCB', '#FFFFE3'],
+
+  light: {
+    // Primary Brand Colors - Using Figma palette
+    primary: '#6D8196',        // Slate blue from palette
+    primaryHover: '#4A4A4A',   // Charcoal from palette
+    primaryFocus: '#3a3a3a',   // Darker than charcoal
+    primaryDisabled: '#CBCBCB', // Cool gray from palette
+
+    // Background Colors
+    background: '#ffffff',
+    backgroundSecondary: '#FFFFE3', // Soft ivory from palette
+    backgroundTertiary: '#f5f5e8', // Slightly darker ivory
+
+    // Surface Colors - Built from Figma palette
+    surface0: '#ffffff',
+    surface50: '#FFFFE3',      // Soft ivory from palette
+    surface100: '#f5f5e8',     // Slightly darker ivory
+    surface200: '#e8e8d8',     // Warm neutral
+    surface300: '#CBCBCB',     // Cool gray from palette
+    surface400: '#a8a8a8',     // Between gray and slate
+    surface500: '#8b8b8b',     // Mid-tone gray
+    surface600: '#6D8196',     // Slate blue from palette
+    surface700: '#5a6b7d',     // Darker slate
+    surface800: '#4A4A4A',     // Charcoal from palette
+    surface900: '#2a2a2a',     // Deeper than charcoal
+
+    // Text Colors - Using Figma palette
+    text50: '#FFFFE3',       // Soft ivory from palette
+    text100: '#f5f5e8',
+    text200: '#CBCBCB',      // Cool gray from palette
+    text300: '#a8a8a8',
+    text400: '#8b8b8b',
+    text500: '#6D8196',      // Slate blue from palette
+    text600: '#5a6b7d',
+    text700: '#4A4A4A',      // Charcoal from palette
+    text800: '#3a3a3a',
+    text900: '#2a2a2a',
+
+    // Border Colors
+    borderPrimary: '#e8e8d8',
+    borderSecondary: '#CBCBCB',
+    borderFocus: '#6D8196',
+
+    // Status Colors
+    success: '#22c55e',
+    successHover: '#16a34a',
+    successFocus: '#15803d',
+    successSoft: '#f0fdf4',
+
+    warning: '#f59e0b',
+    warningHover: '#d97706',
+    warningFocus: '#b45309',
+    warningSoft: '#fffbeb',
+
+    error: '#ef4444',
+    errorHover: '#dc2626',
+    errorFocus: '#b91c1c',
+    errorSoft: '#fef2f2',
+
+    // Shadows - Using charcoal from palette
+    shadowSm: 'rgba(74, 74, 74, 0.06)',
+    shadowMd: 'rgba(74, 74, 74, 0.1)',
+    shadowLg: 'rgba(74, 74, 74, 0.15)',
+
+    // Special Purpose
+    overlayBg: 'rgba(74, 74, 74, 0.5)',
+    metaThemeColor: '#6D8196',
+  },
+
+  dark: {
+    // Primary Brand Colors - Dark Mode
+    primary: '#CBCBCB',        // Cool gray from palette
+    primaryHover: '#FFFFE3',   // Soft ivory from palette
+    primaryFocus: '#ffffff',   // Pure white
+    primaryDisabled: '#5a6b7d', // Muted slate
+
+    // Background Colors - Dark Mode
+    background: '#1a1a1a',     // Deep charcoal
+    backgroundSecondary: '#2a2a2a', // Lighter charcoal
+    backgroundTertiary: '#4A4A4A',  // Charcoal from palette
+
+    // Surface Colors - Dark Mode using Figma palette
+    surface0: '#1a1a1a',
+    surface50: '#2a2a2a',
+    surface100: '#4A4A4A',     // Charcoal from palette
+    surface200: '#5a6b7d',     // Darker slate
+    surface300: '#6D8196',     // Slate blue from palette
+    surface400: '#8b8b8b',     // Mid-tone gray
+    surface500: '#a8a8a8',     // Between gray and cool gray
+    surface600: '#CBCBCB',     // Cool gray from palette
+    surface700: '#e8e8d8',     // Warm neutral
+    surface800: '#f5f5e8',     // Slightly darker ivory
+    surface900: '#FFFFE3',     // Soft ivory from palette
+
+    // Text Colors - Dark Mode using Figma palette
+    text50: '#FFFFE3',       // Soft ivory from palette
+    text100: '#f5f5e8',
+    text200: '#e8e8d8',
+    text300: '#CBCBCB',      // Cool gray from palette
+    text400: '#a8a8a8',
+    text500: '#8b8b8b',
+    text600: '#6D8196',      // Slate blue from palette
+    text700: '#5a6b7d',
+    text800: '#4A4A4A',      // Charcoal from palette
+    text900: '#2a2a2a',
+
+    // Border Colors - Dark Mode
+    borderPrimary: '#4A4A4A',
+    borderSecondary: '#5a6b7d',
+    borderFocus: '#CBCBCB',
+
+    // Status Colors - Dark Mode
+    success: '#4ade80',
+    successHover: '#22c55e',
+    successFocus: '#16a34a',
+    successSoft: '#052e16',
+
+    warning: '#fbbf24',
+    warningHover: '#f59e0b',
+    warningFocus: '#d97706',
+    warningSoft: '#422006',
+
+    error: '#f87171',
+    errorHover: '#ef4444',
+    errorFocus: '#dc2626',
+    errorSoft: '#450a0a',
+
+    // Shadows - Dark Mode using charcoal
+    shadowSm: 'rgba(74, 74, 74, 0.3)',
+    shadowMd: 'rgba(74, 74, 74, 0.4)',
+    shadowLg: 'rgba(74, 74, 74, 0.5)',
+
+    // Special Purpose
+    overlayBg: 'rgba(74, 74, 74, 0.7)',
+    metaThemeColor: '#1a1a1a',
+  },
+
+  contrastRatios: {
+    light: {
+      textOnBackground: 15.5,
+      primaryOnBackground: 15.5,
+    },
+    dark: {
+      textOnBackground: 16.2,
+      primaryOnBackground: 7.8,
+    },
+  },
+};
+
+/**
  * Theme Library - All available themes
  * REQ-001: Minimum 4 preset themes
  */
@@ -651,6 +971,8 @@ export const THEME_LIBRARY: Theme[] = [
   energeticTheme,
   professionalTheme,
   calmTheme,
+  winterChillTheme,
+  elegantMinimalTheme,
 ];
 
 /**

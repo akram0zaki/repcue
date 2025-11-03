@@ -18,6 +18,14 @@
     "calm": {
       "name": "خزامى هادي",
       "description": "خزامى مهدي للجلسات المريحة"
+    },
+    "winter-chill": {
+      "name": "برد الشتا",
+      "description": "أزرق باودر بدرجات تلجية"
+    },
+    "elegant-minimal": {
+      "name": "أنيق وبسيط",
+      "description": "باليت أحادي اللون راقي"
     }
   }
 }

@@ -2690,14 +2690,16 @@ export class StorageService {
    */
   public async updateAppVersion(newVersion: string): Promise<void> {
     const currentSettings = await this.getAppSettings();
-    const updatedSettings: AppSettings = {
+    
+    // Only fill in missing keys from defaults, don't override existing values
+    const mergedSettings: AppSettings = {
       ...DEFAULT_APP_SETTINGS,
-      ...currentSettings,
+      ...(currentSettings || {}), // Preserve all current settings
       app_version: newVersion,
       updated_at: new Date().toISOString()
     };
 
-    await this.saveAppSettings(updatedSettings);
+    await this.saveAppSettings(mergedSettings);
   }
 
 

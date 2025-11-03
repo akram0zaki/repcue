@@ -89,7 +89,7 @@ const Navigation: React.FC = () => {
                 onClick={() => navigate(item.path)}
                 className={`nav-item flex flex-col items-center justify-center rounded-lg transition-colors min-w-0 touch-target ${
                   isActive(item.path)
-                    ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
+                    ? 'nav-item-active'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
                 aria-label={t('a11y.navigateTo', { label: item.label, defaultValue: 'Navigate to {{label}}' })}
@@ -111,7 +111,7 @@ const Navigation: React.FC = () => {
             onClick={() => setShowMoreMenu(!showMoreMenu)}
             className={`nav-more-button flex items-center justify-center rounded-lg transition-colors ${
               isActive(Routes.SETTINGS)
-                ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600'
+                ? 'nav-item-active'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
             aria-label={t('a11y.moreOptions', 'More options')}
@@ -138,7 +138,7 @@ const Navigation: React.FC = () => {
                 }}
                 className={`nav-dropdown-item w-full px-4 py-3 text-sm font-medium flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors rounded-lg ${
                   isRTL ? 'flex-row-reverse justify-end' : ''
-                } ${isActive(Routes.SETTINGS) ? 'bg-primary-50 dark:bg-primary-dark-disabled text-primary-500 dark:text-primary-dark-600' : ''}`}
+                } ${isActive(Routes.SETTINGS) ? 'nav-item-active' : ''}`}
                 data-testid="nav-settings"
               >
                 <SettingsIcon size={18} />

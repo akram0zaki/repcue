@@ -297,6 +297,17 @@ body.rtl .truncate {
     box-shadow: 0 0 0 2px var(--color-primary-focus), 0 0 0 4px color-mix(in srgb, var(--color-primary) 40%, transparent);
   }
 
+  /* Duration badge in collapsed header */
+  .duration-badge {
+    background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+    color: var(--color-primary-focus);
+  }
+  
+  .dark .duration-badge {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+    color: var(--color-primary);
+  }
+
   /* Exercise card using design tokens */
   .exercise-card {
     @apply p-4 rounded-lg border-2 border-transparent;
@@ -529,6 +540,263 @@ body.rtl .truncate {
 
   .float-end-rtl {
     @apply float-right rtl:float-left;
+  }
+
+  /* ========================================
+     NAVIGATION THEMING
+     ======================================== */
+  
+  /* Active navigation item - uses CSS variables from theme system */
+  .nav-item-active {
+    background-color: var(--color-primary-disabled);
+    color: var(--color-primary);
+  }
+
+  /* ========================================
+     COACHING CARD THEMING
+     ======================================== */
+  
+  /* AI insight card - uses theme primary color with transparency */
+  .ai-insight-card {
+    background-color: var(--color-background-primary);
+    border-left-width: 4px;
+    border-left-color: var(--color-primary);
+    border-top: 1px solid var(--color-border-primary);
+    border-right: 1px solid var(--color-border-primary);
+    border-bottom: 1px solid var(--color-border-primary);
+  }
+
+  /* AI insight card slight tint using primary color */
+  .dark .ai-insight-card {
+    background: linear-gradient(135deg, 
+      var(--color-background-primary) 0%, 
+      var(--color-background-secondary) 100%
+    );
+  }
+  
+  /* AI badge styling - solid primary color for maximum visibility */
+  .ai-badge {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 600;
+  }
+
+  /* AI insight action buttons - primary color */
+  .ai-action-btn {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 500;
+  }
+
+  .ai-action-btn:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  /* ========================================
+     COACH PAGE - ACTIVITY LOG & PROGRESS
+     ======================================== */
+  
+  /* Activity log entry dot indicator */
+  .activity-log-dot {
+    background-color: var(--color-primary);
+  }
+
+  /* Streak count number and icons */
+  .streak-count {
+    color: var(--color-primary);
+  }
+
+  /* Calendar active day */
+  .calendar-day-active {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+  }
+
+  /* Calendar today indicator (current day with ring) */
+  .calendar-day-today {
+    background-color: #e5e7eb; /* gray-200 */
+    color: #111827; /* gray-900 */
+    box-shadow: 0 0 0 2px var(--color-primary);
+  }
+
+  .dark .calendar-day-today {
+    background-color: #4b5563; /* gray-600 */
+    color: #f3f4f6; /* gray-100 */
+  }
+
+  /* Timer Page Elements */
+  .workout-mode-header {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .workout-mode-badge {
+    background-color: var(--color-primary-dark);
+    color: white;
+  }
+
+  .workout-favorite-btn {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary-dark);
+  }
+
+  .workout-favorite-btn:hover {
+    background-color: var(--color-primary-lighter);
+  }
+
+  .dark .workout-favorite-btn {
+    background-color: rgba(var(--color-primary-rgb, 59, 130, 246), 0.2);
+    color: var(--color-primary-light);
+  }
+
+  .dark .workout-favorite-btn:hover {
+    background-color: rgba(var(--color-primary-rgb, 59, 130, 246), 0.4);
+  }
+
+  .timer-progress-circle {
+    color: var(--color-primary);
+  }
+
+  .timer-link {
+    color: var(--color-primary-focus);
+    font-weight: 500;
+  }
+
+  .dark .timer-link {
+    color: var(--color-primary);
+  }
+
+  /* Catalog selector indicator dot */
+  .catalog-indicator-dot {
+    background-color: var(--color-primary);
+  }
+
+  /* Insights carousel elements */
+  .view-all-btn {
+    color: var(--color-primary-focus);
+  }
+  
+  .dark .view-all-btn {
+    color: var(--color-primary);
+  }
+
+  .insight-icon {
+    color: var(--color-primary-focus);
+  }
+
+  .dark .insight-icon {
+    color: var(--color-primary);
+  }
+
+  .carousel-indicator-active {
+    background-color: var(--color-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  /* Exercise Page Elements */
+  .exercise-category-strength {
+    background-color: var(--color-primary);
+  }
+
+  .exercise-icon {
+    color: var(--color-primary-dark);
+  }
+
+  .dark .exercise-icon {
+    color: var(--color-primary-light);
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-dark);
+  }
+
+  .exercise-badge-count {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .filter-button-active {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .input-focus:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .exercise-card-custom {
+    border: 2px solid var(--color-primary-light);
+  }
+
+  .dark .exercise-card-custom {
+    border-color: var(--color-primary);
+  }
+
+  .exercise-custom-badge {
+    background-color: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+  }
+
+  .dark .exercise-custom-badge {
+    background-color: rgba(var(--color-primary-rgb, 59, 130, 246), 0.2);
+    color: var(--color-primary-light);
+  }
+
+  .exercise-hover-link {
+    color: inherit;
+  }
+
+  .exercise-hover-link:hover {
+    color: var(--color-primary-dark);
+  }
+
+  .dark .exercise-hover-link:hover {
+    color: var(--color-primary-light);
+  }
+
+  /* Settings Page Elements */
+  .settings-info-text {
+    color: var(--color-primary-dark);
+  }
+
+  .dark .settings-info-text {
+    color: var(--color-primary-light);
+  }
+
+  .settings-consent-badge {
+    background-color: var(--color-primary-lighter);
+    color: var(--color-primary-dark);
+  }
+
+  .dark .settings-consent-badge {
+    background-color: rgba(var(--color-primary-rgb, 59, 130, 246), 0.2);
+    color: var(--color-primary-light);
+  }
+
+  /* Toggle Switch */
+  .toggle-switch-on {
+    background-color: var(--color-primary);
+  }
+
+  /* Progress chart bars */
+  .chart-bar {
+    background-color: var(--color-primary);
+  }
+
+  .chart-bar:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  /* Chart statistics numbers */
+  .chart-stat-number {
+    color: var(--color-primary);
   }
 
   /* ========================================

@@ -317,10 +317,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
         
         {/* Compact Workout Mode Header */}
         {isWorkoutMode && (
-          <div className="bg-primary-500 text-white rounded-lg p-3 mb-2">
+          <div className="workout-mode-header rounded-lg p-3 mb-2">
             <div className="flex items-center justify-between mb-1">
               <h2 className="text-base font-semibold truncate">{workoutMode.workoutName}</h2>
-              <span className="text-xs bg-primary-700 px-2 py-0.5 rounded">
+              <span className="text-xs workout-mode-badge px-2 py-0.5 rounded">
                 {(() => {
                   const currentIndex = workoutMode.currentExerciseIndex;
                   const totalExercises = workoutMode.exercises.length;
@@ -368,7 +368,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               {selectedExercise ? (
                 <button
                   onClick={() => onSetShowExerciseSelector(true)}
-                  className="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline truncate max-w-48"
+                  className="timer-link text-sm font-medium hover:underline truncate max-w-48"
                   data-testid="selected-exercise-button"
                 >
                   {localizeExercise(selectedExercise, t).name}
@@ -376,7 +376,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               ) : (
                 <button
                   onClick={() => onSetShowExerciseSelector(true)}
-                  className="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline"
+                  className="timer-link text-sm font-medium hover:underline"
                   data-testid="open-exercise-selector"
                 >
                   {t('common.choose')}
@@ -393,7 +393,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     <button
                       key={exercise.id}
                       onClick={() => onSetSelectedExercise(exercise)}
-                      className="text-xs py-2 px-3 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-md hover:bg-primary-100 dark:hover:bg-primary-900/40 transition-colors truncate"
+                      className="text-xs py-2 px-3 workout-favorite-btn rounded-md transition-colors truncate"
                     >
                       {localizeExercise(exercise, t).name}
                     </button>
@@ -414,7 +414,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
           >
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.duration')}</span>
-              <span className="text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
+              <span className="text-sm px-2 py-0.5 rounded font-medium duration-badge">
                 {formatDuration(selectedDuration)}
               </span>
             </div>
@@ -568,8 +568,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       isCountdown 
                         ? 'text-orange-500' 
                         : isResting
-                          ? 'text-purple-500'  // Purple for rest progress
-                          : 'text-blue-500'    // Blue for rep progress (fixed color)
+                          ? 'text-purple-500'
+                          : 'timer-progress-circle'
                     }`}
                     strokeLinecap="round"
                   />
@@ -596,14 +596,14 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     stroke="currentColor"
                     strokeWidth="10"
                     fill="none"
-                    strokeDasharray={`${2 * Math.PI * 115}`}
+                    strokeDasharray={`${2 * Math.PI * 115 * finalDisplayProgress / 100} ${2 * Math.PI * 115}`}
                     strokeDashoffset={`${2 * Math.PI * 115 * (1 - finalDisplayProgress / 100)}`}
                     className={`transition-all duration-300 ${
                       isCountdown 
                         ? 'text-orange-500' 
                         : isResting
-                          ? 'text-purple-500'  // Purple for rest progress
-                          : 'text-blue-500'    // Blue for rep progress (fixed color)
+                          ? 'text-purple-500'
+                          : 'timer-progress-circle'
                     }`}
                     strokeLinecap="round"
                   />
@@ -639,7 +639,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       isCountdown && displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
                         : actuallyResting
-                        ? 'text-blue-500 dark:text-blue-400'
+                        ? 'timer-link'
                         : 'text-gray-900 dark:text-gray-100'
                     }`}>
                       {formatTime(displayTime)}
@@ -773,10 +773,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       rx="8"
                       className={`transition-all duration-300 ${
                         isCountdown
-                          ? 'text-orange-500'
-                          : isResting
-                            ? 'text-purple-500'  // Purple for rest progress
-                            : 'text-blue-500'    // Blue for rep progress
+                            ? 'text-orange-500'
+                            : isResting
+                              ? 'text-purple-500'
+                              : 'timer-progress-circle'
                       }`}
                       strokeDasharray={`${2 * (464 + 264)}`}
                       strokeDashoffset={`${2 * (464 + 264) * (1 - finalDisplayProgress / 100)}`}
@@ -809,8 +809,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                         isCountdown
                           ? 'text-orange-500'
                           : isResting
-                            ? 'text-purple-500'  // Purple for rest progress
-                            : 'text-blue-500'    // Blue for rep progress
+                            ? 'text-purple-500'
+                            : 'timer-progress-circle'
                       }`}
                       strokeDasharray={`${2 * (480 + 280)}`}
                       strokeDashoffset={`${2 * (480 + 280) * (1 - finalDisplayProgress / 100)}`}

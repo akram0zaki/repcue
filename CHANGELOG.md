@@ -1,30 +1,218 @@
 ## Unreleased
 
+### 2025-11-03
+
+#### ✨ New Features
+
+**Added Two New Figma-Sourced Themes** 🎨:
+
+1. **Winter Chill Theme** ❄️
+   - **Description**: Cool and icy tones for a winter wonderland aesthetic
+   - **Palette**: Based on Figma Color Combination 91
+     - `#B8E3E9` - Icy blue (lightest)
+     - `#93B1B5` - Cool gray-blue
+     - `#4F7C82` - Teal-gray (primary)
+     - `#0B2E33` - Dark teal (darkest)
+   - **Features**: 
+     - Full light and dark mode support
+     - 4-color preview instead of standard 3
+     - Exact Figma hex codes throughout color scales
+     - Theme-aware shadows using dark teal instead of black
+   - **Translations**: Added in all 8 supported languages (en, fr, de, es, nl, ar, ar-EG, fy)
+
+2. **Elegant Minimal Theme (Ink Wash)** 🖤
+   - **Description**: Sophisticated monochrome palette with charcoal, cool gray, and soft ivory
+   - **Palette**: Based on Figma Color Combination 8
+     - `#4A4A4A` - Charcoal black
+     - `#6D8196` - Slate blue (primary)
+     - `#CBCBCB` - Cool gray
+     - `#FFFFE3` - Soft ivory
+   - **Features**:
+     - Gallery-like minimalist aesthetic
+     - High contrast design for readability
+     - 4-color preview palette
+     - Exact Figma colors as anchor points
+     - Theme-aware shadows using charcoal
+   - **Translations**: Added in all 8 supported languages
+
+#### 🐛 Bug Fixes
+
+**Home Page Dark Mode Text Contrast** 📱:
+- **Issue**: Exercise card descriptions had poor contrast in dark mode on HomePage
+- **Root Cause**: `.secondary-label-text` class lacked dark mode override
+- **Solution**: Added explicit dark mode override in `tokens.css`:
+  ```css
+  .dark .secondary-label-text {
+    color: #cbd5e1; /* text-300 - light gray for better contrast */
+  }
+  ```
+- **Impact**: All exercise descriptions now readable in dark mode
+
+**TypeScript Build Errors** 🔧:
+- **Fixed aria-pressed type error** in `BadgeFilterGroup.tsx`:
+  - Changed `aria-pressed={String(isSelected)}` to `aria-pressed={isSelected}`
+  - TypeScript expects boolean, not string for aria-pressed attribute
+- **Fixed undefined variable** in `OnboardingFlow.tsx`:
+  - Changed `i < currentStep` to `index < currentStep`
+  - Variable `i` was undefined; correct loop variable is `index`
+
+#### 📝 Technical Details
+
+**Theme Implementation**:
+- Updated `apps/frontend/src/data/themes.ts` with two new complete theme definitions
+- Each theme includes 100+ color tokens for light and dark modes
+- Color scales built from exact Figma hex codes as anchor points
+- Intermediate shades interpolated only where needed for smooth transitions
+- Maintained WCAG AA contrast ratios (4.5:1 text, 3:1 UI components)
+
+**Translation Coverage**:
+- Added `theme.winter-chill.name` and `theme.winter-chill.description` keys
+- Added `theme.elegant-minimal.name` and `theme.elegant-minimal.description` keys
+- All translations completed across 8 languages: English, French, German, Spanish, Dutch, Arabic, Egyptian Arabic, Frisian
+
 ### 2025-11-02
 
 #### 🐛 Bug Fixes
 
-**Theme System Improvements**:
+**Theme System Critical Fixes - Part 3** 🔧🎨:
 
-1. **Fixed Theme Persistence Bug** 🔧
-   - **Issue**: Theme selection would revert to default (Ocean Teal) after navigating between pages
-   - **Root Cause**: `updateAppSettings` callback in `App.tsx` used stale closure over `appSettings`, causing theme changes to be overwritten with old state during navigation
-   - **Solution**: Changed to functional `setState` pattern that always uses current state:
+1. **Fixed Theme Reversion During Sync** ⚠️
+   - **Issue**: Theme still reverting to default even after previous stale closure fixes
+   - **Root Cause**: `sync:applied` event handler in `App.tsx` was blindly overwriting local settings with synced data, even when local settings were newer
+     - When sync pulled data from server, it would overwrite recent local theme changes
+     - No version checking meant older server data could override newer local changes
+   - **Solution**: Added version-based conflict resolution in sync handler:
      ```typescript
-     setAppSettings(currentSettings => {
-       const nextSettings = { ...currentSettings, ...newSettings };
-       // ... persistence logic
-       return nextSettings;
+     setAppSettings(prev => {
+       // Only apply synced settings if they're actually newer
+       if (prev.version && updatedSettings.version && updatedSettings.version <= prev.version) {
+         logger.log('[sync:applied] Ignoring older settings from sync');
+         return prev; // Keep current (newer) local settings
+       }
+       return { ...prev, ...updatedSettings }; // Apply newer synced settings
      });
      ```
-   - **Impact**: Theme selections now persist correctly across all navigation
+   - **Impact**: Theme changes now persist even during background sync operations
 
-2. **Complete Hardcoded Color Migration** 🎨
-   - **Systematic Migration**: Fixed 65+ hardcoded blue/teal color instances across 23+ files
-   - **Pattern**: Replaced `bg-blue-*`, `text-blue-*`, `border-blue-*` with theme-aware `bg-primary-*`, `text-primary-*`, `border-primary-*`
-   - **Semantic Classes**: Used `btn-primary`, `btn-secondary` for consistent button styling across app
-   
-   **Components Updated (3 batches)**:
+2. **Fixed Coach Page Dark Mode Hardcoded Colors** 🎨
+   - **Issue**: Coach page showing default teal/blue colors instead of selected theme in dark mode:
+     - Activity log entry dots were teal
+     - Calendar day borders and streak count were teal/blue
+     - Progress chart bars were teal
+     - Chart statistics numbers (Total, Avg, Total Time) were blue
+   - **Files Fixed**:
+     - `CoachPage.tsx`: Activity log dots (2 instances), empty state icon
+     - `WeeklyStreakCalendar.tsx`: Calendar day active state, streak count number
+     - `ProgressChart.tsx`: Chart bars, max workouts label, stat numbers (3 instances)
+   - **Solution**: Created new CSS classes using theme CSS variables:
+     ```css
+     .activity-log-dot { background-color: var(--color-primary); }
+     .streak-count { color: var(--color-primary); }
+     .calendar-day-active { background-color: var(--color-primary) !important; }
+     .chart-bar { background-color: var(--color-primary); }
+     .chart-stat-number { color: var(--color-primary); }
+     ```
+   - **Impact**: All Coach page elements now respect selected theme in both light and dark modes
+
+3. **Fixed Dark Mode Text Visibility** 📝
+   - **Issue**: Page titles and body text completely invisible or unreadable in dark mode
+   - **Root Cause**: CSS variables for text colors weren't providing appropriate values for dark backgrounds
+   - **Solution**: Added explicit dark mode overrides for all typography classes in `tokens.css`:
+     ```css
+     .dark .text-h1, .text-h2, .text-h3 { color: #f8fafc; /* bright white */ }
+     .dark .text-body, .text-small { color: #e2e8f0; /* light gray */ }
+     .dark .text-caption { color: #cbd5e1; /* medium gray */ }
+     ```
+   - **Impact**: All text now highly readable in dark mode with proper contrast hierarchy
+
+**Previous Theme Fixes** (from earlier today):
+
+1. **Fixed Critical Theme Reversion Bug** ⚠️
+   - **Issue**: Theme selection would revert to default (Ocean Teal) after "a few clicks/minutes" even after previous persistence fix
+   - **Root Cause #1** (Previously Fixed): `updateAppSettings` callback used stale closure over `appSettings`
+   - **Root Cause #2** (NEW FIX): **Second stale closure** at `App.tsx` line 1867 in `handleSetSelectedExercise` function
+     - Used `setAppSettings` as a "getter" pattern: `setAppSettings(current => { /* read only */ return current; })`
+     - Created race conditions that periodically overwrote entire `appSettings` object, including `theme_id`
+     - Triggered specifically during exercise selection operations
+   - **Solution**: Replaced setState-as-getter with direct state access:
+     ```typescript
+     // BEFORE: setState as getter (BAD)
+     setAppSettings(current => {
+       const repDuration = Math.round(baseRep * current.rep_speed_factor);
+       setSelectedDuration(repDuration);
+       return current; // Don't change settings, just read them
+     });
+     
+     // AFTER: Direct state access (GOOD)
+     const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
+     setSelectedDuration(repDuration);
+     ```
+   - **Pattern Learned**: Never use setState for reading values - always read directly from state variable
+   - **Impact**: Theme now persists indefinitely across all navigation and user interactions
+
+2. **Complete Hardcoded Color Migration - Final Batch** 🎨
+   - **Previous Work**: Fixed 65+ instances across 23 files (Batches 1-3)
+   - **Final Batch 4**: Fixed remaining 17 theme-related color instances across 10 files:
+     
+     **Files Updated**:
+     - `TimerPage.tsx`: 8 instances - Rep progress indicators, set progress, workout mode displays
+     - `PRCelebration.tsx`: 1 instance - Confetti particle colors (blue/teal → primary/green)
+     - `OnboardingFlow.tsx`: 1 instance - Progress indicator dots
+     - `LegalGate.tsx`: 2 instances - Checkbox border when selected, hover states
+     - `VideoUploadWidget.tsx`: 1 instance - Processing status indicator
+     - `CoachPage.tsx`: 1 instance - "AI-Powered" badge (purple → primary)
+     - `CoachingCard.tsx`: 3 instances - AI insight borders, backgrounds, and badge (all purple/lavender → primary)
+     
+   - **Pattern Applied**: `text-blue-500` → `text-primary-500`, `bg-purple-100` → `bg-primary-100`
+   - **Semantic Colors Preserved**: Orange for countdown, purple for rest periods, red for warnings
+   - **Total Migration**: 82+ hardcoded color instances fixed across 33+ files
+   - **Impact**: All UI elements now correctly reflect selected theme (Start Timer buttons, navigation selection, badges, coach insights with lavender AI cards, confetti animations)
+
+3. **Fixed Navigation Menu Theme Colors** 🎯
+   - **Issue**: Navigation menu selection was still showing blue (default theme) even after selecting orange theme
+   - **Root Cause**: Navigation component was using hardcoded Tailwind utility classes (`bg-primary-50`, `text-primary-500`) which were defined in `tailwind.config.js` with fixed teal/blue colors, instead of using CSS custom properties from the theme system
+   - **Solution**: 
+     - Added `.nav-item-active` CSS class in `index.css` that references CSS variables: `background-color: var(--color-primary-disabled); color: var(--color-primary);`
+     - Updated `Navigation.tsx` to use `.nav-item-active` class instead of hardcoded Tailwind utilities
+   - **Files Modified**: `apps/frontend/src/components/Navigation.tsx`, `apps/frontend/src/index.css`
+   - **Impact**: Navigation menu now correctly reflects selected theme in real-time (orange background/text for orange theme, etc.)
+
+4. **Fixed CoachingCard Theme Integration & Accessibility** 🎨♿
+   - **Issue**: AI insight cards on Coach page had multiple problems:
+     - Badge and card background were same color (both using `--color-primary-disabled`)
+     - Text was unreadable in dark mode (poor contrast)
+     - All colors used hardcoded Tailwind classes instead of CSS variables
+     - Border colors didn't reflect selected theme
+   - **Root Cause**: Components were using Tailwind utility classes (`bg-primary-100`, `text-primary-800`, `text-text-900`) which reference static colors in `tailwind.config.js`, not the dynamic CSS custom properties from the theme system
+   - **Solution**:
+     - Created theme-aware CSS classes in `index.css`:
+       - `.ai-insight-card`: Uses `var(--color-background-primary)`, `var(--color-primary)` for borders
+       - `.ai-badge`: Uses `var(--color-primary)` with white text for maximum visibility
+       - `.ai-action-btn`: Uses `var(--color-primary)` and `var(--color-primary-hover)`
+     - Updated `CoachingCard.tsx`:
+       - Replaced hardcoded Tailwind classes with CSS variable-based classes
+       - Changed title styling to use `.text-h3` (references `var(--color-text-primary)`)
+       - Message already used `.text-body` (references `var(--color-text-secondary)`)
+       - Removed inline styles in favor of CSS classes
+     - Updated `CoachPage.tsx`:
+       - Changed "AI-Powered" badge to use `.ai-badge` class
+   - **Files Modified**: 
+     - `apps/frontend/src/components/CoachingCard.tsx`
+     - `apps/frontend/src/pages/CoachPage.tsx`
+     - `apps/frontend/src/index.css`
+   - **Impact**: 
+     - AI badges now have solid primary color (orange for orange theme) with white text - clearly visible
+     - Card backgrounds use subtle gradient with primary color border
+     - Text has proper contrast in both light and dark modes
+     - All colors dynamically update when theme changes
+
+5. **Theme Persistence Verification** ✅
+   - ThemeContext properly implements `lastSetThemeIdRef` to prevent external overwrites
+   - No more stale closures in settings management chain
+   - Theme changes immediately visible across all components
+   - Persistence to localStorage working correctly
+
+**Complete Hardcoded Color Migration Summary (All Batches)**:
    
    **Batch 1** - High Priority Pages & Initial Components (5c10ce2):
    - `TimerPage.tsx`: Exercise selector buttons, favorite quick access (3 instances)

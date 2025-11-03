@@ -1811,10 +1811,11 @@ function App() {
         op: 'upsert'
       };
       
-      // Persist asynchronously
+      // Persist immediately, trigger sync in background (don't await)
       storageService.saveAppSettings(nextSettings)
         .then(() => {
-          // Nudge sync so app_settings exist on server for other devices
+          // Trigger sync immediately but don't wait (offline-first)
+          logger.log('[updateAppSettings] Settings saved, triggering background sync (version:', nextSettings.version, ')');
           void syncService.sync(true);
         })
         .catch(error => {
@@ -1863,16 +1864,13 @@ function App() {
         const repDuration = Math.round(baseRep * settings.rep_speed_factor);
         setSelectedDuration(repDuration as TimerPreset);
       } else {
-        // Use current settings from state
-        setAppSettings(current => {
-          const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
-          const repDuration = Math.round(baseRep * current.rep_speed_factor);
-          setSelectedDuration(repDuration as TimerPreset);
-          return current; // Don't change settings, just read them
-        });
+        // Use current settings from state - read only, don't mutate
+        const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
+        const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
+        setSelectedDuration(repDuration as TimerPreset);
       }
     }
-  }, [updateAppSettings, timerState.workoutMode, timerState.currentExercise, timerState.currentSet, timerState.currentRep, timerState.totalSets, timerState.totalReps]);
+  }, [updateAppSettings, timerState.workoutMode, timerState.currentExercise, timerState.currentSet, timerState.currentRep, timerState.totalSets, timerState.totalReps, appSettings.rep_speed_factor]);
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
@@ -2618,7 +2616,32 @@ useEffect(() => {
       ]);
       if (updatedExercises.length > 0) setExercises(updatedExercises);
       if (updatedSettings) {
-        setAppSettings(prev => ({ ...prev, ...updatedSettings }));
+        // Only update settings if they're actually newer (prevent reverting recent local changes)
+        setAppSettings(prev => {
+          // If updated settings are older than current, keep current
+          const prevVersion = prev.version || 0;
+          const updatedVersion = updatedSettings.version || 0;
+          
+          if (updatedVersion < prevVersion) {
+            logger.log('[sync:applied] Ignoring older settings from sync (version', updatedVersion, '<', prevVersion, ')');
+            return prev;
+          }
+          
+          // If versions are equal, compare timestamps
+          if (updatedVersion === prevVersion) {
+            const prevTime = new Date(prev.updated_at || 0).getTime();
+            const updatedTime = new Date(updatedSettings.updated_at || 0).getTime();
+            
+            if (updatedTime <= prevTime) {
+              logger.log('[sync:applied] Ignoring equal/older settings from sync (same version, older/equal timestamp)');
+              return prev;
+            }
+          }
+          
+          logger.log('[sync:applied] Applying newer settings from sync (version', updatedVersion, '>=', prevVersion, ')');
+          return { ...prev, ...updatedSettings };
+        });
+        
         // Apply theme immediately after settings change
         if (updatedSettings.dark_mode) {
           document.documentElement.classList.add('dark');

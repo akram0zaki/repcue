@@ -102,7 +102,7 @@ const BadgeFilter: React.FC<BadgeFilterProps> = ({
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-primary-500 dark:hover:border-primary-400'
                 }
               `}
-              aria-pressed={String(isSelected)}
+              aria-pressed={isSelected}
             >
               {value.icon && <span className="mr-1">{value.icon}</span>}
               {valueLabel}

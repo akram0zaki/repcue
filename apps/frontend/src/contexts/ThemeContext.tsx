@@ -191,15 +191,19 @@ export function ThemeProvider({ children, appSettings, onSettingsChange }: Theme
   useEffect(() => {
     // Don't sync if we're currently applying a theme (local change in progress)
     if (isApplying) {
+      logger.log('[ThemeContext] Skipping sync - theme application in progress');
       return;
     }
     
     const settingsThemeId = appSettings.theme_id || DEFAULT_THEME_ID;
     
+    // Log all theme sync attempts for debugging
+    logger.log('[ThemeContext] Sync check - settings:', settingsThemeId, 'current:', currentThemeId, 'lastSet:', lastSetThemeIdRef.current);
+    
     // Only sync if the incoming theme is different from both current AND last set
     // This prevents reverting to stale appSettings after a local change
     if (settingsThemeId !== currentThemeId && settingsThemeId !== lastSetThemeIdRef.current) {
-      logger.log('[ThemeContext] Syncing theme from external settings change:', settingsThemeId);
+      logger.warn('[ThemeContext] THEME REVERSION DETECTED! Syncing theme from external settings change:', settingsThemeId, '(was:', currentThemeId, ')');
       setCurrentThemeId(settingsThemeId);
       lastSetThemeIdRef.current = settingsThemeId;
     }

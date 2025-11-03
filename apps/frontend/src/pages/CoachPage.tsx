@@ -191,13 +191,6 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
   };
 
   /**
-   * Get activity indicator color
-   */
-  const getActivityIndicatorColor = (): string => {
-    return 'bg-primary-500';
-  };
-
-  /**
    * Localize legacy English notes generated at log creation time
    */
   const localizeNotes = (notes?: string): string | null => {
@@ -423,7 +416,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                   <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
                                     <div className="grid grid-cols-[1fr,auto] gap-2 sm:gap-3 items-start mb-2">
                                       <div className="flex items-center gap-2 min-w-0">
-                                        <span className="inline-block w-3 h-3 rounded-full bg-primary-500 shrink-0"></span>
+                                        <span className="inline-block w-3 h-3 rounded-full activity-log-dot shrink-0"></span>
                                         <h4 className="text-h3 break-words">
                                           {(() => {
                                             const nameFromMap = log.workout_id ? workoutNameMap[log.workout_id] : undefined;
@@ -472,7 +465,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-2">
-                                          <span className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}></span>
+                                          <span className="inline-block w-3 h-3 rounded-full activity-log-dot"></span>
                                           <h4 className="text-h3 truncate">
                                             {(() => {
                                               const ex = exercises.find(e => e.id === log.exercise_id);
@@ -555,7 +548,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
               {t('coaching:subtitle', { defaultValue: 'Personalized insights to help you reach your goals' })}
             </p>
             {appSettings.coach_ai_insights_enabled && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-small font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 whitespace-nowrap">
+              <span className="ai-badge inline-flex items-center px-2 py-0.5 rounded text-small font-medium whitespace-nowrap">
                 {t('coaching:aiEnabled', { defaultValue: 'AI-Powered' })}
               </span>
             )}
@@ -575,7 +568,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                 {aiInsights.length > 0 && (
                   <div key="ai-insights-section" className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <svg className="w-5 h-5 streak-count" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
                       <h2 className="text-h3 font-semibold">
@@ -668,7 +661,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                   {/* Title row with badge in top-right */}
                                   <div className="grid grid-cols-[1fr,auto] gap-2 sm:gap-3 items-start mb-2">
                                     <div className="flex items-center gap-2 min-w-0">
-                                      <span className="inline-block w-3 h-3 rounded-full bg-primary-500 shrink-0"></span>
+                                      <span className="inline-block w-3 h-3 rounded-full activity-log-dot shrink-0"></span>
                                       <h4 className="text-h3 break-words">
                                         {(() => {
                                           // Prefer the known workout name if available
@@ -741,7 +734,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                       {log.exercises.map((exercise, index) => (
                                         <div key={index} className="bg-surface-0 dark:bg-surface-800 rounded-lg p-3 border border-surface-200 dark:border-surface-700">
                                           <div className="flex items-center gap-2 mb-2">
-                                            <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${getActivityIndicatorColor()}`}></span>
+                                            <span className="inline-block w-2 h-2 rounded-full shrink-0 activity-log-dot"></span>
                                             <span className="text-body font-medium break-words flex-1">{(() => {
                                               const ex = exercises.find(e => e.id === exercise.exercise_id);
                                               if (!ex) return exercise.exercise_name;
@@ -776,7 +769,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-2">
                                       <span
-                                        className={`inline-block w-3 h-3 rounded-full ${getActivityIndicatorColor()}`}
+                                        className="inline-block w-3 h-3 rounded-full activity-log-dot"
                                       ></span>
                                       <h4 className="text-h3 truncate">
                                         {(() => {

@@ -16,8 +16,16 @@
       "description": "Koel blauw voor gefocuste training"
     },
     "calm": {
-      "name": "Kalme Lavendel",
-      "description": "Rustgevende lavendel voor ontspannen sessies"
+      "name": "Kalm Lavendel",
+      "description": "Rustgevend lavendel voor ontspannen sessies"
+    },
+    "winter-chill": {
+      "name": "Winterse Kou",
+      "description": "Poederblauw met ijskoude tinten"
+    },
+    "elegant-minimal": {
+      "name": "Elegant Minimaal",
+      "description": "Verfijnde monochrome palet"
     }
   }
 }

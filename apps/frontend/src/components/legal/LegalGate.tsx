@@ -302,9 +302,9 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                                 isAccepted
                                   ? 'bg-green-600 border-green-600'
                                   : isSelected
-                                  ? 'bg-blue-500 border-blue-500'
+                                  ? 'bg-primary-500 border-primary-500'
                                   : isViewed
-                                  ? 'border-gray-300 dark:border-gray-600 hover:border-blue-500'
+                                  ? 'border-gray-300 dark:border-gray-600 hover:border-primary-500'
                                   : 'border-gray-300 dark:border-gray-600 opacity-50 cursor-not-allowed'
                               }`}
                               aria-label={isAccepted ? t('gate.accepted') : isSelected ? t('gate.selected') : t('gate.select')}

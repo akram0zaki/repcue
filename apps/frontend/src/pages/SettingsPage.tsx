@@ -277,9 +277,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           {/* Sound Enable/Disable */}
           <div className="flex items-center justify-between mb-3">
-            <label htmlFor="sound-enabled" className="label-text">
-              {t('settings.enableSound')}
-            </label>
+            <div className="flex-1">
+              <label htmlFor="sound-enabled" className="label-text">
+                {t('settings.enableSound')}
+              </label>
+            </div>
             <ToggleSwitch
               id="sound-enabled"
               checked={appSettings.sound_enabled}
@@ -318,9 +320,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
           {/* Vibration Enable/Disable */}
           <div className="flex items-center justify-between mb-3">
-            <label htmlFor="vibration-enabled" className="label-text">
-              {t('settings.enableVibration')}
-            </label>
+            <div className="flex-1">
+              <label htmlFor="vibration-enabled" className="label-text">
+                {t('settings.enableVibration')}
+              </label>
+            </div>
             <ToggleSwitch
               id="vibration-enabled"
               checked={appSettings.vibration_enabled}
@@ -378,7 +382,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               id="interval-duration"
               value={appSettings.interval_duration}
               onChange={handleIntervalChange}
-              className="w-full p-3 border border-surface-300 dark:border-surface-600 rounded-lg bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full p-3 border border-surface-300 dark:border-surface-600 rounded-lg bg-surface-0 dark:bg-surface-700 text-text-900 dark:text-text-50 input-focus"
             >
               <option value={15}>{t('timer.beepInterval15')}</option>
               <option value={30}>{t('timer.beepInterval30')}</option>
@@ -392,9 +396,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
           {/* Ring Timer */}
           <div className="flex items-center justify-between mt-6 mb-3">
-            <label htmlFor="ring-timer" className="label-text">
-              {t('settings.ringTimer')}
-            </label>
+            <div className="flex-1">
+              <label htmlFor="ring-timer" className="label-text">
+                {t('settings.ringTimer')}
+              </label>
+            </div>
             <ToggleSwitch
               id="ring-timer"
               checked={appSettings.ring_timer !== false}
@@ -418,9 +424,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           
           {/* Dark Mode */}
           <div className="flex items-center justify-between mb-3">
-            <label htmlFor="dark-mode" className="label-text">
-              {t('settings.darkMode')}
-            </label>
+            <div className="flex-1">
+              <label htmlFor="dark-mode" className="label-text">
+                {t('settings.darkMode')}
+              </label>
+            </div>
             <ToggleSwitch
               id="dark-mode"
               checked={appSettings.dark_mode}
@@ -436,9 +444,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
           {/* Exercise Demo Videos */}
           <div className="flex items-center justify-between mb-3" data-testid="setting-show-exercise-videos">
-            <label htmlFor="exercise-videos" className="label-text">
-              {t('settings.showExerciseVideos')}
-            </label>
+            <div className="flex-1">
+              <label htmlFor="exercise-videos" className="label-text">
+                {t('settings.showExerciseVideos')}
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t('settings.showExerciseVideosHelp')}
+              </p>
+            </div>
             <ToggleSwitch
               id="exercise-videos"
               checked={appSettings.show_exercise_videos === true}
@@ -446,15 +459,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-exercise-videos"
             />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {t('settings.showExerciseVideosHelp')}
-          </p>
 
           {/* Horizontal Exercise Layout */}
           <div className="flex items-center justify-between mt-6 mb-3" data-testid="setting-horizontal-exercise-layout">
-            <label htmlFor="horizontal-exercise-layout" className="label-text">
-              {t('settings.horizontalExerciseLayout')}
-            </label>
+            <div className="flex-1">
+              <label htmlFor="horizontal-exercise-layout" className="label-text">
+                {t('settings.horizontalExerciseLayout')}
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t('settings.horizontalExerciseLayoutHelp')}
+              </p>
+            </div>
             <ToggleSwitch
               id="horizontal-exercise-layout"
               checked={appSettings.horizontal_exercise_layout === true}
@@ -462,9 +477,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-horizontal-exercise-layout"
             />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {t('settings.horizontalExerciseLayoutHelp')}
-          </p>
         </div>
 
         {/* AI Coach Settings */}
@@ -572,7 +584,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                     }
                   </p>
                   {isAuthenticated && (
-                    <p className="text-xs text-primary-600 dark:text-primary-400 mt-2 flex items-center gap-1">
+                    <p className="text-xs settings-info-text mt-2 flex items-center gap-1">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -627,7 +639,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   id="coach-persona"
                   value={appSettings.coach_persona || 'zen'}
                   onChange={(e) => onUpdateSettings({ coach_persona: e.target.value as 'zen' | 'energy' | 'logic' })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 input-focus"
                   data-testid="select-coach-persona"
                   aria-describedby="coach-persona-help coach-persona-description"
                 >
@@ -687,9 +699,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
                 {/* Streak Insights */}
                 <div className="flex items-center justify-between mb-3">
-                  <label htmlFor="coach-show-streak" className="label-text text-sm">
-                    {t('coaching:settings.showStreak', 'Workout Streaks')}
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="coach-show-streak" className="label-text text-sm">
+                      {t('coaching:settings.showStreak', 'Workout Streaks')}
+                    </label>
+                  </div>
                   <ToggleSwitch
                     id="coach-show-streak"
                     checked={appSettings.coach_show_streak === true}
@@ -700,9 +714,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
                 {/* Muscle Balance Insights */}
                 <div className="flex items-center justify-between mb-3">
-                  <label htmlFor="coach-show-muscle-balance" className="label-text text-sm">
-                    {t('coaching:settings.showMuscleBalance', 'Muscle Balance')}
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="coach-show-muscle-balance" className="label-text text-sm">
+                      {t('coaching:settings.showMuscleBalance', 'Muscle Balance')}
+                    </label>
+                  </div>
                   <ToggleSwitch
                     id="coach-show-muscle-balance"
                     checked={appSettings.coach_show_muscle_balance === true}
@@ -713,9 +729,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
                 {/* Progression Insights */}
                 <div className="flex items-center justify-between mb-3">
-                  <label htmlFor="coach-show-progression" className="label-text text-sm">
-                    {t('coaching:settings.showProgression', 'Progressive Overload')}
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="coach-show-progression" className="label-text text-sm">
+                      {t('coaching:settings.showProgression', 'Progressive Overload')}
+                    </label>
+                  </div>
                   <ToggleSwitch
                     id="coach-show-progression"
                     checked={appSettings.coach_show_progression === true}
@@ -726,9 +744,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
                 {/* Recovery Insights */}
                 <div className="flex items-center justify-between mb-3">
-                  <label htmlFor="coach-show-recovery" className="label-text text-sm">
-                    {t('coaching:settings.showRecovery', 'Recovery Time')}
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="coach-show-recovery" className="label-text text-sm">
+                      {t('coaching:settings.showRecovery', 'Recovery Time')}
+                    </label>
+                  </div>
                   <ToggleSwitch
                     id="coach-show-recovery"
                     checked={appSettings.coach_show_recovery === true}
@@ -739,9 +759,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
                 {/* Suggestion Insights */}
                 <div className="flex items-center justify-between mb-3">
-                  <label htmlFor="coach-show-suggestions" className="label-text text-sm">
-                    {t('coaching:settings.showSuggestions', 'Workout Suggestions')}
-                  </label>
+                  <div className="flex-1">
+                    <label htmlFor="coach-show-suggestions" className="label-text text-sm">
+                      {t('coaching:settings.showSuggestions', 'Workout Suggestions')}
+                    </label>
+                  </div>
                   <ToggleSwitch
                     id="coach-show-suggestions"
                     checked={appSettings.coach_show_suggestions === true}
@@ -770,7 +792,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <p className="text-sm text-gray-700 dark:text-gray-200">
                 {t('settings.consentStatusLabel', 'Consent Status')}: <span className="font-medium">{hasConsent ? t('settings.enabled', 'Enabled') : t('settings.disabled', 'Disabled')}</span>
               </p>
-              <span className="text-xs bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 px-2 py-1 rounded" title={t('settings.consentVersion', 'Consent version')}>
+              <span className="text-xs settings-consent-badge px-2 py-1 rounded" title={t('settings.consentVersion', 'Consent version')}>
                 v{consentStatus.version}
               </span>
             </div>
@@ -796,7 +818,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             <button
               onClick={handleExportData}
               disabled={!hasConsent}
-              className="w-full py-2 px-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+              className="w-full py-2 px-4 btn-primary disabled:bg-surface-400 disabled:cursor-not-allowed font-medium rounded-lg transition-colors"
             >
               {t('settings.exportData')}
             </button>

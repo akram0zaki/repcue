@@ -18,6 +18,14 @@
     "calm": {
       "name": "Lavande Calme",
       "description": "Lavande apaisante pour des séances relaxantes"
+    },
+    "winter-chill": {
+      "name": "Fraîcheur Hivernale",
+      "description": "Bleu poudré avec des tons glacés"
+    },
+    "elegant-minimal": {
+      "name": "Élégant Minimal",
+      "description": "Palette monochrome sophistiquée"
     }
   }
 }

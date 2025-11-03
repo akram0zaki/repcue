@@ -16,8 +16,16 @@
       "description": "Azul fresco para entrenamiento enfocado"
     },
     "calm": {
-      "name": "Lavanda Calmante",
+      "name": "Lavanda Tranquila",
       "description": "Lavanda relajante para sesiones tranquilas"
+    },
+    "winter-chill": {
+      "name": "Frío Invernal",
+      "description": "Azul polvorienta con tonos helados"
+    },
+    "elegant-minimal": {
+      "name": "Elegante Minimalista",
+      "description": "Paleta monocromática sofisticada"
     }
   }
 }
