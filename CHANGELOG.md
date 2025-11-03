@@ -4,6 +4,49 @@
 
 #### ✨ New Features
 
+**Multi-Theme System Enhancements** 🎨:
+- **Lavender Theme as Default**: Changed default theme from Classic Teal to Calm (Lavender/Purple) for a more soothing, mindful workout experience
+  - Primary color: `#8b5cf6` (light mode), `#a78bfa` (dark mode)
+  - All new users will see lavender theme on first visit
+  - Existing users' theme preferences remain unchanged
+
+**Settings Page UX Improvements** ⚙️:
+- **Collapsible Advanced Settings**: Added "Show/Hide advanced settings" toggle button
+  - Hides AI Coach, Data Management, Update Preferences, and Security sections by default
+  - Reduces visual clutter for casual users
+  - Power users can access all features with one click
+  - Animated chevron icon indicates expand/collapse state
+  - Proper ARIA attributes for accessibility
+- Added translation keys: `settings.showAdvancedSettings`, `settings.hideAdvancedSettings`
+
+**Standalone Shared Exercise Page Theming** 🔗:
+- **Dynamic Theme Integration**: Converted all hardcoded colors to use default theme dynamically
+- **20+ Color Replacements**: 
+  - Status badges (public/private, saved/unsaved, video available)
+  - Difficulty badges (beginner/intermediate/advanced)
+  - Exercise type badges (time-based/rep-based)
+  - Warning notifications and alerts
+  - Success/error/warning snackbars
+  - Bullet points in lists
+- **New CSS Classes Created**:
+  - `.badge-primary` - Primary theme badges
+  - `.badge-success` - Success state badges
+  - `.badge-warning` - Warning state badges
+  - `.alert-warning` - Warning alert styling
+  - `.snackbar`, `.snackbar-success`, `.snackbar-error`, `.snackbar-warning`, `.snackbar-info`
+  - `.bullet-primary` - Theme-aware list bullets
+- **Future-Proof**: Page automatically adapts to any theme changes in future releases
+
+#### 🐛 Bug Fixes
+
+**Settings Page Syntax Error** 🔧:
+- **Issue**: Settings page failed to load with "Unexpected token" error at line 1024
+- **Root Cause**: Duplicate closing divs in advanced settings section structure
+- **Solution**: Fixed JSX structure with proper closing tags for collapsible section
+- **Impact**: Settings page now loads correctly with new advanced settings toggle
+
+#### ✨ New Features (from earlier today)
+
 **Added Two New Figma-Sourced Themes** 🎨:
 
 1. **Winter Chill Theme** ❄️

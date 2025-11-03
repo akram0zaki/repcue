@@ -66,14 +66,14 @@ const BadgeFilter: React.FC<BadgeFilterProps> = ({
   return (
     <div className="badge-filter mb-4">
       <div className="flex items-center justify-between mb-2">
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label className="text-sm font-medium label-text">
           {badgeLabel}
         </label>
         {hasSelections && (
           <button
             type="button"
             onClick={() => onClear(badge.id)}
-            className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
+            className="text-xs link hover:underline"
             aria-label={t('common:clear')}
           >
             {t('common:clear', { defaultValue: 'Clear' })}
@@ -98,8 +98,8 @@ const BadgeFilter: React.FC<BadgeFilterProps> = ({
               className={`
                 px-3 py-1.5 text-sm rounded-full border transition-colors
                 ${isSelected
-                  ? 'bg-primary-600 text-white border-primary-600 hover:bg-primary-700'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:border-primary-500 dark:hover:border-primary-400'
+                  ? 'badge-selected'
+                  : 'badge-unselected'
                 }
               `}
               aria-pressed={isSelected}
@@ -167,7 +167,7 @@ export const BadgeFilterGroup: React.FC<BadgeFilterGroupProps> = ({
         <button
           type="button"
           onClick={() => setShowAllBadges(!showAllBadges)}
-          className="text-sm text-primary-600 dark:text-primary-400 hover:underline mt-2"
+          className="text-sm link hover:underline mt-2"
         >
           {showAllBadges
             ? t('common:showFewerFilters', { defaultValue: 'Show fewer filters' })

@@ -41,6 +41,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isForceFullSyncing, setIsForceFullSyncing] = useState(false);
   const [isResettingSyncState, setIsResettingSyncState] = useState(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -311,7 +312,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               disabled={!appSettings.sound_enabled}
               className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
             />
-            <div className="grid grid-cols-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="grid grid-cols-3 mt-2 text-xs help-text">
               <span className="text-left">{t('common.low')}</span>
               <span className="text-center">{t('common.medium')}</span>
               <span className="text-right">{t('common.high')}</span>
@@ -363,12 +364,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               onChange={(e) => onUpdateSettings({ pre_timer_countdown: parseInt(e.target.value) })}
               className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
             />
-            <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex justify-between mt-2 text-xs help-text">
               <span>{t('common.off')}</span>
               <span>5s</span>
               <span>10s</span>
             </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm help-text mt-1">
               {t('settings.preTimerCountdownHelp')}
             </p>
           </div>
@@ -389,7 +390,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <option value={45}>{t('timer.beepInterval45')}</option>
               <option value={60}>{t('timer.beepInterval60')}</option>
             </select>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm help-text mt-1">
               {t('settings.beepIntervalHelp')}
             </p>
           </div>
@@ -408,7 +409,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               dataTestId="toggle-ring-timer"
             />
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs help-text mt-1">
             {t('settings.ringTimerHelp')}
           </p>
         </div>
@@ -448,7 +449,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <label htmlFor="exercise-videos" className="label-text">
                 {t('settings.showExerciseVideos')}
               </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs help-text mt-1">
                 {t('settings.showExerciseVideosHelp')}
               </p>
             </div>
@@ -466,7 +467,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               <label htmlFor="horizontal-exercise-layout" className="label-text">
                 {t('settings.horizontalExerciseLayout')}
               </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs help-text mt-1">
                 {t('settings.horizontalExerciseLayoutHelp')}
               </p>
             </div>
@@ -478,6 +479,37 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             />
           </div>
         </div>
+
+        {/* Advanced Settings Toggle */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+            className="w-full flex items-center justify-between py-3 px-4 bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 rounded-lg transition-colors"
+            aria-expanded={showAdvancedSettings}
+            data-testid="toggle-advanced-settings"
+          >
+            <span className="text-sm font-medium text-text-900 dark:text-text-50">
+              {showAdvancedSettings 
+                ? t('settings.hideAdvancedSettings', 'Hide advanced settings')
+                : t('settings.showAdvancedSettings', 'Show advanced settings')
+              }
+            </span>
+            <svg
+              className={`w-5 h-5 text-text-600 dark:text-text-400 transition-transform ${
+                showAdvancedSettings ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Advanced Settings Section */}
+        {showAdvancedSettings && (
+          <div className="space-y-6">
 
         {/* AI Coach Settings */}
         <section 
@@ -508,7 +540,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               </label>
               <p 
                 id="coach-enabled-help"
-                className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                className="text-xs help-text mt-1"
               >
                 {t('coaching:settings.enabledHelp', 'Get personalized insights and recommendations based on your workout history')}
               </p>
@@ -532,7 +564,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   </label>
                   <p 
                     id="coach-show-on-home-help"
-                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    className="text-xs help-text mt-1"
                   >
                     {t('coaching:settings.showOnHomeHelp', 'Display top insight on your home page')}
                   </p>
@@ -554,7 +586,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   </label>
                   <p 
                     id="coach-auto-refresh-help"
-                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    className="text-xs help-text mt-1"
                   >
                     {t('coaching:settings.autoRefreshHelp', 'Automatically refresh insights every 5 minutes')}
                   </p>
@@ -576,7 +608,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   </label>
                   <p 
                     id="coach-ai-insights-help"
-                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    className="text-xs help-text mt-1"
                   >
                     {isAuthenticated 
                       ? t('coaching:settings.aiInsightsHelp', 'Get advanced AI analysis of your progress, trends, and personalized recommendations. Your data is processed securely and used only to generate insights.')
@@ -610,7 +642,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   </label>
                   <p
                     id="celebration-sounds-help"
-                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    className="text-xs help-text mt-1"
                   >
                     {t('coaching:settings.celebrationSoundsHelp', 'Play celebration sounds for personal records and milestones')}
                   </p>
@@ -631,7 +663,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 </label>
                 <p 
                   id="coach-persona-help"
-                  className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3"
+                  className="text-xs help-text mt-1 mb-3"
                 >
                   {t('coaching:persona.description', 'Choose how your coach communicates with you')}
                 </p>
@@ -655,7 +687,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 </select>
                 <p 
                   id="coach-persona-description"
-                  className="text-xs text-gray-600 dark:text-gray-400 mt-2"
+                  className="text-xs help-text mt-2"
                 >
                   {appSettings.coach_persona === 'energy' && (
                     <span>🔥 {t('coaching:persona.energy.description', 'Enthusiastic, motivational, high-energy')}</span>
@@ -677,7 +709,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   </label>
                   <p
                     id="coach-post-workout-survey-help"
-                    className="text-xs text-gray-500 dark:text-gray-400 mt-1"
+                    className="text-xs help-text mt-1"
                   >
                     {t('coaching:settings.postWorkoutSurveyHelp', 'Quick feedback after workouts helps personalize your coaching insights')}
                   </p>
@@ -797,7 +829,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               </span>
             </div>
             {hasConsent && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs help-text mt-1">
                 {t('settings.dataStoredLocally', 'Your data is stored locally and governed by your granted consent.')}
               </p>
             )}
@@ -822,7 +854,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               {t('settings.exportData')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs help-text mt-1">
               {t('settings.exportDataHelp')}
             </p>
           </div>
@@ -837,7 +869,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               {isManualSyncing ? t('settings.syncInProgress') : t('settings.syncNow')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs help-text mt-1">
               {t('settings.syncNowHelp')}
             </p>
           </div>
@@ -865,7 +897,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                   {isResettingSyncState ? t('common.loading') : t('settings.resetSyncState')}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-xs help-text mt-2">
                 {t('settings.syncAdvancedHelp')}
               </p>
             </div>
@@ -879,7 +911,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               {t('settings.refreshExercises')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs help-text mt-1">
               {t('settings.refreshExercisesHelp')}
             </p>
           </div>
@@ -893,7 +925,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               {t('settings.upgradeDatabase', 'Upgrade Database')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs help-text mt-1">
               {t('settings.upgradeDatabaseHelp', 'Updates your local database to the latest version with new features like personal records tracking.')}
             </p>
           </div>
@@ -907,7 +939,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               {isRefreshing ? t('common.loading') : t('settings.forceRefreshApp')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs help-text">
               {t('settings.forceRefreshAppHelp')}
             </p>
             
@@ -927,7 +959,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
                 {t('settings.updateServiceWorker')}
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <div className="grid grid-cols-2 gap-2 text-xs help-text">
               <p>{t('settings.clearCachesOnlyHelp')}</p>
               <p>{t('settings.updateServiceWorkerHelp')}</p>
             </div>
@@ -942,7 +974,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             >
               {t('settings.clearAllDataAndReset')}
             </button>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs help-text mt-1">
               {t('settings.clearAllDataHelp')}
             </p>
           </div>
@@ -986,6 +1018,9 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </div>
           </div>
         )}
+          </div>
+        )}
+
       </div>
 
       {/* Clear Data Confirmation Toast */}

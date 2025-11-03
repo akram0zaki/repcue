@@ -95,7 +95,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors break-all hyphens-auto break-words [overflow-wrap:anywhere]"
+            className="link break-all hyphens-auto break-words [overflow-wrap:anywhere]"
           >
             {part}
           </a>
@@ -110,48 +110,46 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
 
       {/* Exercise Name and Type */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-text-900 dark:text-text-50">
-            {loc.name}
-          </h1>
+        {showActions && (
+          <div className="flex items-center justify-end gap-2 mb-3">
+            {onToggleFavorite && (
+              <button
+                onClick={onToggleFavorite}
+                className={`p-2 rounded-full transition-colors ${
+                  isFavorite
+                    ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
+                    : 'text-text-400 dark:text-text-600 hover:text-yellow-500 hover:bg-gray-50 dark:hover:bg-gray-800'
+                }`}
+                title={isFavorite ? t('exercises:removeFromFavorites') : t('exercises:addToFavorites')}
+              >
+                {isFavorite ? <StarFilledIcon className="h-6 w-6" /> : <StarIcon className="h-6 w-6" />}
+              </button>
+            )}
 
-          {showActions && (
-            <div className="flex items-center gap-3">
-              {onToggleFavorite && (
+            {isOwner && (
+              <>
                 <button
-                  onClick={onToggleFavorite}
-                  className={`p-2 rounded-full transition-colors ${
-                    isFavorite
-                      ? 'text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20'
-                      : 'text-text-400 dark:text-text-600 hover:text-yellow-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-                  }`}
-                  title={isFavorite ? t('exercises:removeFromFavorites') : t('exercises:addToFavorites')}
+                  onClick={handleEdit}
+                  className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                  title={t('exercises:edit')}
                 >
-                  {isFavorite ? <StarFilledIcon className="h-6 w-6" /> : <StarIcon className="h-6 w-6" />}
+                  <EditIcon className="h-6 w-6" />
                 </button>
-              )}
 
-              {isOwner && (
-                <>
-                  <button
-                    onClick={handleEdit}
-                    className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                    title={t('exercises:edit')}
-                  >
-                    <EditIcon className="h-6 w-6" />
-                  </button>
-
-                  <ShareButton
-                    exerciseId={exercise.id}
-                    exerciseName={loc.name}
-                    ownerId={exercise.owner_id}
-                    className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                  />
-                </>
-              )}
-            </div>
-          )}
-        </div>
+                <ShareButton
+                  exerciseId={exercise.id}
+                  exerciseName={loc.name}
+                  ownerId={exercise.owner_id}
+                  className="p-2 rounded-full text-text-400 dark:text-text-600 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                />
+              </>
+            )}
+          </div>
+        )}
+        
+        <h1 className="text-3xl font-bold text-text-900 dark:text-text-50 mb-4">
+          {loc.name}
+        </h1>
 
         {/* Tags - moved below exercise name (free-form tags only, structured badges displayed separately) */}
         {exercise.tags && exercise.tags.length > 0 && (() => {
@@ -175,7 +173,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
 
         {/* Exercise Description - moved to top */}
         {loc.description && (
-          <p className="text-text-500 dark:text-text-400 leading-relaxed mb-4">
+          <p className="label-text leading-relaxed mb-4">
             {loc.description}
           </p>
         )}
@@ -204,7 +202,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
         <h4 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3">
           {t('exercises:exerciseInfo', 'Exercise Information')}
         </h4>
-        <div className="space-y-3 text-text-500 dark:text-text-400 leading-relaxed">
+        <div className="space-y-3 label-text leading-relaxed">
           {/* Difficulty Level */}
           {exercise.difficulty_level && (
             <div className="flex items-center justify-between">
@@ -269,7 +267,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </h4>
           <ol className="list-decimal list-inside space-y-2">
             {exercise.instructions.map((instruction, index) => (
-              <li key={index} className="text-text-500 dark:text-text-400">
+              <li key={index} className="label-text">
                 {instruction.text}
               </li>
             ))}
@@ -286,7 +284,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </h4>
           <ul className="list-disc list-inside space-y-1">
             {exercise.equipment_needed.map((item, index) => (
-              <li key={index} className="text-text-500 dark:text-text-400">
+              <li key={index} className="label-text">
                 {item}
               </li>
             ))}
@@ -300,7 +298,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           <h4 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3">
             {t('exercises:benefits', 'Benefits')}
           </h4>
-          <p className="text-text-500 dark:text-text-400 leading-relaxed">
+          <p className="label-text leading-relaxed">
             {t(`exerciseDetails:${exercise.id}.benefits`, exercise.benefits || '')}
           </p>
         </div>
@@ -312,7 +310,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           <h4 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3">
             {t('exercises:limitations', 'Limitations')}
           </h4>
-          <p className="text-text-500 dark:text-text-400 leading-relaxed">
+          <p className="label-text leading-relaxed">
             {t(`exerciseDetails:${exercise.id}.limitations`, exercise.limitations || '')}
           </p>
         </div>
@@ -324,7 +322,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           <h4 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3">
             {t('exercises:bestTiming', 'Best Timing')}
           </h4>
-          <p className="text-text-500 dark:text-text-400 leading-relaxed">
+          <p className="label-text leading-relaxed">
             {t(`exerciseDetails:${exercise.id}.best_timing`, exercise.best_timing || '')}
           </p>
         </div>
@@ -343,7 +341,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
               const referencedExercise = getExerciseById(exerciseId);
               return (
                 <li key={index} className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-primary-600 rounded-full flex-shrink-0"></span>
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-primary)' }}></span>
                   {referencedExercise ? (
                     <button
                       onClick={() => {
@@ -353,12 +351,12 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
                           navigate(`${AppRoutes.EXERCISES}/${exerciseId}`);
                         }
                       }}
-                      className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors text-left"
+                      className="link text-left"
                     >
                       {t(`exerciseDetails:${exerciseId}.name`, referencedExercise.name)}
                     </button>
                   ) : (
-                    <span className="text-text-500 dark:text-text-400 italic text-sm">
+                    <span className="label-text italic text-sm">
                       Exercise not found (ID: {exerciseId})
                     </span>
                   )}
@@ -375,7 +373,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           <h4 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3">
             {t('exercises:notes', 'Notes')}
           </h4>
-          <p className="text-text-500 dark:text-text-400 leading-relaxed">
+          <p className="label-text leading-relaxed">
             {t(`exerciseDetails:${exercise.id}.notes`, exercise.notes || '')}
           </p>
         </div>
@@ -391,7 +389,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
           </h4>
           <ul className="list-disc list-inside space-y-1">
             {(exercise.exercise_references || []).map((reference, index) => (
-              <li key={index} className="text-text-500 dark:text-text-400">
+              <li key={index} className="label-text">
                 {renderReference(reference)}
               </li>
             ))}
@@ -409,7 +407,7 @@ export const ExerciseDetailContent: React.FC<ExerciseDetailContentProps> = ({
             {exercise.muscle_groups.map((muscle) => (
               <span
                 key={muscle}
-                className="inline-block px-3 py-1 text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full"
+                className="muscle-group-badge"
               >
                 {t(`exercises:muscleGroupsList.${muscle}`, muscle)}
               </span>

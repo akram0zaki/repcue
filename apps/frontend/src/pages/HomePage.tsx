@@ -246,7 +246,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         {hasConsent && (
           <section className="mb-4">
             {upcomingWorkout ? (
-              <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 rounded-lg p-4 sm:p-5 border border-primary-200 dark:border-primary-700/50 shadow-md">
+              <div className="upcoming-workout-card">
                 <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4">
                   {t('home.upcomingWorkout')}
                 </h2>
@@ -255,7 +255,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                     {/* Date Section */}
                     <div className="text-center sm:text-left rtl:sm:text-right flex-shrink-0">
-                      <div className="text-h2 font-bold text-primary-600 dark:text-primary-400 leading-tight">
+                      <div className="text-h2 font-bold upcoming-workout-weekday leading-tight">
                         {upcomingWorkout.weekday}
                       </div>
                       <div className="text-caption secondary-label-text mt-1">
@@ -425,7 +425,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                 onClick={() => navigate(Routes.EXERCISES)}
                 data-testid="exercises-count-link"
               >
-                <div className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                <div className="text-xl font-bold link">
                   {exercises.length}
                 </div>
                 <div className="text-sm secondary-label-text">

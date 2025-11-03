@@ -183,7 +183,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
             {showReviewForm && (
               <button
                 onClick={toggleReviewInput}
-                className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+                className="text-sm link"
               >
                 {showReviewInput ? t('rating.hideReview') : t('rating.addReview')}
               </button>

@@ -42,7 +42,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     <>
       <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-4 ${className}`}>
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="section-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           {t('profile.title', 'Profile')}
@@ -59,7 +59,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
                 className="h-10 w-10 rounded-full object-cover"
               />
             ) : (
-              <div className="h-10 w-10 rounded-full bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white text-sm font-medium">
+              <div className="h-10 w-10 rounded-full flex items-center justify-center text-white text-sm font-medium profile-avatar">
                 {initials}
               </div>
             )}
@@ -80,7 +80,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             <button
               type="button"
               onClick={onViewProfile}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm min-w-0 w-full"
+              className="btn-primary flex items-center justify-center gap-2 py-2.5 px-3 text-sm min-w-0 w-full"
             >
               <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -117,7 +117,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
           <button
             type="button"
             onClick={() => setShowAuthModal(true)}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="btn-primary w-full flex items-center justify-center gap-2 py-2 px-4"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m0 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />

@@ -14,7 +14,6 @@ const defaultTheme: Theme = {
   id: 'default',
   name: 'themes.default.name',
   description: 'themes.default.description',
-  isDefault: true,
   previewColors: ['#0096C7', '#0077A5', '#52B788'],
   
   light: {
@@ -492,6 +491,7 @@ const calmTheme: Theme = {
   id: 'calm',
   name: 'themes.calm.name',
   description: 'themes.calm.description',
+  isDefault: true,
   previewColors: ['#8b5cf6', '#7c3aed', '#a78bfa'],
 
   light: {

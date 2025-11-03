@@ -368,7 +368,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               {selectedExercise ? (
                 <button
                   onClick={() => onSetShowExerciseSelector(true)}
-                  className="timer-link text-sm font-medium hover:underline truncate max-w-48"
+                  className="link text-sm font-medium hover:underline truncate max-w-48"
                   data-testid="selected-exercise-button"
                 >
                   {localizeExercise(selectedExercise, t).name}
@@ -376,7 +376,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               ) : (
                 <button
                   onClick={() => onSetShowExerciseSelector(true)}
-                  className="timer-link text-sm font-medium hover:underline"
+                  className="link text-sm font-medium hover:underline"
                   data-testid="open-exercise-selector"
                 >
                   {t('common.choose')}
@@ -639,7 +639,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       isCountdown && displayTime <= 10 && displayTime > 0 
                         ? 'text-red-500 dark:text-red-400' 
                         : actuallyResting
-                        ? 'timer-link'
+                        ? 'link'
                         : 'text-gray-900 dark:text-gray-100'
                     }`}>
                       {formatTime(displayTime)}

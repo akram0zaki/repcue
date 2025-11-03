@@ -252,7 +252,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onClick={handleInsightClick}
-          className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-4 shadow-sm border border-primary-200 dark:border-primary-800 cursor-pointer transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+          className="insights-card"
         >
           <div className="flex flex-col items-stretch">
             {/* Top row: Icon centered */}
@@ -321,7 +321,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
               </p>
               {/* AI badge */}
               {currentInsight.source === 'ai' && (
-                <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                <span className="ai-badge">
                   {t('coaching:aiPowered', { defaultValue: 'AI' })}
                 </span>
               )}

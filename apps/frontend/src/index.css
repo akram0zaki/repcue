@@ -514,7 +514,8 @@ body.rtl .truncate {
   }
 
   .section-icon {
-    @apply h-5 w-5 text-blue-600 dark:text-blue-400;
+    @apply h-5 w-5;
+    color: var(--color-primary);
   }
 
   /* RTL-aware utilities */
@@ -657,12 +658,12 @@ body.rtl .truncate {
     color: var(--color-primary);
   }
 
-  .timer-link {
+  .link {
     color: var(--color-primary-focus);
     font-weight: 500;
   }
 
-  .dark .timer-link {
+  .dark .link {
     color: var(--color-primary);
   }
 
@@ -709,10 +710,19 @@ body.rtl .truncate {
   .btn-primary {
     background-color: var(--color-primary);
     color: white;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
   }
 
   .btn-primary:hover {
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-primary-hover);
+  }
+
+  .btn-primary:disabled {
+    background-color: var(--color-surface-400);
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   .exercise-badge-count {
