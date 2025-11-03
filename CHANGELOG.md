@@ -8,6 +8,7 @@
 - **Migration File**: `supabase/migrations/20251027-02-add-missing-app-settings-fields.sql`
 - **Tracker Document**: `docs/migration-tracking/supabase-changes_20251027-app-settings.md`
 - **Issue Resolved**: Fixed schema drift between TypeScript `AppSettings` interface and database table
+- **Status**: ✅ DEPLOYED TO PRODUCTION (2025-11-03, version 20251103224507)
 - **Fields Added** (19 total):
   - **Exercise Settings**: `last_selected_exercise_id`, `rep_speed_factor`
   - **PWA Update System** (3): `update_mode`, `allow_auto_updates`, `update_on_metered`
@@ -24,7 +25,13 @@
   - `coach_persona` enum: 'zen', 'energy', 'logic'
   - `coach_refresh_interval` minimum: 60000ms (1 minute)
 - **Index Created**: `idx_app_settings_last_selected_exercise` for faster exercise lookup
-- **Status**: ⚠️ Migration created in workspace, needs application to dev and prod Supabase
+- **Status**: ✅ Deployed to production (version 20251103224507)
+
+**Theme Preference Migration** 🎨:
+- **Migration File**: `supabase/migrations/20251027-01-add-theme-preference.sql`
+- **Added**: `theme_id` column to `app_settings` table
+- **Themes**: 6 presets (default, energetic, professional, calm, winter, elegant)
+- **Status**: ✅ Deployed to production (version 20251103224434)
 
 **Default Settings Constants Updated** ⚙️:
 - **File**: `apps/frontend/src/constants/index.ts`

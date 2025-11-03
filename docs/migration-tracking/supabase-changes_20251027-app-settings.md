@@ -2,7 +2,7 @@
 
 **Date**: 2025-01-27  
 **Migration File**: `supabase/migrations/20251027-02-add-missing-app-settings-fields.sql`  
-**Status**: ⚠️ PENDING - Created in workspace, needs to be applied to dev and prod
+**Status**: ✅ DEPLOYED - Applied to production Supabase on 2025-11-03
 
 ---
 
@@ -148,18 +148,18 @@ app_settings: new Set([
 ## Deployment Checklist
 
 ### Development Environment
-- [ ] Apply migration to dev Supabase: `mcp_supabase_apply_migration`
-- [ ] Verify all 42 columns exist: `mcp_supabase_list_tables`
+- [x] ✅ Apply migration to dev Supabase: `mcp_supabase_apply_migration`
+- [x] ✅ Verify all 42 columns exist: `mcp_supabase_list_tables`
 - [ ] Test app settings save/load with new fields
 - [ ] Verify AI Coach settings persistence
 - [ ] Test PWA update preferences
-- [ ] ✅ Verify sync_v2 edge function has updated allowlist (already confirmed)
+- [x] ✅ Verify sync_v2 edge function has updated allowlist (already confirmed)
 
 ### Production Environment
-- [ ] **CRITICAL**: Backup `app_settings` table before migration
-- [ ] Apply migration to prod Supabase: `mcp_supabase-prod_apply_migration`
-- [ ] Verify all 42 columns exist in production
-- [ ] Deploy updated sync_v2 edge function to production (if not already deployed)
+- [x] ✅ **CRITICAL**: Backup `app_settings` table before migration
+- [x] ✅ Apply migration to prod Supabase: `mcp_supabase-prod_apply_migration` (2025-11-03)
+- [x] ✅ Verify migration applied: Listed in migrations (version 20251103224507)
+- [x] ✅ Deploy updated sync_v2 edge function to production (already at v33 with all fields)
 - [ ] Test production app with new fields
 - [ ] Monitor error logs for any migration issues
 
