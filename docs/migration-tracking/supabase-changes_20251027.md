@@ -23,7 +23,7 @@
 - Added `theme_id` column to `app_settings` table
   - Type: `TEXT`
   - Default: `'default'`
-  - Constraint: Must be one of: `default`, `energetic`, `professional`, `calm`
+  - Constraint: Must be one of: `default`, `energetic`, `professional`, `calm`, `winter`, `elegant`
 - Updated existing records to have default value
 - Added documentation comment
 
@@ -32,7 +32,7 @@
 ALTER TABLE app_settings
 ADD COLUMN theme_id TEXT DEFAULT 'default';
 
-COMMENT ON COLUMN app_settings.theme_id IS 'User selected theme ID (default, energetic, professional, calm). Controls color palette for the application.';
+COMMENT ON COLUMN app_settings.theme_id IS 'User selected theme ID (default, energetic, professional, calm, winter, elegant). Controls color palette for the application.';
 
 UPDATE app_settings
 SET theme_id = 'default'
@@ -40,7 +40,7 @@ WHERE theme_id IS NULL;
 
 ALTER TABLE app_settings
 ADD CONSTRAINT app_settings_theme_id_check 
-CHECK (theme_id IN ('default', 'energetic', 'professional', 'calm'));
+CHECK (theme_id IN ('default', 'energetic', 'professional', 'calm', 'winter', 'elegant'));
 ```
 
 ---
@@ -123,7 +123,7 @@ return {
 - [ ] Verify constraint rejects invalid theme IDs
 - [ ] Test sync: Local → Supabase (push)
 - [ ] Test sync: Supabase → Local (pull)
-- [ ] Test with all 4 theme IDs: default, energetic, professional, calm
+- [ ] Test with all 6 theme IDs: default, energetic, professional, calm, winter, elegant
 
 ### Production Testing (When Deployed)
 - [ ] Apply migration to prod Supabase
@@ -177,11 +177,18 @@ ALTER TABLE app_settings DROP COLUMN theme_id;
 1. **Backward Compatibility**: The `DEFAULT 'default'` ensures existing records and new records without explicit theme_id work correctly
 2. **Constraint**: The CHECK constraint prevents invalid theme IDs from being stored, ensuring data integrity
 3. **Sync Safety**: Both push (convertAppSettingsForSync) and pull (convertAppSettingsFromSync) operations handle theme_id
-4. **Future-Proofing**: To add new themes, update the constraint:
+4. **Theme Library**: Currently supports 6 themes:
+   - `default` - Classic Teal (original RepCue palette)
+   - `energetic` - Forest Green (vibrant workout energy)
+   - `professional` - Steel Blue (clean corporate aesthetic)
+   - `calm` - Lavender/Purple (soothing mindful sessions) **[DEFAULT as of Nov 3, 2025]**
+   - `winter` - Winter Chill (icy blue tones from Figma Combination 91)
+   - `elegant` - Ink Wash (sophisticated monochrome from Figma Combination 8)
+5. **Future-Proofing**: To add new themes, update the constraint:
    ```sql
    ALTER TABLE app_settings DROP CONSTRAINT app_settings_theme_id_check;
    ALTER TABLE app_settings ADD CONSTRAINT app_settings_theme_id_check 
-   CHECK (theme_id IN ('default', 'energetic', 'professional', 'calm', 'new-theme-id'));
+   CHECK (theme_id IN ('default', 'energetic', 'professional', 'calm', 'winter', 'elegant', 'new-theme-id'));
    ```
 
 ---
@@ -190,10 +197,24 @@ ALTER TABLE app_settings DROP COLUMN theme_id;
 
 **Current Status**: ✅ **DEPLOYED TO DEV** - Migration successfully applied to development environment (October 27, 2025)
 
+**Recent Updates** (November 3, 2025):
+- ✅ Added Winter Chill theme (ID: `winter`) - Icy blue tones from Figma Color Combination 91
+- ✅ Added Elegant Minimal theme (ID: `elegant`) - Sophisticated monochrome from Figma Color Combination 8
+- ✅ Changed default theme from Classic Teal to Calm (Lavender)
+- ⚠️ **DATABASE CONSTRAINT NEEDS UPDATE**: Current constraint only includes 4 themes, needs to be updated to include `winter` and `elegant`
+
 **Verification Results**:
 - Column `theme_id` created: ✅ (TEXT type with default 'default')
-- Check constraint created: ✅ (4 valid theme IDs enforced)
+- Check constraint created: ⚠️ (Only 4 valid theme IDs, needs update to 6)
 - Existing records updated: ✅ (4 records, all have theme_id = 'default')
 - Ready for UI testing and sync validation
 
-**Last Updated**: October 27, 2025
+**Action Required**:
+```sql
+-- Update constraint to include new themes
+ALTER TABLE app_settings DROP CONSTRAINT IF EXISTS app_settings_theme_id_check;
+ALTER TABLE app_settings ADD CONSTRAINT app_settings_theme_id_check 
+CHECK (theme_id IN ('default', 'energetic', 'professional', 'calm', 'winter', 'elegant'));
+```
+
+**Last Updated**: November 3, 2025

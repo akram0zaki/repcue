@@ -157,6 +157,8 @@
     "resetSyncState": "إعادة تعيين حالة المزامنة",
     "syncAdvanced": "مزامنة متقدمة",
     "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة.",
+    "showAdvancedSettings": "إظهار الإعدادات المتقدمة",
+    "hideAdvancedSettings": "إخفاء الإعدادات المتقدمة",
     "updatePreferences": "تحديثات التطبيق",
     "updatePrivacyTitle": "الخصوصية أولاً",
     "updatePrivacyMessage": "فحص التحديثات يرسل فقط رقم إصدارك الحالي. لا يتم نقل أي بيانات شخصية.",

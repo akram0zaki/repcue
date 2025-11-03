@@ -160,6 +160,8 @@
     "resetSyncState": "إعادة تعيين حالة المزامنة",
     "syncAdvanced": "مزامنة متقدمة",
     "syncAdvancedHelp": "مساعدة في استكشاف مشاكل المزامنة.",
+    "showAdvancedSettings": "عرض الإعدادات المتقدمة",
+    "hideAdvancedSettings": "إخفاء الإعدادات المتقدمة",
     "updatePreferences": "تحديثات البرنامج",
     "updatePrivacyTitle": "البرايفسي الأول",
     "updatePrivacyMessage": "فحص التحديثات بيبعت بس رقم إصدارك الحالي. مش بنبعت أي بيانات شخصية.",

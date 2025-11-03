@@ -166,6 +166,8 @@
     "resetSyncState": "Synchronisierungsstatus zurücksetzen",
     "syncAdvanced": "Erweiterte Synchronisierung",
     "syncAdvancedHelp": "Hilfe bei der Fehlersuche von Synchronisierungsproblemen.",
+    "showAdvancedSettings": "Erweiterte Einstellungen anzeigen",
+    "hideAdvancedSettings": "Erweiterte Einstellungen ausblenden",
     "updatePreferences": "App-Updates",
     "updatePrivacyTitle": "Datenschutz steht an erster Stelle",
     "updatePrivacyMessage": "Update-Prüfungen senden nur Ihre aktuelle Versionsnummer. Es werden keine persönlichen Daten übertragen.",

@@ -1,5 +1,45 @@
 ## Unreleased
 
+### 2025-01-27
+
+#### 🗄️ Database Schema
+
+**App Settings Migration - 19 Missing Fields Added** 📊:
+- **Migration File**: `supabase/migrations/20251027-02-add-missing-app-settings-fields.sql`
+- **Tracker Document**: `docs/migration-tracking/supabase-changes_20251027-app-settings.md`
+- **Issue Resolved**: Fixed schema drift between TypeScript `AppSettings` interface and database table
+- **Fields Added** (19 total):
+  - **Exercise Settings**: `last_selected_exercise_id`, `rep_speed_factor`
+  - **PWA Update System** (3): `update_mode`, `allow_auto_updates`, `update_on_metered`
+  - **AI Coach System** (13): 
+    - Master controls: `coach_enabled`
+    - Display prefs: `coach_show_on_home`, `coach_auto_refresh`, `coach_refresh_interval`
+    - Insight types: `coach_show_streak`, `coach_show_muscle_balance`, `coach_show_progression`, `coach_show_recovery`, `coach_show_suggestions`
+    - Advanced: `coach_intro_seen`, `coach_ai_insights_enabled`, `coach_persona`
+    - Gamification: `coach_post_workout_survey_enabled`, `celebration_sounds_enabled`
+- **Database Columns**: Increased from 23 to 42 columns in `app_settings` table
+- **Constraints Added**:
+  - `rep_speed_factor` range check: 0.5 to 2.0
+  - `update_mode` enum: 'automatic', 'notify', 'manual'
+  - `coach_persona` enum: 'zen', 'energy', 'logic'
+  - `coach_refresh_interval` minimum: 60000ms (1 minute)
+- **Index Created**: `idx_app_settings_last_selected_exercise` for faster exercise lookup
+- **Status**: ⚠️ Migration created in workspace, needs application to dev and prod Supabase
+
+**Default Settings Constants Updated** ⚙️:
+- **File**: `apps/frontend/src/constants/index.ts`
+- **Added Missing Fields**:
+  - `coach_post_workout_survey_enabled: true` - Enable post-workout surveys by default
+  - `update_mode: 'automatic'` - Automatic PWA updates by default
+  - `allow_auto_updates: true` - Allow automatic updates
+  - `update_on_metered: false` - Prevent updates on metered connections
+
+**Edge Function Verification** ✅:
+- **File**: `supabase/functions/sync_v2/index.ts`
+- **Status**: Confirmed sync_v2 edge function already includes all 19 new fields in `app_settings` allowlist
+- **Fields Verified**: All new fields (`last_selected_exercise_id`, PWA update fields, AI Coach fields) are present in the allowlist
+- **Action Required**: None - edge function is already synchronized with schema changes
+
 ### 2025-11-03
 
 #### ✨ New Features
