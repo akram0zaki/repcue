@@ -138,7 +138,7 @@ const LegalCenterPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -256,7 +256,7 @@ const LegalCenterPage: React.FC = () => {
                   <button
                     key={doc.id}
                     onClick={() => handleViewDocument(doc)}
-                    className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-500 dark:hover:border-blue-400 transition-colors text-left"
+                    className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-primary-500 dark:hover:border-primary-400 transition-colors text-left"
                   >
                     <div className="flex flex-col gap-2">
                       {/* Row 1: Status icon (left) and chevron (right) */}

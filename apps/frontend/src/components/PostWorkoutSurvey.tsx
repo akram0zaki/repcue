@@ -163,16 +163,16 @@ export const PostWorkoutSurvey: React.FC<PostWorkoutSurveyProps> = ({
             <button
               onClick={() => handleQuickResponse('good')}
               disabled={isSubmitting}
-              className="w-full p-4 rounded-xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full p-4 rounded-xl border-2 border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={t('coaching:survey.good', { defaultValue: 'Felt good' })}
             >
               <div className="flex items-center">
                 <span className="text-3xl mr-3">🙂</span>
                 <div className="text-left flex-1">
-                  <div className="font-semibold text-blue-900 dark:text-blue-100">
+                  <div className="font-semibold text-primary-900 dark:text-primary-100">
                     {t('coaching:survey.good', { defaultValue: 'Felt good' })}
                   </div>
-                  <div className="text-sm text-blue-700 dark:text-blue-300">
+                  <div className="text-sm text-primary-700 dark:text-primary-300">
                     {t('coaching:survey.goodDesc', { defaultValue: 'Solid workout, no issues' })}
                   </div>
                 </div>

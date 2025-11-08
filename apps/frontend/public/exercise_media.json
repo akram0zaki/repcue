@@ -264,5 +264,21 @@
     "video": {
       "landscape": "/videos/bird-dog_v1_848x480.mp4"
     }
+  },
+  {
+    "id": "chair-squat",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "landscape": "/videos/chair-squat_v1_1920x1080.mp4"
+    }
+  },
+  {
+    "id": "wall-push-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "video": {
+      "landscape": "/videos/wall-push-up_v1_1920x1080.mp4"
+    }
   }
 ]

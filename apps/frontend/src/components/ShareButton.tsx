@@ -204,12 +204,12 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
                     value={shareWithEmail}
                     onChange={(e) => setShareWithEmail(e.target.value)}
                     placeholder={t('exercises:optionalEmailPlaceholder', 'Optional: Recipient email')}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md input-focus dark:bg-gray-700 dark:text-gray-100"
                   />
                   <button
                     onClick={handleGenerateShareUrl}
                     disabled={isGeneratingUrl}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md transition-colors"
+                    className="btn-primary w-full py-2 px-4"
                   >
                     {isGeneratingUrl ? t('common.generating', 'Generating...') : t('exercises:generateLink', 'Generate Share Link')}
                   </button>
@@ -236,13 +236,13 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ exerciseId, exerciseName, isO
                 <div className="flex space-x-3">
                   <button
                     onClick={() => copyToClipboard(shareUrl)}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition-colors"
+                    className="btn-primary flex-1 py-2 px-4"
                   >
                     {t('common.copyLink', 'Copy Link')}
                   </button>
                   <button
                     onClick={resetDialog}
-                    className="px-4 py-2 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-800/50 rounded-md transition-colors"
+                    className="px-4 py-2 text-text-700 dark:text-text-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md transition-colors"
                   >
                     {t('common.createAnother', 'Create Another')}
                   </button>
@@ -297,10 +297,10 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
     <>
       <button
         onClick={handleClick}
-        className={`btn-icon ${className}`}
+        className={className}
         title="Share Exercise"
       >
-        <ShareIcon size={20} />
+        <ShareIcon className="h-6 w-6" />
       </button>
       
       <ShareDialog

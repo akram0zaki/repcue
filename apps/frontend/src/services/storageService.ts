@@ -373,6 +373,21 @@ class RepCueDatabase extends Dexie {
       personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId'
     });
 
+    // Version 24: Add theme_id to app_settings for theme customization feature
+    this.version(24).stores({
+      exercises: 'id, name, category, exercise_type, catalogId, is_favorite, *tags, [catalogId+*tags], updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, theme_id, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty',
+      personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId'
+    });
+
       await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
         // Remove old sharing fields that are no longer used
         delete exercise.shared_from_exercise_id;
@@ -2675,14 +2690,16 @@ export class StorageService {
    */
   public async updateAppVersion(newVersion: string): Promise<void> {
     const currentSettings = await this.getAppSettings();
-    const updatedSettings: AppSettings = {
+    
+    // Only fill in missing keys from defaults, don't override existing values
+    const mergedSettings: AppSettings = {
       ...DEFAULT_APP_SETTINGS,
-      ...currentSettings,
+      ...(currentSettings || {}), // Preserve all current settings
       app_version: newVersion,
       updated_at: new Date().toISOString()
     };
 
-    await this.saveAppSettings(updatedSettings);
+    await this.saveAppSettings(mergedSettings);
   }
 
 
@@ -3568,6 +3585,7 @@ export class StorageService {
       default_rest_time: settings.default_rest_time,
       horizontal_exercise_layout: settings.horizontal_exercise_layout,
       ring_timer: settings.ring_timer,
+      theme_id: settings.theme_id,
       // Include all sync metadata (filtering happens below)
       owner_id: settings.owner_id,
       created_at: settings.created_at,
@@ -3615,6 +3633,7 @@ export class StorageService {
       auto_save: (serverData.data_auto_save as boolean) ?? true,
       default_rest_time: (serverData.default_rest_time as number) || 60,
       ring_timer: (serverData.ring_timer as boolean) ?? true,
+      theme_id: (serverData.theme_id as string) || 'default',
       rep_speed_factor: 1.0, // This stays client-side only for now
       last_selected_exercise_id: null, // This stays client-side only for now
       // Include sync metadata

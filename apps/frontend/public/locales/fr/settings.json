@@ -1,0 +1,31 @@
+{
+  "theme": {
+    "label": "Thème de Couleur",
+    "description": "Choisissez votre thème de couleur préféré",
+    "applying": "Application du thème...",
+    "default": {
+      "name": "Bleu Océan",
+      "description": "Thème bleu classique avec contraste équilibré"
+    },
+    "energetic": {
+      "name": "Orange Énergique",
+      "description": "Orange vibrant pour les entraînements énergiques"
+    },
+    "professional": {
+      "name": "Bleu Professionnel",
+      "description": "Bleu frais pour un entraînement concentré"
+    },
+    "calm": {
+      "name": "Lavande Calme",
+      "description": "Lavande apaisante pour des séances relaxantes"
+    },
+    "winter-chill": {
+      "name": "Fraîcheur Hivernale",
+      "description": "Bleu poudré avec des tons glacés"
+    },
+    "elegant-minimal": {
+      "name": "Élégant Minimal",
+      "description": "Palette monochrome sophistiquée"
+    }
+  }
+}

@@ -74,11 +74,11 @@ export const UpdateErrorRecoveryModal: React.FC<UpdateErrorRecoveryModalProps> =
         };
       default:
         return {
-          bgColor: 'bg-blue-100 dark:bg-blue-900/20',
-          borderColor: 'border-blue-500',
-          textColor: 'text-blue-800 dark:text-blue-200',
+          bgColor: 'bg-primary-100 dark:bg-primary-900/20',
+          borderColor: 'border-primary-500',
+          textColor: 'text-primary-800 dark:text-primary-200',
           icon: 'ℹ️',
-          iconColor: 'text-blue-600 dark:text-blue-400'
+          iconColor: 'text-primary-600 dark:text-primary-400'
         };
     }
   };

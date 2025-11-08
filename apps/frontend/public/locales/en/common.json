@@ -161,6 +161,8 @@
     "resetSyncState": "Reset Sync State",
     "syncAdvanced": "Advanced Sync",
     "syncAdvancedHelp": "Help with troubleshooting sync issues.",
+    "showAdvancedSettings": "Show advanced settings",
+    "hideAdvancedSettings": "Hide advanced settings",
     "updatePreferences": "App Updates",
     "updatePrivacyTitle": "Privacy First",
     "updatePrivacyMessage": "Update checks only send your current version number. No personal data is transmitted.",

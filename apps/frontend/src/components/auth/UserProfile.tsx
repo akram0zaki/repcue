@@ -52,7 +52,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({ className = '' }) => {
             className="h-8 w-8 rounded-full object-cover"
           />
         ) : (
-          <div className="h-8 w-8 rounded-full bg-blue-600 dark:bg-blue-700 flex items-center justify-center text-white text-sm font-medium">
+          <div className="h-8 w-8 rounded-full bg-primary-600 dark:bg-primary-700 flex items-center justify-center text-white text-sm font-medium">
             {initials}
           </div>
         )}

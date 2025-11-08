@@ -113,6 +113,7 @@ vi.mock('../../hooks/useExerciseFilter', () => ({
     filterState: {
       selectedCatalogId: 'default',
       selectedCategories: new Set(),
+      selectedBadges: {},
       searchTerm: '',
       showFavoritesOnly: false,
       exerciseFilter: 'all',
@@ -122,7 +123,9 @@ vi.mock('../../hooks/useExerciseFilter', () => ({
     clearFilters: vi.fn(),
     setCatalog: vi.fn(),
     toggleCategory: vi.fn(),
-    clearCategories: vi.fn()
+    clearCategories: vi.fn(),
+    toggleBadgeValue: vi.fn(),
+    clearBadge: vi.fn()
   })
 }));
 

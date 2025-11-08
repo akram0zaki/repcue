@@ -47,7 +47,13 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   coach_intro_seen: false, // Show intro dialog on first CoachPage visit
   coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
   coach_persona: 'zen', // Default coach personality (Enhancement E1.2)
+  coach_post_workout_survey_enabled: true, // Post-workout survey for gamification (Phase 1)
   celebration_sounds_enabled: false, // Default off (Enhancement E1.1)
+  // Update preferences
+  update_mode: 'automatic', // PWA update mode: automatic, notify, or manual
+  allow_auto_updates: true, // Enable automatic updates
+  update_on_metered: false, // Prevent updates on metered connections by default
+  theme_id: 'default', // Default theme for new users (Theme Customization Feature)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

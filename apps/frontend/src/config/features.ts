@@ -31,3 +31,10 @@ export const AI_WORKOUT_BETA = false;
 // Enable versioned legal document acceptance system (Terms, Privacy Policy, etc.)
 // When enabled, users must accept current legal documents to use the app
 export const LEGAL_ACCEPTANCE_V3_ENABLED = true;
+
+// Theme Customization System
+// Default theme ID - used for new users and fallback
+export const DEFAULT_THEME_ID = 'default' as const;
+// Enable/disable theme customization feature
+// Starting enabled (true) on feature branch for development and testing
+export const THEME_CUSTOMIZATION_ENABLED = true;

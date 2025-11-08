@@ -193,7 +193,7 @@ export function PRHistoryPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
             <p className="mt-4 text-gray-600 dark:text-gray-400">
               {t('pr.loading', 'Loading your records...')}
             </p>
@@ -352,7 +352,7 @@ export function PRHistoryPage() {
 
                 {/* Value */}
                 <div className="mb-3">
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
                     {formatValue(record.value, record.recordType)}
                   </div>
                   {record.improvementPercentage && record.improvementPercentage > 0 && (
@@ -394,7 +394,7 @@ export function PRHistoryPage() {
           {records.length === 0 && (
             <button
               onClick={() => navigate('/')}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg 
+              className="btn-primary px-6 py-3 font-semibold 
                 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               {t('pr.startWorkout', 'Start a Workout')}

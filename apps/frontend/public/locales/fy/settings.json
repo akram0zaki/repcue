@@ -1,0 +1,31 @@
+{
+  "theme": {
+    "label": "Kleurskema",
+    "description": "Kies jo favorite kleurskema",
+    "applying": "Skema tapasse...",
+    "default": {
+      "name": "Oseaan Turkoois",
+      "description": "Klassyk turkoois skema mei balansearre kontrast"
+    },
+    "energetic": {
+      "name": "Enerzjyk Oranje",
+      "description": "Libbich oranje foar enerzjyke workouts"
+    },
+    "professional": {
+      "name": "Profesjoneel Blau",
+      "description": "Koel blau foar fokuste training"
+    },
+    "calm": {
+      "name": "Kalm Lavendel",
+      "description": "Kalmjend lavendel foar ûntspannen sesjes"
+    },
+    "winter-chill": {
+      "name": "Winterkâlde",
+      "description": "Poederblau mei iisige tinten"
+    },
+    "elegant-minimal": {
+      "name": "Elegant Minimaal",
+      "description": "Ferfine monochroom palet"
+    }
+  }
+}

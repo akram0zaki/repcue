@@ -158,9 +158,9 @@ const WeeklyStreakCalendar: React.FC<WeeklyStreakCalendarProps> = ({
               <div
                 className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                   weekData.workoutDays[index]
-                    ? 'bg-primary-500 text-white'
+                    ? 'calendar-day-active'
                     : isToday(index)
-                    ? 'bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-gray-100 ring-2 ring-primary-300 dark:ring-primary-600'
+                    ? 'calendar-day-today'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}
               >
@@ -181,7 +181,7 @@ const WeeklyStreakCalendar: React.FC<WeeklyStreakCalendarProps> = ({
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {t('common:activity.charts.currentStreak', { defaultValue: 'Current streak' })}
         </div>
-        <div className="text-lg font-bold text-primary-600 dark:text-primary-400">
+        <div className="text-lg font-bold streak-count">
           {t('common:activity.charts.streakDays', { 
             count: currentStreak, 
             defaultValue: `${currentStreak} day${currentStreak !== 1 ? 's' : ''}` 

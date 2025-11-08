@@ -218,9 +218,9 @@ export function OnboardingFlow({ onComplete, onSkip, className = '' }: Onboardin
                 onClick={() => goToStep(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-200 ${
                   index === currentStep
-                    ? 'bg-blue-600 dark:bg-blue-500 scale-125'
+                    ? 'bg-primary-600 dark:bg-primary-500 scale-125'
                     : index < currentStep
-                    ? 'bg-blue-400 dark:bg-blue-600'
+                      ? 'bg-primary-400 dark:bg-primary-600'
                     : 'bg-gray-300 dark:bg-gray-600'
                 }`}
                 aria-label={`Go to step ${index + 1}`}

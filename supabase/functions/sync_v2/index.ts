@@ -71,10 +71,15 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'owner_id', 'created_at', 'updated_at', 'version', 'deleted'
   ]),
   app_settings: new Set([
-    'id', 'dark_mode', 'reduce_motion', 'vibration_enabled', 'auto_start_next',
+    'id', 'dark_mode', 'theme_id', 'reduce_motion', 'vibration_enabled', 'auto_start_next',
     'default_rest_time', 'beep_interval_seconds', 'beep_volume', 'beep_sound_enabled',
     'pre_timer_countdown', 'show_exercise_videos', 'data_auto_save', 'owner_id',
     'sound_enabled', 'default_interval_duration', 'app_version', 'horizontal_exercise_layout',
+    'last_selected_exercise_id', 'ring_timer', 'update_mode', 'allow_auto_updates', 'update_on_metered',
+    'coach_enabled', 'coach_show_on_home', 'coach_auto_refresh', 'coach_refresh_interval',
+    'coach_show_streak', 'coach_show_muscle_balance', 'coach_show_progression', 'coach_show_recovery',
+    'coach_show_suggestions', 'coach_intro_seen', 'coach_ai_insights_enabled', 'coach_persona',
+    'coach_post_workout_survey_enabled', 'celebration_sounds_enabled',
     'created_at', 'updated_at', 'version', 'deleted'
   ]),
   exercises: new Set([

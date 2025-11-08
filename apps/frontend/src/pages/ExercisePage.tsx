@@ -299,7 +299,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const getCategoryColor = (category: ExerciseCategory): string => {
     switch (category) {
       case Categories.CORE: return 'bg-red-500';
-      case Categories.STRENGTH: return 'bg-primary-500';
+      case Categories.STRENGTH: return 'exercise-category-strength';
       case Categories.CARDIO: return 'bg-green-500';
       case Categories.FLEXIBILITY: return 'bg-purple-500';
       case Categories.BALANCE: return 'bg-yellow-500';
@@ -353,13 +353,13 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
         <div className="mb-4 sm:mb-6">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl sm:text-2xl font-bold text-text-900 dark:text-text-50 flex items-center gap-2">
-              <WorkoutIcon size={24} className="text-primary-600 dark:text-primary-400" />
+              <WorkoutIcon size={24} className="exercise-icon" />
               {t('exercises:title')}
             </h1>
             {flags.canCreateExercises && (
               <button
                 onClick={() => navigate('/exercises/create')}
-                className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
+                className="flex items-center gap-2 btn-primary px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
                 aria-label={t('exercises:createNew', 'Create New Exercise')}
               >
                 <PlusIcon size={20} />
@@ -412,7 +412,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   ].reduce((sum: number, count: number) => sum + count, 0);
                   
                   return activeFilterCount > 0 && (
-                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold bg-primary-500 text-white rounded-full">
+                    <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold exercise-badge-count rounded-full">
                       {activeFilterCount}
                     </span>
                   );
@@ -452,7 +452,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     placeholder={t('exercises:searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => updateFilter({ searchTerm: e.target.value })}
-                    className="block w-full pl-14 sm:pl-16 pr-10 sm:pr-12 py-2.5 sm:py-2 border border-surface-300 dark:border-surface-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="block w-full pl-14 sm:pl-16 pr-10 sm:pr-12 py-2.5 sm:py-2 border border-surface-300 dark:border-surface-600 rounded-md text-sm sm:text-base bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 placeholder-gray-500 dark:placeholder-gray-400 input-focus"
                   />
                   {searchTerm && (
                     <button
@@ -491,7 +491,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       id="sort-select"
                       value={sortBy}
                       onChange={(e) => updateFilter({ sortBy: e.target.value as 'name' | 'type' | 'recently-added' })}
-                      className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[36px] rtl:text-right rtl:pr-8 rtl:pl-2.5"
+                      className="px-2.5 py-1.5 border border-surface-300 dark:border-surface-600 rounded-md text-sm bg-white dark:bg-gray-700 text-text-900 dark:text-text-50 input-focus min-h-[36px] rtl:text-right rtl:pr-8 rtl:pl-2.5"
                     >
                       <option value="name">{t('exercises:sortName', { defaultValue: 'Name' })}</option>
                       <option value="type">{t('exercises:sortType', { defaultValue: 'Type' })}</option>
@@ -509,7 +509,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     onClick={() => updateFilter({ exerciseFilter: 'all' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'all'
-                        ? 'bg-primary-500 text-white'
+                        ? 'filter-button-active'
                         : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                     }`}
                   >
@@ -519,7 +519,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     onClick={() => updateFilter({ exerciseFilter: 'built-in' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'built-in'
-                        ? 'bg-primary-500 text-white'
+                        ? 'filter-button-active'
                         : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                     }`}
                   >
@@ -529,7 +529,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     onClick={() => updateFilter({ exerciseFilter: 'custom' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'custom'
-                        ? 'bg-primary-500 text-white'
+                        ? 'filter-button-active'
                         : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                     }`}
                   >
@@ -539,7 +539,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                     onClick={() => updateFilter({ exerciseFilter: 'shared' })}
                     className={`px-2.5 py-1.5 rounded-lg text-sm font-medium transition-colors min-h-[36px] ${
                       exerciseFilter === 'shared'
-                        ? 'bg-primary-500 text-white'
+                        ? 'filter-button-active'
                         : 'bg-surface-0 dark:bg-surface-800 filter-button-text border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-700'
                     }`}
                   >
@@ -734,7 +734,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
             </p>
             <button
               onClick={clearAllFilters}
-              className="px-4 py-2.5 bg-primary-500 text-white text-sm sm:text-base font-medium rounded-md hover:bg-primary-600 transition-colors min-h-[44px]"
+              className="px-4 py-2.5 btn-primary text-sm sm:text-base font-medium rounded-md transition-colors min-h-[44px]"
             >
               {t('exercises:clearFilters')}
             </button>
@@ -875,7 +875,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   return (
     <div className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
       isUserCreated
-        ? 'border-2 border-primary-300 dark:border-primary-600'
+        ? 'exercise-card-custom'
         : 'border border-surface-200 dark:border-surface-700'
     }`} data-testid="exercise-card">
 
@@ -891,7 +891,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               </span>
               {/* Custom/Shared Tags */}
               {isUserCreated && (
-                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-primary-100 dark:bg-primary-200 text-primary-800 dark:text-primary-900 rounded-full whitespace-nowrap">
+                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium exercise-custom-badge rounded-full whitespace-nowrap">
                   {t('exercises:custom', { defaultValue: 'Custom' })}
                 </span>
               )}
@@ -909,7 +909,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               {isUserCreated && onEdit && (
                 <button
                   onClick={() => onEdit(exercise)}
-                  className="flex-shrink-0 text-text-700 dark:text-text-200 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  className="flex-shrink-0 text-text-700 dark:text-text-200 exercise-hover-link transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
                   title={t('exercises:editExercise', { defaultValue: 'Edit exercise' })}
                   aria-label={t('exercises:editExerciseAria', { name: loc.name, defaultValue: `Edit ${loc.name}` })}
                 >
@@ -956,7 +956,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         <div className="mb-2">
           <button
             onClick={() => onNavigateToExercise(exercise.id)}
-            className="text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            className="text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 exercise-hover-link transition-colors"
             aria-label={t('exercises:viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
           >
             {loc.name}
@@ -980,7 +980,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {/* Start Timer Button - Full Width */}
         <button
           onClick={() => onStartTimer(exercise)}
-          className="w-full px-3 py-2 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors min-h-[36px] flex items-center justify-center gap-1.5"
+          className="w-full px-3 py-2 btn-primary text-sm font-medium rounded-lg transition-colors min-h-[36px] flex items-center justify-center gap-1.5"
           data-testid="start-exercise-timer"
         >
           <PlayIcon size={16} />

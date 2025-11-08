@@ -225,7 +225,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
         {onViewAll && (
           <button
             onClick={onViewAll}
-            className="text-sm text-primary-600 dark:text-primary-400 hover:underline focus:outline-none focus:ring-2 focus:ring-primary-500 rounded px-2 py-1"
+            className="text-sm hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded px-2 py-1 view-all-btn"
           >
             {t('coaching:viewAll', { defaultValue: 'View All' })}
           </button>
@@ -252,11 +252,11 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onClick={handleInsightClick}
-          className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-xl p-4 shadow-sm border border-primary-200 dark:border-primary-800 cursor-pointer transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+          className="insights-card"
         >
           <div className="flex flex-col items-stretch">
             {/* Top row: Icon centered */}
-            <div className={`flex justify-center ${currentInsight.iconColor || 'text-primary-600 dark:text-primary-400'}`}>
+            <div className="flex justify-center insight-icon">
               {(currentInsight.icon && iconMap[currentInsight.icon]) || iconMap.default}
             </div>
 
@@ -321,7 +321,7 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
               </p>
               {/* AI badge */}
               {currentInsight.source === 'ai' && (
-                <span className="inline-flex items-center mt-2 px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                <span className="ai-badge">
                   {t('coaching:aiPowered', { defaultValue: 'AI' })}
                 </span>
               )}
@@ -347,8 +347,8 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
                   }}
                   className={
                     isActive
-                      ? 'w-6 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 bg-primary-600 dark:bg-primary-400 p-0'
-                      : 'w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 p-0'
+                      ? 'w-6 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 p-0 carousel-indicator-active'
+                      : 'w-2 h-2 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 p-0'
                   }
                 />
               );

@@ -354,9 +354,10 @@ These features may be considered for future releases based on user feedback.
 - Dark mode implementation (useDarkMode hook)
 
 **DEP-002: Infrastructure**
-- Supabase app_settings table
-- Existing migration system
+- Supabase app_settings table (dual environments: dev first, then prod)
+- Existing migration system with change tracking
 - Edge functions for sync
+- Migration tracking document: `docs/migration-tracking/supabase-changes_YYYYMMDD.md`
 
 **DEP-003: UI Framework**
 - Tailwind CSS (color system)

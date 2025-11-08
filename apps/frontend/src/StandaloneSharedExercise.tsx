@@ -45,12 +45,7 @@ const StandaloneSnackbar: React.FC<{ children: React.ReactNode }> = ({ children 
     <SnackbarContext.Provider value={{ showSnackbar }}>
       {children}
       {snackbar?.visible && (
-        <div className={`fixed bottom-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg text-white ${
-          snackbar.type === 'success' ? 'bg-green-600' :
-          snackbar.type === 'error' ? 'bg-red-600' :
-          snackbar.type === 'warning' ? 'bg-yellow-600' :
-          'bg-blue-600'
-        }`}>
+        <div className={`snackbar snackbar-${snackbar.type || 'info'}`}>
           {snackbar.message}
         </div>
       )}
@@ -137,7 +132,7 @@ const StandaloneSharedExercise: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">{t('common.loading', 'Loading...')}</p>
         </div>
       </div>
@@ -157,7 +152,7 @@ const StandaloneSharedExercise: React.FC = () => {
           </p>
           <button
             onClick={goToMainApp}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition-colors"
+            className="btn-primary"
           >
             {t('common.goHome', 'Go to RepCue')}
           </button>
@@ -190,7 +185,7 @@ const StandaloneSharedExercise: React.FC = () => {
               <div className="flex items-center justify-between">
                 {/* Left Side - Shared Badge */}
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
+                  <span className="badge-success">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
@@ -202,7 +197,7 @@ const StandaloneSharedExercise: React.FC = () => {
                 {(exercise.custom_video_url || shareInfo?.videoRecoveryTriggered) && (
                   <button
                     onClick={() => setShowVideo(true)}
-                    className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                    className="flex items-center justify-center w-12 h-12 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
                     title={t('common.playVideo', { defaultValue: 'Play video' })}
                     disabled={!exercise.custom_video_url}
                   >
@@ -220,11 +215,7 @@ const StandaloneSharedExercise: React.FC = () => {
 
               {/* Type and Category Badges */}
               <div className="flex flex-wrap gap-2 mb-4">
-                <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
-                  exercise.exercise_type === 'time_based'
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                    : 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300'
-                }`}>
+                <span className={exercise.exercise_type === 'time_based' ? 'badge-success' : 'badge-primary'}>
                   {exercise.exercise_type === 'time_based' ? (
                     <>
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,13 +235,13 @@ const StandaloneSharedExercise: React.FC = () => {
 
                 {/* Difficulty Badge */}
                 {exercise.difficulty_level && (
-                  <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
+                  <span className={
                     exercise.difficulty_level === 'beginner'
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                      ? 'badge-success'
                       : exercise.difficulty_level === 'intermediate'
-                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                      : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                  }`}>
+                      ? 'badge-warning'
+                      : 'badge-primary'
+                  }>
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
@@ -259,11 +250,7 @@ const StandaloneSharedExercise: React.FC = () => {
                 )}
 
                 {/* Public/Private Status Badge */}
-                <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
-                  exercise.is_public
-                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
-                }`}>
+                <span className={`badge-primary ${!exercise.is_public ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' : ''}`}>
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {exercise.is_public ? (
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -281,7 +268,7 @@ const StandaloneSharedExercise: React.FC = () => {
 
             {/* Video Recovery Notification */}
             {shareInfo?.videoRecoveryTriggered && (
-              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <div className="alert-warning mb-4">
                 <div className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 15.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -371,13 +358,13 @@ const StandaloneSharedExercise: React.FC = () => {
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {t('exercises:difficultyLevel', { defaultValue: 'Difficulty' })}:
                     </span>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    <span className={
                       exercise.difficulty_level === 'beginner'
-                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                        ? 'badge-success'
                         : exercise.difficulty_level === 'intermediate'
-                        ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                        : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
-                    }`}>
+                        ? 'badge-warning'
+                        : 'badge-primary'
+                    }>
                       {t(`exercises:difficulties.${exercise.difficulty_level}`, { defaultValue: exercise.difficulty_level })}
                     </span>
                   </div>
@@ -403,7 +390,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   </span>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                     exercise.is_public
-                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                   }`}>
                     {exercise.is_public
@@ -418,11 +405,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {t('exercises:hasVideo', { defaultValue: 'Video Demo' })}:
                   </span>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    (exercise.has_video || exercise.custom_video_url)
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
-                  }`}>
+                  <span className={(exercise.has_video || exercise.custom_video_url) ? 'badge-success' : 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}>
                     {(exercise.has_video || exercise.custom_video_url)
                       ? t('exercises:hasVideoDemo', { defaultValue: 'Available' })
                       : t('exercises:noVideoDemo', { defaultValue: 'Not Available' })
@@ -436,7 +419,7 @@ const StandaloneSharedExercise: React.FC = () => {
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {t('exercises:videoSource', { defaultValue: 'Video Source' })}:
                     </span>
-                    <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded-full">
+                    <span className="badge-primary">
                       {t('exercises:customVideo', { defaultValue: 'Custom Upload' })}
                     </span>
                   </div>
@@ -473,23 +456,31 @@ const StandaloneSharedExercise: React.FC = () => {
             )}
 
             {/* Tags */}
-            {exercise.tags && exercise.tags.length > 0 && (
-              <div className="mb-6">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {t('exercises:tagsHeading', { defaultValue: 'Tags' })}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {exercise.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
-                    >
-                      {t(`exercises:tags.${tag}`, { defaultValue: tag })}
-                    </span>
-                  ))}
+            {exercise.tags && exercise.tags.length > 0 && (() => {
+              // Filter out structured badge tags (those with ':' pattern like 'category:core')
+              // These are displayed by ExerciseBadgeDisplay component
+              const freeFormTags = exercise.tags.filter(tag => !tag.includes(':'));
+              
+              if (freeFormTags.length === 0) return null;
+              
+              return (
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                    {t('exercises:tagsHeading', { defaultValue: 'Tags' })}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {freeFormTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
+                      >
+                        {t(`exercises:tags.${tag}`, { defaultValue: tag })}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Equipment */}
             {exercise.equipment_needed && exercise.equipment_needed.length > 0 && (
@@ -556,13 +547,13 @@ const StandaloneSharedExercise: React.FC = () => {
                     const referencedExercise = getExerciseById(exerciseId);
                     return (
                       <li key={index} className="flex items-center space-x-2">
-                        <span className="w-2 h-2 bg-purple-600 rounded-full flex-shrink-0"></span>
+                        <span className="bullet-primary"></span>
                         {referencedExercise ? (
                           <a
                             href={`${window.location.origin}/exercises/${exerciseId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition-colors"
+                            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:underline transition-colors"
                           >
                             {referencedExercise.name}
                             <span className="ml-1 text-xs text-gray-500">↗</span>
@@ -619,7 +610,7 @@ const StandaloneSharedExercise: React.FC = () => {
                   {exercise.muscle_groups.map((muscle) => (
                     <span
                       key={muscle}
-                      className="inline-block px-3 py-1 text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full"
+                      className="inline-block px-3 py-1 text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 rounded-full"
                     >
                       {muscle}
                     </span>
@@ -634,14 +625,12 @@ const StandaloneSharedExercise: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={handleSaveExercise}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors min-h-[48px] flex items-center justify-center gap-2"
+            className="flex-1 btn-primary min-h-[48px] flex items-center justify-center gap-2"
           >
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              {t('exercises:saveToLibrary', { defaultValue: 'Save to My Library' })}
-            </>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            {t('exercises:saveToLibrary', { defaultValue: 'Save to My Library' })}
           </button>
 
           <button

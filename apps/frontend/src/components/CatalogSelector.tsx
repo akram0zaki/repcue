@@ -245,7 +245,7 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
                 {/* Selection Indicator */}
                 {isSelected && (
                   <div className="absolute top-2 left-2 w-3 h-3 bg-white rounded-full shadow-lg flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 rounded-full catalog-indicator-dot"></div>
                   </div>
                 )}
               </button>

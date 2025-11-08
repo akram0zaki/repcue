@@ -1,0 +1,31 @@
+{
+  "theme": {
+    "label": "Tema de Color",
+    "description": "Elige tu tema de color preferido",
+    "applying": "Aplicando tema...",
+    "default": {
+      "name": "Turquesa Océano",
+      "description": "Tema turquesa clásico con contraste equilibrado"
+    },
+    "energetic": {
+      "name": "Naranja Energético",
+      "description": "Naranja vibrante para entrenamientos de alta energía"
+    },
+    "professional": {
+      "name": "Azul Profesional",
+      "description": "Azul fresco para entrenamiento enfocado"
+    },
+    "calm": {
+      "name": "Lavanda Tranquila",
+      "description": "Lavanda relajante para sesiones tranquilas"
+    },
+    "winter-chill": {
+      "name": "Frío Invernal",
+      "description": "Azul polvorienta con tonos helados"
+    },
+    "elegant-minimal": {
+      "name": "Elegante Minimalista",
+      "description": "Paleta monocromática sofisticada"
+    }
+  }
+}

@@ -339,7 +339,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                 {currentVideoUrl.startsWith('blob-pending-sync://') && (
                   <div className="mb-3 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
                     <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
                       <span className="text-sm text-blue-800 dark:text-blue-200">
                         {t('video.pendingSync', 'Video ready offline - will sync when online')}
                       </span>

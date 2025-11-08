@@ -62,6 +62,7 @@ export function getCatalogBadge(catalogId: string, badgeId: string): CatalogBadg
  * @deprecated Use getExerciseBadgeValues with badgeId='category' instead
  */
 export function getExerciseCategory(exercise: Exercise): string | null {
+  // Get category from tags
   if (exercise.tags && exercise.tags.length > 0) {
     const categoryTag = exercise.tags.find(tag => tag.startsWith('category:'));
     if (categoryTag) {

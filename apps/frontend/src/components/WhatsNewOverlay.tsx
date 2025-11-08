@@ -259,9 +259,9 @@ export const WhatsNewOverlay: React.FC<WhatsNewOverlayProps> = ({
                   <button
                     key={index}
                     onClick={() => setCurrentHighlight(index)}
-                    className={`w-2 h-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-2 h-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                       index === currentHighlight
-                        ? 'bg-blue-500'
+                        ? 'bg-primary-500'
                         : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
                     }`}
                     aria-label={t('whatsNew.goToHighlight', { number: index + 1 })}
@@ -271,7 +271,7 @@ export const WhatsNewOverlay: React.FC<WhatsNewOverlayProps> = ({
 
               <button
                 onClick={handleNext}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
                 aria-label={t('whatsNew.next')}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,14 +294,14 @@ export const WhatsNewOverlay: React.FC<WhatsNewOverlayProps> = ({
                   detail: { updateInfo }
                 }));
               }}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded px-2 py-1"
             >
               {t('whatsNew.seeAllChanges')}
             </button>
 
             <button
               onClick={handleDismiss}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="btn-primary py-2 px-4 font-medium"
             >
               {t('whatsNew.gotIt')}
             </button>

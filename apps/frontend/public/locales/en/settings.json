@@ -1,0 +1,31 @@
+{
+  "theme": {
+    "label": "Color Theme",
+    "description": "Choose your preferred color theme",
+    "applying": "Applying theme...",
+    "default": {
+      "name": "Ocean Teal",
+      "description": "Classic teal theme with balanced contrast"
+    },
+    "energetic": {
+      "name": "Energetic Orange",
+      "description": "Vibrant orange for high-energy workouts"
+    },
+    "professional": {
+      "name": "Professional Blue",
+      "description": "Cool blue for focused training"
+    },
+    "calm": {
+      "name": "Calm Lavender",
+      "description": "Soothing lavender for relaxed sessions"
+    },
+    "winter-chill": {
+      "name": "Winter Chill",
+      "description": "Cool powder blue with icy tones"
+    },
+    "elegant-minimal": {
+      "name": "Elegant Minimal",
+      "description": "Sophisticated monochrome palette"
+    }
+  }
+}
