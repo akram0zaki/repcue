@@ -6,7 +6,7 @@ Renames video files in a directory based on a CSV mapping where:
 - Column 2: exercise_id to use in the target file name
 
 Target naming convention:
-  <exercise_id>__v1_1920x1080.<extension>
+  <exercise_id>_v1_1920x1080.<extension>
 
 Usage examples:
 
@@ -17,7 +17,7 @@ Usage examples:
   -DryRun -ShowSummary
 
 Example:
-.\Rename_Video_Files.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy\out" -MappingCsv "C:\Users\akram\OneDrive\Documents\Workspace\repcue\scripts\exercise-video-id-mapping.csv" -DryRun -ShowSummary
+.\Rename_Video_Files.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy\out" -MappingCsv "C:\Users\akram\OneDrive\Documents\Workspace\repcue\scripts\video\exercise-video-id-mapping.csv" -DryRun -ShowSummary
 
 # Real run, recursive, overwrite on conflict
 .\Rename_Video_Files.ps1 `
@@ -26,7 +26,7 @@ Example:
   -Recurse -Overwrite -ShowSummary
 
 Example:
-.\Rename_Video_Files.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy\out" -MappingCsv "C:\Users\akram\OneDrive\Documents\Workspace\repcue\scripts\exercise-video-id-mapping.csv" -Recurse -Overwrite -ShowSummary
+.\Rename_Video_Files.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy\out" -MappingCsv "C:\Users\akram\OneDrive\Documents\Workspace\repcue\scripts\video\exercise-video-id-mapping.csv" -Recurse -Overwrite -ShowSummary
 
 
 Notes:
@@ -122,7 +122,7 @@ function Build-TargetName {
     [string]$Extension
   )
   $ext = $Extension.TrimStart('.').ToLowerInvariant()
-  return "{0}__v1_1920x1080.{1}" -f $ExerciseId, $ext
+  return "{0}_v1_1920x1080.{1}" -f $ExerciseId, $ext
 }
 
 # Validate inputs

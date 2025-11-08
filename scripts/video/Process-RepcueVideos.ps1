@@ -24,7 +24,7 @@ Example:
   -ShowOutput
 
 Or oneliner:
-.\Process-RepcueVideos.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy" -WatermarkPath "C:\Users\akram\OneDrive\Documents\RepCue\logo\RepCue-1762545545946\RepCue-logo-transparent.png" -WatermarkScale 0.25 -WatermarkOpacity 0.6 -Similarity 0.30 -Blend 0.10 -Padding 20 -ShowOutput
+.\Process-RepcueVideos.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy" -WatermarkPath "C:\Users\akram\OneDrive\Documents\RepCue\logo\RepCue-1762545545946\RepCue-logo-transparent.png" -WatermarkScale 0.3 -WatermarkOpacity 0.6 -Similarity 0.30 -Blend 0.10 -Padding 20 -ShowOutput
 
   #>
 
