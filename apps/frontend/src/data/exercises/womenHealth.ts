@@ -38,9 +38,9 @@ export const WOMEN_HEALTH_EXERCISES: Exercise[] = [
     catalogId: 'women-health',
     default_sets: 3,
     default_reps: 12, // within 10–15
-    rep_duration_seconds: 2,
+    rep_duration_seconds: 6,
     is_favorite: false,
-    has_video: false,
+    has_video: true,
     muscle_groups: ['quads', 'glutes', 'hamstrings', 'core'],
     tags: ['category:strength', 'lower-body', 'quads', 'glutes'],
     benefits: 'Strengthens thighs, hips, glutes; may support bone density.',
@@ -58,9 +58,9 @@ export const WOMEN_HEALTH_EXERCISES: Exercise[] = [
     catalogId: 'women-health',
     default_sets: 3,
     default_reps: 10, // 10–12
-    rep_duration_seconds: 2,
+    rep_duration_seconds: 5,
     is_favorite: false,
-    has_video: false,
+    has_video: true,
     muscle_groups: ['chest', 'shoulders', 'triceps', 'core'],
     tags: ['category:strength', 'upper-body', 'chest', 'arms'],
     benefits: 'Strengthens chest, shoulders, and arms.',
