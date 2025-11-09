@@ -215,14 +215,14 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:ml-auto">
               <button
                 onClick={onClose}
-                className="w-full sm:w-auto px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                className="w-full sm:w-auto px-4 py-2 btn-secondary rounded-lg"
               >
                 {t('common.cancel', { ns: 'common' })}
               </button>
               <button
                 onClick={handleAccept}
                 disabled={requireScrollToBottom && !hasScrolledToBottom}
-                className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+                className="w-full sm:w-auto px-4 py-2 btn-primary rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('accept')}
               </button>

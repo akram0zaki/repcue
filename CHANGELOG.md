@@ -2,6 +2,29 @@
 
 ### 2025-11-09
 
+#### 🎨 UI/UX Improvements
+
+**Theme System Enhancements**:
+- **Legal Center Page**: Fixed hardcoded blue button colors in Medical Disclaimer modal to respect selected theme
+  - Changed Accept button from `bg-blue-600` to `btn-primary` class (uses theme's primary color)
+  - Changed Cancel button to `btn-secondary` class for consistent styling
+  - Buttons now properly adapt to Electric Purple, Ocean Blue, Forest Green, etc.
+- **Home Page**: Improved contrast for tagline text in dark mode
+  - Changed from `dark:text-text-300` to `dark:text-text-100` for better readability
+  - Message "Your personal AI coach for more effective workouts" now more visible
+- **Coach Page**: Fixed refresh insights icon visibility in dark mode
+  - Applied `section-icon` class to use theme's primary color
+- **Settings Page**: Restructured layout by moving Legal Documents section below Theme section
+  - Improved logical flow: Language → Audio → Display (Dark Mode, Theme, Videos, Layout) → Legal Documents → Advanced
+
+**Exercise Detail Page**:
+- **Collapsing Header Parallax**: Implemented smooth parallax effect for video demos
+  - Video stays fixed at top while content scrolls up
+  - Content initially overlaps 10% of video height
+  - Maximum collapse keeps 25% of video visible
+  - Respects `prefers-reduced-motion` for accessibility
+  - Full-width responsive layout (320px+ viewports)
+
 #### 🎥 Video Hosting - Cloudflare R2 Migration
 
 **Complete Migration to R2 Storage** 🚀:

@@ -201,7 +201,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
           <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-1">
             {APP_NAME}
           </h1>
-          <p className="text-sm text-text-600 dark:text-text-300">
+          <p className="text-sm text-text-600 dark:text-text-100">
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>

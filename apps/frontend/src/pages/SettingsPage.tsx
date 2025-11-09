@@ -244,31 +244,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
         </div>
 
-        {/* Legal Section (separate, directly below Language) */}
-        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
-          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
-            <DocumentTextIcon size={20} className="section-icon" />
-            {t('legal:title')}
-          </h2>
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => navigate('/legal')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
-              data-testid="open-legal-center"
-              aria-label={t('a11y.navigateTo', { label: t('legal:title'), defaultValue: 'Navigate to {{label}}' })}
-            >
-              <span className="flex items-center gap-2 text-text-900 dark:text-text-50">
-                <DocumentTextIcon size={18} />
-                {t('legal:title')}
-              </span>
-              <svg className="w-5 h-5 text-text-500 dark:text-text-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
         {/* Audio Settings */}
   <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
           <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
@@ -477,6 +452,31 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               onChange={() => onUpdateSettings({ horizontal_exercise_layout: !appSettings.horizontal_exercise_layout })}
               dataTestId="toggle-horizontal-exercise-layout"
             />
+          </div>
+        </div>
+
+        {/* Legal Section */}
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <DocumentTextIcon size={20} className="section-icon" />
+            {t('legal:title')}
+          </h2>
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate('/legal')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+              data-testid="open-legal-center"
+              aria-label={t('a11y.navigateTo', { label: t('legal:title'), defaultValue: 'Navigate to {{label}}' })}
+            >
+              <span className="flex items-center gap-2 text-text-900 dark:text-text-50">
+                <DocumentTextIcon size={18} />
+                {t('legal:title')}
+              </span>
+              <svg className="w-5 h-5 text-text-500 dark:text-text-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
 

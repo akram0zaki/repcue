@@ -45,7 +45,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   coach_show_recovery: true,
   coach_show_suggestions: true,
   coach_intro_seen: false, // Show intro dialog on first CoachPage visit
-  coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
+  coach_ai_insights_enabled: true, // AI insights enabled by default (requires auth)
   coach_persona: 'zen', // Default coach personality (Enhancement E1.2)
   coach_post_workout_survey_enabled: true, // Post-workout survey for gamification (Phase 1)
   celebration_sounds_enabled: false, // Default off (Enhancement E1.1)

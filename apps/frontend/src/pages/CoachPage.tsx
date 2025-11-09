@@ -525,12 +525,12 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="flex-shrink-0 p-2 text-text-tertiary dark:text-text-secondary hover:text-text-900 dark:hover:text-text-50 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors focus:outline-none focus:ring-2 focus:ring-text-secondary focus:ring-offset-2 dark:focus:ring-offset-surface-900 disabled:opacity-50"
+              className="flex-shrink-0 p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900 disabled:opacity-50"
               style={{ direction: 'ltr' }}
               aria-label={t('common:refresh', { defaultValue: 'Refresh' })}
             >
               <svg 
-                className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`}
+                className={`section-icon ${isRefreshing ? 'animate-spin' : ''}`}
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24" 
