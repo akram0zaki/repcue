@@ -1,5 +1,7 @@
 # Exercise Catalog System (Multi-Catalog with Badge System)
 
+> **⚠️ PLANNED REFACTOR**: This system is being refactored to use a global exercise repository with many-to-many catalog memberships. See `docs/implementation-plans/global-exercise-repository.md` for details. This will eliminate exercise duplication across catalogs.
+
 This document explains the architecture and implementation of RepCue's multi-catalog exercise system with flexible badge-based filtering, and provides a concise developer guide for adding or modifying catalogs and exercises.
 
 ## Architecture Overview
