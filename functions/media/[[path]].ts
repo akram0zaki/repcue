@@ -92,6 +92,18 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   const url = new URL(request.url);
   const debug = env.DEBUG === 'true';
   
+  // Check if R2 binding is available
+  if (!env.VIDEOS) {
+    console.error('[Media Proxy] R2 bucket binding "VIDEOS" is not configured');
+    return new Response('Service configuration error: R2 bucket not available', { 
+      status: 503,
+      headers: { 
+        'Cache-Control': 'no-store',
+        'Content-Type': 'text/plain'
+      }
+    });
+  }
+  
   // Extract path from URL (everything after /media/)
   const requestPath = url.pathname;
   
