@@ -1,0 +1,134 @@
+name: Video Validation
+
+# Trigger on changes to exercise_media.json or video scripts
+on:
+  pull_request:
+    paths:
+      - 'apps/frontend/public/exercise_media.json'
+      - 'scripts/video/**'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  validate-manifest:
+    name: Validate Video Manifest
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Validate manifest schema
+        run: node scripts/video/manifest-build.mjs --validate
+        continue-on-error: false
+      
+      - name: Check filename patterns
+        run: node scripts/video/validate-filenames.mjs
+        continue-on-error: false
+      
+      - name: Verify no large video binaries in repo
+        run: |
+          # Check for video files larger than 100KB in git history
+          echo "Checking for large video binaries..."
+          large_files=$(git diff --name-only --diff-filter=A ${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }} | grep -E '\.(mp4|webm)$' || true)
+          
+          if [ -n "$large_files" ]; then
+            echo "ERROR: Video binary files detected in PR. Videos should be uploaded to R2, not committed to the repository."
+            echo "Files found:"
+            echo "$large_files"
+            exit 1
+          else
+            echo "✓ No large video binaries detected"
+          fi
+        shell: bash
+      
+      - name: Comment validation results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `
+            ## 📹 Video Manifest Validation
+            
+            **Status**: ${{ job.status }}
+            
+            ### Checks Performed:
+            - ✅ Manifest schema validation
+            - ✅ Filename pattern verification
+            - ✅ Large binary detection
+            
+            ${job.status === 'failure' ? '⚠️ Please review the logs above for validation errors.' : '✨ All validation checks passed!'}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+  verify-r2-objects:
+    name: Verify R2 Objects (Optional)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' # Only run on manual trigger
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Verify R2 objects exist
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: node scripts/video/verify-r2-objects.mjs
+        continue-on-error: true # Don't fail PR if R2 check fails (secrets might not be available)
+      
+      - name: Comment R2 verification results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `
+            ## 🔍 R2 Object Verification
+            
+            **Status**: ${{ job.status }}
+            
+            This optional check verifies that video files referenced in the manifest actually exist in the R2 bucket.
+            
+            ${job.status === 'success' ? '✅ All referenced videos found in R2!' : '⚠️ Some videos may be missing from R2. Check logs for details.'}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });

@@ -1,5 +1,80 @@
 ## Unreleased
 
+### 2025-11-09
+
+#### 🎥 Video Hosting - Cloudflare R2 Migration
+
+**Complete Migration to R2 Storage** 🚀:
+- **Status**: ✅ COMPLETE - All videos now served from Cloudflare R2
+- **Implementation Plan**: `docs/implementation-plans/video-hosting/video-hosting-implementation-plan.md`
+- **Migration Tracker**: `docs/migration-tracking/r2-video-migration_20251109.md`
+
+**Infrastructure Changes**:
+- **R2 Bucket**: Created `repcue-videos` bucket with 21 videos (9 exercises, multiple aspects/formats)
+- **Pages Function Proxy**: Implemented `/media/*` proxy in `functions/media/[[path]].ts`
+  - Same-origin video delivery (preserves CSP compliance)
+  - HTTP 206 Range request support for video seeking
+  - Immutable cache headers (`max-age=31536000`)
+  - Path validation and sanitization (OWASP A01 compliance)
+  - Content-Type inference with proper MIME types
+- **Wrangler Configuration**: Updated `wrangler.toml` with R2 bucket bindings for dev and prod environments
+
+**Video Processing Pipeline**:
+- **Encoding Script**: Enhanced `scripts/video/Process-RepcueVideos.ps1`
+  - FPS preservation (fixed 30fps → 25fps reduction bug)
+  - Proper dimension extraction (1920x1080, 1080x1920, 1080x1080)
+  - Watermark burning with chroma key support
+- **Upload Script**: Created `scripts/video/publish-to-r2-wrangler.mjs`
+  - SHA256 hashing for immutable filenames
+  - Duration extraction via ffprobe
+  - Timing information (per-file and total upload time)
+  - Upload mapping generation for manifest building
+- **Manifest Builder**: Created `scripts/video/manifest-build.mjs`
+  - Multi-format, multi-resolution variant structure
+  - Duration field positioning (fps → duration → video → variants)
+  - Deterministic key ordering for stable diffs
+
+**Filename Convention**:
+- **Pattern**: `exerciseId_v1_WIDTHxHEIGHT_hash8.ext`
+- **Example**: `burpees_v1_1080x1920_95dc97e6.webm`
+- **Validation**: Regex pattern in Pages Function: `/^[a-z0-9_-]+_v1_\d{3,4}x\d{3,4}_[a-f0-9]{8,}\.(mp4|webm)$/i`
+
+**Client-Side Changes**:
+- **Feature Flag**: Added `VIDEO_R2_ENABLED` in `src/config/features.ts` (enabled for production)
+- **Type Definitions**: Enhanced `src/types/media.ts` with `ExerciseMediaVariants` structure
+- **Video Selection**: Updated `src/utils/selectVideoVariant.ts` for new variants schema
+- **Backward Compatibility**: Preserved legacy `video.*` fields for graceful fallback
+- **Local Development**: Added Vite proxy configuration to route `/media/*` to dev deployment
+
+**Manifest Updates**:
+- **File**: `apps/frontend/public/exercise_media.json`
+- **Structure**: Added `variants` with nested `aspect → resolution → format → {url, sha256}`
+- **Metadata**: Includes `fps`, `duration`, `default` resolution/aspect for each exercise
+- **Coverage**: 9 exercises with 21 total video variants
+
+**CI/CD Integration**:
+- **Validation Scripts**: 
+  - `scripts/video/validate-filenames.mjs` - Filename pattern verification
+  - `scripts/video/verify-r2-objects.mjs` - R2 object existence checks
+- **GitHub Actions**: Created `video-validate.yml` workflow for PR validation
+
+**Deployment**:
+- **Dev Environment**: Deployed to `feature-r2-video-bucket.repcue-dev.pages.dev`
+- **Custom Domain**: Configured `dev.repcue.me` (DNS + Pages project setup)
+- **Verification**: Confirmed 200 OK responses with proper Content-Type and cache headers
+- **Local Videos Removed**: All legacy `/public/videos/` files deleted - exclusive R2 delivery
+
+**Performance & Security**:
+- **Cache Strategy**: Immutable caching (1 year) for hashed filenames
+- **Range Support**: Verified HTTP 206 Partial Content for video seeking
+- **Path Validation**: Strict regex prevents directory traversal (OWASP A01)
+- **CSP Compliance**: Same-origin `/media/*` path maintains Content Security Policy
+
+**Documentation**:
+- **Migration Guide**: `docs/implementation-plans/video-hosting/R2-MIGRATION-README.md`
+- **Exercise Video Specs**: Updated `docs/exercise-video-specs.md` with R2 pipeline details
+- **Implementation Plan**: Comprehensive tracking in `video-hosting-implementation-plan.md`
+
 ### 2025-01-27
 
 #### 🗄️ Database Schema

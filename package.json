@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter @repcue/frontend dev",
     "dev:be": "pnpm --filter @repcue/backend dev",
-  "build": "pnpm --filter @repcue/frontend build",
+    "build": "pnpm --filter @repcue/frontend build",
     "preview": "pnpm --filter @repcue/frontend preview",
     "start": "pnpm --filter @repcue/backend start",
     "build:serve": "pnpm --filter @repcue/frontend build && pnpm --filter @repcue/backend start",
@@ -47,5 +47,11 @@
     "apps/frontend/src/**/*.{ts,tsx}": [
       "node apps/frontend/scripts/i18n-scan.mjs"
     ]
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.927.0"
+  },
+  "comments": {
+    "@aws-sdk/client-s3": "LEGACY: Used by deprecated publish-to-r2.mjs. Use wrangler CLI (publish-to-r2-wrangler.mjs) instead."
   }
 }

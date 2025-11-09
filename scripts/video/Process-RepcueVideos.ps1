@@ -90,11 +90,11 @@ function Get-VideoDimensions {
   param([Parameter(Mandatory=$true)][string]$Path)
   try {
     if ($script:FFPROBE_AVAILABLE) {
-      # Returns "<width>:<height>" e.g., "1920:1080"
+      # Returns "<width>:<height>:<fps>" e.g., "1920:1080:30"
       $probeArgs = @(
         "-v","error",
         "-select_streams","v:0",
-        "-show_entries","stream=width,height",
+        "-show_entries","stream=width,height,r_frame_rate",
         "-of","csv=s=:p=0",
         $Path
       )
@@ -104,19 +104,28 @@ function Get-VideoDimensions {
         if ($parts.Count -ge 2 -and [int]::TryParse($parts[0], [ref]([int]0)) ) {
           $w = [int]$parts[0]
           $h = [int]$parts[1]
-          return @{ Width = $w; Height = $h }
+          $fps = "30"  # Default fallback
+          if ($parts.Count -ge 3 -and $parts[2] -match "(\d+)/(\d+)") {
+            # Parse fraction like "30/1" or "30000/1001"
+            $num = [double]$matches[1]
+            $den = [double]$matches[2]
+            $fps = [Math]::Round($num / $den, 3).ToString()
+          }
+          return @{ Width = $w; Height = $h; Fps = $fps }
         }
       }
     }
-    # Fallback: parse ffmpeg stderr for WxH
+    # Fallback: parse ffmpeg stderr for WxH and fps
     $ffargs = @("-hide_banner","-i", $Path)
     $ffout = & ffmpeg @ffargs 2>&1 | Out-String
     if ($ffout) {
       $m = [regex]::Match($ffout, "(\d{2,5})x(\d{2,5})")
-      if ($m.Success) {
-        $w = [int]$m.Groups[1].Value
-        $h = [int]$m.Groups[2].Value
-        return @{ Width = $w; Height = $h }
+      $fpsMatch = [regex]::Match($ffout, "(\d+(?:\.\d+)?)\s*fps")
+      $w = if ($m.Success) { [int]$m.Groups[1].Value } else { 0 }
+      $h = if ($m.Success) { [int]$m.Groups[2].Value } else { 0 }
+      $fps = if ($fpsMatch.Success) { $fpsMatch.Groups[1].Value } else { "30" }
+      if ($w -gt 0 -and $h -gt 0) {
+        return @{ Width = $w; Height = $h; Fps = $fps }
       }
     }
     return $null
@@ -155,10 +164,11 @@ foreach ($f in $files) {
   }
   $vidW = [int]$dims.Width
   $vidH = [int]$dims.Height
+  $vidFps = $dims.Fps
   $wmWidth = [int]([Math]::Max(1, [Math]::Floor($vidW * $WatermarkScale)))
 
   if ($ShowOutput) {
-    Write-Host "  Dimensions: ${vidW}x${vidH}; WM width: ${wmWidth}px"
+    Write-Host "  Dimensions: ${vidW}x${vidH} @ ${vidFps}fps; WM width: ${wmWidth}px"
   }
 
   # 1) WEBM: replace green with white (default) or keep alpha if -TransparentWebm
@@ -177,6 +187,7 @@ foreach ($f in $files) {
       "-an",
       "-c:v", "libvpx-vp9",
       "-pix_fmt", "yuva420p",
+      "-r", $vidFps,
       "-auto-alt-ref", "0",
       $outWebm
     )
@@ -198,6 +209,7 @@ color=c=white:s=${vidW}x${vidH}[bg];
       "-an",
       "-c:v", "libvpx-vp9",
       "-pix_fmt", "yuv420p",
+      "-r", $vidFps,
       "-b:v", "0",
       "-crf", "30",
       $outWebm
@@ -245,6 +257,7 @@ color=c=white:s=${vidW}x${vidH}[bg];
       "-an",
       "-c:v", "libx264",
       "-pix_fmt", "yuv420p",
+      "-r", $vidFps,
       "-crf", "20",
       "-preset", "medium",
       "-movflags", "+faststart",

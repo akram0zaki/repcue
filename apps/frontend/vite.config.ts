@@ -8,7 +8,13 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:3001'
+      '/api': 'http://localhost:3001',
+      // Proxy /media/* requests to deployed Pages Function for R2 video testing
+      '/media': {
+        target: 'https://feature-r2-video-bucket.repcue-dev.pages.dev',
+        changeOrigin: true,
+        secure: true
+      }
     }
   },
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg'],

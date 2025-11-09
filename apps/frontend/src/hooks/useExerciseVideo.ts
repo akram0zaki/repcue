@@ -99,7 +99,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
     const m = mediaIndex[exercise.id];
     setMedia(m ?? null);
-    if (!m) { setVideoUrl(null); return; }
+    if (!m || !m.video) { setVideoUrl(null); return; }
     const chosen = m.video.square || m.video.portrait || m.video.landscape || null;
     setVideoUrl(chosen ?? null);
   }, [exercise, mediaIndex]);

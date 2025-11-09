@@ -1,0 +1,41 @@
+# Cloudflare Pages + R2 Configuration for RepCue
+# https://developers.cloudflare.com/pages/functions/bindings/
+
+name = "repcue"
+compatibility_date = "2025-11-01"
+pages_build_output_dir = "apps/frontend/dist"
+
+# R2 Bucket binding for exercise demo videos
+# Access via env.VIDEOS in Pages Functions
+# Using single bucket for both dev and prod
+[[r2_buckets]]
+binding = "VIDEOS"
+bucket_name = "repcue-videos"
+preview_bucket_name = "repcue-videos"
+
+# Environment variables (non-sensitive)
+[vars]
+DEBUG = "false"
+
+# Production environment (repcue.me - main project)
+[env.production]
+name = "repcue"
+
+[env.production.vars]
+DEBUG = "false"
+
+[[env.production.r2_buckets]]
+binding = "VIDEOS"
+bucket_name = "repcue-videos"
+
+# Preview environment (dev.repcue.me - repcue-dev project, PR previews)
+# Using same bucket as production
+[env.preview]
+name = "repcue-dev"
+
+[env.preview.vars]
+DEBUG = "true"
+
+[[env.preview.r2_buckets]]
+binding = "VIDEOS"
+bucket_name = "repcue-videos"
