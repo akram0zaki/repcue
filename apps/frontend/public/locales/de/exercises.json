@@ -9,6 +9,7 @@
   "tagsHeading": "Tags",
   "badgeTagsHelp": "Badge-Tags:",
   "badgeTagsDescription": "Nutzen Sie strukturierte Tags wie **category:core** oder **equipment:bodyweight** zum Filtern. Schaltflächen zum schnellen Hinzufügen finden Sie unten.",
+  "baseTagsPreview": "Basistags",
   "freeFormTags": "Zusätzliche Tags (Freitext)",
   "freeFormTagsHint": "Fügen Sie benutzerdefinierte Tags für die Suche hinzu (z. B. **Aufwärmen**, **fortgeschritten**, **Zuhause**)",
   "allTags": "Alle Tags",
@@ -144,6 +145,7 @@
   "videoSource": "Videoquelle",
   "viewDetails": "Details anzeigen",
   "viewDetailsAria": "Übungsdetails anzeigen",
+  "catalogBadgeAria": "Katalog-Badge: {{badge}}",
   "visibility": "Sichtbarkeit",
   "repDuration": "Wiederholungsdauer",
   "types": {

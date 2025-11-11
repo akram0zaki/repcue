@@ -1,5 +1,122 @@
 ## Unreleased
 
+### 2025-11-11
+
+#### 🧱 Global Exercise Repository – Consolidation Progress (Phases 1–6 Partial)
+
+**Phase 1 (Types) – COMPLETE**:
+- Introduced `GlobalExercise`, `CatalogMembership`, `ExerciseWithMemberships`, and `ExerciseInCatalog` types (catalog-agnostic core + membership join model).
+- Deprecated legacy single-catalog `Exercise` interface (backward compatibility preserved during migration stage).
+
+**Phase 2 (IndexedDB Schema v25) – COMPLETE**:
+- Added `catalog_memberships` Dexie table with composite and single-field indexes (`[catalog_id+exercise_id]`, `exercise_id`, `catalog_id`, `display_order`).
+- Migration logic: split previous `tags` into `base_tags` (universal) and `catalog_tags` (per membership), auto-generated membership rows for all existing exercises.
+- Initialized sync metadata fields (`version`, `dirty`, `op`, timestamps) for both exercises and memberships—stable across cold restarts.
+
+**Phase 3 (Data Refactoring) – COMPLETE**:
+- Created `globalExercises.ts` with 87 unique canonical exercises (resolved 7 cross-catalog duplicates: glute-bridges, lunges, calf-raises, cat-cow, butt-kicks, high-knees, single-leg-stand).
+- Generated 94 membership records across General Fitness, Women’s Health, Aikido, Tai Chi, Zumba (`memberships/*.ts`).
+- Implemented aggregator with deterministic ordering; catalog-specific tags moved into `catalog_tags` for membership isolation.
+
+**Phase 4 (Supabase Schema + sync_v2) – COMPLETE**:
+- Deployed dev migration creating `catalog_memberships` table (RLS policies + indexes) and updated `sync_v2` Edge Function allowlist & validation for new table.
+- Added ownership and version safeguards; unique constraint prevents duplicate (exercise_id, catalog_id) pairs.
+
+**Phase 4.5 (Local Validation) – IN PROGRESS**:
+- Verified Dexie v25 migration idempotency and persistence across reloads.
+- Confirmed built-in exercises + memberships remain local-only (not erroneously pushed to cloud).
+- Pending: cold start + restart smoke with populated favorites & custom exercises.
+
+**Phase 5 (UI Updates – Partial)**:
+- Updated `useExerciseFilter` to fetch membership-aware sets (`getExercisesForCatalog`) and merge `base_tags` + `catalog_tags` for badge/search logic.
+- Implemented `CatalogMultiSelector` (accessible multi-checkbox; Tailwind only, keyboard & SR friendly).
+- Refactored `ExerciseForm` for multi-catalog assignment, base vs catalog tag separation, membership diff (add / soft delete / update) and validation (≥1 catalog required).
+- Adjusted `ExerciseList` & `ExercisePage` to render merged catalog badges; ARIA improvements applied.
+- Ensured `TimerPage` exercise loading unaffected by catalog transition (no reliance on legacy `catalogId`).
+- Pending: offline queue verification & multi-catalog automated UI tests.
+
+**Phase 6 (Translations – Substantial Progress)**:
+- Canonical EN `exerciseDetails.json` normalized: uniform metadata fields (`benefits`, `limitations`, `best_timing`, `suggested_combinations`, `exercise_references`).
+- Removed duplicate Women’s Health translations for shared exercises (General Fitness canonical retained).
+- Propagated new catalog assignment & accessibility keys (`catalogs.assignCatalogs`, `exercises.catalogBadgeAria`, etc.) across all locales (EN, DE, ES, FR, NL, AR, AR-EG, FY).
+- i18n scan passes with no missing keys; remaining manual UI multilingual verification pending.
+
+#### 🧪 Test Suite Stabilization (Phase 7 Kickoff)
+- ConsentService tests updated to version 3 schema (`legalAcceptances` integration, revoke flow) – 23 passing.
+- ThemeService tests refactored to new palette & validation signature – 25 passing.
+- LegalDocsService unit + simplified integration tests stabilized (date handling normalized via relative future dates & frozen clock) – 45 passing (2 skipped intentional).
+- Reduced noise by excluding Playwright E2E specs from Vitest unit runs.
+- Upcoming: CoachingService, InsightsService cache expectations, Recommendation engine threshold alignment, UpdateErrorHandler message mapping.
+
+#### 🔐 Security & Data Integrity Highlights
+- Owner assignment fallback added when creating catalog memberships (prevents null ownership edge cases in tests & future sync integrity checks).
+- Migration routines avoid duplication—single source of truth for shared exercises mitigates drift and inconsistent translations.
+- RLS policies + sync allowlist ensure only permitted fields propagate (principle of least privilege upheld per OWASP guidance).
+
+#### 📌 Pending / Next Focus
+- UI offline queue validation for multi-catalog CRUD.
+- Membership CRUD automated tests & badge merge tests.
+- Coaching/Insights/Recommendation test realignment.
+- Final Phase 6 multilingual UI verification & accessibility audit (screen reader badge announcements).
+- Production deployment of Global Exercise Repository deferred until full test coverage and sync validation complete.
+
+---
+
+### 2025-11-10
+
+#### 🗄️ Database Schema - Phase 4: Supabase Deployment
+
+**catalog_memberships Table Created** 🎉:
+- **Migration**: `20251110-01-create-catalog-memberships.sql` applied successfully to dev environment
+- **Table Structure**: 13 columns supporting many-to-many exercise-catalog relationships
+  - Primary fields: `id`, `exercise_id`, `catalog_id`
+  - Catalog-specific metadata: `catalog_tags[]`, `display_order`, `featured`
+  - Internationalization: `custom_name_key`, `custom_description_key`
+  - Ownership: `owner_id` (NULL for built-in exercises)
+  - Sync support: `created_at`, `updated_at`, `version`, `deleted`
+- **Indexes**: 5 indexes created for optimal query performance
+  - `catalog_memberships_exercise_id_idx` (exercise lookups)
+  - `catalog_memberships_catalog_id_idx` (catalog filtering)
+  - `catalog_memberships_owner_id_idx` (user data)
+  - `catalog_memberships_updated_at_idx` (sync operations)
+  - `catalog_memberships_exercise_catalog_idx` (compound queries)
+- **Security**: RLS enabled with 6 policies
+  - Users can view own memberships
+  - Users can view public exercise memberships
+  - Users can view built-in exercise memberships (owner_id IS NULL)
+  - Users can insert/update/delete own memberships only
+- **Data Migration**: 8 existing exercise-catalog relationships migrated successfully
+  - Extracted catalog-specific tags (containing ':') into `catalog_tags` array
+  - Preserved backward compatibility with existing `exercises.catalog_id` field
+
+**sync_v2 Edge Function Updated**:
+- **Version 58**: Deployed to dev environment with catalog_memberships support
+- **Changes**:
+  - Added `catalog_memberships` to `SYNC_TABLES` array
+  - Added field allowlist for catalog_memberships (13 fields)
+  - Push operations: Ownership validation, field filtering, upsert to server
+  - Pull operations: Cursor-based pagination for memberships
+- **Status**: ✅ Ready for testing in dev environment
+
+**Tracking & Documentation**:
+- Created `docs/migration-tracking/supabase-changes_20251110.md` with comprehensive tracking:
+  - Full schema specification
+  - Risk assessment (High/Medium/Low categories)
+  - Testing strategy (Unit/Integration/E2E)
+  - Rollback procedures
+  - Environment synchronization status
+- **Next Steps**:
+  - Test sync operations (push/pull catalog_memberships)
+  - Monitor dev environment for 24-48 hours
+  - Apply to production after validation
+  - Proceed to Phase 5: UI component updates
+
+**Technical Details**:
+- Foreign key constraint: `exercise_id` → `exercises(id)` ON DELETE CASCADE
+- Unique constraint: `(exercise_id, catalog_id)` prevents duplicates
+- Conditional audit trigger (only if `log_table_change()` exists)
+- Migration is idempotent (ON CONFLICT DO NOTHING)
+
 ### 2025-11-09
 
 #### 🎨 UI/UX Improvements

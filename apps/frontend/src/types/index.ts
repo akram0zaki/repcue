@@ -28,12 +28,20 @@ export interface ExerciseInstruction {
   duration_seconds?: number; // For timed steps
 }
 
-// Core exercise types
-export interface Exercise extends SyncMetadata {
+// Global exercise repository types (Phase 1: Global Exercise Repository)
+
+/**
+ * GlobalExercise represents a catalog-agnostic exercise definition.
+ * Exercises are defined once and can be referenced by multiple catalogs
+ * via CatalogMembership records.
+ * 
+ * This replaces the one-to-many Exercise → Catalog relationship with
+ * a many-to-many relationship through catalog_memberships.
+ */
+export interface GlobalExercise extends SyncMetadata {
   name: string;
   description?: string;
   exercise_type: ExerciseType;
-  catalogId: string;            // References ExerciseCatalog.id
   default_duration?: number; // in seconds - for time-based exercises
   default_sets?: number; // for repetition-based exercises
   default_reps?: number; // for repetition-based exercises
@@ -46,7 +54,134 @@ export interface Exercise extends SyncMetadata {
   /** Indicates whether a guided video is available for this exercise */
   has_video?: boolean; // default false in catalog initialization
   is_favorite: boolean;
-  tags: string[];
+  
+  /**
+   * Base tags: Universal, catalog-agnostic tags (e.g., 'stability', 'warmup', 'isometric')
+   * These are NOT catalog-specific badge tags.
+   * Catalog-specific tags (e.g., 'category:core', 'kyu:6') are stored in CatalogMembership.catalog_tags
+   */
+  base_tags: string[];
+  
+  // Enhanced fields for user-created exercises
+  instructions?: ExerciseInstruction[]; // Rich instructions for user-created exercises
+  difficulty_level?: 'beginner' | 'intermediate' | 'advanced';
+  equipment_needed?: string[]; // Required equipment
+  muscle_groups?: string[]; // Target muscle groups
+  is_public?: boolean; // can be shared publicly
+  is_verified?: boolean; // admin-verified quality
+  custom_video_url?: string; // User-uploaded video URL
+  
+  // Community stats (read-only from server)
+  rating_average?: number;
+  rating_count?: number;
+  copy_count?: number;
+
+  // Extended exercise metadata (for built-in exercises)
+  benefits?: string; // Health and fitness benefits of the exercise
+  limitations?: string; // Contraindications or limitations
+  best_timing?: string; // Optimal times to perform the exercise
+  suggested_combinations?: string[]; // IDs of exercises that pair well with this one
+  notes?: string; // Additional notes or tips
+  exercise_references?: string[]; // Sources, studies, or references
+
+  // Shared exercise reference fields (for reference-based sharing)
+  is_shared_reference?: boolean; // Flag indicating this exercise is accessed via reference
+  shared_at?: string; // ISO timestamp when the exercise was shared with the user
+}
+
+/**
+ * CatalogMembership represents the many-to-many relationship between
+ * GlobalExercise and ExerciseCatalog.
+ * 
+ * Each membership can override exercise properties for a specific catalog context,
+ * such as catalog-specific tags, display order, featured status, etc.
+ */
+export interface CatalogMembership extends SyncMetadata {
+  exercise_id: string;           // References GlobalExercise.id
+  catalog_id: string;            // References ExerciseCatalog.id
+  
+  // Catalog-specific overrides
+  /**
+   * Catalog-specific tags for badge filtering (e.g., 'category:core', 'kyu:6', 'equipment:bodyweight')
+   * These tags are specific to this catalog's badge system
+   */
+  catalog_tags?: string[];
+  
+  /** Display order within the catalog (lower = appears first) */
+  display_order?: number;
+  
+  /** Whether this exercise is featured/highlighted in the catalog */
+  featured?: boolean;
+  
+  /** Override the exercise name translation key for this catalog */
+  custom_name_key?: string;
+  
+  /** Override the exercise description translation key for this catalog */
+  custom_description_key?: string;
+  
+  /** Catalog-specific notes about this exercise */
+  catalog_notes?: string;
+}
+
+/**
+ * Helper type: Exercise with all its catalog memberships
+ * Used in forms and components that manage exercise-catalog relationships
+ */
+export interface ExerciseWithMemberships extends GlobalExercise {
+  memberships: CatalogMembership[];
+}
+
+/**
+ * Helper type: Exercise in a specific catalog context
+ * Used when displaying exercises within a catalog (e.g., ExercisePage)
+ * Includes the membership info and merged tags for filtering
+ */
+export interface ExerciseInCatalog extends GlobalExercise {
+  membership: CatalogMembership;
+  /**
+   * Effective tags for filtering: base_tags + catalog_tags merged
+   * This is what the badge filtering system uses
+   */
+  effectiveTags: string[];
+}
+
+// Core exercise types (LEGACY - for backward compatibility during migration)
+/**
+ * @deprecated Use GlobalExercise instead. This type will be removed in a future version.
+ * Exercise with direct catalog ownership (one-to-many relationship).
+ * Being replaced by GlobalExercise + CatalogMembership (many-to-many relationship).
+ */
+export interface Exercise extends SyncMetadata {
+  name: string;
+  description?: string;
+  exercise_type: ExerciseType;
+  /**
+   * @deprecated Use catalog_memberships table for catalog relationships.
+   * This field is optional for backward compatibility during migration to GlobalExercise.
+   */
+  catalogId?: string;            // References ExerciseCatalog.id
+  default_duration?: number; // in seconds - for time-based exercises
+  default_sets?: number; // for repetition-based exercises
+  default_reps?: number; // for repetition-based exercises
+  /**
+   * Optional per-exercise default duration for a single repetition (in seconds).
+   * If provided, this overrides BASE_REP_TIME for this exercise. The effective
+   * duration used in timers becomes (rep_duration_seconds * repSpeedFactor).
+   */
+  rep_duration_seconds?: number; // per-rep base time for repetition-based exercises
+  /** Indicates whether a guided video is available for this exercise */
+  has_video?: boolean; // default false in catalog initialization
+  is_favorite: boolean;
+  /**
+   * @deprecated Use base_tags in GlobalExercise or catalog_tags in CatalogMembership.
+   * This field is optional for backward compatibility during migration to GlobalExercise.
+   */
+  tags?: string[];
+  /**
+   * Base tags (catalog-agnostic) - present in GlobalExercise format.
+   * Optional for backward compatibility during migration.
+   */
+  base_tags?: string[];
   
   // Enhanced fields for user-created exercises
   instructions?: ExerciseInstruction[]; // Rich instructions for user-created exercises

@@ -63,6 +63,7 @@ import {
   LegalCenterPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
+import DevToolsPage from './pages/DevToolsPage';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
 import { PRCelebration } from './components/coaching/PRCelebration';
 import { PostWorkoutSurvey } from './components/PostWorkoutSurvey';
@@ -1609,6 +1610,11 @@ function App() {
                 }
                 
                 // Stop the timer - exercise complete
+                // Ensure UI reflects completion (currentTime === targetTime) for rep-based standalone completion
+                setTimerState(prev => ({
+                  ...prev,
+                  currentTime: prev.targetTime || prev.currentTime
+                }));
                 stopTimer(true);
               }
             }
@@ -1750,6 +1756,10 @@ function App() {
             }
             
             // Stop timer completely - all reps and sets done
+            setTimerState(prev => ({
+              ...prev,
+              currentTime: prev.targetTime || prev.currentTime
+            }));
             stopTimer(true);
           }
         } else {
@@ -1852,6 +1862,25 @@ function App() {
         currentExercise: undefined
       }));
     }
+
+    // BUGFIX: Clear stale targetTime/currentTime when switching between exercise types
+    // Scenario: After completing a rep-based exercise (targetTime = repDuration, e.g. 4s) with no pre-countdown,
+    // startActualTimer reuses prev.targetTime because it was set and we go directly to startActualTimer.
+    // Selecting a new time-based exercise then incorrectly keeps the old small targetTime.
+    // Fix: When selecting a new exercise (and timer not running, not in workout mode), clear targetTime so
+    // startTimer/startActualTimer uses the newly selectedDuration instead of stale previous value.
+    if (!timerState.isRunning && !timerState.workoutMode) {
+      setTimerState(prev => ({
+        ...prev,
+        targetTime: undefined,
+        currentTime: 0,
+        // Clear any standalone rep tracking state to avoid leaking into time-based selection
+        currentSet: undefined,
+        totalSets: undefined,
+        currentRep: undefined,
+        totalReps: undefined
+      }));
+    }
     
     setSelectedExercise(exercise);
     updateAppSettings({ last_selected_exercise_id: exercise ? exercise.id : null });
@@ -1868,6 +1897,13 @@ function App() {
         const baseRep = exercise.rep_duration_seconds || BASE_REP_TIME;
         const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
         setSelectedDuration(repDuration as TimerPreset);
+      }
+    } else if (exercise?.exercise_type === 'time_based') {
+      // Ensure selecting a new time-based exercise resets duration to its default
+      // Prime directive: selecting an exercise should reflect its canonical default duration
+      const defaultDuration = exercise.default_duration || 30;
+      if (selectedDuration !== defaultDuration) {
+        setSelectedDuration(defaultDuration as TimerPreset);
       }
     }
   }, [updateAppSettings, timerState.workoutMode, timerState.currentExercise, timerState.currentSet, timerState.currentRep, timerState.totalSets, timerState.totalReps, appSettings.rep_speed_factor]);
@@ -2034,6 +2070,12 @@ function App() {
           // logger.log('[init] Ensuring exercise catalogs and exercises are seeded');
           await storageService.ensureCatalogsSeeded();
           await storageService.ensureExercisesSeeded();
+          // For v25+ global exercise repository, ensure catalog memberships are seeded
+          try {
+            await storageService.ensureCatalogMembershipsSeeded();
+          } catch (e) {
+            logger.warn('[init] ensureCatalogMembershipsSeeded failed:', e);
+          }
           const seedMs = Date.now() - tSeedStart;
           if (seedMs > 1000) logger.warn(`[init] seeding took ${seedMs}ms`); else logger.log(`[init] seeding took ${seedMs}ms`);
 
@@ -2877,6 +2919,10 @@ useEffect(() => {
                     <CoachPage appSettings={appSettings} exercises={exercises} />
                   </Suspense>
                 } 
+              />
+              <Route 
+                path="/dev-tools" 
+                element={<DevToolsPage />} 
               />
               <Route 
                 path={AppRoutes.PR_HISTORY} 

@@ -1,4 +1,9 @@
 {
+  "assignCatalogs": "Tawize oan katalogussen",
+  "assignHint": "Kies ien of mear katalogussen om te bepalen wêr’t dizze oefening ferskynt.",
+  "assignmentHeading": "Katalogus tawizing",
+  "assignmentHint": "Selektearje de katalogussen dêr’t dizze oefening yn opnommen wurdt. Dit kin letter oanpast wurde.",
+  "minOneRequired": "Selektearje teminsten ien katalogus om fierder te gean.",
   "selectCatalog": "Oefenkatalogus",
   "selectDescription": "Kies in oefenkatalogus om de beskikbere oefeningen te sjen",
   "general-fitness": {

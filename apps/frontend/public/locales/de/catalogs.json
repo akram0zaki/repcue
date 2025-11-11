@@ -1,4 +1,9 @@
 {
+  "assignCatalogs": "Zu Katalogen zuweisen",
+  "assignHint": "Wähle einen oder mehrere Kataloge aus, um festzulegen, wo diese Übung erscheint.",
+  "assignmentHeading": "Katalogzuweisung",
+  "assignmentHint": "Wähle Kataloge, in denen diese Übung verfügbar sein soll. Dies kann jederzeit geändert werden.",
+  "minOneRequired": "Wähle mindestens einen Katalog aus, um fortzufahren.",
   "selectCatalog": "Übungskatalog",
   "selectDescription": "Wähle einen Übungskatalog aus, um verfügbare Übungen anzuzeigen",
   "general-fitness": {

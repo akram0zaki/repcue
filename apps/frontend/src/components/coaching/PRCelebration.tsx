@@ -36,8 +36,12 @@ export function PRCelebration({
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Check if user prefers reduced motion
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Check if user prefers reduced motion (guarded for non-browser/test envs)
+  const mql =
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
+  const prefersReducedMotion = !!(mql && 'matches' in mql && mql.matches);
 
   // Format the record type for display
   const getRecordTypeLabel = (type: string): string => {
@@ -266,8 +270,10 @@ export function PRCelebration({
         {/* Auto-dismiss indicator */}
         {autoDismiss && (
           <div className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
-            {t('pr.autoDismiss', 'Auto-closing in {{seconds}} seconds', { 
-              seconds: Math.ceil(dismissDelay / 1000) 
+            {t('pr.autoDismiss', 'Auto-closing in {{seconds}} seconds', {
+              seconds: Math.ceil(dismissDelay / 1000),
+              // Backward-compat for legacy locale strings using {{param0}}
+              param0: Math.ceil(dismissDelay / 1000)
             })}
           </div>
         )}

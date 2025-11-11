@@ -600,8 +600,9 @@ export class AnalyticsService {
 
       logs.forEach(log => {
         const exercise = exerciseMap.get(log.exercise_id);
-        if (exercise && exercise.catalogId) {
-          catalogCount[exercise.catalogId] = (catalogCount[exercise.catalogId] || 0) + 1;
+        if (exercise && (exercise as any).catalogId) {
+          const catalogId = (exercise as any).catalogId;
+          catalogCount[catalogId] = (catalogCount[catalogId] || 0) + 1;
         }
       });
 

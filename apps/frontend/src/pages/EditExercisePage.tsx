@@ -121,6 +121,7 @@ export const EditExercisePage: React.FC = () => {
     setLoading(true);
 
     try {
+      const selectedCatalogIds: string[] = (exerciseData as any).selectedCatalogIds || [exercise.catalogId || 'general-fitness'];
       // Update exercise via IndexedDB storage service (offline-first)
       // The sync service will handle pushing to server later
       const updatedExercise: Exercise = {
@@ -131,10 +132,11 @@ export const EditExercisePage: React.FC = () => {
         // Update with new data
         name: exerciseData.name || exercise.name,
         exercise_type: exerciseData.exercise_type || exercise.exercise_type,
-        catalogId: exercise.catalogId || 'general-fitness', // Preserve existing catalogId
+        catalogId: selectedCatalogIds[0] || exercise.catalogId || 'general-fitness', // Legacy field retention
         description: exerciseData.description ?? exercise.description,
         instructions: exerciseData.instructions ?? exercise.instructions,
-        tags: exerciseData.tags ?? exercise.tags,
+        tags: (exerciseData.tags as string[]) ?? (exerciseData.base_tags as string[]) ?? exercise.tags,
+        base_tags: (exerciseData.base_tags as string[]) ?? (exerciseData.tags as string[]) ?? exercise.base_tags,
         muscle_groups: exerciseData.muscle_groups ?? exercise.muscle_groups,
         equipment_needed: exerciseData.equipment_needed ?? exercise.equipment_needed,
         difficulty_level: exerciseData.difficulty_level ?? exercise.difficulty_level,
@@ -167,6 +169,33 @@ export const EditExercisePage: React.FC = () => {
       
       // Save to IndexedDB (this will mark it as dirty for sync)
       await storageService.saveExercise(updatedExercise);
+
+      // Sync catalog memberships: add missing and remove deselected
+      const existingMemberships = await storageService.getExerciseMemberships(updatedExercise.id);
+      const existingSet = new Set(existingMemberships.map(m => m.catalog_id));
+      const selectedSet = new Set(selectedCatalogIds);
+
+      // Add newly selected
+      for (const cid of selectedSet) {
+        if (!existingSet.has(cid)) {
+          try {
+            await storageService.addExerciseToCatalog(updatedExercise.id, cid, {});
+          } catch (e) {
+            logger.warn('Failed to add membership for catalog', cid, e);
+          }
+        }
+      }
+
+      // Remove deselected (soft delete)
+      for (const cid of existingSet) {
+        if (!selectedSet.has(cid)) {
+          try {
+            await storageService.removeExerciseFromCatalog(updatedExercise.id, cid);
+          } catch (e) {
+            logger.warn('Failed to remove membership for catalog', cid, e);
+          }
+        }
+      }
 
       // Notify App.tsx to refresh exercises
       if (typeof window !== 'undefined') {

@@ -37,6 +37,7 @@ import { ShareButton } from '../components/ShareButton';
 import CatalogSelector from '../components/CatalogSelector';
 import BadgeFilterGroup from '../components/BadgeFilterGroup';
 import { EXERCISE_CATALOGS } from '../data/catalogs';
+import { storageService } from '../services/storageService';
 import { useExerciseFilter } from '../hooks/useExerciseFilter';
 import { getCatalogBadges, getExerciseBadgeValues } from '../utils/catalogBadges';
 
@@ -389,7 +390,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
             <button
               onClick={() => setFiltersExpanded(!filtersExpanded)}
               className="w-full flex items-center justify-between text-left"
-              aria-expanded={filtersExpanded}
+              aria-expanded={filtersExpanded ? 'true' : 'false'}
               aria-controls="filters-content"
             >
               <div className="flex items-center gap-2">
@@ -744,7 +745,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
     </div>
     {/* Preview Modal */}
     {previewOpen && (
-      <div className="fixed inset-0 z-[100]" aria-hidden={!previewOpen}>
+      <div className="fixed inset-0 z-[100]">
         <div
           className="absolute inset-0 bg-black/50"
           onClick={closePreview}
@@ -857,6 +858,24 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 }) => {
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const loc = localizeExercise(exercise, t);
+  const [catalogIds, setCatalogIds] = useState<string[]>(() => exercise.catalogId ? [exercise.catalogId] : []);
+  // Load memberships for multi-catalog display (Phase 5 visual)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const memberships = await storageService.getExerciseMemberships(exercise.id);
+        if (cancelled) return;
+        if (memberships && memberships.length > 0) {
+          const ids = Array.from(new Set(memberships.map(m => m.catalog_id)));
+          setCatalogIds(ids);
+        }
+      } catch (e) {
+        logger.warn('ExerciseCard: failed to load memberships', { id: exercise.id, error: e });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [exercise.id]);
   
   // Check if the exercise is user-created and belongs to the current user
   // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
@@ -900,6 +919,20 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   {t('exercises:shared', { defaultValue: 'Shared' })}
                 </span>
               )}
+              {/* Catalog badges (multi-catalog) */}
+              {catalogIds.map(cid => {
+                const catalog = EXERCISE_CATALOGS.find(c => c.id === cid);
+                const label = catalog ? t(catalog.nameKey, { ns: 'catalogs', defaultValue: cid }) : cid;
+                return (
+                  <span
+                    key={cid}
+                    className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 whitespace-nowrap"
+                    aria-label={t('exercises:catalogBadgeAria', { catalog: label, defaultValue: `Catalog: ${label}` })}
+                  >
+                    {label}
+                  </span>
+                );
+              })}
             </div>
 
             {/* Right Side - Action Buttons */}
@@ -962,6 +995,16 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {loc.name}
           </button>
         </div>
+        {/* Base tags preview (truncated) */}
+        {Array.isArray((exercise as any).base_tags) && (exercise as any).base_tags.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-1 max-h-12 overflow-hidden" aria-label={t('exercises:baseTagsPreview', { defaultValue: 'Base tags' })}>
+            {(exercise as any).base_tags.slice(0, 6).map((tag: string) => (
+              <span key={tag} className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-100 dark:bg-surface-700 text-text-700 dark:text-text-200 rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Video/Image Area */}
         <div className="mb-2">

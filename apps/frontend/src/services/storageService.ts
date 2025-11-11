@@ -2,6 +2,8 @@ import Dexie from 'dexie';
 import type { Table, Transaction } from 'dexie';
 import type {
   Exercise,
+  GlobalExercise,
+  CatalogMembership,
   ActivityLog,
   UserPreferences,
   AppSettings,
@@ -34,7 +36,11 @@ type StoredAppSettings = AppSettings;
 
 type StoredUserFavorite = UserFavorite;
 
-type StoredExercise = Exercise;
+// Exercise types: Support both legacy Exercise and new GlobalExercise during migration
+type StoredExercise = Exercise | GlobalExercise;
+
+// Catalog membership type for many-to-many relationship
+type StoredCatalogMembership = CatalogMembership;
 
 // Workout-related data interfaces  
 type StoredWorkout = Workout;
@@ -61,6 +67,7 @@ interface StoredVideoFile extends SyncMetadata {
  */
 class RepCueDatabase extends Dexie {
   exercises!: Table<StoredExercise>;
+  catalog_memberships!: Table<StoredCatalogMembership>;
   activity_logs!: Table<StoredActivityLog>;
   user_preferences!: Table<StoredUserPreferences>;
   app_settings!: Table<StoredAppSettings>;
@@ -340,6 +347,15 @@ class RepCueDatabase extends Dexie {
       // Clean up old sharing-related fields from exercises
       logger.log('[Migration v21] Removing old sharing columns from exercises for reference-based sharing');
 
+      // Remove legacy sharing fields from exercises
+      await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
+        delete exercise.shared_from_exercise_id;
+        delete exercise.shared_from_user_id;
+        delete exercise.is_shared_copy;
+        logger.log(`[Migration v21] Cleaned up sharing fields for exercise ${exercise.id}`);
+      });
+    });
+
     // Version 22: Add tags support for catalog badge system
     // Add multiEntry index on tags array for efficient badge filtering
     this.version(22).stores({
@@ -388,14 +404,104 @@ class RepCueDatabase extends Dexie {
       personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId'
     });
 
-      await trans.table('exercises').toCollection().modify((exercise: Record<string, unknown>) => {
-        // Remove old sharing fields that are no longer used
-        delete exercise.shared_from_exercise_id;
-        delete exercise.shared_from_user_id;
-        delete exercise.is_shared_copy;
+    // Version 25: Global Exercise Repository - Many-to-many exercises ↔ catalogs
+    // This migration transforms the one-to-many (exercise → catalog) relationship
+    // into a many-to-many relationship via catalog_memberships table
+    this.version(25).stores({
+      // Exercises: Remove catalogId, rename tags → base_tags (catalog-agnostic tags only)
+      exercises: 'id, name, category, exercise_type, is_favorite, *base_tags, updated_at, created_at, owner_id, deleted, version, dirty',
+      // NEW: Catalog memberships - join table for many-to-many relationship
+      // Indexes: exercise_id, catalog_id, [catalog_id+exercise_id] compound, display_order for sorting
+      catalog_memberships: 'id, exercise_id, catalog_id, [catalog_id+exercise_id], display_order, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, theme_id, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty',
+      personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId'
+    }).upgrade(async (trans) => {
+      logger.log('[Migration v25] Starting Global Exercise Repository migration');
+      logger.log('[Migration v25] Transforming one-to-many to many-to-many relationship');
+      
+      const now = new Date().toISOString();
+      const memberships: Array<{
+        id: string;
+        exercise_id: string;
+        catalog_id: string;
+        catalog_tags: string[];
+        display_order: number;
+        featured: boolean;
+        created_at: string;
+        updated_at: string;
+        deleted: boolean;
+        version: number;
+        dirty: number;
+        op: string;
+        synced_at: string | null;
+        owner_id: string | null;
+      }> = [];
+
+      // Get all exercises and create memberships
+      const exercises = await trans.table('exercises').toArray();
+      logger.log(`[Migration v25] Processing ${exercises.length} exercises`);
+
+      for (const exercise of exercises) {
+        const catalogId = exercise.catalogId || 'general-fitness';
+        // Handle both old (tags) and new (base_tags) format during migration
+        const tags = (exercise as any).tags || exercise.base_tags || [];
         
-        logger.log(`[Migration v21] Cleaned up sharing fields for exercise ${exercise.id}`);
-      });
+        // Separate catalog-specific tags from base tags
+        const catalogTags = tags.filter((tag: string) => {
+          // Tags with prefixes like 'category:', 'equipment:', 'kyu:', etc. are catalog-specific
+          return tag.includes(':');
+        });
+        
+        const baseTags = tags.filter((tag: string) => {
+          // Tags without prefixes are base/universal tags
+          return !tag.includes(':');
+        });
+
+        // Create membership record
+        const membership = {
+          id: crypto.randomUUID(),
+          exercise_id: exercise.id as string,
+          catalog_id: catalogId as string,
+          catalog_tags: catalogTags as string[],
+          display_order: 0, // Will be set properly when data files are refactored
+          featured: false,
+          created_at: now,
+          updated_at: now,
+          deleted: false,
+          version: 1,
+          dirty: 1, // Mark as dirty to sync to server
+          op: 'INSERT',
+          synced_at: null,
+          owner_id: exercise.owner_id as string | null
+        };
+        
+        memberships.push(membership);
+
+        // Update exercise: remove catalogId, set base_tags
+        exercise.base_tags = baseTags;
+        delete exercise.catalogId;
+        delete (exercise as any).tags; // Remove old tags property during migration
+        
+        logger.log(`[Migration v25] Exercise ${exercise.id}: ${catalogTags.length} catalog tags, ${baseTags.length} base tags`);
+      }
+
+      // Bulk insert memberships
+      logger.log(`[Migration v25] Creating ${memberships.length} catalog memberships`);
+      await trans.table('catalog_memberships').bulkAdd(memberships);
+
+      // Bulk update exercises
+      logger.log(`[Migration v25] Updating ${exercises.length} exercises with base_tags`);
+      await trans.table('exercises').bulkPut(exercises);
+
+      logger.log('[Migration v25] Migration complete - exercises now support many-to-many catalogs');
     });
   }
 
@@ -734,21 +840,28 @@ export class StorageService {
    */
   public async checkAndUpgradeDatabase(): Promise<void> {
     try {
-      const currentVersion = this.db.verno;
-      const latestVersion = 23; // Update this when adding new versions
-      
-      if (currentVersion < latestVersion) {
-        logger.log(`Database needs upgrade: current v${currentVersion}, latest v${latestVersion}`);
-        
-        // Close the database
+      // Persisted version from backend DB (Edge shows 210 for v21)
+      const backend = this.db.backendDB?.();
+      const persistedVersion = (backend && typeof backend.version === 'number') ? backend.version : 0;
+      const latestVersion = 25;
+
+      if (persistedVersion < latestVersion * 10 && navigator.userAgent.includes('Edg/')) {
+        // Edge reports version*10; normalize
+        logger.log(`[DB] Detected Edge-style version ${persistedVersion}, normalizing for comparison`);
+      }
+
+      const normalizedPersisted = navigator.userAgent.includes('Edg/') ? Math.floor(persistedVersion / 10) : persistedVersion;
+
+      if (normalizedPersisted < latestVersion) {
+        logger.log(`Database needs upgrade: current v${normalizedPersisted}, latest v${latestVersion}`);
+        // Close and reopen to trigger Dexie migration chain
         this.db.close();
-        
-        // Reopen will trigger the upgrade
         await this.db.open();
-        
-        logger.log(`Database upgraded to v${this.db.verno}`);
+        const newBackend = this.db.backendDB?.();
+        const newVersion = newBackend?.version ?? 0;
+        logger.log(`Database reopened. Backend version now: ${newVersion}`);
       } else {
-        logger.log(`Database is up to date at v${currentVersion}`);
+        logger.log(`Database is up to date at v${normalizedPersisted}`);
       }
     } catch (error) {
       logger.error('Error checking/upgrading database:', error);
@@ -1391,7 +1504,7 @@ export class StorageService {
    * Enrich exercises with custom_video_url for offline-first bidirectional sync
    * Sets blob-pending-sync URLs for exercises that have video files
    */
-  private async enrichExercisesWithVideoUrls(exercises: Exercise[]): Promise<Exercise[]> {
+  private async enrichExercisesWithVideoUrls(exercises: StoredExercise[]): Promise<StoredExercise[]> {
     try {
       logger.log('💾 [EnrichVideo] Starting exercise enrichment with video URLs');
 
@@ -1449,7 +1562,7 @@ export class StorageService {
    * This runs client-side only and marks affected exercises dirty so the corrected flag
    * is propagated on the next sync. Errors are swallowed to avoid blocking getExercises().
    */
-  private async reconcileHasVideoFlags(exercises: Exercise[]): Promise<Exercise[]> {
+  private async reconcileHasVideoFlags(exercises: StoredExercise[]): Promise<StoredExercise[]> {
     try {
       if (!this.db.video_files) return exercises;
 
@@ -1761,7 +1874,7 @@ export class StorageService {
    * Get all exercises (filtered to exclude deleted records)
    * Now includes shared exercise references from user_favorites
    */
-  public async getExercises(): Promise<Exercise[]> {
+  public async getExercises(): Promise<StoredExercise[]> {
     if (!this.canStoreData()) {
       return [];
     }
@@ -1907,7 +2020,7 @@ export class StorageService {
     catalogId: string,
     badgeId: string,
     value: string | number
-  ): Promise<Exercise[]> {
+  ): Promise<StoredExercise[]> {
     if (!this.canStoreData()) {
       return [];
     }
@@ -1960,11 +2073,13 @@ export class StorageService {
         const tagPrefix = `${badgeId}:`;
 
         for (const exercise of exercises) {
-          if (!exercise.tags || !Array.isArray(exercise.tags)) {
+          // Handle GlobalExercise which has base_tags
+          const globalEx = exercise as GlobalExercise;
+          if (!globalEx.base_tags || !Array.isArray(globalEx.base_tags)) {
             continue;
           }
 
-          for (const tag of exercise.tags) {
+          for (const tag of globalEx.base_tags) {
             if (typeof tag === 'string' && tag.startsWith(tagPrefix)) {
               const value = tag.substring(tagPrefix.length);
               // Try to parse as number if possible
@@ -2006,15 +2121,16 @@ export class StorageService {
           return false;
         }
 
-        const currentTags = exercise.tags || [];
+        const globalEx = exercise as GlobalExercise;
+        const currentTags = globalEx.base_tags || [];
         const uniqueTags = Array.from(new Set([...currentTags, ...newTags]));
 
         await this.db.exercises.update(exerciseId, {
-          tags: uniqueTags,
+          base_tags: uniqueTags,
           updated_at: new Date().toISOString(),
           version: (exercise.version || 1) + 1,
           dirty: 1 // Mark as dirty for sync
-        });
+        } as any); // Type assertion needed for GlobalExercise fields
 
         logger.log('addTagsToExercise: Tags added successfully', {
           exerciseId,
@@ -2054,16 +2170,17 @@ export class StorageService {
           return false;
         }
 
-        const currentTags = exercise.tags || [];
+        const globalEx = exercise as GlobalExercise;
+        const currentTags = globalEx.base_tags || [];
         const tagsToRemoveSet = new Set(tagsToRemove);
-        const filteredTags = currentTags.filter(tag => !tagsToRemoveSet.has(tag));
+        const filteredTags = currentTags.filter((tag: string) => !tagsToRemoveSet.has(tag));
 
         await this.db.exercises.update(exerciseId, {
-          tags: filteredTags,
+          base_tags: filteredTags,
           updated_at: new Date().toISOString(),
           version: (exercise.version || 1) + 1,
           dirty: 1 // Mark as dirty for sync
-        });
+        } as any); // Type assertion needed for GlobalExercise fields
 
         logger.log('removeTagsFromExercise: Tags removed successfully', {
           exerciseId,
@@ -2093,22 +2210,40 @@ export class StorageService {
   logger.log(`[seed] exercises.count before=${existingCount}`);
   // Force seeding after Version 18 migration
   logger.log(`[seed] Forcing seeding due to Version 18 migration`);
+      // Determine seeding strategy based on schema version
+      // v25+ uses GlobalExercise + CatalogMembership (many-to-many)
+      const isGlobalRepoSchema = this.db.verno >= 25;
+      let cleanSeeds: StoredExercise[] = [];
 
-      // Lazy import to avoid upfront bundle cost and circular deps
-      const { INITIAL_EXERCISES } = await import('../data/exercises');
-
-
-      // Prepare clean seed records and insert in a single transaction using bulkPut for speed
-      const cleanSeeds: StoredExercise[] = INITIAL_EXERCISES.map(exercise => ({
-        ...exercise,
-        dirty: 0,
-        version: 1,
-        created_at: '2025-01-01T00:00:00.000Z',
-        updated_at: '2025-01-01T00:00:00.000Z',
-        deleted: false,
-        owner_id: null,
-        op: 'seed'
-      } as StoredExercise));
+      if (isGlobalRepoSchema) {
+        logger.log('[seed] Using GLOBAL_EXERCISES seeding path (v25+)');
+        const { GLOBAL_EXERCISES } = await import('../data/globalExercises');
+        cleanSeeds = GLOBAL_EXERCISES.map(exercise => ({
+          ...exercise,
+          // Ensure legacy fields absent / normalized
+          dirty: 0,
+          version: 1,
+          created_at: '2025-01-01T00:00:00.000Z',
+          updated_at: '2025-01-01T00:00:00.000Z',
+          deleted: false,
+          owner_id: null,
+          op: 'seed'
+        } as StoredExercise));
+      } else {
+        // Legacy path (pre-v25) still seeds INITIAL_EXERCISES for backward compatibility
+        logger.log('[seed] Using legacy INITIAL_EXERCISES seeding path (< v25)');
+        const { INITIAL_EXERCISES } = await import('../data/exercises');
+        cleanSeeds = INITIAL_EXERCISES.map(exercise => ({
+          ...exercise,
+          dirty: 0,
+          version: 1,
+          created_at: '2025-01-01T00:00:00.000Z',
+          updated_at: '2025-01-01T00:00:00.000Z',
+          deleted: false,
+          owner_id: null,
+          op: 'seed'
+        } as StoredExercise));
+      }
 
   try {
         await this.db.transaction('rw', this.db.exercises, async () => {
@@ -2137,6 +2272,64 @@ export class StorageService {
   return finalCount;
     } catch (error) {
       logger.warn('Failed to seed exercises catalog:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Ensure catalog_memberships are seeded for v25+ schema.
+   * Uses ALL_CATALOG_MEMBERSHIPS static data. Safe no-op if pre-v25 or already populated.
+   */
+  public async ensureCatalogMembershipsSeeded(): Promise<number> {
+    // Only applicable for v25+ schema
+    if (this.db.verno < 25) {
+      return 0;
+    }
+    if (!this.canStoreData()) {
+      logger.warn('[seed] Skipping catalog_memberships seeding: consent not granted');
+      return 0;
+    }
+    try {
+      // Table should exist in v25+; guard in case of partial migration
+      const table: Table<StoredCatalogMembership> | undefined = (this.db as any).catalog_memberships;
+      if (!table) {
+        logger.warn('[seed] catalog_memberships table not present (unexpected)');
+        return 0;
+      }
+      const existing = await table.count();
+      if (existing > 0) {
+        logger.log(`[seed] catalog_memberships already seeded (count=${existing}), skipping`);
+        return existing;
+      }
+      logger.log('[seed] Seeding catalog_memberships from ALL_CATALOG_MEMBERSHIPS');
+      const { ALL_CATALOG_MEMBERSHIPS } = await import('../data/memberships');
+      const seeds: StoredCatalogMembership[] = ALL_CATALOG_MEMBERSHIPS.map(m => ({
+        ...m,
+        // Normalize sync metadata for seed
+        dirty: 0,
+        version: 1,
+        deleted: false,
+        owner_id: null,
+        op: 'seed',
+        created_at: '2025-01-01T00:00:00.000Z',
+        updated_at: '2025-01-01T00:00:00.000Z',
+        synced_at: undefined
+      }));
+      try {
+        await this.db.transaction('rw', table, async () => {
+          await table.bulkAdd(seeds);
+        });
+      } catch (bulkErr) {
+        logger.warn('[seed] bulkAdd failed for catalog_memberships; falling back to sequential adds', bulkErr);
+        for (const m of seeds) {
+          try { await table.add(m); } catch (putErr) { logger.warn('[seed] Failed to add membership', { id: m.id, err: putErr }); }
+        }
+      }
+      const final = await table.count();
+      logger.log(`[seed] catalog_memberships seeding complete (count=${final})`);
+      return final;
+    } catch (err) {
+      logger.warn('Failed to seed catalog_memberships:', err);
       return 0;
     }
   }
@@ -2801,7 +2994,7 @@ export class StorageService {
    * Quickly load built-in exercises without requiring consent (read-only).
    * This intentionally excludes any user-created content for privacy.
    */
-  public async getBuiltInExercisesFastUnsafe(): Promise<Exercise[]> {
+  public async getBuiltInExercisesFastUnsafe(): Promise<StoredExercise[]> {
     try {
       const stored = await this.db.exercises
         .filter(exercise => {
@@ -2821,7 +3014,7 @@ export class StorageService {
    * Fast path to fetch exercises without consulting preferences (no favorites merge).
    * Useful as a fallback when we need quick UI hydration.
    */
-  public async getExercisesFast(): Promise<Exercise[]> {
+  public async getExercisesFast(): Promise<StoredExercise[]> {
     if (!this.canStoreData()) return [];
     try {
       const tFastStart = Date.now();
@@ -2871,6 +3064,257 @@ export class StorageService {
       // Use the resolved workoutId so downstream lookups (e.g., resolveWorkoutName) find it
       this.fallbackStorage.set(`workout_${workoutId}`, storedWorkout);
     }
+  }
+
+  // =================================================================
+  // Catalog Membership Methods (Phase 2: Global Exercise Repository)
+  // =================================================================
+
+  /**
+   * Get all catalog memberships for a specific catalog
+   * 
+   * @param catalogId - The catalog ID to get memberships for
+   * @returns Array of catalog memberships
+   */
+  public async getCatalogMemberships(catalogId: string): Promise<CatalogMembership[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const memberships = await this.db.catalog_memberships
+          .where('catalog_id')
+          .equals(catalogId)
+          .and(m => !m.deleted)
+          .sortBy('display_order');
+        
+        return memberships;
+      },
+      () => []
+    );
+  }
+
+  /**
+   * Get all catalog memberships for a specific exercise
+   * 
+   * @param exerciseId - The exercise ID to get memberships for
+   * @returns Array of catalog memberships
+   */
+  public async getExerciseMemberships(exerciseId: string): Promise<CatalogMembership[]> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const memberships = await this.db.catalog_memberships
+          .where('exercise_id')
+          .equals(exerciseId)
+          .and(m => !m.deleted)
+          .toArray();
+        
+        return memberships;
+      },
+      () => []
+    );
+  }
+
+  /**
+   * Get exercises for a specific catalog with membership information
+   * Joins exercises with their catalog membership data
+   * 
+   * @param catalogId - The catalog ID to get exercises for
+   * @returns Array of exercises with membership info and effective tags
+   */
+  public async getExercisesForCatalog(catalogId: string): Promise<Array<GlobalExercise & { membership: CatalogMembership; effectiveTags: string[] }>> {
+    if (!this.canStoreData()) {
+      return [];
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        // Get memberships for this catalog
+        const memberships = await this.getCatalogMemberships(catalogId);
+        
+        // Get exercises for these memberships
+        const exerciseIds = memberships.map(m => m.exercise_id);
+        const exercises = await this.db.exercises
+          .where('id')
+          .anyOf(exerciseIds)
+          .and(ex => !ex.deleted)
+          .toArray();
+
+        // Create a map for quick lookup
+        const exerciseMap = new Map(exercises.map(ex => [ex.id, ex]));
+        
+        // Join exercises with memberships and compute effective tags
+        const result = memberships
+          .map(membership => {
+            const exercise = exerciseMap.get(membership.exercise_id);
+            if (!exercise) return null;
+
+            const baseTags = (exercise as GlobalExercise).base_tags || [];
+            const catalogTags = membership.catalog_tags || [];
+            
+            return {
+              ...exercise as GlobalExercise,
+              membership,
+              effectiveTags: [...baseTags, ...catalogTags]
+            };
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        return result;
+      },
+      () => []
+    );
+  }
+
+  /**
+   * Add an exercise to a catalog (create membership)
+   * 
+   * @param exerciseId - The exercise ID
+   * @param catalogId - The catalog ID
+   * @param membershipData - Optional membership override data
+   * @returns The created membership ID, or null if failed
+   */
+  public async addExerciseToCatalog(
+    exerciseId: string,
+    catalogId: string,
+    membershipData?: Partial<Pick<CatalogMembership, 'catalog_tags' | 'display_order' | 'featured' | 'custom_name_key' | 'custom_description_key' | 'catalog_notes'>>
+  ): Promise<string | null> {
+    if (!this.canStoreData()) {
+      return null;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        // Resolve owner from authenticated user; fall back to exercise owner when available
+        let userId = this.getCurrentUserId();
+        if (!userId) {
+          try {
+            const ex = await this.db.exercises.get(exerciseId);
+            if (ex && ex.owner_id) userId = ex.owner_id as string;
+          } catch {
+            // ignore and keep null
+          }
+        }
+        const now = new Date().toISOString();
+
+        // Check if membership already exists
+        const existing = await this.db.catalog_memberships
+          .where('[catalog_id+exercise_id]')
+          .equals([catalogId, exerciseId])
+          .first();
+
+        if (existing && !existing.deleted) {
+          logger.warn(`Membership already exists for exercise ${exerciseId} in catalog ${catalogId}`);
+          return existing.id;
+        }
+
+        const membership: CatalogMembership = {
+          id: crypto.randomUUID(),
+          exercise_id: exerciseId,
+          catalog_id: catalogId,
+          catalog_tags: membershipData?.catalog_tags || [],
+          display_order: membershipData?.display_order,
+          featured: membershipData?.featured,
+          custom_name_key: membershipData?.custom_name_key,
+          custom_description_key: membershipData?.custom_description_key,
+          catalog_notes: membershipData?.catalog_notes,
+          created_at: now,
+          updated_at: now,
+          deleted: false,
+          version: 1,
+          dirty: 1,
+          op: 'upsert',
+          synced_at: undefined,
+          owner_id: userId
+        };
+
+        await this.db.catalog_memberships.add(membership);
+        logger.log(`Added exercise ${exerciseId} to catalog ${catalogId}`);
+
+        return membership.id;
+      },
+      () => null
+    );
+  }
+
+  /**
+   * Remove an exercise from a catalog (soft delete membership)
+   * 
+   * @param exerciseId - The exercise ID
+   * @param catalogId - The catalog ID
+   * @returns True if successful
+   */
+  public async removeExerciseFromCatalog(
+    exerciseId: string,
+    catalogId: string
+  ): Promise<boolean> {
+    if (!this.canStoreData()) {
+      return false;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const membership = await this.db.catalog_memberships
+          .where('[catalog_id+exercise_id]')
+          .equals([catalogId, exerciseId])
+          .first();
+
+        if (!membership) {
+          logger.warn(`No membership found for exercise ${exerciseId} in catalog ${catalogId}`);
+          return false;
+        }
+
+        const deleteOp = prepareSoftDelete(membership);
+        await this.db.catalog_memberships.put(deleteOp);
+        logger.log(`Removed exercise ${exerciseId} from catalog ${catalogId}`);
+
+        return true;
+      },
+      () => false
+    );
+  }
+
+  /**
+   * Update catalog membership data
+   * 
+   * @param membershipId - The membership ID to update
+   * @param updates - Partial membership data to update
+   * @returns True if successful
+   */
+  public async updateCatalogMembership(
+    membershipId: string,
+    updates: Partial<Pick<CatalogMembership, 'catalog_tags' | 'display_order' | 'featured' | 'custom_name_key' | 'custom_description_key' | 'catalog_notes'>>
+  ): Promise<boolean> {
+    if (!this.canStoreData()) {
+      return false;
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const membership = await this.db.catalog_memberships.get(membershipId);
+        if (!membership || membership.deleted) {
+          logger.warn(`Membership ${membershipId} not found or deleted`);
+          return false;
+        }
+
+        const updateOp = prepareUpsert(
+          { ...membership, ...updates },
+          membership.id,
+          this.getCurrentUserId()
+        );
+
+        await this.db.catalog_memberships.put(updateOp);
+        logger.log(`Updated membership ${membershipId}`);
+
+        return true;
+      },
+      () => false
+    );
   }
 
   /**
@@ -3322,7 +3766,7 @@ export class StorageService {
   /**
    * Convert stored exercise to runtime format
    */
-  private convertStoredExercise(stored: StoredExercise): Exercise {
+  private convertStoredExercise(stored: StoredExercise): StoredExercise {
     return {
       ...stored
     };
@@ -3467,7 +3911,7 @@ export class StorageService {
    * Fetch original exercise data for shared exercise references
    * This resolves the references to actual exercise data
    */
-  public async getSharedExerciseData(exerciseIds: string[]): Promise<Exercise[]> {
+  public async getSharedExerciseData(exerciseIds: string[]): Promise<StoredExercise[]> {
     if (!this.canStoreData() || exerciseIds.length === 0) {
       return [];
     }
@@ -3762,7 +4206,7 @@ export class StorageService {
   /**
    * Create a custom exercise
    */
-  public async createCustomExercise(exerciseData: Omit<Exercise, 'id' | 'created_at' | 'updated_at' | 'version' | 'synced_at' | 'is_dirty'>): Promise<Exercise> {
+  public async createCustomExercise(exerciseData: Omit<Exercise, 'id' | 'created_at' | 'updated_at' | 'version' | 'synced_at' | 'is_dirty'>): Promise<StoredExercise> {
     if (!this.canStoreData()) {
       throw new Error('Storage consent required to create custom exercises');
     }
@@ -3798,7 +4242,7 @@ export class StorageService {
   /**
    * Update a custom exercise (only for owned exercises)
    */
-  public async updateCustomExercise(exerciseId: string, updates: Partial<Exercise>): Promise<Exercise> {
+  public async updateCustomExercise(exerciseId: string, updates: Partial<StoredExercise>): Promise<StoredExercise> {
     if (!this.canStoreData()) {
       throw new Error('Storage consent required to update exercises');
     }
@@ -3837,7 +4281,7 @@ export class StorageService {
   /**
    * Get exercises shared with current user (synced from server)
    */
-  public async getSharedExercises(): Promise<Exercise[]> {
+  public async getSharedExercises(): Promise<StoredExercise[]> {
     if (!this.canStoreData()) {
       return [];
     }
@@ -3863,7 +4307,7 @@ export class StorageService {
   /**
    * Get exercises created by current user
    */
-  public async getUserCreatedExercises(): Promise<Exercise[]> {
+  public async getUserCreatedExercises(): Promise<StoredExercise[]> {
     if (!this.canStoreData()) {
       return [];
     }
@@ -3888,7 +4332,7 @@ export class StorageService {
   /**
    * Copy an exercise to user's library
    */
-  public async copyExercise(sourceExercise: Exercise): Promise<Exercise> {
+  public async copyExercise(sourceExercise: StoredExercise): Promise<StoredExercise> {
     if (!this.canStoreData()) {
       throw new Error('Storage consent required to copy exercises');
     }
@@ -3977,7 +4421,7 @@ export class StorageService {
    * Get all exercises (builtin + user-created + shared)
    * Now includes shared exercise references from user_favorites
    */
-  public async getAllExercises(): Promise<Exercise[]> {
+  public async getAllExercises(): Promise<StoredExercise[]> {
     if (!this.canStoreData()) {
       return [];
     }
@@ -4016,7 +4460,7 @@ export class StorageService {
           acc.push(exercise);
         }
         return acc;
-      }, [] as Exercise[]);
+      }, [] as StoredExercise[]);
 
       return uniqueExercises;
     } catch (error) {
@@ -4029,14 +4473,14 @@ export class StorageService {
   /**
    * Get exercises from a specific catalog
    */
-  public async getExercisesByCatalog(catalogId: string): Promise<Exercise[]> {
+  public async getExercisesByCatalog(catalogId: string): Promise<StoredExercise[]> {
     if (!this.canStoreData()) {
       return [];
     }
 
     try {
       const allExercises = await this.getAllExercises();
-      return allExercises.filter(exercise => exercise.catalogId === catalogId);
+      return allExercises.filter(exercise => (exercise as any).catalogId === catalogId);
     } catch (error) {
       logger.error('Failed to get exercises by catalog:', error);
       return [];

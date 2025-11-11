@@ -15,6 +15,7 @@
   "tagsHeading": "Tags",
   "badgeTagsHelp": "Badgetags:",
   "badgeTagsDescription": "Gebruik gestructureerde tags zoals **category:core** of **equipment:bodyweight** om te filteren. Knoppen voor snel toevoegen vindt u hieronder.",
+  "baseTagsPreview": "Basistags",
   "freeFormTags": "Extra Tags (Vrije tekst)",
   "freeFormTagsHint": "Voeg aangepaste tags toe om te zoeken (bijv. **warming-up**, **gevorderd**, **thuis**)",
   "allTags": "Alle Tags",
@@ -218,6 +219,7 @@
   "videoSource": "Video Bron",
   "viewDetails": "Bekijk Details",
   "viewDetailsAria": "Bekijk oefeningdetails",
+  "catalogBadgeAria": "Catalogus-badge: {{badge}}",
   "visibility": "Zichtbaarheid",
   "validation": {
     "required": "Verplicht",

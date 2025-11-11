@@ -45,6 +45,7 @@ const SYNC_TABLES = [
   'user_preferences',
   'app_settings',
   'exercises',
+  'catalog_memberships',
   'user_favorites',
   'workouts',
   'activity_logs',
@@ -90,6 +91,11 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'custom_video_url', 'has_video', 'default_duration', 'default_sets', 'default_reps',
     'catalog_id', 'benefits', 'limitations', 'best_timing', 'suggested_combinations',
     'notes', 'exercise_references'
+  ]),
+  catalog_memberships: new Set([
+    'id', 'exercise_id', 'catalog_id', 'catalog_tags', 'display_order', 'featured',
+    'custom_name_key', 'custom_description_key', 'owner_id', 'created_at', 'updated_at',
+    'version', 'deleted'
   ]),
   user_favorites: new Set([
     'id', 'owner_id', 'item_id', 'item_type', 'exercise_type',

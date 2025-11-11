@@ -295,21 +295,21 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-6 text-white shadow-lg">
+              <div className="empty-state-card">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex-shrink-0 self-center sm:self-start">
                     <CalendarIcon size={48} className="drop-shadow-sm" />
                   </div>
                   <div className="flex-1 text-center sm:text-start-rtl">
-                    <h2 className="text-h3 font-bold mb-3 leading-tight">
+                    <h2 className="text-h3 font-bold mb-3 leading-tight text-text-50">
                       {t('home.noScheduleTitle')}
                     </h2>
-                    <p className="text-body text-white/90 mb-5 leading-relaxed">
+                    <p className="text-body text-text-100 mb-5 leading-relaxed">
                       {t('home.noScheduleBody')}
                     </p>
                     <button
                       onClick={() => navigate(Routes.WORKOUTS)}
-                      className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-lg text-caption font-semibold transition-all duration-200 border border-white/20 hover:border-white/30 shadow-sm touch-target"
+                      className="btn-primary touch-target"
                     >
                       {t('home.addWorkout')}
                     </button>

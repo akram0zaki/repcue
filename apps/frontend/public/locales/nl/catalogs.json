@@ -1,4 +1,9 @@
 {
+  "assignCatalogs": "Toewijzen aan catalogi",
+  "assignHint": "Selecteer één of meer catalogi om te bepalen waar deze oefening verschijnt.",
+  "assignmentHeading": "Catalogustoewijzing",
+  "assignmentHint": "Kies de catalogi waarin deze oefening wordt opgenomen. Je kunt dit later aanpassen.",
+  "minOneRequired": "Selecteer minstens één catalogus om verder te gaan.",
   "selectCatalog": "Oefencatalogus",
   "selectDescription": "Kies een oefencatalogus om de beschikbare oefeningen te bekijken",
   "general-fitness": {
