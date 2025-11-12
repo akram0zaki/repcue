@@ -6,7 +6,6 @@ import {
   PlayIcon
 } from './components/icons/NavigationIcons';
 import { VideoThumbnail } from './components/VideoThumbnail';
-import { ExercisePlaceholder } from './components/ExercisePlaceholder';
 import { localizeExercise } from './utils/localizeExercise';
 import { getExerciseById } from './data/exercises';
 
@@ -282,20 +281,14 @@ const StandaloneSharedExercise: React.FC = () => {
 
             {/* Video/Image Area - Matching catalog style */}
             <div className="mb-4">
-              {(exercise.has_video || exercise.custom_video_url) ? (
-                <div className="max-w-md mx-auto">
-                  <VideoThumbnail
-                    exercise={exercise}
-                    onVideoLoad={() => {}}
-                    onVideoError={() => {}}
-                    className="w-full"
-                  />
-                </div>
-              ) : (
-                <div className="max-w-md mx-auto">
-                  <ExercisePlaceholder size="lg" />
-                </div>
-              )}
+              <div className="max-w-md mx-auto">
+                <VideoThumbnail
+                  exercise={exercise}
+                  onVideoLoad={() => {}}
+                  onVideoError={() => {}}
+                  className="w-full"
+                />
+              </div>
             </div>
 
             {/* Default Values */}
@@ -653,6 +646,7 @@ const StandaloneSharedExercise: React.FC = () => {
               <button
                 onClick={() => setShowVideo(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label={t('common.close', 'Close')}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

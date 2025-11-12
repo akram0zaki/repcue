@@ -13,6 +13,8 @@
  *   --bucket=<name>       R2 bucket name (default: repcue-videos)
  *   --dry-run             Show actions without uploading
  *   --force               Upload even if file exists (skip check)
+ *   --reset-mapping       Ignore existing upload mapping (re-upload all)
+ *   (implicit) verify     After upload, verifies object exists before logging success
  * 
  * Prerequisites:
  *   - wrangler CLI installed: npm install -g wrangler
@@ -29,20 +31,51 @@
  */
 
 import fs from 'node:fs/promises';
+import fssync from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { createHash } from 'node:crypto';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 
-const args = Object.fromEntries(process.argv.slice(2).map(s => {
-  const [k, v] = s.startsWith('--') ? s.slice(2).split('=') : [s, true];
-  return [k, v === undefined ? true : v];
-}));
+function parseArgs(argv) {
+  const out = {};
+  const arr = argv.slice(2);
+  for (let i = 0; i < arr.length; i++) {
+    const token = arr[i];
+    if (!token.startsWith('--')) {
+      // Positional tokens are ignored for now
+      continue;
+    }
+    const body = token.slice(2);
+    const eqIdx = body.indexOf('=');
+    if (eqIdx !== -1) {
+      const key = body.slice(0, eqIdx);
+      const val = body.slice(eqIdx + 1);
+      out[key] = val;
+    } else {
+      const key = body;
+      const next = arr[i + 1];
+      if (next && !next.startsWith('--')) {
+        out[key] = next;
+        i++;
+      } else {
+        out[key] = true;
+      }
+    }
+  }
+  return out;
+}
+
+const args = parseArgs(process.argv);
 
 const INPUT_DIR = args.dir;
-const BUCKET = args.bucket || 'repcue-videos';
+const BUCKET = args.bucket || 'repcue-exercise-videos';
 const DRY_RUN = !!args['dry-run'];
 const FORCE = !!args.force;
+const VERBOSE = !!args.verbose;
+const RESET_MAPPING = !!args['reset-mapping'];
+const ACCOUNT_ID = args['account-id'] || process.env.CF_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID;
+const PROFILE = args.profile || process.env.CF_PROFILE;
 
 if (!INPUT_DIR) {
   console.error('❌ Error: --dir=<path> is required');
@@ -99,21 +132,67 @@ async function getVideoDuration(filePath) {
 }
 
 /**
- * Execute wrangler command
+ * Resolve wrangler executable and execute commands with global flags
  */
-function runWrangler(args) {
+const isWin = process.platform === 'win32';
+const localWrangler = path.join(process.cwd(), 'node_modules', '.bin', isWin ? 'wrangler.cmd' : 'wrangler');
+
+function resolveWranglerInvocation() {
+  // Prefer local devDependency
+  try {
+    if (fssync.existsSync(localWrangler)) {
+      return { cmd: localWrangler, baseArgs: [] };
+    }
+  } catch {}
+  // Try global wrangler
+  const v1 = spawnSync('wrangler', ['--version'], { shell: true, stdio: 'ignore' });
+  if (v1.status === 0) {
+    return { cmd: 'wrangler', baseArgs: [] };
+  }
+  // Fallback to npx wrangler (requires network on first run)
+  const v2 = spawnSync('npx', ['wrangler', '--version'], { shell: true, stdio: 'ignore' });
+  if (v2.status === 0) {
+    return { cmd: 'npx', baseArgs: ['wrangler'] };
+  }
+  return null;
+}
+
+const wranglerInvocation = resolveWranglerInvocation();
+
+function withGlobalFlags(args) {
+  const flags = [];
+  // Note: Wrangler v4 doesn't accept --account-id as a global flag for R2; use env var instead.
+  if (PROFILE) {
+    flags.push('--profile', PROFILE);
+  }
+  return [...flags, ...args];
+}
+
+function runWrangler(args, options = {}) {
+  const { discardStdout = false } = options;
+  if (!wranglerInvocation) {
+    const installTip = 'pnpm add -D wrangler@4.47.0; pnpm exec wrangler login';
+    throw new Error(`Wrangler CLI not found. Install locally then login:\n   ${installTip}`);
+  }
   return new Promise((resolve, reject) => {
-    const proc = spawn('wrangler', args, {
-      stdio: ['inherit', 'pipe', 'pipe'],
-      shell: true
+    const proc = spawn(wranglerInvocation.cmd, [...wranglerInvocation.baseArgs, ...withGlobalFlags(args)], {
+      stdio: ['ignore', discardStdout ? 'ignore' : 'pipe', 'pipe'],
+      shell: true,
+      env: {
+        ...process.env,
+        // Prefer CLOUDFLARE_ACCOUNT_ID; include legacy aliases for safety
+        ...(ACCOUNT_ID ? { CLOUDFLARE_ACCOUNT_ID: ACCOUNT_ID, CF_ACCOUNT_ID: ACCOUNT_ID } : {}),
+      }
     });
 
     let stdout = '';
     let stderr = '';
 
-    proc.stdout.on('data', (data) => {
-      stdout += data.toString();
-    });
+    if (!discardStdout) {
+      proc.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+    }
 
     proc.stderr.on('data', (data) => {
       stderr += data.toString();
@@ -123,7 +202,8 @@ function runWrangler(args) {
       if (code === 0) {
         resolve({ stdout, stderr });
       } else {
-        reject(new Error(`Wrangler exited with code ${code}\n${stderr}`));
+        const err = new Error(`Wrangler exited with code ${code}${stderr ? `\n${stderr}` : ''}`);
+        reject(err);
       }
     });
 
@@ -134,22 +214,17 @@ function runWrangler(args) {
 }
 
 /**
- * Check if file exists in R2 bucket
+ * Existence check compatible with current Wrangler (no head/list):
+ * Uses GET with --pipe and checks exit code. Returns true if object exists.
  */
 async function fileExistsInR2(bucket, key) {
   if (FORCE) return false;
-
   try {
-    // Check existence using head operation (faster than get)
-    const result = await runWrangler([
-      'r2', 'object', 'get',
-      `${bucket}/${key}`,
-      '--remote',  // Check remote R2, not local
-      '--pipe'
-    ]);
+    await runWrangler(['r2','object','get', `${bucket}/${key}`, '--pipe'], { discardStdout: true });
+    if (VERBOSE) console.log(`      [exist-check:get] found ${key}`);
     return true;
   } catch (err) {
-    // File doesn't exist or error occurred
+    if (VERBOSE) console.log(`      [exist-check:get] missing ${key}: ${err.message}`);
     return false;
   }
 }
@@ -162,11 +237,27 @@ async function uploadToR2(bucket, key, filePath, contentType) {
     'r2', 'object', 'put',
     `${bucket}/${key}`,
     '--file', filePath,
-    '--content-type', contentType,
-    '--remote'  // Upload to actual R2, not local storage
+    '--content-type', contentType
   ];
 
   await runWrangler(args);
+}
+
+async function verifyExistsWithRetry(bucket, key, attempts = 3) {
+  let lastErr = null;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      await runWrangler(['r2','object','get', `${bucket}/${key}`, '--pipe'], { discardStdout: true });
+      return true;
+    } catch (err) {
+      lastErr = err;
+      // backoff: 150ms, 400ms, 800ms
+      const delay = i === 0 ? 150 : i === 1 ? 400 : 800;
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  if (VERBOSE && lastErr) console.error(`      [verify] failed for ${key}: ${lastErr.message}`);
+  return false;
 }
 
 /**
@@ -253,6 +344,9 @@ async function checkPerformanceBudget(filePath, format) {
  * Load existing mapping file
  */
 async function loadMapping() {
+  if (RESET_MAPPING) {
+    return [];
+  }
   try {
     const content = await fs.readFile(MAPPING_FILE, 'utf-8');
     return JSON.parse(content);
@@ -264,8 +358,29 @@ async function loadMapping() {
 /**
  * Save mapping file
  */
+function dedupeMapping(mapping) {
+  // Keep only the latest entry per unique r2Key; if same exercise/aspect/resolution/format repeats, keep latest uploadedAt
+  const byKey = new Map();
+  for (const entry of mapping) {
+    const key = entry.r2Key || `${entry.exerciseId}|${entry.aspect}|${entry.resolution}|${entry.format}|${entry.sha256}`;
+    const prev = byKey.get(key);
+    if (!prev) {
+      byKey.set(key, entry);
+      continue;
+    }
+    // Compare uploadedAt timestamps if available
+    const prevTs = Date.parse(prev.uploadedAt || '');
+    const currTs = Date.parse(entry.uploadedAt || '');
+    if (!isNaN(currTs) && (isNaN(prevTs) || currTs >= prevTs)) {
+      byKey.set(key, entry);
+    }
+  }
+  return Array.from(byKey.values());
+}
+
 async function saveMapping(mapping) {
-  await fs.writeFile(MAPPING_FILE, JSON.stringify(mapping, null, 2));
+  const cleaned = dedupeMapping(mapping);
+  await fs.writeFile(MAPPING_FILE, JSON.stringify(cleaned, null, 2));
 }
 
 /**
@@ -275,14 +390,28 @@ async function main() {
   console.log('🎬 RepCue Video Publisher (Wrangler Edition)');
   console.log(`📁 Source: ${INPUT_DIR}`);
   console.log(`🪣 Bucket: ${BUCKET}`);
-  console.log(`🔍 Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}\n`);
+  console.log(`🔍 Mode: ${DRY_RUN ? 'DRY RUN' : 'LIVE'}${RESET_MAPPING ? ' + RESET MAPPING' : ''}`);
+  console.log(`🏷️  Account: ${ACCOUNT_ID || '(none)'}`);
+  if (PROFILE) console.log(`👤 Profile: ${PROFILE}`);
+  console.log('');
 
   // Check wrangler is available
   try {
     await runWrangler(['--version']);
   } catch (err) {
-    console.error('❌ Error: wrangler CLI not found or not authenticated');
-    console.log('   Run: npm install -g wrangler && wrangler login');
+    console.error('❌ Error:', err.message);
+    console.log('   Tip: Prefer local install to avoid PATH issues:');
+    console.log('        pnpm add -D wrangler@4.47.0');
+    console.log('        pnpm exec wrangler login');
+    process.exit(1);
+  }
+
+  // Verify authentication (whoami)
+  try {
+    await runWrangler(['whoami'], { discardStdout: false });
+  } catch {
+    console.error('❌ Wrangler is installed but not authenticated.');
+    console.log('   Run: pnpm exec wrangler login');
     process.exit(1);
   }
 
@@ -342,6 +471,7 @@ async function main() {
       // Check if already exists
       const exists = await fileExistsInR2(BUCKET, r2Key);
       if (exists && !FORCE) {
+        console.log(`   Exists in bucket ${BUCKET}: ${r2Key}`);
         console.log(`   ⏭️  Already exists, skipping`);
         results.skipped++;
         continue;
@@ -350,12 +480,18 @@ async function main() {
       // Upload
       const contentType = info.format === 'webm' ? 'video/webm' : 'video/mp4';
       await uploadToR2(BUCKET, r2Key, filePath, contentType);
-      
+
+      // Post-upload verification to ensure we don't log false positives
+      const verified = await verifyExistsWithRetry(BUCKET, r2Key, 3);
+      if (!verified) {
+        throw new Error(`Post-upload verification failed for ${r2Key}`);
+      }
+
       const uploadTime = ((Date.now() - fileStartTime) / 1000).toFixed(2);
       console.log(`   ✅ Uploaded successfully (${uploadTime}s)`);
       results.success++;
 
-      // Add to mapping
+      // Add to mapping only after verification succeeds
       const stats = await fs.stat(filePath);
       const mappingEntry = {
         exerciseId: info.exerciseId,

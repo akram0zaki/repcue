@@ -10,8 +10,8 @@ pages_build_output_dir = "apps/frontend/dist"
 # Using single bucket for both dev and prod
 [[r2_buckets]]
 binding = "VIDEOS"
-bucket_name = "repcue-videos"
-preview_bucket_name = "repcue-videos"
+bucket_name = "repcue-exercise-videos"
+preview_bucket_name = "repcue-exercise-videos"
 
 # Environment variables (non-sensitive)
 [vars]
@@ -26,7 +26,7 @@ DEBUG = "false"
 
 [[env.production.r2_buckets]]
 binding = "VIDEOS"
-bucket_name = "repcue-videos"
+bucket_name = "repcue-exercise-videos"
 
 # Preview environment (dev.repcue.me - repcue-dev project, PR previews)
 # Using same bucket as production
@@ -38,4 +38,4 @@ DEBUG = "true"
 
 [[env.preview.r2_buckets]]
 binding = "VIDEOS"
-bucket_name = "repcue-videos"
+bucket_name = "repcue-exercise-videos"

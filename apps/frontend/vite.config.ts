@@ -11,7 +11,7 @@ export default defineConfig({
       '/api': 'http://localhost:3001',
       // Proxy /media/* requests to deployed Pages Function for R2 video testing
       '/media': {
-        target: 'https://feature-r2-video-bucket.repcue-dev.pages.dev',
+        target: 'https://repcue-dev.pages.dev',
         changeOrigin: true,
         secure: true
       }

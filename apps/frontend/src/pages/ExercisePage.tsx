@@ -28,7 +28,6 @@ import type { AuthUserProfile } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
 import getVideoSources from '../utils/videoSources';
 import { VideoThumbnail } from '../components/VideoThumbnail';
-import { ExercisePlaceholder } from '../components/ExercisePlaceholder';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
@@ -390,7 +389,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
             <button
               onClick={() => setFiltersExpanded(!filtersExpanded)}
               className="w-full flex items-center justify-between text-left"
-              aria-expanded={filtersExpanded ? 'true' : 'false'}
+              aria-expanded={filtersExpanded}
               aria-controls="filters-content"
             >
               <div className="flex items-center gap-2">
@@ -1008,16 +1007,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
 
         {/* Video/Image Area */}
         <div className="mb-2">
-          {(exercise.has_video || exercise.custom_video_url) ? (
-            <VideoThumbnail
-              exercise={exercise}
-              onVideoLoad={() => {}}
-              onVideoError={() => {}}
-              className="w-full aspect-square"
-            />
-          ) : (
-            <ExercisePlaceholder size="md" />
-          )}
+          <VideoThumbnail
+            exercise={exercise}
+            onVideoLoad={() => {}}
+            onVideoError={() => {}}
+            className="w-full aspect-square"
+          />
         </div>
 
         {/* Start Timer Button - Full Width */}

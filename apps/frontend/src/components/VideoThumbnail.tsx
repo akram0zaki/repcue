@@ -9,6 +9,20 @@ import selectVideoVariant from '../utils/selectVideoVariant';
 import type { Exercise } from '../types';
 import logger from '../utils/logger';
 
+// Helper: quick existence probe (first byte) to detect 404/missing objects
+const probe = async (probeUrl: string): Promise<boolean> => {
+  try {
+    const res = await fetch(probeUrl, {
+      method: 'GET',
+      headers: { Range: 'bytes=0-0' },
+      cache: 'no-store'
+    });
+    return res.ok || res.status === 206; // 206 expected for ranged reads
+  } catch {
+    return false;
+  }
+};
+
 // Simple pause icon component
 const PauseIcon: React.FC<{ size?: number; className?: string }> = ({ size = 24, className = '' }) => (
   <svg
@@ -44,14 +58,14 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [mediaMeta, setMediaMeta] = useState<any | null>(null); // cached media entry for fallback
+  const [attemptedFallback, setAttemptedFallback] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const hasVideo = exercise.has_video || exercise.custom_video_url;
+  // has_video can be stale; we derive availability from media index or custom URL
 
   // Resolve video URL
   useEffect(() => {
-    if (!hasVideo) return;
-
     const resolveUrl = async () => {
       try {
         let url: string | null = null;
@@ -70,10 +84,11 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           //   resolvedUrl: url,
           //   isBlob: url?.startsWith('blob:')
           // });
-        } else if (exercise.has_video) {
+        } else {
           // For built-in exercises, load from exercise media
           const mediaIndex = await loadExerciseMedia();
           const media = mediaIndex[exercise.id];
+          setMediaMeta(media || null);
           if (media) {
             url = selectVideoVariant(
               media,
@@ -84,14 +99,53 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         }
 
         if (url) {
+          // Preflight probe of selected URL; if missing, attempt global variant fallback (mp4 first for robustness)
+          let ok = await probe(url);
+          if (!ok && mediaMeta?.variants) {
+            const formatOrder: string[] = ['mp4', 'webm'];
+            for (const aspect of Object.keys(mediaMeta.variants)) {
+              const aspectGroup = mediaMeta.variants[aspect];
+              for (const res of Object.keys(aspectGroup)) {
+                const formats = aspectGroup[res];
+                for (const fmt of formatOrder) {
+                  const candidate = formats?.[fmt]?.url;
+                  if (candidate && candidate !== url) {
+                    const ok2 = await probe(candidate);
+                    if (ok2) {
+                      logger.warn('🎥 [VideoThumbnail] Primary video missing; switching variant', {
+                        exerciseId: exercise.id,
+                        primary: url,
+                        fallback: candidate,
+                        aspect,
+                        res,
+                        format: fmt
+                      });
+                      url = candidate;
+                      ok = true;
+                      break;
+                    }
+                  }
+                }
+                if (ok) break;
+              }
+              if (ok) break;
+            }
+          }
+          if (!ok) {
+            setHasError(true);
+            setVideoUrl(null);
+            logger.warn('🎥 [VideoThumbnail] No accessible video variant found after probe attempts', { exerciseId: exercise.id });
+            return;
+          }
           // Additional blob URL validation for shared exercises
-          if (url.startsWith('blob:') && isSharedExercise(exercise.id)) {
+          const blobUrl = url || '';
+          if (blobUrl.startsWith('blob:') && isSharedExercise(exercise.id)) {
             logger.log('🎥 [VideoThumbnail] Validating blob URL for shared exercise:', {
               exerciseId: exercise.id,
-              blobUrl: url,
-              urlValid: url.length > 10, // Basic check that blob URL isn't truncated
-              hasProtocol: url.includes('://'),
-              hasOrigin: url.includes(window.location.origin)
+              blobUrl,
+              urlValid: blobUrl.length > 10, // Basic check that blob URL isn't truncated
+              hasProtocol: blobUrl.includes('://'),
+              hasOrigin: blobUrl.includes(window.location.origin)
             });
           }
 
@@ -108,7 +162,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     };
 
     resolveUrl();
-  }, [exercise.id, exercise.has_video, exercise.custom_video_url, hasVideo]);
+  }, [exercise.id, exercise.custom_video_url]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -184,6 +238,29 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         }
       }
 
+      // Attempt graceful fallback: if webm failed and mp4 exists in variants, try mp4 once
+      const currentUrl = videoUrl || '';
+      if (!attemptedFallback && currentUrl.endsWith('.webm') && mediaMeta?.variants) {
+        // Find first mp4 variant across aspects/resolutions
+        for (const aspect of Object.keys(mediaMeta.variants)) {
+          const aspectGroup = mediaMeta.variants[aspect];
+          for (const res of Object.keys(aspectGroup)) {
+            const formats = aspectGroup[res];
+            if (formats?.mp4?.url) {
+              logger.warn('🎥 [VideoThumbnail] WebM failed, attempting MP4 fallback', {
+                exerciseId: exercise.id,
+                failedWebm: currentUrl,
+                fallbackUrl: formats.mp4.url
+              });
+              setAttemptedFallback(true);
+              setVideoUrl(formats.mp4.url);
+              setHasError(false);
+              return; // abort marking error; retry with mp4
+            }
+          }
+        }
+      }
+
       setHasError(true);
       onVideoError?.();
     };
@@ -228,7 +305,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   };
 
   // If no video or error, show placeholder
-  if (!hasVideo || hasError || !videoUrl) {
+  if (hasError || !videoUrl) {
     return (
       <div className={`relative ${className}`}>
         <ExercisePlaceholder size="md" />

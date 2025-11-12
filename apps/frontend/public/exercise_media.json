@@ -1,16 +1,142 @@
 [
   {
-    "id": "bear-crawl",
+    "id": "3-4-sit-ups",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 4.37,
+    "duration": 5.93,
     "video": {},
     "variants": {
       "landscape": {
         "1080": {
           "mp4": {
-            "url": "/media/bear-crawl_v1_1920x1080_b5960f0a.mp4",
-            "sha256": "b5960f0a"
+            "url": "/media/3-4-sit-ups_v1_1920x1080_caa830b4.mp4",
+            "sha256": "caa830b4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "air-twisting-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/air-twisting-crunch_v1_1920x1080_d45ad7c8.mp4",
+            "sha256": "d45ad7c8"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "alternate-lying-floor-leg-raise",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/alternate-lying-floor-leg-raise_v1_1920x1080_4b2724ea.mp4",
+            "sha256": "4b2724ea"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "arm-circles",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.57,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/arm-circles_v1_1920x1080_36c4ec0f.mp4",
+            "sha256": "36c4ec0f"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "assisted-lying-leg-raise-with-lateral-throw-down",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/assisted-lying-leg-raise-with-lateral-throw-down_v1_1920x1080_6118a62e.mp4",
+            "sha256": "6118a62e"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "balance-board",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/balance-board_v1_1920x1080_0a86cf07.mp4",
+            "sha256": "0a86cf07"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "bear-crawl",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 19.83,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bear-crawl_v1_1920x1080_c17f7999.mp4",
+            "sha256": "c17f7999"
           }
         }
       }
@@ -24,30 +150,14 @@
     "id": "bicycle-crunches",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 1.17,
+    "duration": 5.97,
     "video": {},
     "variants": {
-      "square": {
-        "1080": {
-          "webm": {
-            "url": "/media/bicycle-crunches_v1_1080x1080_1eb232ee.webm",
-            "sha256": "1eb232ee"
-          }
-        }
-      },
-      "portrait": {
-        "1920": {
-          "webm": {
-            "url": "/media/bicycle-crunches_v1_1080x1920_b21fcdcc.webm",
-            "sha256": "b21fcdcc"
-          }
-        }
-      },
       "landscape": {
         "1080": {
-          "webm": {
-            "url": "/media/bicycle-crunches_v1_1920x1080_40dd1b70.webm",
-            "sha256": "40dd1b70"
+          "mp4": {
+            "url": "/media/bicycle-crunches_v1_1920x1080_347d366a.mp4",
+            "sha256": "347d366a"
           }
         }
       }
@@ -61,51 +171,224 @@
     "id": "bird-dog",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 4.37,
+    "duration": 8.13,
     "video": {},
     "variants": {
       "landscape": {
-        "480": {
+        "1080": {
           "mp4": {
-            "url": "/media/bird-dog_v1_848x480_b5960f0a.mp4",
-            "sha256": "b5960f0a"
+            "url": "/media/bird-dog_v1_1920x1080_ee076fca.mp4",
+            "sha256": "ee076fca"
           }
         }
       }
     },
     "default": {
       "aspect": "landscape",
-      "res": "480"
+      "res": "1080"
+    }
+  },
+  {
+    "id": "bodyweight-pulse-squat",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 14.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bodyweight-pulse-squat_v1_1920x1080_fe5cdc9b.mp4",
+            "sha256": "fe5cdc9b"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "bodyweight-side-squat-step",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 24.43,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bodyweight-side-squat-step_v1_1920x1080_0c31b7d2.mp4",
+            "sha256": "0c31b7d2"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "brachialis-narrow-pull-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/brachialis-narrow-pull-up_v1_1920x1080_03ee74ce.mp4",
+            "sha256": "03ee74ce"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "brachialis-pull-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/brachialis-pull-up_v1_1920x1080_8c82d594.mp4",
+            "sha256": "8c82d594"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
     }
   },
   {
     "id": "burpees",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 4.23,
+    "duration": 3.97,
     "video": {},
     "variants": {
-      "square": {
-        "1080": {
-          "webm": {
-            "url": "/media/burpees_v1_1080x1080_e3760fc4.webm",
-            "sha256": "e3760fc4"
-          }
-        }
-      },
-      "portrait": {
-        "1920": {
-          "webm": {
-            "url": "/media/burpees_v1_1080x1920_95dc97e6.webm",
-            "sha256": "95dc97e6"
-          }
-        }
-      },
       "landscape": {
         "1080": {
-          "webm": {
-            "url": "/media/burpees_v1_1920x1080_281e3b44.webm",
-            "sha256": "281e3b44"
+          "mp4": {
+            "url": "/media/burpees_v1_1920x1080_45227e52.mp4",
+            "sha256": "45227e52"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "butt-kicks",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/butt-kicks_v1_1920x1080_5cfd3468.mp4",
+            "sha256": "5cfd3468"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "butterfly-pull-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/butterfly-pull-up_v1_1920x1080_91ccd4f4.mp4",
+            "sha256": "91ccd4f4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "calf-raises",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/calf-raises_v1_1920x1080_9bc11c8c.mp4",
+            "sha256": "9bc11c8c"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "calf-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/calf-stretch_v1_1920x1080_4dd92aff.mp4",
+            "sha256": "4dd92aff"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "cat-cow",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.47,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/cat-cow_v1_1920x1080_df12c0b7.mp4",
+            "sha256": "df12c0b7"
           }
         }
       }
@@ -125,12 +408,386 @@
       "landscape": {
         "1080": {
           "mp4": {
-            "url": "/media/chair-squat_v1_1920x1080_b8d5e954.mp4",
-            "sha256": "b8d5e954"
-          },
-          "webm": {
-            "url": "/media/chair-squat_v1_1920x1080_a8459def.webm",
-            "sha256": "a8459def"
+            "url": "/media/chair-squat_v1_1920x1080_af0894b0.mp4",
+            "sha256": "af0894b0"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "child-pose",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 10.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/child-pose_v1_1920x1080_25febb52.mp4",
+            "sha256": "25febb52"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "crab-twist-toe-touch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/crab-twist-toe-touch_v1_1920x1080_f39b333a.mp4",
+            "sha256": "f39b333a"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "dead-bug",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 11.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/dead-bug_v1_1920x1080_a34c7e17.mp4",
+            "sha256": "a34c7e17"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "desk-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/desk-plank_v1_1920x1080_5c17e036.mp4",
+            "sha256": "5c17e036"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "downward-dog",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/downward-dog_v1_1920x1080_94d0a08c.mp4",
+            "sha256": "94d0a08c"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "elbow-flexion",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/elbow-flexion_v1_1920x1080_4246d033.mp4",
+            "sha256": "4246d033"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "forearm-supination",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/forearm-supination_v1_1920x1080_7bee9aa7.mp4",
+            "sha256": "7bee9aa7"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "forward-fold",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 16.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/forward-fold_v1_1920x1080_89f9ee7b.mp4",
+            "sha256": "89f9ee7b"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "front-plank-toe-tap",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/front-plank-toe-tap_v1_1920x1080_af9cbd52.mp4",
+            "sha256": "af9cbd52"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "front-scoops",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.43,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/front-scoops_v1_1920x1080_21c6c243.mp4",
+            "sha256": "21c6c243"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "glute-bridges",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/glute-bridges_v1_1920x1080_d911d198.mp4",
+            "sha256": "d911d198"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "hamstring-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hamstring-stretch_v1_1920x1080_0737395c.mp4",
+            "sha256": "0737395c"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "heel-to-toe-walk",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/heel-to-toe-walk_v1_1920x1080_e5b0ecf0.mp4",
+            "sha256": "e5b0ecf0"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "high-knees",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 2.63,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/high-knees_v1_1920x1080_161a5fb8.mp4",
+            "sha256": "161a5fb8"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "hip-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-crunch_v1_1920x1080_d1cb7e18.mp4",
+            "sha256": "d1cb7e18"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "hip-opener",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 12.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-opener_v1_1920x1080_d59b5e85.mp4",
+            "sha256": "d59b5e85"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "hip-roll-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-roll-plank_v1_1920x1080_5c9759bd.mp4",
+            "sha256": "5c9759bd"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "hip-swirls",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-swirls_v1_1920x1080_8b5031cc.mp4",
+            "sha256": "8b5031cc"
           }
         }
       }
@@ -144,30 +801,371 @@
     "id": "jumping-jacks",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 1.53,
+    "duration": 5.93,
     "video": {},
     "variants": {
-      "square": {
-        "1080": {
-          "webm": {
-            "url": "/media/jumping-jacks_v1_1080x1080_70612018.webm",
-            "sha256": "70612018"
-          }
-        }
-      },
-      "portrait": {
-        "1920": {
-          "webm": {
-            "url": "/media/jumping-jacks_v1_1080x1920_5306b78a.webm",
-            "sha256": "5306b78a"
-          }
-        }
-      },
       "landscape": {
         "1080": {
-          "webm": {
-            "url": "/media/jumping-jacks_v1_1920x1080_31c4fba2.webm",
-            "sha256": "31c4fba2"
+          "mp4": {
+            "url": "/media/jumping-jacks_v1_1920x1080_2b7be4eb.mp4",
+            "sha256": "2b7be4eb"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "jumping-jacks-modified",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/jumping-jacks-modified_v1_1920x1080_206b2264.mp4",
+            "sha256": "206b2264"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "kneeling-backward-hip-circles",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/kneeling-backward-hip-circles_v1_1920x1080_6cde2833.mp4",
+            "sha256": "6cde2833"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "kneeling-thoracic-spine",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/kneeling-thoracic-spine_v1_1920x1080_f95fdf7a.mp4",
+            "sha256": "f95fdf7a"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "leg-pull-side",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/leg-pull-side_v1_1920x1080_53ac5bfc.mp4",
+            "sha256": "53ac5bfc"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "lever-stepper",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lever-stepper_v1_1920x1080_1d94265e.mp4",
+            "sha256": "1d94265e"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "lunges",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lunges_v1_1920x1080_46783827.mp4",
+            "sha256": "46783827"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "lying-abduction-leg-raise-on-floor",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-abduction-leg-raise-on-floor_v1_1920x1080_3a2c573b.mp4",
+            "sha256": "3a2c573b"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "lying-back-extension",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-back-extension_v1_1920x1080_30c42094.mp4",
+            "sha256": "30c42094"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "lying-floor-abduction",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-floor-abduction_v1_1920x1080_472cdff2.mp4",
+            "sha256": "472cdff2"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "lying-prone-w-to-y",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.17,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-prone-w-to-y_v1_1920x1080_a655c4fd.mp4",
+            "sha256": "a655c4fd"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "marching-in-place",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 1.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/marching-in-place_v1_1920x1080_2cb50f61.mp4",
+            "sha256": "2cb50f61"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "modified-push-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/modified-push-up_v1_1920x1080_7d8d7ea1.mp4",
+            "sha256": "7d8d7ea1"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "mountain-climbers",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/mountain-climbers_v1_1920x1080_90d50150.mp4",
+            "sha256": "90d50150"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "muscle-up-on-vertical-bar",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/muscle-up-on-vertical-bar_v1_1920x1080_9be6cf3c.mp4",
+            "sha256": "9be6cf3c"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "neck-rolls",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.43,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/neck-rolls_v1_1920x1080_b265d9c7.mp4",
+            "sha256": "b265d9c7"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "palm-up-palm-down-rotation",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/palm-up-palm-down-rotation_v1_1920x1080_4c064d66.mp4",
+            "sha256": "4c064d66"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "pelvic-tilts",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/pelvic-tilts_v1_1920x1080_83515e0f.mp4",
+            "sha256": "83515e0f"
           }
         }
       }
@@ -181,30 +1179,98 @@
     "id": "plank",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 5,
+    "duration": 5.97,
     "video": {},
     "variants": {
-      "square": {
-        "1080": {
-          "webm": {
-            "url": "/media/plank_v1_1080x1080_ab564660.webm",
-            "sha256": "ab564660"
-          }
-        }
-      },
-      "portrait": {
-        "1920": {
-          "webm": {
-            "url": "/media/plank_v1_1080x1920_0bebd45c.webm",
-            "sha256": "0bebd45c"
-          }
-        }
-      },
       "landscape": {
         "1080": {
-          "webm": {
-            "url": "/media/plank_v1_1920x1080_48aea90e.webm",
-            "sha256": "48aea90e"
+          "mp4": {
+            "url": "/media/plank_v1_1920x1080_b136fd78.mp4",
+            "sha256": "b136fd78"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "power-clean-thruster",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.33,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/power-clean-thruster_v1_1920x1080_7010fb88.mp4",
+            "sha256": "7010fb88"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "prayer-push",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/prayer-push_v1_1920x1080_30d4cd3a.mp4",
+            "sha256": "30d4cd3a"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "press-under",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.67,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/press-under_v1_1920x1080_b18292c0.mp4",
+            "sha256": "b18292c0"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "push-up-jack",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/push-up-jack_v1_1920x1080_2fbf1235.mp4",
+            "sha256": "2fbf1235"
           }
         }
       }
@@ -218,30 +1284,623 @@
     "id": "push-ups",
     "repsPerLoop": 1,
     "fps": 30,
-    "duration": 2.9,
+    "duration": 5.93,
     "video": {},
     "variants": {
-      "square": {
-        "1080": {
-          "webm": {
-            "url": "/media/push-ups_v1_1080x1080_1e720b31.webm",
-            "sha256": "1e720b31"
-          }
-        }
-      },
-      "portrait": {
-        "1920": {
-          "webm": {
-            "url": "/media/push-ups_v1_1080x1920_d7d8ce60.webm",
-            "sha256": "d7d8ce60"
-          }
-        }
-      },
       "landscape": {
         "1080": {
-          "webm": {
-            "url": "/media/push-ups_v1_1920x1080_8be2dc11.webm",
-            "sha256": "8be2dc11"
+          "mp4": {
+            "url": "/media/push-ups_v1_1920x1080_b42bdc36.mp4",
+            "sha256": "b42bdc36"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "quad-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/quad-stretch_v1_1920x1080_035ab82e.mp4",
+            "sha256": "035ab82e"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "reverse-lunge-leg-kick",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.73,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/reverse-lunge-leg-kick_v1_1920x1080_976812bf.mp4",
+            "sha256": "976812bf"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "russian-twists",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/russian-twists_v1_1920x1080_fb60df58.mp4",
+            "sha256": "fb60df58"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "seated-cardio-arm-pumps",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-cardio-arm-pumps_v1_1920x1080_ccfcb27e.mp4",
+            "sha256": "ccfcb27e"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "seated-circle-leg-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-circle-leg-crunch_v1_1920x1080_b67d82b2.mp4",
+            "sha256": "b67d82b2"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "seated-neck-tap",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-neck-tap_v1_1920x1080_cee9b98b.mp4",
+            "sha256": "cee9b98b"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "seated-spinal-twist",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.83,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-spinal-twist_v1_1920x1080_25bd62a4.mp4",
+            "sha256": "25bd62a4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "shin-box",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 10.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shin-box_v1_1920x1080_bcc9dc53.mp4",
+            "sha256": "bcc9dc53"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "shoulder-flexion",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shoulder-flexion_v1_1920x1080_562d9358.mp4",
+            "sha256": "562d9358"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "shoulder-rolls",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shoulder-rolls_v1_1920x1080_22b13ab2.mp4",
+            "sha256": "22b13ab2"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "shoulder-transverse-flexion",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shoulder-transverse-flexion_v1_1920x1080_cdd0a1a1.mp4",
+            "sha256": "cdd0a1a1"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "side-bridge-bent-leg",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-bridge-bent-leg_v1_1920x1080_274c07c3.mp4",
+            "sha256": "274c07c3"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "side-kick-burpee",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.47,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-kick-burpee_v1_1920x1080_81a18db6.mp4",
+            "sha256": "81a18db6"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "side-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-plank_v1_1920x1080_ca48cd68.mp4",
+            "sha256": "ca48cd68"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "side-plank-rotation",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 11.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-plank-rotation_v1_1920x1080_aa2a8967.mp4",
+            "sha256": "aa2a8967"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "side-steps-cardio",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-steps-cardio_v1_1920x1080_1ccd8f55.mp4",
+            "sha256": "1ccd8f55"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "side-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-stretch_v1_1920x1080_2b47a2a9.mp4",
+            "sha256": "2b47a2a9"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "single-leg-stand",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/single-leg-stand_v1_1920x1080_27b090c8.mp4",
+            "sha256": "27b090c8"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "sitting-lotus-pose-hip-horizontal",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/sitting-lotus-pose-hip-horizontal_v1_1920x1080_fc88841f.mp4",
+            "sha256": "fc88841f"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "snatch-high",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/snatch-high_v1_1920x1080_362cc77d.mp4",
+            "sha256": "362cc77d"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "squats",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/squats_v1_1920x1080_0639c52c.mp4",
+            "sha256": "0639c52c"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "standing-side-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-side-crunch_v1_1920x1080_6ea2fb23.mp4",
+            "sha256": "6ea2fb23"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "standing-side-crunch-elbow-to-knee",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-side-crunch-elbow-to-knee_v1_1920x1080_19361fd7.mp4",
+            "sha256": "19361fd7"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "standing-side-leg-raise",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-side-leg-raise_v1_1920x1080_5a3f8065.mp4",
+            "sha256": "5a3f8065"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "standing-swimmer",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.33,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-swimmer_v1_1920x1080_da263470.mp4",
+            "sha256": "da263470"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "step-touch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/step-touch_v1_1920x1080_8913869f.mp4",
+            "sha256": "8913869f"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "step-up-stair",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/step-up-stair_v1_1920x1080_8161aa87.mp4",
+            "sha256": "8161aa87"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "tree-pose",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 12.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/tree-pose_v1_1920x1080_a099d776.mp4",
+            "sha256": "a099d776"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "tricep-dips",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/tricep-dips_v1_1920x1080_eb2b63df.mp4",
+            "sha256": "eb2b63df"
           }
         }
       }
@@ -261,12 +1920,50 @@
       "landscape": {
         "1080": {
           "mp4": {
-            "url": "/media/wall-push-up_v1_1920x1080_09659bda.mp4",
-            "sha256": "09659bda"
-          },
-          "webm": {
-            "url": "/media/wall-push-up_v1_1920x1080_5c44a965.webm",
-            "sha256": "5c44a965"
+            "url": "/media/wall-push-up_v1_1920x1080_2f18a2a4.mp4",
+            "sha256": "2f18a2a4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "wall-sit",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.63,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/wall-sit_v1_1920x1080_b4f7b4ca.mp4",
+            "sha256": "b4f7b4ca"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "warrior-3",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/warrior-3_v1_1920x1080_e15945e4.mp4",
+            "sha256": "e15945e4"
           }
         }
       }

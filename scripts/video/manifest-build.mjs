@@ -35,6 +35,10 @@ const args = Object.fromEntries(
 const MAPPING_PATH = args.mapping || 'scripts/video/upload-mapping.json';
 const DRY_RUN = args['dry-run'] === true || args['dry-run'] === 'true';
 const VALIDATE = args.validate === true || args.validate === 'true';
+const FORMATS = (args.formats ? String(args.formats) : 'mp4,webm')
+  .split(',')
+  .map(s => s.trim().toLowerCase())
+  .filter(Boolean);
 const MANIFEST_PATH = 'apps/frontend/public/exercise_media.json';
 
 /**
@@ -100,6 +104,11 @@ function buildVariants(entries) {
 
   for (const entry of entries) {
     const { aspect, resolution, format, r2Url, sha256, durationSeconds } = entry;
+
+    // Filter by allowed formats
+    if (!FORMATS.includes(format)) {
+      continue;
+    }
 
     // Capture duration from first entry (should be same for all variants)
     if (duration === null && durationSeconds) {
@@ -242,7 +251,7 @@ async function main() {
   console.log('🔧 RepCue Manifest Builder');
   console.log(`📄 Manifest: ${MANIFEST_PATH}`);
   console.log(`📊 Mapping: ${MAPPING_PATH}`);
-  console.log(`🔧 Mode: ${DRY_RUN ? 'DRY RUN' : VALIDATE ? 'VALIDATE ONLY' : 'LIVE'}\n`);
+  console.log(`🔧 Mode: ${DRY_RUN ? 'DRY RUN' : VALIDATE ? 'VALIDATE ONLY' : 'LIVE'} | Formats: ${FORMATS.join(', ')}\n`);
 
   // If validate-only mode and no mapping, just validate existing manifest
   if (VALIDATE && !existsSync(MAPPING_PATH)) {

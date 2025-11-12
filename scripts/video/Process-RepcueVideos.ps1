@@ -5,8 +5,8 @@ Process-RepcueVideos.ps1
 - Adds RepCue watermark (transparent PNG)
 - Auto-scales watermark to a % of video width + sets opacity
 - Places watermark bottom-right with padding
-- Outputs .webm (transparent) + .mp4 (fallback on solid bg) into ./out
-- Logs failures to ./process_failures.log
+ - Outputs .webm (transparent) + .mp4 (fallback on solid bg) into OutputDir (defaults to InputDir\out)
+ - Logs failures to OutputDir\process_failures.log
 
 REQUIREMENTS:
 - ffmpeg available in PATH
@@ -22,9 +22,11 @@ Example:
   -Blend 0.10 `
   -Padding 20 `
   -ShowOutput
+  -OutputFormat mp4/webm/all
+  -OutputDir "C:\\path\\to\\custom\\out"
 
 Or oneliner:
-.\Process-RepcueVideos.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy" -WatermarkPath "C:\Users\akram\OneDrive\Documents\RepCue\logo\RepCue-1762545545946\RepCue-logo-transparent.png" -WatermarkScale 0.3 -WatermarkOpacity 0.6 -Similarity 0.30 -Blend 0.10 -Padding 20 -ShowOutput
+.\Process-RepcueVideos.ps1 -InputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy\in" -OutputDir "C:\Users\akram\OneDrive\Documents\RepCue\videos\anatomy\out" -WatermarkPath "C:\Users\akram\OneDrive\Documents\RepCue\logo\RepCue-1762545545946\RepCue-logo-transparent.png" -WatermarkScale 0.3 -WatermarkOpacity 0.6 -Similarity 0.30 -Blend 0.10 -Padding 20 -ShowOutput -OutputFormat mp4
 
   #>
 
@@ -33,6 +35,8 @@ param(
   [string]$InputDir,
   [Parameter(Mandatory=$true)]
   [string]$WatermarkPath,
+  [Parameter(Mandatory=$false)]
+  [string]$OutputDir,
 
   # --- Keying controls ---
   [string]$GreenHex = "00ff00",   # green screen key color (hex without 0x)
@@ -44,7 +48,9 @@ param(
   [double]$WatermarkOpacity = 0.60, # 0.0–1.0 alpha (e.g., 0.6 = 60%)
   [int]$Padding = 20,             # px from right & bottom
   [switch]$TransparentWebm,       # if set, WEBM keeps alpha (no white fill)
-  [switch]$SkipMp4Fallback,       # if set, only produce transparent .webm
+  [switch]$SkipMp4Fallback,       # legacy flag, superseded by -OutputFormat mp4/webm/all
+  [ValidateSet('mp4','webm','all')]
+  [string]$OutputFormat = 'all',  # choose which formats to generate
   [switch]$ShowOutput             # if set, show ffmpeg output
 )
 
@@ -70,10 +76,14 @@ try { & ffprobe -version 2>$null | Out-Null } catch {
 }
 
 # Create output & log paths
-$outDir = Join-Path $InputDir "out"
+if ([string]::IsNullOrWhiteSpace($OutputDir)) {
+  $outDir = Join-Path $InputDir "out"
+} else {
+  $outDir = $OutputDir
+}
 if (-not (Test-Path $outDir)) { New-Item -ItemType Directory -Path $outDir | Out-Null }
 
-$logPath = Join-Path $InputDir "process_failures.log"
+$logPath = Join-Path $outDir "process_failures.log"
 "[{0}] Starting batch in '{1}'" -f (Get-Date), $InputDir | Out-File -FilePath $logPath -Encoding UTF8
 "Green key: 0x$GreenHex  Similarity: $Similarity  Blend: $Blend" | Out-File -FilePath $logPath -Append -Encoding UTF8
 "Watermark: $WatermarkPath  Scale: $WatermarkScale  Opacity: $WatermarkOpacity  Padding: $Padding" | Out-File -FilePath $logPath -Append -Encoding UTF8
@@ -146,6 +156,12 @@ if ($files.Count -eq 0) {
 Write-Host ("Found {0} file(s)." -f $files.Count)
 
 foreach ($f in $files) {
+  # Determine generation choices per file
+  $doWebm = $OutputFormat -in @('webm','all')
+  $doMp4  = $OutputFormat -in @('mp4','all')
+  # Backward compatibility: if user passed -SkipMp4Fallback and didn't force mp4, disable mp4
+  if ($SkipMp4Fallback.IsPresent -and $OutputFormat -ne 'mp4') { $doMp4 = $false }
+
   $src  = $f.FullName
   $name = [System.IO.Path]::GetFileNameWithoutExtension($src)
 
@@ -171,8 +187,8 @@ foreach ($f in $files) {
     Write-Host "  Dimensions: ${vidW}x${vidH} @ ${vidFps}fps; WM width: ${wmWidth}px"
   }
 
-  # 1) WEBM: replace green with white (default) or keep alpha if -TransparentWebm
-  if ($TransparentWebm.IsPresent) {
+  # WEBM generation (if selected)
+  if ($doWebm -and $TransparentWebm.IsPresent) {
     $filterWebm = @"
 [0:v]chromakey=0x${GreenHex}:${Similarity}:${Blend},format=rgba[fg];
 [1:v]scale=${wmWidth}:-1,format=rgba,colorchannelmixer=aa=${WatermarkOpacity}[wm];
@@ -192,7 +208,7 @@ foreach ($f in $files) {
       $outWebm
     )
   }
-  else {
+  elseif ($doWebm) {
     $filterWebm = @"
 [0:v]chromakey=0x${GreenHex}:${Similarity}:${Blend},format=rgba[fg];
 color=c=white:s=${vidW}x${vidH}[bg];
@@ -216,30 +232,30 @@ color=c=white:s=${vidW}x${vidH}[bg];
     )
   }
 
-  if ($ShowOutput) {
-    Write-Host "  Running: ffmpeg $($webmArgs -join ' ')"
-  }
-
-  $webmStartTime = Get-Date
-  $webmOutput = & ffmpeg $webmArgs 2>&1 | Out-String
-  $webmDuration = (Get-Date) - $webmStartTime
-  
-  if ($LASTEXITCODE -ne 0) {
-    $errorLines = $webmOutput -split "`n" | Select-Object -Last 10
-    $errorMsg = ($errorLines -join "`n").Trim()
-    Log-Failure $src "WEBM" $errorMsg
-    if ($ShowOutput) {
-      Write-Host "  WEBM FAILED. Last 10 lines:" -ForegroundColor Red
-      Write-Host $errorMsg
+  if ($doWebm) {
+    if ($ShowOutput) { Write-Host "  Running: ffmpeg $($webmArgs -join ' ')" }
+    $webmStartTime = Get-Date
+    $webmOutput = & ffmpeg $webmArgs 2>&1 | Out-String
+    $webmDuration = (Get-Date) - $webmStartTime
+    if ($LASTEXITCODE -ne 0) {
+      $errorLines = $webmOutput -split "`n" | Select-Object -Last 10
+      $errorMsg = ($errorLines -join "`n").Trim()
+      Log-Failure $src "WEBM" $errorMsg
+      if ($ShowOutput) {
+        Write-Host "  WEBM FAILED. Last 10 lines:" -ForegroundColor Red
+        Write-Host $errorMsg
+      }
+      # Only skip further processing if webm was the only requested format
+      if (-not $doMp4) { continue }
+    } elseif ($ShowOutput) {
+      Write-Host "  WEBM created successfully in $($webmDuration.TotalSeconds.ToString('F2'))s" -ForegroundColor Green
     }
-    continue
-  } elseif ($ShowOutput) {
-    Write-Host "  WEBM created successfully in $($webmDuration.TotalSeconds.ToString('F2'))s" -ForegroundColor Green
+    if ($LASTEXITCODE -eq 0) {
+      "[{0}] SUCCESS | WEBM | {1} | Duration: {2:F2}s" -f (Get-Date), $src, $webmDuration.TotalSeconds | Out-File -FilePath $logPath -Append -Encoding UTF8
+    }
   }
-  
-  "[{0}] SUCCESS | WEBM | {1} | Duration: {2:F2}s" -f (Get-Date), $src, $webmDuration.TotalSeconds | Out-File -FilePath $logPath -Append -Encoding UTF8
 
-  if (-not $SkipMp4Fallback.IsPresent) {
+  if ($doMp4) {
     # 2) MP4: key green → composite over white → watermark
     $filterMp4 = @"
 [0:v]chromakey=0x${GreenHex}:${Similarity}:${Blend},format=rgba[fg];
@@ -283,7 +299,6 @@ color=c=white:s=${vidW}x${vidH}[bg];
     } elseif ($ShowOutput) {
       Write-Host "  MP4 created successfully in $($mp4Duration.TotalSeconds.ToString('F2'))s" -ForegroundColor Green
     }
-    
     if ($LASTEXITCODE -eq 0) {
       "[{0}] SUCCESS | MP4 | {1} | Duration: {2:F2}s" -f (Get-Date), $src, $mp4Duration.TotalSeconds | Out-File -FilePath $logPath -Append -Encoding UTF8
     }
@@ -295,4 +310,4 @@ color=c=white:s=${vidW}x${vidH}[bg];
   }
 }
 
-Write-Host "Done. Check 'out' for results and 'process_failures.log' for any errors."
+Write-Host "Done. Check '$outDir' for results and 'process_failures.log' for any errors."

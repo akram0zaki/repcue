@@ -1,5 +1,45 @@
 ## Unreleased
 
+### 2025-11-13
+
+#### 🎥 Video Infrastructure Pivot & Reliability Hardening
+
+**New Bucket Migration**:
+- Switched R2 storage from `repcue-videos` to `repcue-exercise-videos` after persistent 0-object dashboard visibility anomalies despite reported successful uploads.
+- Updated `wrangler.toml` to bind `env.VIDEOS` to the new bucket for default, preview (`repcue-dev`), and production (`repcue`).
+- Added explicit bucket creation & verification steps to deployment and video workflow docs.
+
+**Uploader Script Enhancements** (`scripts/video/publish-to-r2-wrangler.mjs`):
+- Replaced naive argv parsing with robust parser supporting `--flag value` and `--flag=value` forms.
+- Added multi-path Wrangler resolution (prefer local devDependency → global binary → `npx wrangler`).
+- Removed unsupported `--account-id` CLI flag usage; now injects `CLOUDFLARE_ACCOUNT_ID` / `CF_ACCOUNT_ID` via environment for R2 operations.
+- Added authentication guards (`wrangler --version`, `wrangler whoami`) with actionable remediation tips.
+- Improved error messages and banner output (prints actual account ID, profile, mode).
+- Default bucket changed to `repcue-exercise-videos` (overridable via `--bucket`).
+- Preserved post-upload verification (GET + retry backoff) to eliminate false positives (security & integrity).
+
+**Documentation Updates**:
+- `.local/videos.md`: New bucket creation commands (`wrangler r2 bucket create/info`), dry-run workflow, revised wipe command, Wrangler troubleshooting section (local install + auth steps), updated bucket name throughout.
+- `.local/deploy.md`: Added bucket existence checks before Pages deploy for dev and prod; notes on new binding.
+
+**Operational Guidance**:
+- Recommended one-file smoke test before full upload to confirm correct account context.
+- Clarified that manifest builder remains local-only; no R2 dependency for JSON generation.
+
+**Security & Compliance**:
+- Maintains OWASP A01 (Broken Access Control) principles by enforcing deterministic verification over trusting upload exit codes.
+- Avoids accidental multi-account drift by surfacing explicit account in logs and removing silent flag misuse.
+
+**Next Steps** (not yet executed):
+- Optional: Add purge helper using S3-compatible API once Wrangler adds object listing or adopt Cloudflare API for enumeration.
+- Monitor new bucket object count post initial upload to validate visibility fix.
+
+#### 🛠 Developer Experience
+- Clearer failure diagnostics when Wrangler missing or unauthenticated (actionable install/login guidance).
+- Environment-variable approach future-proofs uploader against Wrangler CLI flag changes.
+
+---
+
 ### 2025-11-11
 
 #### 🧱 Global Exercise Repository – Consolidation Progress (Phases 1–6 Partial)
