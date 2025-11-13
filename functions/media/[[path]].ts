@@ -87,118 +87,13 @@ function inferContentType(key: string): string {
 /**
  * Main handler for /media/* requests
  */
-export const onRequest: PagesFunction<Env> = async (context) => {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  const debug = env.DEBUG === 'true';
-  
-  // Check if R2 binding is available
-  if (!env.VIDEOS) {
-    console.error('[Media Proxy] R2 bucket binding "VIDEOS" is not configured');
-    return new Response('Service configuration error: R2 bucket not available', { 
-      status: 503,
-      headers: { 
-        'Cache-Control': 'no-store',
-        'Content-Type': 'text/plain'
-      }
-    });
-  }
-  
-  // Extract path from URL (everything after /media/)
-  const requestPath = url.pathname;
-  
-  // Sanitize and validate path
-  const key = sanitizePath(requestPath);
-  if (!key) {
-    if (debug) {
-      console.warn(`[Media Proxy] Invalid path rejected: ${requestPath}`);
+export const onRequest: PagesFunction<Env> = async () => {
+  // Function temporarily disabled while serving static assets from /videos
+  return new Response('Media function disabled; use /videos/* static assets', {
+    status: 410,
+    headers: {
+      'Cache-Control': 'no-store',
+      'Content-Type': 'text/plain'
     }
-    return new Response('Invalid path', { 
-      status: 400,
-      headers: { 'Cache-Control': 'no-store' }
-    });
-  }
-  
-  try {
-    // Fetch object metadata first (cheaper than full GET)
-    const object = await env.VIDEOS.get(key);
-    
-    if (!object) {
-      if (debug) {
-        console.warn(`[Media Proxy] Object not found: ${key}`);
-      }
-      return new Response('Not Found', { 
-        status: 404,
-        headers: { 'Cache-Control': 'no-store' }
-      });
-    }
-    
-    // Get file size for range calculations
-    const fileSize = object.size;
-    
-    // Parse Range header if present
-    const rangeHeader = request.headers.get('Range');
-    const range = parseRange(rangeHeader, fileSize);
-    
-    // Determine Content-Type (use R2 metadata or infer from extension)
-    const contentType = object.httpMetadata?.contentType || inferContentType(key);
-    
-    // Prepare response headers
-    const headers = new Headers({
-      'Content-Type': contentType,
-      'Accept-Ranges': 'bytes',
-      'X-Content-Type-Options': 'nosniff',
-      // Immutable cache for hashed filenames (1 year)
-      'Cache-Control': 'public, max-age=31536000, immutable',
-    });
-    
-    // Handle range request (206 Partial Content)
-    if (range) {
-      const { start, end } = range;
-      const contentLength = end - start + 1;
-      
-      // Fetch partial content from R2
-      const partialObject = await env.VIDEOS.get(key, {
-        range: { offset: start, length: contentLength }
-      });
-      
-      if (!partialObject) {
-        return new Response('Range Not Satisfiable', { 
-          status: 416,
-          headers: { 'Content-Range': `bytes */${fileSize}` }
-        });
-      }
-      
-      headers.set('Content-Length', contentLength.toString());
-      headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
-      
-      if (debug) {
-        console.log(`[Media Proxy] Serving partial: ${key} (${start}-${end}/${fileSize})`);
-      }
-      
-      return new Response(partialObject.body, {
-        status: 206,
-        headers,
-      });
-    }
-    
-    // Full content response (200 OK)
-    headers.set('Content-Length', fileSize.toString());
-    
-    if (debug) {
-      console.log(`[Media Proxy] Serving full: ${key} (${fileSize} bytes)`);
-    }
-    
-    return new Response(object.body, {
-      status: 200,
-      headers,
-    });
-    
-  } catch (error) {
-    console.error(`[Media Proxy] Error serving ${key}:`, error);
-    return new Response('Internal Server Error', { 
-      status: 500,
-      headers: { 'Cache-Control': 'no-store' }
-    });
-  }
+  });
 };

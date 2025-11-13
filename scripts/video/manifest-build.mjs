@@ -25,16 +25,29 @@ import { readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
 
-const args = Object.fromEntries(
-  process.argv.slice(2).map(s => {
-    const [k, v] = s.startsWith('--') ? s.slice(2).split('=') : [s, true];
-    return [k, v === undefined ? true : v];
-  })
-);
+function parseArgs(argv){
+  const out = {};
+  const arr = argv.slice(2);
+  for (let i=0;i<arr.length;i++){
+    const t = arr[i];
+    if(!t.startsWith('--')) continue;
+    const b = t.slice(2);
+    const eq = b.indexOf('=');
+    if(eq !== -1){ out[b.slice(0,eq)] = b.slice(eq+1); continue; }
+    const nxt = arr[i+1];
+    if(nxt && !nxt.startsWith('--')){ out[b] = nxt; i++; }
+    else { out[b] = true; }
+  }
+  return out;
+}
+
+const args = parseArgs(process.argv);
 
 const MAPPING_PATH = args.mapping || 'scripts/video/upload-mapping.json';
 const DRY_RUN = args['dry-run'] === true || args['dry-run'] === 'true';
 const VALIDATE = args.validate === true || args.validate === 'true';
+const STATIC = args.static === true || args.static === 'true';
+const BASE_PATH = args.base ? String(args.base) : (STATIC ? '/videos' : '/media');
 const FORMATS = (args.formats ? String(args.formats) : 'mp4,webm')
   .split(',')
   .map(s => s.trim().toLowerCase())
@@ -98,12 +111,19 @@ function groupByExercise(mapping) {
 /**
  * Build variants structure from grouped entries
  */
-function buildVariants(entries) {
+function extractVersion(entry){
+  // Try to infer version from originalFile like exercise_v1_1920x1080.mp4
+  const name = entry.originalFile || entry.r2Key || '';
+  const m = name.match(/_v(\d+)_/);
+  return m ? m[1] : '1';
+}
+
+function buildVariants(exerciseId, entries) {
   const variants = {};
   let duration = null;
 
   for (const entry of entries) {
-    const { aspect, resolution, format, r2Url, sha256, durationSeconds } = entry;
+    const { aspect, resolution, format, r2Url, sha256, durationSeconds, dimensions } = entry;
 
     // Filter by allowed formats
     if (!FORMATS.includes(format)) {
@@ -125,11 +145,21 @@ function buildVariants(entries) {
       variants[aspect][resolution] = {};
     }
 
+    // Build URL
+    let url;
+    if (STATIC) {
+      const v = extractVersion(entry);
+      const dims = dimensions || `${resolution}x${resolution}`;
+      url = `${BASE_PATH}/${exerciseId}_v${v}_${dims}.${format}`;
+    } else {
+      url = r2Url;
+    }
+
+    const meta = { url };
+    if (!STATIC && sha256) meta.sha256 = sha256;
+
     // Add format variant
-    variants[aspect][resolution][format] = {
-      url: r2Url,
-      sha256,
-    };
+    variants[aspect][resolution][format] = meta;
   }
 
   return { variants, duration };
@@ -251,7 +281,7 @@ async function main() {
   console.log('🔧 RepCue Manifest Builder');
   console.log(`📄 Manifest: ${MANIFEST_PATH}`);
   console.log(`📊 Mapping: ${MAPPING_PATH}`);
-  console.log(`🔧 Mode: ${DRY_RUN ? 'DRY RUN' : VALIDATE ? 'VALIDATE ONLY' : 'LIVE'} | Formats: ${FORMATS.join(', ')}\n`);
+  console.log(`🔧 Mode: ${DRY_RUN ? 'DRY RUN' : VALIDATE ? 'VALIDATE ONLY' : 'LIVE'} | Formats: ${FORMATS.join(', ')} | ${STATIC ? 'STATIC=/videos' : 'R2=/media'} (base=${BASE_PATH})\n`);
 
   // If validate-only mode and no mapping, just validate existing manifest
   if (VALIDATE && !existsSync(MAPPING_PATH)) {
@@ -287,7 +317,7 @@ async function main() {
   for (const [exerciseId, entries] of grouped.entries()) {
     console.log(`📝 ${exerciseId}:`);
 
-    const { variants, duration } = buildVariants(entries);
+    const { variants, duration } = buildVariants(exerciseId, entries);
     const existing = manifestMap.get(exerciseId);
 
     if (existing) {
