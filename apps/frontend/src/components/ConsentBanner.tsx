@@ -14,20 +14,26 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
 
   /**
    * Automatically accept all required legal documents
-   * This eliminates the need for a separate legal gate
+   * This eliminates the need for a separate legal gate on first access
    */
   const acceptAllLegalDocuments = async (includeOptional: boolean = false): Promise<void> => {
     try {
       logger.log('[ConsentBanner] acceptAllLegalDocuments called with includeOptional:', includeOptional);
-      // Ensure legal docs service is initialized (defensive in case app init hasn't completed yet)
+      
+      // Ensure legal docs service is initialized (critical - must complete before accepting)
       let manifest = legalDocsService.getCurrentManifest();
       if (!manifest) {
         logger.log('[ConsentBanner] No manifest loaded yet, initializing LegalDocsService...');
-        await legalDocsService.initialize();
+        const initSuccess = await legalDocsService.initialize();
+        if (!initSuccess) {
+          logger.error('[ConsentBanner] Failed to initialize LegalDocsService');
+          return;
+        }
         manifest = legalDocsService.getCurrentManifest();
       }
-      if (!manifest) {
-        logger.warn('[ConsentBanner] No legal manifest available for automatic acceptance after initialize()');
+      
+      if (!manifest || !manifest.documents) {
+        logger.warn('[ConsentBanner] No legal manifest available for automatic acceptance');
         return;
       }
 
@@ -35,33 +41,53 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
       const currentLanguage = document.documentElement.lang || 'en';
       logger.log('[ConsentBanner] currentLanguage:', currentLanguage);
       
-      logger.log('[ConsentBanner] Manifest documents summary:', manifest.documents.map(doc => ({ id: doc.id, required: doc.required })));
+      logger.log('[ConsentBanner] Manifest has', manifest.documents.length, 'documents');
 
-      // Filter documents to accept
+      // Filter documents to accept (exclude imprint which is display-only)
       const documentsToAccept = includeOptional 
-        ? manifest.documents.filter(doc => doc.id !== 'imprint') // Exclude display-only docs
+        ? manifest.documents.filter(doc => doc.id !== 'imprint')
         : manifest.documents.filter(doc => doc.required);
 
-      logger.log('[ConsentBanner] documentsToAccept:', documentsToAccept.map(doc => doc.id));
+      logger.log('[ConsentBanner] Accepting', documentsToAccept.length, 'documents:', documentsToAccept.map(doc => doc.id));
 
       // Accept each document
+      let acceptedCount = 0;
       for (const doc of documentsToAccept) {
-        const localizedDoc = legalDocsService.getDocument(doc.id, currentLanguage);
-        if (localizedDoc && localizedDoc.locales.length > 0) {
-          const localeData = localizedDoc.locales[0];
+        try {
+          const localizedDoc = legalDocsService.getDocument(doc.id, currentLanguage);
+          if (!localizedDoc) {
+            logger.warn('[ConsentBanner] Could not get localized document for', doc.id);
+            continue;
+          }
           
-          const success = legalDocsService.recordAcceptance({
+          if (!localizedDoc.locales || localizedDoc.locales.length === 0) {
+            logger.warn('[ConsentBanner] Document', doc.id, 'has no locales');
+            continue;
+          }
+
+          const localeData = localizedDoc.locales[0];
+          const acceptance = {
             docId: doc.id,
             acceptedVersion: doc.version,
             contentHash: localeData.contentHash,
             acceptedAt: new Date().toISOString(),
             acceptedLocale: localeData.locale
-          });
-
-          logger.log('[ConsentBanner] recordAcceptance for', doc.id, 'success:', success);
-          logger.log('[ConsentBanner] Current legalAcceptances:', consentService.getLegalAcceptances());
+          };
+          
+          const success = legalDocsService.recordAcceptance(acceptance);
+          if (success) {
+            acceptedCount++;
+            logger.log('[ConsentBanner] ✅ Recorded acceptance for', doc.id, 'v' + doc.version);
+          } else {
+            logger.warn('[ConsentBanner] ❌ Failed to record acceptance for', doc.id);
+          }
+        } catch (docError) {
+          logger.error('[ConsentBanner] Error accepting document', doc.id, ':', docError);
         }
       }
+      
+      logger.log('[ConsentBanner] Accepted', acceptedCount, 'of', documentsToAccept.length, 'documents');
+      logger.log('[ConsentBanner] Final legalAcceptances:', consentService.getLegalAcceptances());
     } catch (error) {
       logger.error('Error during automatic legal document acceptance:', error);
     }

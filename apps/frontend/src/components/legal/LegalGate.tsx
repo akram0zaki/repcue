@@ -60,22 +60,19 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
         }
         
         // Separate documents by acceptance status
-        // Get documents that are blocking (need immediate acceptance)
-        const allStatuses = legalDocsService.getAllAcceptanceStatuses(i18n.language);
-        const blockingDocIds = new Set(
-          allStatuses.filter(s => s.isBlocking).map(s => s.docId)
-        );
-        
-        // Filter out imprint (display-only document, shown in footer)
+        // Categorize documents by their 'required' field, not by 'isBlocking' status
+        // Required documents MUST be accepted, regardless of policy (force vs deferred)
+        // Optional documents are informational and don't require acceptance
         const documentsForGate = manifest.documents.filter((doc: LegalDoc) => doc.id !== 'imprint');
         
-        const required = documentsForGate.filter((doc: LegalDoc) => blockingDocIds.has(doc.id));
-        const optional = documentsForGate.filter((doc: LegalDoc) => !blockingDocIds.has(doc.id));
+        const required = documentsForGate.filter((doc: LegalDoc) => doc.required);
+        const optional = documentsForGate.filter((doc: LegalDoc) => !doc.required);
         
         setRequiredDocs(required);
         setOptionalDocs(optional);
         
-        logger.log('[LegalGate] Blocking documents:', Array.from(blockingDocIds));
+        logger.log('[LegalGate] Required documents:', required.map(d => d.id));
+        logger.log('[LegalGate] Optional documents:', optional.map(d => d.id));
         
         // Initialize accepted docs from consent service
         const existingAcceptances = consentService.getLegalAcceptances();

@@ -2,6 +2,68 @@
 
 ### 2025-11-17
 
+#### 🔐 Fixed: Legal Document Gating System - Mandatory Document Acceptance Enforcement
+
+**Issue**: Users could access the application fully without accepting mandatory legal documents (Privacy Policy, Cookie Policy, Medical Disclaimer, Liability Waiver). Legal Center showed "Acceptance Required" status but the gate was not blocking access.
+
+**Root Cause**: 
+1. ConsentBanner was automatically accepting legal documents but without proper error handling - some acceptances could fail silently
+2. LegalGate was not integrated into the App.tsx rendering flow
+3. Legal document updates weren't being detected to trigger re-acceptance requirements
+
+**Fix Implemented**:
+
+**1. Enhanced ConsentBanner.tsx**:
+- Improved `acceptAllLegalDocuments()` with better initialization checks
+- Added proper error handling for individual document acceptance
+- Added acceptance count tracking and detailed logging
+- Ensured LegalDocsService is fully initialized before attempting to accept documents
+- Better resilience: individual document failures don't prevent banner from proceeding
+
+**2. Added Legal Gate Enforcement to App.tsx**:
+- Added `showLegalGate` state to track when legal documents need acceptance
+- Imported LegalGate component
+- Added `checkLegalDocumentStatus()` effect that:
+  - Runs after app loads and when consent/language changes
+  - Ensures LegalDocsService is initialized
+  - Checks for blocking or unaccepted required documents
+  - Automatically shows LegalGate if documents need acceptance
+- Added `handleLegalGateAccepted()` handler to close gate when documents are accepted
+- Updated render logic to show:
+  - ConsentBanner if no consent
+  - LegalGate if consent granted but documents need acceptance
+  - App if both consent and legal acceptance satisfied
+
+**3. Fixed Document Categorization in LegalGate.tsx**:
+- Changed from using `isBlocking` status to using `doc.required` field
+- Correctly categorizes documents as Required vs Optional:
+  - **Required**: Must be accepted (required=true) regardless of policy
+  - **Optional**: Informational only (required=false)
+- Prevents mandatory documents from appearing under Optional section
+
+**Flow**:
+```
+First Access:
+ConsentBanner → Auto-accept all required docs → Access app
+
+Document Update:
+LegalGate appears → User reviews & accepts → Continue using app
+```
+
+**Result**:
+- ✅ Mandatory documents must be accepted before app access
+- ✅ Document updates trigger legal gate blocking access
+- ✅ Proper categorization of required vs optional documents
+- ✅ Resilient acceptance logic with detailed error tracking
+- ✅ GDPR compliant: explicit acceptance of legal documents
+
+**Files Modified**:
+- `apps/frontend/src/components/ConsentBanner.tsx` - Enhanced acceptance logic with error handling
+- `apps/frontend/src/App.tsx` - Added legal gate state, effects, and rendering
+- `apps/frontend/src/components/legal/LegalGate.tsx` - Fixed document categorization
+
+---
+
 #### 🎨 Fixed: Consent Banner Theme Colors
 
 **Issue**: Consent banner displayed with incorrect blue/teal colors instead of default Calm Lavender theme when deployed to Cloudflare Pages.

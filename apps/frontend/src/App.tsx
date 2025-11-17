@@ -18,6 +18,7 @@ import { useSharedExercises } from './hooks/useSharedExercises';
 import { useSnackbar } from './components/SnackbarProvider';
 import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
+import { LegalGate } from './components/legal/LegalGate';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import ScrollToTop from './components/ScrollToTop';
@@ -259,6 +260,9 @@ function App() {
   const [forceUpdateData, setForceUpdateData] = useState<UpdateInfo | null>(null);
   const [showWorkoutForceUpdateModal, setShowWorkoutForceUpdateModal] = useState(false);
   const [workoutForceUpdateData, setWorkoutForceUpdateData] = useState<UpdateInfo | null>(null);
+  
+  // Legal documents state
+  const [showLegalGate, setShowLegalGate] = useState(false);
   
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
@@ -2494,6 +2498,8 @@ useEffect(() => {
   useEffect(() => {
     const handleConsentGranted = () => {
       setHasConsent(true);
+      // When consent is granted, close legal gate if open
+      setShowLegalGate(false);
     };
 
     const handleConsentRevoked = () => {
@@ -2514,9 +2520,59 @@ useEffect(() => {
     };
   }, []);
 
+  // Check for legal document updates and blocking status
+  useEffect(() => {
+    const checkLegalDocumentStatus = async () => {
+      // Only check after initial load and when user has consent
+      if (isLoading || !hasConsent || isPublicOrLegalRoute()) {
+        return;
+      }
+
+      try {
+        // Ensure legal docs service is initialized
+        let initialized = !!legalDocsService.getCurrentManifest();
+        if (!initialized) {
+          initialized = await legalDocsService.initialize();
+        }
+
+        if (!initialized) {
+          logger.warn('Legal documents service not initialized, skipping status check');
+          return;
+        }
+
+        // Get current language
+        const locale = i18n.language || 'en';
+
+        // Check if there are any blocking documents (documents with required acceptance)
+        const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
+        const hasUnaccepted = legalDocsService.hasUnacceptedRequired(locale);
+
+        logger.log('[legal-gate-check]', {
+          hasBlocking,
+          hasUnaccepted,
+          locale
+        });
+
+        if (hasBlocking || hasUnaccepted) {
+          logger.log('Legal gate: blocking documents detected, showing legal gate');
+          setShowLegalGate(true);
+        }
+      } catch (error) {
+        logger.error('Error checking legal document status:', error);
+      }
+    };
+
+    checkLegalDocumentStatus();
+  }, [hasConsent, isLoading, i18n.language, showLegalGate]);
+
   // Handle consent banner
   const handleConsentGranted = () => {
     setHasConsent(true);
+  };
+
+  // Handle legal gate acceptance
+  const handleLegalGateAccepted = () => {
+    setShowLegalGate(false);
   };
 
   
@@ -2725,6 +2781,9 @@ useEffect(() => {
       {/* Show consent banner if no consent (except for public share routes and legal center) */}
       {!hasConsent && !isPublicOrLegalRoute() ? (
         <ConsentBanner onConsentGranted={handleConsentGranted} />
+      ) : showLegalGate && hasConsent && !isPublicOrLegalRoute() ? (
+        // Show legal gate if documents need acceptance (blocking documents detected)
+        <LegalGate isOpen={showLegalGate} onContinue={handleLegalGateAccepted} />
       ) : isLoading ? (
         // Show loading state
         <div className="min-h-screen bg-surface-secondary flex items-center justify-center">
