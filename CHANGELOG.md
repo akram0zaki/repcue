@@ -1,5 +1,365 @@
 ## Unreleased
 
+### 2025-11-17
+
+#### 🎨 Fixed: Consent Banner Theme Colors
+
+**Issue**: Consent banner displayed with incorrect blue/teal colors instead of default Calm Lavender theme when deployed to Cloudflare Pages.
+
+**Root Cause**: ConsentBanner component was rendered **before** ThemeProvider wrapper, causing it to receive default Tailwind colors instead of theme-aware CSS custom properties.
+
+**Fix Implemented**:
+- Restructured `App.tsx` render logic to include ConsentBanner inside ThemeProvider
+- Used nested ternary pattern: consent check → loading → router → fallback
+- Wrapped modals in `{hasConsent && ...}` to prevent showing during consent flow
+- Theme now properly applied **before** any UI renders
+
+**Result**:
+- ✅ Consent banner now displays with correct Calm Lavender theme colors (#8b5cf6 primary)
+- ✅ Maintains GDPR compliance with Legal Center access before consent
+- ✅ All theme CSS variables properly initialized before UI render
+
+**Files Modified**:
+- `apps/frontend/src/App.tsx` - Restructured ThemeProvider wrapper placement
+- `apps/frontend/public/_redirects` - **NEW**: Cloudflare Pages SPA routing configuration
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### 🔧 Fixed: Legal Center SPA Routing on Cloudflare Pages
+
+**Issue**: Legal Center page (`/legal`) showed "page cannot be reached" error when accessed from consent banner.
+
+**Root Cause**: Cloudflare Pages was returning 404 for `/legal` route because it's a **client-side route** (React Router), not a physical file. Without proper configuration, Cloudflare Pages looked for a file at `/legal` instead of serving `index.html` and letting the SPA handle routing.
+
+**Fix Implemented**:
+- Created `_redirects` file in `apps/frontend/public/` to configure Cloudflare Pages for SPA routing
+- All routes now serve `index.html` (except actual files like assets, legal docs, etc.)
+- React Router handles client-side routing after `index.html` loads
+- `isPublicOrLegalRoute()` properly evaluates and bypasses consent gate for `/legal`
+
+**_redirects Configuration**:
+```
+# Serve actual files directly
+/assets/*  200
+/legal/*   200
+/locales/* 200
+# ... other static files
+
+# Serve all other routes through index.html for SPA routing
+/*  /index.html  200
+```
+
+**Result**:
+- ✅ Legal Center now accessible at https://dev.repcue.me/legal
+- ✅ Opening in new tab works correctly (no consent gate shown)
+- ✅ GDPR compliant - users can review legal documents before consenting
+- ✅ Proper SPA routing for all client-side routes
+
+**Files Modified**:
+- `apps/frontend/public/_redirects` - **NEW**: Cloudflare Pages SPA routing configuration
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### 🔧 Fixed: Legal Center Page Loading Error
+
+**Issue**: Legal Center page showed "Error loading Legal Center page" when navigated to from Settings or directly via URL, both locally and in deployment.
+
+**Root Cause**: The 'legal' translation namespace was **not registered** in the i18n configuration. When `LegalCenterPage` component tried to use `useTranslation(['legal', 'common'])`, it failed to load the 'legal' namespace, causing the entire component import to fail in the lazy loading boundary.
+
+**Fix Implemented**:
+- Added 'legal' namespace to the `ns` array in `apps/frontend/src/i18n.ts`
+- Added error state handling in `LegalCenterPage.tsx` for better error messaging
+
+**i18n Configuration Change**:
+```typescript
+// Before:
+ns: ['common', 'titles', 'a11y', 'exercises', 'auth', 'catalogs'],
+
+// After:
+ns: ['common', 'titles', 'a11y', 'exercises', 'auth', 'catalogs', 'legal'],
+```
+
+**Result**:
+- ✅ Legal Center page now loads correctly
+- ✅ All translations (title, status, documents, etc.) display properly
+- ✅ Works both with and without consent
+- ✅ Functions correctly in all 8 supported languages
+
+**Files Modified**:
+- `apps/frontend/src/i18n.ts` - Added 'legal' namespace registration
+- `apps/frontend/src/pages/LegalCenterPage.tsx` - Added error state handling
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### 🎯 UX Enhancement: Context-Aware Back Button in Legal Center
+
+**Issue**: Legal Center page showed a back button even when opened in a new window from the consent banner, where there was no history to navigate back to. This created a confusing UX as the back button was out of context.
+
+**Root Cause**: The back button was always visible regardless of how the user accessed the Legal Center page (in-app navigation vs. new window).
+
+**Fix Implemented**:
+- Added `canGoBack` state that checks `window.history.length` to determine if there's navigation history
+- Back button now only displays when `history.length > 1` (navigated from within app)
+- When opened in new window from consent banner, no back button is shown (cleaner UX)
+
+**Logic**:
+```typescript
+// Check if there's history to go back to
+const [canGoBack, setCanGoBack] = useState(false);
+
+useEffect(() => {
+  // If opened in new window from consent banner, history.length = 1
+  // If navigated from Settings, history.length > 1
+  setCanGoBack(window.history.length > 1);
+}, []);
+```
+
+**Result**:
+- ✅ **From Consent Banner** (new window): No back button → Clean, focused document review
+- ✅ **From Settings** (in-app): Back button shown → Easy navigation back to Settings
+- ✅ **Context-Aware**: UI adapts to user's entry point automatically
+
+**Files Modified**:
+- `apps/frontend/src/pages/LegalCenterPage.tsx` - Context-aware back button logic
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### 🔧 Fixed: Essentials Consent Auto-Accepts Mandatory Documents
+
+**Issue**: When clicking "Accept Essential", consent was granted but only 3 legal documents were auto-accepted instead of all 5 mandatory documents. This left users with incomplete consent state.
+
+**Root Cause**: The `acceptAllLegalDocuments()` function was using `isBlocking` status check instead of simply filtering by `doc.required` field. This complex logic was incorrectly identifying which documents needed to be accepted for essential mode.
+
+**Fix Implemented**:
+- Simplified logic in `ConsentBanner.tsx` to filter documents by `doc.required` field directly
+- Essential mode now correctly accepts all 5 mandatory documents: Terms, Privacy, Cookie, Medical Disclaimer, Liability Waiver
+- Full mode still accepts all documents (required + optional)
+- Added comprehensive debug logging to track acceptance flow
+
+**Code Change**:
+```typescript
+// Before: Complex logic using isBlocking status
+const documentsToAccept = includeOptional 
+  ? manifest.documents.filter(doc => doc.id !== 'imprint')
+  : manifest.documents.filter(doc => {
+      const allStatuses = legalDocsService.getAllAcceptanceStatuses(currentLanguage);
+      const blockingDocIds = new Set(allStatuses.filter(s => s.isBlocking).map(s => s.docId));
+      return blockingDocIds.has(doc.id);
+    });
+
+// After: Simple required field check
+const documentsToAccept = includeOptional 
+  ? manifest.documents.filter(doc => doc.id !== 'imprint')
+  : manifest.documents.filter(doc => doc.required);
+```
+
+**Result**:
+- ✅ **Essential Consent**: Auto-accepts 5 required documents (Terms, Privacy, Cookie, Medical, Liability)
+- ✅ **Full Consent**: Auto-accepts 7 documents (5 required + 2 optional: DPA, Subscription)
+- ✅ **Defensive Initialization**: Ensures LegalDocsService is initialized before acceptance
+- ✅ **Debug Logging**: Comprehensive logging for troubleshooting consent flow
+
+**Files Modified**:
+- `apps/frontend/src/components/ConsentBanner.tsx` - Simplified document filtering logic
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### 🎨 UX Enhancement: Accepted Document Modal State
+
+**Issue**: When viewing an already-accepted legal document from Legal Center, the "Accept" button was still clickable and active, which could confuse users into thinking they needed to re-accept the document.
+
+**Fix Implemented**:
+- Added `isAccepted` prop to `LegalDocumentModal` component
+- When a document is already accepted:
+  - Button shows "Accepted" instead of "Accept"
+  - Button is disabled (non-clickable)
+  - Button maintains visual feedback showing accepted state
+- Scroll-to-bottom requirement automatically bypassed for accepted documents
+- `handleAccept()` returns early (no-op) if document already accepted
+
+**LegalDocumentModal Changes**:
+```typescript
+// New prop
+interface LegalDocumentModalProps {
+  // ... existing props
+  isAccepted?: boolean; // Whether this document is already accepted
+}
+
+// Button behavior
+<button
+  onClick={handleAccept}
+  disabled={isAccepted || (requireScrollToBottom && !hasScrolledToBottom)}
+  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {isAccepted ? t('accepted') : t('accept')}
+</button>
+```
+
+**LegalCenterPage Changes**:
+- Passes `isAccepted` status from document's acceptance status to modal
+- Status determined from `statuses.get(docId)?.accepted` check
+
+**i18n Updates**:
+- Added `"accepted": "Accepted"` key to all 8 language locale files
+- Translations: EN: "Accepted", FR: "Accepté", DE: "Akzeptiert", ES: "Aceptado", etc.
+
+**Result**:
+- ✅ **Clear Visual Feedback**: Users immediately see which documents are accepted
+- ✅ **Prevents Confusion**: No accidental re-acceptance attempts
+- ✅ **Consistent UX**: Disabled state follows platform conventions
+- ✅ **i18n Complete**: All languages have "Accepted" translation
+
+**Files Modified**:
+- `apps/frontend/src/components/legal/LegalDocumentModal.tsx` - Added `isAccepted` prop and button state logic
+- `apps/frontend/src/pages/LegalCenterPage.tsx` - Pass acceptance status to modal
+- `apps/frontend/public/locales/*/legal.json` - Added "accepted" translation key (8 locales)
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### 🎨 Fixed: Consent Banner Link and Icon Styling
+
+**Issue**: Consent banner links and icon were not using the correct theme colors. Links showed default blue, and icon was invisible or wrong colors across multiple fix attempts.
+
+**Root Cause & Evolution**:
+1. **Links**: Used default Tailwind classes instead of theme-aware classes
+2. **Icon Background**: Attempted multiple fixes with theme classes that either didn't exist or showed inverse colors
+   - `bg-accent-500`: Didn't exist in Tailwind config (invisible)
+   - Inline `style` with CSS vars: Rejected by linter
+   - `bg-accent-primary`: Didn't exist in Tailwind config
+   - `bg-primary-500` container: Wrong pattern - showed white icon on purple background (reverse of Settings)
+3. **Correct Pattern**: Settings page shows purple icon with no background container
+
+**Fix Implemented**:
+- **Links**: Changed from `text-primary-*` to `text-accent-*` classes with dark mode variants
+- **Icon**: Removed background container, applied `section-icon` class directly to SVG
+  - Matches Settings page pattern exactly
+  - Uses `color: var(--color-primary)` from CSS custom property
+  - No background container needed
+
+**Code Changes**:
+```tsx
+// Links - BEFORE
+<button className="text-primary-600 hover:text-primary-700 underline">
+
+// Links - AFTER  
+<button className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline">
+
+// Icon - BEFORE (wrong - white on purple)
+<div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
+  <svg className="w-6 h-6 text-white" />
+</div>
+
+// Icon - AFTER (correct - purple icon, no background)
+<svg className="w-6 h-6 mr-3 section-icon" fill="none" stroke="currentColor" />
+```
+
+**CSS Reference**:
+```css
+/* apps/frontend/src/index.css */
+.section-icon {
+  @apply h-5 w-5;
+  color: var(--color-primary);
+}
+```
+
+**Result**:
+- ✅ **Links**: Use accent theme color (proper contrast for both light/dark modes)
+- ✅ **Icon**: Matches Settings page pattern with purple/theme-colored icon
+- ✅ **Consistent**: Same styling approach across all app sections
+- ✅ **Theme-Aware**: Colors update when theme changes
+
+**Files Modified**:
+- `apps/frontend/src/components/ConsentBanner.tsx` - Updated link classes and icon structure
+- `apps/frontend/src/index.css` - Cleaned up (removed temporary `.consent-icon-bg` class)
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
+#### ⚙️ Architecture: Single Source of Truth for Default Theme
+
+**Issue**: Default theme configuration existed in **two places**, causing confusion and preventing theme changes from taking effect:
+1. `src/config/features.ts`: `DEFAULT_THEME_ID = 'calm'`
+2. `src/constants/index.ts`: `DEFAULT_APP_SETTINGS.theme_id = 'calm'` (hardcoded)
+
+When changing `features.ts` to `'winter-chill'`, the app still used `'calm'` because `DEFAULT_APP_SETTINGS` had its own hardcoded value that wasn't referencing the feature flag.
+
+**Problem**: Two sources of truth led to:
+- Configuration drift when updating default theme
+- Confusion about which file to modify
+- Potential for different defaults in different parts of the codebase
+
+**Fix Implemented**:
+- Established **single source of truth** pattern
+- `config/features.ts` is the authoritative source for `DEFAULT_THEME_ID`
+- `constants/index.ts` imports and references it dynamically
+- Clear import chain: `features.ts` → `constants/index.ts` → `ThemeContext.tsx`
+
+**Code Changes**:
+```typescript
+// apps/frontend/src/constants/index.ts
+
+// ADDED: Import statement
+import { DEFAULT_THEME_ID } from '../config/features';
+
+// BEFORE: Hardcoded value
+export const DEFAULT_APP_SETTINGS: AppSettings = {
+  // ...
+  theme_id: 'calm', // Default theme for new users
+};
+
+// AFTER: References single source
+export const DEFAULT_APP_SETTINGS: AppSettings = {
+  // ...
+  theme_id: DEFAULT_THEME_ID, // Default theme for new users (set in config/features.ts)
+};
+```
+
+**Architecture**:
+```
+config/features.ts (SOURCE OF TRUTH)
+  export const DEFAULT_THEME_ID = 'winter-chill' as const;
+         ↓
+constants/index.ts (REFERENCES SOURCE)
+  import { DEFAULT_THEME_ID } from '../config/features';
+  theme_id: DEFAULT_THEME_ID
+         ↓
+ThemeContext.tsx (CONSUMES)
+  const themeIdFromSettings = appSettings.theme_id || DEFAULT_THEME_ID;
+```
+
+**Result**:
+- ✅ **Single Source**: Change default theme in ONE place only (`config/features.ts`)
+- ✅ **No Duplication**: Eliminated redundant configuration
+- ✅ **Clear Ownership**: Feature flags own configuration values
+- ✅ **Type Safety**: `as const` ensures compile-time type checking
+- ✅ **Documentation**: Comment points to authoritative source
+
+**How to Change Default Theme (Going Forward)**:
+1. Edit `apps/frontend/src/config/features.ts`
+2. Change `DEFAULT_THEME_ID = 'your-theme-id' as const;`
+3. That's it! All references automatically use new value
+
+**Files Modified**:
+- `apps/frontend/src/config/features.ts` - Changed to `'winter-chill'` (and enabled DEBUG flag)
+- `apps/frontend/src/constants/index.ts` - Import `DEFAULT_THEME_ID` instead of hardcoding
+
+**Tracking**: `docs/migration-tracking/consent-theme-fix_20251117.md`
+
+---
+
 ### 2025-11-14
 
 #### 🔧 Critical Fix: Legal Center Accessible Without Consent

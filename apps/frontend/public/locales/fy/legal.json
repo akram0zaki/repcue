@@ -4,6 +4,7 @@
   "optional": "Opsjonele dokuminten",
   "version": "Ferzje",
   "accept": "Akseptearje",
+  "accepted": "Akseptearre",
   "loadError": "Kin dokumint net lade. Besykje it opnij.",
   "scrollToAccept": "Scroll nei ûnderen om te akseptearjen",
   "effectiveIn": "Jildich oer {{days}} dagen",

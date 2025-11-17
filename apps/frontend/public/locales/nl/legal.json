@@ -4,6 +4,7 @@
   "optional": "Optionele documenten",
   "version": "Versie",
   "accept": "Accepteren",
+  "accepted": "Geaccepteerd",
   "loadError": "Kan document niet laden. Probeer het opnieuw.",
   "scrollToAccept": "Scroll naar beneden om te accepteren",
   "effectiveIn": "Van kracht over {{days}} dagen",

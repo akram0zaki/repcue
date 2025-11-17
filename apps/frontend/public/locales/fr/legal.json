@@ -4,6 +4,7 @@
   "optional": "Documents optionnels",
   "version": "Version",
   "accept": "Accepter",
+  "accepted": "Accepté",
   "loadError": "Échec du chargement du document. Veuillez réessayer.",
   "scrollToAccept": "Veuillez faire défiler jusqu'en bas pour accepter",
   "effectiveIn": "Effectif dans {{days}} jours",

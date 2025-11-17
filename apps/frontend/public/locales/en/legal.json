@@ -4,6 +4,7 @@
   "optional": "Optional Documents",
   "version": "Version",
   "accept": "Accept",
+  "accepted": "Accepted",
   "loadError": "Failed to load document. Please try again.",
   "scrollToAccept": "Please scroll to the bottom to accept",
   "effectiveIn": "Effective in {{days}} days",

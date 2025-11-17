@@ -17,7 +17,7 @@ export const SYNC_ENGINE = 'v2' as const;
 
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = false;
+export const DEBUG = true;
 // Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
 export const SYNC_DEBUG = false;
 
@@ -34,7 +34,7 @@ export const LEGAL_ACCEPTANCE_V3_ENABLED = true;
 
 // Theme Customization System
 // Default theme ID - used for new users and fallback
-export const DEFAULT_THEME_ID = 'calm' as const;
+export const DEFAULT_THEME_ID = 'winter-chill' as const;
 // Enable/disable theme customization feature
 // Starting enabled (true) on feature branch for development and testing
 export const THEME_CUSTOMIZATION_ENABLED = true;

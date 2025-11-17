@@ -30,6 +30,9 @@ interface LegalDocumentModalProps {
   
   /** Whether Accept button should be disabled initially (until scrolled to bottom) */
   requireScrollToBottom?: boolean;
+  
+  /** Whether this document is already accepted */
+  isAccepted?: boolean;
 }
 
 /**
@@ -51,13 +54,14 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
   showAcceptButton = false,
   onAccept,
   onClose,
-  requireScrollToBottom = true
+  requireScrollToBottom = true,
+  isAccepted = false
 }) => {
   const { t } = useTranslation(['legal', 'common']);
   const [markdown, setMarkdown] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(!requireScrollToBottom);
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(!requireScrollToBottom || isAccepted);
   const contentRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +95,7 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
 
   // Check if user has scrolled to bottom
   const handleScroll = () => {
-    if (!contentRef.current || !requireScrollToBottom || hasScrolledToBottom) {
+    if (!contentRef.current || !requireScrollToBottom || hasScrolledToBottom || isAccepted) {
       return;
     }
 
@@ -138,6 +142,9 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
   }, [isLoading]);
 
   const handleAccept = () => {
+    if (isAccepted) {
+      return; // No-op if already accepted
+    }
     if (onAccept && (!requireScrollToBottom || hasScrolledToBottom)) {
       onAccept();
     }
@@ -207,7 +214,7 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
         {/* Footer with Accept button */}
         {showAcceptButton && !isLoading && !loadError && (
           <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {requireScrollToBottom && !hasScrolledToBottom && (
+            {!isAccepted && requireScrollToBottom && !hasScrolledToBottom && (
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t('scrollToAccept')}
               </p>
@@ -221,10 +228,10 @@ export const LegalDocumentModal: React.FC<LegalDocumentModalProps> = ({
               </button>
               <button
                 onClick={handleAccept}
-                disabled={requireScrollToBottom && !hasScrolledToBottom}
+                disabled={isAccepted || (requireScrollToBottom && !hasScrolledToBottom)}
                 className="w-full sm:w-auto px-4 py-2 btn-primary rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t('accept')}
+                {isAccepted ? t('accepted') : t('accept')}
               </button>
             </div>
           </div>

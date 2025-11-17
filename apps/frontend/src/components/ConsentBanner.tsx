@@ -18,26 +18,31 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
    */
   const acceptAllLegalDocuments = async (includeOptional: boolean = false): Promise<void> => {
     try {
-      const manifest = legalDocsService.getCurrentManifest();
+      logger.log('[ConsentBanner] acceptAllLegalDocuments called with includeOptional:', includeOptional);
+      // Ensure legal docs service is initialized (defensive in case app init hasn't completed yet)
+      let manifest = legalDocsService.getCurrentManifest();
       if (!manifest) {
-        logger.warn('No legal manifest available for automatic acceptance');
+        logger.log('[ConsentBanner] No manifest loaded yet, initializing LegalDocsService...');
+        await legalDocsService.initialize();
+        manifest = legalDocsService.getCurrentManifest();
+      }
+      if (!manifest) {
+        logger.warn('[ConsentBanner] No legal manifest available for automatic acceptance after initialize()');
         return;
       }
 
       // Get current language for localization
       const currentLanguage = document.documentElement.lang || 'en';
+      logger.log('[ConsentBanner] currentLanguage:', currentLanguage);
       
+      logger.log('[ConsentBanner] Manifest documents summary:', manifest.documents.map(doc => ({ id: doc.id, required: doc.required })));
+
       // Filter documents to accept
       const documentsToAccept = includeOptional 
         ? manifest.documents.filter(doc => doc.id !== 'imprint') // Exclude display-only docs
-        : manifest.documents.filter(doc => {
-            // Accept only mandatory/required documents for essential mode
-            const allStatuses = legalDocsService.getAllAcceptanceStatuses(currentLanguage);
-            const blockingDocIds = new Set(allStatuses.filter(s => s.isBlocking).map(s => s.docId));
-            return blockingDocIds.has(doc.id);
-          });
+        : manifest.documents.filter(doc => doc.required);
 
-      logger.log(`Automatically accepting ${documentsToAccept.length} legal documents (includeOptional: ${includeOptional})`);
+      logger.log('[ConsentBanner] documentsToAccept:', documentsToAccept.map(doc => doc.id));
 
       // Accept each document
       for (const doc of documentsToAccept) {
@@ -53,11 +58,8 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
             acceptedLocale: localeData.locale
           });
 
-          if (success) {
-            logger.log(`Auto-accepted legal document: ${doc.id}`);
-          } else {
-            logger.warn(`Failed to auto-accept legal document: ${doc.id}`);
-          }
+          logger.log('[ConsentBanner] recordAcceptance for', doc.id, 'success:', success);
+          logger.log('[ConsentBanner] Current legalAcceptances:', consentService.getLegalAcceptances());
         }
       }
     } catch (error) {
@@ -68,13 +70,14 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
   const handleAcceptAll = async () => {
     setIsProcessing(true);
     try {
+      logger.log('[ConsentBanner] handleAcceptAll clicked');
       // Grant full consent (including analytics)
       consentService.grantConsent(true);
+      logger.log('[ConsentBanner] Consent after grantConsent(true):', consentService.getConsentData());
       
       // Automatically accept all legal documents (required + optional)
       await acceptAllLegalDocuments(true);
-      
-      logger.log('User accepted all: consent granted + all legal documents accepted');
+      logger.log('[ConsentBanner] User accepted all: consent granted + all legal documents accepted');
       onConsentGranted();
     } catch (error) {
       logger.error('Error handling accept all:', error);
@@ -87,13 +90,14 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
   const handleAcceptEssential = async () => {
     setIsProcessing(true);
     try {
+      logger.log('[ConsentBanner] handleAcceptEssential clicked');
       // Grant essential consent only (no analytics)
       consentService.grantConsent(false);
+      logger.log('[ConsentBanner] Consent after grantConsent(false):', consentService.getConsentData());
       
       // Automatically accept only mandatory legal documents
       await acceptAllLegalDocuments(false);
-      
-      logger.log('User accepted essential: consent granted + mandatory legal documents accepted');
+      logger.log('[ConsentBanner] User accepted essential: consent granted + mandatory legal documents accepted');
       onConsentGranted();
     } catch (error) {
       logger.error('Error handling accept essential:', error);
@@ -113,23 +117,21 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
       >
         <div className="p-6">
           <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center mr-3">
-              <svg 
-                className="w-6 h-6 text-white" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
-                />
-              </svg>
-            </div>
-            <h2 id="consent-title" className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            <svg 
+              className="w-6 h-6 mr-3 section-icon" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
+              />
+            </svg>
+            <h2 id="consent-title" className="text-xl font-bold text-text-900 dark:text-text-50">
               Your Privacy & Legal Consent
             </h2>
           </div>
@@ -144,7 +146,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
               <div className="space-y-2">
                 <button
                   onClick={() => setShowDetails(true)}
-                  className="text-primary-600 hover:text-primary-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded block"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline font-medium focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 rounded block"
                   aria-expanded="false"
                   aria-controls="privacy-details"
                 >
@@ -152,7 +154,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
                 </button>
                 <button
                   onClick={() => window.open('/legal', '_blank')}
-                  className="text-primary-600 hover:text-primary-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded block"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline font-medium focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 rounded block"
                 >
                   View all legal documents in Legal Center
                 </button>
@@ -185,7 +187,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
 
                 <button
                   onClick={() => setShowDetails(false)}
-                  className="text-primary-600 hover:text-primary-700 underline font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
+                  className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline font-medium focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 rounded"
                   aria-expanded="true"
                   aria-controls="privacy-details"
                 >

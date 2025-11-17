@@ -2717,29 +2717,23 @@ useEffect(() => {
     }
   }, [appSettings.dark_mode, hasConsent]);
 
-  // Show consent banner if no consent (except for public share routes and legal center)
-  if (!hasConsent && !isPublicOrLegalRoute()) {
-    return <ConsentBanner onConsentGranted={handleConsentGranted} />;
-  }
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-surface-secondary flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-body font-medium">Loading RepCue...</p>
-        </div>
-      </div>
-    );
-  }
-
   // JSDOM can miss origin/href; BrowserRouter will throw. Provide minimal fallback.
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
   return (
     <ThemeProvider appSettings={appSettings} onSettingsChange={updateAppSettings}>
-      {canUseBrowserRouter ? (
+      {/* Show consent banner if no consent (except for public share routes and legal center) */}
+      {!hasConsent && !isPublicOrLegalRoute() ? (
+        <ConsentBanner onConsentGranted={handleConsentGranted} />
+      ) : isLoading ? (
+        // Show loading state
+        <div className="min-h-screen bg-surface-secondary flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-body font-medium">Loading RepCue...</p>
+          </div>
+        </div>
+      ) : canUseBrowserRouter ? (
         <Router>
         <ScrollToTop />
         <ChunkErrorBoundary>
@@ -2939,13 +2933,16 @@ useEffect(() => {
         </ChunkErrorBoundary>
       )}
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode="signin"
-      />
+      {/* Modals and overlays - show only when not in consent flow */}
+      {hasConsent && (
+        <>
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            initialMode="signin"
+          />
 
-      <ForceUpdateModal
+          <ForceUpdateModal
         isOpen={showForceUpdateModal}
         updateInfo={forceUpdateData || undefined}
         onApplyUpdate={async () => {
@@ -3044,6 +3041,8 @@ useEffect(() => {
           }}
           isSubmitting={false}
         />
+      )}
+        </>
       )}
     </ThemeProvider>
   );

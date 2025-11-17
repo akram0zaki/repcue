@@ -24,15 +24,34 @@ const LegalCenterPage: React.FC = () => {
   const [documents, setDocuments] = useState<LegalDoc[]>([]);
   const [statuses, setStatuses] = useState<Map<string, LegalAcceptanceStatus>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<{ doc: LegalDoc; path: string } | null>(null);
   const currentLocale = i18n.language;
   const isRTL = currentLocale.startsWith('ar');
+
+  // Check if user can navigate back (opened from within app vs new window)
+  const [canGoBack, setCanGoBack] = useState(false);
+
+  useEffect(() => {
+    // Check if page was opened in a new window/tab vs navigated within app
+    // If window.opener exists, this page was opened via window.open() - no back navigation context
+    const isPopupWindow = window.opener !== null;
+    
+    // Check if history has more than the initial entry
+    const hasNavigationHistory = window.history.length > 1;
+    
+    // Show back button only if:
+    // - NOT a popup window (wasn't opened via window.open()), AND
+    // - Has navigation history (can actually go back)
+    setCanGoBack(!isPopupWindow && hasNavigationHistory);
+  }, []);
 
   // Load documents and statuses
   useEffect(() => {
     const loadDocuments = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         
         // Ensure LegalDocsService is initialized
         await legalDocsService.initialize();
@@ -41,7 +60,9 @@ const LegalCenterPage: React.FC = () => {
         const manifest = legalDocsService.getCurrentManifest();
         
         if (!manifest) {
-          logger.error('No legal manifest available');
+          const errorMsg = 'No legal manifest available';
+          logger.error(errorMsg);
+          setError(errorMsg);
           return;
         }
         
@@ -57,8 +78,10 @@ const LegalCenterPage: React.FC = () => {
         setStatuses(statusMap);
         
         logger.log(`Loaded ${manifest.documents.length} legal documents`);
-      } catch (error) {
-        logger.error('Failed to load legal documents:', error);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Failed to load legal documents';
+        logger.error('Failed to load legal documents:', err);
+        setError(errorMsg);
       } finally {
         setIsLoading(false);
       }
@@ -143,21 +166,60 @@ const LegalCenterPage: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <div className="flex items-start gap-3">
+              <XCircleIcon className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-2">
+                  Error Loading Legal Center
+                </h2>
+                <p className="text-sm text-red-800 dark:text-red-200 mb-4">
+                  {error}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="btn-primary text-sm"
+                  >
+                    Reload Page
+                  </button>
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="btn-secondary text-sm"
+                  >
+                    Go Back
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              aria-label={t('common.back', { ns: 'common' })}
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-            </button>
+            {/* Only show back button if there's history to go back to */}
+            {canGoBack && (
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                aria-label={t('common.back', { ns: 'common' })}
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </button>
+            )}
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {t('title')}
             </h1>
@@ -306,18 +368,24 @@ const LegalCenterPage: React.FC = () => {
       </div>
 
       {/* Document Modal */}
-      {selectedDoc && (
-        <LegalDocumentModal
-          docId={selectedDoc.doc.id}
-          title={t(`documents.${selectedDoc.doc.id}`, selectedDoc.doc.title)}
-          markdownPath={selectedDoc.path}
-          isRTL={isRTL}
-          showAcceptButton={true}
-          onAccept={handleAcceptDocument}
-          onClose={() => setSelectedDoc(null)}
-          requireScrollToBottom={true}
-        />
-      )}
+      {selectedDoc && (() => {
+        const selectedStatus = statuses.get(selectedDoc.doc.id);
+        const isAccepted = selectedStatus?.accepted || false;
+        
+        return (
+          <LegalDocumentModal
+            docId={selectedDoc.doc.id}
+            title={t(`documents.${selectedDoc.doc.id}`, selectedDoc.doc.title)}
+            markdownPath={selectedDoc.path}
+            isRTL={isRTL}
+            showAcceptButton={true}
+            isAccepted={isAccepted}
+            onAccept={handleAcceptDocument}
+            onClose={() => setSelectedDoc(null)}
+            requireScrollToBottom={true}
+          />
+        );
+      })()}
     </div>
   );
 };

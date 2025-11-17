@@ -1,4 +1,5 @@
 import type { AppSettings } from '../types';
+import { DEFAULT_THEME_ID } from '../config/features';
 
 // Application Constants
 export const APP_NAME = 'RepCue';
@@ -53,7 +54,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   update_mode: 'automatic', // PWA update mode: automatic, notify, or manual
   allow_auto_updates: true, // Enable automatic updates
   update_on_metered: false, // Prevent updates on metered connections by default
-  theme_id: 'calm', // Default theme for new users (Theme Customization Feature)
+  theme_id: DEFAULT_THEME_ID, // Default theme for new users (set in config/features.ts)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,
