@@ -53,7 +53,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   update_mode: 'automatic', // PWA update mode: automatic, notify, or manual
   allow_auto_updates: true, // Enable automatic updates
   update_on_metered: false, // Prevent updates on metered connections by default
-  theme_id: 'default', // Default theme for new users (Theme Customization Feature)
+  theme_id: 'calm', // Default theme for new users (Theme Customization Feature)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

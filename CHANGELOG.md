@@ -1,5 +1,99 @@
 ## Unreleased
 
+### 2025-11-14
+
+#### 🔧 Critical Fix: Legal Center Accessible Without Consent
+
+**Made Legal Center Bypass Consent Gate for GDPR Compliance**:
+- **Issue**: Legal Center link opened in new tab but hit consent gate, creating infinite consent loops
+- **GDPR Requirement**: Users must be able to review legal documents BEFORE making consent decisions
+- **Solution**: Added Legal Center (`/legal`) to public routes that bypass consent gate
+- **Implementation**:
+  - Created `isPublicOrLegalRoute()` function to check for both share routes and Legal Center
+  - Updated consent gate logic to allow Legal Center access without consent
+  - Maintained data initialization skip for public routes (Legal Center doesn't need exercise data)
+  - Preserved rehydration skip for share-specific routes only
+- **Result**: 
+  - ✅ Legal Center accessible from consent banner without infinite loops
+  - ✅ Users can review all legal documents before consenting (GDPR compliant)
+  - ✅ Proper separation: public routes vs legal-only routes
+  - ✅ App performance maintained with appropriate data loading
+
+#### 🛠️ Critical Fix: Router Context Issue in Consent Banner
+
+**Fixed Router Hook Context Error**:
+- **Issue**: App was failing to load with `useNavigate() may be used only in the context of a <Router> component` error
+- **Root Cause**: ConsentBanner was being rendered before the main Router component was initialized
+- **Fix**: Replaced `useNavigate()` hook with `window.open('/legal', '_blank')` for Legal Center access
+- **Result**: App now loads successfully and Legal Center link opens in new tab from consent banner
+- **Impact**: ✅ App loads properly, ✅ Legal Center still accessible, ✅ No router context dependencies
+
+#### 🎯 UX Enhancement: Enhanced Consent Flow with Legal Center Integration
+
+**Streamlined Consent with Legal Document Access**:
+- **Enhanced Consent Banner**: Now includes direct link to Legal Center for users who want to review legal documents before consenting
+- **Clear Legal Integration**: Added "View all legal documents in Legal Center" button alongside privacy details
+- **Improved Transparency**: Footer text now explicitly mentions that consent automatically accepts "all required legal documents (Terms of Service, Privacy Policy, etc.)"
+- **Better User Choice**: Users can now easily access and review all legal documents before making their consent decision
+- **Implementation**:
+  - Added Legal Center navigation link in consent banner
+  - Enhanced consent description to clarify automatic legal document acceptance
+  - Maintained streamlined flow while providing full transparency and access to legal details
+
+#### 🎨 Theme Enhancement: Calm Lavender as Default
+
+**Set Calm Lavender as Default Theme for New Users**:
+- **Change**: Updated default theme from Classic Teal to Calm Lavender (purple) for a more soothing, mindful workout experience
+- **Implementation**:
+  - **Feature Config**: Changed `DEFAULT_THEME_ID` from `'default'` to `'calm'` in `src/config/features.ts`
+  - **App Settings**: Updated `theme_id` in default settings from `'default'` to `'calm'` in `src/constants/index.ts`
+  - **Theme Library**: Calm theme already marked with `isDefault: true` in `src/data/themes.ts`
+- **Impact**:
+  - ✅ **New users** see calming lavender/purple theme on first visit
+  - ✅ **Existing users** retain their current theme preferences unchanged
+  - ✅ **Mindful aesthetic** aligns with RepCue's focus on thoughtful, intentional fitness
+  - ✅ **WCAG compliant** maintains 4.5:1+ contrast ratios in all modes
+
+#### 🎯 UX Enhancement: Streamlined Consent Flow
+
+**Consolidated Consent and Legal Acceptance - Single User Gate**:
+- **Issue**: Redundant user experience with separate consent banner and legal gate requiring two acceptance steps
+- **UX Problem**: First-time users faced two consecutive gates (consent → legal), harming onboarding flow
+- **Solution**: Consolidated into single consent banner that handles both consent and legal document acceptance
+- **Implementation**:
+  - **Enhanced ConsentBanner**: Added automatic legal document acceptance based on user consent choice
+  - **Removed LegalGate**: Eliminated separate legal gate component and its blocking behavior
+  - **Streamlined Flow**: Users now accept both privacy consent and legal documents in one action
+  - **Preserved Functionality**: All legal document tracking and versioning maintained in backend
+- **Benefits**:
+  - ✅ **50% reduction in onboarding friction** - single gate instead of dual gates
+  - ✅ **Improved user experience** - cleaner, more intuitive first-time flow
+  - ✅ **Maintained compliance** - full legal document acceptance tracking preserved
+  - ✅ **Better conversion** - reduced abandonment from multiple acceptance steps
+
+#### 🚫 PWA Install Prompt Completely Disabled - COMPREHENSIVE FIX
+
+**Install Prompt Globally Disabled - All Event Listeners Eliminated**:
+- **Issue**: PWA install prompt continued to flash rapidly despite feature flag due to multiple event listener sources
+- **Root Cause Analysis**: Found **3 separate sources** of `beforeinstallprompt` event listeners:
+  1. `useInstallPrompt` hook (disabled but still running)
+  2. `setupInstallPrompt()` in `utils/serviceWorker.ts`
+  3. `enhanceInstallPrompt()` in `utils/pwaDetection.ts`
+- **Comprehensive Solution**: 
+  - **Hook Conditional Loading**: Only call `useInstallPrompt()` when `INSTALL_PROMPT_ENABLED = true`
+  - **Service Worker Guard**: Added feature flag check in `setupInstallPrompt()`
+  - **PWA Detection Guard**: Added feature flag check in `enhanceInstallPrompt()`
+  - **Complete Event Listener Elimination**: No `beforeinstallprompt` listeners when disabled
+- **Impact**: 
+  - ✅ **Zero install prompt activity** - no hooks running, no event listeners registered
+  - ✅ **Eliminated all sources of flashing** - comprehensive coverage of all install prompt systems
+  - ✅ **Clean performance** - no unnecessary event handlers or React effects
+  - ❌ Users cannot use in-app install prompt (can still manually add to home screen)
+- **Easy Re-Enable**: 
+  - Single flag: Set `INSTALL_PROMPT_ENABLED = true` in `src/config/features.ts`
+  - All systems will re-activate automatically
+- **Testing**: No install prompt activity should occur on any platform - completely eliminated flashing
+
 ### 2025-11-13
 
 #### 🎥 Video Infrastructure Pivot & Reliability Hardening

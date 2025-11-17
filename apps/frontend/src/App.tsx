@@ -25,12 +25,11 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { UpdateNotificationManager } from './components/UpdateNotificationManager';
-import { LegalGate } from './components/legal/LegalGate';
-import type { UpdateInfo, UpdateError } from './types';
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
+import type { UpdateInfo, UpdateError } from './types';
 import type { PersonalRecord } from './types/coaching';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
@@ -279,9 +278,6 @@ function App() {
   const [showPostWorkoutSurvey, setShowPostWorkoutSurvey] = useState(false);
   const [surveyActivityLog, setSurveyActivityLog] = useState<ActivityLog | null>(null);
 
-  // Legal gate state
-  const [showLegalGate, setShowLegalGate] = useState(false);
-
   // Handle pending share token after authentication
   useEffect(() => {
     const handlePendingShareToken = async () => {
@@ -315,9 +311,11 @@ function App() {
   });
 
   // Helper function to check if we're on a shared exercise route that doesn't require consent
-  const isPublicShareRoute = useCallback(() => {
+  // Check if current route should be accessible without consent (public routes + legal center)
+  const isPublicOrLegalRoute = useCallback(() => {
     if (typeof window !== 'undefined' && window.location) {
-      return window.location.pathname.startsWith('/share/');
+      const path = window.location.pathname;
+      return path.startsWith('/share/') || path === '/legal';
     }
     return false;
   }, []);
@@ -1910,9 +1908,9 @@ function App() {
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
-    // Skip initialization for public share routes - they don't need local data
-    if (isPublicShareRoute()) {
-      logger.log('[init] Skipping initialization for public share route');
+    // Skip initialization for public share routes and legal center - they don't need local data
+    if (isPublicOrLegalRoute()) {
+      logger.log('[init] Skipping initialization for public/legal route');
       setIsLoading(false);
       return;
     }
@@ -2201,39 +2199,7 @@ function App() {
       logger.warn('Version recovery check failed:', error);
     }
   }, 5000); // Check after 5 seconds
-  }, [hasConsent, isPublicShareRoute]);
-
-  // Check for blocking legal documents
-  useEffect(() => {
-    const checkLegalGate = async () => {
-      logger.log('[Legal Gate Check] Starting check - hasConsent:', hasConsent, 'isLoading:', isLoading);
-      
-      if (!hasConsent || isLoading) {
-        logger.log('[Legal Gate Check] Skipping - waiting for consent or app to load');
-        return;
-      }
-
-      try {
-        const locale = i18n.language || 'en';
-        logger.log('[Legal Gate Check] Checking for blocking documents in locale:', locale);
-        
-        const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
-        logger.log('[Legal Gate Check] Has blocking documents:', hasBlocking);
-        
-        if (hasBlocking) {
-          logger.log('📄 Blocking legal documents detected, showing legal gate');
-          setShowLegalGate(true);
-        } else {
-          logger.log('[Legal Gate Check] No blocking documents found');
-          setShowLegalGate(false);
-        }
-      } catch (error) {
-        logger.error('❌ Failed to check legal gate:', error);
-      }
-    };
-
-    checkLegalGate();
-  }, [hasConsent, isLoading, i18n.language]);
+  }, [hasConsent, isPublicOrLegalRoute]);
 
   // Handle shared exercise save from redirect
   useEffect(() => {
@@ -2477,10 +2443,10 @@ useEffect(() => {
     const tryRehydrate = async () => {
       if (isLoading || exercises.length > 0) return;
       // If consent missing, we can still safely peek built-ins to hydrate UI without storing anything
-      // But skip this entirely for public share routes since they don't need local exercises
+      // But skip this entirely for public share routes and legal center since they don't need local exercises
       if (!hasConsent) {
-        if (isPublicShareRoute()) {
-          logger.log('[rehydrate] Skipping exercise rehydration for public share route');
+        if (isPublicOrLegalRoute()) {
+          logger.log('[rehydrate] Skipping exercise rehydration for public/legal route');
           return;
         }
         try {
@@ -2522,7 +2488,7 @@ useEffect(() => {
     };
     void tryRehydrate();
     return () => { cancelled = true; };
-  }, [hasConsent, isLoading, exercises.length, isPublicShareRoute]);
+  }, [hasConsent, isLoading, exercises.length, isPublicOrLegalRoute]);
 
   // Listen for consent changes
   useEffect(() => {
@@ -2751,8 +2717,8 @@ useEffect(() => {
     }
   }, [appSettings.dark_mode, hasConsent]);
 
-  // Show consent banner if no consent (except for public share routes)
-  if (!hasConsent && !isPublicShareRoute()) {
+  // Show consent banner if no consent (except for public share routes and legal center)
+  if (!hasConsent && !isPublicOrLegalRoute()) {
     return <ConsentBanner onConsentGranted={handleConsentGranted} />;
   }
 
@@ -2765,21 +2731,6 @@ useEffect(() => {
           <p className="text-body font-medium">Loading RepCue...</p>
         </div>
       </div>
-    );
-  }
-
-  // Block app rendering if Legal Gate is open (blocking documents must be accepted first)
-  if (showLegalGate) {
-    return (
-      <>
-        <LegalGate
-          isOpen={showLegalGate}
-          onContinue={() => {
-            logger.log('📄 Legal gate accepted, continuing to app');
-            setShowLegalGate(false);
-          }}
-        />
-      </>
     );
   }
 

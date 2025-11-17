@@ -17,7 +17,7 @@ export const SYNC_ENGINE = 'v2' as const;
 
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = true;
+export const DEBUG = false;
 // Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
 export const SYNC_DEBUG = false;
 
@@ -34,7 +34,7 @@ export const LEGAL_ACCEPTANCE_V3_ENABLED = true;
 
 // Theme Customization System
 // Default theme ID - used for new users and fallback
-export const DEFAULT_THEME_ID = 'default' as const;
+export const DEFAULT_THEME_ID = 'calm' as const;
 // Enable/disable theme customization feature
 // Starting enabled (true) on feature branch for development and testing
 export const THEME_CUSTOMIZATION_ENABLED = true;
@@ -43,3 +43,8 @@ export const THEME_CUSTOMIZATION_ENABLED = true;
 // Enable Cloudflare R2-based video hosting with /media/* proxy
 // When enabled, uses new variants structure; when disabled, falls back to legacy video paths
 export const VIDEO_R2_ENABLED = true; // Enabled for testing R2 video hosting
+
+// PWA Install Prompt Controls
+// Completely disabled due to persistent flashing bug across platforms
+export const INSTALL_PROMPT_ENABLED = false; // Globally disabled until flashing issue resolved
+export const INSTALL_PROMPT_IOS_ENABLED = false; // iOS-specific disable (kept for future)
