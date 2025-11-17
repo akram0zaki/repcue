@@ -1,21 +1,35 @@
 #!/usr/bin/env node
 /**
- * RepCue Manifest Builder - Update exercise_media.json with R2 variants
+ * RepCue Manifest Builder - Update exercise_media.json with video variants
  * 
- * Reads upload mapping from publish-to-r2.mjs and updates the exercise media manifest
- * with new variants structure while preserving backward compatibility with legacy video paths.
+ * Supports both R2 (remote) and static (local /videos) delivery modes.
+ * Reads upload mapping and updates exercise_media.json with variants structure.
  * 
  * Usage:
  *   node scripts/video/manifest-build.mjs [options]
  * 
  * Options:
- *   --mapping=<path>    Path to upload-mapping.json (default: scripts/video/encoded/upload-mapping.json)
+ *   --mapping=<path>    Path to upload-mapping.json (default: scripts/video/upload-mapping.json)
+ *   --formats=<list>    Comma-separated formats to include (default: mp4,webm)
+ *   --static            Generate static /videos URLs without hashes (default: false, uses R2 /media)
+ *   --base=<path>       Base path for URLs (default: /videos if --static, else /media)
  *   --dry-run           Show changes without writing to manifest
  *   --validate          Validate manifest against JSON schema
+ * 
+ * Examples:
+ *   # R2 mode (hashed URLs via /media)
+ *   node scripts/video/manifest-build.mjs --mapping=scripts/video/upload-mapping.json
+ *   
+ *   # Static mode (non-hashed URLs via /videos)
+ *   node scripts/video/manifest-build.mjs --mapping=scripts/video/upload-mapping.json --static
+ *   
+ *   # MP4 only, static delivery
+ *   node scripts/video/manifest-build.mjs --formats=mp4 --static
  * 
  * The script:
  * - Groups uploads by exercise ID, aspect, resolution, and format
  * - Creates/updates variants structure in exercise_media.json
+ * - Supports both R2 (with hashes) and static (non-hashed) filename patterns
  * - Preserves legacy video paths for backward compatibility
  * - Ensures deterministic key ordering for stable diffs
  * - Validates entries against expected structure

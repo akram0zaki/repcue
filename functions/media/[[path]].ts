@@ -15,13 +15,40 @@
  * - Rate limiting via Cloudflare
  */
 
+import { ReadableStream } from 'stream/web';
+
+interface R2Bucket {
+  get(key: string, options?: { range?: string }): Promise<R2Object | null>;
+  put(key: string, data: ReadableStream | ArrayBuffer | string): Promise<R2Object>;
+  delete(key: string): Promise<void>;
+}
+
+interface R2Object {
+  key: string;
+  version: string;
+  size: number;
+  etag: string;
+  httpEtag: string;
+  uploaded: Date;
+  httpMetadata?: { contentType?: string };
+  customMetadata?: Record<string, string>;
+  body?: ReadableStream;
+}
+
 interface Env {
   VIDEOS: R2Bucket;
   DEBUG?: string;
 }
 
-// Strict filename pattern: exerciseId_v1_WIDTHxHEIGHT_hash.ext (e.g., burpees_v1_1080x1920_95dc97e6.webm)
-const VALID_KEY_PATTERN = /^[a-z0-9_-]+_v1_\d{3,4}x\d{3,4}_[a-f0-9]{8,}\.(mp4|webm)$/i;
+type PagesFunction<Env = Record<string, unknown>> = (
+  context: { request: Request; env: Env; params?: Record<string, string> }
+) => Promise<Response> | Response;
+
+// Patterns for filename validation
+// Hashed: exerciseId_v1_WIDTHxHEIGHT_hash.ext (e.g., burpees_v1_1080x1920_95dc97e6.webm)
+const HASHED_KEY_PATTERN = /^[a-z0-9_-]+_v1_\d{3,4}x\d{3,4}_[a-f0-9]{8,}\.(mp4|webm)$/i;
+// Non-hashed: exerciseId_v1_WIDTHxHEIGHT.ext (e.g., burpees_v1_1080x1920.mp4)
+const NON_HASHED_KEY_PATTERN = /^[a-z0-9_-]+_v1_\d{3,4}x\d{3,4}\.(mp4|webm)$/i;
 
 // Content-Type mapping (fallback if R2 metadata missing)
 const CONTENT_TYPES: Record<string, string> = {
@@ -31,6 +58,7 @@ const CONTENT_TYPES: Record<string, string> = {
 
 /**
  * Sanitize and validate the requested path
+ * Accepts both hashed and non-hashed patterns
  * Prevents path traversal attacks (OWASP A01)
  */
 function sanitizePath(path: string): string | null {
@@ -43,8 +71,8 @@ function sanitizePath(path: string): string | null {
     return null;
   }
   
-  // Validate against strict pattern
-  if (!VALID_KEY_PATTERN.test(cleanPath)) {
+  // Validate against either hashed or non-hashed pattern
+  if (!HASHED_KEY_PATTERN.test(cleanPath) && !NON_HASHED_KEY_PATTERN.test(cleanPath)) {
     return null;
   }
   
@@ -87,13 +115,139 @@ function inferContentType(key: string): string {
 /**
  * Main handler for /media/* requests
  */
-export const onRequest: PagesFunction<Env> = async () => {
-  // Function temporarily disabled while serving static assets from /videos
-  return new Response('Media function disabled; use /videos/* static assets', {
-    status: 410,
-    headers: {
-      'Cache-Control': 'no-store',
-      'Content-Type': 'text/plain'
+export const onRequest: PagesFunction<Env> = async (context: any) => {
+  const { request, env } = context;
+  const url = new URL(request.url);
+  const debug = env.DEBUG === 'true';
+  
+  // Check if R2 binding is available
+  if (!env.VIDEOS) {
+    console.error('[Media Proxy] R2 bucket binding "VIDEOS" is not configured');
+    return new Response('Service configuration error: R2 bucket not available', { 
+      status: 503,
+      headers: { 
+        'Cache-Control': 'no-store',
+        'Content-Type': 'text/plain'
+      }
+    });
+  }
+  
+  // Extract path from URL (everything after /media/)
+  const requestPath = url.pathname;
+  
+  // Sanitize and validate path
+  const key = sanitizePath(requestPath);
+  if (!key) {
+    if (debug) {
+      console.warn(`[Media Proxy] Invalid path rejected: ${requestPath}`);
     }
-  });
+    return new Response('Invalid path', { 
+      status: 400,
+      headers: { 'Cache-Control': 'no-store' }
+    });
+  }
+  
+  try {
+    // Try to fetch object with the requested key (hashed or non-hashed)
+    let object = await env.VIDEOS.get(key);
+    let usedKey = key;
+    
+    // Fallback: If hashed pattern and not found, try non-hashed variant
+    if (!object && HASHED_KEY_PATTERN.test(key)) {
+      const nonHashedKey = key.replace(/_[a-f0-9]{8,}\./, '.');
+      const fallbackObject = await env.VIDEOS.get(nonHashedKey);
+      
+      if (fallbackObject) {
+        if (debug) {
+          console.log(`[Media Proxy] Hashed not found (${key}), using non-hashed (${nonHashedKey})`);
+        }
+        object = fallbackObject;
+        usedKey = nonHashedKey;
+      }
+    }
+    
+    if (!object) {
+      if (debug) {
+        console.warn(`[Media Proxy] Object not found: ${key}`);
+      }
+      return new Response('Not Found', { 
+        status: 404,
+        headers: { 'Cache-Control': 'no-store' }
+      });
+    }
+    
+    // Get file size for range calculations
+    const fileSize = object.size;
+    
+    // Parse Range header if present
+    const rangeHeader = request.headers.get('Range');
+    const range = parseRange(rangeHeader, fileSize);
+    
+    // Determine Content-Type (use R2 metadata or infer from extension)
+    const contentType = object.httpMetadata?.contentType || inferContentType(usedKey);
+    
+    // Prepare response headers
+    const headers = new Headers({
+      'Content-Type': contentType,
+      'Accept-Ranges': 'bytes',
+      'X-Content-Type-Options': 'nosniff',
+    });
+    
+    // Set cache control based on whether we're using hashed or non-hashed
+    // Hashed files are immutable; non-hashed may be updated
+    if (HASHED_KEY_PATTERN.test(usedKey)) {
+      headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    } else {
+      headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+    }
+    
+    // Handle range request (206 Partial Content)
+    if (range) {
+      const { start, end } = range;
+      const contentLength = end - start + 1;
+      
+      // Fetch partial content from R2
+      const partialObject = await env.VIDEOS.get(usedKey, {
+        range: { offset: start, length: contentLength }
+      });
+      
+      if (!partialObject) {
+        return new Response('Range Not Satisfiable', { 
+          status: 416,
+          headers: { 'Content-Range': `bytes */${fileSize}` }
+        });
+      }
+      
+      headers.set('Content-Length', contentLength.toString());
+      headers.set('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+      
+      if (debug) {
+        console.log(`[Media Proxy] Serving partial: ${usedKey} (${start}-${end}/${fileSize})`);
+      }
+      
+      return new Response(partialObject.body, {
+        status: 206,
+        headers,
+      });
+    }
+    
+    // Full content response (200 OK)
+    headers.set('Content-Length', fileSize.toString());
+    
+    if (debug) {
+      console.log(`[Media Proxy] Serving full: ${usedKey} (${fileSize} bytes)`);
+    }
+    
+    return new Response(object.body, {
+      status: 200,
+      headers,
+    });
+    
+  } catch (error) {
+    console.error(`[Media Proxy] Error serving ${key}:`, error);
+    return new Response('Internal Server Error', { 
+      status: 500,
+      headers: { 'Cache-Control': 'no-store' }
+    });
+  }
 };
