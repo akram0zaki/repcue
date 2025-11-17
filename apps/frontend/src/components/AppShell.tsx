@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { usePlatform } from '../utils/platformDetection';
 import { useInstallPrompt } from '../hooks/useInstallPrompt';
+import { INSTALL_PROMPT_ENABLED, INSTALL_PROMPT_IOS_ENABLED } from '../config/features';
 import { useOnboarding } from '../hooks/useOnboarding';
 import Navigation from './Navigation';
 import InstallPrompt from './InstallPrompt';
@@ -62,7 +63,23 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const { t } = useTranslation(['a11y', 'titles']);
   const location = useLocation();
   const platform = usePlatform();
-  const installPrompt = useInstallPrompt();
+  
+  // CRITICAL: Only call useInstallPrompt hook when feature is enabled to prevent flashing
+  const installPrompt = INSTALL_PROMPT_ENABLED ? useInstallPrompt() : {
+    isAvailable: false,
+    canShowPrompt: false,
+    isInstalling: false,
+    isInstalled: false,
+    installError: null,
+    promptInstall: async () => false,
+    dismissPrompt: () => {},
+    resetError: () => {},
+    getInstallAnalytics: () => [],
+    clearAnalytics: () => {},
+    installMethod: 'unsupported' as const,
+    needsManualInstructions: false,
+  };
+  
   const onboarding = useOnboarding();
   // Avoid intrusive skip-link: only show after keyboard navigation (Tab)
   const [showSkipLink, setShowSkipLink] = useState<boolean>(() => {
@@ -174,7 +191,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       <SyncStatusBanner />
 
       {/* Install prompt integration */}
-      {installPrompt.canShowPrompt && !platform.isStandalone && (
+      {/* Hook only runs when INSTALL_PROMPT_ENABLED is true */}
+      {installPrompt.canShowPrompt && !platform.isStandalone && (!platform.isIOS || INSTALL_PROMPT_IOS_ENABLED) && (
         <InstallPrompt
           onDismiss={installPrompt.dismissPrompt}
         />

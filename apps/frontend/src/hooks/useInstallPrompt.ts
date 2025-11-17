@@ -15,6 +15,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { isIOS, canInstall, getBrowserName, getOSName } from '../utils/platformDetection';
+import { INSTALL_PROMPT_ENABLED, INSTALL_PROMPT_IOS_ENABLED } from '../config/features';
+import logger from '../utils/logger';
 
 /**
  * BeforeInstallPromptEvent interface for TypeScript
@@ -97,6 +99,7 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
   const [isInstalling, setIsInstalling] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [installError, setInstallError] = useState<string | null>(null);
+  const [hasInitialized, setHasInitialized] = useState(false);
   
   // Refs for cleanup
   const promptTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -234,6 +237,8 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
    * Handle beforeinstallprompt event
    */
   const handleBeforeInstallPrompt = useCallback((event: Event): void => {
+    logger.debug('Install prompt: beforeinstallprompt event received');
+    
     // Prevent the mini-infobar from appearing on mobile
     event.preventDefault();
     
@@ -245,10 +250,11 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
 
     // Check if we can show the prompt (not on cooldown)
     const canShow = !isPromptOnCooldown() && !checkIfInstalled();
+    logger.debug('Install prompt: canShow =', canShow, 'onCooldown =', isPromptOnCooldown(), 'isInstalled =', checkIfInstalled());
     setCanShowPrompt(canShow);
 
-    // Track that prompt is available
-    trackInstallEvent('not_available', 'native_prompt');
+    // Track that prompt is available (correct event name)
+    trackInstallEvent('prompted', 'native_prompt');
   }, [isPromptOnCooldown, checkIfInstalled, trackInstallEvent]);
 
   /**
@@ -360,6 +366,18 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
    * Setup event listeners and initial state
    */
   useEffect(() => {
+    // GLOBAL DISABLE: Install prompt completely disabled due to persistent flashing bug
+    if (!INSTALL_PROMPT_ENABLED) {
+      logger.warn('Install prompt: Globally disabled due to persistent flashing issues');
+      setIsAvailable(false);
+      setCanShowPrompt(false);
+      setHasInitialized(true);
+      return;
+    }
+
+    // Prevent multiple initialization
+    if (hasInitialized) return;
+
     // Load analytics
     analyticsRef.current = loadAnalytics();
 
@@ -369,6 +387,7 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
 
     // Don't set up listeners if already installed
     if (alreadyInstalled) {
+      setHasInitialized(true);
       return;
     }
 
@@ -376,11 +395,22 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // For iOS or other platforms without beforeinstallprompt
+    // TEMPORARY: Disable iOS install prompt to prevent flashing bug
+    // TODO: Re-enable once flashing issue is properly resolved
     if (isIOS() && canInstall()) {
-      setIsAvailable(true);
-      setCanShowPrompt(!isPromptOnCooldown());
+      if (!INSTALL_PROMPT_IOS_ENABLED) {
+        logger.warn('Install prompt: iOS prompt disabled via feature flag due to flashing bug');
+        setIsAvailable(false);
+        setCanShowPrompt(false);
+      } else {
+        const shouldShow = !isPromptOnCooldown();
+        logger.debug('Install prompt: iOS initialization - shouldShow =', shouldShow, 'onCooldown =', isPromptOnCooldown());
+        setIsAvailable(true);
+        setCanShowPrompt(shouldShow);
+      }
     }
+
+    setHasInitialized(true);
 
     // Cleanup function
     return () => {
@@ -391,13 +421,8 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
         clearTimeout(promptTimeoutRef.current);
       }
     };
-  }, [
-    loadAnalytics,
-    checkIfInstalled,
-    handleBeforeInstallPrompt,
-    handleAppInstalled,
-    isPromptOnCooldown,
-  ]);
+    // Remove dependencies that cause re-renders - only run once on mount
+  }, []);
 
   // Calculate derived state
   const installMethod = getInstallMethod();

@@ -2,6 +2,7 @@
  * PWA Detection and Deep Link Utilities
  */
 
+import { INSTALL_PROMPT_ENABLED } from '../config/features';
 import logger from './logger';
 
 // Declare the BeforeInstallPromptEvent interface for PWA install prompts
@@ -130,6 +131,12 @@ export function registerPWALinkHandlers(): void {
  * Add install prompt enhancement for better PWA adoption
  */
 export function enhanceInstallPrompt(): void {
+  // FEATURE FLAG: Don't set up install prompt if disabled
+  if (!INSTALL_PROMPT_ENABLED) {
+    logger.warn('Install prompt: enhanceInstallPrompt disabled via feature flag');
+    return;
+  }
+
   let deferredPrompt: BeforeInstallPromptEvent | null = null;
   
   window.addEventListener('beforeinstallprompt', (e) => {

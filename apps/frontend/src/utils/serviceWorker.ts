@@ -1,4 +1,5 @@
-import logger from './logger'
+import logger from './logger';
+import { INSTALL_PROMPT_ENABLED } from '../config/features';
 /**
  * Service Worker registration utilities for RepCue PWA
  * Implements secure service worker management following OWASP guidelines
@@ -295,6 +296,13 @@ export const forceUpdateServiceWorker = async (): Promise<void> => {
  */
 export const setupInstallPrompt = (): Promise<boolean> => {
   return new Promise((resolve) => {
+    // FEATURE FLAG: Don't set up install prompt if disabled
+    if (!INSTALL_PROMPT_ENABLED) {
+      logger.warn('Install prompt: setupInstallPrompt disabled via feature flag');
+      resolve(false);
+      return;
+    }
+
     let deferredPrompt: BeforeInstallPromptEvent | null = null;
 
     window.addEventListener('beforeinstallprompt', (e) => {
