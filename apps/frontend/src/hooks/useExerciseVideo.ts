@@ -4,6 +4,8 @@ import type { ExerciseMediaIndex, ExerciseMedia } from '../types/media';
 import { VIDEO_DEMOS_ENABLED } from '../config/features';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
+import { selectVideoVariant } from '../utils/selectVideoVariant';
+import logger from '../utils/logger';
 
 interface UseExerciseVideoOptions {
   exercise: Exercise | null | undefined;
@@ -15,6 +17,8 @@ interface UseExerciseVideoOptions {
   isActiveMovement: boolean;
   // Explicit paused state (manual pause UI, if any)
   isPaused: boolean;
+  // Speed multiplier for video playback (0.5 = faster, 2.0 = slower)
+  repSpeedFactor: number;
 }
 
 interface UseExerciseVideoResult {
@@ -27,7 +31,7 @@ interface UseExerciseVideoResult {
 }
 
 // Phase 1 hook: metadata resolution + loop boundary detection + basic playback gating.
-export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isActiveMovement, isPaused }: UseExerciseVideoOptions): UseExerciseVideoResult {
+export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isActiveMovement, isPaused, repSpeedFactor }: UseExerciseVideoOptions): UseExerciseVideoResult {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [media, setMedia] = useState<ExerciseMedia | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -49,9 +53,9 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     loopHandlersRef.current.add(handler);
   }, []);
 
-  // Resolve metadata & choose initial variant (square -> portrait -> landscape)
+  // Resolve metadata & choose initial variant (R2 variants preferred, fallback to legacy)
   useEffect(() => {
-    if (!exercise || (!exercise.has_video && !exercise.custom_video_url)) {
+    if (!exercise) {
       setMedia(null);
       setVideoUrl(null);
       setReady(false);
@@ -89,7 +93,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
       return;
     }
 
-    // For built-in exercises, use the media index
+    // For built-in exercises (or any exercise without custom URL), use the media index
     if (!mediaIndex) {
       setMedia(null);
       setVideoUrl(null);
@@ -99,8 +103,9 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
     const m = mediaIndex[exercise.id];
     setMedia(m ?? null);
-    if (!m || !m.video) { setVideoUrl(null); return; }
-    const chosen = m.video.square || m.video.portrait || m.video.landscape || null;
+    if (!m) { setVideoUrl(null); return; }
+    // Prefer R2 variants selection with viewport-aware choice
+    const chosen = selectVideoVariant(m);
     setVideoUrl(chosen ?? null);
   }, [exercise, mediaIndex]);
 
@@ -121,20 +126,56 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
   // Reusable play condition
   // Only play during active movement phase (timer running & not countdown/rest)
-  const shouldPlay = VIDEO_DEMOS_ENABLED && enabled && !reducedMotion && !!videoUrl && isActiveMovement && !isPaused && isRunning;
+  // Debug override: allow disabling autoplay without hiding the video
+  const disableAutoplay = typeof window !== 'undefined' && (window as Window & { __DISABLE_VIDEO_AUTOPLAY__?: boolean }).__DISABLE_VIDEO_AUTOPLAY__ === true;
+  const shouldPlay = VIDEO_DEMOS_ENABLED && enabled && !reducedMotion && !!videoUrl && isActiveMovement && !isPaused && isRunning && !disableAutoplay;
+
+  // Apply playback speed multiplier
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !videoUrl) return;
+    // Convert rep_speed_factor to playback rate (inverse: 0.5 = 2x speed, 2.0 = 0.5x speed)
+    const playbackRate = 1 / repSpeedFactor;
+    v.playbackRate = playbackRate;
+    console.log('🎥 [Video Playback Rate] Set to:', playbackRate, '| Factor:', repSpeedFactor, '| Actual value:', v.playbackRate);
+  }, [repSpeedFactor, videoUrl]);
+
+  // Monitor playback rate changes (detect if something is overriding it)
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    
+    const handleRateChange = () => {
+      const expected = 1 / repSpeedFactor;
+      console.log('🎥 [ratechange event] Playback rate changed to:', v.playbackRate, '| Expected:', expected);
+      if (Math.abs(v.playbackRate - expected) > 0.01) {
+        console.warn('⚠️ [ratechange] Playback rate differs from expected! Correcting...');
+        v.playbackRate = expected;
+      }
+    };
+    
+    v.addEventListener('ratechange', handleRateChange);
+    return () => v.removeEventListener('ratechange', handleRateChange);
+  }, [repSpeedFactor]);
 
   // Playback management (initial + dependency changes)
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     if (!shouldPlay) { if (!v.paused) v.pause(); return; }
+    // Ensure playback rate is set before playing
+    const playbackRate = 1 / repSpeedFactor;
+    console.log('🎥 [Playback mgmt] Setting rate before play:', playbackRate);
+    v.playbackRate = playbackRate;
+    console.log('🎥 [Playback mgmt] Rate after setting:', v.playbackRate);
     // In tests, play() is often stubbed; still invoke it synchronously.
     // Always call play() when shouldPlay flips true so spies observe it.
     const maybePromise = v.play();
+    console.log('🎥 [Playback mgmt] Called play(), rate is now:', v.playbackRate);
     if (maybePromise && typeof (maybePromise as Promise<void>).catch === 'function') {
       (maybePromise as Promise<void>).catch(() => {});
     }
-  }, [shouldPlay]);
+  }, [shouldPlay, repSpeedFactor]);
 
   // Resume after visibility change (e.g., user switched tabs/routes and came back)
   useEffect(() => {
@@ -143,13 +184,15 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
       if (document.visibilityState === 'visible') {
         const v = videoRef.current;
         if (v && shouldPlay && v.paused) {
+          // Ensure playback rate is set before resuming
+          v.playbackRate = 1 / repSpeedFactor;
           v.play().catch(err => console.debug('Auto-resume play rejected', err));
         }
       }
     };
     document.addEventListener('visibilitychange', handler);
     return () => document.removeEventListener('visibilitychange', handler);
-  }, [shouldPlay]);
+  }, [shouldPlay, repSpeedFactor]);
 
   // When timer stops or resets, ensure video seeks to start for consistent next start
   useEffect(() => {
@@ -169,6 +212,10 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     setReady(false); setError(null);
     const loaded = () => {
       setReady(true);
+      // Apply playback rate when video loads
+      const playbackRate = 1 / repSpeedFactor;
+      v.playbackRate = playbackRate;
+      logger.log('[video] Applied playback rate on load:', playbackRate);
       // Attempt play again in case metadata arrived after initial effect
       if (shouldPlay && v.paused) {
         v.play().catch(() => {});
@@ -185,7 +232,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     v.addEventListener('loadeddata', loaded);
     v.addEventListener('error', failed);
     return () => { v.removeEventListener('loadeddata', loaded); v.removeEventListener('error', failed); };
-  }, [videoUrl, shouldPlay, exercise]);
+  }, [videoUrl, shouldPlay, exercise, repSpeedFactor]);
 
   // Cleanup blob URLs when component unmounts or video URL changes
   useEffect(() => {

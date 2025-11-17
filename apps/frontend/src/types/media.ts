@@ -40,6 +40,7 @@ export type ExerciseMedia = {
   id: string; // matches Exercise.id
   repsPerLoop: 1 | 2; // number of reps visually represented per video loop (future-proof)
   fps: 24 | 30; // frames per second of source encode
+  duration?: number; // accurate duration in seconds from video metadata (optional for backward compatibility)
   
   // Legacy video paths (backward compatibility - will be deprecated)
   video?: {

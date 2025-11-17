@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: file already uses t(); any remaining literals are app constants or non-user-visible */
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Exercise, AppSettings, Workout } from '../types';
 import { Routes, Weekday } from '../types';
@@ -19,6 +19,8 @@ import { useCoachingInsights } from '../hooks/useCoachingInsights';
 import InsightsCarousel from '../components/InsightsCarousel';
 import Imprint from '../components/Imprint';
 import logger from '../utils/logger';
+import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import type { ExerciseMediaIndex } from '../types/media';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -60,6 +62,15 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   } | null>(null);
   const [hasConsent, setHasConsent] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Media index to detect video availability independent of legacy has_video
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+  useEffect(() => { loadExerciseMedia().then(setMediaIndex).catch(() => setMediaIndex({} as ExerciseMediaIndex)); }, []);
+
+  const hasAnyVideo = useCallback((ex: Exercise): boolean => {
+    if (ex.custom_video_url) return true;
+    if (mediaIndex && ex.id && mediaIndex[ex.id]) return true;
+    return false;
+  }, [mediaIndex]);
 
   useEffect(() => {
     const checkConsentAndLoadUpcoming = async () => {
@@ -164,7 +175,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
     return exercises
       .filter(exercise =>
         exercise.catalogId === 'general-fitness' &&
-        (exercise.has_video || exercise.custom_video_url)
+        hasAnyVideo(exercise)
       )
       .slice(0, 3);
   };

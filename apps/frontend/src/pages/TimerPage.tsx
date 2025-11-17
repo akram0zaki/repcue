@@ -151,9 +151,24 @@ const TimerPage: React.FC<TimerPageProps> = ({
         // If workout is completed (currentExerciseIndex >= total exercises), don't show any video
         workoutMode && workoutMode.currentExerciseIndex >= workoutMode.exercises.length
           ? null
-          : (workoutCurrentExercise && (workoutCurrentExercise.has_video || workoutCurrentExercise.custom_video_url) ? workoutCurrentExercise : null)
+          : (
+              workoutCurrentExercise && (
+                // Show when a custom URL exists, or media metadata is available in the index
+                !!workoutCurrentExercise.custom_video_url ||
+                !!(mediaIndex && workoutCurrentExercise.id && (mediaIndex as any)[workoutCurrentExercise.id])
+              )
+                ? workoutCurrentExercise
+                : null
+            )
       )
-    : (selectedExercise && (selectedExercise.has_video || selectedExercise.custom_video_url) ? selectedExercise : null);
+    : (
+        selectedExercise && (
+          !!selectedExercise.custom_video_url ||
+          !!(mediaIndex && selectedExercise.id && (mediaIndex as any)[selectedExercise.id])
+        )
+          ? selectedExercise
+          : null
+      );
     
   // Initialize video hook with the correct exercise
   const exerciseVideo = useExerciseVideo({
@@ -162,7 +177,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
     enabled: !!videoFeatureEnabled,
     isRunning: timerState.isRunning,
     isActiveMovement: timerState.isRunning && !timerState.isCountdown && !restingNow,
-    isPaused: !timerState.isRunning
+    isPaused: !timerState.isRunning,
+    repSpeedFactor: appSettings.rep_speed_factor
   });
   
   // Phase 3 T-3.3: Prefetch upcoming exercise video during rest or pre-countdown
@@ -178,10 +194,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
           ? workoutMode.exercises[workoutMode.currentExerciseIndex]
           : null;
         const nextExercise = nextWorkoutEx ? exercises.find(e => e.id === nextWorkoutEx.exercise_id) : null;
-        if (nextExercise?.has_video || nextExercise?.custom_video_url) {
-          if (nextExercise.custom_video_url) {
+        if (
+          (nextExercise && nextExercise.custom_video_url) ||
+          (nextExercise && mediaIndex && mediaIndex[nextExercise.id])
+        ) {
+          if (nextExercise && nextExercise.custom_video_url) {
             prefetchUrl = await resolveVideoUrl(nextExercise.custom_video_url);
-          } else if (mediaIndex) {
+          } else if (mediaIndex && nextExercise) {
             const m = mediaIndex[nextExercise.id];
             if (m) prefetchUrl = selectVideoVariant(m);
           }
@@ -470,7 +489,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
               className={`relative mx-auto mb-3 ${repPulse ? 'transition-transform' : ''} timer-square-280`}
               aria-live="off"
             >
-            {showVideoInsideCircle && (
+            {showVideoInsideCircle && ((() => {
+              logger.debug('[TimerPage] Rendering video element', { url: videoUrl, factor: appSettings.rep_speed_factor });
+              return (
               <div
                 className="absolute inset-4 sm:inset-6 rounded-full overflow-hidden z-[1] flex items-center justify-center"
                 data-testid="exercise-video-wrapper"
@@ -479,7 +500,6 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <video
                   key={selectedExercise?.id || 'no-exercise'}
                   ref={exerciseVideo.videoRef}
-                  autoPlay
                   muted
                   loop
                   playsInline
@@ -487,6 +507,18 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   className="h-full w-full object-cover object-center mx-auto block gpu-accelerated"
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                   data-testid="exercise-video"
+                  onLoadedMetadata={(e) => {
+                    // Set playback rate as soon as metadata is loaded (before autoPlay starts)
+                    const video = e.currentTarget;
+                    const playbackRate = 1 / appSettings.rep_speed_factor;
+                    video.playbackRate = playbackRate;
+                  }}
+                  onPlay={(e) => {
+                    // CRITICAL: Set playback rate right when video starts playing
+                    const video = e.currentTarget;
+                    const playbackRate = 1 / appSettings.rep_speed_factor;
+                    video.playbackRate = playbackRate;
+                  }}
                   onLoadedData={() => {
                     // Safety: ensure play attempt if hook's effect missed due to timing
                     if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
@@ -501,7 +533,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 {/* Subtle overlay to maintain ring contrast */}
                 <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />
               </div>
-            )}
+              );
+            })())}
             {/* Show exercise description when no video is available */}
             {!showVideoInsideCircle && selectedExercise && !isCountdown && !restingNow && (
               <div

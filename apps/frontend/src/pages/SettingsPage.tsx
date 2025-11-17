@@ -387,6 +387,36 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           <p className="text-xs help-text mt-1">
             {t('settings.ringTimerHelp')}
           </p>
+
+          {/* Rep Speed Factor */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="rep-speed-factor" className="label-text">
+                {t('settings.repSpeedFactor')}
+              </label>
+              <span className="text-sm text-text-500 dark:text-text-400">
+                {appSettings.rep_speed_factor.toFixed(1)}x
+              </span>
+            </div>
+            <input
+              id="rep-speed-factor"
+              type="range"
+              min="0.5"
+              max="2.0"
+              step="0.1"
+              value={appSettings.rep_speed_factor}
+              onChange={(e) => onUpdateSettings({ rep_speed_factor: parseFloat(e.target.value) })}
+              className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between mt-2 text-xs help-text">
+              <span>0.5x {t('settings.faster')}</span>
+              <span>1.0x</span>
+              <span>2.0x {t('settings.slower')}</span>
+            </div>
+            <p className="text-sm help-text mt-1">
+              {t('settings.repSpeedFactorHelp')}
+            </p>
+          </div>
         </div>
 
         {/* Appearance Settings */}

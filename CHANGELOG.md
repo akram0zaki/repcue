@@ -1,6 +1,56 @@
 ## Unreleased
 
+### 2025-11-18
+
+#### 🎥 Deprecate `has_video` Flag — Media Index as Source of Truth
+
+Completed the deprecation of the legacy `has_video` flag in presentation logic. Video availability and rendering now rely exclusively on either the canonical `exercise_media.json` index or an exercise’s `custom_video_url`.
+
+**Key Changes**:
+- Timer video render and prefetch paths no longer read `has_video`; they use media index presence or custom URL exclusively.
+- Home and Standalone Shared Exercise “Video” badge logic updated to derive availability from media index or custom URL.
+- `useExerciseVideo` hook no longer gates by `has_video`; resolves media from index/custom URL and maintains robust playbackRate handling.
+- Swapped stray `console.log` in `TimerPage` with centralized `logger.debug` per project logging standards.
+
+**Why**:
+- Media index is the canonical source (R2 variants + metadata such as duration); `has_video` caused false negatives (e.g., Dead Bug).
+- Aligns all UI with the R2-backed video system and variant selection.
+
+**Files Modified**:
+- `apps/frontend/src/pages/TimerPage.tsx` — Removed `has_video` gating in render + prefetch; replaced console log with `logger.debug`.
+- `apps/frontend/src/pages/HomePage.tsx` — `hasAnyVideo` computed from media index or custom URL only.
+- `apps/frontend/src/StandaloneSharedExercise.tsx` — Video badge reflects media index/custom URL; ignores `has_video`.
+- `apps/frontend/src/hooks/useExerciseVideo.ts` — Media resolution independent of `has_video`; defensive playbackRate application retained.
+
+**Notes**:
+- Storage layer still includes a lightweight reconciliation helper for legacy data; UI no longer consumes `has_video`. We can remove reconciliation in a future cleanup after a short deprecation window.
+
+
 ### 2025-11-17
+
+#### ⏱️ Improved: Timer Duration Accuracy and Video Playback Speed Control
+
+**Enhancement**: Timer duration for rep-based exercises now reads from `exercise_media.json` for accuracy, and the `rep_speed_factor` setting now controls both timer progression AND video playback speed.
+
+**Timer Duration Changes**:
+- Created `getExerciseDurationFromMedia()` utility in `loadExerciseMedia.ts` to fetch accurate duration from media metadata
+- Updated ExerciseMedia type to include optional `duration` field (backward compatible with existing entries)
+- Modified App.tsx timer effect to load duration from exercise media with fallback to rep_duration_seconds
+- Timer now displays more accurate rep progress for all rep-based exercises
+
+**Video Playback Speed Control**:
+- Added `repSpeedFactor` parameter to `useExerciseVideo` hook
+- Video playback rate now syncs with rep_speed_factor setting (0.5x = faster video/reps, 2.0x = slower video/reps)
+- Updated TimerPage to pass rep_speed_factor to video hook
+- Ensures video demos match the user's selected rep speed for better follow-along experience
+
+**Benefits**:
+- Accurate duration values from video metadata improve timer accuracy
+- Better rep progress tracking for users following along with demo videos
+- Video playback speed matches timer progression for synchronized experience
+- Graceful fallback to original values if media duration unavailable
+
+---
 
 #### 🔐 Fixed: Legal Document Gating System - Mandatory Document Acceptance Enforcement
 

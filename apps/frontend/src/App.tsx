@@ -35,6 +35,7 @@ import type { PersonalRecord } from './types/coaching';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 import { computeWorkoutDurations } from './utils/workoutDuration';
+import { getExerciseDurationFromMedia } from './utils/loadExerciseMedia';
 import i18n from './i18n';
 import logger from './utils/logger';
 import { isCustom } from './utils/syncFilters';
@@ -389,14 +390,31 @@ function App() {
   const initStartedRef = useRef<boolean>(false);
 
   // Effect to ensure correct duration for rep-based exercises
+  // Reads accurate duration from exercise_media.json instead of globalExercises.ts
   useEffect(() => {
-    if (selectedExercise?.exercise_type === 'repetition_based' && appSettings.rep_speed_factor) {
-    const baseRep = selectedExercise.rep_duration_seconds || BASE_REP_TIME;
-    const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
+    if (!selectedExercise?.exercise_type || selectedExercise.exercise_type !== 'repetition_based' || !appSettings.rep_speed_factor) {
+      return;
+    }
+
+    const updateDuration = async () => {
+      // Fetch accurate duration from exercise media index
+      const mediaDuration = await getExerciseDurationFromMedia(selectedExercise.id);
+      const baseRep = mediaDuration ?? selectedExercise.rep_duration_seconds ?? BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
       if (selectedDuration !== repDuration) {
         setSelectedDuration(repDuration as TimerPreset);
       }
-    }
+    };
+
+    updateDuration().catch(err => {
+      logger.warn('[timer-duration] Failed to update duration from media:', err);
+      // Fallback to original duration calculation
+      const baseRep = selectedExercise.rep_duration_seconds ?? BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
+      if (selectedDuration !== repDuration) {
+        setSelectedDuration(repDuration as TimerPreset);
+      }
+    });
   }, [selectedExercise, appSettings.rep_speed_factor, selectedDuration]);
 
   // Timer refs for interval management
@@ -542,6 +560,10 @@ function App() {
       alert('Please select an exercise first');
       return;
     }
+
+    // Log the rep speed factor value (debug logger respects DEBUG flag)
+    logger.log('🎬 [TIMER START] Rep Speed Factor:', appSettings.rep_speed_factor);
+    logger.log('🎬 [TIMER START] Video Playback Rate should be:', 1 / appSettings.rep_speed_factor);
 
     // Request wake lock to keep screen active at the start
     if (wakeLockSupported) {

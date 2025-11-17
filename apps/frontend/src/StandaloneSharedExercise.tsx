@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabaseFunctionBaseUrl } from './config/supabase';
 import type { Exercise } from './types';
@@ -8,6 +8,8 @@ import {
 import { VideoThumbnail } from './components/VideoThumbnail';
 import { localizeExercise } from './utils/localizeExercise';
 import { getExerciseById } from './data/exercises';
+import { loadExerciseMedia } from './utils/loadExerciseMedia';
+import type { ExerciseMediaIndex } from './types/media';
 
 interface ShareInfo {
   sharedBy: string;
@@ -67,6 +69,19 @@ const StandaloneSharedExercise: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showVideo, setShowVideo] = useState(false);
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+
+  useEffect(() => {
+    loadExerciseMedia().then(setMediaIndex).catch(() => setMediaIndex({} as ExerciseMediaIndex));
+  }, []);
+
+  const hasAnyVideo = useMemo(() => {
+    const ex = sharedData?.exercise;
+    if (!ex) return false;
+    if (ex.custom_video_url) return true;
+    if (mediaIndex && ex.id && mediaIndex[ex.id]) return true;
+    return false;
+  }, [sharedData?.exercise, mediaIndex]);
 
   // Load shared exercise data
   useEffect(() => {
@@ -398,8 +413,8 @@ const StandaloneSharedExercise: React.FC = () => {
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {t('exercises:hasVideo', { defaultValue: 'Video Demo' })}:
                   </span>
-                  <span className={(exercise.has_video || exercise.custom_video_url) ? 'badge-success' : 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}>
-                    {(exercise.has_video || exercise.custom_video_url)
+                  <span className={hasAnyVideo ? 'badge-success' : 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}>
+                    {hasAnyVideo
                       ? t('exercises:hasVideoDemo', { defaultValue: 'Available' })
                       : t('exercises:noVideoDemo', { defaultValue: 'Not Available' })
                     }
