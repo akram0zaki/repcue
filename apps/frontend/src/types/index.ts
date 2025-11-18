@@ -512,6 +512,8 @@ export interface AppSettings extends SyncMetadata {
   coach_persona?: 'zen' | 'energy' | 'logic'; // Coach personality style (Enhancement E1.2)
   coach_post_workout_survey_enabled?: boolean; // Show post-workout survey after workouts (Phase 1 Gamification)
   celebration_sounds_enabled?: boolean; // Enable celebration sounds for PRs and milestones (Enhancement E1.1)
+  // Video rendering preference
+  video_fit_mode?: 'fit' | 'fill'; // Fit = contain (no crop), Fill = cover (may crop)
   // Theme System (Theme Customization Feature)
   theme_id?: string; // Selected theme ID from preset library (default: 'default')
 }

@@ -263,7 +263,9 @@
     "beepInterval45": "Alle 45 Sekunden",
     "beepInterval60": "Alle 60 Sekunden",
     "wakeLock": "Bildschirm aktiv halten",
-    "selectExercise": "Übung auswählen"
+    "selectExercise": "Übung auswählen",
+    "fit": "Einpassen",
+    "fill": "Füllen"
   },
   "weekday": {
     "monday": "Montag",

@@ -87,6 +87,7 @@ const TimerPageWrapper: React.FC<{
   onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
   onStartWorkoutMode: (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => Promise<void>;
+  onUpdateSettings?: (patch: Partial<AppSettings>) => void;
 }> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -2915,6 +2916,7 @@ useEffect(() => {
                       onStopTimer={stopTimer}
                       onResetTimer={resetTimer}
                       onStartWorkoutMode={startWorkoutMode}
+                      onUpdateSettings={updateAppSettings}
                     />
                   </Suspense>
                 } 

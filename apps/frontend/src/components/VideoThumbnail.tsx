@@ -43,13 +43,15 @@ interface VideoThumbnailProps {
   onVideoLoad?: () => void;
   onVideoError?: () => void;
   className?: string;
+  objectFit?: 'contain' | 'cover';
 }
 
 export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   exercise,
   onVideoLoad,
   onVideoError,
-  className = ''
+  className = '',
+  objectFit = 'cover'
 }) => {
   const { t } = useTranslation('exercises');
   const { isSharedExercise } = useSharedExercises();
@@ -324,7 +326,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         key={videoUrl} // Force re-render when URL changes
         ref={videoRef}
         src={videoUrl || undefined}
-        className="w-full h-full object-cover rounded-lg bg-gray-100 dark:bg-gray-800"
+        className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-lg bg-gray-100 dark:bg-gray-800`}
         preload="auto" // Changed from metadata to auto to ensure video loads
         muted
         loop // Videos will loop automatically when playing

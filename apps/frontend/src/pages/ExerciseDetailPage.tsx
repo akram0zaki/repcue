@@ -10,6 +10,7 @@ import { VideoThumbnail } from '../components/VideoThumbnail';
 import { useAuth } from '../hooks/useAuth';
 import logger from '../utils/logger';
 import '../styles/exerciseDetailParallax.css';
+import type { AppSettings } from '../types';
 
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +24,7 @@ const ExerciseDetailPage: React.FC = () => {
   const [isOwner, setIsOwner] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const [videoFitMode, setVideoFitMode] = useState<'fit' | 'fill'>('fit');
 
   useEffect(() => {
     if (!id) {
@@ -45,6 +47,19 @@ const ExerciseDetailPage: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Load video fit mode from settings
+  useEffect(() => {
+    (async () => {
+      try {
+        const settings = await storageService.getAppSettings();
+        const mode = settings?.video_fit_mode === 'fill' ? 'fill' : 'fit';
+        setVideoFitMode(mode);
+      } catch (e) {
+        // default remains 'fit'
+      }
+    })();
   }, []);
 
   // Refresh favorite status when page regains focus or becomes visible
@@ -285,10 +300,43 @@ const ExerciseDetailPage: React.FC = () => {
         <div className="w-full h-full">
           <VideoThumbnail
             exercise={exercise}
-            className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:w-full [&>video]:object-cover [&>div]:h-full [&>div]:aspect-auto"
+            className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:w-full [&>div]:h-full [&>div]:aspect-auto"
+            objectFit={videoFitMode === 'fit' ? 'contain' : 'cover'}
             onVideoLoad={() => logger.log('Hero video loaded for exercise:', exercise.id)}
             onVideoError={() => logger.warn('Hero video failed to load for exercise:', exercise.id)}
           />
+          {/* Fit/Fill toggle overlay */}
+          <div className="absolute top-3 right-3 z-10">
+            <button
+              type="button"
+              className="btn-ghost btn-sm"
+              onClick={async () => {
+                const next = videoFitMode === 'fit' ? 'fill' : 'fit';
+                setVideoFitMode(next);
+                try {
+                  const current = await storageService.getAppSettings();
+                  if (current) {
+                    const nextSettings: AppSettings = {
+                      ...current,
+                      video_fit_mode: next,
+                      version: (current.version || 1) + 1,
+                      updated_at: new Date().toISOString(),
+                      dirty: 1,
+                      op: 'upsert'
+                    } as AppSettings;
+                    await storageService.saveAppSettings(nextSettings);
+                  }
+                } catch (e) {
+                  logger.warn('Failed to persist video_fit_mode setting from ExerciseDetailPage', e);
+                }
+              }}
+              aria-label={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+              title={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+              data-testid="toggle-video-fit-detail"
+            >
+              {videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+            </button>
+          </div>
         </div>
       </div>
 

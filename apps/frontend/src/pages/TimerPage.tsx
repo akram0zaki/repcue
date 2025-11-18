@@ -30,6 +30,7 @@ interface TimerPageProps {
   onStartTimer: () => Promise<void>;
   onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
+  onUpdateSettings?: (patch: Partial<AppSettings>) => void;
 }
 
 const TimerPage: React.FC<TimerPageProps> = ({ 
@@ -46,7 +47,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onSetShowExerciseSelector,
   onStartTimer,
   onStopTimer,
-  onResetTimer
+  onResetTimer,
+  onUpdateSettings
 }) => {
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   
@@ -504,7 +506,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   loop
                   playsInline
                   preload="metadata"
-                  className="h-full w-full object-cover object-center mx-auto block gpu-accelerated"
+                  className={`h-full w-full ${appSettings.video_fit_mode === 'fit' ? 'object-contain' : 'object-cover'} object-center mx-auto block gpu-accelerated`}
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                   data-testid="exercise-video"
                   onLoadedMetadata={(e) => {
@@ -717,7 +719,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     loop
                     playsInline
                     preload="metadata"
-                    className="h-full w-full object-cover gpu-accelerated"
+                    className={`h-full w-full ${appSettings.video_fit_mode === 'fit' ? 'object-contain' : 'object-cover'} gpu-accelerated`}
                     aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                     data-testid="exercise-video"
                     onLoadedData={() => {
@@ -929,6 +931,23 @@ const TimerPage: React.FC<TimerPageProps> = ({
             >
               {t('common.reset')}
             </button>
+
+            {/* Fit/Fill toggle */}
+            {videoFeatureEnabled && (
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => {
+                  const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
+                  onUpdateSettings?.({ video_fit_mode: next });
+                }}
+                data-testid="toggle-video-fit"
+                aria-label={appSettings.video_fit_mode === 'fit' ? t('timer.fit', 'Fit') : t('timer.fill', 'Fill')}
+                title={appSettings.video_fit_mode === 'fit' ? t('timer.fit', 'Fit') : t('timer.fill', 'Fill')}
+              >
+                {appSettings.video_fit_mode === 'fit' ? t('timer.fit', 'Fit') : t('timer.fill', 'Fill')}
+              </button>
+            )}
           </div>
         </div>
 

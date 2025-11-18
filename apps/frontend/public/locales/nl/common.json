@@ -255,7 +255,9 @@
     "beepInterval45": "Elke 45 seconden",
     "beepInterval60": "Elke 60 seconden",
     "wakeLock": "Wake Lock",
-    "selectExercise": "Selecteer Oefening"
+    "selectExercise": "Selecteer Oefening",
+    "fit": "Passend",
+    "fill": "Vullen"
   },
   "weekday": {
     "monday": "Maandag",

@@ -260,7 +260,9 @@
     "beepInterval45": "Every 45 seconds",
     "beepInterval60": "Every 60 seconds",
     "wakeLock": "Wake Lock",
-    "selectExercise": "Select Exercise"
+    "selectExercise": "Select Exercise",
+    "fit": "Fit",
+    "fill": "Fill"
   },
   "weekday": {
     "monday": "Monday",

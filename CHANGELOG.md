@@ -25,6 +25,46 @@ Completed the deprecation of the legacy `has_video` flag in presentation logic. 
 **Notes**:
 - Storage layer still includes a lightweight reconciliation helper for legacy data; UI no longer consumes `has_video`. We can remove reconciliation in a future cleanup after a short deprecation window.
 
+---
+
+#### 🎥 Video Demos: Fit/Fill Toggle (default Fit) — Completed
+
+Introduced a global, persisted video fit mode to eliminate unwanted cropping of landscape videos in portrait containers.
+
+**What’s new**:
+- New setting `video_fit_mode: 'fit' | 'fill'` (default: `fit`).
+- UI toggle in both Timer and Exercise Details hero:
+  - `Fit` uses `object-contain` to prevent cropping.
+  - `Fill` uses `object-cover` to fill the frame (may crop).
+- Preference is stored in `AppSettings` and applied consistently across views.
+
+**Files Modified**:
+- `apps/frontend/src/pages/ExerciseDetailPage.tsx` — Hero video honors fit mode; added overlay toggle; persistence via `storageService`. Also fixed a TypeScript narrowing issue (see Fix below).
+- `apps/frontend/src/pages/TimerPage.tsx` — Video element applies `contain/cover` based on setting; added Fit/Fill toggle (previous commit).
+- `apps/frontend/src/components/VideoThumbnail.tsx` — Supports `objectFit` prop ('contain' | 'cover') (previous commit).
+- `apps/frontend/src/types/index.ts`, `apps/frontend/src/constants/index.ts` — Added `video_fit_mode` to `AppSettings` and default settings (previous commit).
+
+**i18n**:
+- Added new keys `timer.fit` and `timer.fill` across locales:
+  - `en` (existing), `de` (Einpassen/Füllen), `es` (Ajustar/Rellenar), `fr` (Ajuster/Remplir), `nl` (Passend/Vullen), `fy` (Passen/Folje), `ar` (احتواء/ملء), `ar-EG` (احتواء/ملء)
+- Files updated:
+  - `apps/frontend/public/locales/de/common.json`
+  - `apps/frontend/public/locales/es/common.json`
+  - `apps/frontend/public/locales/fr/common.json`
+  - `apps/frontend/public/locales/nl/common.json`
+  - `apps/frontend/public/locales/fy/common.json`
+  - `apps/frontend/public/locales/ar/common.json`
+  - `apps/frontend/public/locales/ar-EG/common.json`
+- Validation: `pnpm i18n:scan` reports all referenced keys present.
+
+**Fix**:
+- 🔧 TypeScript build error TS2322 resolved in `ExerciseDetailPage.tsx` by removing an overly strict `AppSettings | undefined` annotation and relying on `if (current)` narrowing:
+  - Before: `const current: AppSettings | undefined = await storageService.getAppSettings();`
+  - After: `const current = await storageService.getAppSettings();`
+
+**Build/Deploy**:
+- Frontend build succeeds (`pnpm build`), and dev Pages deploy executed for `repcue-dev`.
+
 
 ### 2025-11-17
 

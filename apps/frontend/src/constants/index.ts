@@ -34,6 +34,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   auto_start_next: false,
   horizontal_exercise_layout: true, // default to horizontal category listing
   ring_timer: false, // default to rectangular timer layout
+  video_fit_mode: 'fit', // default to fit to avoid cropping in portrait
   app_version: null, // Will be set from server on first launch
   // AI Coach settings (opt-in by default for Phase 1)
   coach_enabled: true, // Default enabled for Phase 1 rollout

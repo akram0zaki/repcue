@@ -263,7 +263,9 @@
     "beepInterval45": "Elke 45 sekonden",
     "beepInterval60": "Elke 60 sekonden",
     "wakeLock": "Wekkerslot",
-    "selectExercise": "Oefening selektearje"
+    "selectExercise": "Oefening selektearje",
+    "fit": "Passen",
+    "fill": "Folje"
   },
   "weekday": {
     "monday": "Moandei",
