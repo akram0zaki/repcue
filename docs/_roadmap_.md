@@ -14,3 +14,6 @@
 - Add more locales (Turkish, Swedish, Persian, Portoguese, Russian, and Chinese)
 - Create prompt files to cover the scope of routine tasks:
     + Periodic UI and A11y audit and implementable recommendations for gaps fixing
+- Introduce placeholder and framework for rendering advertisements on the timer widget during the rest period between sets or exercises.
+- Switch from wrangler to S3 libraries to handle R2 storage.
+- Create admin application for backoffice management.
