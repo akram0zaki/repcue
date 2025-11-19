@@ -471,6 +471,31 @@ const TimerPage: React.FC<TimerPageProps> = ({
         </div>
         )}
 
+        {/* Progress Details Section - Single line compact display */}
+        {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-3 py-2 mb-2">
+            <div className="flex items-center justify-center gap-3 text-xs font-medium">
+              <span className="text-gray-700 dark:text-gray-300">
+                Rep {Math.min((currentRep || 0) + 1, totalReps)}/{totalReps}
+              </span>
+              <span className="text-gray-400 dark:text-gray-600">|</span>
+              {isResting && restTimeRemaining !== undefined ? (
+                <span className="text-purple-600 dark:text-purple-400">
+                  Rest {formatTime(restTimeRemaining)}
+                </span>
+              ) : (
+                <span className="text-gray-500 dark:text-gray-500">
+                  Active
+                </span>
+              )}
+              <span className="text-gray-400 dark:text-gray-600">|</span>
+              <span className="text-gray-700 dark:text-gray-300">
+                Set {(currentSet || 0) + 1}/{totalSets}
+              </span>
+            </div>
+          </div>
+        )}
+
 
         {/* Countdown Banner */}
         {isCountdown && (
@@ -646,7 +671,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
               )}
             </svg>
             
-            {/* Time Display - Positioned at top to avoid overlapping description/video */}
+            {/* Time Display - Only show for countdown, rest, or time-based exercises */}
+            {(!isRepBased || isCountdown || actuallyResting) && (
             <div className="absolute top-0 left-0 right-0 flex justify-center pt-4 z-10" data-testid="timer-display">
               <div className="text-center">
                 {isCountdown ? (
@@ -656,16 +682,6 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 timer-text-shadow-sm">
                       {t('timer.getReadyEllipsis')}
-                    </div>
-                  </>
-                ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
-                  <>
-                    {/* Rep-based exercise display: show rep progress instead of time countdown (only when reps remain). */}
-                    <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 timer-text-shadow-lg">
-                      Rep {(currentRep || 0) + 1}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1 timer-text-shadow-sm">
-                      of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
                     </div>
                   </>
                 ) : (
@@ -698,6 +714,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 )}
               </div>
             </div>
+            )}
           </div>
           ) : (
             /* Rectangular Timer with Border Progress */
@@ -854,7 +871,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 )}
               </svg>
 
-              {/* Time Display for Rectangular Timer - Positioned at top to avoid overlapping description/video */}
+              {/* Time Display for Rectangular Timer - Only show for countdown, rest, or time-based exercises */}
+              {(!isRepBased || isCountdown || actuallyResting) && (
               <div className="absolute top-0 left-0 right-0 flex justify-center pt-4 z-10" data-testid="timer-display">
                 <div className="text-center">
                   {isCountdown ? (
@@ -864,16 +882,6 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       </div>
                       <div className="text-sm text-white mt-1 timer-text-shadow-sm">
                         {t('timer.getReadyEllipsis')}
-                      </div>
-                    </>
-                  ) : isRepBased && !actuallyResting && currentRep !== undefined && totalReps !== undefined && currentRep < totalReps ? (
-                    <>
-                      {/* Rep-based exercise display: show rep progress instead of time countdown (only when reps remain). */}
-                      <div className="text-3xl font-bold text-white timer-text-shadow-lg">
-                        Rep {(currentRep || 0) + 1}
-                      </div>
-                      <div className="text-sm text-white mt-1 timer-text-shadow-sm">
-                        of {totalReps} in Set {(currentSet || 0) + 1}/{totalSets}
                       </div>
                     </>
                   ) : (
@@ -900,6 +908,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   )}
                 </div>
               </div>
+              )}
             </div>
           )}
 

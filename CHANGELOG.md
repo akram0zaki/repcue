@@ -1,5 +1,25 @@
 ## Unreleased
 
+### 2025-11-20
+
+#### 🎨 Fixed Home Page Empty Schedule Section Contrast
+
+Fixed poor contrast in the empty schedule section ("No Schedule Set") in light mode by updating the styling to match the upcoming workout card.
+
+**What Changed**:
+- Replaced `empty-state-card` class with `upcoming-workout-card` class for consistent styling
+- Updated text colors to use semantic design tokens (`heading-text` and `text-secondary`) instead of inline Tailwind classes
+- Empty schedule section now has proper contrast in both light and dark modes
+
+**Why**:
+- Light mode had white/very light text on a light gradient background, making it difficult to read
+- Semantic tokens ensure consistency across themes and maintain WCAG accessibility standards
+
+**Files Modified**:
+- `apps/frontend/src/pages/HomePage.tsx` — Updated empty schedule section styling
+
+---
+
 ### 2025-11-18
 
 #### 🎥 Deprecate `has_video` Flag — Media Index as Source of Truth

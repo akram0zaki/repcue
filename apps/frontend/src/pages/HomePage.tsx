@@ -306,16 +306,16 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                 </div>
               </div>
             ) : (
-              <div className="empty-state-card">
+              <div className="upcoming-workout-card">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex-shrink-0 self-center sm:self-start">
                     <CalendarIcon size={48} className="drop-shadow-sm" />
                   </div>
                   <div className="flex-1 text-center sm:text-start-rtl">
-                    <h2 className="text-h3 font-bold mb-3 leading-tight text-text-50">
+                    <h2 className="text-h3 font-bold mb-3 leading-tight heading-text">
                       {t('home.noScheduleTitle')}
                     </h2>
-                    <p className="text-body text-text-100 mb-5 leading-relaxed">
+                    <p className="text-body text-secondary mb-5 leading-relaxed">
                       {t('home.noScheduleBody')}
                     </p>
                     <button

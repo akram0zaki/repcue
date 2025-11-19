@@ -35,6 +35,7 @@ export function PRCelebration({
   const { t } = useTranslation('coaching');
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(Math.ceil(dismissDelay / 1000));
 
   // Check if user prefers reduced motion (guarded for non-browser/test envs)
   const mql =
@@ -113,6 +114,20 @@ export function PRCelebration({
 
     return () => clearTimeout(dismissTimer);
   }, [autoDismiss, dismissDelay]);
+
+  // Update countdown timer every second
+  useEffect(() => {
+    if (!autoDismiss) return;
+
+    const countdownInterval = setInterval(() => {
+      setRemainingSeconds((prev) => {
+        const next = prev - 1;
+        return next > 0 ? next : 0;
+      });
+    }, 1000);
+
+    return () => clearInterval(countdownInterval);
+  }, [autoDismiss]);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -271,9 +286,9 @@ export function PRCelebration({
         {autoDismiss && (
           <div className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
             {t('pr.autoDismiss', 'Auto-closing in {{seconds}} seconds', {
-              seconds: Math.ceil(dismissDelay / 1000),
+              seconds: remainingSeconds,
               // Backward-compat for legacy locale strings using {{param0}}
-              param0: Math.ceil(dismissDelay / 1000)
+              param0: remainingSeconds
             })}
           </div>
         )}

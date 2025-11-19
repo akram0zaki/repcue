@@ -76,8 +76,9 @@ describe('TimerPage - Rep Flow', () => {
       />
     );
 
-    // For a stopped rep-based exercise in workout mode, we should see the timer display
-    expect(screen.getByTestId('timer-display')).toBeInTheDocument();
+    // For a stopped rep-based exercise in workout mode, compact progress section shows initial state
+    expect(screen.getByText('Rep 1/8')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
 
     // In workout mode, we should see workout header
     expect(screen.getByText('Upper Body')).toBeInTheDocument();
@@ -121,12 +122,13 @@ describe('TimerPage - Rep Flow', () => {
       />
     );
 
-    // For a running rep-based exercise, we should see the rep display in the timer
-    expect(screen.getByText('Rep 3')).toBeInTheDocument();
-    expect(screen.getByText(/of 8 in Set 1\/3/)).toBeInTheDocument();
+    // For a running rep-based exercise, we should see the compact progress section
+    expect(screen.getByText('Rep 3/8')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
 
-    // The timer display should be present
-    expect(screen.getByTestId('timer-display')).toBeInTheDocument();
+    // The timer display should NOT be present during active rep-based exercise (no text overlay)
+    expect(screen.queryByTestId('timer-display')).not.toBeInTheDocument();
   });
 
   it('should show rep progress advancing through the set', () => {
@@ -165,8 +167,9 @@ describe('TimerPage - Rep Flow', () => {
       />
     );
 
-    // For a stopped rep-based exercise that's not running, we just check the timer display exists
-    expect(screen.getByTestId('timer-display')).toBeInTheDocument();
+    // For a stopped rep-based exercise, compact progress section shows the current progress
+    expect(screen.getByText('Rep 5/8')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
 
     // In workout mode, we should see workout header
     expect(screen.getByText('Upper Body')).toBeInTheDocument();
