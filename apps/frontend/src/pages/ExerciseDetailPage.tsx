@@ -56,7 +56,7 @@ const ExerciseDetailPage: React.FC = () => {
         const settings = await storageService.getAppSettings();
         const mode = settings?.video_fit_mode === 'fill' ? 'fill' : 'fit';
         setVideoFitMode(mode);
-      } catch (e) {
+      } catch {
         // default remains 'fit'
       }
     })();

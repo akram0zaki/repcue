@@ -7,6 +7,7 @@ import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import type { Exercise } from '../types';
+import type { ExerciseMedia } from '../types/media';
 import logger from '../utils/logger';
 
 // Helper: quick existence probe (first byte) to detect 404/missing objects
@@ -60,7 +61,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [mediaMeta, setMediaMeta] = useState<any | null>(null); // cached media entry for fallback
+  const [mediaMeta, setMediaMeta] = useState<ExerciseMedia | null>(null); // cached media entry for fallback
   const [attemptedFallback, setAttemptedFallback] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -106,11 +107,13 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           if (!ok && mediaMeta?.variants) {
             const formatOrder: string[] = ['mp4', 'webm'];
             for (const aspect of Object.keys(mediaMeta.variants)) {
-              const aspectGroup = mediaMeta.variants[aspect];
+              const aspectGroup = mediaMeta.variants[aspect as keyof typeof mediaMeta.variants];
+              if (!aspectGroup) continue;
               for (const res of Object.keys(aspectGroup)) {
-                const formats = aspectGroup[res];
+                const formats = aspectGroup[res as keyof typeof aspectGroup];
+                if (!formats) continue;
                 for (const fmt of formatOrder) {
-                  const candidate = formats?.[fmt]?.url;
+                  const candidate = formats[fmt as keyof typeof formats]?.url;
                   if (candidate && candidate !== url) {
                     const ok2 = await probe(candidate);
                     if (ok2) {
@@ -245,10 +248,12 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       if (!attemptedFallback && currentUrl.endsWith('.webm') && mediaMeta?.variants) {
         // Find first mp4 variant across aspects/resolutions
         for (const aspect of Object.keys(mediaMeta.variants)) {
-          const aspectGroup = mediaMeta.variants[aspect];
+          const aspectGroup = mediaMeta.variants[aspect as keyof typeof mediaMeta.variants];
+          if (!aspectGroup) continue;
           for (const res of Object.keys(aspectGroup)) {
-            const formats = aspectGroup[res];
-            if (formats?.mp4?.url) {
+            const formats = aspectGroup[res as keyof typeof aspectGroup];
+            if (!formats) continue;
+            if (formats.mp4?.url) {
               logger.warn('🎥 [VideoThumbnail] WebM failed, attempting MP4 fallback', {
                 exerciseId: exercise.id,
                 failedWebm: currentUrl,

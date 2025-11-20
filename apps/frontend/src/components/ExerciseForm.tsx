@@ -456,11 +456,12 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       case 'muscleGroups':
         setMuscleGroups(muscleGroups.filter((_, i) => i !== index));
         break;
-      case 'tags':
+      case 'tags': {
         const filtered = tags.filter((_, i) => i !== index);
         setTags(filtered);
         setBaseTags(filtered);
         break;
+      }
     }
   };
 

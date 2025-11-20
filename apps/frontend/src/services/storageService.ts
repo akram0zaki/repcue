@@ -452,7 +452,8 @@ class RepCueDatabase extends Dexie {
       for (const exercise of exercises) {
         const catalogId = exercise.catalogId || 'general-fitness';
         // Handle both old (tags) and new (base_tags) format during migration
-        const tags = (exercise as any).tags || exercise.base_tags || [];
+        const exWithTags = exercise as Exercise & { tags?: string[]; base_tags?: string[] };
+        const tags = exWithTags.tags || exercise.base_tags || [];
         
         // Separate catalog-specific tags from base tags
         const catalogTags = tags.filter((tag: string) => {
@@ -488,6 +489,7 @@ class RepCueDatabase extends Dexie {
         // Update exercise: remove catalogId, set base_tags
         exercise.base_tags = baseTags;
         delete exercise.catalogId;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delete (exercise as any).tags; // Remove old tags property during migration
         
         logger.log(`[Migration v25] Exercise ${exercise.id}: ${catalogTags.length} catalog tags, ${baseTags.length} base tags`);
@@ -2130,6 +2132,7 @@ export class StorageService {
           updated_at: new Date().toISOString(),
           version: (exercise.version || 1) + 1,
           dirty: 1 // Mark as dirty for sync
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any); // Type assertion needed for GlobalExercise fields
 
         logger.log('addTagsToExercise: Tags added successfully', {
@@ -2180,6 +2183,7 @@ export class StorageService {
           updated_at: new Date().toISOString(),
           version: (exercise.version || 1) + 1,
           dirty: 1 // Mark as dirty for sync
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any); // Type assertion needed for GlobalExercise fields
 
         logger.log('removeTagsFromExercise: Tags removed successfully', {
@@ -2291,6 +2295,7 @@ export class StorageService {
     }
     try {
       // Table should exist in v25+; guard in case of partial migration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const table: Table<StoredCatalogMembership> | undefined = (this.db as any).catalog_memberships;
       if (!table) {
         logger.warn('[seed] catalog_memberships table not present (unexpected)');
@@ -4480,7 +4485,7 @@ export class StorageService {
 
     try {
       const allExercises = await this.getAllExercises();
-      return allExercises.filter(exercise => (exercise as any).catalogId === catalogId);
+      return allExercises.filter(exercise => (exercise as StoredExercise & { catalogId?: string }).catalogId === catalogId);
     } catch (error) {
       logger.error('Failed to get exercises by catalog:', error);
       return [];

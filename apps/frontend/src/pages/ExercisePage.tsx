@@ -995,9 +995,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </button>
         </div>
         {/* Base tags preview (truncated) */}
-        {Array.isArray((exercise as any).base_tags) && (exercise as any).base_tags.length > 0 && (
+        {Array.isArray((exercise as Exercise & { base_tags?: string[] }).base_tags) && (exercise as Exercise & { base_tags?: string[] }).base_tags!.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-1 max-h-12 overflow-hidden" aria-label={t('exercises:baseTagsPreview', { defaultValue: 'Base tags' })}>
-            {(exercise as any).base_tags.slice(0, 6).map((tag: string) => (
+            {(exercise as Exercise & { base_tags?: string[] }).base_tags!.slice(0, 6).map((tag: string) => (
               <span key={tag} className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-100 dark:bg-surface-700 text-text-700 dark:text-text-200 rounded">
                 {tag}
               </span>

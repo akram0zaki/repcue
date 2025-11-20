@@ -64,8 +64,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const location = useLocation();
   const platform = usePlatform();
   
-  // CRITICAL: Only call useInstallPrompt hook when feature is enabled to prevent flashing
-  const installPrompt = INSTALL_PROMPT_ENABLED ? useInstallPrompt() : {
+  // CRITICAL: Always call hook, but conditionally use its values based on feature flag
+  const installPromptHook = useInstallPrompt();
+  const installPrompt = INSTALL_PROMPT_ENABLED ? installPromptHook : {
     isAvailable: false,
     canShowPrompt: false,
     isInstalling: false,

@@ -12,7 +12,7 @@
  * - Time-based analytics with flexible date ranges
  */
 
-import type { ActivityLog } from '../types';
+import type { ActivityLog, Exercise } from '../types';
 import type {
   WorkoutStatistics,
   StreakData,
@@ -600,8 +600,9 @@ export class AnalyticsService {
 
       logs.forEach(log => {
         const exercise = exerciseMap.get(log.exercise_id);
-        if (exercise && (exercise as any).catalogId) {
-          const catalogId = (exercise as any).catalogId;
+        const exWithCatalog = exercise as Exercise & { catalogId?: string };
+        if (exercise && exWithCatalog.catalogId) {
+          const catalogId = exWithCatalog.catalogId;
           catalogCount[catalogId] = (catalogCount[catalogId] || 0) + 1;
         }
       });

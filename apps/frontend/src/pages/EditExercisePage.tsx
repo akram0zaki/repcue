@@ -121,7 +121,7 @@ export const EditExercisePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const selectedCatalogIds: string[] = (exerciseData as any).selectedCatalogIds || [exercise.catalogId || 'general-fitness'];
+      const selectedCatalogIds: string[] = (exerciseData as Partial<Exercise> & { selectedCatalogIds?: string[] }).selectedCatalogIds || [exercise.catalogId || 'general-fitness'];
       // Update exercise via IndexedDB storage service (offline-first)
       // The sync service will handle pushing to server later
       const updatedExercise: Exercise = {

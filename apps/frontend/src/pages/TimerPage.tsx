@@ -157,7 +157,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               workoutCurrentExercise && (
                 // Show when a custom URL exists, or media metadata is available in the index
                 !!workoutCurrentExercise.custom_video_url ||
-                !!(mediaIndex && workoutCurrentExercise.id && (mediaIndex as any)[workoutCurrentExercise.id])
+                !!(mediaIndex && workoutCurrentExercise.id && (mediaIndex as Record<string, unknown>)[workoutCurrentExercise.id])
               )
                 ? workoutCurrentExercise
                 : null
@@ -166,7 +166,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     : (
         selectedExercise && (
           !!selectedExercise.custom_video_url ||
-          !!(mediaIndex && selectedExercise.id && (mediaIndex as any)[selectedExercise.id])
+          !!(mediaIndex && selectedExercise.id && (mediaIndex as Record<string, unknown>)[selectedExercise.id])
         )
           ? selectedExercise
           : null

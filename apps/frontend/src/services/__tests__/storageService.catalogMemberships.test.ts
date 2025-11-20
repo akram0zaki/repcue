@@ -18,14 +18,14 @@ vi.mock('dexie', () => {
     toArray = vi.fn(async () => Array.from(this.data.values()));
     clear = vi.fn(async () => { this.data.clear(); });
     count = vi.fn(async () => this.data.size);
-    where(indexOrField: string) {
-      const self = this;
+    where = (indexOrField: string) => {
+      const data = this.data;
       // Composite index path
       if (indexOrField === '[catalog_id+exercise_id]') {
         return {
           equals(tuple: [string, string]) {
             const [catalogId, exerciseId] = tuple;
-            const match = Array.from(self.data.values()).filter((r: any) => r.catalog_id === catalogId && r.exercise_id === exerciseId);
+            const match = Array.from(data.values()).filter((r: { catalog_id: string; exercise_id: string }) => r.catalog_id === catalogId && r.exercise_id === exerciseId);
             return { first: () => Promise.resolve(match[0] || null) } as any;
           }
         } as any;
@@ -139,12 +139,12 @@ describe('StorageService catalog memberships', () => {
       where(field: string) {
         return {
           anyOf: (ids: string[]) => {
-            let records = Array.from(exerciseMap.values()).filter((r: any) => ids.includes(r.id));
+            const records = Array.from(exerciseMap.values()).filter((r: { id: string }) => ids.includes(r.id));
             return {
-              and: (fn: (r: any) => boolean) => ({ toArray: () => Promise.resolve(records.filter(fn)) })
+              and: (fn: (r: { id: string }) => boolean) => ({ toArray: () => Promise.resolve(records.filter(fn)) })
             };
           }
-        } as any;
+        } as { anyOf: (ids: string[]) => { and: (fn: (r: { id: string }) => boolean) => { toArray: () => Promise<unknown[]> } } };
       }
     } as any;
 

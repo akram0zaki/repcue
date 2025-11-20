@@ -21,7 +21,7 @@ export const CreateExercisePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const selectedCatalogIds: string[] = (exerciseData as any).selectedCatalogIds || ['general-fitness'];
+      const selectedCatalogIds: string[] = (exerciseData as Exercise & { selectedCatalogIds?: string[] }).selectedCatalogIds || ['general-fitness'];
       // Create exercise via IndexedDB storage service (offline-first)
       // The sync service will handle pushing to server later
       // If offline (no user), set owner_id to null - sync will update when user logs in

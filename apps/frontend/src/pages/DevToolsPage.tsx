@@ -53,6 +53,7 @@ export default function DevToolsPage() {
   const checkCatalogMemberships = async () => {
     try {
       // Try to access the table
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = await (storageService as any).db;
       const count = await db.catalog_memberships.count();
       setCatalogMemberships(count);
@@ -69,7 +70,7 @@ export default function DevToolsPage() {
       const all = await storageService.getExercisesFast();
       // Filter by query (id or name contains)
       const q = exerciseQuery.trim().toLowerCase();
-      const filtered = (all as any[]).filter((e) => {
+      const filtered = (all as Array<{ id?: string; name?: string }>).filter((e) => {
         const id = String(e.id || '').toLowerCase();
         const name = String(e.name || '').toLowerCase();
         return q ? id.includes(q) || name.includes(q) : true;
@@ -104,6 +105,7 @@ export default function DevToolsPage() {
       setStatus('Closing database connection...');
       
       // Close the Dexie instance
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (storageService as any).db.close();
       
       setStatus('Database closed. Deleting RepCueDB...');
@@ -131,11 +133,13 @@ export default function DevToolsPage() {
       setStatus('Attempting to reopen database...');
       
       // Close current connection
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (storageService as any).db.close();
       
       setStatus('Database closed. Reopening...');
       
       // Try to reopen - this should trigger upgrade
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (storageService as any).db.open();
       
       // Check version again
@@ -235,18 +239,19 @@ export default function DevToolsPage() {
           <div className="text-sm opacity-70 mb-2">Showing up to 50 exercises. Green = in catalog.</div>
           <div className="max-h-96 overflow-auto divide-y">
             {exercises.map((ex) => {
-              const inCat = isInCatalog((ex as any).id);
+              const exWithId = ex as GlobalExercise & { id: string; name: string };
+              const inCat = isInCatalog(exWithId.id);
               return (
-                <div key={(ex as any).id} className="flex items-center justify-between py-2">
+                <div key={exWithId.id} className="flex items-center justify-between py-2">
                   <div className="truncate">
-                    <div className={`font-medium ${inCat ? 'text-success' : ''}`}>{(ex as any).name}</div>
-                    <div className="text-xs opacity-70">{(ex as any).id}</div>
+                    <div className={`font-medium ${inCat ? 'text-success' : ''}`}>{exWithId.name}</div>
+                    <div className="text-xs opacity-70">{exWithId.id}</div>
                   </div>
                   <div className="flex gap-2">
                     {!inCat ? (
-                      <button className="btn btn-sm btn-success" onClick={() => void addMembership((ex as any).id)}>Add</button>
+                      <button className="btn btn-sm btn-success" onClick={() => void addMembership(exWithId.id)}>Add</button>
                     ) : (
-                      <button className="btn btn-sm btn-error" onClick={() => void removeMembership((ex as any).id)}>Remove</button>
+                      <button className="btn btn-sm btn-error" onClick={() => void removeMembership(exWithId.id)}>Remove</button>
                     )}
                   </div>
                 </div>
