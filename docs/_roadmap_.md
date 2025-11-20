@@ -17,3 +17,6 @@
 - Introduce placeholder and framework for rendering advertisements on the timer widget during the rest period between sets or exercises.
 - Switch from wrangler to S3 libraries to handle R2 storage.
 - Create admin application for backoffice management.
+- Introduce muscle group selection on a model instead of entering group names.
+- Popular exercises should be the top 5 frequently exercised based on workout history if the user is logged on, otherwise current behavior remains. The workout history should be scanned daily by a scheduled job, and populate another table popular_exercises with ranking.
+
