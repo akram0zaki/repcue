@@ -574,35 +574,10 @@
     "workouts": "Workouts",
     "workoutsOnly": "Nur Workouts"
   },
-  "video": {
-    "exerciseVideo": "Übungsvideo",
-    "uploadsNotAvailable": "Video-Uploads sind derzeit nicht verfügbar.",
-    "urlPlaceholderHelper": "Sie können vorerst eine Video-URL als Platzhalter hinzufügen.",
-    "urlPlaceholder": "Video-URL (optional)",
-    "currentVideo": "Aktuelles Video",
-    "removeVideo": "Video entfernen",
-    "clickToUpload": "Klicken, um ein Video hochzuladen",
-    "supportedFormats": "MP4, MOV, AVI bis 50 MB",
-    "maxFileSize": "Maximale Dateigröße: 50 MB",
-    "uploadHint": "Laden Sie ein Demonstrationsvideo für diese Übung hoch (optional)",
-    "fileTooLarge": "Die Datei ist zu groß. Die maximale Größe beträgt 50 MB.",
-    "invalidFileType": "Bitte wählen Sie eine gültige Videodatei aus.",
-    "unsupportedFormat": "Nicht unterstütztes Videoformat. Bitte verwenden Sie MP4, WebM oder OGG für die beste Kompatibilität.",
-    "uploadFailed": "Video-Upload fehlgeschlagen. Bitte versuchen Sie es erneut.",
-    "localVideoConfirmed": "Lokales Video bestätigt",
-    "uploaded": "hochgeladen",
-    "loadError": "Video konnte nicht geladen werden",
-    "codecNotSupported": "Dieses Video verwendet einen nicht unterstützten Codec. Versuchen Sie, es in H.264 MP4-Format zu konvertieren für bessere Browser-Kompatibilität.",
-    "formatError": "Videoformat nicht erkannt. Bitte verwenden Sie eine Standard-MP4-, WebM- oder OGG-Videodatei.",
-    "formatNotSupported": "Videoformat wird von Ihrem Browser nicht unterstützt. Verwenden Sie MP4 mit H.264-Codec.",
-    "decodeError": "Videodatei scheint beschädigt oder verwendet nicht unterstützte Codierung. Versuchen Sie, das Video neu zu codieren.",
-    "networkError": "Netzwerkfehler beim Laden des Videos. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-    "loadAborted": "Video-Laden wurde unterbrochen. Bitte versuchen Sie das Hochladen erneut.",
-    "codecSuggestion": "Empfohlen: Verwenden Sie FFmpeg oder HandBrake, um zu MP4 mit H.264-Video und AAC-Audio zu konvertieren.",
-    "cannotDisplay": "Kann Video nicht anzeigen",
-    "localVideo": "Lokale Videodatei",
-    "pendingSync": "Video wartet auf Synchronisierung",
-    "videoWithIssues": "Video hat Probleme"
+  "exercise": {
+    "noEquipment": "Keine Ausrüstung",
+    "startEx": "Starten",
+    "startExercise": "Übung Starten"
   },
   "profile": {
     "title": "Profil",
@@ -724,18 +699,6 @@
       "bugFixes": "Fehlerbehebungen",
       "securityUpdates": "Sicherheitsupdates"
     }
-  },
-  "rating": {
-    "reviews": "Bewertungen",
-    "yourRating": "Ihre Bewertung",
-    "rateThis": "Bewerten Sie diese Übung",
-    "addReview": "Bewertung hinzufügen",
-    "hideReview": "Bewertung ausblenden",
-    "reviewPlaceholder": "Schreiben Sie Ihre Bewertung (optional)...",
-    "characters": "Zeichen",
-    "submitError": "Fehler beim Einreichen der Bewertung",
-    "submitting": "Wird eingereicht...",
-    "loginToRate": "Melden Sie sich an, um Übungen zu bewerten und zu überprüfen"
   },
   "sync": {
     "syncing": "Daten werden synchronisiert...",

@@ -13,5 +13,19 @@
   "uploaded": "Video geüpload",
   "uploadsNotAvailable": "Video-uploads zijn niet beschikbaar",
   "urlPlaceholder": "Voer video-URL in",
-  "urlPlaceholderHelper": "YouTube, Vimeo of directe video-URL"
+  "urlPlaceholderHelper": "YouTube, Vimeo of directe video-URL",
+
+  "unsupportedFormat": "Niet-ondersteund videoformaat. Gebruik a.u.b. MP4, WebM, of OGG-formaat voor de beste compatibiliteit.",
+  "localVideoConfirmed": "Lokale video bevestigd",
+  "formatNotSupported": "Videoformaat wordt niet ondersteund door uw browser. Probeer MP4 te gebruiken met de H.264-codec.",
+  "codecNotSupported": "Deze video gebruikt een niet-ondersteunde codec. Probeer te converteren naar H.264 MP4-formaat voor betere browsercompatibiliteit.",
+  "formatError": "Videoformaat wordt niet herkend. Gebruik a.u.b. een standaard MP4-, WebM- of OGG-videobestand.",
+  "decodeError": "Videobestand lijkt beschadigd of maakt gebruik van niet-ondersteunde codering. Probeer de video opnieuw te coderen.",
+  "networkError": "Netwerkfout tijdens het laden van de video. Controleer uw verbinding en probeer het opnieuw.",
+  "loadAborted": "Het laden van de video is onderbroken. Probeer opnieuw te uploaden.",
+  "codecSuggestion": "Aanbevolen: Gebruik FFmpeg of HandBrake om te converteren naar MP4 met H.264-video en AAC-audio.",
+  "cannotDisplay": "Kan video niet weergeven",
+  "localVideo": "Lokale video (offline gereed)",
+  "pendingSync": "Video offline gereed - synchroniseert wanneer u online bent",
+  "videoWithIssues": "Video met problemen"
 }

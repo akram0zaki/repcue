@@ -278,5 +278,8 @@
     "full-body": "Ganzkörper",
     "hands": "Hände",
     "mobility": "Mobilität"
-  }
+  },
+  "exerciseParameters": "Übungsparameter",
+  "exerciseVideo": "Übungsvideo",
+  "videoUploadAfterSave": "Video-Upload ist nach dem Speichern der Übung verfügbar."
 }

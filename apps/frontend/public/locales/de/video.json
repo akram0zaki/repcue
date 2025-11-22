@@ -13,5 +13,19 @@
   "uploaded": "Video hochgeladen",
   "uploadsNotAvailable": "Video-Uploads sind nicht verfügbar",
   "urlPlaceholder": "Geben Sie die Video-URL ein",
-  "urlPlaceholderHelper": "YouTube, Vimeo oder direkte Video-URL"
+  "urlPlaceholderHelper": "YouTube, Vimeo oder direkte Video-URL",
+
+  "unsupportedFormat": "Nicht unterstütztes Videoformat. Verwenden Sie bitte das MP4-, WebM- oder OGG-Format für beste Kompatibilität.",
+  "localVideoConfirmed": "Lokales Video bestätigt",
+  "formatNotSupported": "Videoformat wird von Ihrem Browser nicht unterstützt. Versuchen Sie, MP4 mit dem H.264-Codec zu verwenden.",
+  "codecNotSupported": "Dieses Video verwendet einen nicht unterstützten Codec. Versuchen Sie, es in das H.264 MP4-Format zu konvertieren, um eine bessere Browser-Kompatibilität zu erzielen.",
+  "formatError": "Videoformat nicht erkannt. Verwenden Sie bitte eine Standard-Videodatei im MP4-, WebM- oder OGG-Format.",
+  "decodeError": "Videodatei scheint beschädigt zu sein oder verwendet eine nicht unterstützte Kodierung. Versuchen Sie, das Video neu zu kodieren.",
+  "networkError": "Netzwerkfehler beim Laden des Videos. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "loadAborted": "Das Laden des Videos wurde unterbrochen. Bitte versuchen Sie erneut, es hochzuladen.",
+  "codecSuggestion": "Empfohlen: Verwenden Sie FFmpeg oder HandBrake zur Konvertierung in MP4 mit H.264-Video und AAC-Audio.",
+  "cannotDisplay": "Video kann nicht angezeigt werden",
+  "localVideo": "Lokales Video (offline-bereit)",
+  "pendingSync": "Video offline bereit - wird synchronisiert, wenn Sie online sind",
+  "videoWithIssues": "Video mit Problemen"
 }

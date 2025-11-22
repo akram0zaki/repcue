@@ -625,6 +625,11 @@
     "pendingSync": "الفيديو في انتظار المزامنة",
     "videoWithIssues": "الفيديو به مشكلات"
   },
+  "exercise": {
+    "noEquipment": "لا معدات",
+    "startEx": "ابدأ",
+    "startExercise": "ابدأ التمرين"
+  },
   "profile": {
     "title": "البروفايل",
     "myProfile": "بروفايلي",

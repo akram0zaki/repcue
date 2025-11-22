@@ -582,35 +582,10 @@
     "workouts": "Entrenamientos",
     "workoutsOnly": "Solo Entrenamientos"
   },
-    "video": {
-    "exerciseVideo": "Video de ejercicio",
-    "uploadsNotAvailable": "Las cargas de video aún no están disponibles.",
-    "urlPlaceholderHelper": "Por ahora puede añadir un marcador de posición con una URL de video.",
-    "urlPlaceholder": "URL del video (opcional)",
-    "currentVideo": "Video actual",
-    "removeVideo": "Eliminar video",
-    "clickToUpload": "Haga clic para subir un video",
-    "supportedFormats": "MP4, MOV, AVI hasta 50 MB",
-    "maxFileSize": "Tamaño máximo de archivo: 50 MB",
-    "uploadHint": "Suba un video de demostración para este ejercicio (opcional)",
-    "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es 50 MB.",
-    "invalidFileType": "Por favor, seleccione un archivo de video válido.",
-    "unsupportedFormat": "Formato de video no compatible. Use MP4, WebM o OGG para una mejor compatibilidad.",
-    "uploadFailed": "Error al subir el video. Inténtelo de nuevo.",
-    "localVideoConfirmed": "Archivo de video local confirmado",
-    "uploaded": "subido",
-    "loadError": "Error al cargar el video",
-    "codecNotSupported": "Este video utiliza un códec no compatible. Intente convertirlo al formato H.264 MP4 para obtener una mejor compatibilidad con el navegador.",
-    "formatError": "Formato de video no reconocido. Por favor, use un archivo de video estándar MP4, WebM u OGG.",
-    "formatNotSupported": "Formato de video no compatible con su navegador. Intente usar MP4 con códec H.264.",
-    "decodeError": "El archivo de video parece estar dañado o utiliza una codificación no compatible. Intente volver a codificar el video.",
-    "networkError": "Error de red al cargar el video. Verifique su conexión e inténtelo de nuevo.",
-    "loadAborted": "La carga del video fue interrumpida. Por favor, intente subirlo nuevamente.",
-    "codecSuggestion": "Recomendado: Use FFmpeg o HandBrake para convertir a MP4 con video H.264 y audio AAC.",
-    "cannotDisplay": "No se puede mostrar el video",
-    "localVideo": "Archivo de video local",
-    "pendingSync": "El video está pendiente de sincronización",
-    "videoWithIssues": "El video tiene problemas"
+  "exercise": {
+    "noEquipment": "Sin equipo",
+    "startEx": "Comenzar",
+    "startExercise": "Comenzar ejercicio"
   },
   "profile": {
     "title": "Perfil",
@@ -732,18 +707,6 @@
       "bugFixes": "Correcciones de errores",
       "securityUpdates": "Actualizaciones de seguridad"
     }
-  },
-  "rating": {
-    "reviews": "Reseñas",
-    "yourRating": "Tu calificación",
-    "rateThis": "Califica este ejercicio",
-    "addReview": "Agregar Reseña",
-    "hideReview": "Ocultar Reseña",
-    "reviewPlaceholder": "Escriba su reseña (opcional)...",
-    "characters": "caracteres",
-    "submitError": "Error al enviar la reseña",
-    "submitting": "Enviando...",
-    "loginToRate": "Inicie sesión para calificar y revisar ejercicios"
   },
   "sync": {
     "syncing": "Sincronizando datos...",

@@ -89,7 +89,7 @@ export const CreateExercisePage: React.FC = () => {
         }));
       }
 
-      showSnackbar(t('exercises.createSuccess', 'Exercise created successfully!'), {
+      showSnackbar(t('exercises:createSuccess', 'Exercise created successfully!'), {
         type: 'success'
       });
 
@@ -100,7 +100,7 @@ export const CreateExercisePage: React.FC = () => {
     } catch (error) {
       logger.error('Failed to create exercise:', error);
       showSnackbar(
-        t('exercises.createError', 'Failed to create exercise. Please try again.'),
+        t('exercises:createError', 'Failed to create exercise. Please try again.'),
         { type: 'error' }
       );
     } finally {
@@ -125,7 +125,7 @@ export const CreateExercisePage: React.FC = () => {
                 {t('errors.featureNotAvailable', 'Feature Not Available')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {t('exercises.createNotEnabled', 'Exercise creation is not currently enabled.')}
+                {t('exercises:createNotEnabled', 'Exercise creation is not currently enabled.')}
               </p>
               <button 
                 onClick={() => navigate('/exercises')} 

@@ -103,6 +103,15 @@
     "viewCoach": "Voir le Coach",
     "tryIt": "Essayer"
   },
+  "actions": {
+    "viewProgress": "Voir les progrès",
+    "workoutNow": "S'entraîner maintenant",
+    "findExercises": "Trouver des exercices",
+    "startWorkout": "Commencer l'entraînement",
+    "startExercise": "Commencer {{param0}}",
+    "viewCoach": "Voir le coach",
+    "tryIt": "Essayer"
+  },
   "pr": {
     "title": "Records Personnels",
     "subtitle": "Tes meilleures performances pour chaque exercice",

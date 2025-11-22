@@ -29,7 +29,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
   onRatingChange,
   className = ''
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('rating');
   const [userRating, setUserRating] = useState<UserRating | null>(null);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,7 +130,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
       setShowReviewInput(false);
     } catch (err) {
       logger.error('Error submitting rating:', err);
-      setError(t('rating.submitError'));
+      setError(t('submitError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -169,7 +169,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
           ))}
         </div>
         <span className="text-sm text-gray-600 dark:text-gray-400">
-          {currentRating > 0 ? currentRating.toFixed(1) : '0.0'} ({ratingCount} {t('rating.reviews')})
+          {currentRating > 0 ? currentRating.toFixed(1) : '0.0'} ({ratingCount} {t('reviews')})
         </span>
       </div>
 
@@ -178,14 +178,14 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
         <div className="border-t pt-3">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {userRating ? t('rating.yourRating') : t('rating.rateThis')}
+              {userRating ? t('yourRating') : t('rateThis')}
             </span>
             {showReviewForm && (
               <button
                 onClick={toggleReviewInput}
                 className="text-sm link"
               >
-                {showReviewInput ? t('rating.hideReview') : t('rating.addReview')}
+                {showReviewInput ? t('hideReview') : t('addReview')}
               </button>
             )}
           </div>
@@ -227,14 +227,14 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
               <textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
-                placeholder={t('rating.reviewPlaceholder')}
+                placeholder={t('reviewPlaceholder')}
                 maxLength={500}
                 rows={3}
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
               <div className="flex justify-between items-center">
                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {reviewText.length}/500 {t('rating.characters')}
+                  {reviewText.length}/500 {t('characters')}
                 </span>
               </div>
             </div>
@@ -261,7 +261,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
             <div className="mt-2 flex items-center space-x-2">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
               <span className="text-sm text-gray-600 dark:text-gray-400">
-                {t('rating.submitting')}
+                {t('submitting')}
               </span>
             </div>
           )}
@@ -271,7 +271,7 @@ export const ExerciseRating: React.FC<ExerciseRatingProps> = ({
       {/* Login Prompt */}
       {!isAuthenticated && (
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {t('rating.loginToRate')}
+          {t('loginToRate')}
         </div>
       )}
     </div>

@@ -13,5 +13,19 @@
   "uploaded": "Vidéo téléchargée",
   "uploadsNotAvailable": "Les téléchargements de vidéos ne sont pas disponibles",
   "urlPlaceholder": "Entrez l'URL de la vidéo",
-  "urlPlaceholderHelper": "YouTube, Vimeo ou URL directe de la vidéo"
+  "urlPlaceholderHelper": "YouTube, Vimeo ou URL directe de la vidéo",
+
+  "unsupportedFormat": "Format vidéo non pris en charge. Veuillez utiliser le format MP4, WebM ou OGG pour une meilleure compatibilité.",
+  "localVideoConfirmed": "Vidéo locale confirmée",
+  "formatNotSupported": "Format vidéo non pris en charge par votre navigateur. Essayez d'utiliser le format MP4 avec le codec H.264.",
+  "codecNotSupported": "Cette vidéo utilise un codec non pris en charge. Essayez de convertir au format MP4 H.264 pour une meilleure compatibilité avec le navigateur.",
+  "formatError": "Format vidéo non reconnu. Veuillez utiliser un fichier vidéo standard MP4, WebM ou OGG.",
+  "decodeError": "Le fichier vidéo semble corrompu ou utilise un encodage non pris en charge. Essayez de ré-encoder la vidéo.",
+  "networkError": "Erreur réseau lors du chargement de la vidéo. Vérifiez votre connexion et réessayez.",
+  "loadAborted": "Le chargement de la vidéo a été interrompu. Veuillez essayer de la télécharger à nouveau.",
+  "codecSuggestion": "Recommandé : Utilisez FFmpeg ou HandBrake pour convertir en MP4 avec vidéo H.264 et audio AAC.",
+  "cannotDisplay": "Impossible d'afficher la vidéo",
+  "localVideo": "Vidéo locale (prête hors ligne)",
+  "pendingSync": "Vidéo prête hors ligne - se synchronisera lorsque vous serez en ligne",
+  "videoWithIssues": "Vidéo avec problèmes"
 }

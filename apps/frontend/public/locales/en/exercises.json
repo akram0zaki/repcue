@@ -255,15 +255,12 @@
   "shareErrorAuth": "You must be signed in to share exercises",
   "shareErrorNotSynced": "Exercise must be synced before sharing",
   "shareErrorOffline": "Cannot share while offline",
-  "exerciseParameters": "Exercise Parameters",
-  "exerciseVideo": "Exercise Video",
   "sharePublic": "Public",
   "sharePublicDesc": "Anyone can find and copy this exercise",
   "shareWithUser": "Share with User",
   "shareWithUserDesc": "Share with a specific user by email",
   "sharedPublicly": "Shared publicly",
   "sharedWithUser": "Shared with user",
-  "videoUploadAfterSave": "Video upload will be available after saving the exercise.",
   "publicHelp": "When enabled, this exercise will be visible to all users in the community",
   "viewOnly": "View Only",
   "viewOnlyDesc": "User can view but not edit",
@@ -284,5 +281,10 @@
     "repsPositive": "Reps must be greater than 0",
     "repDurationPositive": "Rep duration must be greater than 0",
     "stepDurationPositive": "Step duration must be greater than 0"
-  }
+  },
+  "exerciseParameters": "Exercise Parameters",
+  "exerciseVideo": "Exercise Video",
+  "videoUploadAfterSave": "Video upload will be available after saving the exercise.",
+  "types.repetition_based": "Repetition-based",
+  "types.time_based": "Time-based"
 }

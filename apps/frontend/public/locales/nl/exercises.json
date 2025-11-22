@@ -282,5 +282,8 @@
     "full-body": "Volledig Lichaam",
     "hands": "Handen",
     "mobility": "Mobiliteit"
-  }
+  },
+  "exerciseParameters": "Oefening Parameters",
+  "exerciseVideo": "Oefening Video",
+  "videoUploadAfterSave": "Video upload wordt beschikbaar na het opslaan van de oefening."
 }

@@ -14,15 +14,29 @@ const LOCALES_DIR = join(FRONTEND_DIR, 'public', 'locales')
 // Supported locales based on your project
 const SUPPORTED_LOCALES = ['en', 'ar', 'ar-EG', 'nl', 'de', 'fy', 'es', 'fr']
 
-// JSON files to check for parity
-const FILES_TO_CHECK = [
-  'exerciseDetails.json',
-  'common.json',
-  'exercises.json',
-  'settings.json',
-  'timer.json',
-  'workouts.json'
-]
+/**
+ * Discover all unique JSON files that exist across all locale directories
+ * @returns {string[]} Array of JSON filenames found in at least one locale
+ */
+function discoverLocaleFiles() {
+  const fileSet = new Set()
+  
+  for (const locale of SUPPORTED_LOCALES) {
+    const localePath = join(LOCALES_DIR, locale)
+    if (!existsSync(localePath)) continue
+    
+    try {
+      const files = readdirSync(localePath)
+      files
+        .filter(f => f.endsWith('.json'))
+        .forEach(f => fileSet.add(f))
+    } catch (error) {
+      console.warn(`Warning: Could not read directory ${localePath}`)
+    }
+  }
+  
+  return Array.from(fileSet).sort()
+}
 
 function getKeysFromJson(filePath) {
   if (!existsSync(filePath)) {
@@ -126,9 +140,19 @@ function main() {
   const args = process.argv.slice(2)
   const listAllFlag = args.includes('--list-all')
   const fileArg = args.find(a => a.startsWith('--file='))
+  
+  // Discover files dynamically instead of hardcoded list
+  const discoveredFiles = discoverLocaleFiles()
   const filesToCheck = fileArg 
     ? [fileArg.split('=')[1]] 
-    : FILES_TO_CHECK
+    : discoveredFiles
+  
+  if (discoveredFiles.length === 0) {
+    console.log('⚠️  No JSON files found in any locale directory')
+    process.exit(1)
+  }
+  
+  console.log(`\nℹ️  Found ${discoveredFiles.length} file(s) to check: ${discoveredFiles.join(', ')}\n`)
   
   let totalMismatches = 0
   const allDetails = []

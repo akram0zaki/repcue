@@ -282,5 +282,8 @@
     "full-body": "Corps Entier",
     "hands": "Mains",
     "mobility": "Mobilité"
-  }
+  },
+  "exerciseParameters": "Paramètres de l'exercice",
+  "exerciseVideo": "Vidéo de l'exercice",
+  "videoUploadAfterSave": "Le téléchargement de la vidéo sera disponible après avoir enregistré l'exercice."
 }

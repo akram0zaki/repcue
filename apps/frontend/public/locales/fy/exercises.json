@@ -284,5 +284,8 @@
     "full-body": "Folslein Lichem",
     "hands": "Hannen",
     "mobility": "Mobiliteit"
-  }
+  },
+  "exerciseParameters": "Oefeningparameters",
+  "exerciseVideo": "Oefeningfideo",
+  "videoUploadAfterSave": "Fideoupload is beskikber nei it bewarjen fan de oefening."
 }

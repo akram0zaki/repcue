@@ -13,5 +13,19 @@
   "uploaded": "Fideo upload",
   "uploadsNotAvailable": "Fideo-uploads binne net beskikber",
   "urlPlaceholder": "Fier fideo-URL yn",
-  "urlPlaceholderHelper": "YouTube, Vimeo, of direkte fideo-URL"
+  "urlPlaceholderHelper": "YouTube, Vimeo, of direkte fideo-URL",
+
+"unsupportedFormat": "Net-ûndersteund fideoformaat. Brûk asjebleaft it MP4-, WebM- of OGG-formaat foar de bêste kompatibiliteit.",
+  "localVideoConfirmed": "Lokale fideo befêstige",
+  "formatNotSupported": "Fideoformaat wurdt net ûndersteund troch jo browser. Besykje MP4 mei de H.264-codec te brûken.",
+  "codecNotSupported": "Dizze fideo brûkt in net-ûndersteunde codec. Besykje te konvertearjen nei H.264 MP4-formaat foar bettere browserkompatibiliteit.",
+  "formatError": "Fideoformaat net werkend. Brûk asjebleaft in standert MP4-, WebM- of OGG-fideobestân.",
+  "decodeError": "Fideobestân liket korrupt te wêzen of brûkt net-ûndersteunde kodearring. Besykje de fideo opnij te kodearjen.",
+  "networkError": "Netwurkfout by it laden fan de fideo. Kontrolearje jo ferbining en besykje it opnij.",
+  "loadAborted": "It laden fan de fideo waard ûnderbrutsen. Besykje asjebleaft opnij te uploaden.",
+  "codecSuggestion": "Oanrikkemandearre: Brûk FFmpeg of HandBrake om te konvertearjen nei MP4 mei H.264-fideo en AAC-audio.",
+  "cannotDisplay": "Kin fideo net werjaan",
+  "localVideo": "Lokale fideo (offline ree)",
+  "pendingSync": "Fideo offline ree - sil syngronisearje as online",
+  "videoWithIssues": "Fideo mei problemen"
 }

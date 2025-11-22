@@ -279,5 +279,8 @@
     "full-body": "جسم كامل",
     "hands": "يدان",
     "mobility": "مرونة حركة"
-  }
+  },
+  "exerciseParameters": "معلمات التمرين",
+  "exerciseVideo": "فيديو التمرين",
+  "videoUploadAfterSave": "سيكون تحميل الفيديو متاحًا بعد حفظ التمرين."
 }

@@ -1142,10 +1142,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         isOpen={cancelModalOpen}
         onClose={() => handleConfirmCancel(true)} // Keep draft when closing
         onConfirm={() => handleConfirmCancel(false)} // Discard changes when confirming
-        title={t('cancelTitle', 'Cancel Exercise Form')}
-        message={t('keepDraft', 'Keep your form draft for next time?')}
-        confirmText={t('discard', 'Discard Changes')}
-        cancelText={t('common.keepDraft', 'Keep Draft')}
+        title={t('exercises:cancelTitle', 'Cancel Exercise Form')}
+        message={t('exercises:keepDraft', 'Keep your form draft for next time?')}
+        confirmText={t('exercises:discard', 'Discard Changes')}
+        cancelText={t('common:common.keepDraft', 'Keep Draft')}
         variant="default"
       />
 

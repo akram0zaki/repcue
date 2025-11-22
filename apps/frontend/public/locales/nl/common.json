@@ -568,35 +568,10 @@
     "workoutsOnly": "Alleen Trainingen"
   },
   "exerciseParameters": "Oefenparameters",
-  "video": {
-    "exerciseVideo": "Oefenvideo",
-    "uploadsNotAvailable": "Video-uploads zijn momenteel niet beschikbaar.",
-    "urlPlaceholderHelper": "Je kunt voorlopig een video-URL als placeholder toevoegen.",
-    "urlPlaceholder": "Video-URL (optioneel)",
-    "currentVideo": "Huidige video",
-    "removeVideo": "Video verwijderen",
-    "clickToUpload": "Klik om een video te uploaden",
-    "supportedFormats": "MP4, MOV, AVI tot 50 MB",
-    "maxFileSize": "Maximale bestandsgrootte: 50 MB",
-    "uploadHint": "Upload een demonstratievideo voor deze oefening (optioneel)",
-    "fileTooLarge": "Het bestand is te groot. De maximale grootte is 50 MB.",
-    "invalidFileType": "Selecteer een geldig videobestand.",
-    "unsupportedFormat": "Niet-ondersteund videoformaat. Gebruik MP4, WebM of OGG voor de beste compatibiliteit.",
-    "uploadFailed": "Uploaden van video mislukt. Probeer het opnieuw.",
-    "localVideoConfirmed": "Lokaal videobestand bevestigd",
-    "uploaded": "geüpload",
-    "loadError": "Video laden mislukt",
-    "codecNotSupported": "Deze video gebruikt een niet-ondersteunde codec. Probeer te converteren naar H.264 MP4-indeling voor betere browsercompatibiliteit.",
-    "formatError": "Videoformaat niet herkend. Gebruik een standaard MP4-, WebM- of OGG-videobestand.",
-    "formatNotSupported": "Videoformaat wordt niet ondersteund door je browser. Probeer MP4 met H.264-codec te gebruiken.",
-    "decodeError": "Videobestand lijkt beschadigd of gebruikt een niet-ondersteunde codering. Probeer de video opnieuw te coderen.",
-    "networkError": "Netwerkfout bij het laden van video. Controleer je verbinding en probeer het opnieuw.",
-    "loadAborted": "Video laden is onderbroken. Probeer het opnieuw te uploaden.",
-    "codecSuggestion": "Aanbevolen: Gebruik FFmpeg of HandBrake om te converteren naar MP4 met H.264-video en AAC-audio.",
-    "cannotDisplay": "Kan video niet weergeven",
-    "localVideo": "Lokaal videobestand",
-    "pendingSync": "Video wacht op synchronisatie",
-    "videoWithIssues": "Video heeft problemen"
+  "exercise": {
+    "noEquipment": "Geen apparatuur",
+    "startEx": "Start",
+    "startExercise": "Start Oefening"
   },
   "profile": {
     "title": "Profiel",
@@ -718,18 +693,6 @@
       "bugFixes": "Bugfixes",
       "securityUpdates": "Beveiligingsupdates"
     }
-  },
-  "rating": {
-    "reviews": "Beoordelingen",
-    "yourRating": "Jouw beoordeling",
-    "rateThis": "Beoordeel deze oefening",
-    "addReview": "Beoordeling toevoegen",
-    "hideReview": "Beoordeling verbergen",
-    "reviewPlaceholder": "Schrijf je beoordeling (optioneel)...",
-    "characters": "tekens",
-    "submitError": "Verzenden van beoordeling mislukt",
-    "submitting": "Verzenden...",
-    "loginToRate": "Log in om oefeningen te beoordelen en te recenseren"
   },
   "sync": {
     "syncing": "Gegevens worden gesynchroniseerd...",

@@ -582,35 +582,10 @@
     "workouts": "Trainings",
     "workoutsOnly": "Allinne Trainings"
   },
-  "video": {
-    "exerciseVideo": "Oefenfideo",
-    "uploadsNotAvailable": "Fideouploads binne noch net beskikber.",
-    "urlPlaceholderHelper": "Jo kinne foar no in fideo-URL as plakholder tafoegje.",
-    "urlPlaceholder": "Fideo-URL (opsjoneel)",
-    "currentVideo": "Aktuele fideo",
-    "removeVideo": "Fideo fuortsmite",
-    "clickToUpload": "Klik om in fideo te uploaden",
-    "supportedFormats": "MP4, MOV, AVI oant 50 MB",
-    "maxFileSize": "Maksimale bestânsgrutte: 50 MB",
-    "uploadHint": "Upload in demonstraasjefideo foar dizze oefening (opsjoneel)",
-    "fileTooLarge": "It bestân is te grut. De maksimale grutte is 50 MB.",
-    "invalidFileType": "Kies in jildich fideobestân.",
-    "unsupportedFormat": "Net-stipe fideoformaat. Brûk graach MP4, WebM of OGG foar de bêste kompatibiliteit.",
-    "uploadFailed": "Fideoupload mislearre. Probearje it opnij.",
-    "localVideoConfirmed": "Lokaal fideobestân befêstige",
-    "uploaded": "upload klear",
-    "loadError": "Fideo laden mislearre",
-    "codecNotSupported": "Dizze fideo brûkt in net-stipe codec. Besykje om te konvertearjen nei H.264 MP4-formaat foar bettere browserkompatibiliteit.",
-    "formatError": "Videoformaat net erkend. Brûk asjebleaft in standert MP4-, WebM- of OGG-fideobestân.",
-    "formatNotSupported": "Videoformaat net stipe troch jo browser. Besykje om MP4 mei H.264-codec te brûken.",
-    "decodeError": "Fideo-bestân liket korrumpearre te wêzen of brûkt net-stipe kodering. Besykje om de fideo te herkodearjen.",
-    "networkError": "Netwurkflater by it laden fan 'e fideo. Kontrolearje jo ferbining en besykje it opnij.",
-    "loadAborted": "It laden fan 'e fideo is ûnderbrocht. Besykje it opnij te uploaden.",
-    "codecSuggestion": "Recommandé : Utilisez FFmpeg ou HandBrake pour convertir en MP4 avec vidéo H.264 et audio AAC.",
-    "cannotDisplay": "Fideo kin net toand wurde",
-    "localVideo": "Lokaal fideobestân",
-    "pendingSync": "Fideo wachtet op syngronisaasje",
-    "videoWithIssues": "Fideo hat problemen"
+  "exercise": {
+    "noEquipment": "Gjin apparatuer",
+    "startEx": "Start",
+    "startExercise": "Start Oefening"
   },
   "profile": {
     "title": "Profyl",
@@ -732,18 +707,6 @@
       "bugFixes": "Bugfixes",
       "securityUpdates": "Befeiligingsupdates"
     }
-  },
-  "rating": {
-    "reviews": "beoardielingen",
-    "yourRating": "Dyn beoardieling",
-    "rateThis": "Beoardielje dizze oefening",
-    "addReview": "Beoardieling tafoegje",
-    "hideReview": "Beoardieling ferbergje",
-    "reviewPlaceholder": "Skriuw dyn beoardieling (opsjoneel)...",
-    "characters": "tekens",
-    "submitError": "It ynstjoeren fan de beoardieling is mislearre",
-    "submitting": "Oan it ynstjoeren...",
-    "loginToRate": "Meld dy oan om oefeningen te beoardieljen en te besjen"
   },
   "sync": {
     "syncing": "Gegevens wurde syngronisearre...",
