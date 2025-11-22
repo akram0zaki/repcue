@@ -400,6 +400,26 @@
     }
   },
   {
+    "id": "chest-opener",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 2.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/chest-opener_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
     "id": "child-pose",
     "repsPerLoop": 1,
     "fps": 30,
@@ -1130,6 +1150,26 @@
         "1080": {
           "mp4": {
             "url": "/media/plank_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    }
+  },
+  {
+    "id": "plank-cross-body-touch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/plank-cross-body-touch_v1_1920x1080.mp4"
           }
         }
       }

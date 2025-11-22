@@ -388,5 +388,437 @@
     "limitations": "إدارة التعب؛ خفّض الشدة إذا تدهورت التقنية.",
     "best_timing": "مقطع ختامي في نهاية الحصة.",
     "notes": "بدّل الشركاء لتغيير الإيقاع والحجم."
+  },
+  "lying-back-extension": {
+    "name": "تمديد الظهر من النوم",
+    "description": "اقعد على بطنك وارفع صدرك وإيديك من عالأرض",
+    "benefits": "بيقوّي عضلات أسفل الظهر والعمود الفقري. بيحسّن الوضعية وبيمدّ البطن والصدر.",
+    "limitations": "ماتعملوش لو عندك إصابة حادة في الضهر. ماترفعش عالي قوي.",
+    "best_timing": "بعد الإحماء أو في آخر التمرين.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "خلّي رقبتك طبيعية وماتشدّش لفوق قوي."
+  },
+  "front-plank-toe-tap": {
+    "name": "بلانك أمامي مع لمس صوابع الرجل",
+    "description": "من وضع البلانك، المس صوابع رجلك بإيد متقاطعة بالتبادل",
+    "benefits": "بيقوّي الجذع والكتفين وبيحسّن التوازن والتنسيق.",
+    "limitations": "خلّي الحوض ثابت. ماتعملوش لو رسغك بيوجعك.",
+    "best_timing": "في تمارين الجذع أو HIIT.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "اتحرك ببطء وخلّي وضعية البلانك قويّة."
+  },
+  "crab-twist-toe-touch": {
+    "name": "السلطعون الملتوي مع لمس صوابع الرجل",
+    "description": "من وضع السلطعون (قعدة معكوسة)، ارفع الحوض والمس الرجل التانية",
+    "benefits": "بيشتغل على الجذع والأرداف والكتفين. بيحسّن الحركية والتنسيق.",
+    "limitations": "كُن حذر مع الرسغ والكتفين.",
+    "best_timing": "في دواير القوّة أو الحركة.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "ارفع الحوض عالي وازعط الأرداف."
+  },
+  "standing-side-crunch": {
+    "name": "كرنش جنبي واقف",
+    "description": "قف وارفع ركبتك للجنب نحو الكوع",
+    "benefits": "بيستهدف العضلات الجنبية وبيحسّن التوازن.",
+    "limitations": "خلّي على التوازن. ماتعملش حركات سريعة قوي.",
+    "best_timing": "في تمارين الجذع أو كإحماء.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "ازعط العضلات الجنبية في الفوق."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "سكوات جانبي بخطوة",
+    "description": "خطوة للجنب واثني الركبة في سكوات، وبعدين ارجع",
+    "benefits": "بيقوّي الرجلين والأرداف. بيحسّن الحركة الجنبية.",
+    "limitations": "خلّي الركب ورا صوابع الرجل.",
+    "best_timing": "في تمارين الرجلين أو HIIT.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "ازق عن طريق العقب وخلّي صدرك مرفوع."
+  },
+  "hip-roll-plank": {
+    "name": "بلانك مع دوران الحوض",
+    "description": "من البلانك، دوّر حوضك من جنب للتاني",
+    "benefits": "بيقوّي الجذع والعضلات الجنبية. بيحسّن استقرار الجذع.",
+    "limitations": "خلّي الكتفين ثابتين.",
+    "best_timing": "في تمارين الجذع المتقدّمة.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "اتحرّك ببطء وخلّي السيطرة."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "سكوات بنبضات",
+    "description": "اثبت في وضع السكوات التحتاني وانبض فوق وتحت",
+    "benefits": "بيبني تحمّل العضلات في الرجلين والأرداف.",
+    "limitations": "ممكن يبقى مرهق. ابدأ بنبضات أقل.",
+    "best_timing": "كاستنزاف نهائي لتمرين الرجلين.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "خلّي النبضات صغيرة ومضبوطة."
+  },
+  "shoulder-rolls": {
+    "name": "تدوير الكتف",
+    "description": "دوّر الكتفين لقدّام ولورا بحركة دايرية",
+    "benefits": "بيخفّف توتر الكتف والرقبة. بيحسّن الحركية.",
+    "limitations": "اتحرّك بلطف، ماتعملش حركات سريعة.",
+    "best_timing": "كإحماء أو فترات راحة أثناء الشغل.",
+    "suggested_combinations": ["cat-cow", "downward-dog"],
+    "notes": "اتنفّس بعمق مع كلّ دورة."
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "تمرين الذراعين وإنت قاعد",
+    "description": "اقعد وحرّك دراعك بسرعة فوق وتحت",
+    "benefits": "بيعلّي ضربات القلب من غير تأثير عالرجلين.",
+    "limitations": "مناسب للحركة المحدودة.",
+    "best_timing": "للمكتب أو أثناء السفر.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "ممتاز للستات الكبيرة والحالات ما بعد العمليات."
+  },
+  "heel-to-toe-walk": {
+    "name": "المشي من العقب لصوابع الرجل",
+    "description": "امشي في خط مستقيم من العقب لصوابع الرجل",
+    "benefits": "بيحسّن التنسيق والتوازن.",
+    "limitations": "ماتعملوش لو عندك دوخة.",
+    "best_timing": "في المشي الصبح.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "بيساعد يمنع الوقوع عند كبار السن."
+  },
+  "side-plank-rotation": {
+    "name": "بلانك جانبي مع دوران",
+    "description": "من البلانك الجانبي، دوّر الجذع ومرّر دراعك تحت جسمك",
+    "benefits": "بيقوّي العضلات الجنبية والكتفين. بيحسّن حركية الجذع.",
+    "limitations": "خلّي الحوض مستقر.",
+    "best_timing": "بعد ما تتقن البلانك الجانبي العادي.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "اتحرّك ببطء مع السيطرة الكاملة."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "دواير الحوض لورا وإنت راكع",
+    "description": "من وضع الركوع، دوّر حوضك في دواير",
+    "benefits": "بيحسّن حركية الحوض وبيخفّف التوتر.",
+    "limitations": "ابدأ بدواير صغيرة.",
+    "best_timing": "كإحماء أو تمديد.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "خلّي الحركة سلسة ومضبوطة."
+  },
+  "lying-floor-abduction": {
+    "name": "تبعيد الرجل من النوم",
+    "description": "اقعد على جنبك وارفع الرجل الفوقانية",
+    "benefits": "بيقوّي عضلات الحوض الخارجية والأرداف.",
+    "limitations": "خلّي محاذاة الجسم.",
+    "best_timing": "في تمارين الرجلين أو الأرداف.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "ماتزّن الرجل، اتحرّك بضبط."
+  },
+  "balance-board": {
+    "name": "لوح التوازن",
+    "description": "قف على لوح توازن وخليك ثابت",
+    "benefits": "بيحسّن التوازن واستقرار الرسغ.",
+    "limitations": "ابدأ جمب دعم عشان السلامة.",
+    "best_timing": "كتمرين توازن منفصل.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "ابدأ بأوقات قصيرة وزوّد تدريجياً."
+  },
+  "hip-swirls": {
+    "name": "دوران الحوض",
+    "description": "قف ودوّر حوضك في دواير كبيرة",
+    "benefits": "بيحسّن حركية الحوض وبيحضّر للتمرين.",
+    "limitations": "ماتدوّرش سريع قوي.",
+    "best_timing": "كإحماء ديناميكي.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "خلّي الحركة سلسة ومضبوطة."
+  },
+  "push-up-jack": {
+    "name": "ضغط مع فتح الرجلين",
+    "description": "اعمل ضغطة مع فتح رجلك في نفس الوقت",
+    "benefits": "بيجمع بين قوّة الجزء العلوي والكارديو.",
+    "limitations": "صعب على المبتدئين.",
+    "best_timing": "في تمارين HIIT أو دواير القوّة.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "خلّي وضعية البلانك قويّة."
+  },
+  "hip-crunch": {
+    "name": "كرنش الحوض",
+    "description": "من وضع البلانك الجانبي، اجيب الركبة نحو الصدر",
+    "benefits": "بيشتغل على العضلات الجنبية والجذع.",
+    "limitations": "محتاج قوّة جذع كويّسة.",
+    "best_timing": "في تمارين الجذع المتقدّمة.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "خلّي التوازن والسيطرة."
+  },
+  "shin-box": {
+    "name": "صندوق الساق",
+    "description": "اقعد مع ثني الركب بزاوية 90 درجة وانتقل بين الجنبين",
+    "benefits": "بيحسّن حركية الحوض والتوازن.",
+    "limitations": "ممكن يبقى صعب عالركب.",
+    "best_timing": "كتمديد أو حركية.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "اتحرّك ببطء وخلّي الوضعية."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "كرنش جنبي من الكوع للركبة",
+    "description": "قف، ارفع الركبة للجنب والمسها بالكوع التاني",
+    "benefits": "بيستهدف العضلات الجنبية وبيحسّن التوازن.",
+    "limitations": "ماتعملش حركات سريعة قوي.",
+    "best_timing": "في تمارين الجذع.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "ازعط العضلات الجنبية في الفوق."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "كرنش دايري وإنت قاعد",
+    "description": "اقعد، ارفع رجليك ودوّرهم في دواير",
+    "benefits": "بيقوّي الجذع والعضلات الجنبية.",
+    "limitations": "صعب على المبتدئين.",
+    "best_timing": "في تمارين الجذع المتقدّمة.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "خلّي الحركة بطيئة ومضبوطة."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "وضع اللوتس الأفقي للحوض",
+    "description": "اقعد مع تقاطع الرجلين ومدّ لقدّام",
+    "benefits": "بيمدّ الحوض والفخدين الداخلية.",
+    "limitations": "محتاج مرونة كويّسة في الحوض.",
+    "best_timing": "كتمديد بعد التمرين.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "ماتجبرش الحركة، امدد بلطف."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "رفع الرجل بالتبعيد من الأرض",
+    "description": "اقعد على جنبك وارفع الرجل الفوقانية لفوق",
+    "benefits": "بيقوّي عضلات الحوض الخارجية.",
+    "limitations": "خلّي الجسم مستقيم.",
+    "best_timing": "في تمارين الأرداف.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "اتحرّك بضبط، ماتزّنش."
+  },
+  "side-bridge-bent-leg": {
+    "name": "جسر جانبي برجل مثنية",
+    "description": "بلانك جانبي مع ثني الرجل التحتانية للدعم",
+    "benefits": "نسخة معدّلة للبلانك الجانبي. بيقوّي الجذع.",
+    "limitations": "أسهل من البلانك الجانبي الكامل.",
+    "best_timing": "للمبتدئين أو الإحماء.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "خلّي الحوض مرفوع ومحاذاة الجسم."
+  },
+  "leg-pull-side": {
+    "name": "سحب الرجل الجانبي",
+    "description": "من بلانك جانبي، ارفع الرجل الفوقانية",
+    "benefits": "بيقوّي الجذع والحوض والكتفين.",
+    "limitations": "تمرين متقدّم.",
+    "best_timing": "بعد ما تتقن البلانك الجانبي.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "خلّي الاستقرار والسيطرة."
+  },
+  "power-clean-thruster": {
+    "name": "رفع نضيف قوي مع دفع",
+    "description": "حركة مركّبة: رفع من الأرض للكتفين بعدين دفع علوي",
+    "benefits": "تمرين قوّة وقوّة انفجارية لكامل الجسم.",
+    "limitations": "تقنية معقّدة، محتاج تدريب.",
+    "best_timing": "في تمارين القوّة المتقدّمة.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "اتعلم التقنية الصح قبل الأوزان التقيلة."
+  },
+  "snatch-high": {
+    "name": "خطف عالي",
+    "description": "رفع سريع من الأرض لفوق الراس في حركة واحدة",
+    "benefits": "بيطوّر القوّة الانفجارية والتنسيق الكلّي.",
+    "limitations": "تقنية متقدّمة جدّاً.",
+    "best_timing": "للرياضيين المدرّبين بس.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "محتاج حركية ممتازة وتقنية."
+  },
+  "press-under": {
+    "name": "الضغط تحت",
+    "description": "انزل تحت البار مع دفعه لفوق",
+    "benefits": "بيحسّن سرعة الانتقال والقوّة العلوية.",
+    "limitations": "تقنية رفع أثقال أولمبي متقدّمة.",
+    "best_timing": "كتمرين مساعد للرفع الأولمبي.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "محتاج تدريب متخصص."
+  },
+  "lever-stepper": {
+    "name": "جهاز الدرج الرافع",
+    "description": "استخدم جهاز الدرج للكارديو بالخطوات",
+    "benefits": "كارديو منخفض التأثير، بيقوّي الرجلين.",
+    "limitations": "محتاج جهاز stepper.",
+    "best_timing": "كتمرين كارديو مستقل.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "ابدأ ببطء وزوّد الشدّة تدريجياً."
+  },
+  "seated-neck-tap": {
+    "name": "نقر الرقبة وإنت قاعد",
+    "description": "اقعد واضغط برفق على جوانب الرقبة",
+    "benefits": "بيخفّف التوتر وبيحسّن الدورة الدموية.",
+    "limitations": "كُن لطيف جدّاً.",
+    "best_timing": "كتمديد أو استرخاء.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "ماتضغطش بقوّة على الرقبة."
+  },
+  "elbow-flexion": {
+    "name": "ثني الكوع",
+    "description": "اثني الكوع عشان تقرّب الإيد من الكتف",
+    "benefits": "بيقوّي العضلة ذات الرأسين والساعد.",
+    "limitations": "ممكن تستخدم أوزان خفيفة.",
+    "best_timing": "في تمارين الذراع.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "خلّي الكوع ثابت جمب الجسم."
+  },
+  "side-kick-burpee": {
+    "name": "بيربي مع ركلة جانبية",
+    "description": "اعمل بيربي وزوّد ركلة جانبية في الفوق",
+    "benefits": "بيجمع بين القوّة والكارديو والفنون القتالية.",
+    "limitations": "تمرين متقدّم وشديد.",
+    "best_timing": "في تمارين HIIT المتقدّمة.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "خلّي التوازن لمّا تركل."
+  },
+  "butterfly-pull-up": {
+    "name": "عقلة فراشة",
+    "description": "عقلة بحركة متأرجحة دايرية",
+    "benefits": "بيبني قوّة الضهر والدراع مع الحركة الديناميكية.",
+    "limitations": "تقنية CrossFit متقدّمة.",
+    "best_timing": "للرياضيين المدرّبين.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "محتاج قوّة جزء علوي كويّسة."
+  },
+  "front-scoops": {
+    "name": "حركة المجرفة الأمامية",
+    "description": "حركة الذراع الدايرية من تحت لفوق",
+    "benefits": "بيحمي الكتفين وبيحسّن حركية المفصل.",
+    "limitations": "اتحرّك بلطف.",
+    "best_timing": "كإحماء للكتف.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "خلّي الحركة سلسة."
+  },
+  "shoulder-flexion": {
+    "name": "ثني الكتف",
+    "description": "ارفع دراعك لقدّام لمستوى الكتف",
+    "benefits": "بيقوّي الجزء الأمامي من الكتف.",
+    "limitations": "ممكن تستخدم أوزان خفيفة.",
+    "best_timing": "في تمارين الكتف.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "خلّي الكوع ممدود شويّة."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "ثني الكتف الأفقي",
+    "description": "حرّك دراعك أفقي عبر الجسم",
+    "benefits": "بيستهدف عضلات الصدر والكتف الأمامي.",
+    "limitations": "ماتعملش حركات سريعة.",
+    "best_timing": "في تمارين الجزء العلوي.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "خلّي السيطرة طول الحركة."
+  },
+  "forearm-supination": {
+    "name": "دوران الساعد لبرّه",
+    "description": "دوّر الساعد من جوّه لبرّه",
+    "benefits": "بيقوّي عضلات الساعد وبيحسّن قبضة الإيد.",
+    "limitations": "ممكن تستخدم أوزان خفيفة.",
+    "best_timing": "في تمارين الساعد.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "اتحرّك ببطء وبسيطرة."
+  },
+  "brachialis-pull-up": {
+    "name": "عقلة للعضلة العضدية",
+    "description": "عقلة بقبضة متعادلة (باطن الإيدين متقابلتين)",
+    "benefits": "بيستهدف العضلة العضدية والبايسبس.",
+    "limitations": "محتاج قوّة جزء علوي.",
+    "best_timing": "في تمارين الضهر والذراع.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "خلّي الحركة بطيئة ومضبوطة."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "عقلة ضيّقة للعضلة العضدية",
+    "description": "عقلة بقبضة ضيّقة ومتعادلة",
+    "benefits": "بيزيد التركيز عالعضلة العضدية.",
+    "limitations": "أصعب من العقلة العادية.",
+    "best_timing": "في تمارين الذراع المتقدّمة.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "ممكن القبضة المحدودة تبقى تحدّي."
+  },
+  "prayer-push": {
+    "name": "ضغط الصلاة",
+    "description": "اضغط إيديك مع بعض قدّام الصدر بقوّة",
+    "benefits": "بيقوّي عضلات الصدر والذراعين إيزومترياً.",
+    "limitations": "تمرين إيزومتري منخفض التأثير.",
+    "best_timing": "في أي وقت، حتّى عالمكتب.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "اضغط بقوّة واحتفظ لثواني."
+  },
+  "lying-prone-w-to-y": {
+    "name": "حركة W لـ Y من النوم عالبطن",
+    "description": "اقعد عابطنك وحرّك دراعك من شكل W لـ Y",
+    "benefits": "بيقوّي الضهر العلوي والكتفين.",
+    "limitations": "ممكن تبقى مش مريحة للرقبة.",
+    "best_timing": "في تمارين الضهر أو تصحيح الوضعية.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "خلّي رقبتك طبيعية."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "دوران باطن الإيد فوق وتحت",
+    "description": "دوّر الساعدين من باطن فوق لباطن تحت",
+    "benefits": "بيحسّن حركية الساعد والمرونة.",
+    "limitations": "تمرين خفيف للحركية.",
+    "best_timing": "كإحماء أو تمديد.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "اتحرّك بلطف وببطء."
+  },
+  "air-twisting-crunch": {
+    "name": "كرنش ملتوي في الهوا",
+    "description": "اقعد ولفّ الجذع مع رفع الركب",
+    "benefits": "بيستهدف العضلات الجنبية والبطن.",
+    "limitations": "ماتشدّش رقبتك.",
+    "best_timing": "في تمارين الجذع.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "ركّز على دوران الجذع."
+  },
+  "standing-swimmer": {
+    "name": "السبّاح الواقف",
+    "description": "قف وحرّك دراعك بحركة سباحة بالتبادل",
+    "benefits": "بيقوّي الضهر والكتفين. بيحسّن الوضعية.",
+    "limitations": "اتأكّد من وجود مساحة حواليك.",
+    "best_timing": "كإحماء أو تمرين خفيف.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "خلّي الحركة سلسة ومضبوطة."
+  },
+  "3-4-sit-ups": {
+    "name": "كرنش 3-4",
+    "description": "كرنش بنطاق جزئي (¾ من الحركة الكاملة)",
+    "benefits": "بيقلّل الضغط عالضهر مع تنشيط البطن.",
+    "limitations": "أسهل من كرنش البطن الكامل.",
+    "best_timing": "في تمارين الجذع.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "ماتطلعش بالكامل، اوقف عند ¾."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "رفع الرجلين بالتبادل من النوم",
+    "description": "اقعد وارفع رجل واحدة كلّ مرّة",
+    "benefits": "بيقوّي البطن التحتاني.",
+    "limitations": "خلّي أسفل ضهرك عالأرض.",
+    "best_timing": "في تمارين الجذع.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "اتحرّك ببطء وخلّي السيطرة."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "رفع الرجل بمساعدة مع رمي جانبي",
+    "description": "ارفع رجليك وبعدين ارميهم للجنب بمساعدة شريك",
+    "benefits": "بيقوّي الجذع والعضلات الجنبية.",
+    "limitations": "محتاج شريك تدريب.",
+    "best_timing": "في تمارين الجذع المتقدّمة.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "الشريك يساعد بالرمي المضبوط."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "تمديد العمود الفقري الصدري راكع",
+    "description": "اركع وحط الكوع عامقعد، انزل بصدرك لتحت",
+    "benefits": "بيحسّن حركية العمود الفقري الصدري وبيمدّ الكتفين.",
+    "limitations": "كُن لطيف، ماتجبرش الحركة.",
+    "best_timing": "كإحماء أو تمديد.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "اتنفّس بعمق وامدد بلطف."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "لانج خلفي مع ركلة رجل",
+    "description": "خطوة لورا في لانج، بعدين اركل الرجل الخلفية لقدّام",
+    "benefits": "بيجمع بين قوّة الرجلين والتوازن والقوّة الانفجارية. بيحسّن التنسيق والرشاقة.",
+    "limitations": "اتقن اللانجز العادية الأوّل. كُن حذر مع الركبة الداعمة.",
+    "best_timing": "في دواير وظيفية أو كاستنزاف لتمرين الرجلين.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "ازفر بحدّة لمّا تركل. ابدأ ببطء وبعدين زوّد السرعة."
   }
 }

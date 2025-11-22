@@ -259,5 +259,437 @@
     "suggested_combinations": ["downward-dog", "child-pose"],
     "notes": "Relaja por completo el cuello y deja caer la cabeza al inclinarte. Distribuye el peso hacia las puntas de los pies (no solo en los talones) para un mejor estiramiento de isquiotibiales. Puedes agarrar codos opuestos y balancearte suavemente de lado a lado para liberar tensión extra. Respira lento y profundo; con cada exhalación, deja que el torso se acerque un poco más a los muslos. Para subir, activa el core y desenróllate despacio, vértebra a vértebra, para evitar mareos.",
     "exercise_references": ["Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/", "YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx"]
+  },
+  "lying-back-extension": {
+    "name": "Extensión dorsal tumbado",
+    "description": "Tumbado boca abajo, eleva el pecho y los brazos del suelo",
+    "benefits": "Fortalece los músculos de la espalda baja y la columna vertebral. Mejora la postura y estira el abdomen y el pecho.",
+    "limitations": "Evitar si hay lesión aguda de espalda. No elevar demasiado alto.",
+    "best_timing": "Después del calentamiento o al final del entrenamiento.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "Mantén el cuello neutral y evita mirar hacia arriba."
+  },
+  "front-plank-toe-tap": {
+    "name": "Plancha frontal con toque de dedos",
+    "description": "Desde posición de plancha, tocar alternadamente los dedos del pie con la mano cruzada",
+    "benefits": "Fortalece el core y los hombros, mejora el equilibrio y la coordinación.",
+    "limitations": "Mantener las caderas estables. Evitar si hay dolor de muñeca.",
+    "best_timing": "En entrenamientos de core o circuitos HIIT.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "Moverse lentamente y mantener una posición de plancha sólida."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Cangrejo con giro y toque de dedos",
+    "description": "Desde posición de cangrejo (sentado invertido), elevar las caderas y tocar la pierna opuesta",
+    "benefits": "Trabaja el core, los glúteos y los hombros. Mejora la movilidad y la coordinación.",
+    "limitations": "Tener cuidado con las muñecas y los hombros.",
+    "best_timing": "En circuitos de fuerza o movilidad.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "Elevar las caderas alto y apretar los glúteos."
+  },
+  "standing-side-crunch": {
+    "name": "Crunch lateral de pie",
+    "description": "De pie, llevar la rodilla lateralmente hacia el codo",
+    "benefits": "Trabaja los oblicuos y mejora el equilibrio.",
+    "limitations": "Mantener el equilibrio. Evitar movimientos bruscos.",
+    "best_timing": "En entrenamientos de core o como calentamiento.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Contraer los oblicuos en la parte superior del movimiento."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Sentadilla lateral con paso",
+    "description": "Dar un paso lateral y flexionar la rodilla en sentadilla, luego regresar",
+    "benefits": "Fortalece las piernas y los glúteos. Mejora la movilidad lateral.",
+    "limitations": "Mantener las rodillas detrás de los dedos del pie.",
+    "best_timing": "En entrenamientos de piernas o circuitos HIIT.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Empujar a través de los talones y mantener el pecho erguido."
+  },
+  "hip-roll-plank": {
+    "name": "Plancha con rodamiento de caderas",
+    "description": "Desde posición de plancha, rodar las caderas de izquierda a derecha",
+    "benefits": "Fortalece el core y los oblicuos. Mejora la estabilidad del core.",
+    "limitations": "Mantener los hombros estables.",
+    "best_timing": "En entrenamientos avanzados de core.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "Moverse lentamente y mantener el control."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Sentadilla con pulsaciones",
+    "description": "Mantener la posición baja de sentadilla y pulsar arriba y abajo",
+    "benefits": "Desarrolla la resistencia muscular de piernas y glúteos.",
+    "limitations": "Puede ser agotador. Comenzar con menos pulsaciones.",
+    "best_timing": "Como finalizador para el entrenamiento de piernas.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "Mantener las pulsaciones pequeñas y controladas."
+  },
+  "shoulder-rolls": {
+    "name": "Rodamientos de hombros",
+    "description": "Rodar los hombros hacia adelante y atrás en movimiento circular",
+    "benefits": "Alivia la tensión de los hombros y la rigidez del cuello. Mejora la movilidad.",
+    "limitations": "Moverse suavemente, sin movimientos bruscos.",
+    "best_timing": "Como calentamiento o durante pausas de trabajo.",
+    "suggested_combinations": ["cat-cow", "downward-dog"],
+    "notes": "Respirar profundamente con cada círculo."
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Bombeos de brazos cardio sentado",
+    "description": "Sentado, bombear los brazos rápidamente arriba y abajo",
+    "benefits": "Aumenta la frecuencia cardíaca sin estresar las piernas.",
+    "limitations": "Adaptado para movilidad limitada.",
+    "best_timing": "Para la oficina o durante viajes.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Excelente para personas mayores y casos post-operatorios."
+  },
+  "heel-to-toe-walk": {
+    "name": "Caminar talón-punta",
+    "description": "Caminar en línea recta de talón a punta",
+    "benefits": "Mejora la coordinación y el equilibrio.",
+    "limitations": "Evitar si hay mareos.",
+    "best_timing": "Durante paseos matutinos.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Ayuda a prevenir caídas en personas mayores."
+  },
+  "side-plank-rotation": {
+    "name": "Plancha lateral con rotación",
+    "description": "Desde plancha lateral, rotar el torso y pasar el brazo bajo el cuerpo",
+    "benefits": "Fortalece los oblicuos y los hombros. Mejora la movilidad del core.",
+    "limitations": "Mantener las caderas estables.",
+    "best_timing": "Después de dominar la plancha lateral normal.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Moverse lentamente con control total."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Círculos de caderas hacia atrás arrodillado",
+    "description": "Desde posición arrodillada, hacer círculos con las caderas",
+    "benefits": "Mejora la movilidad de las caderas y alivia la tensión.",
+    "limitations": "Comenzar con círculos pequeños.",
+    "best_timing": "Como calentamiento o estiramiento.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Mantener el movimiento fluido y controlado."
+  },
+  "lying-floor-abduction": {
+    "name": "Abducción de pierna tumbado",
+    "description": "Tumbado de lado, elevar la pierna superior",
+    "benefits": "Fortalece las caderas externas y los glúteos.",
+    "limitations": "Mantener la alineación del cuerpo.",
+    "best_timing": "En entrenamientos de piernas o glúteos.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "Sin balanceo, movimiento controlado."
+  },
+  "balance-board": {
+    "name": "Tabla de equilibrio",
+    "description": "Pararse en una tabla de equilibrio y mantener la estabilidad",
+    "benefits": "Mejora el equilibrio y la estabilidad del tobillo.",
+    "limitations": "Comenzar cerca de un soporte para seguridad.",
+    "best_timing": "Como entrenamiento de equilibrio separado.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Comenzar con tiempos cortos y aumentar gradualmente."
+  },
+  "hip-swirls": {
+    "name": "Círculos de caderas",
+    "description": "De pie, hacer círculos con las caderas en grandes movimientos circulares",
+    "benefits": "Mejora la movilidad de las caderas y prepara para el entrenamiento.",
+    "limitations": "No girar demasiado rápido.",
+    "best_timing": "Como calentamiento dinámico.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "Mantener el movimiento fluido y controlado."
+  },
+  "push-up-jack": {
+    "name": "Flexión con salto de piernas",
+    "description": "Hacer una flexión mientras simultáneamente se abren las piernas",
+    "benefits": "Combina fuerza del tren superior con cardio.",
+    "limitations": "Difícil para principiantes.",
+    "best_timing": "En entrenamientos HIIT o circuitos de fuerza.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Mantener una posición de plancha sólida."
+  },
+  "hip-crunch": {
+    "name": "Crunch de caderas",
+    "description": "Desde plancha lateral, llevar la rodilla hacia el pecho",
+    "benefits": "Trabaja los oblicuos y el core.",
+    "limitations": "Requiere buena fuerza del core.",
+    "best_timing": "En entrenamientos avanzados de core.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "Mantener el equilibrio y el control."
+  },
+  "shin-box": {
+    "name": "Caja de tibias",
+    "description": "Sentado con rodillas dobladas a 90 grados, alternar entre lados",
+    "benefits": "Mejora la movilidad de las caderas y el equilibrio.",
+    "limitations": "Puede ser difícil para las rodillas.",
+    "best_timing": "Como estiramiento o movilidad.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "Moverse lentamente y mantener la postura."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Crunch lateral de pie codo a rodilla",
+    "description": "De pie, llevar la rodilla lateralmente y tocarla con el codo opuesto",
+    "benefits": "Trabaja los oblicuos y mejora el equilibrio.",
+    "limitations": "Evitar movimientos bruscos.",
+    "best_timing": "En entrenamientos de core.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "Contraer los oblicuos en la parte superior."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Crunch circular de piernas sentado",
+    "description": "Sentado, elevar las piernas y hacerlas girar en círculos",
+    "benefits": "Fortalece el core y los oblicuos.",
+    "limitations": "Difícil para principiantes.",
+    "best_timing": "En entrenamientos avanzados de core.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "Mantener el movimiento lento y controlado."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Loto sentado caderas horizontales",
+    "description": "Sentado con piernas cruzadas, inclinarse hacia adelante",
+    "benefits": "Estira las caderas y la parte interna de los muslos.",
+    "limitations": "Requiere buena flexibilidad de caderas.",
+    "best_timing": "Como estiramiento después del entrenamiento.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "No forzar, estirar suavemente."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Elevación de pierna en abducción tumbado",
+    "description": "Tumbado de lado, elevar la pierna superior",
+    "benefits": "Fortalece las caderas externas.",
+    "limitations": "Mantener el cuerpo recto.",
+    "best_timing": "En entrenamientos de glúteos.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "Movimiento controlado, sin balanceo."
+  },
+  "side-bridge-bent-leg": {
+    "name": "Puente lateral pierna doblada",
+    "description": "Plancha lateral con pierna inferior doblada para apoyo",
+    "benefits": "Plancha lateral modificada. Fortalece el core.",
+    "limitations": "Más fácil que la plancha lateral completa.",
+    "best_timing": "Para principiantes o calentamiento.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Mantener las caderas altas y el cuerpo alineado."
+  },
+  "leg-pull-side": {
+    "name": "Tracción lateral de pierna",
+    "description": "Desde plancha lateral, elevar la pierna superior",
+    "benefits": "Fortalece el core, las caderas y los hombros.",
+    "limitations": "Ejercicio avanzado.",
+    "best_timing": "Después de dominar la plancha lateral.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "Mantener estabilidad y control."
+  },
+  "power-clean-thruster": {
+    "name": "Cargada de potencia con thruster",
+    "description": "Movimiento compuesto: cargada del suelo a los hombros, luego empuje sobre la cabeza",
+    "benefits": "Fuerza y potencia explosiva de todo el cuerpo.",
+    "limitations": "Técnica compleja, requiere entrenamiento.",
+    "best_timing": "En entrenamientos de fuerza avanzados.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "Aprender la técnica correcta antes de cargas pesadas."
+  },
+  "snatch-high": {
+    "name": "Arrancada alta",
+    "description": "Levantamiento rápido del suelo sobre la cabeza en un movimiento",
+    "benefits": "Desarrolla potencia explosiva y coordinación de todo el cuerpo.",
+    "limitations": "Técnica muy avanzada.",
+    "best_timing": "Solo para atletas entrenados.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "Requiere excelente movilidad y técnica."
+  },
+  "press-under": {
+    "name": "Prensa bajo la barra",
+    "description": "Descender bajo la barra mientras se empuja hacia arriba",
+    "benefits": "Mejora velocidad de transición y fuerza del tren superior.",
+    "limitations": "Técnica avanzada de levantamiento olímpico.",
+    "best_timing": "Como ejercicio accesorio para levantamiento olímpico.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "Requiere entrenamiento especializado."
+  },
+  "lever-stepper": {
+    "name": "Máquina de pasos con palanca",
+    "description": "Usar máquina de pasos para cardio con movimiento de caminar",
+    "benefits": "Cardio de bajo impacto, fortalece las piernas.",
+    "limitations": "Requiere máquina de pasos.",
+    "best_timing": "Como sesión de cardio separada.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Comenzar lentamente y aumentar la intensidad gradualmente."
+  },
+  "seated-neck-tap": {
+    "name": "Toque de cuello sentado",
+    "description": "Sentado, tocar suavemente los lados del cuello",
+    "benefits": "Alivia la tensión y mejora la circulación.",
+    "limitations": "Ser muy cuidadoso.",
+    "best_timing": "Como estiramiento o relajación.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "No aplicar presión fuerte en el cuello."
+  },
+  "elbow-flexion": {
+    "name": "Flexión de codo",
+    "description": "Doblar el codo para acercar la mano al hombro",
+    "benefits": "Fortalece el bíceps y el antebrazo.",
+    "limitations": "Puede usar pesos ligeros.",
+    "best_timing": "En entrenamientos de brazos.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Mantener el codo estable contra el cuerpo."
+  },
+  "side-kick-burpee": {
+    "name": "Burpee con patada lateral",
+    "description": "Hacer un burpee y agregar una patada lateral en la parte superior",
+    "benefits": "Combina fuerza, cardio y artes marciales.",
+    "limitations": "Ejercicio avanzado de alta intensidad.",
+    "best_timing": "En entrenamientos HIIT avanzados.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "Mantener el equilibrio durante la patada."
+  },
+  "butterfly-pull-up": {
+    "name": "Dominada mariposa",
+    "description": "Dominada con movimiento circular de balanceo",
+    "benefits": "Desarrolla fuerza de espalda y brazos con movimiento dinámico.",
+    "limitations": "Técnica avanzada de CrossFit.",
+    "best_timing": "Para atletas entrenados.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Requiere buena fuerza del tren superior."
+  },
+  "front-scoops": {
+    "name": "Movimientos de pala frontal",
+    "description": "Movimiento circular de brazos de abajo hacia arriba",
+    "benefits": "Calienta los hombros y mejora la movilidad articular.",
+    "limitations": "Moverse suavemente.",
+    "best_timing": "Como calentamiento de hombros.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Mantener el movimiento fluido."
+  },
+  "shoulder-flexion": {
+    "name": "Flexión de hombro",
+    "description": "Elevar los brazos hacia adelante a la altura del hombro",
+    "benefits": "Fortalece la parte frontal del hombro.",
+    "limitations": "Puede usar pesos ligeros.",
+    "best_timing": "En entrenamientos de hombros.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "Mantener el codo ligeramente flexionado."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Flexión transversa de hombro",
+    "description": "Mover el brazo horizontalmente a través del cuerpo",
+    "benefits": "Trabaja los músculos del pecho y la parte frontal del hombro.",
+    "limitations": "Evitar movimientos bruscos.",
+    "best_timing": "En entrenamientos del tren superior.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Mantener el control durante el movimiento."
+  },
+  "forearm-supination": {
+    "name": "Supinación del antebrazo",
+    "description": "Girar el antebrazo de dentro hacia fuera",
+    "benefits": "Fortalece los músculos del antebrazo y mejora el agarre.",
+    "limitations": "Puede usar pesos ligeros.",
+    "best_timing": "En entrenamientos de antebrazos.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "Moverse lentamente y con control."
+  },
+  "brachialis-pull-up": {
+    "name": "Dominada braquial",
+    "description": "Dominada con agarre neutral (palmas enfrentadas)",
+    "benefits": "Trabaja los músculos braquiales y bíceps.",
+    "limitations": "Requiere fuerza del tren superior.",
+    "best_timing": "En entrenamientos de espalda y brazos.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Mantener el movimiento lento y controlado."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Dominada braquial estrecha",
+    "description": "Dominada con agarre estrecho y neutral",
+    "benefits": "Aumenta el enfoque en el braquial.",
+    "limitations": "Más difícil que la dominada normal.",
+    "best_timing": "En entrenamientos avanzados de brazos.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "El agarre estrecho puede ser desafiante."
+  },
+  "prayer-push": {
+    "name": "Presión de oración",
+    "description": "Presionar firmemente las palmas de las manos juntas frente al pecho",
+    "benefits": "Fortalece pecho y brazos de forma isométrica.",
+    "limitations": "Ejercicio isométrico de bajo impacto.",
+    "best_timing": "En cualquier momento, incluso en la oficina.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Presionar firmemente y mantener unos segundos."
+  },
+  "lying-prone-w-to-y": {
+    "name": "W a Y tumbado boca abajo",
+    "description": "Tumbado boca abajo, mover los brazos de forma W a Y",
+    "benefits": "Fortalece la parte superior de la espalda y los hombros.",
+    "limitations": "Puede ser incómodo para el cuello.",
+    "best_timing": "En entrenamientos de espalda o corrección postural.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "Mantener el cuello neutral."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Rotación palma arriba palma abajo",
+    "description": "Girar los antebrazos de palma arriba a palma abajo",
+    "benefits": "Mejora la movilidad y flexibilidad del antebrazo.",
+    "limitations": "Ejercicio de movilidad ligero.",
+    "best_timing": "Como calentamiento o estiramiento.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "Moverse suave y lentamente."
+  },
+  "air-twisting-crunch": {
+    "name": "Crunch con giro en el aire",
+    "description": "Sentado, rotar el torso mientras se elevan las rodillas",
+    "benefits": "Trabaja los oblicuos y los abdominales.",
+    "limitations": "No tirar del cuello.",
+    "best_timing": "En entrenamientos de core.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Enfocarse en la rotación del torso."
+  },
+  "standing-swimmer": {
+    "name": "Nadador de pie",
+    "description": "De pie, mover los brazos en movimiento de natación alternado",
+    "benefits": "Fortalece la espalda y los hombros. Mejora la postura.",
+    "limitations": "Asegurarse de tener espacio alrededor.",
+    "best_timing": "Como calentamiento o ejercicio ligero.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Mantener el movimiento fluido y controlado."
+  },
+  "3-4-sit-ups": {
+    "name": "Abdominales 3/4",
+    "description": "Crunch con movimiento parcial (3/4 del movimiento completo)",
+    "benefits": "Reduce la presión en la espalda mientras activa los abdominales.",
+    "limitations": "Más fácil que el abdominal completo.",
+    "best_timing": "En entrenamientos de core.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "No subir completamente, detenerse en 3/4."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Elevación de piernas alternada tumbado",
+    "description": "Tumbado, elevar una pierna a la vez",
+    "benefits": "Fortalece los abdominales inferiores.",
+    "limitations": "Mantener la espalda baja en el suelo.",
+    "best_timing": "En entrenamientos de core.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "Moverse lentamente y mantener el control."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Elevación de piernas asistida con lanzamiento lateral",
+    "description": "Elevar las piernas y dejar que el compañero las lance lateralmente",
+    "benefits": "Fortalece el core y los oblicuos.",
+    "limitations": "Requiere un compañero de entrenamiento.",
+    "best_timing": "En entrenamientos avanzados de core.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "El compañero ayuda con lanzamiento controlado."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Estiramiento torácico arrodillado",
+    "description": "Arrodillado, colocar los codos en una silla, bajar el pecho",
+    "benefits": "Mejora la movilidad de la columna torácica y estira los hombros.",
+    "limitations": "Ser cuidadoso, no forzar.",
+    "best_timing": "Como calentamiento o estiramiento.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Respirar profundamente y estirar suavemente."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Zancada reversa con patada",
+    "description": "Dar un paso atrás en zancada, luego dar una patada con la pierna trasera hacia adelante",
+    "benefits": "Combina fuerza de piernas, equilibrio y potencia explosiva. Mejora coordinación y agilidad.",
+    "limitations": "Dominar primero las zancadas normales. Ser cuidadoso con la rodilla de apoyo.",
+    "best_timing": "En circuitos funcionales o como finalizador de piernas.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "Exhalar vigorosamente al patear. Comenzar lentamente y aumentar la velocidad."
   }
 }

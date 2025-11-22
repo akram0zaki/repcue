@@ -12,7 +12,9 @@ import type { CatalogMembership } from '../../types';
 
 /**
  * All catalog memberships from all catalogs
- * Total: 94 memberships (for 87 unique exercises)
+ * Total: 141 memberships (for 134 unique exercises)
+ * - Original catalogs: 94 memberships
+ * - CSV import (Nov 2025): 47 memberships
  */
 export const ALL_CATALOG_MEMBERSHIPS: CatalogMembership[] = [
   ...GENERAL_FITNESS_MEMBERSHIPS,

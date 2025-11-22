@@ -388,5 +388,437 @@
     "limitations": "Vermoeidheids­management; verlaag intensiteit bij vormverlies.",
     "best_timing": "Afsluitende capstone aan het einde van de les.",
     "notes": "Wissel partners om ritme en formaat te variëren."
+  },
+  "lying-back-extension": {
+    "name": "Liggende rugextensie",
+    "description": "Lig op je buik en til je borst en armen van de grond",
+    "benefits": "Versterkt onderrug en ruggengraatspieren. Verbetert houding en rekt buik en borst.",
+    "limitations": "Vermijd bij acute rugblessure. Ga niet te hoog omhoog.",
+    "best_timing": "Na opwarming of aan het einde van de training.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "Houd nek neutraal en vermijd naar boven kijken."
+  },
+  "front-plank-toe-tap": {
+    "name": "Front plank met teen-tik",
+    "description": "Vanuit plankpositie, tik afwisselend tenen met gekruiste hand",
+    "benefits": "Versterkt romp en schouders, verbetert balans en coördinatie.",
+    "limitations": "Houd heupen stabiel. Vermijd bij polspijn.",
+    "best_timing": "In romptrainingen of HIIT-circuits.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "Beweeg langzaam en behoud stevige plankpositie."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Krab-draai met teenaanraking",
+    "description": "Vanuit krab-positie (omgekeerde zit), til heupen en raak tegenovergesteld been aan",
+    "benefits": "Werkt romp, bilspieren en schouders. Verbetert mobiliteit en coördinatie.",
+    "limitations": "Wees voorzichtig met polsen en schouders.",
+    "best_timing": "In kracht- of mobiliteitscircuits.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "Til heupen hoog en knijp bilspieren samen."
+  },
+  "standing-side-crunch": {
+    "name": "Staande zij-crunch",
+    "description": "Sta rechtop en breng knie zijwaarts naar elleboog",
+    "benefits": "Benadrukt schuine buikspieren en verbetert balans.",
+    "limitations": "Behoud balans. Vermijd snelle bewegingen.",
+    "best_timing": "In romptrainingen of als opwarming.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Knijp schuine buikspieren samen bovenaan."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Zijwaartse squat-stap",
+    "description": "Stap zijwaarts en buig knie in squat, keer dan terug",
+    "benefits": "Versterkt benen en bilspieren. Verbetert zijwaartse mobiliteit.",
+    "limitations": "Houd knieën achter tenen.",
+    "best_timing": "In beentrainingen of HIIT-circuits.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Duw door hielen en houd borst omhoog."
+  },
+  "hip-roll-plank": {
+    "name": "Heup-rol plank",
+    "description": "Vanuit plankpositie, draai heupen van links naar rechts",
+    "benefits": "Versterkt romp en schuine buikspieren. Verbetert rompstabiliteit.",
+    "limitations": "Houd schouders stabiel.",
+    "best_timing": "In gevorderde romptrainingen.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "Beweeg langzaam en behoud controle."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Puls-squat",
+    "description": "Houd onderste squat-positie vast en puls op en neer",
+    "benefits": "Bouwt spierverzet op in benen en bilspieren.",
+    "limitations": "Kan vermoeiend zijn. Begin met minder pulsen.",
+    "best_timing": "Als burnout-finisher voor beentraining.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "Houd pulsen klein en gecontroleerd."
+  },
+  "shoulder-rolls": {
+    "name": "Schouderrollen",
+    "description": "Rol schouders voorwaarts en achterwaarts in cirkelvormige beweging",
+    "benefits": "Verlicht schouderspanning en nekstijfheid. Verbetert mobiliteit.",
+    "limitations": "Beweeg zacht, geen snelle rukken.",
+    "best_timing": "Als opwarming of werkpauzes.",
+    "suggested_combinations": ["cat-cow", "downward-dog"],
+    "notes": "Adem diep bij elke cirkel."
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Zittende cardio armpompen",
+    "description": "Zit en pomp armen snel omhoog en omlaag",
+    "benefits": "Verhoogt hartslag zonder beenbelasting.",
+    "limitations": "Geschikt voor beperkte mobiliteit.",
+    "best_timing": "Voor kantoor of tijdens reizen.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Uitstekend voor senioren en post-operatieve gevallen."
+  },
+  "heel-to-toe-walk": {
+    "name": "Hiel-naar-teen lopen",
+    "description": "Loop in rechte lijn van hiel naar teen",
+    "benefits": "Verbetert coördinatie en balans.",
+    "limitations": "Vermijd bij duizeligheid.",
+    "best_timing": "In ochtendwandelingen.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Helpt valpreventie bij ouderen."
+  },
+  "side-plank-rotation": {
+    "name": "Zij-plank rotatie",
+    "description": "Vanuit zij-plank, draai romp en reik arm onder lichaam door",
+    "benefits": "Versterkt schuine buikspieren en schouders. Verbetert rompmobiliteit.",
+    "limitations": "Houd heupen stabiel.",
+    "best_timing": "Na beheersing van gewone zij-plank.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Beweeg langzaam met volledige controle."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Knielende achterwaartse heupcirkels",
+    "description": "Vanuit knielende positie, cirkel heupen in ronde bewegingen",
+    "benefits": "Verbetert heupmobiliteit en verlicht spanning.",
+    "limitations": "Begin met kleine cirkels.",
+    "best_timing": "Als opwarming of stretch.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Houd beweging vloeiend en gecontroleerd."
+  },
+  "lying-floor-abduction": {
+    "name": "Liggende been-abductie",
+    "description": "Lig op je zij en til bovenste been omhoog",
+    "benefits": "Versterkt buitenste heupen en bilspieren.",
+    "limitations": "Behoud lichaamslijn.",
+    "best_timing": "In been- of biltrainingen.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "Geen zwaaibeweging, gecontroleerde beweging."
+  },
+  "balance-board": {
+    "name": "Balanceerplank",
+    "description": "Sta op balanceerplank en behoud stabiliteit",
+    "benefits": "Verbetert balans en enkelstabiliteit.",
+    "limitations": "Begin bij steun voor veiligheid.",
+    "best_timing": "Als aparte balanstraining.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Begin met korte tijden en bouw geleidelijk op."
+  },
+  "hip-swirls": {
+    "name": "Heup-draaiingen",
+    "description": "Sta en cirkel heupen in grote ronde bewegingen",
+    "benefits": "Verbetert heupmobiliteit en bereidt voor op training.",
+    "limitations": "Draai niet te snel.",
+    "best_timing": "Als dynamische opwarming.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "Houd beweging soepel en gecontroleerd."
+  },
+  "push-up-jack": {
+    "name": "Opdruk met spreiding",
+    "description": "Doe een opdruk terwijl je benen tegelijk spreidt",
+    "benefits": "Combineert bovenlichaamkracht met cardio.",
+    "limitations": "Uitdagend voor beginners.",
+    "best_timing": "In HIIT of krachtcircuits.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Behoud stevige plankhouding."
+  },
+  "hip-crunch": {
+    "name": "Heup-crunch",
+    "description": "Vanuit zij-plank, breng knie naar borst",
+    "benefits": "Werkt schuine buikspieren en romp.",
+    "limitations": "Vereist goede rompkracht.",
+    "best_timing": "In gevorderde romptrainingen.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "Behoud balans en controle."
+  },
+  "shin-box": {
+    "name": "Scheenbeen-doos",
+    "description": "Zit met knieën gebogen op 90 graden en wissel tussen zijden",
+    "benefits": "Verbetert heupmobiliteit en balans.",
+    "limitations": "Kan uitdagend zijn voor knieën.",
+    "best_timing": "Als stretch of mobiliteit.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "Beweeg langzaam en behoud houding."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Staande zij-crunch elleboog naar knie",
+    "description": "Sta, breng knie zijwaarts en raak met tegenovergestelde elleboog aan",
+    "benefits": "Benadrukt schuine buikspieren en verbetert balans.",
+    "limitations": "Vermijd snelle bewegingen.",
+    "best_timing": "In romptrainingen.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "Knijp schuine buikspieren samen bovenaan."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Zittende cirkel been-crunch",
+    "description": "Zit, til benen en cirkel ze in ronde bewegingen",
+    "benefits": "Versterkt romp en schuine buikspieren.",
+    "limitations": "Uitdagend voor beginners.",
+    "best_timing": "In gevorderde romptrainingen.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "Houd beweging langzaam en gecontroleerd."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Zittende lotus horizontale heup",
+    "description": "Zit met gekruiste benen en buig voorwaarts",
+    "benefits": "Rekt heupen en binnenste dijen.",
+    "limitations": "Vereist goede heupflexibiliteit.",
+    "best_timing": "Als stretch na training.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "Forceer niet, rek zacht."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Liggende abductie beenheffing",
+    "description": "Lig op je zij en til bovenste been omhoog",
+    "benefits": "Versterkt buitenste heupen.",
+    "limitations": "Houd lichaam recht.",
+    "best_timing": "In biltrainingen.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "Gecontroleerde beweging, geen zwaai."
+  },
+  "side-bridge-bent-leg": {
+    "name": "Zij-brug met gebogen been",
+    "description": "Zij-plank met onderste been gebogen voor steun",
+    "benefits": "Gemodificeerde zij-plank. Versterkt romp.",
+    "limitations": "Gemakkelijker dan volledige zij-plank.",
+    "best_timing": "Voor beginners of opwarming.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Houd heupen omhoog en lichaam uitgelijnd."
+  },
+  "leg-pull-side": {
+    "name": "Been-trek zijkant",
+    "description": "Vanuit zij-plank, til bovenste been",
+    "benefits": "Versterkt romp, heupen en schouders.",
+    "limitations": "Gevorderde oefening.",
+    "best_timing": "Na beheersing van zij-plank.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "Behoud stabiliteit en controle."
+  },
+  "power-clean-thruster": {
+    "name": "Power clean thruster",
+    "description": "Samengestelde beweging: clean van grond naar schouders dan overhead press",
+    "benefits": "Kracht en explosieve kracht voor volledige lichaam.",
+    "limitations": "Complexe techniek, vereist training.",
+    "best_timing": "In gevorderde krachttrainingen.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "Leer juiste techniek voor zware gewichten."
+  },
+  "snatch-high": {
+    "name": "Hoge snatch",
+    "description": "Snelle lift van grond naar overhead in één beweging",
+    "benefits": "Ontwikkelt explosieve kracht en volledige coördinatie.",
+    "limitations": "Zeer gevorderde techniek.",
+    "best_timing": "Alleen voor getrainde atleten.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "Vereist uitstekende mobiliteit en techniek."
+  },
+  "press-under": {
+    "name": "Press-under",
+    "description": "Daal onder de bar terwijl je deze omhoog drukt",
+    "benefits": "Verbetert overgangssnelheid en bovenlichaamkracht.",
+    "limitations": "Gevorderde olympische lift techniek.",
+    "best_timing": "Als accessoire voor olympisch liften.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "Vereist gespecialiseerde training."
+  },
+  "lever-stepper": {
+    "name": "Lever stepper machine",
+    "description": "Gebruik stepper machine voor cardio met stapbeweging",
+    "benefits": "Lage impact cardio, versterkt benen.",
+    "limitations": "Vereist stepper machine.",
+    "best_timing": "Als apart cardio-sessie.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Begin langzaam en verhoog intensiteit geleidelijk."
+  },
+  "seated-neck-tap": {
+    "name": "Zittende nek-tik",
+    "description": "Zit en tik zacht op zijkanten van nek",
+    "benefits": "Verlicht spanning en verbetert circulatie.",
+    "limitations": "Wees zeer voorzichtig.",
+    "best_timing": "Als stretch of ontspanning.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Geen harde druk op nek."
+  },
+  "elbow-flexion": {
+    "name": "Elleboog-flexie",
+    "description": "Buig elleboog om hand naar schouder te brengen",
+    "benefits": "Versterkt biceps en onderarm.",
+    "limitations": "Kan lichte gewichten gebruiken.",
+    "best_timing": "In armtrainingen.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Houd elleboog stabiel tegen lichaam."
+  },
+  "side-kick-burpee": {
+    "name": "Zij-schop burpee",
+    "description": "Doe een burpee en voeg zij-schop toe bovenaan",
+    "benefits": "Combineert kracht, cardio en vechtkunst.",
+    "limitations": "Gevorderde, hoge intensiteit oefening.",
+    "best_timing": "In gevorderde HIIT-trainingen.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "Behoud balans tijdens schoppen."
+  },
+  "butterfly-pull-up": {
+    "name": "Vlinder pull-up",
+    "description": "Pull-up met zwaaiende cirkelvormige beweging",
+    "benefits": "Bouwt rug- en armkracht met dynamische beweging.",
+    "limitations": "Gevorderde CrossFit techniek.",
+    "best_timing": "Voor getrainde atleten.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Vereist goede bovenlichaamkracht."
+  },
+  "front-scoops": {
+    "name": "Voorwaartse schep-bewegingen",
+    "description": "Cirkelvormige armbeweging van onder naar boven",
+    "benefits": "Warmt schouders op en verbetert gewrichtsmobiliteit.",
+    "limitations": "Beweeg zacht.",
+    "best_timing": "Als schouder opwarming.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Houd beweging soepel."
+  },
+  "shoulder-flexion": {
+    "name": "Schouder-flexie",
+    "description": "Til armen voorwaarts naar schouderhoogte",
+    "benefits": "Versterkt voorste schouder.",
+    "limitations": "Kan lichte gewichten gebruiken.",
+    "best_timing": "In schoudertrainingen.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "Houd elleboog licht gebogen."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Schouder transversale flexie",
+    "description": "Beweeg arm horizontaal over het lichaam",
+    "benefits": "Benadrukt borst en voorste schouder spieren.",
+    "limitations": "Vermijd snelle bewegingen.",
+    "best_timing": "In bovenlichaamtrainingen.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Behoud controle door beweging."
+  },
+  "forearm-supination": {
+    "name": "Onderarm supinatie",
+    "description": "Draai onderarm van binnen naar buiten",
+    "benefits": "Versterkt onderarmspieren en verbetert grip.",
+    "limitations": "Kan lichte gewichten gebruiken.",
+    "best_timing": "In onderarmtrainingen.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "Beweeg langzaam en gecontroleerd."
+  },
+  "brachialis-pull-up": {
+    "name": "Brachialis pull-up",
+    "description": "Pull-up met neutrale grip (handpalmen naar elkaar)",
+    "benefits": "Benadrukt brachialis en biceps spieren.",
+    "limitations": "Vereist bovenlichaamkracht.",
+    "best_timing": "In rug- en armtrainingen.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Houd beweging langzaam en gecontroleerd."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Brachialis nauwe pull-up",
+    "description": "Pull-up met nauwe, neutrale grip",
+    "benefits": "Verhoogt focus op brachialis.",
+    "limitations": "Moeilijker dan gewone pull-up.",
+    "best_timing": "In gevorderde armtrainingen.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "Nauwe grip kan uitdagend zijn."
+  },
+  "prayer-push": {
+    "name": "Gebed-druk",
+    "description": "Druk handpalmen stevig tegen elkaar voor borst",
+    "benefits": "Versterkt borst en armen isometrisch.",
+    "limitations": "Lage impact isometrische oefening.",
+    "best_timing": "Op elk moment, zelfs op kantoor.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Druk stevig en houd enkele seconden."
+  },
+  "lying-prone-w-to-y": {
+    "name": "Liggend W naar Y beweging",
+    "description": "Lig op buik en beweeg armen van W naar Y vorm",
+    "benefits": "Versterkt bovenrug en schouders.",
+    "limitations": "Kan ongemakkelijk zijn voor nek.",
+    "best_timing": "In rugtrainingen of houdingscorrectie.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "Houd nek neutraal."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Handpalm-op handpalm-neer rotatie",
+    "description": "Draai onderarmen van handpalm omhoog naar handpalm omlaag",
+    "benefits": "Verbetert onderarm mobiliteit en flexibiliteit.",
+    "limitations": "Lichte mobiliteitsoefening.",
+    "best_timing": "Als opwarming of stretch.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "Beweeg zacht en langzaam."
+  },
+  "air-twisting-crunch": {
+    "name": "Lucht draaiende crunch",
+    "description": "Zit en draai romp terwijl je knieën optilt",
+    "benefits": "Benadrukt schuine buikspieren en buikspieren.",
+    "limitations": "Trek niet aan nek.",
+    "best_timing": "In romptrainingen.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Focus op romprotatie."
+  },
+  "standing-swimmer": {
+    "name": "Staande zwemmer",
+    "description": "Sta en beweeg armen in afwisselende zwembeweging",
+    "benefits": "Versterkt rug en schouders. Verbetert houding.",
+    "limitations": "Zorg voor ruimte om je heen.",
+    "best_timing": "Als opwarming of lichte oefening.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Houd beweging soepel en gecontroleerd."
+  },
+  "3-4-sit-ups": {
+    "name": "3/4 sit-ups",
+    "description": "Crunch met gedeeltelijke beweging (3/4 van volledige beweging)",
+    "benefits": "Vermindert rugdruk terwijl buikspieren worden geactiveerd.",
+    "limitations": "Gemakkelijker dan volledige sit-up.",
+    "best_timing": "In romptrainingen.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Kom niet helemaal omhoog, stop bij 3/4."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Afwisselende liggende been-heffing",
+    "description": "Lig en til één been per keer",
+    "benefits": "Versterkt onderste buikspieren.",
+    "limitations": "Houd onderrug op de grond.",
+    "best_timing": "In romptrainingen.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "Beweeg langzaam en behoud controle."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Ondersteunde been-heffing met zijwaartse neergooi",
+    "description": "Til benen en laat partner ze zijwaarts weggooien",
+    "benefits": "Versterkt romp en schuine buikspieren.",
+    "limitations": "Vereist trainingspartner.",
+    "best_timing": "In gevorderde romptrainingen.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "Partner helpt met gecontroleerde gooi."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Knielende thoracale wervelkolom stretch",
+    "description": "Kniel en plaats ellebogen op stoel, zak borst naar beneden",
+    "benefits": "Verbetert thoracale wervelkolom mobiliteit en rekt schouders.",
+    "limitations": "Wees voorzichtig, forceer niet.",
+    "best_timing": "Als opwarming of stretch.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Adem diep en rek zacht."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Achterwaartse lunge met been-schop",
+    "description": "Stap achterwaarts in lunge, schop dan achterste been voorwaarts",
+    "benefits": "Combineert beenkracht, balans en explosieve kracht. Verbetert coördinatie en wendbaarheid.",
+    "limitations": "Beheers eerst gewone lunges. Wees voorzichtig met ondersteunende knie.",
+    "best_timing": "In functionele circuits of als been burnout-finisher.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "Adem scherp uit bij schoppen. Begin langzaam en bouw snelheid op."
   }
 }

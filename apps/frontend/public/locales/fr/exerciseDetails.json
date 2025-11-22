@@ -259,5 +259,437 @@
     "suggested_combinations": ["downward-dog", "child-pose"],
     "notes": "Se tenir debout avec les pieds à la largeur des hanches. Se pencher lentement vers l'avant depuis les hanches, en gardant le dos droit initialement. Laisser les bras pendre naturellement ou placer les mains sur les tibias, chevilles ou sol selon la flexibilité. Respirer profondément et ne pas forcer l'étirement. Plier légèrement les genoux si nécessaire pour le confort.",
     "exercise_references": ["Yoga Journal – Standing Forward Fold; https://www.yogajournal.com/poses/standing-forward-bend/", "Healthline – Forward Fold Benefits; https://www.healthline.com/health/fitness/standing-forward-fold"]
+  },
+  "lying-back-extension": {
+    "name": "Extension dorsale allongée",
+    "description": "Allongé sur le ventre, soulever la poitrine et les bras du sol",
+    "benefits": "Renforce les muscles du bas du dos et de la colonne vertébrale. Améliore la posture et étire l'abdomen et la poitrine.",
+    "limitations": "Éviter en cas de blessure aiguë du dos. Ne pas lever trop haut.",
+    "best_timing": "Après l'échauffement ou en fin d'entraînement.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "Garder le cou neutre et éviter de regarder vers le haut."
+  },
+  "front-plank-toe-tap": {
+    "name": "Planche avant avec tape d'orteils",
+    "description": "Depuis la position de planche, toucher alternativement les orteils avec la main croisée",
+    "benefits": "Renforce le tronc et les épaules, améliore l'équilibre et la coordination.",
+    "limitations": "Garder les hanches stables. Éviter en cas de douleur au poignet.",
+    "best_timing": "Dans les entraînements du tronc ou circuits HIIT.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "Bouger lentement et maintenir une position de planche solide."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Crabe avec torsion et touché d'orteils",
+    "description": "Depuis la position du crabe (assis inversé), lever les hanches et toucher la jambe opposée",
+    "benefits": "Travaille le tronc, les fessiers et les épaules. Améliore la mobilité et la coordination.",
+    "limitations": "Être prudent avec les poignets et les épaules.",
+    "best_timing": "Dans les circuits de force ou de mobilité.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "Lever les hanches haut et serrer les fessiers."
+  },
+  "standing-side-crunch": {
+    "name": "Crunch latéral debout",
+    "description": "Debout, ramener le genou latéralement vers le coude",
+    "benefits": "Cible les obliques et améliore l'équilibre.",
+    "limitations": "Maintenir l'équilibre. Éviter les mouvements brusques.",
+    "best_timing": "Dans les entraînements du tronc ou comme échauffement.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Contracter les obliques en haut du mouvement."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Squat latéral avec pas",
+    "description": "Faire un pas latéral et fléchir le genou en squat, puis revenir",
+    "benefits": "Renforce les jambes et les fessiers. Améliore la mobilité latérale.",
+    "limitations": "Garder les genoux derrière les orteils.",
+    "best_timing": "Dans les entraînements des jambes ou circuits HIIT.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Pousser à travers les talons et garder la poitrine haute."
+  },
+  "hip-roll-plank": {
+    "name": "Planche avec roulement de hanches",
+    "description": "Depuis la position de planche, faire rouler les hanches de gauche à droite",
+    "benefits": "Renforce le tronc et les obliques. Améliore la stabilité du tronc.",
+    "limitations": "Garder les épaules stables.",
+    "best_timing": "Dans les entraînements avancés du tronc.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "Bouger lentement et maintenir le contrôle."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Squat avec pulsations",
+    "description": "Maintenir la position basse du squat et pulser de haut en bas",
+    "benefits": "Développe l'endurance musculaire des jambes et des fessiers.",
+    "limitations": "Peut être fatigant. Commencer avec moins de pulsations.",
+    "best_timing": "Comme finisher pour l'entraînement des jambes.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "Garder les pulsations petites et contrôlées."
+  },
+  "shoulder-rolls": {
+    "name": "Roulements d'épaules",
+    "description": "Rouler les épaules vers l'avant et l'arrière en mouvement circulaire",
+    "benefits": "Soulage les tensions des épaules et la raideur du cou. Améliore la mobilité.",
+    "limitations": "Bouger doucement, pas de mouvements brusques.",
+    "best_timing": "Comme échauffement ou pendant les pauses de travail.",
+    "suggested_combinations": ["cat-cow", "downward-dog"],
+    "notes": "Respirer profondément à chaque cercle."
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Pompes de bras cardio assis",
+    "description": "Assis, pomper les bras rapidement de haut en bas",
+    "benefits": "Augmente la fréquence cardiaque sans solliciter les jambes.",
+    "limitations": "Adapté pour mobilité limitée.",
+    "best_timing": "Pour le bureau ou pendant les voyages.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Excellent pour les seniors et cas post-opératoires."
+  },
+  "heel-to-toe-walk": {
+    "name": "Marche talon-pointe",
+    "description": "Marcher en ligne droite du talon à la pointe",
+    "benefits": "Améliore la coordination et l'équilibre.",
+    "limitations": "Éviter en cas de vertiges.",
+    "best_timing": "Lors des promenades matinales.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Aide à la prévention des chutes chez les seniors."
+  },
+  "side-plank-rotation": {
+    "name": "Planche latérale avec rotation",
+    "description": "Depuis la planche latérale, faire pivoter le tronc et passer le bras sous le corps",
+    "benefits": "Renforce les obliques et les épaules. Améliore la mobilité du tronc.",
+    "limitations": "Garder les hanches stables.",
+    "best_timing": "Après avoir maîtrisé la planche latérale normale.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Bouger lentement avec un contrôle total."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Cercles de hanches arrière à genoux",
+    "description": "Depuis la position à genoux, faire des cercles avec les hanches",
+    "benefits": "Améliore la mobilité des hanches et soulage les tensions.",
+    "limitations": "Commencer par de petits cercles.",
+    "best_timing": "Comme échauffement ou étirement.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Garder le mouvement fluide et contrôlé."
+  },
+  "lying-floor-abduction": {
+    "name": "Abduction de jambe allongée",
+    "description": "Allongé sur le côté, lever la jambe supérieure",
+    "benefits": "Renforce les hanches externes et les fessiers.",
+    "limitations": "Maintenir l'alignement du corps.",
+    "best_timing": "Dans les entraînements des jambes ou fessiers.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "Pas de balancement, mouvement contrôlé."
+  },
+  "balance-board": {
+    "name": "Planche d'équilibre",
+    "description": "Se tenir sur une planche d'équilibre et maintenir la stabilité",
+    "benefits": "Améliore l'équilibre et la stabilité de la cheville.",
+    "limitations": "Commencer près d'un support pour la sécurité.",
+    "best_timing": "Comme entraînement d'équilibre séparé.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Commencer avec de courts temps et augmenter progressivement."
+  },
+  "hip-swirls": {
+    "name": "Cercles de hanches",
+    "description": "Debout, faire des cercles avec les hanches en grands mouvements circulaires",
+    "benefits": "Améliore la mobilité des hanches et prépare à l'entraînement.",
+    "limitations": "Ne pas tourner trop vite.",
+    "best_timing": "Comme échauffement dynamique.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "Garder le mouvement fluide et contrôlé."
+  },
+  "push-up-jack": {
+    "name": "Pompe avec écart de jambes",
+    "description": "Faire une pompe en écartant simultanément les jambes",
+    "benefits": "Combine la force du haut du corps avec le cardio.",
+    "limitations": "Difficile pour les débutants.",
+    "best_timing": "Dans les entraînements HIIT ou circuits de force.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Maintenir une position de planche solide."
+  },
+  "hip-crunch": {
+    "name": "Crunch de hanches",
+    "description": "Depuis la planche latérale, ramener le genou vers la poitrine",
+    "benefits": "Travaille les obliques et le tronc.",
+    "limitations": "Nécessite une bonne force du tronc.",
+    "best_timing": "Dans les entraînements avancés du tronc.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "Maintenir l'équilibre et le contrôle."
+  },
+  "shin-box": {
+    "name": "Boîte de tibias",
+    "description": "Assis avec les genoux pliés à 90 degrés, alterner entre les côtés",
+    "benefits": "Améliore la mobilité des hanches et l'équilibre.",
+    "limitations": "Peut être difficile pour les genoux.",
+    "best_timing": "Comme étirement ou mobilité.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "Bouger lentement et maintenir la posture."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Crunch latéral debout coude au genou",
+    "description": "Debout, ramener le genou latéralement et le toucher avec le coude opposé",
+    "benefits": "Cible les obliques et améliore l'équilibre.",
+    "limitations": "Éviter les mouvements brusques.",
+    "best_timing": "Dans les entraînements du tronc.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "Contracter les obliques en haut."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Crunch circulaire des jambes assis",
+    "description": "Assis, lever les jambes et les faire tourner en cercles",
+    "benefits": "Renforce le tronc et les obliques.",
+    "limitations": "Difficile pour les débutants.",
+    "best_timing": "Dans les entraînements avancés du tronc.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "Garder le mouvement lent et contrôlé."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Lotus assis hanches horizontales",
+    "description": "Assis jambes croisées, se pencher vers l'avant",
+    "benefits": "Étire les hanches et l'intérieur des cuisses.",
+    "limitations": "Nécessite une bonne flexibilité des hanches.",
+    "best_timing": "Comme étirement après l'entraînement.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "Ne pas forcer, étirer doucement."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Levé de jambe en abduction allongé",
+    "description": "Allongé sur le côté, lever la jambe supérieure",
+    "benefits": "Renforce les hanches externes.",
+    "limitations": "Garder le corps droit.",
+    "best_timing": "Dans les entraînements des fessiers.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "Mouvement contrôlé, pas de balancement."
+  },
+  "side-bridge-bent-leg": {
+    "name": "Pont latéral jambe pliée",
+    "description": "Planche latérale avec jambe inférieure pliée pour support",
+    "benefits": "Planche latérale modifiée. Renforce le tronc.",
+    "limitations": "Plus facile que la planche latérale complète.",
+    "best_timing": "Pour débutants ou échauffement.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Garder les hanches hautes et le corps aligné."
+  },
+  "leg-pull-side": {
+    "name": "Traction latérale de jambe",
+    "description": "Depuis la planche latérale, lever la jambe supérieure",
+    "benefits": "Renforce le tronc, les hanches et les épaules.",
+    "limitations": "Exercice avancé.",
+    "best_timing": "Après avoir maîtrisé la planche latérale.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "Maintenir stabilité et contrôle."
+  },
+  "power-clean-thruster": {
+    "name": "Épaulé-jeté puissance",
+    "description": "Mouvement composé : épaulé du sol aux épaules puis développé au-dessus de la tête",
+    "benefits": "Force et puissance explosive pour tout le corps.",
+    "limitations": "Technique complexe, nécessite formation.",
+    "best_timing": "Dans les entraînements de force avancés.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "Apprendre la technique correcte avant les charges lourdes."
+  },
+  "snatch-high": {
+    "name": "Arraché haut",
+    "description": "Levage rapide du sol au-dessus de la tête en un mouvement",
+    "benefits": "Développe la puissance explosive et la coordination totale.",
+    "limitations": "Technique très avancée.",
+    "best_timing": "Pour athlètes entraînés seulement.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "Nécessite excellente mobilité et technique."
+  },
+  "press-under": {
+    "name": "Presse sous la barre",
+    "description": "Descendre sous la barre en la poussant vers le haut",
+    "benefits": "Améliore vitesse de transition et force du haut du corps.",
+    "limitations": "Technique avancée d'haltérophilie olympique.",
+    "best_timing": "Comme exercice accessoire pour l'haltérophilie olympique.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "Nécessite formation spécialisée."
+  },
+  "lever-stepper": {
+    "name": "Machine stepper à levier",
+    "description": "Utiliser machine stepper pour cardio avec mouvement de marche",
+    "benefits": "Cardio faible impact, renforce les jambes.",
+    "limitations": "Nécessite machine stepper.",
+    "best_timing": "Comme session cardio séparée.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Commencer lentement et augmenter l'intensité progressivement."
+  },
+  "seated-neck-tap": {
+    "name": "Tapotement du cou assis",
+    "description": "Assis, tapoter doucement les côtés du cou",
+    "benefits": "Soulage les tensions et améliore la circulation.",
+    "limitations": "Être très prudent.",
+    "best_timing": "Comme étirement ou relaxation.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Pas de pression forte sur le cou."
+  },
+  "elbow-flexion": {
+    "name": "Flexion du coude",
+    "description": "Fléchir le coude pour rapprocher la main de l'épaule",
+    "benefits": "Renforce le biceps et l'avant-bras.",
+    "limitations": "Peut utiliser des poids légers.",
+    "best_timing": "Dans les entraînements des bras.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Garder le coude stable contre le corps."
+  },
+  "side-kick-burpee": {
+    "name": "Burpee avec coup de pied latéral",
+    "description": "Faire un burpee et ajouter un coup de pied latéral en haut",
+    "benefits": "Combine force, cardio et arts martiaux.",
+    "limitations": "Exercice avancé haute intensité.",
+    "best_timing": "Dans les entraînements HIIT avancés.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "Maintenir l'équilibre pendant le coup de pied."
+  },
+  "butterfly-pull-up": {
+    "name": "Traction papillon",
+    "description": "Traction avec mouvement circulaire oscillant",
+    "benefits": "Développe force du dos et des bras avec mouvement dynamique.",
+    "limitations": "Technique CrossFit avancée.",
+    "best_timing": "Pour athlètes entraînés.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Nécessite bonne force du haut du corps."
+  },
+  "front-scoops": {
+    "name": "Mouvements de pelle avant",
+    "description": "Mouvement circulaire des bras du bas vers le haut",
+    "benefits": "Échauffe les épaules et améliore la mobilité articulaire.",
+    "limitations": "Bouger doucement.",
+    "best_timing": "Comme échauffement des épaules.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Garder le mouvement fluide."
+  },
+  "shoulder-flexion": {
+    "name": "Flexion de l'épaule",
+    "description": "Lever les bras vers l'avant à hauteur d'épaule",
+    "benefits": "Renforce l'avant de l'épaule.",
+    "limitations": "Peut utiliser des poids légers.",
+    "best_timing": "Dans les entraînements des épaules.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "Garder le coude légèrement fléchi."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Flexion transverse de l'épaule",
+    "description": "Bouger le bras horizontalement à travers le corps",
+    "benefits": "Cible les muscles de la poitrine et de l'avant de l'épaule.",
+    "limitations": "Éviter les mouvements brusques.",
+    "best_timing": "Dans les entraînements du haut du corps.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Maintenir le contrôle pendant le mouvement."
+  },
+  "forearm-supination": {
+    "name": "Supination de l'avant-bras",
+    "description": "Tourner l'avant-bras de l'intérieur vers l'extérieur",
+    "benefits": "Renforce les muscles de l'avant-bras et améliore la prise.",
+    "limitations": "Peut utiliser des poids légers.",
+    "best_timing": "Dans les entraînements de l'avant-bras.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "Bouger lentement et avec contrôle."
+  },
+  "brachialis-pull-up": {
+    "name": "Traction brachialis",
+    "description": "Traction avec prise neutre (paumes face à face)",
+    "benefits": "Cible les muscles brachialis et biceps.",
+    "limitations": "Nécessite force du haut du corps.",
+    "best_timing": "Dans les entraînements du dos et des bras.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Garder le mouvement lent et contrôlé."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Traction brachialis étroite",
+    "description": "Traction avec prise étroite et neutre",
+    "benefits": "Augmente le focus sur le brachialis.",
+    "limitations": "Plus difficile que la traction normale.",
+    "best_timing": "Dans les entraînements avancés des bras.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "La prise étroite peut être difficile."
+  },
+  "prayer-push": {
+    "name": "Presse de prière",
+    "description": "Presser fermement les paumes des mains ensemble devant la poitrine",
+    "benefits": "Renforce poitrine et bras de manière isométrique.",
+    "limitations": "Exercice isométrique faible impact.",
+    "best_timing": "À tout moment, même au bureau.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Presser fermement et maintenir quelques secondes."
+  },
+  "lying-prone-w-to-y": {
+    "name": "W vers Y allongé sur le ventre",
+    "description": "Allongé sur le ventre, bouger les bras de forme W à Y",
+    "benefits": "Renforce le haut du dos et les épaules.",
+    "limitations": "Peut être inconfortable pour le cou.",
+    "best_timing": "Dans les entraînements du dos ou correction posturale.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "Garder le cou neutre."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Rotation paume vers le haut paume vers le bas",
+    "description": "Tourner les avant-bras de paume vers le haut à paume vers le bas",
+    "benefits": "Améliore la mobilité et flexibilité de l'avant-bras.",
+    "limitations": "Exercice de mobilité léger.",
+    "best_timing": "Comme échauffement ou étirement.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "Bouger doucement et lentement."
+  },
+  "air-twisting-crunch": {
+    "name": "Crunch avec torsion dans l'air",
+    "description": "Assis, faire pivoter le tronc tout en levant les genoux",
+    "benefits": "Cible les obliques et les abdominaux.",
+    "limitations": "Ne pas tirer sur le cou.",
+    "best_timing": "Dans les entraînements du tronc.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Se concentrer sur la rotation du tronc."
+  },
+  "standing-swimmer": {
+    "name": "Nageur debout",
+    "description": "Debout, bouger les bras en mouvement de nage alterné",
+    "benefits": "Renforce le dos et les épaules. Améliore la posture.",
+    "limitations": "S'assurer d'avoir de l'espace autour.",
+    "best_timing": "Comme échauffement ou exercice léger.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Garder le mouvement fluide et contrôlé."
+  },
+  "3-4-sit-ups": {
+    "name": "Redressements 3/4",
+    "description": "Crunch avec mouvement partiel (3/4 du mouvement complet)",
+    "benefits": "Réduit la pression sur le dos tout en activant les abdominaux.",
+    "limitations": "Plus facile que le redressement complet.",
+    "best_timing": "Dans les entraînements du tronc.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Ne pas monter complètement, s'arrêter aux 3/4."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Levé de jambes alterné allongé",
+    "description": "Allongé, lever une jambe à la fois",
+    "benefits": "Renforce les abdominaux inférieurs.",
+    "limitations": "Garder le bas du dos au sol.",
+    "best_timing": "Dans les entraînements du tronc.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "Bouger lentement et maintenir le contrôle."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Levé de jambes assisté avec projection latérale",
+    "description": "Lever les jambes et laisser le partenaire les projeter latéralement",
+    "benefits": "Renforce le tronc et les obliques.",
+    "limitations": "Nécessite un partenaire d'entraînement.",
+    "best_timing": "Dans les entraînements avancés du tronc.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "Le partenaire aide avec projection contrôlée."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Étirement thoracique à genoux",
+    "description": "À genoux, placer les coudes sur une chaise, abaisser la poitrine",
+    "benefits": "Améliore la mobilité de la colonne thoracique et étire les épaules.",
+    "limitations": "Être prudent, ne pas forcer.",
+    "best_timing": "Comme échauffement ou étirement.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Respirer profondément et étirer doucement."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Fente arrière avec coup de pied",
+    "description": "Faire un pas arrière en fente, puis donner un coup de pied avec la jambe arrière vers l'avant",
+    "benefits": "Combine force des jambes, équilibre et puissance explosive. Améliore coordination et agilité.",
+    "limitations": "Maîtriser d'abord les fentes normales. Être prudent avec le genou de support.",
+    "best_timing": "Dans les circuits fonctionnels ou comme finisher pour les jambes.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "Expirer vivement lors du coup de pied. Commencer lentement puis augmenter la vitesse."
   }
 }

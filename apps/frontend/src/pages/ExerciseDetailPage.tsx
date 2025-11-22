@@ -309,7 +309,7 @@ const ExerciseDetailPage: React.FC = () => {
           <div className="absolute top-3 right-3 z-10">
             <button
               type="button"
-              className="btn-ghost btn-sm"
+              className="btn-ghost btn-sm border-2 border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
               onClick={async () => {
                 const next = videoFitMode === 'fit' ? 'fill' : 'fit';
                 setVideoFitMode(next);

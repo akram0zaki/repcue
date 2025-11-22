@@ -4,7 +4,7 @@ import type { CatalogMembership } from '../../types';
  * Women's Health Catalog Memberships
  * 
  * Links exercises to the Women's Health catalog with catalog-specific metadata.
- * Total memberships: 40
+ * Total memberships: 50 (40 original + 10 from CSV import Nov 2025)
  */
 
 /**
@@ -390,6 +390,97 @@ export const WOMEN_HEALTH_MEMBERSHIPS: CatalogMembership[] = [
     catalog_id: 'women-health',
     catalog_tags: ['category:core'],
     display_order: 40,
+    featured: false
+  }),
+
+  // CSV Import - November 2025
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'lying-back-extension',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:core'],
+    display_order: 41,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'front-plank-toe-tap',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:core'],
+    display_order: 42,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'crab-twist-toe-touch',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:core'],
+    display_order: 43,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'standing-side-crunch',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:core'],
+    display_order: 44,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'bodyweight-side-squat-step',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:strength'],
+    display_order: 45,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'hip-roll-plank',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:core'],
+    display_order: 46,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'bodyweight-pulse-squat',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:strength'],
+    display_order: 47,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'shoulder-rolls',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:flexibility'],
+    display_order: 48,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'seated-cardio-arm-pumps',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:cardio'],
+    display_order: 49,
+    featured: false
+  }),
+
+  createMembership({
+    id: crypto.randomUUID(),
+    exercise_id: 'heel-to-toe-walk',
+    catalog_id: 'women-health',
+    catalog_tags: ['equipment:bodyweight', 'category:balance'],
+    display_order: 50,
     featured: false
   })
 ];

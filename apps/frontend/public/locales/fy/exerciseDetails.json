@@ -261,5 +261,437 @@
     "suggested_combinations": ["downward-dog", "child-pose"],
     "notes": "Untspan jo nekke folslein en lit jo holle swier hingje as jo bûge binne. Ferspried it gewicht nei de ballen fan jo fuotten (net allinich de hakken) om in bettere hamstringstretch te krijen. Jo kinne tsjinoerstelde ellebogen fêsthâlde en sêft fan side nei side swaaie om ekstra spanning los te litten. Adem stadich en djip; mei elke útademing sjoch dan oft jo jo romp wat tichter by jo dijen sakje litte kinne. Om oerein te kommen, span jo kearn oan en rôlje stadich op, ien wervel tagelyk, om dizigens te foarkommen.",
     "exercise_references": ["Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/", "YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx"]
+  },
+  "lying-back-extension": {
+    "name": "Rêchstriking Lizgjend",
+    "description": "Lizgjend op buik, boarst en earms fan grûn heffe",
+    "benefits": "Fersterket ûnderrêch en rêchbonkespieren. Ferbetteret hâlding en stretcht buik en boarst.",
+    "limitations": "Mije by akute rêchblessuere. Net te heech heffe.",
+    "best_timing": "Nei opwaarming of oan ein fan workout.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "Hâld nekke neutraal en foarkom nei boppe sjen."
+  },
+  "front-plank-toe-tap": {
+    "name": "Frontplank mei Tean Tap",
+    "description": "Fanút plankposysje, wikseljend tean reitsje mei krúswize hân",
+    "benefits": "Fersterket kearn en skouders, ferbetteret lykwicht en koördinaasje.",
+    "limitations": "Hâld heupen stabyl. Mije by polspine.",
+    "best_timing": "Yn kearnworkouts of HIIT sirkels.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "Bewege stadich en behâld fêste plankposysje."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Crab Twist mei Tean Touch",
+    "description": "Fanút crab-posysje (ôfkears sitten), heupen heffe en tsjinoerstelde skonk reitsje",
+    "benefits": "Wurket kearn, bilspieren en skouders. Ferbetteret mobiliteit en koördinaasje.",
+    "limitations": "Wês foarsichtich mei polsen en skouders.",
+    "best_timing": "Yn krêft- of mobiliteitsirkels.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "Heffe heupen heech en span bilspieren oan."
+  },
+  "standing-side-crunch": {
+    "name": "Steande Side Crunch",
+    "description": "Steande, knibbel lateraal nei elleboog bringe",
+    "benefits": "Rjochtet obliques en ferbetteret lykwicht.",
+    "limitations": "Behâld lykwicht. Mije lûde bewegingen.",
+    "best_timing": "Yn kearnworkouts of as opwaarming.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Span obliques oan boppe-oan beweging."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Sidestap Squat",
+    "description": "Laterale stap meitsje en knibbel bûge yn squat, dan werom",
+    "benefits": "Fersterket skonken en bilspieren. Ferbetteret laterale mobiliteit.",
+    "limitations": "Hâld knibbels efter teannen.",
+    "best_timing": "Yn skonkworkouts of HIIT sirkels.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Druk troch hakken en hâld boarst omheech."
+  },
+  "hip-roll-plank": {
+    "name": "Plank mei Heup Rôlje",
+    "description": "Fanút plankposysje, heupen fan lofts nei rjochts rôlje",
+    "benefits": "Fersterket kearn en obliques. Ferbetteret kearnstabiliteit.",
+    "limitations": "Hâld skouders stabyl.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "Bewege stadich en behâld kontrôle."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Pulse Squat",
+    "description": "Lege squatposysje hâlde en omheech en omleech pulse",
+    "benefits": "Bouwt spierúthâldingsfermogen yn skonken en bilspieren op.",
+    "limitations": "Kin fermoeijend wêze. Begjin mei minder pulses.",
+    "best_timing": "As finisher foar skonkworkout.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "Hâld pulses lyts en kontrolearre."
+  },
+  "shoulder-rolls": {
+    "name": "Skouder Rôljes",
+    "description": "Skouders nei foaren en efter rôlje yn sirkulêre beweging",
+    "benefits": "Ferhelpt skoulderspanning en nekstyfens. Ferbetteret mobiliteit.",
+    "limitations": "Bewege sêft, gjin lûde bewegingen.",
+    "best_timing": "As opwaarming of tidens wurkpauzes.",
+    "suggested_combinations": ["cat-cow", "downward-dog"],
+    "notes": "Adem djip by elke sirkel."
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Sittende Cardio Earm Pumps",
+    "description": "Sittend, earms fluch omheech en omleech pompe",
+    "benefits": "Ferheget hertslag sûnder skonken te bestreekjen.",
+    "limitations": "Oanpast foar beheinde mobiliteit.",
+    "best_timing": "Foar kantoar of tidens reizgjen.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Geweldich foar senioaren en postoperatyf."
+  },
+  "heel-to-toe-walk": {
+    "name": "Hak-nei-Tean Kuierje",
+    "description": "Yn rjochte line kuierje fan hak nei tean",
+    "benefits": "Ferbetteret koördinaasje en lykwicht.",
+    "limitations": "Mije by dizzyness.",
+    "best_timing": "By moarns kuierjen.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Helpt foarkomme fan fallen by senioaren."
+  },
+  "side-plank-rotation": {
+    "name": "Side Plank mei Rotaasje",
+    "description": "Fanút side plank, romp draaie en earm ûnder lichem troch bringe",
+    "benefits": "Fersterket obliques en skouders. Ferbetteret kearnmobiliteit.",
+    "limitations": "Hâld heupen stabyl.",
+    "best_timing": "Nei meistering fan reguliere side plank.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Bewege stadich mei folsleine kontrôle."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Knielende Efterútgean Heup Sirkels",
+    "description": "Fanút knielposysje, sirkels meitsje mei heupen",
+    "benefits": "Ferbetteret heupmobiliteit en ferhelpt spanning.",
+    "limitations": "Begjin mei lytse sirkels.",
+    "best_timing": "As opwaarming of stretch.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Hâld beweging floeiend en kontrolearre."
+  },
+  "lying-floor-abduction": {
+    "name": "Lizgjende Skonk Abduksje",
+    "description": "Op side lizgjend, boppeste skonk heffe",
+    "benefits": "Fersterket bûtenste heupen en bilspieren.",
+    "limitations": "Behâld lichaamsynstelling.",
+    "best_timing": "Yn skonk- of bilspierworkouts.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "Gjin swaaien, kontrolearre beweging."
+  },
+  "balance-board": {
+    "name": "Lykwichtsbord",
+    "description": "Steane op lykwichtsbord en stabiliteit behâlde",
+    "benefits": "Ferbetteret lykwicht en enkelstabiliteit.",
+    "limitations": "Begjin by stipe foar feiligens.",
+    "best_timing": "As aparte lykwichtstraining.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Begjin mei koarte tiden en ferheegje stadichoan."
+  },
+  "hip-swirls": {
+    "name": "Heup Swirls",
+    "description": "Steande, grutte sirkulêre bewegingen meitsje mei heupen",
+    "benefits": "Ferbetteret heupmobiliteit en beriedt foar training.",
+    "limitations": "Net te fluch draaie.",
+    "best_timing": "As dynamyske opwaarming.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "Hâld beweging floeiend en kontrolearre."
+  },
+  "push-up-jack": {
+    "name": "Push-up Jack",
+    "description": "Push-up dwaan wylst gelyktiidich skonken útjaan",
+    "benefits": "Kombinearret boppelichaamskrêft mei cardio.",
+    "limitations": "Dreech foar begjinners.",
+    "best_timing": "Yn HIIT workouts of krêftsirkels.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Behâld fêste plankposysje."
+  },
+  "hip-crunch": {
+    "name": "Heup Crunch",
+    "description": "Fanút side plank, knibbel nei boarst bringe",
+    "benefits": "Wurket obliques en kearn.",
+    "limitations": "Freget goede kearnkrêft.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "Behâld lykwicht en kontrôle."
+  },
+  "shin-box": {
+    "name": "Shin Box",
+    "description": "Sittend mei knibbels op 90 graden, tusken kanten wikselje",
+    "benefits": "Ferbetteret heupmobiliteit en lykwicht.",
+    "limitations": "Kin dreech wêze foar knibbels.",
+    "best_timing": "As stretch of mobiliteit.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "Bewege stadich en behâld hâlding."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Steande Side Crunch Elleboog-nei-Knibbel",
+    "description": "Steande, knibbel lateraal bringe en reitsje mei tsjinoerstelde elleboog",
+    "benefits": "Rjochtet obliques en ferbetteret lykwicht.",
+    "limitations": "Mije lûde bewegingen.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "Span obliques oan boppe-oan."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Sittende Sirkel Skonk Crunch",
+    "description": "Sittend, skonken heffe en yn sirkels draaie",
+    "benefits": "Fersterket kearn en obliques.",
+    "limitations": "Dreech foar begjinners.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "Hâld beweging stadich en kontrolearre."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Sittende Lotus Heupen Horizontaal",
+    "description": "Sittend mei skonken krúst, nei foaren hingje",
+    "benefits": "Stretcht heupen en binnenkant dijen.",
+    "limitations": "Freget goede heupfleksibiliteit.",
+    "best_timing": "As stretch nei workout.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "Net forsearje, sêft strekke."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Lizgjende Abduksje Skonk Heffe",
+    "description": "Op side lizgjend, boppeste skonk heffe",
+    "benefits": "Fersterket bûtenste heupen.",
+    "limitations": "Hâld lichem rjocht.",
+    "best_timing": "Yn bilspierworkouts.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "Kontrolearre beweging, gjin swaaien."
+  },
+  "side-bridge-bent-leg": {
+    "name": "Side Bridge mei Bûgde Skonk",
+    "description": "Side plank mei ûnderste skonk bûgd foar stipe",
+    "benefits": "Oanpaste side plank. Fersterket kearn.",
+    "limitations": "Makliker as folsleine side plank.",
+    "best_timing": "Foar begjinners of opwaarming.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Hâld heupen heech en lichem rjocht."
+  },
+  "leg-pull-side": {
+    "name": "Skonk Pull Side",
+    "description": "Fanút side plank, boppeste skonk heffe",
+    "benefits": "Fersterket kearn, heupen en skouders.",
+    "limitations": "Avansearre oefening.",
+    "best_timing": "Nei meistering fan side plank.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "Behâld stabiliteit en kontrôle."
+  },
+  "power-clean-thruster": {
+    "name": "Power Clean Thruster",
+    "description": "Gearstalde beweging: clean fan grûn nei skouders, dan push oerheid",
+    "benefits": "Folsleine-lichaams krêft en eksplosjyf fermogen.",
+    "limitations": "Komplekse technyk, freget training.",
+    "best_timing": "Yn avansearre krêftworkouts.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "Leare korrekte technyk foar swiere lasten."
+  },
+  "snatch-high": {
+    "name": "Snatch High",
+    "description": "Rappe lift fan grûn nei oerheid yn ien beweging",
+    "benefits": "Ûntwikkelt eksplosjyf fermogen en folsleine-lichaams koördinaasje.",
+    "limitations": "Hiel avansearre technyk.",
+    "best_timing": "Allinich foar treine atleten.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "Freget poerbêste mobiliteit en technyk."
+  },
+  "press-under": {
+    "name": "Press Under",
+    "description": "Ûnder stang dûke wylst omheech drukke",
+    "benefits": "Ferbetteret oergongsnelheid en boppelichaamskrêft.",
+    "limitations": "Avansearre Olympyske hefttechnyk.",
+    "best_timing": "As aksessuere oefening foar Olympysk hefjen.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "Freget spesjalisearre training."
+  },
+  "lever-stepper": {
+    "name": "Lever Stepper Masine",
+    "description": "Steppermasine brûke foar cardio mei kuier beweging",
+    "benefits": "Leech-ympakt cardio, fersterket skonken.",
+    "limitations": "Freget steppermasine.",
+    "best_timing": "As aparte cardiosesje.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Begjin stadich en ferheegje yntensiteit stadichoan."
+  },
+  "seated-neck-tap": {
+    "name": "Sittende Nekke Tap",
+    "description": "Sittend, sêft kanten fan nekke tikke",
+    "benefits": "Ferhelpt spanning en ferbetteret sirkulaasje.",
+    "limitations": "Wês hiel foarsichtich.",
+    "best_timing": "As stretch of ûntspanning.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Gjin sterke druk op nekke."
+  },
+  "elbow-flexion": {
+    "name": "Elleboog Fleksje",
+    "description": "Elleboog bûge om hân nei skouder te bringen",
+    "benefits": "Fersterket biceps en foarerms.",
+    "limitations": "Kin lichte gewichten brûke.",
+    "best_timing": "Yn earmworkouts.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Hâld elleboog stabyl tsjin lichem."
+  },
+  "side-kick-burpee": {
+    "name": "Burpee mei Side Kick",
+    "description": "Burpee dwaan en side kick tafoegje boppe-oan",
+    "benefits": "Kombinearret krêft, cardio en ferdigenigskeunsten.",
+    "limitations": "Avansearre heech-yntensiteit oefening.",
+    "best_timing": "Yn avansearre HIIT workouts.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "Behâld lykwicht tidens kick."
+  },
+  "butterfly-pull-up": {
+    "name": "Butterfly Pull-up",
+    "description": "Pull-up mei sirkulêr swaaie beweging",
+    "benefits": "Ûntwikkelt rêch- en earmkrêft mei dynamyske beweging.",
+    "limitations": "Avansearre CrossFit technyk.",
+    "best_timing": "Foar treine atleten.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Freget goede boppelichaamskrêft."
+  },
+  "front-scoops": {
+    "name": "Front Scoops",
+    "description": "Sirkulêre earmbewegingen fan ûnder nei boppe",
+    "benefits": "Waarmje skouders op en ferbetteret gewrichtsmobiliteit.",
+    "limitations": "Bewege sêft.",
+    "best_timing": "As skouder opwaarming.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Hâld beweging floeiend."
+  },
+  "shoulder-flexion": {
+    "name": "Skouder Fleksje",
+    "description": "Earms nei foaren heffe op skoulderhichte",
+    "benefits": "Fersterket foarkant fan skouder.",
+    "limitations": "Kin lichte gewichten brûke.",
+    "best_timing": "Yn skouderworkouts.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "Hâld elleboog licht bûgd."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Skouder Transversale Fleksje",
+    "description": "Earm horizontaal oer lichem bewege",
+    "benefits": "Rjochtet boarstspieren en foarkant skouder.",
+    "limitations": "Mije lûde bewegingen.",
+    "best_timing": "Yn boppelichaamworkouts.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Behâld kontrôle tidens beweging."
+  },
+  "forearm-supination": {
+    "name": "Foarerms Supinaasje",
+    "description": "Foarerms draaie fan binnen nei bûten",
+    "benefits": "Fersterket foaeremspieren en ferbetteret grip.",
+    "limitations": "Kin lichte gewichten brûke.",
+    "best_timing": "Yn foarermsworkouts.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "Bewege stadich en mei kontrôle."
+  },
+  "brachialis-pull-up": {
+    "name": "Brachialis Pull-up",
+    "description": "Pull-up mei neutrale grip (palmen tsjinoer inoar)",
+    "benefits": "Rjochtet brachialis en bicepsspieren.",
+    "limitations": "Freget boppelichaamskrêft.",
+    "best_timing": "Yn rêch- en earmworkouts.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Hâld beweging stadich en kontrolearre."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Brachialis Narrow Pull-up",
+    "description": "Pull-up mei nauwe en neutrale grip",
+    "benefits": "Ferheget fokus op brachialis.",
+    "limitations": "Dreger as normale pull-up.",
+    "best_timing": "Yn avansearre earmworkouts.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "Nauwe grip kin útdaagjend wêze."
+  },
+  "prayer-push": {
+    "name": "Prayer Push",
+    "description": "Palmens fan hannen stevich gear drukke foar boarst",
+    "benefits": "Fersterket boarst en earms isometrysk.",
+    "limitations": "Leech-ympakt isometryske oefening.",
+    "best_timing": "Op elk momint, sels op kantoar.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Druk stevich en hâld pear sekonden."
+  },
+  "lying-prone-w-to-y": {
+    "name": "Lizgjende W nei Y",
+    "description": "Lizgjend op buik, earms bewege fan W nei Y foarm",
+    "benefits": "Fersterket boppeste rêch en skouders.",
+    "limitations": "Kin ûngemaklik wêze foar nekke.",
+    "best_timing": "Yn rêchworkouts of hâldingskorrekje.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "Hâld nekke neutraal."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Palm Omheech Palm Omleech Rotaasje",
+    "description": "Foarerms draaie fan palm omheech nei palm omleech",
+    "benefits": "Ferbetteret foarerms mobiliteit en fleksibiliteit.",
+    "limitations": "Lichte mobiliteitsefening.",
+    "best_timing": "As opwaarming of stretch.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "Bewege sêft en stadich."
+  },
+  "air-twisting-crunch": {
+    "name": "Air Twisting Crunch",
+    "description": "Sittend, romp draaie wylst knibbels heffe",
+    "benefits": "Rjochtet obliques en abdominalen.",
+    "limitations": "Net oan nekke lûke.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Fokus op romprotaasje."
+  },
+  "standing-swimmer": {
+    "name": "Steande Swimmer",
+    "description": "Steande, earms yn wikselende swimbeweging bewege",
+    "benefits": "Fersterket rêch en skouders. Ferbetteret hâlding.",
+    "limitations": "Soargje foar romte om hinne.",
+    "best_timing": "As opwaarming of lichte oefening.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Hâld beweging floeiend en kontrolearre."
+  },
+  "3-4-sit-ups": {
+    "name": "3/4 Sit-ups",
+    "description": "Crunch mei parsjele beweging (3/4 fan folsleine beweging)",
+    "benefits": "Ferleget druk op rêch wylst buikspieren aktivearje.",
+    "limitations": "Makliker as folsleine sit-up.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Net folslein omheech, stopje by 3/4."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Wikselende Lizgjende Skonk Heffe",
+    "description": "Lizgjend, ien skonk tagelyk heffe",
+    "benefits": "Fersterket ûnderste buikspieren.",
+    "limitations": "Hâld ûnderrêch op grûn.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "Bewege stadich en behâld kontrôle."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Assistearre Skonk Heffe mei Laterale Smite",
+    "description": "Skonken heffe en maat lit se lateraal smite",
+    "benefits": "Fersterket kearn en obliques.",
+    "limitations": "Freget trainingsmaat.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "Maat helpt mei kontrolearre smite."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Knielende Thoracale Rêchbonke Stretch",
+    "description": "Knielend, ellebogen op stoel, boarst omleech bringe",
+    "benefits": "Ferbetteret thoracale rêchbonke mobiliteit en stretcht skouders.",
+    "limitations": "Wês foarsichtich, net forsearje.",
+    "best_timing": "As opwaarming of stretch.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Adem djip en strek sêft."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Reverse Lunge mei Skonk Kick",
+    "description": "Efterút stapje yn lunge, dan efterste skonk nei foaren kicke",
+    "benefits": "Kombinearret skonkkrêft, lykwicht en eksplosjyf fermogen. Ferbetteret koördinaasje en behendichheid.",
+    "limitations": "Meister earst normale lunges. Wês foarsichtich mei stipe knibbel.",
+    "best_timing": "Yn funksjonele sirkels of as skonk finisher.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "Adem krêftich út by kick. Begjin stadich en ferheegje snelheid."
   }
 }

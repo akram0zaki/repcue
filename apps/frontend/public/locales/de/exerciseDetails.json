@@ -259,5 +259,437 @@
     "suggested_combinations": ["downward-dog", "cat-cow"],
     "notes": "Stehe aufrecht mit Füßen hüftbreit auseinander. Beuge dich langsam von der Hüfte (nicht vom Rücken) und reiche deine Hände zum Boden. Gehe nur so weit wie angenehm ohne Schmerzen. Atme tief und entspanne dich 15–30 Sekunden in der Position.",
     "exercise_references": ["Yoga Journal – Forward Fold Benefits; https://www.yogajournal.com/poses/standing-forward-bend/", "Healthline – Forward Fold Stretch; https://www.healthline.com/health/fitness-exercise/standing-forward-fold"]
+  },
+  "lying-back-extension": {
+    "name": "Rückenstreckung im Liegen",
+    "description": "Auf dem Bauch liegen und Brust sowie Arme vom Boden heben",
+    "benefits": "Stärkt die unteren Rücken- und Wirbelsäulenmuskeln. Verbessert die Körperhaltung und dehnt Bauch und Brust.",
+    "limitations": "Bei akuter Rückenverletzung vermeiden. Nicht zu hoch heben.",
+    "best_timing": "Nach dem Aufwärmen oder am Ende des Trainings.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "Halte den Nacken neutral und vermeide es, nach oben zu schauen."
+  },
+  "front-plank-toe-tap": {
+    "name": "Front-Plank mit Zehen-Tippen",
+    "description": "Aus der Plank-Position abwechselnd Zehen mit gekreuzter Hand antippen",
+    "benefits": "Stärkt Rumpf und Schultern, verbessert Balance und Koordination.",
+    "limitations": "Halte die Hüften stabil. Bei Handgelenkschmerzen vermeiden.",
+    "best_timing": "In Rumpftrainings oder HIIT-Zirkeln.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "Bewege dich langsam und behalte eine feste Plank-Position bei."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Krabben-Drehung mit Zehen-Berührung",
+    "description": "Aus der Krabben-Position (umgekehrtes Sitzen) Hüften anheben und gegenüberliegendes Bein berühren",
+    "benefits": "Trainiert Rumpf, Gesäß und Schultern. Verbessert Mobilität und Koordination.",
+    "limitations": "Vorsicht bei Handgelenken und Schultern.",
+    "best_timing": "In Kraft- oder Mobilitätszirkeln.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "Hebe die Hüften hoch und spanne das Gesäß an."
+  },
+  "standing-side-crunch": {
+    "name": "Stehender Seiten-Crunch",
+    "description": "Stehe aufrecht und bringe das Knie seitlich zum Ellenbogen",
+    "benefits": "Betont die schrägen Bauchmuskeln und verbessert das Gleichgewicht.",
+    "limitations": "Halte das Gleichgewicht. Vermeide schnelle Bewegungen.",
+    "best_timing": "In Rumpftrainings oder als Aufwärmung.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Spanne die schrägen Bauchmuskeln oben an."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Seitliche Kniebeuge mit Schritt",
+    "description": "Schritt zur Seite und beuge das Knie in eine Kniebeuge, dann zurückkehren",
+    "benefits": "Stärkt Beine und Gesäß. Verbessert seitliche Mobilität.",
+    "limitations": "Halte die Knie hinter den Zehen.",
+    "best_timing": "In Beintrainings oder HIIT-Zirkeln.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Drücke durch die Fersen und halte die Brust hoch."
+  },
+  "hip-roll-plank": {
+    "name": "Hüftrollen-Plank",
+    "description": "Aus der Plank-Position die Hüften von links nach rechts rollen",
+    "benefits": "Stärkt Rumpf und schräge Bauchmuskeln. Verbessert Rumpfstabilität.",
+    "limitations": "Halte die Schultern stabil.",
+    "best_timing": "In fortgeschrittenen Rumpftrainings.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "Bewege dich langsam und behalte die Kontrolle."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Puls-Kniebeuge",
+    "description": "Halte die untere Kniebeuge-Position und pulse auf und ab",
+    "benefits": "Baut muskuläre Ausdauer in Beinen und Gesäß auf.",
+    "limitations": "Kann ermüdend sein. Beginne mit weniger Pulsen.",
+    "best_timing": "Als Burnout-Finisher für Beintraining.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "Halte die Pulse klein und kontrolliert."
+  },
+  "shoulder-rolls": {
+    "name": "Schulterrollen",
+    "description": "Rolle die Schultern vorwärts und rückwärts in kreisförmiger Bewegung",
+    "benefits": "Lindert Schulterverspannungen und Nackensteifheit. Verbessert Mobilität.",
+    "limitations": "Bewege dich sanft, keine ruckartigen Bewegungen.",
+    "best_timing": "Als Aufwärmung oder während Arbeitspausen.",
+    "suggested_combinations": ["cat-cow", "downward-dog"],
+    "notes": "Atme bei jeder Kreisbewegung tief ein."
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Sitzende Cardio-Armpumpen",
+    "description": "Sitze und pumpe die Arme schnell auf und ab",
+    "benefits": "Erhöht die Herzfrequenz ohne Belastung der Beine.",
+    "limitations": "Geeignet für eingeschränkte Mobilität.",
+    "best_timing": "Für Büro oder während Reisen.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Hervorragend für Senioren und postoperative Fälle."
+  },
+  "heel-to-toe-walk": {
+    "name": "Ferse-zu-Zehe-Gehen",
+    "description": "Gehe in gerader Linie von Ferse zu Zehe",
+    "benefits": "Verbessert Koordination und Balance.",
+    "limitations": "Bei Schwindel vermeiden.",
+    "best_timing": "Bei Morgenspaziergängen.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Hilft bei Sturzprävention bei Senioren."
+  },
+  "side-plank-rotation": {
+    "name": "Seitstütz-Rotation",
+    "description": "Aus dem Seitstütz den Rumpf drehen und den Arm unter dem Körper durchreichen",
+    "benefits": "Stärkt schräge Bauchmuskeln und Schultern. Verbessert Rumpfmobilität.",
+    "limitations": "Halte die Hüften stabil.",
+    "best_timing": "Nach Beherrschung des normalen Seitstützes.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Bewege dich langsam mit voller Kontrolle."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Kniende rückwärtige Hüftkreise",
+    "description": "Aus kniender Position die Hüften in kreisförmigen Bewegungen kreisen",
+    "benefits": "Verbessert Hüftmobilität und lindert Verspannungen.",
+    "limitations": "Beginne mit kleinen Kreisen.",
+    "best_timing": "Als Aufwärmung oder Dehnung.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Halte die Bewegung fließend und kontrolliert."
+  },
+  "lying-floor-abduction": {
+    "name": "Liegende Bein-Abduktion",
+    "description": "Auf der Seite liegen und das obere Bein anheben",
+    "benefits": "Stärkt äußere Hüften und Gesäß.",
+    "limitations": "Behalte die Körperausrichtung bei.",
+    "best_timing": "In Bein- oder Gesäßtrainings.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "Keine Schwungbewegung, kontrollierte Bewegung."
+  },
+  "balance-board": {
+    "name": "Balance-Board",
+    "description": "Auf Balance-Board stehen und Stabilität halten",
+    "benefits": "Verbessert Balance und Knöchelstabilität.",
+    "limitations": "Beginne bei Unterstützung zur Sicherheit.",
+    "best_timing": "Als separates Balance-Training.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Beginne mit kurzen Zeiten und baue schrittweise auf."
+  },
+  "hip-swirls": {
+    "name": "Hüftkreisen",
+    "description": "Stehe und kreise die Hüften in großen kreisförmigen Bewegungen",
+    "benefits": "Verbessert Hüftmobilität und bereitet auf Training vor.",
+    "limitations": "Drehe nicht zu schnell.",
+    "best_timing": "Als dynamische Aufwärmung.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "Halte die Bewegung geschmeidig und kontrolliert."
+  },
+  "push-up-jack": {
+    "name": "Liegestütz mit Grätsche",
+    "description": "Führe einen Liegestütz aus, während die Beine gleichzeitig gegrätscht werden",
+    "benefits": "Kombiniert Oberkörperkraft mit Cardio.",
+    "limitations": "Herausfordernd für Anfänger.",
+    "best_timing": "In HIIT- oder Kraftzirkeln.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Behalte eine feste Plank-Haltung bei."
+  },
+  "hip-crunch": {
+    "name": "Hüft-Crunch",
+    "description": "Aus dem Seitstütz das Knie zur Brust bringen",
+    "benefits": "Trainiert schräge Bauchmuskeln und Rumpf.",
+    "limitations": "Erfordert gute Rumpfkraft.",
+    "best_timing": "In fortgeschrittenen Rumpftrainings.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "Behalte Balance und Kontrolle."
+  },
+  "shin-box": {
+    "name": "Schienbein-Box",
+    "description": "Sitze mit gebeugten Knien im 90-Grad-Winkel und wechsle zwischen den Seiten",
+    "benefits": "Verbessert Hüftmobilität und Balance.",
+    "limitations": "Kann für Knie herausfordernd sein.",
+    "best_timing": "Als Dehnung oder Mobilität.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "Bewege dich langsam und behalte die Haltung bei."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Stehender Seiten-Crunch Ellenbogen zum Knie",
+    "description": "Stehe, bringe das Knie seitlich und berühre es mit dem gegenüberliegenden Ellenbogen",
+    "benefits": "Betont schräge Bauchmuskeln und verbessert Balance.",
+    "limitations": "Vermeide schnelle Bewegungen.",
+    "best_timing": "In Rumpftrainings.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "Spanne die schrägen Bauchmuskeln oben an."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Sitzender Kreis-Bein-Crunch",
+    "description": "Sitze, hebe die Beine und kreise sie in runden Bewegungen",
+    "benefits": "Stärkt Rumpf und schräge Bauchmuskeln.",
+    "limitations": "Herausfordernd für Anfänger.",
+    "best_timing": "In fortgeschrittenen Rumpftrainings.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "Halte die Bewegung langsam und kontrolliert."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Sitzender Lotus horizontale Hüfte",
+    "description": "Sitze mit gekreuzten Beinen und beuge dich nach vorne",
+    "benefits": "Dehnt Hüften und innere Oberschenkel.",
+    "limitations": "Erfordert gute Hüftflexibilität.",
+    "best_timing": "Als Dehnung nach dem Training.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "Nicht erzwingen, sanft dehnen."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Liegende Abduktion Beinheben",
+    "description": "Auf der Seite liegen und das obere Bein anheben",
+    "benefits": "Stärkt äußere Hüften.",
+    "limitations": "Halte den Körper gerade.",
+    "best_timing": "In Gesäßtrainings.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "Kontrollierte Bewegung, kein Schwung."
+  },
+  "side-bridge-bent-leg": {
+    "name": "Seitenbrücke mit gebeugtem Bein",
+    "description": "Seitstütz mit gebeugtem unteren Bein zur Unterstützung",
+    "benefits": "Modifizierter Seitstütz. Stärkt Rumpf.",
+    "limitations": "Einfacher als vollständiger Seitstütz.",
+    "best_timing": "Für Anfänger oder Aufwärmung.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Halte die Hüften hoch und den Körper ausgerichtet."
+  },
+  "leg-pull-side": {
+    "name": "Beinzug Seite",
+    "description": "Aus dem Seitstütz das obere Bein anheben",
+    "benefits": "Stärkt Rumpf, Hüften und Schultern.",
+    "limitations": "Fortgeschrittene Übung.",
+    "best_timing": "Nach Beherrschung des Seitstützes.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "Behalte Stabilität und Kontrolle."
+  },
+  "power-clean-thruster": {
+    "name": "Power Clean Thruster",
+    "description": "Zusammengesetzte Bewegung: Clean vom Boden zu den Schultern, dann Overhead-Press",
+    "benefits": "Kraft und explosive Kraft für den ganzen Körper.",
+    "limitations": "Komplexe Technik, erfordert Training.",
+    "best_timing": "In fortgeschrittenen Krafttrainings.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "Lerne die richtige Technik vor schweren Gewichten."
+  },
+  "snatch-high": {
+    "name": "Hoher Snatch",
+    "description": "Schneller Lift vom Boden nach oben in einer Bewegung",
+    "benefits": "Entwickelt explosive Kraft und vollständige Koordination.",
+    "limitations": "Sehr fortgeschrittene Technik.",
+    "best_timing": "Nur für trainierte Athleten.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "Erfordert ausgezeichnete Mobilität und Technik."
+  },
+  "press-under": {
+    "name": "Press-Under",
+    "description": "Unter die Stange abtauchen, während sie nach oben gedrückt wird",
+    "benefits": "Verbessert Übergangsgeschwindigkeit und Oberkörperkraft.",
+    "limitations": "Fortgeschrittene olympische Lift-Technik.",
+    "best_timing": "Als Zusatzübung für olympisches Heben.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "Erfordert spezialisiertes Training."
+  },
+  "lever-stepper": {
+    "name": "Hebel-Stepper-Maschine",
+    "description": "Verwende Stepper-Maschine für Cardio mit Schrittbewegung",
+    "benefits": "Low-Impact-Cardio, stärkt Beine.",
+    "limitations": "Erfordert Stepper-Maschine.",
+    "best_timing": "Als separate Cardio-Einheit.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Beginne langsam und erhöhe die Intensität schrittweise."
+  },
+  "seated-neck-tap": {
+    "name": "Sitzender Nacken-Klopfer",
+    "description": "Sitze und klopfe sanft auf die Seiten des Nackens",
+    "benefits": "Lindert Verspannungen und verbessert die Durchblutung.",
+    "limitations": "Sei sehr vorsichtig.",
+    "best_timing": "Als Dehnung oder Entspannung.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Kein harter Druck auf den Nacken."
+  },
+  "elbow-flexion": {
+    "name": "Ellenbogen-Beugung",
+    "description": "Beuge den Ellenbogen, um die Hand zur Schulter zu bringen",
+    "benefits": "Stärkt Bizeps und Unterarm.",
+    "limitations": "Kann leichte Gewichte verwenden.",
+    "best_timing": "In Armtrainings.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Halte den Ellenbogen stabil am Körper."
+  },
+  "side-kick-burpee": {
+    "name": "Seitentritt-Burpee",
+    "description": "Führe einen Burpee aus und füge oben einen Seitentritt hinzu",
+    "benefits": "Kombiniert Kraft, Cardio und Kampfkunst.",
+    "limitations": "Fortgeschrittene, hochintensive Übung.",
+    "best_timing": "In fortgeschrittenen HIIT-Trainings.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "Behalte das Gleichgewicht beim Treten."
+  },
+  "butterfly-pull-up": {
+    "name": "Schmetterlings-Klimmzug",
+    "description": "Klimmzug mit schwingender kreisförmiger Bewegung",
+    "benefits": "Baut Rücken- und Armkraft mit dynamischer Bewegung auf.",
+    "limitations": "Fortgeschrittene CrossFit-Technik.",
+    "best_timing": "Für trainierte Athleten.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Erfordert gute Oberkörperkraft."
+  },
+  "front-scoops": {
+    "name": "Vordere Schaufelbewegungen",
+    "description": "Kreisförmige Armbewegung von unten nach oben",
+    "benefits": "Wärmt Schultern auf und verbessert Gelenkmobilität.",
+    "limitations": "Bewege dich sanft.",
+    "best_timing": "Als Schulteraufwärmung.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Halte die Bewegung geschmeidig."
+  },
+  "shoulder-flexion": {
+    "name": "Schulterbeugung",
+    "description": "Hebe die Arme nach vorne auf Schulterhöhe",
+    "benefits": "Stärkt vordere Schulter.",
+    "limitations": "Kann leichte Gewichte verwenden.",
+    "best_timing": "In Schultertrainings.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "Halte den Ellenbogen leicht gebeugt."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Schulter transversale Beugung",
+    "description": "Bewege den Arm horizontal über den Körper",
+    "benefits": "Betont Brust- und vordere Schultermuskeln.",
+    "limitations": "Vermeide schnelle Bewegungen.",
+    "best_timing": "In Oberkörpertrainings.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Behalte die Kontrolle während der Bewegung."
+  },
+  "forearm-supination": {
+    "name": "Unterarm-Supination",
+    "description": "Drehe den Unterarm von innen nach außen",
+    "benefits": "Stärkt Unterarmmuskeln und verbessert den Griff.",
+    "limitations": "Kann leichte Gewichte verwenden.",
+    "best_timing": "In Unterarmtrainings.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "Bewege dich langsam und kontrolliert."
+  },
+  "brachialis-pull-up": {
+    "name": "Brachialis-Klimmzug",
+    "description": "Klimmzug mit neutralem Griff (Handflächen zueinander)",
+    "benefits": "Betont Brachialis- und Bizepsmuskeln.",
+    "limitations": "Erfordert Oberkörperkraft.",
+    "best_timing": "In Rücken- und Armtrainings.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Halte die Bewegung langsam und kontrolliert."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Brachialis enger Klimmzug",
+    "description": "Klimmzug mit engem, neutralem Griff",
+    "benefits": "Erhöht den Fokus auf Brachialis.",
+    "limitations": "Schwieriger als normaler Klimmzug.",
+    "best_timing": "In fortgeschrittenen Armtrainings.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "Enger Griff kann herausfordernd sein."
+  },
+  "prayer-push": {
+    "name": "Gebets-Druck",
+    "description": "Drücke die Handflächen vor der Brust fest zusammen",
+    "benefits": "Stärkt Brust und Arme isometrisch.",
+    "limitations": "Low-Impact isometrische Übung.",
+    "best_timing": "Jederzeit, sogar im Büro.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Drücke fest und halte einige Sekunden."
+  },
+  "lying-prone-w-to-y": {
+    "name": "Liegende W-zu-Y-Bewegung",
+    "description": "Liege auf dem Bauch und bewege die Arme von W- zu Y-Form",
+    "benefits": "Stärkt oberen Rücken und Schultern.",
+    "limitations": "Kann unbequem für den Nacken sein.",
+    "best_timing": "In Rückentrainings oder Haltungskorrektur.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "Halte den Nacken neutral."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Handfläche-hoch Handfläche-runter Rotation",
+    "description": "Drehe die Unterarme von Handfläche nach oben zu Handfläche nach unten",
+    "benefits": "Verbessert Unterarmmobilität und Flexibilität.",
+    "limitations": "Leichte Mobilitätsübung.",
+    "best_timing": "Als Aufwärmung oder Dehnung.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "Bewege dich sanft und langsam."
+  },
+  "air-twisting-crunch": {
+    "name": "Luft-Dreh-Crunch",
+    "description": "Sitze und drehe den Rumpf, während die Knie angehoben werden",
+    "benefits": "Betont schräge Bauchmuskeln und Bauchmuskeln.",
+    "limitations": "Ziehe nicht am Nacken.",
+    "best_timing": "In Rumpftrainings.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Konzentriere dich auf Rumpfrotation."
+  },
+  "standing-swimmer": {
+    "name": "Stehender Schwimmer",
+    "description": "Stehe und bewege die Arme in abwechselnder Schwimmbewegung",
+    "benefits": "Stärkt Rücken und Schultern. Verbessert Haltung.",
+    "limitations": "Sorge für Platz um dich herum.",
+    "best_timing": "Als Aufwärmung oder leichte Übung.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Halte die Bewegung geschmeidig und kontrolliert."
+  },
+  "3-4-sit-ups": {
+    "name": "3/4 Sit-ups",
+    "description": "Crunch mit teilweiser Bewegung (3/4 der vollen Bewegung)",
+    "benefits": "Reduziert Rückendruck, während Bauchmuskeln aktiviert werden.",
+    "limitations": "Einfacher als vollständiger Sit-up.",
+    "best_timing": "In Rumpftrainings.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Komme nicht vollständig hoch, stoppe bei 3/4."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Abwechselndes liegendes Beinheben",
+    "description": "Liege und hebe ein Bein pro Durchgang",
+    "benefits": "Stärkt untere Bauchmuskeln.",
+    "limitations": "Halte den unteren Rücken am Boden.",
+    "best_timing": "In Rumpftrainings.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "Bewege dich langsam und behalte die Kontrolle."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Unterstütztes Beinheben mit seitlichem Herabwerfen",
+    "description": "Hebe die Beine und lasse den Partner sie seitlich wegwerfen",
+    "benefits": "Stärkt Rumpf und schräge Bauchmuskeln.",
+    "limitations": "Erfordert Trainingspartner.",
+    "best_timing": "In fortgeschrittenen Rumpftrainings.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "Partner hilft mit kontrolliertem Wurf."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Kniende thorakale Wirbelsäulendehnung",
+    "description": "Knie und platziere Ellenbogen auf Stuhl, senke Brust nach unten",
+    "benefits": "Verbessert thorakale Wirbelsäulenmobilität und dehnt Schultern.",
+    "limitations": "Sei vorsichtig, nicht erzwingen.",
+    "best_timing": "Als Aufwärmung oder Dehnung.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Atme tief und dehne sanft."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Rückwärts-Ausfallschritt mit Beintritt",
+    "description": "Schritt rückwärts in Ausfallschritt, dann trete das hintere Bein nach vorne",
+    "benefits": "Kombiniert Beinkraft, Balance und explosive Kraft. Verbessert Koordination und Beweglichkeit.",
+    "limitations": "Beherrsche zuerst normale Ausfallschritte. Sei vorsichtig mit dem stützenden Knie.",
+    "best_timing": "In funktionellen Zirkeln oder als Bein-Burnout-Finisher.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "Atme scharf beim Treten aus. Beginne langsam und baue Geschwindigkeit auf."
   }
 }
