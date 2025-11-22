@@ -30,6 +30,8 @@
     "pw:ui": "playwright test -c playwright.config.ts --ui",
     "i18n:scan": "node scripts/i18n-scan.mjs",
     "i18n:report": "node scripts/i18n-scan.mjs || exit 0",
+    "i18n:parity": "node scripts/i18n-parity-check.mjs",
+    "i18n:parity:list": "node scripts/i18n-parity-check.mjs --list-all",
     "i18n:exercises-report": "node scripts/i18n-exercises-report.mjs",
     "generate-favicons": "node scripts/generate-favicons.js",
     "generate-favicons:full": "node scripts/generate-favicons.js --full",
