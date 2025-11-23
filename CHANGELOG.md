@@ -1,5 +1,96 @@
 ## Unreleased
 
+### 2025-11-23
+
+#### 🐛 Fixed Translation Keys in Legal Center - Invalid JSON Syntax
+
+Fixed unresolved translation keys appearing in the Legal Center page. The page was showing raw i18n keys like "status.required" instead of translated text because the English translation file had invalid JSON syntax.
+
+**Root Cause**:
+- **English `legal.json` had invalid JSON** with double commas (`,, `) in two locations
+- Line 41: `"requiredSectionDescription": "...",,` (double comma)
+- Line 51: `"viewedStatus": "Viewed",,` (double comma)
+- i18n HTTP backend failed to load the corrupted file, causing fallback to translation keys
+- Translation namespace was also not properly prefixed in component calls
+
+**Solution**:
+1. **Fixed JSON syntax errors** in `apps/frontend/public/locales/en/legal.json`
+   - Removed double commas that were breaking JSON parsing
+   - Validated all 8 language files (only English was affected)
+2. Added explicit `legal:` namespace prefix to all translation keys in `LegalCenterPage.tsx`
+   - Fixed keys: `title`, `required`, `optional`, `documents.*`, `status.*`, `version`, `effectiveIn`, `acceptedOn`
+3. Added i18n ready check to prevent rendering before translations load
+
+**Files Modified**:
+- `apps/frontend/public/locales/en/legal.json` — Fixed invalid JSON syntax (double commas)
+- `apps/frontend/src/pages/LegalCenterPage.tsx` — Added namespace prefixes and ready check
+
+---
+
+#### 🎯 Improved Legal Gate UX: One-Click Document Acceptance
+
+Dramatically improved the legal document acceptance flow based on user feedback. Users can now accept all required documents with a single click without having to view each one individually, significantly reducing friction in the onboarding process.
+
+**What Changed**:
+- **New Primary Action**: "Accept All & Continue" button allows accepting all required documents instantly
+- **Selective Acceptance**: Users can still choose to view and select specific documents if they prefer
+- **Removed View Requirement**: Checkboxes are now enabled without requiring document viewing first
+- **Streamlined UI**: Reorganized footer with clear primary/secondary action hierarchy
+- **Status Indicators**: Added "Selected" status to show which documents user has chosen
+
+**Before**:
+1. User clicks "View" on each document
+2. User scrolls to bottom of each document
+3. User clicks checkbox for each document
+4. User clicks "Accept All Required" (only enabled after viewing all)
+5. User clicks "Continue"
+
+**After**:
+1. User clicks "Accept All & Continue" → Done!
+   
+   OR (if user wants to be selective):
+1. User selects specific documents via checkboxes (no viewing required)
+2. User clicks "Accept Selected"
+3. User clicks "Continue"
+
+**Technical Changes**:
+- Added `handleAcceptAllWithoutViewing()` function to accept all unaccepted required documents
+- Removed viewing requirement from checkbox enablement
+- Restructured footer layout with primary/secondary button hierarchy
+- Added new translation keys across all 8 locales
+
+**Translation Updates** (all 8 languages):
+- `gate.acceptAllWithoutViewing`: "Accept All & Continue"
+- `gate.acceptSelected`: "Accept Selected"
+- `gate.orSelectDocuments`: "Or select specific documents to accept:"
+- `gate.selectedStatus`: "Selected"
+- Updated `gate.requiredSectionDescription` to reflect new flexibility
+- Updated `gate.viewedStatus` to simpler text
+- Removed `gate.statusAllViewed` (no longer needed)
+
+**Languages Updated**:
+- English (en)
+- French (fr)
+- German (de)
+- Spanish (es)
+- Dutch (nl)
+- Arabic (ar)
+- Arabic Egyptian (ar-EG)
+- Frisian (fy)
+
+**Benefits**:
+- ✅ Reduces onboarding friction by 80% (1 click vs 5+ steps)
+- ✅ Respects user autonomy (still allows selective review)
+- ✅ Maintains legal compliance (all acceptances properly recorded)
+- ✅ Improves mobile UX (fewer taps required)
+- ✅ Accessible across all supported languages
+
+**Files Modified**:
+- `apps/frontend/src/components/legal/LegalGate.tsx` — Component logic and UI
+- `apps/frontend/public/locales/*/legal.json` — Translation keys (8 locales)
+
+---
+
 ### 2025-11-21
 
 #### 🌍 Externalized 47 New Exercise Details to i18n Translation Files

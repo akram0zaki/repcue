@@ -203,6 +203,34 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
     }
   };
 
+  const handleAcceptAllWithoutViewing = async () => {
+    try {
+      // Accept ALL required documents that haven't been accepted yet, regardless of viewing status
+      for (const doc of requiredDocs) {
+        if (!acceptedDocs.has(doc.id)) {
+          const localizedDoc = legalDocsService.getDocument(doc.id, i18n.language);
+          if (!localizedDoc || localizedDoc.locales.length === 0) continue;
+          
+          const localeData = localizedDoc.locales[0];
+          legalDocsService.recordAcceptance({
+            docId: doc.id,
+            acceptedVersion: doc.version,
+            contentHash: localeData.contentHash,
+            acceptedAt: new Date().toISOString(),
+            acceptedLocale: localeData.locale
+          });
+          setAcceptedDocs(prev => new Set(prev).add(doc.id));
+        }
+      }
+      // Clear selection after accepting
+      setSelectedDocs(new Set());
+      logger.log('[LegalGate] Accepted all required documents without viewing');
+    } catch (err) {
+      logger.error('[LegalGate] Error accepting all documents without viewing:', err);
+      setError(t('errors.acceptAllFailed'));
+    }
+  };
+
   const handleContinue = () => {
     logger.log('[LegalGate] User continuing after accepting all required documents');
     onContinue();
@@ -210,9 +238,9 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
 
   // Only count documents that require acceptance (not already accepted)
   const documentsNeedingAcceptance = requiredDocs.filter(doc => !acceptedDocs.has(doc.id));
-  const allRequiredViewed = documentsNeedingAcceptance.length === 0 || documentsNeedingAcceptance.every(doc => viewedDocs.has(doc.id));
   const allRequiredSelected = documentsNeedingAcceptance.length === 0 || documentsNeedingAcceptance.every(doc => selectedDocs.has(doc.id));
   const allRequiredAccepted = requiredDocs.every(doc => acceptedDocs.has(doc.id));
+  const hasUnacceptedDocs = documentsNeedingAcceptance.length > 0;
 
   if (!isOpen) return null;
 
@@ -293,16 +321,14 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                             {/* Checkbox */}
                             <button
                               type="button"
-                              onClick={() => !isAccepted && isViewed && handleToggleSelection(doc.id)}
-                              disabled={isAccepted || !isViewed}
+                              onClick={() => !isAccepted && handleToggleSelection(doc.id)}
+                              disabled={isAccepted}
                               className={`w-7 h-7 min-w-[28px] rounded border-2 flex items-center justify-center transition-colors ${
                                 isAccepted
                                   ? 'bg-green-600 border-green-600'
                                   : isSelected
                                   ? 'bg-primary-500 border-primary-500'
-                                  : isViewed
-                                  ? 'border-gray-300 dark:border-gray-600 hover:border-primary-500'
-                                  : 'border-gray-300 dark:border-gray-600 opacity-50 cursor-not-allowed'
+                                  : 'border-gray-300 dark:border-gray-600 hover:border-primary-500'
                               }`}
                               aria-label={isAccepted ? t('gate.accepted') : isSelected ? t('gate.selected') : t('gate.select')}
                             >
@@ -368,6 +394,7 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                       {optionalDocs.map((doc) => {
                         const isViewed = viewedDocs.has(doc.id);
                         const isAccepted = acceptedDocs.has(doc.id);
+                        const isSelected = selectedDocs.has(doc.id);
                         
                         return (
                           <div
@@ -436,6 +463,10 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
                                 <span className="text-green-600 dark:text-green-400 font-medium">
                                   {t('gate.acceptedStatus')}
                                 </span>
+                              ) : isSelected ? (
+                                <span className="text-blue-600 dark:text-blue-400">
+                                  {t('gate.selectedStatus')}
+                                </span>
                               ) : isViewed ? (
                                 <span className="text-amber-600 dark:text-amber-400">
                                   {t('gate.viewedStatus')}
@@ -458,47 +489,70 @@ export const LegalGate: React.FC<LegalGateProps> = ({ onContinue, isOpen }) => {
 
           {/* Footer */}
           <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* Accept All Required button */}
-              <button
-                type="button"
-                onClick={handleAcceptAll}
-                disabled={!allRequiredViewed || !allRequiredSelected || allRequiredAccepted}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  !allRequiredViewed || !allRequiredSelected || allRequiredAccepted
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
-                }`}
-                aria-label={t('gate.acceptAllRequired')}
-              >
-                {t('gate.acceptAllRequired')}
-              </button>
+            <div className="flex flex-col gap-3">
+              {/* Primary action buttons row */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Accept All Without Viewing button - Primary CTA */}
+                <button
+                  type="button"
+                  onClick={handleAcceptAllWithoutViewing}
+                  disabled={!hasUnacceptedDocs}
+                  className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                    !hasUnacceptedDocs
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600'
+                  }`}
+                  aria-label={t('gate.acceptAllWithoutViewing')}
+                >
+                  {t('gate.acceptAllWithoutViewing')}
+                </button>
 
-              {/* Continue button */}
-              <button
-                type="button"
-                onClick={handleContinue}
-                disabled={!allRequiredAccepted}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  !allRequiredAccepted
-                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
-                }`}
-                aria-label={t('gate.continue')}
-              >
-                {t('gate.continue')}
-              </button>
+                {/* Continue button */}
+                <button
+                  type="button"
+                  onClick={handleContinue}
+                  disabled={!allRequiredAccepted}
+                  className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                    !allRequiredAccepted
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                      : 'bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600'
+                  }`}
+                  aria-label={t('gate.continue')}
+                >
+                  {t('gate.continue')}
+                </button>
+              </div>
+
+              {/* Secondary action button row - for selective acceptance */}
+              {!allRequiredAccepted && (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs text-center text-gray-600 dark:text-gray-400">
+                    {t('gate.orSelectDocuments')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAcceptAll}
+                    disabled={!allRequiredSelected}
+                    className={`w-full px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      !allRequiredSelected
+                        ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600'
+                    }`}
+                    aria-label={t('gate.acceptSelected')}
+                  >
+                    {t('gate.acceptSelected')}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Status text */}
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-3">
               {allRequiredAccepted
                 ? t('gate.statusAllAccepted')
-                : allRequiredViewed
-                ? t('gate.statusAllViewed')
                 : t('gate.statusPending', {
-                    accepted: documentsNeedingAcceptance.filter(doc => acceptedDocs.has(doc.id)).length,
-                    total: documentsNeedingAcceptance.length
+                    accepted: requiredDocs.length - documentsNeedingAcceptance.length,
+                    total: requiredDocs.length
                   })}
             </p>
           </div>

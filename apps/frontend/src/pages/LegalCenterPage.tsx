@@ -19,7 +19,7 @@ import logger from '../utils/logger';
  * - Mobile-first responsive design
  */
 const LegalCenterPage: React.FC = () => {
-  const { t, i18n } = useTranslation(['legal', 'common']);
+  const { t, i18n, ready } = useTranslation(['legal', 'common']);
   const navigate = useNavigate();
   const [documents, setDocuments] = useState<LegalDoc[]>([]);
   const [statuses, setStatuses] = useState<Map<string, LegalAcceptanceStatus>>(new Map());
@@ -146,19 +146,20 @@ const LegalCenterPage: React.FC = () => {
 
   const getStatusText = (status: LegalAcceptanceStatus) => {
     if (status.accepted) {
-      return t('status.accepted');
+      return t('legal:status.accepted');
     }
     if (status.requiresAcceptance) {
-      return t('status.required');
+      return t('legal:status.required');
     }
-    return t('status.optional');
+    return t('legal:status.optional');
   };
 
   const getDaysUntilEffective = (effectiveFrom?: string): number | null => {
     return legalDocsService.getDaysUntilEffective(effectiveFrom);
   };
 
-  if (isLoading) {
+  // Wait for both i18n and data to be ready
+  if (!ready || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -221,7 +222,7 @@ const LegalCenterPage: React.FC = () => {
               </button>
             )}
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              {t('title')}
+              {t('legal:title')}
             </h1>
           </div>
         </div>
@@ -232,7 +233,7 @@ const LegalCenterPage: React.FC = () => {
         {/* Required Documents */}
         <section className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {t('required')}
+            {t('legal:required')}
           </h2>
           <div className="space-y-3">
             {documents.filter(doc => doc.required).map(doc => {
@@ -285,14 +286,14 @@ const LegalCenterPage: React.FC = () => {
                     {daysUntilEffective !== null && daysUntilEffective > 0 && (
                       <div className="flex items-center gap-1 text-sm text-orange-600 dark:text-orange-400">
                         <ClockIcon className="w-4 h-4" />
-                        {t('effectiveIn', { days: daysUntilEffective })}
+                        {t('legal:effectiveIn', { days: daysUntilEffective })}
                       </div>
                     )}
 
                     {/* Accepted date (optional, below rows) */}
                     {status?.acceptedAt && (
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {t('acceptedOn', {
+                        {t('legal:acceptedOn', {
                           date: new Date(status.acceptedAt).toLocaleDateString()
                         })}
                       </span>
@@ -308,7 +309,7 @@ const LegalCenterPage: React.FC = () => {
         {documents.some(doc => !doc.required) && (
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {t('optional')}
+              {t('legal:optional')}
             </h2>
             <div className="space-y-3">
               {documents.filter(doc => !doc.required).map(doc => {
@@ -337,23 +338,25 @@ const LegalCenterPage: React.FC = () => {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-baseline gap-2 min-w-0">
                           <h3 className="font-medium text-gray-900 dark:text-white min-w-0 break-words whitespace-normal hyphens-auto">
-                            {t(`documents.${doc.id}`, doc.title)}
+                            {t(`legal:documents.${doc.id}`, doc.title)}
                           </h3>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0">v{doc.version}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0">
+                            {t('legal:version')} {doc.version}
+                          </span>
                         </div>
                       </div>
 
                       {/* Row 3: Optional badge */}
                       <div className="text-sm">
                         <span className="px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                          {t('status.optional')}
+                          {t('legal:status.optional')}
                         </span>
                       </div>
 
                       {/* Row 4: Accepted date if present (acts as meta) */}
                       {status?.acceptedAt && (
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {t('acceptedOn', {
+                          {t('legal:acceptedOn', {
                             date: new Date(status.acceptedAt).toLocaleDateString()
                           })}
                         </span>
@@ -375,7 +378,7 @@ const LegalCenterPage: React.FC = () => {
         return (
           <LegalDocumentModal
             docId={selectedDoc.doc.id}
-            title={t(`documents.${selectedDoc.doc.id}`, selectedDoc.doc.title)}
+            title={t(`legal:documents.${selectedDoc.doc.id}`, selectedDoc.doc.title)}
             markdownPath={selectedDoc.path}
             isRTL={isRTL}
             showAcceptButton={true}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { consentService } from './services/consentService';
+import { consentService, ConsentService } from './services/consentService';
 import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
@@ -2566,6 +2566,14 @@ useEffect(() => {
         // Get current language
         const locale = i18n.language || 'en';
 
+        // Get detailed status for debugging
+        const allStatuses = legalDocsService.getAllAcceptanceStatuses(locale);
+        const consentService = ConsentService.getInstance();
+        const storedAcceptances = consentService.getLegalAcceptances();
+        
+        logger.log('[legal-gate-check] Stored acceptances:', storedAcceptances);
+        logger.log('[legal-gate-check] Current manifest statuses:', allStatuses);
+
         // Check if there are any blocking documents (documents with required acceptance)
         const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
         const hasUnaccepted = legalDocsService.hasUnacceptedRequired(locale);
@@ -2573,7 +2581,8 @@ useEffect(() => {
         logger.log('[legal-gate-check]', {
           hasBlocking,
           hasUnaccepted,
-          locale
+          locale,
+          requiredDocsCount: allStatuses.filter(s => s.requiresAcceptance).length
         });
 
         if (hasBlocking || hasUnaccepted) {
@@ -2586,7 +2595,7 @@ useEffect(() => {
     };
 
     checkLegalDocumentStatus();
-  }, [hasConsent, isLoading, i18n.language, showLegalGate]);
+  }, [hasConsent, isLoading, i18n.language]); // Removed showLegalGate to prevent circular dependency
 
   // Handle consent banner
   const handleConsentGranted = () => {

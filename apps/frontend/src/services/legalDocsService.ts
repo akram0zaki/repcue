@@ -58,8 +58,12 @@ export class LegalDocsService {
     try {
       logger.log('Initializing LegalDocsService...');
       
-      // Load baseline manifest (always available offline)
-      this.baselineManifest = await this.loadBaselineManifest();
+      // In dev mode, always reload to pick up manifest changes
+      // In production, only load if not already loaded
+      if (import.meta.env.DEV || !this.baselineManifest) {
+        // Load baseline manifest (always available offline)
+        this.baselineManifest = await this.loadBaselineManifest();
+      }
       
       if (!this.baselineManifest) {
         logger.error('Failed to load baseline manifest');
