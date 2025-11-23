@@ -36,6 +36,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
+  const [showExportSuccessToast, setShowExportSuccessToast] = useState(false);
+  const [showExportErrorToast, setShowExportErrorToast] = useState(false);
   const { isAuthenticated } = useAuth();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -77,12 +79,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       }
       URL.revokeObjectURL(url);
 
-      // Show success message
-      alert(t('settings.exportSuccess', 'Data exported successfully'));
+      // Show success toast
+      setShowExportSuccessToast(true);
     } catch (error) {
       logger.error('Failed to export data:', error);
-      // Show error message to user
-      alert(t('settings.exportError', 'Failed to export data. Please try again.'));
+      // Show error toast
+      setShowExportErrorToast(true);
     }
   };
 
@@ -1075,6 +1077,24 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         message={t('settings.forceRefreshConfirm')}
         confirmText={t('settings.forceRefreshApp')}
         cancelText={t('common.cancel')}
+      />
+
+      {/* Export Data Success Toast */}
+      <Toast
+        isOpen={showExportSuccessToast}
+        onClose={() => setShowExportSuccessToast(false)}
+        type="info"
+        message={t('settings.exportSuccess')}
+        confirmText={t('common.ok')}
+      />
+
+      {/* Export Data Error Toast */}
+      <Toast
+        isOpen={showExportErrorToast}
+        onClose={() => setShowExportErrorToast(false)}
+        type="danger"
+        message={t('settings.exportError')}
+        confirmText={t('common.ok')}
       />
 
       {/* Delete Account Modal */}

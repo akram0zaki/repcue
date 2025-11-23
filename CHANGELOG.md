@@ -2,6 +2,58 @@
 
 ### 2025-11-23
 
+#### 🎨 Toast Component Theme Integration & Translation Improvements
+
+Updated the Toast notification component to fully respect the active theme and fixed translation issues. Toast notifications now seamlessly adapt to all themes (Winter Chill, Calm, Energetic, Professional, etc.) in both light and dark modes.
+
+**What Changed**:
+- **Theme-Aware Colors**: Toast now uses CSS custom properties from ThemeService instead of hardcoded colors
+- **Dynamic Theme Adaptation**: Buttons, backgrounds, borders, and text colors all inherit from selected theme
+- **Translation Key Fix**: Added missing `"ok": "OK"` translation to all 8 language files
+- **Export Data Improvements**: 
+  - Built-in exercises now excluded from data export (only user-created exercises exported)
+  - JavaScript alerts replaced with styled Toast notifications for export success/error
+  - Activity logs and workout sessions still export fully (can reference built-in exercises)
+
+**Theme Integration Details**:
+- Backdrop: `var(--color-overlay-bg)`
+- Card background: `var(--color-surface-0)`
+- Text colors: `var(--color-text-900)` (title), `var(--color-text-700)` (message)
+- Info buttons: `var(--color-primary)` with hover/focus variants
+- Warning buttons: `var(--color-warning)` with variants
+- Danger buttons: `var(--color-error)` with variants
+- Cancel button: Theme-aware surface and border colors
+- Icon backgrounds: Theme-specific soft backgrounds
+
+**Translation Keys Added**:
+- English: `"ok": "OK"`
+- French: `"ok": "OK"`
+- German: `"ok": "OK"`
+- Spanish: `"ok": "OK"`
+- Dutch: `"ok": "OK"`
+- Arabic: `"ok": "موافق"` (Muwafiq)
+- Arabic Egyptian: `"ok": "تمام"` (Tamam)
+- Frisian: `"ok": "Goed"`
+
+**User Experience**:
+- **Before**: Export toasts showed hardcoded blue buttons regardless of theme; "OK" button showed as raw translation key
+- **After**: Export toasts match Winter Chill's icy blue (or any selected theme); "OK" properly translated in user's language
+
+**Files Modified**:
+- `apps/frontend/src/components/Toast.tsx` — Theme-aware colors, optional onConfirm, optional title
+- `apps/frontend/public/locales/*/common.json` — Added "ok" translation (8 languages)
+- `apps/frontend/src/pages/SettingsPage.tsx` — Toast state management, removed fallback text
+- `apps/frontend/src/services/storageService.ts` — Filter built-in exercises from export
+
+**Technical Implementation**:
+- Made `onConfirm` prop optional to support single-button toasts (info/success messages)
+- Made `title` prop optional for simple notifications
+- Replaced all hardcoded Tailwind color classes with `bg-[color:var(--color-*)]` syntax
+- Used ThemeService CSS custom properties: `--color-primary`, `--color-error`, `--color-warning`, etc.
+- Export filtering uses `isCustom()` utility to identify UUID-based user exercises
+
+---
+
 #### ✨ Consent Banner Internationalization & Automatic Legal Document Acceptance
 
 Enhanced the consent banner with full internationalization support and automatic legal document acceptance to eliminate redundant user flows. Users now see the consent banner in their preferred language and no longer face a separate legal gate after accepting consent.

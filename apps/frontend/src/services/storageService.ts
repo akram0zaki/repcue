@@ -1322,7 +1322,19 @@ export class StorageService {
       
       for (const tableName of tables) {
         try {
-          data[tableName] = await this.db.table(tableName).toArray();
+          let tableData = await this.db.table(tableName).toArray();
+          
+          // Filter out built-in exercises - only export user-created exercises
+          // Built-in exercises are RepCue's intellectual property
+          // Activity logs and workout sessions can reference built-in exercises (keep those)
+          if (tableName === 'exercises') {
+            const { isCustom } = await import('../utils/syncFilters');
+            tableData = tableData.filter((exercise: { id?: string }) => {
+              return exercise.id && isCustom(exercise.id);
+            });
+          }
+          
+          data[tableName] = tableData;
         } catch (error) {
           logger.error(`Error exporting ${tableName}:`, error);
           data[tableName] = [];
