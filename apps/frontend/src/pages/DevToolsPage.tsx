@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { storageService } from '../services/storageService';
 import { syncService } from '../services/syncService';
+import { legalDocsService } from '../services/legalDocsService';
+import { consentService } from '../services/consentService';
 import type { CatalogMembership, GlobalExercise } from '../types';
+import logger from '../utils/logger';
 
 /**
  * Developer tools page for testing and debugging
@@ -21,6 +24,11 @@ export default function DevToolsPage() {
   const [syncStatus, setSyncStatus] = useState(syncService.getSyncStatus());
   const [lastSyncResult, setLastSyncResult] = useState<null | { success: boolean; pushed: number; pulled: number; tables: number; errors: number }>(null);
   const [syncCardMsg, setSyncCardMsg] = useState<string>('');
+  
+  // Legal docs & cache inspector state
+  const [legalStatus, setLegalStatus] = useState<string>('');
+  const [manifestData, setManifestData] = useState<string>('');
+  const [cacheInfo, setCacheInfo] = useState<string>('');
 
   useEffect(() => {
     const unsubscribe = syncService.onSyncStatusChange((st) => {
@@ -327,6 +335,163 @@ export default function DevToolsPage() {
           <p className="mt-4 text-xs opacity-70">Sync operations log detailed metadata to the console via the logger. Use after membership CRUD to validate push/pull behavior (Phase 4.5).</p>
         </div>
         
+        <div className="card p-4 bg-base-200">
+          <h2 className="text-xl font-semibold mb-4">Legal Documents & Cache Inspector</h2>
+          
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={async () => {
+                  setLegalStatus('Loading manifest...');
+                  await legalDocsService.initialize();
+                  const manifest = legalDocsService.getCurrentManifest();
+                  if (manifest) {
+                    setManifestData(JSON.stringify(manifest, null, 2));
+                    setLegalStatus(`✅ Loaded manifest with ${manifest.documents.length} documents (updatedAt: ${manifest.updatedAt})`);
+                    logger.log('[DevTools] Manifest:', manifest);
+                  } else {
+                    setLegalStatus('❌ No manifest loaded');
+                    setManifestData('');
+                  }
+                }}
+                className="btn btn-primary btn-sm"
+              >
+                Load Current Manifest
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setLegalStatus('Fetching manifest directly from server...');
+                  try {
+                    const response = await fetch(`/legal/manifest.json?t=${Date.now()}`, {
+                      cache: 'reload',
+                      headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                      }
+                    });
+                    const data = await response.json();
+                    setManifestData(JSON.stringify(data, null, 2));
+                    setLegalStatus(`✅ Direct fetch: ${data.documents?.length || 0} documents (updatedAt: ${data.updatedAt})`);
+                    logger.log('[DevTools] Direct manifest fetch:', data);
+                  } catch (error) {
+                    setLegalStatus(`❌ Fetch error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-secondary btn-sm"
+              >
+                Fetch Manifest (Direct)
+              </button>
+              
+              <button 
+                onClick={() => {
+                  const acceptances = consentService.getLegalAcceptances();
+                  setManifestData(JSON.stringify(acceptances, null, 2));
+                  setLegalStatus(`✅ Found ${acceptances.length} stored acceptances`);
+                  logger.log('[DevTools] Stored acceptances:', acceptances);
+                }}
+                className="btn btn-accent btn-sm"
+              >
+                Show Stored Acceptances
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setLegalStatus('Inspecting cache storage...');
+                  setCacheInfo('');
+                  try {
+                    const cacheNames = await caches.keys();
+                    let info = `Found ${cacheNames.length} caches:\n`;
+                    
+                    for (const name of cacheNames) {
+                      const cache = await caches.open(name);
+                      const keys = await cache.keys();
+                      info += `\n${name}: ${keys.length} entries\n`;
+                      
+                      // Check for manifest in this cache
+                      const manifestKeys = keys.filter(k => k.url.includes('manifest.json'));
+                      for (const key of manifestKeys) {
+                        const response = await cache.match(key);
+                        if (response) {
+                          const data = await response.json();
+                          info += `  - ${key.url}\n`;
+                          info += `    updatedAt: ${data.updatedAt}\n`;
+                          info += `    versions: ${data.documents?.map((d: {id: string; version: string}) => `${d.id}:${d.version}`).join(', ')}\n`;
+                        }
+                      }
+                    }
+                    
+                    setCacheInfo(info);
+                    setLegalStatus('✅ Cache inspection complete');
+                    logger.log('[DevTools] Cache info:', info);
+                  } catch (error) {
+                    setCacheInfo(`Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                    setLegalStatus('❌ Cache inspection failed');
+                  }
+                }}
+                className="btn btn-info btn-sm"
+              >
+                Inspect Cache Storage
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setLegalStatus('Clearing legal manifest cache...');
+                  try {
+                    const deleted = await caches.delete('legal-manifest-cache');
+                    setLegalStatus(deleted ? '✅ Cache cleared' : '⚠️ Cache not found');
+                    setCacheInfo('');
+                    logger.log('[DevTools] Cache deletion result:', deleted);
+                  } catch (error) {
+                    setLegalStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-warning btn-sm"
+              >
+                Clear Legal Cache
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setLegalStatus('Clearing all caches...');
+                  try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    setLegalStatus(`✅ Cleared ${cacheNames.length} caches`);
+                    setCacheInfo('');
+                    logger.log('[DevTools] Cleared all caches:', cacheNames);
+                  } catch (error) {
+                    setLegalStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-error btn-sm"
+              >
+                Clear All Caches
+              </button>
+            </div>
+            
+            {legalStatus && (
+              <div className="alert alert-info text-sm">
+                <span>{legalStatus}</span>
+              </div>
+            )}
+            
+            {cacheInfo && (
+              <div className="bg-base-300 p-3 rounded">
+                <h3 className="font-semibold mb-2 text-sm">Cache Storage Info:</h3>
+                <pre className="text-xs whitespace-pre-wrap overflow-x-auto">{cacheInfo}</pre>
+              </div>
+            )}
+            
+            {manifestData && (
+              <div className="bg-base-300 p-3 rounded max-h-96 overflow-y-auto">
+                <h3 className="font-semibold mb-2 text-sm">Manifest Data:</h3>
+                <pre className="text-xs whitespace-pre-wrap">{manifestData}</pre>
+              </div>
+            )}
+          </div>
+        </div>
+        
         <div className="card p-4 bg-base-300">
           <h2 className="text-xl font-semibold mb-2">Info</h2>
           <ul className="list-disc list-inside space-y-2 text-sm">
@@ -335,6 +500,7 @@ export default function DevToolsPage() {
             <li>Version 25 adds catalog_memberships table</li>
             <li>"Force Upgrade" will delete all local data and recreate the database</li>
             <li>"Reopen Database" attempts to upgrade without data loss</li>
+            <li>Legal manifest cached by service worker - use cache tools to debug version mismatches</li>
           </ul>
         </div>
       </div>

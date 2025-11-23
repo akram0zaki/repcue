@@ -2,6 +2,48 @@
 
 ### 2025-11-23
 
+#### ✨ Consent Banner Internationalization & Automatic Legal Document Acceptance
+
+Enhanced the consent banner with full internationalization support and automatic legal document acceptance to eliminate redundant user flows. Users now see the consent banner in their preferred language and no longer face a separate legal gate after accepting consent.
+
+**What Changed**:
+- **Consent Banner i18n**: Fully internationalized consent banner with translations in 8 languages (en, fr, de, es, nl, ar, ar-EG, fy)
+- **Browser Language Detection**: Automatically detects and applies browser/system language on first visit
+- **Language Preference Respect**: Remembers user's language choice even when consent is deleted
+- **Automatic Legal Acceptance**: Consent banner now automatically accepts all required legal documents when user clicks "Accept All & Continue" or "Accept Essential"
+- **Eliminated Double-Gate UX**: Users no longer see both consent banner AND legal gate on first visit
+- **Cache Management Tools**: Added comprehensive cache inspection and clearing tools in `/dev-tools` page
+
+**Technical Implementation**:
+- Created `consent.json` translation files for all 8 supported locales
+- Browser language detection with fallback chain: stored preference → browser language → base language → English
+- Automatic legal document acceptance integrated into consent banner flow
+- Aggressive cache-busting for legal manifest to prevent stale version issues
+- Force re-initialization of legalDocsService before legal gate checks to ensure fresh data
+- Enhanced cache headers (`Cache-Control: no-cache`, `Pragma: no-cache`, `cache: reload`)
+- Added dev tools for debugging cache and manifest version issues
+
+**User Experience**:
+- **Before**: Consent banner → click accept → Legal gate appears → select documents → click accept again
+- **After**: Consent banner → click accept → App loads directly (no legal gate)
+
+**Files Modified**:
+- `apps/frontend/public/locales/*/consent.json` — New translation files (8 languages)
+- `apps/frontend/src/components/ConsentBanner.tsx` — i18n integration, automatic legal acceptance, language detection
+- `apps/frontend/src/App.tsx` — Force manifest re-initialization before legal gate check
+- `apps/frontend/src/services/legalDocsService.ts` — Aggressive cache-busting with reload strategy
+- `apps/frontend/src/pages/DevToolsPage.tsx` — Legal documents & cache inspection tools
+
+**Dev Tools Added**:
+- Load/inspect current manifest
+- Fetch manifest directly from server (bypass cache)
+- Show stored legal acceptances
+- Inspect Cache Storage (see cached manifest versions)
+- Clear legal manifest cache
+- Clear all caches
+
+---
+
 #### 🐛 Fixed Translation Keys in Legal Center - Invalid JSON Syntax
 
 Fixed unresolved translation keys appearing in the Legal Center page. The page was showing raw i18n keys like "status.required" instead of translated text because the English translation file had invalid JSON syntax.

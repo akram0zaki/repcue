@@ -1,5 +1,5 @@
-/* eslint-disable no-restricted-syntax -- i18n-exempt: consent copy pending localization; UX validated */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { consentService } from '../services/consentService';
 import { legalDocsService } from '../services/legalDocsService';
 import logger from '../utils/logger';
@@ -11,6 +11,38 @@ interface ConsentBannerProps {
 export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { t, i18n } = useTranslation('consent');
+
+  // Detect and set browser language on mount (only if user has no stored language preference)
+  useEffect(() => {
+    // Check if user already has a language preference stored
+    const storedLanguage = localStorage.getItem('i18nextLng');
+    
+    // If user has a stored preference, respect it (don't override)
+    if (storedLanguage) {
+      return;
+    }
+    
+    // No stored preference - detect browser language
+    const browserLang = navigator.language || navigator.languages?.[0] || 'en';
+    const supportedLanguages = ['en', 'fr', 'de', 'es', 'nl', 'ar', 'ar-EG', 'fy'];
+    
+    // Try exact match first (e.g., 'ar-EG')
+    if (supportedLanguages.includes(browserLang)) {
+      i18n.changeLanguage(browserLang);
+      return;
+    }
+    
+    // Try base language (e.g., 'ar-EG' -> 'ar')
+    const baseLang = browserLang.split('-')[0];
+    if (supportedLanguages.includes(baseLang)) {
+      i18n.changeLanguage(baseLang);
+      return;
+    }
+    
+    // Fallback to English
+    i18n.changeLanguage('en');
+  }, [i18n]);
 
   /**
    * Automatically accept all required legal documents
@@ -18,12 +50,9 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
    */
   const acceptAllLegalDocuments = async (includeOptional: boolean = false): Promise<void> => {
     try {
-      logger.log('[ConsentBanner] acceptAllLegalDocuments called with includeOptional:', includeOptional);
-      
       // Ensure legal docs service is initialized (critical - must complete before accepting)
       let manifest = legalDocsService.getCurrentManifest();
       if (!manifest) {
-        logger.log('[ConsentBanner] No manifest loaded yet, initializing LegalDocsService...');
         const initSuccess = await legalDocsService.initialize();
         if (!initSuccess) {
           logger.error('[ConsentBanner] Failed to initialize LegalDocsService');
@@ -39,29 +68,17 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
 
       // Get current language for localization
       const currentLanguage = document.documentElement.lang || 'en';
-      logger.log('[ConsentBanner] currentLanguage:', currentLanguage);
-      
-      logger.log('[ConsentBanner] Manifest has', manifest.documents.length, 'documents');
 
       // Filter documents to accept (exclude imprint which is display-only)
       const documentsToAccept = includeOptional 
         ? manifest.documents.filter(doc => doc.id !== 'imprint')
         : manifest.documents.filter(doc => doc.required);
 
-      logger.log('[ConsentBanner] Accepting', documentsToAccept.length, 'documents:', documentsToAccept.map(doc => doc.id));
-
       // Accept each document
-      let acceptedCount = 0;
       for (const doc of documentsToAccept) {
         try {
           const localizedDoc = legalDocsService.getDocument(doc.id, currentLanguage);
-          if (!localizedDoc) {
-            logger.warn('[ConsentBanner] Could not get localized document for', doc.id);
-            continue;
-          }
-          
-          if (!localizedDoc.locales || localizedDoc.locales.length === 0) {
-            logger.warn('[ConsentBanner] Document', doc.id, 'has no locales');
+          if (!localizedDoc || !localizedDoc.locales || localizedDoc.locales.length === 0) {
             continue;
           }
 
@@ -74,20 +91,11 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
             acceptedLocale: localeData.locale
           };
           
-          const success = legalDocsService.recordAcceptance(acceptance);
-          if (success) {
-            acceptedCount++;
-            logger.log('[ConsentBanner] ✅ Recorded acceptance for', doc.id, 'v' + doc.version);
-          } else {
-            logger.warn('[ConsentBanner] ❌ Failed to record acceptance for', doc.id);
-          }
+          legalDocsService.recordAcceptance(acceptance);
         } catch (docError) {
           logger.error('[ConsentBanner] Error accepting document', doc.id, ':', docError);
         }
       }
-      
-      logger.log('[ConsentBanner] Accepted', acceptedCount, 'of', documentsToAccept.length, 'documents');
-      logger.log('[ConsentBanner] Final legalAcceptances:', consentService.getLegalAcceptances());
     } catch (error) {
       logger.error('Error during automatic legal document acceptance:', error);
     }
@@ -96,14 +104,15 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
   const handleAcceptAll = async () => {
     setIsProcessing(true);
     try {
-      logger.log('[ConsentBanner] handleAcceptAll clicked');
       // Grant full consent (including analytics)
       consentService.grantConsent(true);
-      logger.log('[ConsentBanner] Consent after grantConsent(true):', consentService.getConsentData());
       
       // Automatically accept all legal documents (required + optional)
       await acceptAllLegalDocuments(true);
-      logger.log('[ConsentBanner] User accepted all: consent granted + all legal documents accepted');
+      
+      // Small delay to ensure React flushes state updates and localStorage is written
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       onConsentGranted();
     } catch (error) {
       logger.error('Error handling accept all:', error);
@@ -116,14 +125,15 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
   const handleAcceptEssential = async () => {
     setIsProcessing(true);
     try {
-      logger.log('[ConsentBanner] handleAcceptEssential clicked');
       // Grant essential consent only (no analytics)
       consentService.grantConsent(false);
-      logger.log('[ConsentBanner] Consent after grantConsent(false):', consentService.getConsentData());
       
       // Automatically accept only mandatory legal documents
       await acceptAllLegalDocuments(false);
-      logger.log('[ConsentBanner] User accepted essential: consent granted + mandatory legal documents accepted');
+      
+      // Small delay to ensure React flushes state updates and localStorage is written
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       onConsentGranted();
     } catch (error) {
       logger.error('Error handling accept essential:', error);
@@ -158,14 +168,13 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
               />
             </svg>
             <h2 id="consent-title" className="text-xl font-bold text-text-900 dark:text-text-50">
-              Your Privacy & Legal Consent
+              {t('title')}
             </h2>
           </div>
 
           <div id="consent-description" className="text-gray-700 dark:text-gray-300 mb-6">
             <p className="mb-3">
-              RepCue needs your permission to store exercise data and requires acceptance 
-              of our terms and privacy policy to provide the best experience.
+              {t('description')}
             </p>
             
             {!showDetails ? (
@@ -176,38 +185,38 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
                   aria-expanded="false"
                   aria-controls="privacy-details"
                 >
-                  Learn more about how we protect your privacy
+                  {t('learnMore')}
                 </button>
                 <button
                   onClick={() => window.open('/legal', '_blank')}
                   className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline font-medium focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 rounded block"
                 >
-                  View all legal documents in Legal Center
+                  {t('viewLegalCenter')}
                 </button>
               </div>
             ) : (
               <div id="privacy-details" className="space-y-3">
                 <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                    What data do we store?
+                    {t('dataWeStore.title')}
                   </h3>
                   <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-400">
-                    <li>• Your exercise preferences and favorites</li>
-                    <li>• Activity logs with exercise duration and timestamps</li>
-                    <li>• App settings (sound, vibration, intervals)</li>
-                    <li>• No personal information or biometric data</li>
+                    <li>• {t('dataWeStore.preferences')}</li>
+                    <li>• {t('dataWeStore.activityLogs')}</li>
+                    <li>• {t('dataWeStore.settings')}</li>
+                    <li>• {t('dataWeStore.noPersonalData')}</li>
                   </ul>
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">
-                    Your data stays private
+                    {t('dataPrivacy.title')}
                   </h3>
                   <ul className="text-sm space-y-1 text-gray-600 dark:text-gray-400">
-                    <li>• All data is stored locally on your device</li>
-                    <li>• Nothing is sent to external servers without your permission</li>
-                    <li>• You can export or delete your data at any time</li>
-                    <li>• Full GDPR compliance with your rights</li>
+                    <li>• {t('dataPrivacy.localStorage')}</li>
+                    <li>• {t('dataPrivacy.noExternalServers')}</li>
+                    <li>• {t('dataPrivacy.exportDelete')}</li>
+                    <li>• {t('dataPrivacy.gdprCompliance')}</li>
                   </ul>
                 </div>
 
@@ -217,7 +226,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
                   aria-expanded="true"
                   aria-controls="privacy-details"
                 >
-                  Show less
+                  {t('showLess')}
                 </button>
               </div>
             )}
@@ -231,7 +240,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
               autoFocus
               data-testid="consent-accept-all"
             >
-              {isProcessing ? 'Processing...' : 'Accept All & Continue'}
+              {isProcessing ? t('processing') : t('acceptAll')}
             </button>
             
             <button
@@ -240,12 +249,11 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
               className="btn-secondary w-full touch-target"
               data-testid="consent-accept-essential"
             >
-              {isProcessing ? 'Processing...' : 'Essential Only'}
+              {isProcessing ? t('processing') : t('acceptEssential')}
             </button>
             
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              Both options automatically accept all required legal documents (Terms of Service, Privacy Policy, etc.). 
-              You can view these documents anytime in the Legal Center and change preferences later in Settings.
+              {t('disclaimer')}
             </p>
           </div>
         </div>

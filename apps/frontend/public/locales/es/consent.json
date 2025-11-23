@@ -1,0 +1,25 @@
+{
+  "title": "Su privacidad y consentimiento legal",
+  "description": "RepCue necesita su permiso para almacenar datos de ejercicio y requiere la aceptación de nuestros términos y política de privacidad para brindar la mejor experiencia.",
+  "learnMore": "Aprenda más sobre cómo protegemos su privacidad",
+  "viewLegalCenter": "Ver todos los documentos legales en el Centro Legal",
+  "showLess": "Mostrar menos",
+  "acceptAll": "Aceptar Todo y Continuar",
+  "acceptEssential": "Solo Esencial",
+  "processing": "Procesando...",
+  "disclaimer": "Ambas opciones aceptan automáticamente todos los documentos legales requeridos (Términos de Servicio, Política de Privacidad, etc.). Puede ver estos documentos en cualquier momento en el Centro Legal y cambiar sus preferencias más tarde en Configuración.",
+  "dataWeStore": {
+    "title": "¿Qué datos almacenamos?",
+    "preferences": "Sus preferencias de ejercicio y favoritos",
+    "activityLogs": "Registros de actividad con duración del ejercicio y marcas de tiempo",
+    "settings": "Configuración de la aplicación (sonido, vibración, intervalos)",
+    "noPersonalData": "Sin información personal o datos biométricos"
+  },
+  "dataPrivacy": {
+    "title": "Sus datos permanecen privados",
+    "localStorage": "Todos los datos se almacenan localmente en su dispositivo",
+    "noExternalServers": "Nada se envía a servidores externos sin su permiso",
+    "exportDelete": "Puede exportar o eliminar sus datos en cualquier momento",
+    "gdprCompliance": "Cumplimiento total del RGPD con sus derechos"
+  }
+}

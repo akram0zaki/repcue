@@ -56,8 +56,6 @@ export class LegalDocsService {
     }
 
     try {
-      logger.log('Initializing LegalDocsService...');
-      
       // In dev mode, always reload to pick up manifest changes
       // In production, only load if not already loaded
       if (import.meta.env.DEV || !this.baselineManifest) {
@@ -69,14 +67,6 @@ export class LegalDocsService {
         logger.error('Failed to load baseline manifest');
         return false;
       }
-
-      logger.log(`Loaded baseline manifest with ${this.baselineManifest.documents.length} documents`);
-      logger.log('Baseline manifest updatedAt:', this.baselineManifest.updatedAt);
-      
-      // Log each document's details
-      this.baselineManifest.documents.forEach(doc => {
-        logger.log(`  - ${doc.id} v${doc.version} (required: ${doc.required}, policy: ${doc.policy}, effectiveFrom: ${doc.effectiveFrom || 'immediate'})`);
-      });
       
       return true;
     } catch (error) {
@@ -92,13 +82,18 @@ export class LegalDocsService {
    */
   private async loadBaselineManifest(): Promise<LegalManifest | null> {
     try {
-      // In development, add cache-busting query param
+      // In development, add cache-busting query param AND force reload headers
       const url = import.meta.env.DEV 
-        ? `${BASELINE_MANIFEST_PATH}?t=${Date.now()}`
+        ? `${BASELINE_MANIFEST_PATH}?t=${Date.now()}&r=${Math.random()}`
         : BASELINE_MANIFEST_PATH;
       
       const response = await fetch(url, {
-        cache: import.meta.env.DEV ? 'no-cache' : 'force-cache'
+        cache: import.meta.env.DEV ? 'reload' : 'force-cache',
+        headers: import.meta.env.DEV ? {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        } : {}
       });
 
       if (!response.ok) {

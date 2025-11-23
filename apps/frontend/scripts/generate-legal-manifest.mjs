@@ -36,7 +36,7 @@ const DOCUMENTS = [
   {
     id: 'terms_conditions',
     title: 'Terms & Conditions',
-    version: '1.0.1',
+    version: '1.0.0',
     required: true,
     policy: 'deferred',
     effectiveFrom: '2025-11-01T00:00:00Z',
@@ -45,7 +45,7 @@ const DOCUMENTS = [
   {
     id: 'privacy_policy',
     title: 'Privacy Policy',
-    version: '1.0.1',
+    version: '1.0.0',
     required: true,
     policy: 'deferred',
     effectiveFrom: '2025-11-01T00:00:00Z',

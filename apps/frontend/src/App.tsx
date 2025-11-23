@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { consentService, ConsentService } from './services/consentService';
+import { consentService } from './services/consentService';
 import { storageService, StorageService } from './services/storageService';
 import { audioService } from './services/audioService';
 import { syncService } from './services/syncService';
@@ -2552,11 +2552,10 @@ useEffect(() => {
       }
 
       try {
-        // Ensure legal docs service is initialized
-        let initialized = !!legalDocsService.getCurrentManifest();
-        if (!initialized) {
-          initialized = await legalDocsService.initialize();
-        }
+        // CRITICAL: Always re-initialize to ensure we have the latest manifest
+        // This prevents race conditions where ConsentBanner loads fresh manifest
+        // but this check uses stale cached data
+        const initialized = await legalDocsService.initialize();
 
         if (!initialized) {
           logger.warn('Legal documents service not initialized, skipping status check');
@@ -2566,27 +2565,11 @@ useEffect(() => {
         // Get current language
         const locale = i18n.language || 'en';
 
-        // Get detailed status for debugging
-        const allStatuses = legalDocsService.getAllAcceptanceStatuses(locale);
-        const consentService = ConsentService.getInstance();
-        const storedAcceptances = consentService.getLegalAcceptances();
-        
-        logger.log('[legal-gate-check] Stored acceptances:', storedAcceptances);
-        logger.log('[legal-gate-check] Current manifest statuses:', allStatuses);
-
         // Check if there are any blocking documents (documents with required acceptance)
         const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
         const hasUnaccepted = legalDocsService.hasUnacceptedRequired(locale);
 
-        logger.log('[legal-gate-check]', {
-          hasBlocking,
-          hasUnaccepted,
-          locale,
-          requiredDocsCount: allStatuses.filter(s => s.requiresAcceptance).length
-        });
-
         if (hasBlocking || hasUnaccepted) {
-          logger.log('Legal gate: blocking documents detected, showing legal gate');
           setShowLegalGate(true);
         }
       } catch (error) {
