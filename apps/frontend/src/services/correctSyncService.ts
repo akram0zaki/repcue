@@ -18,6 +18,7 @@ const SYNC_TIMEOUT_MS = 8_000; // Overall sync timeout per invocation (reduced t
 const SYNC_ORDER: readonly string[] = [
   'user_preferences',
   'app_settings',
+  'user_profiles', // User fitness profiles for AI Workout Builder
   'exercises',
   'user_favorites',
   'workouts',

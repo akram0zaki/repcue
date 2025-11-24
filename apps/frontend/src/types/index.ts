@@ -586,42 +586,8 @@ export interface AuthUserProfile {
 }
 
 // Profile and connection types
-export interface UserProfile extends SyncMetadata {
-  user_id: string; // Auth user ID
-  display_name?: string; // How they like to be called
-  bio?: string;
-  location?: string;
-  website?: string;
-  privacy_settings: UserPrivacySettings;
-  stats?: UserStats;
-  badges?: UserBadge[];
-  join_date: string; // ISO timestamp
-  last_active?: string; // ISO timestamp
-}
-
-export interface UserPrivacySettings {
-  profile_visibility: 'public' | 'connections' | 'private';
-  show_stats: boolean;
-  show_activity: boolean;
-  allow_connection_requests: boolean;
-}
-
-export interface UserStats {
-  total_workouts: number;
-  total_exercises_created: number;
-  total_workouts_created: number;
-  streak_days: number;
-  longest_streak: number;
-  favorite_category?: ExerciseCategory;
-}
-
-export interface UserBadge {
-  id: string;
-  name: string;
-  description: string;
-  icon_url?: string;
-  earned_at: string; // ISO timestamp
-}
+// User profile types now in userProfile.ts
+export type { UserProfile, FitnessProfileData, SocialProfileData } from './userProfile';
 
 export interface Connection extends SyncMetadata {
   user_id: string; // The user who owns this connection

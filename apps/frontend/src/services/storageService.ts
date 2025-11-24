@@ -14,6 +14,7 @@ import type {
   ExerciseCatalog
 } from '../types';
 import type { PersonalRecord } from '../types/coaching';
+import type { UserProfile } from '../types/userProfile';
 import { consentService } from './consentService';
 import { authService } from './authService';
 import { SYNC_DEBUG } from '../config/features';
@@ -50,6 +51,9 @@ type StoredWorkoutSession = WorkoutSession;
 // Personal records for tracking exercise achievements
 type StoredPersonalRecord = PersonalRecord;
 
+// User profile for fitness information
+type StoredUserProfile = UserProfile;
+
 // Video file storage for offline-first approach
 interface StoredVideoFile extends SyncMetadata {
   exercise_id: string;
@@ -77,6 +81,7 @@ class RepCueDatabase extends Dexie {
   video_files!: Table<StoredVideoFile>;
   exercise_catalogs!: Table<ExerciseCatalog>;
   personal_records!: Table<StoredPersonalRecord>;
+  user_profiles!: Table<StoredUserProfile>;
 
   constructor() {
     super('RepCueDB');
@@ -504,6 +509,24 @@ class RepCueDatabase extends Dexie {
       await trans.table('exercises').bulkPut(exercises);
 
       logger.log('[Migration v25] Migration complete - exercises now support many-to-many catalogs');
+    });
+
+    // Version 26: Add user_profiles table for AI Workout Builder pre-population
+    this.version(26).stores({
+      exercises: 'id, name, category, exercise_type, is_favorite, *base_tags, updated_at, created_at, owner_id, deleted, version, dirty',
+      catalog_memberships: 'id, exercise_id, catalog_id, [catalog_id+exercise_id], display_order, updated_at, created_at, owner_id, deleted, version, dirty',
+      activity_logs: 'id, exercise_id, exercise_name, catalog_id, workout_id, timestamp, duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      user_preferences: 'id, owner_id, sound_enabled, vibration_enabled, default_interval_duration, dark_mode, updated_at, created_at, deleted, version, dirty',
+      app_settings: 'id, owner_id, interval_duration, sound_enabled, vibration_enabled, beep_volume, dark_mode, theme_id, app_version, updated_at, created_at, deleted, version, dirty',
+      user_favorites: 'id, owner_id, item_id, item_type, exercise_type, updated_at, created_at, deleted, version, dirty',
+      workouts: 'id, name, description, scheduled_days, is_active, estimated_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      workout_sessions: 'id, workout_id, workout_name, start_time, end_time, is_completed, completion_percentage, total_duration, updated_at, created_at, owner_id, deleted, version, dirty',
+      sync_state: 'user_id',
+      video_files: 'id, exercise_id, file_name, file_size, mime_type, upload_pending, updated_at, created_at, owner_id, deleted, version, dirty',
+      exercise_catalogs: 'id, name_key, description_key, is_default, is_premium, display_order, updated_at, created_at, deleted, version, dirty',
+      personal_records: 'id, exerciseId, exerciseName, recordType, value, achievedAt, workoutId',
+      // NEW: User fitness profiles for AI Workout Builder
+      user_profiles: 'id, user_id, owner_id, updated_at, created_at, deleted, version, dirty'
     });
   }
 
@@ -4656,6 +4679,160 @@ export class StorageService {
     } catch (error) {
       logger.error('Failed to get personal records by exercise from IndexedDB:', error);
       return [];
+    }
+  }
+
+  // ============================================================================
+  // User Profile Methods
+  // ============================================================================
+
+  /**
+   * Get user's fitness profile
+   * Returns null if no profile exists or user is not authenticated
+   */
+  public async getUserProfile(): Promise<UserProfile | null> {
+    if (!this.canStoreData()) {
+      return null;
+    }
+
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        logger.warn('Cannot get profile - user not authenticated');
+        return null;
+      }
+
+      // Check if table exists (defensive check)
+      if (!this.db.user_profiles) {
+        logger.warn('User profiles table does not exist in database');
+        return null;
+      }
+
+      // Find profile by user_id (there should be only one per user)
+      const profiles = await this.db.user_profiles
+        .where('user_id')
+        .equals(user.id)
+        .toArray();
+
+      const activeProfiles = filterActiveRecords(profiles);
+      
+      if (activeProfiles.length === 0) {
+        return null;
+      }
+
+      if (activeProfiles.length > 1) {
+        logger.warn(`Multiple profiles found for user ${user.id}, returning first`);
+      }
+
+      return activeProfiles[0];
+    } catch (error) {
+      logger.error('Failed to get user profile from IndexedDB:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Save or update user's fitness profile (consent-aware)
+   * 
+   * @param profileData - Profile data to save (partial or full)
+   * @returns True if successful, false otherwise
+   */
+  public async saveUserProfile(profileData: Partial<UserProfile>): Promise<boolean> {
+    if (!this.canStoreData()) {
+      logger.warn('Cannot save profile without user consent');
+      return false;
+    }
+
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        logger.warn('Cannot save profile - user not authenticated');
+        return false;
+      }
+
+      // Check if table exists (defensive check)
+      if (!this.db.user_profiles) {
+        logger.warn('User profiles table does not exist in database');
+        return false;
+      }
+
+      // Check if profile already exists
+      const existingProfile = await this.getUserProfile();
+
+      let preparedProfile: UserProfile;
+
+      if (existingProfile) {
+        // Update existing profile
+        preparedProfile = prepareUpsert(
+          {
+            ...existingProfile,
+            ...profileData,
+            user_id: user.id,
+            last_updated_from_wizard: new Date().toISOString(),
+          },
+          user.id
+        );
+      } else {
+        // Create new profile
+        preparedProfile = prepareUpsert(
+          {
+            id: crypto.randomUUID(),
+            user_id: user.id,
+            ...profileData,
+            last_updated_from_wizard: new Date().toISOString(),
+          } as UserProfile,
+          user.id
+        );
+      }
+
+      await this.db.user_profiles.put(preparedProfile);
+      logger.log(`✅ Saved user profile for user ${user.id}`);
+      return true;
+    } catch (error) {
+      logger.error('Failed to save user profile to IndexedDB:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Delete user's fitness profile (soft delete for sync)
+   * 
+   * @returns True if successful, false otherwise
+   */
+  public async deleteUserProfile(): Promise<boolean> {
+    if (!this.canStoreData()) {
+      logger.warn('Cannot delete profile without user consent');
+      return false;
+    }
+
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        logger.warn('Cannot delete profile - user not authenticated');
+        return false;
+      }
+
+      // Check if table exists (defensive check)
+      if (!this.db.user_profiles) {
+        logger.warn('User profiles table does not exist in database');
+        return false;
+      }
+
+      const profile = await this.getUserProfile();
+      
+      if (!profile) {
+        logger.warn('No profile found to delete');
+        return false;
+      }
+
+      // Use soft delete (tombstone pattern) for sync compatibility
+      const tombstone = prepareSoftDelete(profile, user.id);
+      await this.db.user_profiles.put(tombstone);
+      logger.log(`🗑️ Soft deleted user profile for user ${user.id}`);
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete user profile from IndexedDB:', error);
+      return false;
     }
   }
 }

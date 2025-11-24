@@ -5,7 +5,7 @@
  * Handles form data, validation, navigation, and API submission.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   OnboardingData,
@@ -29,6 +29,12 @@ import {
 } from '../utils/aiWorkoutValidation';
 import { aiWorkoutService, AIWorkoutServiceError } from '../services/aiWorkoutService';
 import { StorageService } from '../services/storageService';
+import {
+  profileToScreen1,
+  profileToScreen2,
+  profileToScreen3,
+  formDataToProfile,
+} from '../utils/profileConversion';
 import logger from '../utils/logger';
 
 interface UseAIWorkoutFlowReturn {
@@ -44,6 +50,8 @@ interface UseAIWorkoutFlowReturn {
   isSuccess: boolean;
   /** Generated workouts (if successful) */
   workouts: GeneratedWorkout[];
+  /** AI-generated feedback for the user */
+  feedback: string | null;
   /** Error from submission (if any) */
   submitError: AIWorkoutError | null;
   /** Update data for current screen */
@@ -74,7 +82,59 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
 
   const [isSuccess, setIsSuccess] = useState(false);
   const [workouts, setWorkouts] = useState<GeneratedWorkout[]>([]);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<AIWorkoutError | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  /**
+   * Load user profile on mount and pre-populate form if it exists
+   */
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (profileLoaded) return;
+
+      try {
+        const storageService = StorageService.getInstance();
+        const profile = await storageService.getUserProfile();
+
+        if (profile) {
+          logger.log('[useAIWorkoutFlow] Loaded user profile, pre-populating form');
+
+          const screen1 = profileToScreen1(profile);
+          const screen2 = profileToScreen2(profile);
+          const screen3 = profileToScreen3(profile);
+
+          setState((prev) => ({
+            ...prev,
+            data: {
+              screen1: { ...prev.data.screen1, ...screen1 } as Screen1Data,
+              screen2: { ...prev.data.screen2, ...screen2 } as Screen2Data,
+              screen3: { ...prev.data.screen3, ...screen3, saveToProfile: true } as Screen3Data,
+            },
+          }));
+
+          logger.log('[useAIWorkoutFlow] Form pre-populated from profile');
+        } else {
+          logger.log('[useAIWorkoutFlow] No profile found, starting with empty form');
+          // Set default saveToProfile to true for new users
+          setState((prev) => ({
+            ...prev,
+            data: {
+              ...prev.data,
+              screen3: { ...prev.data.screen3, saveToProfile: true } as Screen3Data,
+            },
+          }));
+        }
+
+        setProfileLoaded(true);
+      } catch (error) {
+        logger.error('[useAIWorkoutFlow] Failed to load profile:', error);
+        setProfileLoaded(true); // Mark as loaded even on error to prevent retry loops
+      }
+    };
+
+    loadProfile();
+  }, [profileLoaded]);
 
   /**
    * Update data for current screen
@@ -192,7 +252,8 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
           age: screen1.age,
           height: screen1.height,
           weight: screen1.weight,
-          goal: screen2.goal,
+          goals: screen2.goals,
+          goalDuration: screen2.goalDuration,
           fitnessLevel: screen2.fitnessLevel,
           trainingTime: screen2.trainingTime,
           injuries: screen3.injuries || '',
@@ -203,7 +264,8 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
       };
 
       logger.log('[useAIWorkoutFlow] Calling AI workout service', {
-        goal: request.responses.goal,
+        goals: request.responses.goals,
+        goalDuration: request.responses.goalDuration,
         fitnessLevel: request.responses.fitnessLevel,
         locale: request.locale,
       });
@@ -213,7 +275,7 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
 
       logger.log('[useAIWorkoutFlow] Workouts generated successfully', {
         count: response.workouts.length,
-        correlationId: response.metadata.correlationId,
+        generationId: response.generationId,
       });
 
       // Save workouts to IndexedDB
@@ -272,7 +334,36 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
         count: response.workouts.length,
       });
 
+      // Save to user profile if checkbox is selected
+      if (screen3.saveToProfile) {
+        logger.log('[useAIWorkoutFlow] Saving form data to user profile');
+        const profileData = formDataToProfile(screen1, screen2, screen3);
+        logger.log('[useAIWorkoutFlow] Profile data to save:', {
+          birth_year: profileData.birth_year,
+          hasFitness: !!profileData.fitness,
+          fitness: profileData.fitness
+        });
+        const profileSaved = await storageService.saveUserProfile(profileData);
+        
+        if (profileSaved) {
+          logger.log('[useAIWorkoutFlow] Profile updated successfully');
+          // Verify what was saved
+          const savedProfile = await storageService.getUserProfile();
+          logger.log('[useAIWorkoutFlow] Verified saved profile has fitness data:', {
+            hasFitness: !!savedProfile?.fitness,
+            fitnessKeys: savedProfile?.fitness ? Object.keys(savedProfile.fitness) : []
+          });
+        } else {
+          logger.warn('[useAIWorkoutFlow] Failed to save profile');
+        }
+      } else {
+        logger.log('[useAIWorkoutFlow] Skipping profile save (checkbox unchecked)');
+      }
+
       setWorkouts(response.workouts);
+      // Feedback property removed from AIWorkoutResponse interface per design decision
+      // Setting to null to maintain hook state consistency
+      setFeedback(response.feedback || null);
       setIsSuccess(true);
       setState((prev) => ({ ...prev, isSubmitting: false }));
     } catch (error: unknown) {
@@ -329,6 +420,7 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
     });
     setIsSuccess(false);
     setWorkouts([]);
+    setFeedback(null);
     setSubmitError(null);
   }, []);
 
@@ -339,6 +431,7 @@ export function useAIWorkoutFlow(): UseAIWorkoutFlowReturn {
     isSubmitting: state.isSubmitting,
     isSuccess,
     workouts,
+    feedback,
     submitError,
     updateData,
     goNext,

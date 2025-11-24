@@ -67,13 +67,22 @@
   "screen2": {
     "title": "Your Goals & Preferences",
     "subtitle": "What are you working towards?",
-    "goal": {
-      "label": "Primary Goal",
+    "goals": {
+      "label": "Primary Goals",
+      "helper": "Select one or more goals you want to achieve",
       "weightLoss": "Weight Loss",
       "muscleBuilding": "Muscle Building",
       "healthMaintenance": "Health Maintenance",
       "flexibility": "Flexibility & Mobility",
-      "error": "Please select your primary goal"
+      "marathonDesSables": "Marathon des Sables Preparation",
+      "error": "Please select at least one goal"
+    },
+    "goalDuration": {
+      "label": "Time to Achieve Goals (Optional)",
+      "helper": "How many months do you have to achieve your goals?",
+      "placeholder": "e.g., 3, 6, 12",
+      "unit": "months",
+      "error": "Goal duration must be between 1 and 24 months"
     },
     "fitnessLevel": {
       "label": "Current Fitness Level",
@@ -103,6 +112,10 @@
   "screen3": {
     "title": "Health & Training Style",
     "subtitle": "Let's keep you safe and effective",
+    "saveToProfile": {
+      "label": "Save to my profile",
+      "description": "Save this information to pre-fill future AI Workout Builder sessions. You can change this anytime in your profile settings."
+    },
     "injuries": {
       "label": "Injuries or Limitations (Optional)",
       "placeholder": "e.g., knee pain, lower back issues, shoulder injury...",
@@ -156,6 +169,7 @@
   "results": {
     "title": "Your Personalized Workouts",
     "subtitle": "AI-generated workouts tailored to your goals",
+    "feedbackTitle": "AI Coach Insights",
     "aiGeneratedBadge": "AI-Generated",
     "exerciseCount": "{{count}} exercises",
     "durationSeconds": "~{{seconds}} sec",

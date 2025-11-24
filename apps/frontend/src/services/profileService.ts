@@ -1,9 +1,7 @@
 import type { 
   UserProfile, 
   Connection, 
-  ConnectionRequest, 
-  UserStats,
-  UserPrivacySettings
+  ConnectionRequest
 } from '../types';
 import logger from '../utils/logger';
 
@@ -40,11 +38,12 @@ class ProfileService {
         version: 1,
         created_at: new Date().toISOString(),
         user_id: userId,
-        display_name: 'Test User',
-        bio: 'Fitness enthusiast and RepCue user',
-        privacy_settings: this.getDefaultPrivacySettings(),
-        stats: this.getDefaultUserStats(),
-        badges: [],
+        name: 'Test User',
+        social: {
+          bio: 'Fitness enthusiast and RepCue user',
+          privacy_settings: this.getDefaultPrivacySettings(),
+          stats: this.getDefaultUserStats()
+        },
         join_date: new Date().toISOString()
       };
       return defaultProfile;
@@ -196,7 +195,7 @@ class ProfileService {
   /**
    * Update user stats
    */
-  async updateUserStats(userId: string, stats: Partial<UserStats>): Promise<boolean> {
+  async updateUserStats(userId: string, stats: Partial<{ total_workouts: number; total_exercises_created: number; total_workouts_created: number; streak_days: number; longest_streak: number }>): Promise<boolean> {
     try {
       // Mock implementation
       logger.log('Updating user stats for', userId, ':', stats);
@@ -223,9 +222,9 @@ class ProfileService {
   /**
    * Get default privacy settings
    */
-  private getDefaultPrivacySettings(): UserPrivacySettings {
+  private getDefaultPrivacySettings() {
     return {
-      profile_visibility: 'connections',
+      profile_visibility: 'connections' as const,
       show_stats: true,
       show_activity: false,
       allow_connection_requests: true
@@ -235,7 +234,7 @@ class ProfileService {
   /**
    * Get default user stats
    */
-  getDefaultUserStats(): UserStats {
+  getDefaultUserStats() {
     return {
       total_workouts: 15,
       total_exercises_created: 3,
@@ -251,10 +250,11 @@ class ProfileService {
   async createInitialProfile(userId: string, displayName?: string): Promise<boolean> {
     const initialProfile: Partial<UserProfile> = {
       user_id: userId,
-      display_name: displayName,
-      privacy_settings: this.getDefaultPrivacySettings(),
-      stats: this.getDefaultUserStats(),
-      badges: []
+      name: displayName,
+      social: {
+        privacy_settings: this.getDefaultPrivacySettings(),
+        stats: this.getDefaultUserStats()
+      }
     };
 
     return await this.saveUserProfile(initialProfile as UserProfile);

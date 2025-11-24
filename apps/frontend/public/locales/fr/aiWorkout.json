@@ -67,13 +67,22 @@
   "screen2": {
     "title": "Vos objectifs et préférences",
     "subtitle": "Vers quoi travaillez-vous ?",
-    "goal": {
-      "label": "Objectif principal",
+    "goals": {
+      "label": "Objectifs principaux",
+      "helper": "Sélectionnez un ou plusieurs objectifs que vous souhaitez atteindre",
       "weightLoss": "Perte de poids",
       "muscleBuilding": "Prise de muscle",
       "healthMaintenance": "Maintien de la santé",
       "flexibility": "Souplesse et mobilité",
-      "error": "Veuillez sélectionner votre objectif principal"
+      "marathonDesSables": "Préparation Marathon des Sables",
+      "error": "Veuillez sélectionner au moins un objectif"
+    },
+    "goalDuration": {
+      "label": "Temps pour atteindre les objectifs (Optionnel)",
+      "helper": "Combien de mois avez-vous pour atteindre vos objectifs ?",
+      "placeholder": "par ex., 3, 6, 12",
+      "unit": "mois",
+      "error": "La durée de l'objectif doit être entre 1 et 24 mois"
     },
     "fitnessLevel": {
       "label": "Niveau de forme actuel",
@@ -102,8 +111,10 @@
   },
   "screen3": {
     "title": "Santé et style d’entraînement",
-    "subtitle": "Restons efficaces et en sécurité",
-    "injuries": {
+    "subtitle": "Restons efficaces et en sécurité",    "saveToProfile": {
+      "label": "Enregistrer dans mon profil",
+      "description": "Enregistrez ces informations pour pré-remplir les futures sessions de l'assistant d'entraînement IA. Vous pouvez modifier cela à tout moment dans vos paramètres de profil."
+    },    "injuries": {
       "label": "Blessures ou limitations (facultatif)",
       "placeholder": "ex. : douleur au genou, bas du dos, épaule blessée...",
       "description": "Indiquez-nous vos blessures ou limitations physiques afin que nous puissions recommander des exercices sûrs.",
@@ -155,8 +166,7 @@
   },
   "results": {
     "title": "Vos entraînements personnalisés",
-    "subtitle": "Entraînements générés par IA adaptés à vos objectifs",
-    "aiGeneratedBadge": "Généré par IA",
+    "subtitle": "Entraînements générés par IA adaptés à vos objectifs",    "feedbackTitle": "Conseils du Coach IA",    "aiGeneratedBadge": "Généré par IA",
     "exerciseCount": "{{count}} exercices",
     "durationSeconds": "~{{seconds}} sec",
     "durationMinutes": "~{{minutes}} min",

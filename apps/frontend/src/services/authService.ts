@@ -108,6 +108,9 @@ export class AuthService {
         }
       } catch {}
 
+  // Create user profile if it doesn't exist (non-blocking)
+  this.ensureUserProfile(userProfile).catch(err => logger.warn('Profile creation failed (non-blocking):', err));
+
   // Claim ownership of anonymous data on first sign-in (non-blocking with guard)
   this.claimAnonymousData().catch(err => logger.warn('Ownership claim failed (non-blocking):', err));
 
@@ -137,6 +140,36 @@ export class AuthService {
       refreshToken: undefined
     };
     this.notifyListeners();
+  }
+
+  /**
+   * Ensure user profile exists (create if needed)
+   */
+  private async ensureUserProfile(userProfile: AuthUserProfile): Promise<void> {
+    try {
+      const existingProfile = await storageService.getUserProfile();
+      
+      if (!existingProfile) {
+        logger.log('Creating initial user profile...');
+        const initialProfile = {
+          user_id: userProfile.id,
+          name: userProfile.displayName || undefined,
+          join_date: userProfile.createdAt?.toISOString() || new Date().toISOString(),
+          last_active: new Date().toISOString(),
+        };
+        
+        await storageService.saveUserProfile(initialProfile);
+        logger.log('✅ Initial user profile created');
+      } else {
+        // Update last_active timestamp
+        await storageService.saveUserProfile({
+          ...existingProfile,
+          last_active: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      logger.error('Failed to ensure user profile:', error);
+    }
   }
 
   /**
