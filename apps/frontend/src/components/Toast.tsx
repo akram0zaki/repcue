@@ -37,7 +37,9 @@ const Toast: React.FC<ToastProps> = ({
   const handleConfirm = () => {
     setIsVisible(false);
     setTimeout(() => {
-      onConfirm();
+      if (onConfirm) {
+        onConfirm();
+      }
       onClose();
     }, 300);
   };
