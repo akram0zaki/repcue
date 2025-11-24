@@ -902,36 +902,55 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         <div className="mb-1">
           <div className="flex items-start justify-between gap-3">
             {/* Left Side - Exercise Details and Tags - Allow wrapping */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0">
+            <div className="flex flex-col gap-y-1 flex-1 min-w-0">
               {/* Exercise Details - Left-aligned */}
               <span className="text-sm font-medium text-text-800 dark:text-text-100">
                 {formatSimplifiedDetails(exercise)}
               </span>
-              {/* Custom/Shared Tags */}
-              {isUserCreated && (
-                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium exercise-custom-badge rounded-full whitespace-nowrap">
-                  {t('exercises:custom', { defaultValue: 'Custom' })}
-                </span>
-              )}
-              {currentUser && isSharedExerciseCard && (
-                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full whitespace-nowrap">
-                  {t('exercises:shared', { defaultValue: 'Shared' })}
-                </span>
-              )}
-              {/* Catalog badges (multi-catalog) */}
-              {catalogIds.map(cid => {
-                const catalog = EXERCISE_CATALOGS.find(c => c.id === cid);
-                const label = catalog ? t(catalog.nameKey, { ns: 'catalogs', defaultValue: cid }) : cid;
-                return (
-                  <span
-                    key={cid}
-                    className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 whitespace-nowrap"
-                    aria-label={t('exercises:catalogBadgeAria', { catalog: label, defaultValue: `Catalog: ${label}` })}
-                  >
-                    {label}
+              
+              {/* Category Badges Section - Fixed 2 lines with overflow indicator */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 h-[3rem] overflow-hidden relative">
+                {/* Custom/Shared Tags */}
+                {isUserCreated && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium exercise-custom-badge rounded-full whitespace-nowrap">
+                    {t('exercises:custom', { defaultValue: 'Custom' })}
                   </span>
-                );
-              })}
+                )}
+                {currentUser && isSharedExerciseCard && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full whitespace-nowrap">
+                    {t('exercises:shared', { defaultValue: 'Shared' })}
+                  </span>
+                )}
+                {/* Catalog badges (multi-catalog) */}
+                {(() => {
+                  const MAX_VISIBLE_BADGES = 3;
+                  const visibleCatalogIds = catalogIds.slice(0, MAX_VISIBLE_BADGES);
+                  const hiddenCount = catalogIds.length - MAX_VISIBLE_BADGES;
+                  
+                  return (
+                    <>
+                      {visibleCatalogIds.map(cid => {
+                        const catalog = EXERCISE_CATALOGS.find(c => c.id === cid);
+                        const label = catalog ? t(catalog.nameKey, { ns: 'catalogs', defaultValue: cid }) : cid;
+                        return (
+                          <span
+                            key={cid}
+                            className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 whitespace-nowrap"
+                            aria-label={t('exercises:catalogBadgeAria', { catalog: label, defaultValue: `Catalog: ${label}` })}
+                          >
+                            {label}
+                          </span>
+                        );
+                      })}
+                      {hiddenCount > 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-surface-200 dark:bg-surface-600 text-text-700 dark:text-text-200 whitespace-nowrap">
+                          +{hiddenCount}
+                        </span>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
             </div>
 
             {/* Right Side - Action Buttons */}
@@ -994,15 +1013,35 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {loc.name}
           </button>
         </div>
-        {/* Base tags preview (truncated) */}
-        {Array.isArray((exercise as Exercise & { base_tags?: string[] }).base_tags) && (exercise as Exercise & { base_tags?: string[] }).base_tags!.length > 0 && (
-          <div className="mb-2 flex flex-wrap gap-1 max-h-12 overflow-hidden" aria-label={t('exercises:baseTagsPreview', { defaultValue: 'Base tags' })}>
-            {(exercise as Exercise & { base_tags?: string[] }).base_tags!.slice(0, 6).map((tag: string) => (
-              <span key={tag} className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-100 dark:bg-surface-700 text-text-700 dark:text-text-200 rounded">
-                {tag}
-              </span>
-            ))}
+        {/* Base tags preview - Fixed 2 lines with overflow indicator */}
+        {Array.isArray((exercise as Exercise & { base_tags?: string[] }).base_tags) && (exercise as Exercise & { base_tags?: string[] }).base_tags!.length > 0 ? (
+          <div className="mb-2 h-[3rem] overflow-hidden relative" aria-label={t('exercises:baseTagsPreview', { defaultValue: 'Base tags' })}>
+            <div className="flex flex-wrap gap-1">
+              {(() => {
+                const baseTags = (exercise as Exercise & { base_tags?: string[] }).base_tags!;
+                const MAX_VISIBLE_TAGS = 6;
+                const visibleTags = baseTags.slice(0, MAX_VISIBLE_TAGS);
+                const hiddenCount = baseTags.length - MAX_VISIBLE_TAGS;
+                
+                return (
+                  <>
+                    {visibleTags.map((tag: string) => (
+                      <span key={tag} className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-100 dark:bg-surface-700 text-text-700 dark:text-text-200 rounded whitespace-nowrap">
+                        {tag}
+                      </span>
+                    ))}
+                    {hiddenCount > 0 && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-200 dark:bg-surface-600 text-text-700 dark:text-text-200 rounded whitespace-nowrap">
+                        +{hiddenCount}
+                      </span>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
           </div>
+        ) : (
+          <div className="mb-2 h-[3rem]" aria-hidden="true" />
         )}
 
         {/* Video/Image Area */}
