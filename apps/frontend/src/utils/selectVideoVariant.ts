@@ -134,7 +134,6 @@ function selectFromVariants(
     for (const format of formatPreference) {
       const variant = resolutionVariants[format];
       if (variant?.url) {
-        logger.log(`[Video] Selected R2 variant: ${aspect}/${resolution}/${format} -> ${variant.url}`);
         return variant.url;
       }
     }

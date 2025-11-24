@@ -73,15 +73,21 @@ if (workbox) {
     })
   );
 
-  // Exercise videos
+  // Exercise videos - Use CacheFirst for instant playback (zero re-downloads)
+  // Videos are cached permanently once downloaded (90 days expiration, refreshed on access)
   workbox.routing.registerRoute(
-    /^\/videos\/.*\.(mp4|webm|mov)$/i,
-    new workbox.strategies.StaleWhileRevalidate({
-      cacheName: 'exercise-videos-cache',
+    /^\/(videos|media)\/.*\.(mp4|webm|mov)$/i,
+    new workbox.strategies.CacheFirst({
+      cacheName: 'exercise-videos-cache-v2',
       plugins: [
+        new workbox.cacheableResponse.CacheableResponsePlugin({
+          statuses: [0, 200, 206], // Cache successful responses and video range requests
+        }),
+        new workbox.rangeRequests.RangeRequestsPlugin(), // Support video seeking
         new workbox.expiration.ExpirationPlugin({
-          maxEntries: 60,
-          maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          maxEntries: 100,
+          maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
+          purgeOnQuotaError: true,
         }),
       ],
     })

@@ -230,8 +230,17 @@ const ProfilePage: React.FC<ProfilePageProps> = () => {
     <div className="min-h-screen pt-safe pb-20 bg-surface-secondary">
       <div className="container mx-auto px-4 py-4 max-w-md">
         {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-h1">
+        <div className="mb-4 flex items-center gap-3">
+          <button
+            onClick={() => navigate(-1)}
+            className="btn-secondary p-2 rounded-lg"
+            aria-label={t('common.goBack')}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-h1 flex-1">
             {isViewingOwnProfile ? t('profile.myProfile') : t('profile.profile')}
           </h1>
         </div>

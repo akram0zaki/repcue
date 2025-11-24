@@ -476,21 +476,21 @@ const TimerPage: React.FC<TimerPageProps> = ({
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-3 py-2 mb-2">
             <div className="flex items-center justify-center gap-3 text-xs font-medium">
               <span className="text-gray-700 dark:text-gray-300">
-                Rep {Math.min((currentRep || 0) + 1, totalReps)}/{totalReps}
+                {t('common:timer.rep')} {Math.min((currentRep || 0) + 1, totalReps)}/{totalReps}
               </span>
               <span className="text-gray-400 dark:text-gray-600">|</span>
               {isResting && restTimeRemaining !== undefined ? (
                 <span className="text-purple-600 dark:text-purple-400">
-                  Rest {formatTime(restTimeRemaining)}
+                  {t('common:timer.rest')} {formatTime(restTimeRemaining)}
                 </span>
               ) : (
                 <span className="text-gray-500 dark:text-gray-500">
-                  Active
+                  {t('common:timer.active')}
                 </span>
               )}
               <span className="text-gray-400 dark:text-gray-600">|</span>
               <span className="text-gray-700 dark:text-gray-300">
-                Set {(currentSet || 0) + 1}/{totalSets}
+                {t('common:timer.set')} {(currentSet || 0) + 1}/{totalSets}
               </span>
             </div>
           </div>

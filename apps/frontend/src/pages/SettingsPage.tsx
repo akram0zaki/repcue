@@ -7,6 +7,7 @@ import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { VideoCacheService } from '../services/videoCacheService';
 import { SpeakerIcon, DocumentTextIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -38,12 +39,14 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
   const [showExportSuccessToast, setShowExportSuccessToast] = useState(false);
   const [showExportErrorToast, setShowExportErrorToast] = useState(false);
+  const [showClearVideoCacheToast, setShowClearVideoCacheToast] = useState(false);
   const { isAuthenticated } = useAuth();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isForceFullSyncing, setIsForceFullSyncing] = useState(false);
   const [isResettingSyncState, setIsResettingSyncState] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [isClearingVideoCache, setIsClearingVideoCache] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -90,6 +93,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
 
   const handleClearData = async () => {
     setShowClearDataToast(true);
+  };
+
+  const handleClearVideoCache = async () => {
+    try {
+      setIsClearingVideoCache(true);
+      const videoCacheService = VideoCacheService.getInstance();
+      await videoCacheService.clearAll();
+      setShowClearVideoCacheToast(true);
+      logger.log('[Settings] Video cache cleared successfully');
+    } catch (error) {
+      logger.error('[Settings] Failed to clear video cache:', error);
+    } finally {
+      setIsClearingVideoCache(false);
+    }
   };
 
   const handleSyncNow = async () => {
@@ -997,6 +1014,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </div>
           </div>
 
+          {/* Clear Video Cache Button */}
+          <div className="mb-4">
+            <button
+              onClick={handleClearVideoCache}
+              disabled={isClearingVideoCache}
+              className="w-full btn-secondary"
+            >
+              {isClearingVideoCache ? t('settings.clearing') : t('settings.clearVideoCache')}
+            </button>
+            <p className="text-xs help-text mt-1">
+              {t('settings.clearVideoCacheHelp')}
+            </p>
+          </div>
+
           {/* Clear Data Button */}
           <div>
             <button
@@ -1094,6 +1125,15 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         onClose={() => setShowExportErrorToast(false)}
         type="danger"
         message={t('settings.exportError')}
+        confirmText={t('common.ok')}
+      />
+
+      {/* Clear Video Cache Success Toast */}
+      <Toast
+        isOpen={showClearVideoCacheToast}
+        onClose={() => setShowClearVideoCacheToast(false)}
+        type="info"
+        message={t('settings.videoCacheCleared', { defaultValue: 'Video cache cleared successfully' })}
         confirmText={t('common.ok')}
       />
 

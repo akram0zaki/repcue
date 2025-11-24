@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
-import { EXERCISE_CATALOGS, getAvailableCatalogs } from '../data/catalogs';
+import { EXERCISE_CATALOGS } from '../data/catalogs';
 import { useRTLDetection } from '../hooks/useRTLDetection';
 import { ChevronLeftIcon, ChevronRightIcon } from './icons/NavigationIcons';
 

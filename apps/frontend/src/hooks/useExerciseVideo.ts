@@ -54,6 +54,7 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
   }, []);
 
   // Resolve metadata & choose initial variant (R2 variants preferred, fallback to legacy)
+  // NOW WITH CACHING: Resolves video URL through cache service for instant playback
   useEffect(() => {
     if (!exercise) {
       setMedia(null);
@@ -104,9 +105,21 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     const m = mediaIndex[exercise.id];
     setMedia(m ?? null);
     if (!m) { setVideoUrl(null); return; }
+    
     // Prefer R2 variants selection with viewport-aware choice
     const chosen = selectVideoVariant(m);
-    setVideoUrl(chosen ?? null);
+    
+    // CRITICAL FIX: Resolve through cache service for instant playback
+    // This ensures videos are cached and loaded from IndexedDB instead of network
+    if (chosen) {
+      resolveVideoUrl(chosen).then(cachedUrl => {
+        setVideoUrl(cachedUrl);
+      }).catch(() => {
+        setVideoUrl(null);
+      });
+    } else {
+      setVideoUrl(null);
+    }
   }, [exercise, mediaIndex]);
 
   // Loop boundary detection via timeupdate wrap-around

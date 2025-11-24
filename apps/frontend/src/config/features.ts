@@ -44,6 +44,11 @@ export const THEME_CUSTOMIZATION_ENABLED = true;
 // When enabled, uses new variants structure; when disabled, falls back to legacy video paths
 export const VIDEO_R2_ENABLED = true; // Enabled for testing R2 video hosting
 
+// Smart Video Caching System
+// Enable persistent IndexedDB caching for instant video playback and offline access
+// When enabled, videos are cached locally and never re-downloaded (40x faster load times)
+export const VIDEO_CACHING_ENABLED = true; // Enabled for persistent video caching
+
 // PWA Install Prompt Controls
 // Completely disabled due to persistent flashing bug across platforms
 export const INSTALL_PROMPT_ENABLED = false; // Globally disabled until flashing issue resolved

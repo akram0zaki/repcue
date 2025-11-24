@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: page already uses t() for user-visible text; remaining literals are units, icons, or fallback defaults */
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Exercise, ExerciseCategory, AppSettings } from '../types';
+import type { Exercise, ExerciseCategory, AppSettings, CatalogMembership } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
 import { 
@@ -39,6 +39,7 @@ import { EXERCISE_CATALOGS } from '../data/catalogs';
 import { storageService } from '../services/storageService';
 import { useExerciseFilter } from '../hooks/useExerciseFilter';
 import { getCatalogBadges, getExerciseBadgeValues } from '../utils/catalogBadges';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -54,6 +55,18 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
   const { isSharedExercise } = useSharedExercises();
+
+  // Bulk load all exercise memberships to prevent N+1 query problem
+  const [exerciseMemberships, setExerciseMemberships] = useState<Map<string, CatalogMembership[]>>(new Map());
+  
+  useEffect(() => {
+    const loadMemberships = async () => {
+      const exerciseIds = exercises.map(ex => ex.id);
+      const memberships = await storageService.getAllExerciseMemberships(exerciseIds);
+      setExerciseMemberships(memberships);
+    };
+    loadMemberships();
+  }, [exercises]);
 
   // Use the centralized exercise filter hook with badge support
   const {
@@ -650,6 +663,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                                 onNavigateToExercise={handleNavigateToExercise}
                                 currentUser={user}
                                 isSharedExercise={isSharedExercise}
+                                memberships={exerciseMemberships.get(exercise.id) || []}
                               />
                             </div>
                           ))}
@@ -692,6 +706,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                           onNavigateToExercise={handleNavigateToExercise}
                           currentUser={user}
                           isSharedExercise={isSharedExercise}
+                          memberships={exerciseMemberships.get(exercise.id) || []}
                         />
                       ))}
                     </div>
@@ -717,6 +732,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 onNavigateToExercise={handleNavigateToExercise}
                 currentUser={user}
                 isSharedExercise={isSharedExercise}
+                memberships={exerciseMemberships.get(exercise.id) || []}
               />
             ))}
           </div>
@@ -842,6 +858,7 @@ interface ExerciseCardProps {
   onNavigateToExercise: (exerciseId: string) => void;
   currentUser?: AuthUserProfile; // User from auth hook
   isSharedExercise: (exerciseId: string) => boolean; // Function to check if exercise is shared
+  memberships?: CatalogMembership[]; // Pre-loaded memberships to prevent N+1 queries
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -853,28 +870,26 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onDelete,
   onNavigateToExercise,
   currentUser,
-  isSharedExercise
+  isSharedExercise,
+  memberships
 }) => {
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const loc = localizeExercise(exercise, t);
-  const [catalogIds, setCatalogIds] = useState<string[]>(() => exercise.catalogId ? [exercise.catalogId] : []);
-  // Load memberships for multi-catalog display (Phase 5 visual)
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const memberships = await storageService.getExerciseMemberships(exercise.id);
-        if (cancelled) return;
-        if (memberships && memberships.length > 0) {
-          const ids = Array.from(new Set(memberships.map(m => m.catalog_id)));
-          setCatalogIds(ids);
-        }
-      } catch (e) {
-        logger.warn('ExerciseCard: failed to load memberships', { id: exercise.id, error: e });
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [exercise.id]);
+  
+  // Use pre-loaded memberships to determine catalog IDs (prevents N+1 query problem)
+  const catalogIds = useMemo(() => {
+    if (memberships && memberships.length > 0) {
+      return Array.from(new Set(memberships.map(m => m.catalog_id)));
+    }
+    return exercise.catalogId ? [exercise.catalogId] : [];
+  }, [memberships, exercise.catalogId]);
+  
+  // Lazy load video thumbnails using intersection observer
+  const { ref: cardRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
+    threshold: 0,
+    rootMargin: '300px', // Start loading 300px before visible
+    freezeOnceVisible: true // Keep loaded once visible
+  });
   
   // Check if the exercise is user-created and belongs to the current user
   // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
@@ -891,7 +906,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const isSharedExerciseCard = isSharedExercise(exercise.id);
 
   return (
-    <div className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+    <div 
+      ref={cardRef}
+      className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
       isUserCreated
         ? 'exercise-card-custom'
         : 'border border-surface-200 dark:border-surface-700'
@@ -1044,14 +1061,19 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <div className="mb-2 h-[3rem]" aria-hidden="true" />
         )}
 
-        {/* Video/Image Area */}
+        {/* Video/Image Area - Lazy loaded when visible */}
         <div className="mb-2">
-          <VideoThumbnail
-            exercise={exercise}
-            onVideoLoad={() => {}}
-            onVideoError={() => {}}
-            className="w-full aspect-square"
-          />
+          {isIntersecting ? (
+            <VideoThumbnail
+              exercise={exercise}
+              onVideoLoad={() => {}}
+              onVideoError={() => {}}
+              className="w-full aspect-square"
+            />
+          ) : (
+            // Lightweight placeholder while off-screen
+            <div className="w-full aspect-square bg-surface-100 dark:bg-surface-700 rounded-lg animate-pulse" />
+          )}
         </div>
 
         {/* Start Timer Button - Full Width */}

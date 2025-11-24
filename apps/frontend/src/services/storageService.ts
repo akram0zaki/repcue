@@ -3161,6 +3161,40 @@ export class StorageService {
   }
 
   /**
+   * Bulk load catalog memberships for multiple exercises
+   * This prevents N+1 query problems when displaying multiple exercises
+   * 
+   * @param exerciseIds - Array of exercise IDs to get memberships for
+   * @returns Map of exercise ID to their catalog memberships
+   */
+  public async getAllExerciseMemberships(exerciseIds: string[]): Promise<Map<string, CatalogMembership[]>> {
+    if (!this.canStoreData() || exerciseIds.length === 0) {
+      return new Map();
+    }
+
+    return await this.safeDatabaseAccess(
+      async () => {
+        const memberships = await this.db.catalog_memberships
+          .where('exercise_id')
+          .anyOf(exerciseIds)
+          .and(m => !m.deleted)
+          .toArray();
+        
+        // Group by exercise ID
+        const membershipMap = new Map<string, CatalogMembership[]>();
+        memberships.forEach(membership => {
+          const existing = membershipMap.get(membership.exercise_id) || [];
+          existing.push(membership);
+          membershipMap.set(membership.exercise_id, existing);
+        });
+        
+        return membershipMap;
+      },
+      () => new Map()
+    );
+  }
+
+  /**
    * Get exercises for a specific catalog with membership information
    * Joins exercises with their catalog membership data
    * 
