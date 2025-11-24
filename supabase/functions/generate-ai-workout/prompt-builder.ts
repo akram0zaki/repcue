@@ -194,7 +194,7 @@ Difficulty: ${ex.difficulty_level || 'Not specified'}
 ${ex.exercise_type === 'repetition_based' ? `Default Sets: ${ex.default_sets || 3}\nDefault Reps: ${ex.default_reps || 10}` : ''}
 ${ex.exercise_type === 'time_based' ? `Default Duration: ${ex.default_duration || 60}s` : ''}
 ${ex.rep_duration_seconds ? `Rep Duration: ${ex.rep_duration_seconds}s` : ''}
-Tags: ${ex.tags.join(', ') || 'None'}
+Tags: ${ex.tags?.join(', ') || 'None'}
 Equipment: ${ex.equipment_needed?.join(', ') || 'None'}
 Muscle Groups: ${ex.muscle_groups?.join(', ') || 'Not specified'}
 Benefits: ${ex.benefits || 'Not specified'}
