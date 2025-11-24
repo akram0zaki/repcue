@@ -8,7 +8,7 @@
 - ✅ Move the timer progress display above the video in a dedicated section
 - On the exercises listing create top-level category `Community` to host the custom exercises made public by users
 - Progressive Workouts
-- Profile enrichment (year of birth, unique name on screen, registered since, personal records, connections, etc)
+- ✅ Profile enrichment (year of birth, unique name on screen, registered since, personal records, connections, etc)
 - ✅ Change the color scheme to a more exciting palette as opposed to the current [corporate] one
 - Improved error handling, assigning error codes to common backend errors and ensure recognized error codes render localized error messages.
 - Social engagement (rating and reviews, leagues, etc)

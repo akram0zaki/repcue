@@ -4,6 +4,7 @@ import { syncService } from '../services/syncService';
 import { legalDocsService } from '../services/legalDocsService';
 import { consentService } from '../services/consentService';
 import type { CatalogMembership, GlobalExercise } from '../types';
+import { getAllCatalogs } from '../data/catalogs';
 import logger from '../utils/logger';
 
 /**
@@ -36,14 +37,10 @@ export default function DevToolsPage() {
     });
     return () => { unsubscribe(); };
   }, []);
+  
+  // Get all catalogs from the catalog data (including non-visible ones for dev tools)
   const catalogOptions = useMemo(
-    () => [
-      { id: 'general-fitness', label: 'General Fitness' },
-      { id: 'women-health', label: "Women's Health" },
-      { id: 'tai-chi', label: 'Tai Chi' },
-      { id: 'aikido', label: 'Aikido' },
-      { id: 'zumba', label: 'Zumba' }
-    ],
+    () => getAllCatalogs().map(c => ({ id: c.id, label: c.nameKey })),
     []
   );
 

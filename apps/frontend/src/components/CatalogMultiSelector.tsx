@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
-import { getAllCatalogs } from '../data/catalogs';
+import { getAvailableCatalogs } from '../data/catalogs';
 
 interface CatalogMultiSelectorProps {
   selectedCatalogIds: string[];
@@ -29,7 +29,7 @@ const CatalogMultiSelector: React.FC<CatalogMultiSelectorProps> = ({
   const { t } = useTranslation(['catalogs', 'common']);
   const catalogs = (availableCatalogs && availableCatalogs.length > 0)
     ? availableCatalogs
-    : getAllCatalogs();
+    : getAvailableCatalogs(); // This now filters by isVisible
 
   const toggle = (id: string) => {
     if (disabled) return;

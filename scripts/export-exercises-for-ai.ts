@@ -14,6 +14,7 @@
 
 import { GLOBAL_EXERCISES } from '../apps/frontend/src/data/globalExercises.js';
 import { ALL_CATALOG_MEMBERSHIPS } from '../apps/frontend/src/data/memberships/index.js';
+import { EXERCISE_CATALOGS } from '../apps/frontend/src/data/catalogs.js';
 import { writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -22,8 +23,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Catalogs to exclude (premium catalogs not for general AI use)
-const EXCLUDED_CATALOGS = ['zumba', 'tai-chi', 'aikido'];
+// Get excluded catalogs based on isIncludedInAI property
+const EXCLUDED_CATALOGS = EXERCISE_CATALOGS
+  .filter(catalog => catalog.isIncludedInAI === false)
+  .map(catalog => catalog.id);
 
 /**
  * Escape CSV field value
@@ -61,7 +64,7 @@ const includedExerciseIds = new Set(
 
 console.log(`📊 Total exercises in system: ${GLOBAL_EXERCISES.length}`);
 console.log(`📋 Total memberships: ${ALL_CATALOG_MEMBERSHIPS.length}`);
-console.log(`🚫 Excluded catalogs: ${EXCLUDED_CATALOGS.join(', ')}`);
+console.log(`🚫 Excluded catalogs (isIncludedInAI=false): ${EXCLUDED_CATALOGS.join(', ')}`);
 console.log(`✅ Exercises to export: ${includedExerciseIds.size}\n`);
 
 // Filter exercises and join with catalog memberships

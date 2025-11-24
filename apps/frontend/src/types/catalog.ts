@@ -186,5 +186,17 @@ export interface ExerciseCatalog {
    * @example 'kyuLevel' - groups by Aikido Kyu level
    */
   groupByBadge?: string;
+  
+  /** 
+   * Whether this catalog should be visible/rendered in the UI
+   * @default true
+   */
+  isVisible?: boolean;
+  
+  /** 
+   * Whether this catalog should be included in AI export scripts (CSV generation)
+   * @default true
+   */
+  isIncludedInAI?: boolean;
 }
 

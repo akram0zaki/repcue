@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
-import { EXERCISE_CATALOGS } from '../data/catalogs';
+import { EXERCISE_CATALOGS, getAvailableCatalogs } from '../data/catalogs';
 import { useRTLDetection } from '../hooks/useRTLDetection';
 import { ChevronLeftIcon, ChevronRightIcon } from './icons/NavigationIcons';
 
@@ -21,8 +21,12 @@ const CatalogSelector: React.FC<CatalogSelectorProps> = ({
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Sort catalogs by display order
-  const sortedCatalogs = [...EXERCISE_CATALOGS].sort((a, b) => a.displayOrder - b.displayOrder);
+  // Get only visible catalogs sorted by display order
+  // Note: getAvailableCatalogs filters by isVisible and premium status
+  // For catalog selector, we show all visible catalogs regardless of premium
+  const sortedCatalogs = EXERCISE_CATALOGS
+    .filter(catalog => catalog.isVisible !== false)
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 
   // Handle image loading errors
   const handleImageError = (catalogId: string) => {

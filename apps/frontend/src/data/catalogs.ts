@@ -23,6 +23,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'blue',
     pictureUrl: '/images/catalogs/general-fitness-square.png',
     groupByBadge: 'category', // Group exercises by category badge on listing page
+    isVisible: true,
+    isIncludedInAI: true,
     badges: [
       {
         id: 'category',
@@ -72,6 +74,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'pink',
     pictureUrl: '/images/catalogs/women-health-square.png',
     groupByBadge: 'category', // Group exercises by category badge on listing page
+    isVisible: true,
+    isIncludedInAI: true,
     badges: [
       {
         id: 'category',
@@ -108,6 +112,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'black',
     pictureUrl: '/images/catalogs/aikido-square.png',
     groupByBadge: 'kyuLevel', // Group exercises by Kyu level badge on listing page
+    isVisible: true,
+    isIncludedInAI: false,
     badges: [
       {
         id: 'category',
@@ -146,6 +152,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'green',
     pictureUrl: '/images/catalogs/tai-chi-square.png',
     groupByBadge: 'category', // Group exercises by form badge on listing page
+    isVisible: true,
+    isIncludedInAI: false,
     badges: [
       {
         id: 'category',
@@ -178,6 +186,8 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'purple',
     pictureUrl: '/images/catalogs/zumba-square.png',
     groupByBadge: 'style', // Group exercises by dance style badge on listing page
+    isVisible: false,
+    isIncludedInAI: false,
     badges: [
       {
         id: 'category',
@@ -229,7 +239,18 @@ export function getAllCatalogs(): ExerciseCatalog[] {
 
 /**
  * Get catalogs available to user based on premium status
+ * Only returns visible catalogs (isVisible !== false)
  */
 export function getAvailableCatalogs(isPremiumUser: boolean = false): ExerciseCatalog[] {
-  return getAllCatalogs().filter(catalog => !catalog.isPremium || isPremiumUser);
+  return getAllCatalogs().filter(catalog => 
+    (catalog.isVisible !== false) && (!catalog.isPremium || isPremiumUser)
+  );
+}
+
+/**
+ * Get catalogs that should be included in AI exports
+ * Only returns catalogs where isIncludedInAI !== false
+ */
+export function getAIIncludedCatalogs(): ExerciseCatalog[] {
+  return getAllCatalogs().filter(catalog => catalog.isIncludedInAI !== false);
 }
