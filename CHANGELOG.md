@@ -1,6 +1,203 @@
 ## Unreleased
 
+### 2025-11-24
+
+#### 🐛 Fix: AI Workout Edge Function crash (undefined .length)
+
+- Root cause: `generateWorkouts()` returned an array, but `index.ts` expected `{ workouts, feedback }` and accessed `result.workouts.length`, causing `TypeError: Cannot read properties of undefined (reading 'length')`.
+- Fix:
+  - Updated `supabase/functions/generate-ai-workout/workout-generator.ts` to return `{ workouts }` (and optional `feedback` in future).
+  - Added null-safety in `supabase/functions/generate-ai-workout/index.ts` when logging/returning `workouts`.
+- Impact: Resolves 500 errors during AI workout generation and stabilizes logging.
+
+
 ### 2025-11-23
+
+#### 🏗️ Fixed Duplicate AIWorkoutResponse Interface Architecture
+
+**Problem**: Two conflicting `AIWorkoutResponse` interfaces existed with different structures
+- **Public Interface** (`types/aiWorkout.ts`): `{ workouts, feedback, generationId }`
+- **Service Internal** (`aiWorkoutService.ts`): `{ workouts, feedback, metadata: { correlationId, ... } }`
+
+**Issues Caused**:
+- Type confusion and shadowing
+- Edge Function returns metadata structure, but consumers expected generationId
+- Breaking changes required coordination across multiple files
+
+**Solution Applied**:
+- Renamed service's internal interface to `EdgeFunctionResponse` (clearer intent)
+- Service now imports and returns public `AIWorkoutResponse` interface
+- Added transformation layer: `metadata.correlationId` → `generationId`
+- Updated hook to use `response.generationId` instead of `response.metadata.correlationId`
+
+**Benefits**:
+- Single source of truth for public API contract
+- Clear separation between internal Edge Function response and public interface
+- Type safety maintained across service boundary
+- Future changes only need to update the transformation layer
+
+**Files Changed**:
+- `apps/frontend/src/services/aiWorkoutService.ts` (interface rename + transformation)
+- `apps/frontend/src/hooks/useAIWorkoutFlow.ts` (use generationId field)
+
+---
+
+#### � Improved AI Workout Card Layout for RTL Languages
+
+**Issue**: Workout cards in AI results were cramped with AI badge and workout name competing for space on same line
+
+**Changes**:
+- Moved "مُنشأ بالذكاء الاصطناعي" (AI-Generated) badge to its own line above workout name
+- Workout name now on separate line 2 with proper spacing (mb-2)
+- Better vertical rhythm: badge (mb-3) → name (mb-2) → description → details
+- Improved readability in Arabic and all RTL languages
+
+**Files Changed**:
+- `apps/frontend/src/components/AIWorkoutResultsModal.tsx` (workout card structure)
+
+---
+
+#### �🐛 Fixed AI Insights Not Displaying in Workout Builder
+
+**Issue**: AI Coach Insights section appeared in Arabic (and all languages) but content was empty
+- **Root Cause**: Frontend hook hardcoded `setFeedback(null)` despite Edge Function returning feedback
+- **Type Mismatch**: Service's internal `AIWorkoutResponse` interface missing `feedback` field
+
+**Fix Applied**:
+- Updated `useAIWorkoutFlow.ts` to use `response.feedback` instead of hardcoded null
+- Added `feedback?: string` to service's internal `AIWorkoutResponse` interface
+- Improved comment clarity: "Feedback property removed from AIWorkoutResponse interface per design decision" → proper handling
+
+**Result**: AI-generated insights now render properly in all languages including Arabic RTL layout
+
+**Files Changed**:
+- `apps/frontend/src/hooks/useAIWorkoutFlow.ts` (line 355)
+- `apps/frontend/src/services/aiWorkoutService.ts` (interface AIWorkoutResponse)
+
+---
+
+#### ✨ Improved Profile Creation and Page Layout
+
+**Profile Creation During Authentication**:
+- Profile now automatically created during sign-in/sign-up via `AuthService.ensureUserProfile()`
+- Captures actual registration date from `user.createdAt` (not today's date)
+- Updates `last_active` timestamp on each sign-in
+- Non-blocking implementation - auth flow continues even if profile creation fails
+- Eliminates "Profile Not Found" errors on first visit to profile page
+
+**Restructured ProfilePage Layout**:
+- **Top Section**: Avatar, name (editable), email, birth year (editable)
+  - Name and birth year can be edited inline with save/cancel buttons
+  - Birth year validation: 1900 to current year
+  - Removed duplicate name field from fitness section
+- **Middle Section**: Connections, Statistics (always visible), Member Since
+- **Bottom Section**: Fitness Profile (gender, height, weight, goals, training frequency, style)
+- Statistics section now always visible (shows 0 values when no data)
+- Member Since uses actual `join_date` from profile (registration date, not current date)
+
+**Technical Implementation**:
+- `ensureUserProfile()` method in AuthService called from `handleSessionChange()`
+- Birth year editing state: `editingBirthYear`, `birthYearValue`
+- Birth year handlers: `handleSaveBirthYear()` with validation, `handleCancelBirthYearEdit()`
+- Improved visual hierarchy with logical field ordering
+
+#### 🔄 Unified User Profile System
+
+Refactored the user profile system to use a single unified interface with nested objects for fitness and social data, eliminating confusion from having multiple UserProfile interfaces.
+
+**What Changed**:
+- **Single UserProfile Interface**: Unified interface in `userProfile.ts` with nested `fitness` and `social` objects
+- **Common Fields**: Name and birth_year now at profile root level (not nested)
+- **Nested Data**: Fitness-specific fields in `fitness` object, social-specific fields in `social` object
+- **Database Schema**: Updated to use JSONB columns for nested fitness and social data
+- **Responsive UI**: Save button now wraps properly on 320px width screens
+- **Translations**: All profile page strings externalized to `profile.json` (English only, ready for other locales)
+
+**Unified Structure**:
+```typescript
+interface UserProfile extends SyncMetadata {
+  user_id: string;
+  name?: string;              // Common field
+  birth_year?: number;        // Common field
+  fitness?: {                 // Nested fitness data
+    gender, height, weight,
+    primary_goals, training_frequency,
+    preferred_training_style
+  };
+  social?: {                  // Nested social data
+    bio, location, website,
+    privacy_settings, stats
+  };
+  join_date?: string;
+  last_active?: string;
+}
+```
+
+**Database Changes**:
+- Replaced individual columns with JSONB: `fitness JSONB`, `social JSONB`
+- Common fields at root: `name TEXT`, `birth_year INTEGER`
+- More flexible schema that can accommodate future data without migrations
+
+**Profile Page Updates**:
+- Unified profile display with conditional rendering based on nested data
+- Responsive button layout: `flex-col sm:flex-row` for proper wrapping
+- All hardcoded strings replaced with `t('profile:key')` translations
+- Goal labels, training frequency, and training style use translation keys
+
+**Translation Keys Added** (English only):
+- Profile section labels: `fitnessProfile`, `name`, `gender`, `age`, etc.
+- Actions: `edit`, `save`, `cancel`, `notSet`
+- Goal labels: `goalLabels.weight_loss`, `goalLabels.muscle_building`, etc.
+- Training preferences: `trainingFrequencyLabels.*`, `trainingStyleLabels.*`
+- Empty state: `noFitnessData`
+
+**Files Modified**:
+- `apps/frontend/src/types/userProfile.ts` — Unified UserProfile interface with nested objects
+- `apps/frontend/src/types/index.ts` — Removed duplicate UserProfile, export from userProfile.ts
+- `apps/frontend/src/pages/ProfilePage.tsx` — Updated to use unified interface, responsive buttons, translations
+- `apps/frontend/src/utils/profileConversion.ts` — Updated for nested structure
+- `supabase/migrations/20251123_create_user_profiles_table.sql` — JSONB columns for flexibility
+- `apps/frontend/public/locales/en/profile.json` — New translation file (43 keys)
+
+**User Experience**:
+- **Before**: Two conflicting UserProfile interfaces, Save button overflow on mobile, hardcoded English strings
+- **After**: Single source of truth, responsive layout, internationalization-ready
+
+**Next Steps**: Add translations to remaining 7 locales (fr, de, es, nl, ar, ar-EG, fy)
+
+#### 🆔 Profile Page Integration with Fitness Profile
+
+Updated the Profile Page to display and edit user fitness profile data. Added an editable name field to the user profile system.
+
+**What Changed**:
+- **Fitness Profile Display**: Profile page now shows fitness profile data (gender, age, height, weight, goals, training preferences)
+- **Editable Name Field**: Added name field to user_profiles table with inline editing on profile page
+- **Database Schema Update**: Added `name TEXT` column to user_profiles table
+- **Type Updates**: Added `name?: string` to UserProfile interface in userProfile.ts
+- **UI Integration**: Fitness profile card displays below social profile on /profile page (own profile only)
+
+**Profile Page Features**:
+- **Name Editing**: Click "Edit" → inline input → Save/Cancel buttons
+- **Fitness Data Display**: Shows gender, age (calculated from birth_year), height, weight, goals, training preferences
+- **Smart Display**: Only shows fields that have values (no empty sections)
+- **Goal Tags**: Primary goals displayed as colorful badges
+- **Empty State**: Shows helpful message if no fitness profile exists yet
+
+**Technical Implementation**:
+- Renamed existing UserProfile type to SocialProfile (from types/index.ts) to avoid confusion
+- FitnessProfile type imported from types/userProfile.ts
+- StorageService.getUserProfile() called to load fitness data
+- Profile updates saved via StorageService.saveUserProfile()
+- Name field persisted to IndexedDB and synced to Supabase
+
+**Files Modified**:
+- `apps/frontend/src/types/userProfile.ts` — Added name field to UserProfile interface
+- `apps/frontend/src/pages/ProfilePage.tsx` — Added fitness profile display, name editing, dual profile types
+- `supabase/migrations/20251123_create_user_profiles_table.sql` — Added name TEXT column
+
+**User Experience**:
+- **Before**: Profile page only showed social profile (mock data)
+- **After**: Profile page shows both social profile and editable fitness profile data
 
 #### 🎨 Toast Component Theme Integration & Translation Improvements
 
