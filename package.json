@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter @repcue/frontend dev",
     "dev:be": "pnpm --filter @repcue/backend dev",
+    "export-exercises": "npx tsx scripts/export-exercises-for-ai.ts",
     "build": "pnpm --filter @repcue/frontend build",
     "preview": "pnpm --filter @repcue/frontend preview",
     "start": "pnpm --filter @repcue/backend start",
@@ -37,7 +38,8 @@
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "husky": "^9.1.6",
-    "lint-staged": "^15.2.10"
+    "lint-staged": "^15.2.10",
+    "tsx": "^4.20.6"
   },
   "lint-staged": {
     "apps/frontend/**/*.{ts,tsx,js,jsx,css,scss}": [
