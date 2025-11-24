@@ -253,7 +253,8 @@ serve(async (req) => {
     }
 
     logInfo(correlationId, 'Request validation passed', {
-      goal: requestBody.responses?.goal,
+      goals: requestBody.responses?.goals,
+      goalDuration: requestBody.responses?.goalDuration,
       fitnessLevel: requestBody.responses?.fitnessLevel,
       hasInjuries: !!requestBody.responses?.injuries
     });
@@ -264,12 +265,14 @@ serve(async (req) => {
     logInfo(correlationId, 'Processing AI workout generation request', {
       userId,
       locale: sanitizedRequest.locale,
-      goal: sanitizedRequest.responses.goal,
+      goals: sanitizedRequest.responses.goals,
+      goalDuration: sanitizedRequest.responses.goalDuration,
       fitnessLevel: sanitizedRequest.responses.fitnessLevel
     });
 
     // Generate workouts
-    const workouts = await generateWorkouts(sanitizedRequest, userId, correlationId);
+    const result = await generateWorkouts(sanitizedRequest, userId, correlationId);
+    const workouts = Array.isArray(result?.workouts) ? result.workouts : [];
 
     const duration = Date.now() - startTime;
     logInfo(correlationId, 'AI workout generation completed', {
@@ -282,6 +285,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         workouts,
+        feedback: result?.feedback,
         metadata: {
           correlationId,
           generatedAt: new Date().toISOString(),

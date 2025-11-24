@@ -341,41 +341,88 @@ describe('aiWorkoutValidation', () => {
 
   describe('validateScreen2', () => {
     const validData: Screen2Data = {
-      goal: 'muscle_building',
+      goals: ['muscle_building'],
       fitnessLevel: 'intermediate',
       trainingTime: 'morning',
     };
 
-    describe('goal validation', () => {
-      it('should accept valid goal', () => {
+    describe('goals validation', () => {
+      it('should accept valid single goal', () => {
         const errors = validateScreen2(validData);
-        expect(errors.goal).toBeUndefined();
+        expect(errors.goals).toBeUndefined();
       });
 
-      it('should accept all valid goals', () => {
-        const goals: Array<Screen2Data['goal']> = [
+      it('should accept multiple valid goals', () => {
+        const data: Screen2Data = {
+          ...validData,
+          goals: ['weight_loss', 'muscle_building', 'flexibility'],
+        };
+        const errors = validateScreen2(data);
+        expect(errors.goals).toBeUndefined();
+      });
+
+      it('should accept all valid goals including marathon_des_sables', () => {
+        const goals: FitnessGoal[] = [
           'weight_loss',
           'muscle_building',
           'health_maintenance',
           'flexibility',
+          'marathon_des_sables',
         ];
 
         goals.forEach((goal) => {
-          const errors = validateScreen2({ ...validData, goal });
-          expect(errors.goal).toBeUndefined();
+          const errors = validateScreen2({ ...validData, goals: [goal] });
+          expect(errors.goals).toBeUndefined();
         });
       });
 
-      it('should reject missing goal', () => {
-        const data = { ...validData, goal: undefined as any };
+      it('should reject empty goals array', () => {
+        const data = { ...validData, goals: [] };
         const errors = validateScreen2(data);
-        expect(errors.goal).toBe('Primary goal is required');
+        expect(errors.goals).toBe('At least one goal is required');
       });
 
-      it('should reject invalid goal', () => {
-        const data = { ...validData, goal: 'invalid' as any };
+      it('should reject missing goals', () => {
+        const data = { ...validData, goals: undefined as any };
         const errors = validateScreen2(data);
-        expect(errors.goal).toBe('Invalid goal selection');
+        expect(errors.goals).toBe('At least one goal is required');
+      });
+
+      it('should reject invalid goal in array', () => {
+        const data = { ...validData, goals: ['invalid' as any] };
+        const errors = validateScreen2(data);
+        expect(errors.goals).toBe('Invalid goal selection');
+      });
+    });
+
+    describe('goalDuration validation', () => {
+      it('should accept valid goal duration', () => {
+        const data = { ...validData, goalDuration: 6 };
+        const errors = validateScreen2(data);
+        expect(errors.goalDuration).toBeUndefined();
+      });
+
+      it('should accept undefined goal duration (optional)', () => {
+        const errors = validateScreen2(validData);
+        expect(errors.goalDuration).toBeUndefined();
+      });
+
+      it('should reject goal duration less than 1', () => {
+        const data = { ...validData, goalDuration: 0 };
+        const errors = validateScreen2(data);
+        expect(errors.goalDuration).toBe('Goal duration must be between 1 and 24 months');
+      });
+
+      it('should reject goal duration greater than 24', () => {
+        const data = { ...validData, goalDuration: 25 };
+        const errors = validateScreen2(data);
+        expect(errors.goalDuration).toBe('Goal duration must be between 1 and 24 months');
+      });
+
+      it('should reject invalid goal duration (NaN)', () => {
+        const data = { ...validData, goalDuration: NaN };
+        const errors = validateScreen2(data);
+        expect(errors.goalDuration).toBe('Goal duration must be between 1 and 24 months');
       });
     });
 

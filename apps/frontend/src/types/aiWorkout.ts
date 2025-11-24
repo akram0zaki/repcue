@@ -11,9 +11,9 @@
 export type Gender = 'male' | 'female' | 'other';
 
 /**
- * User's primary fitness goal
+ * User's fitness goal(s)
  */
-export type FitnessGoal = 'weight_loss' | 'muscle_building' | 'health_maintenance' | 'flexibility';
+export type FitnessGoal = 'weight_loss' | 'muscle_building' | 'health_maintenance' | 'flexibility' | 'marathon_des_sables';
 
 /**
  * User's fitness experience level
@@ -67,7 +67,8 @@ export interface Screen1Data {
  * Screen 2 data: Goals & Preferences
  */
 export interface Screen2Data {
-  goal: FitnessGoal;
+  goals: FitnessGoal[]; // Changed from single goal to array of goals
+  goalDuration?: number; // Duration in months to achieve goal(s)
   fitnessLevel: FitnessLevel;
   trainingTime: TrainingTime;
 }
@@ -79,6 +80,7 @@ export interface Screen3Data {
   injuries: string; // Free-form text, max 500 chars
   trainingStyle: TrainingStyle;
   timeAvailability: TimeAvailability;
+  saveToProfile: boolean; // Whether to save entered data to user profile
 }
 
 /**
@@ -100,7 +102,8 @@ export interface AIWorkoutRequest {
     age: number;
     height: Height;
     weight: Weight;
-    goal: FitnessGoal;
+    goals: FitnessGoal[]; // Multiple goals support
+    goalDuration?: number; // Duration in months
     fitnessLevel: FitnessLevel;
     trainingTime: TrainingTime;
     injuries: string;
@@ -121,7 +124,8 @@ export interface AIWorkoutMetadata {
   generatedAt: string; // ISO 8601 format
   /** Parameters used for generation (for future reference/regeneration) */
   generationParams: {
-    goal: FitnessGoal;
+    goals: FitnessGoal[];
+    goalDuration?: number;
     fitnessLevel: FitnessLevel;
     trainingStyle: TrainingStyle;
     timeAvailability: TimeAvailability;
@@ -155,6 +159,8 @@ export interface GeneratedWorkout {
 export interface AIWorkoutResponse {
   /** Generated workouts (1-3 workouts) */
   workouts: GeneratedWorkout[];
+  /** AI-generated feedback and context for the user (e.g., timeline assessment, attention points, recommendations) */
+  feedback?: string;
   /** Unique identifier for this generation request (for tracking/debugging) */
   generationId: string;
 }
@@ -183,7 +189,8 @@ export interface Screen1ValidationErrors {
  * Field-level validation errors for Screen 2
  */
 export interface Screen2ValidationErrors {
-  goal?: string;
+  goals?: string;
+  goalDuration?: string;
   fitnessLevel?: string;
   trainingTime?: string;
 }

@@ -243,13 +243,23 @@ export function validateScreen1(data: Partial<Screen1Data>): Screen1ValidationEr
 export function validateScreen2(data: Partial<Screen2Data>): Screen2ValidationErrors {
   const errors: Screen2ValidationErrors = {};
 
-  // Validate goal
-  if (!data.goal) {
-    errors.goal = 'Primary goal is required';
-  } else if (
-    !['weight_loss', 'muscle_building', 'health_maintenance', 'flexibility'].includes(data.goal)
-  ) {
-    errors.goal = 'Invalid goal selection';
+  const validGoals = ['weight_loss', 'muscle_building', 'health_maintenance', 'flexibility', 'marathon_des_sables'];
+
+  // Validate goals (now an array)
+  if (!data.goals || data.goals.length === 0) {
+    errors.goals = 'At least one goal is required';
+  } else if (!Array.isArray(data.goals)) {
+    errors.goals = 'Goals must be an array';
+  } else if (!data.goals.every(goal => validGoals.includes(goal))) {
+    errors.goals = 'Invalid goal selection';
+  }
+
+  // Validate goal duration (optional, but if provided must be valid)
+  if (data.goalDuration !== undefined && data.goalDuration !== null) {
+    const duration = Number(data.goalDuration);
+    if (isNaN(duration) || duration < 1 || duration > 24) {
+      errors.goalDuration = 'Goal duration must be between 1 and 24 months';
+    }
   }
 
   // Validate fitness level

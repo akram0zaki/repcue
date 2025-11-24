@@ -30,7 +30,8 @@ export interface UserProfile {
     kg?: number;
     lbs?: number;
   };
-  goal: 'weight_loss' | 'muscle_building' | 'health_maintenance' | 'flexibility';
+  goals: Array<'weight_loss' | 'muscle_building' | 'health_maintenance' | 'flexibility' | 'marathon_des_sables'>;
+  goalDuration?: number; // months to achieve goals
   fitnessLevel: 'beginner' | 'intermediate' | 'advanced';
   trainingTime: '3-4' | '4-5' | '5-6' | '6+'; // days per week
   injuries?: string;
@@ -107,7 +108,8 @@ Return ONLY valid JSON (no markdown, no explanations) with this exact structure:
       "scheduledDays": ["monday", "wednesday", "friday"],
       "estimatedDuration": 1800
     }
-  ]
+  ],
+  "feedback": "string"
 }
 
 VALIDATION RULES:
@@ -139,8 +141,16 @@ function buildUserProfileSection(profile: UserProfile): string {
     'weight_loss': 'Weight Loss',
     'muscle_building': 'Muscle Building',
     'health_maintenance': 'Health Maintenance',
-    'flexibility': 'Flexibility & Mobility'
+    'flexibility': 'Flexibility & Mobility',
+    'marathon_des_sables': 'Marathon des Sables Preparation'
   };
+
+  // Defensive check: ensure goals is an array
+  const goals = Array.isArray(profile.goals) ? profile.goals : [];
+  const goalsText = goals.length > 0 
+    ? goals.map(g => goalLabels[g] || g).join(', ')
+    : 'Not specified';
+  const durationText = profile.goalDuration ? ` (${profile.goalDuration} months timeframe)` : '';
 
   const levelLabels = {
     'beginner': 'Beginner',
@@ -159,7 +169,7 @@ function buildUserProfileSection(profile: UserProfile): string {
 - Age: ${profile.age} years
 - Height: ${heightStr}
 - Weight: ${weightStr}
-- Primary Goal: ${goalLabels[profile.goal]}
+- Goals: ${goalsText}${durationText}
 - Fitness Level: ${levelLabels[profile.fitnessLevel]}
 - Training Frequency: ${profile.trainingTime} days per week
 - Time per Session: ${profile.timeAvailability} minutes
@@ -217,9 +227,23 @@ export function buildAIPrompt(
   logDebug(correlationId, 'Building AI prompt', {
     exerciseCount: exercises.length,
     fitnessLevel: profile.fitnessLevel,
-    goal: profile.goal,
+    goals: profile.goals,
     hasInjuries: !!profile.injuries
   });
+
+  // Calculate goals text for use in prompt
+  const goalLabels = {
+    'weight_loss': 'Weight Loss',
+    'muscle_building': 'Muscle Building',
+    'health_maintenance': 'Health Maintenance',
+    'flexibility': 'Flexibility & Mobility',
+    'marathon_des_sables': 'Marathon des Sables Preparation'
+  };
+  
+  const goals = Array.isArray(profile.goals) ? profile.goals : [];
+  const goalsText = goals.length > 0 
+    ? goals.map(g => goalLabels[g] || g).join(', ')
+    : 'Not specified';
 
   const systemPrompt = buildSystemPrompt();
   const userProfileSection = buildUserProfileSection(profile);

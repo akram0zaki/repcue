@@ -6,15 +6,17 @@
  */
 
 import { supabase } from '../config/supabase';
-import type { AIWorkoutRequest, GeneratedWorkout } from '../types/aiWorkout';
+import type { AIWorkoutRequest, AIWorkoutResponse, GeneratedWorkout } from '../types/aiWorkout';
 import { authService } from './authService';
 import logger from '../utils/logger';
 
 /**
- * Response from generate-ai-workout Edge Function
+ * Internal response structure from the Edge Function
+ * (includes metadata that gets transformed to public AIWorkoutResponse)
  */
-interface AIWorkoutResponse {
+interface EdgeFunctionResponse {
   workouts: GeneratedWorkout[];
+  feedback?: string;
   metadata: {
     correlationId: string;
     generatedAt: string;
@@ -96,7 +98,7 @@ class AIWorkoutService {
       }
 
       logger.log('[AIWorkoutService] Generating workouts', {
-        goal: request.responses.goal,
+        goals: request.responses.goals,
         fitnessLevel: request.responses.fitnessLevel,
         locale: request.locale
       });
@@ -110,7 +112,7 @@ class AIWorkoutService {
       const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
 
       try {
-        const { data, error } = await supabase.functions.invoke<AIWorkoutResponse>(
+        const { data, error } = await supabase.functions.invoke<EdgeFunctionResponse>(
           'generate-ai-workout',
           {
             body: request,
@@ -226,7 +228,12 @@ class AIWorkoutService {
           correlationId: data.metadata?.correlationId
         });
 
-        return data;
+        // Transform EdgeFunctionResponse to public AIWorkoutResponse interface
+        return {
+          workouts: data.workouts,
+          feedback: data.feedback,
+          generationId: data.metadata.correlationId
+        };
 
       } catch (fetchError: unknown) {
         clearTimeout(timeoutId);
