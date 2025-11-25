@@ -74,6 +74,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     setHasError(false);
     setVideoUrl(null);
     
+    let isMounted = true;
+    
     const resolveUrl = async () => {
       try {
         let url: string | null = null;
@@ -96,6 +98,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           // For built-in exercises, load from exercise media
           const mediaIndex = await loadExerciseMedia();
           const media = mediaIndex[exercise.id];
+          if (!isMounted) return;
+          
           setMediaMeta(media || null);
           if (media) {
             const selectedPath = selectVideoVariant(
@@ -107,6 +111,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
             url = selectedPath ? await resolveVideoUrl(selectedPath) : null;
           }
         }
+
+        if (!isMounted) return;
 
         if (url) {
           // Skip probe for cached blob URLs - they're guaranteed valid from VideoCacheService
@@ -145,8 +151,10 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
             }
           }
           if (!ok) {
-            setHasError(true);
-            setVideoUrl(null);
+            if (isMounted) {
+              setHasError(true);
+              setVideoUrl(null);
+            }
             logger.warn('🎥 [VideoThumbnail] No accessible video variant found after probe attempts', { exerciseId: exercise.id });
             return;
           }
@@ -162,24 +170,37 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
             });
           }
 
-          setVideoUrl(url);
-          setHasError(false);
-          // If URL is a blob (cached), mark as loaded immediately to skip loading state
-          if (url.startsWith('blob:')) {
-            setIsLoaded(true);
+          if (isMounted) {
+            setVideoUrl(url);
+            setHasError(false);
+            // If URL is a blob (cached), mark as loaded immediately to skip loading state
+            if (url.startsWith('blob:')) {
+              setIsLoaded(true);
+            }
           }
         } else {
-          setHasError(true);
-          logger.warn('🎥 [VideoThumbnail] No video URL resolved for exercise:', exercise.id);
+          if (isMounted) {
+            setHasError(true);
+            logger.warn('🎥 [VideoThumbnail] No video URL resolved for exercise:', exercise.id);
+          }
         }
       } catch (error) {
         logger.error('🎥 [VideoThumbnail] Error resolving video URL:', error);
-        setHasError(true);
+        if (isMounted) {
+          setHasError(true);
+        }
       }
     };
 
     resolveUrl();
-  }, [exercise.id, exercise.custom_video_url]);
+    
+    // Cleanup function - no blob URL revocation
+    // Blob URLs are managed by VideoCacheService and should persist
+    // across component mount/unmount cycles for performance
+    return () => {
+      isMounted = false;
+    };
+  }, [exercise.id, exercise.custom_video_url]); // Removed isSharedExercise - it's a function, causes infinite re-renders
 
   useEffect(() => {
     const video = videoRef.current;

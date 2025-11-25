@@ -1,5 +1,50 @@
 ## Unreleased
 
+### 2025-11-25
+
+#### 🐛 Safari/iOS Video Loading Fix
+
+**Problem**: Video thumbnails showing white panels when scrolling back up on exercise pages in Safari/iOS
+- Videos load initially but fail to display after scrolling away and back
+- Inconsistent behavior: some videos show, some don't
+- Eventually all videos show "No Video" placeholder
+
+**Root Cause**: 
+- `useIntersectionObserver` with `freezeOnceVisible: true` prevented component re-rendering when scrolling back
+- Blob URLs from `VideoCacheService` were not being re-resolved when component remounted
+- No cleanup mechanism for async operations when component unmounted
+
+**Solution**:
+1. Added `isMounted` flag cleanup pattern in VideoThumbnail component to prevent state updates on unmounted components
+2. Blob URLs persist across component mount/unmount cycles (managed by VideoCacheService)
+3. Added proper async operation cancellation to prevent memory leaks
+4. Maintained `freezeOnceVisible: true` for performance (initial approach with `false` caused flickering)
+
+**Changes**:
+- `apps/frontend/src/components/VideoThumbnail.tsx`: Added `isMounted` flag and cleanup function to video URL resolution effect
+- `apps/frontend/src/pages/ExercisePage.tsx`: Kept `freezeOnceVisible: true` - blob URLs persist via VideoCacheService
+- `apps/frontend/src/test/setup.ts`: Added IntersectionObserver mock for test compatibility
+- Added detailed comments explaining the fix for future maintainers
+
+**Impact**: Videos now load consistently when scrolling up/down on exercise pages in Safari and iOS browsers without flickering
+
+**Note**: Initial fix attempt used `freezeOnceVisible: false` but caused rapid re-rendering and flickering. The real fix was the async cleanup pattern.
+
+#### 🐛 Edge Function: generate-ai-workout Crash Fix
+
+**Problem**: Edge function crashing with "Cannot read properties of undefined (reading 'join')" error when generating AI workouts
+
+**Root Cause**: Exercise objects with undefined `tags` property caused crash when attempting `ex.tags.join(', ')`
+
+**Solution**: Added optional chaining operator (`?.`) to safely access tags array: `ex.tags?.join(', ')`
+
+**Changes**:
+- `supabase/functions/generate-ai-workout/prompt-builder.ts` (line 148): Changed `ex.tags.join(', ')` → `ex.tags?.join(', ')`
+
+**Impact**: AI workout generation now handles exercises with missing tags gracefully without crashing
+
+---
+
 ### 2025-11-24
 
 #### 🌐 Clear Video Cache Button Internationalization Fix

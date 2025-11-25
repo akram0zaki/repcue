@@ -885,10 +885,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   }, [memberships, exercise.catalogId]);
   
   // Lazy load video thumbnails using intersection observer
+  // Note: freezeOnceVisible=true is safe because VideoCacheService persists blob URLs
+  // The async cleanup (isMounted flag) in VideoThumbnail prevents race conditions
   const { ref: cardRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
     threshold: 0,
     rootMargin: '300px', // Start loading 300px before visible
-    freezeOnceVisible: true // Keep loaded once visible
+    freezeOnceVisible: true // Optimization: once visible, stay visible (blob URLs persist)
   });
   
   // Check if the exercise is user-created and belongs to the current user
