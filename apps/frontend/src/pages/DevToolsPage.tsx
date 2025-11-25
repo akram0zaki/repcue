@@ -492,6 +492,14 @@ export default function DevToolsPage() {
         <div className="card p-4 bg-base-200">
           <h2 className="text-xl font-semibold mb-4">🎥 Video Cache Diagnostics</h2>
           
+          <div className="alert alert-info text-xs mb-3">
+            <div>
+              <div className="font-semibold">Platform Detection:</div>
+              <div>User Agent: {navigator.userAgent}</div>
+              <div>iOS Detected: {/iphone|ipad|ipod/i.test(navigator.userAgent) ? '✅ YES - Caching DISABLED' : '❌ NO - Caching ENABLED'}</div>
+            </div>
+          </div>
+          
           <div className="space-y-3">
             <div className="flex flex-wrap gap-2">
               <button 

@@ -6,12 +6,14 @@ import logger from './logger';
 
 /**
  * Detect if running on iOS (iPhone, iPad, iPod)
- * iOS WebKit has strict blob URL security restrictions in video elements,
- * regardless of browser (Safari, Chrome, Firefox on iOS all use WebKit)
+ * iOS WebKit invalidates blob URLs more aggressively than other platforms
  */
 function isIOS(): boolean {
   const ua = navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod/.test(ua);
+  const detected = /iphone|ipad|ipod/.test(ua);
+  // Log for debugging - will show in console
+  logger.log('🎥 [iOS Detection]', { userAgent: ua, isIOS: detected });
+  return detected;
 }
 
 /**
@@ -66,7 +68,9 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
       } else {
         // Caching disabled or iOS detected - return URL directly (browser will fetch)
         if (isIOS()) {
-          logger.log('🎥 [ResolveVideo] iOS detected - bypassing video cache, using direct URL');
+          logger.log('🎥 [ResolveVideo] iOS detected - bypassing video cache, using direct URL', { videoUrl });
+        } else {
+          logger.log('🎥 [ResolveVideo] Caching disabled - using direct URL', { VIDEO_CACHING_ENABLED, videoUrl });
         }
         return videoUrl;
       }
