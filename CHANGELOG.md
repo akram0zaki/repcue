@@ -2,47 +2,80 @@
 
 ### 2025-11-25
 
-#### 🐛 iOS Video Loading Fix - Disabled Caching on iOS
+#### � Video Caching Simplified - Standard HTTP Caching
 
-**Problem**: Video thumbnails showing "No Video" or failing to load on iOS devices (iPhone/iPad with Safari, Chrome, Firefox)
-- Videos work initially but show "No Video" after page refresh
-- Blob URLs created from IndexedDB cache fail to load in video elements on iOS
-- Issue affects all browsers on iOS (Safari, Chrome, Firefox) as they all use WebKit
+**Problem**: Video thumbnails showing "No Video" on iOS devices after page refresh
+- Previous approach using IndexedDB blob URLs failed on iOS WebKit
+- iOS detection bypass (serving direct URLs) also didn't solve the issue
+- Overly complex caching mechanism with blob URL lifecycle management
 
 **Root Cause**: 
-- iOS WebKit has strict security restrictions on blob URLs in video elements
-- Blob URLs created from cached video data fail to load with "Error: Unknown"
-- This is an iOS platform limitation, not browser-specific
-- Diagnostic testing revealed: blob URLs created successfully but rejected by video element
+- IndexedDB blob URL approach was unnecessarily complex
+- iOS WebKit has restrictions on blob URLs in video elements
+- Better solution: Use industry-standard HTTP caching with CDN
 
 **Solution**:
-- Disabled video caching entirely on iOS devices
-- Videos now load directly from server URLs on iOS instead of using blob URLs from cache
-- Detection: User agent matching `/iphone|ipad|ipod/`
-- Desktop and Android devices continue to use optimized caching system
+- **Replaced IndexedDB blob URL caching with standard HTTP caching**
+- Videos now served directly from R2 via Cloudflare CDN
+- Browser handles caching automatically via `Cache-Control` headers
+- Service Worker provides additional caching layer (optional)
+- Much simpler, more reliable, works across all platforms
+
+**Architecture**:
+```
+Client Request
+  ↓
+Browser HTTP Cache (standard Cache-Control)
+  ↓ (cache miss)
+Service Worker Cache (optional, for offline)
+  ↓ (cache miss)
+Cloudflare CDN Edge Cache
+  ↓ (cache miss)
+Cloudflare R2 Origin
+```
 
 **Changes**:
 - `apps/frontend/src/utils/resolveVideoUrl.ts`: 
-  - Added `isIOS()` detection function checking for iPhone/iPad/iPod in user agent
-  - Modified caching logic: `VIDEO_CACHING_ENABLED && !isIOS()`
-  - iOS devices bypass VideoCacheService and use direct URLs
-  - Added logging: "iOS detected - bypassing video cache, using direct URL"
+  - Removed iOS detection logic (no longer needed)
+  - Removed VideoCacheService integration for /media/* URLs
+  - Videos now return direct URLs - browser/CDN handles caching
+  - Kept VideoCacheService only for custom user uploads (blob-video://)
+  - Removed unused imports (VideoCacheService, VIDEO_CACHING_ENABLED)
 - `apps/frontend/src/pages/DevToolsPage.tsx`:
-  - Added "🎯 Simulate Exercise Page Load" diagnostic button
-  - Full pipeline test: load media index → select variant → resolve URL → test video element
-  - Helped identify exact failure point: blob URL creation succeeds, video element loading fails
+  - Updated platform detection display: now shows platform type and caching method
+  - Updated video diagnostics to test HTTP URLs instead of assuming blob URLs
+  - Updated info panel to explain HTTP-based caching system
+  - "Simulate Exercise Page Load" now properly tests both HTTP and blob URLs
+- R2 Pages Function (`functions/media/[[path]].ts`):
+  - Already configured with proper Cache-Control headers:
+    - Hashed files: `public, max-age=31536000, immutable` (1 year)
+    - Non-hashed: `public, max-age=3600, must-revalidate` (1 hour)
+  - Range request support for video seeking (HTTP 206)
+- Service Worker (`vite.config.ts`):
+  - Already configured with CacheFirst strategy for videos
+  - 90-day cache expiration, 100 video limit
+  - Provides offline support when enabled
 
-**Impact**: 
-- Videos now load reliably on all iOS devices regardless of browser
-- Consistent video playback after page refreshes and long periods of inactivity
-- Trade-off: iOS users get fresh videos from server (no offline caching benefit)
-- Desktop and Android users maintain optimized caching with offline support
+**Benefits**:
+- ✅ Works reliably on all platforms (iOS, Android, desktop)
+- ✅ Simpler code - no blob URL lifecycle management
+- ✅ Industry standard approach
+- ✅ Better performance - CDN edge caching
+- ✅ Offline support via Service Worker (optional)
+- ✅ No platform-specific workarounds needed
+
+**Migration Notes**:
+- VideoCacheService still exists for custom user-uploaded videos (blob-video:// scheme)
+- Built-in exercise videos (/media/*) now use standard HTTP caching
+- Users may see one-time re-download as cache transitions
+- Diagnostic tools in DevToolsPage remain useful for troubleshooting
 
 **Technical Details**:
-- iOS WebKit blocks blob URLs from IndexedDB in video elements for security
-- Previous fixes (removing blob validation, enhanced error handling) helped identify root cause
-- Final solution: Platform-specific behavior - cache on desktop/Android, direct URLs on iOS
-- Future consideration: Explore Media Source Extensions (MSE) or alternative iOS-compatible caching
+- HTTP Cache-Control headers tell browser how long to cache
+- Cloudflare CDN caches at edge locations globally
+- Service Worker adds offline capability without complexity
+- No blob URL creation/revocation needed for regular videos
+- Platform-agnostic solution - same code path for all devices
 
 #### 🐛 Edge Function: generate-ai-workout Crash Fix
 

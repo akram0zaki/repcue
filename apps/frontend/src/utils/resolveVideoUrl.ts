@@ -1,30 +1,17 @@
 import { storageService } from '../services/storageService';
 import { supabase } from '../config/supabase';
-import { VideoCacheService } from '../services/videoCacheService';
-import { VIDEO_CACHING_ENABLED } from '../config/features';
 import logger from './logger';
 
 /**
- * Detect if running on iOS (iPhone, iPad, iPod)
- * iOS WebKit invalidates blob URLs more aggressively than other platforms
- */
-function isIOS(): boolean {
-  const ua = navigator.userAgent.toLowerCase();
-  const detected = /iphone|ipad|ipod/.test(ua);
-  // Log for debugging - will show in console
-  logger.log('🎥 [iOS Detection]', { userAgent: ua, isIOS: detected });
-  return detected;
-}
-
-/**
  * Resolves video URLs, handling:
- *  - Regular (http/https) URLs: check cache first, then fetch and cache (if caching enabled)
+ *  - Regular (http/https) URLs: returned as-is, browser handles caching via HTTP
  *  - blob: URLs: returned directly (already resolved)
  *  - blob-pending-sync://{exerciseId}/{filename}: local file stored, upload still pending
  *  - blob-video://{exerciseId}/{filename}: local file stored & cloud-confirmed (stable scheme)
  *  - shared-video://{originalExerciseId}/{originalOwnerId}: reuse another exercise's video
  *
- * Uses VideoCacheService for persistent caching of regular URLs (http/https) when enabled.
+ * Note: Video caching now relies on standard HTTP Cache-Control headers and browser/CDN caching.
+ * This is more reliable than IndexedDB blob URLs, especially on iOS/Safari.
  * For blob-* schemes we look up IndexedDB (via storageService) and materialize a runtime blob: URL.
  * If the binary is missing but a storage_path exists we attempt a download (covers recovery cases).
  * For shared videos we reference the original exercise's stored video file.
@@ -41,39 +28,15 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
   if (videoUrl.startsWith('blob-pending-sync://') || videoUrl.startsWith('blob-video://') || videoUrl.startsWith('shared-video://')) {
     // Handle these schemes below (don't return early)
   } else {
-    // For regular HTTP/HTTPS/relative URLs, use the video cache service if enabled
-    // This includes: http://, https://, /media/*, /videos/*, etc.
+    // For regular HTTP/HTTPS/relative URLs, return as-is
+    // Browser will handle caching via standard HTTP Cache-Control headers
+    // This works reliably across all platforms including iOS
     const isHttpUrl = videoUrl.startsWith('http://') || videoUrl.startsWith('https://');
     const isRelativeUrl = videoUrl.startsWith('/');
     
     if (isHttpUrl || isRelativeUrl) {
-      // iOS WebKit has issues with blob URLs in video elements, so disable caching on iOS
-      const useCaching = VIDEO_CACHING_ENABLED && !isIOS();
-      
-      if (useCaching) {
-        const videoCacheService = VideoCacheService.getInstance();
-        
-        // Convert relative URLs to absolute URLs for caching
-        const absoluteUrl = isRelativeUrl ? new URL(videoUrl, window.location.origin).href : videoUrl;
-        
-        // Try to get from cache first
-        const cachedUrl = await videoCacheService.getVideo(absoluteUrl);
-        if (cachedUrl) {
-          return cachedUrl;
-        }
-        
-        // Fetch and cache if not found
-        const fetchedUrl = await videoCacheService.fetchAndCache(absoluteUrl);
-        return fetchedUrl;
-      } else {
-        // Caching disabled or iOS detected - return URL directly (browser will fetch)
-        if (isIOS()) {
-          logger.log('🎥 [ResolveVideo] iOS detected - bypassing video cache, using direct URL', { videoUrl });
-        } else {
-          logger.log('🎥 [ResolveVideo] Caching disabled - using direct URL', { VIDEO_CACHING_ENABLED, videoUrl });
-        }
-        return videoUrl;
-      }
+      logger.log('🎥 [ResolveVideo] Using direct URL - browser/CDN will handle caching', { videoUrl });
+      return videoUrl;
     }
     
     // Unknown URL format, return as-is

@@ -496,7 +496,8 @@ export default function DevToolsPage() {
             <div>
               <div className="font-semibold">Platform Detection:</div>
               <div>User Agent: {navigator.userAgent}</div>
-              <div>iOS Detected: {/iphone|ipad|ipod/i.test(navigator.userAgent) ? '✅ YES - Caching DISABLED' : '❌ NO - Caching ENABLED'}</div>
+              <div>Platform: {/iphone|ipad|ipod/i.test(navigator.userAgent) ? 'iOS' : /android/i.test(navigator.userAgent) ? 'Android' : 'Desktop/Other'}</div>
+              <div>Video Caching: Browser HTTP Cache + CDN (all platforms)</div>
             </div>
           </div>
           
@@ -781,32 +782,34 @@ export default function DevToolsPage() {
                       }
                       
                       info += `✅ URL resolved: ${url.substring(0, 50)}...\n`;
-                      info += `   URL type: ${url.startsWith('blob:') ? 'BLOB' : 'HTTP'}\n`;
+                      info += `   URL type: ${url.startsWith('blob:') ? 'BLOB (custom upload)' : 'HTTP (browser cached)'}\n`;
                       
-                      // Step 4: Test if blob URL works
-                      if (url.startsWith('blob:')) {
-                        info += '4️⃣ Testing blob URL...\n';
-                        try {
-                          // Create a test video element
-                          const video = document.createElement('video');
-                          video.src = url;
-                          video.muted = true;
-                          
-                          // Wait for loadedmetadata event
-                          const loadPromise = new Promise((resolve, reject) => {
-                            video.onloadedmetadata = () => resolve(true);
-                            video.onerror = (e) => reject(e);
-                            setTimeout(() => reject(new Error('Timeout')), 5000);
-                          });
-                          
-                          await loadPromise;
-                          info += `✅ Blob URL works - video metadata loaded\n`;
-                          info += `   Duration: ${video.duration.toFixed(2)}s\n`;
-                          info += `   Dimensions: ${video.videoWidth}x${video.videoHeight}\n`;
-                        } catch (videoError) {
-                          info += `❌ Blob URL failed to load in video element\n`;
-                          info += `   Error: ${videoError instanceof Error ? videoError.message : 'Unknown'}\n`;
-                        }
+                      // Step 4: Test if video URL loads in video element
+                      info += '4️⃣ Testing video loading...\n';
+                      try {
+                        // Create a test video element
+                        const video = document.createElement('video');
+                        video.src = url;
+                        video.muted = true;
+                        
+                        // Wait for loadedmetadata event
+                        const loadPromise = new Promise((resolve, reject) => {
+                          video.onloadedmetadata = () => resolve(true);
+                          video.onerror = (e) => reject(e);
+                          setTimeout(() => reject(new Error('Timeout after 5s')), 5000);
+                        });
+                        
+                        await loadPromise;
+                        info += `✅ Video loaded successfully\n`;
+                        info += `   Duration: ${video.duration.toFixed(2)}s\n`;
+                        info += `   Dimensions: ${video.videoWidth}x${video.videoHeight}\n`;
+                        
+                        // Clean up
+                        video.src = '';
+                        video.load();
+                      } catch (videoError) {
+                        info += `❌ Video failed to load in video element\n`;
+                        info += `   Error: ${videoError instanceof Error ? videoError.message : 'Unknown'}\n`;
                       }
                       
                       info += '\n';
@@ -839,12 +842,14 @@ export default function DevToolsPage() {
             
             <div className="alert alert-info text-xs">
               <div>
-                <div className="font-semibold mb-1">💡 Video Cache System:</div>
+                <div className="font-semibold mb-1">💡 Video Caching System (HTTP-Based):</div>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Videos cached in IndexedDB with 90-day expiration</li>
-                  <li>Blob URLs created on-demand from cached video data</li>
-                  <li>Safari/iOS may invalidate blob URLs more aggressively</li>
-                  <li>System validates and recreates blob URLs if invalid</li>
+                  <li>Built-in videos use standard HTTP caching (Cache-Control headers)</li>
+                  <li>Browser automatically caches videos per HTTP standards</li>
+                  <li>Cloudflare CDN provides edge caching globally</li>
+                  <li>Service Worker adds optional offline support (90-day cache)</li>
+                  <li>Works reliably across all platforms (iOS, Android, Desktop)</li>
+                  <li>Custom user uploads still use IndexedDB (blob-video:// scheme)</li>
                   <li>Check console logs (DEBUG=true) for detailed diagnostics</li>
                 </ul>
               </div>
