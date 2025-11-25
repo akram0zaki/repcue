@@ -2,33 +2,47 @@
 
 ### 2025-11-25
 
-#### 🐛 Safari/iOS Video Loading Fix
+#### 🐛 iOS Video Loading Fix - Disabled Caching on iOS
 
-**Problem**: Video thumbnails showing white panels when scrolling back up on exercise pages in Safari/iOS
-- Videos load initially but fail to display after scrolling away and back
-- Inconsistent behavior: some videos show, some don't
-- Eventually all videos show "No Video" placeholder
+**Problem**: Video thumbnails showing "No Video" or failing to load on iOS devices (iPhone/iPad with Safari, Chrome, Firefox)
+- Videos work initially but show "No Video" after page refresh
+- Blob URLs created from IndexedDB cache fail to load in video elements on iOS
+- Issue affects all browsers on iOS (Safari, Chrome, Firefox) as they all use WebKit
 
 **Root Cause**: 
-- `useIntersectionObserver` with `freezeOnceVisible: true` prevented component re-rendering when scrolling back
-- Blob URLs from `VideoCacheService` were not being re-resolved when component remounted
-- No cleanup mechanism for async operations when component unmounted
+- iOS WebKit has strict security restrictions on blob URLs in video elements
+- Blob URLs created from cached video data fail to load with "Error: Unknown"
+- This is an iOS platform limitation, not browser-specific
+- Diagnostic testing revealed: blob URLs created successfully but rejected by video element
 
 **Solution**:
-1. Added `isMounted` flag cleanup pattern in VideoThumbnail component to prevent state updates on unmounted components
-2. Blob URLs persist across component mount/unmount cycles (managed by VideoCacheService)
-3. Added proper async operation cancellation to prevent memory leaks
-4. Maintained `freezeOnceVisible: true` for performance (initial approach with `false` caused flickering)
+- Disabled video caching entirely on iOS devices
+- Videos now load directly from server URLs on iOS instead of using blob URLs from cache
+- Detection: User agent matching `/iphone|ipad|ipod/`
+- Desktop and Android devices continue to use optimized caching system
 
 **Changes**:
-- `apps/frontend/src/components/VideoThumbnail.tsx`: Added `isMounted` flag and cleanup function to video URL resolution effect
-- `apps/frontend/src/pages/ExercisePage.tsx`: Kept `freezeOnceVisible: true` - blob URLs persist via VideoCacheService
-- `apps/frontend/src/test/setup.ts`: Added IntersectionObserver mock for test compatibility
-- Added detailed comments explaining the fix for future maintainers
+- `apps/frontend/src/utils/resolveVideoUrl.ts`: 
+  - Added `isIOS()` detection function checking for iPhone/iPad/iPod in user agent
+  - Modified caching logic: `VIDEO_CACHING_ENABLED && !isIOS()`
+  - iOS devices bypass VideoCacheService and use direct URLs
+  - Added logging: "iOS detected - bypassing video cache, using direct URL"
+- `apps/frontend/src/pages/DevToolsPage.tsx`:
+  - Added "🎯 Simulate Exercise Page Load" diagnostic button
+  - Full pipeline test: load media index → select variant → resolve URL → test video element
+  - Helped identify exact failure point: blob URL creation succeeds, video element loading fails
 
-**Impact**: Videos now load consistently when scrolling up/down on exercise pages in Safari and iOS browsers without flickering
+**Impact**: 
+- Videos now load reliably on all iOS devices regardless of browser
+- Consistent video playback after page refreshes and long periods of inactivity
+- Trade-off: iOS users get fresh videos from server (no offline caching benefit)
+- Desktop and Android users maintain optimized caching with offline support
 
-**Note**: Initial fix attempt used `freezeOnceVisible: false` but caused rapid re-rendering and flickering. The real fix was the async cleanup pattern.
+**Technical Details**:
+- iOS WebKit blocks blob URLs from IndexedDB in video elements for security
+- Previous fixes (removing blob validation, enhanced error handling) helped identify root cause
+- Final solution: Platform-specific behavior - cache on desktop/Android, direct URLs on iOS
+- Future consideration: Explore Media Source Extensions (MSE) or alternative iOS-compatible caching
 
 #### 🐛 Edge Function: generate-ai-workout Crash Fix
 

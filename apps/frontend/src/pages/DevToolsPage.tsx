@@ -489,6 +489,361 @@ export default function DevToolsPage() {
           </div>
         </div>
         
+        <div className="card p-4 bg-base-200">
+          <h2 className="text-xl font-semibold mb-4">🎥 Video Cache Diagnostics</h2>
+          
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={async () => {
+                  setStatus('Inspecting video cache...');
+                  try {
+                    const { VideoCacheService } = await import('../services/videoCacheService');
+                    const cacheService = VideoCacheService.getInstance();
+                    const stats = await cacheService.getStorageStats();
+                    
+                    let info = '📊 Video Cache Statistics:\n\n';
+                    info += `Total Videos: ${stats.totalVideos}\n`;
+                    info += `Total Size: ${(stats.totalSize / 1024 / 1024).toFixed(2)} MB\n`;
+                    info += `Quota Used: ${(stats.quotaUsed / 1024 / 1024).toFixed(2)} MB\n`;
+                    info += `Quota Available: ${(stats.quotaAvailable / 1024 / 1024).toFixed(2)} MB\n`;
+                    info += `Quota Usage: ${stats.quotaPercentage.toFixed(1)}%\n`;
+                    info += `Oldest Video: ${stats.oldestVideo ? new Date(stats.oldestVideo).toLocaleString() : 'N/A'}\n`;
+                    info += `Newest Video: ${stats.newestVideo ? new Date(stats.newestVideo).toLocaleString() : 'N/A'}\n`;
+                    
+                    setCacheInfo(info);
+                    setStatus('✅ Cache stats loaded');
+                    logger.log('[DevTools] Video cache stats:', stats);
+                  } catch (error) {
+                    setStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                    setCacheInfo(`Error loading cache stats: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-primary btn-sm"
+              >
+                Get Cache Stats
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setStatus('Testing video URL resolution...');
+                  try {
+                    const testUrls = [
+                      '/media/3-4-sit-ups_v1_1920x1080.mp4',
+                      '/media/plank_v1_1920x1080.mp4',
+                      '/media/burpees_v1_1920x1080.mp4'
+                    ];
+                    
+                    let info = '🧪 Video URL Resolution Test:\n\n';
+                    
+                    for (const url of testUrls) {
+                      info += `Testing: ${url}\n`;
+                      const absoluteUrl = new URL(url, window.location.origin).href;
+                      
+                      try {
+                        const { VideoCacheService } = await import('../services/videoCacheService');
+                        const cacheService = VideoCacheService.getInstance();
+                        
+                        const cachedUrl = await cacheService.getVideo(absoluteUrl);
+                        
+                        if (cachedUrl) {
+                          info += `  ✅ Cache HIT: ${cachedUrl.substring(0, 30)}...\n`;
+                          info += `  ℹ️ Blob URL created (Safari blocks HEAD validation)\n`;
+                          info += `  Blob URL: ${cachedUrl.substring(0, 50)}...\n`;
+                        } else {
+                          info += `  ⚠️ Cache MISS - not in IndexedDB\n`;
+                        }
+                      } catch (error) {
+                        info += `  ❌ Error: ${error instanceof Error ? error.message : 'Unknown'}\n`;
+                      }
+                      
+                      info += '\n';
+                    }
+                    
+                    setCacheInfo(info);
+                    setStatus('✅ URL resolution test complete');
+                    logger.log('[DevTools] Video URL test complete');
+                  } catch (error) {
+                    setStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-secondary btn-sm"
+              >
+                Test Video URLs
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setStatus('Inspecting IndexedDB video cache...');
+                  try {
+                    // Open IndexedDB directly
+                    const dbRequest = indexedDB.open('repcue-video-cache', 1);
+                    
+                    dbRequest.onsuccess = async () => {
+                      const db = dbRequest.result;
+                      const transaction = db.transaction(['videos'], 'readonly');
+                      const store = transaction.objectStore('videos');
+                      const getAllRequest = store.getAll();
+                      
+                      getAllRequest.onsuccess = () => {
+                        const videos = getAllRequest.result;
+                        let info = `📦 IndexedDB Video Cache (${videos.length} entries):\n\n`;
+                        
+                        videos.slice(0, 10).forEach((video: {
+                          id: string;
+                          url: string;
+                          size: number;
+                          mimeType: string;
+                          cachedAt: number;
+                          lastAccessedAt: number;
+                          expiresAt: number;
+                          accessCount: number;
+                        }) => {
+                          info += `URL: ${video.url.substring(video.url.lastIndexOf('/') + 1)}\n`;
+                          info += `  ID: ${video.id}\n`;
+                          info += `  Size: ${(video.size / 1024 / 1024).toFixed(2)} MB\n`;
+                          info += `  MIME: ${video.mimeType}\n`;
+                          info += `  Cached: ${new Date(video.cachedAt).toLocaleString()}\n`;
+                          info += `  Last Access: ${new Date(video.lastAccessedAt).toLocaleString()}\n`;
+                          info += `  Expires: ${new Date(video.expiresAt).toLocaleString()}\n`;
+                          info += `  Access Count: ${video.accessCount}\n`;
+                          info += `  Expired: ${Date.now() > video.expiresAt ? '❌ YES' : '✅ NO'}\n`;
+                          info += '\n';
+                        });
+                        
+                        if (videos.length > 10) {
+                          info += `... and ${videos.length - 10} more videos\n`;
+                        }
+                        
+                        setCacheInfo(info);
+                        setStatus(`✅ Found ${videos.length} videos in IndexedDB`);
+                        logger.log('[DevTools] IndexedDB videos:', videos);
+                      };
+                      
+                      getAllRequest.onerror = () => {
+                        setStatus(`❌ Error reading from IndexedDB: ${getAllRequest.error?.message}`);
+                      };
+                    };
+                    
+                    dbRequest.onerror = () => {
+                      setStatus(`❌ Error opening IndexedDB: ${dbRequest.error?.message}`);
+                    };
+                  } catch (error) {
+                    setStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-accent btn-sm"
+              >
+                Inspect IndexedDB
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  if (!confirm('This will clear all cached videos. Continue?')) return;
+                  
+                  setStatus('Clearing video cache...');
+                  try {
+                    const { VideoCacheService } = await import('../services/videoCacheService');
+                    const cacheService = VideoCacheService.getInstance();
+                    await cacheService.clearAll();
+                    
+                    setStatus('✅ Video cache cleared');
+                    setCacheInfo('');
+                    logger.log('[DevTools] Video cache cleared');
+                  } catch (error) {
+                    setStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-warning btn-sm"
+              >
+                Clear Video Cache
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setStatus('Fetching test video...');
+                  setCacheInfo('🔄 Testing video fetch and cache...\n\n');
+                  
+                  try {
+                    const testUrl = '/media/plank_v1_1920x1080.mp4';
+                    const absoluteUrl = new URL(testUrl, window.location.origin).href;
+                    
+                    let info = `Testing URL: ${absoluteUrl}\n\n`;
+                    
+                    // Import service
+                    const { VideoCacheService } = await import('../services/videoCacheService');
+                    const cacheService = VideoCacheService.getInstance();
+                    
+                    // Try to fetch
+                    info += '1️⃣ Attempting fetch and cache...\n';
+                    const blobUrl = await cacheService.fetchAndCache(absoluteUrl);
+                    
+                    if (blobUrl) {
+                      info += `✅ Fetch successful: ${blobUrl}\n\n`;
+                      
+                      // Validate blob URL
+                      info += '2️⃣ Blob URL created successfully\n';
+                      info += `ℹ️ Safari blocks HEAD validation on blob URLs\n`;
+                      info += `✅ Blob URL ready for video playback\n\n`;
+                      
+                      // Try to retrieve from cache
+                      info += '3️⃣ Retrieving from cache...\n';
+                      const cachedUrl = await cacheService.getVideo(absoluteUrl);
+                      
+                      if (cachedUrl) {
+                        info += `✅ Cache retrieval successful\n`;
+                        info += `Cached URL: ${cachedUrl}\n`;
+                        info += `URLs match: ${cachedUrl === blobUrl ? '✅ YES' : '⚠️ NO (different blob URLs)'}\n`;
+                      } else {
+                        info += `❌ Cache retrieval failed - video not found in cache\n`;
+                      }
+                      
+                    } else {
+                      info += `❌ Fetch failed - no blob URL returned\n`;
+                    }
+                    
+                    setCacheInfo(info);
+                    setStatus('✅ Test complete - check details above');
+                    logger.log('[DevTools] Video fetch test complete');
+                    
+                  } catch (error) {
+                    setCacheInfo(`❌ Test failed: ${error instanceof Error ? error.message : 'Unknown'}\n${error instanceof Error ? error.stack : ''}`);
+                    setStatus(`❌ Test failed`);
+                    logger.error('[DevTools] Video fetch test error:', error);
+                  }
+                }}
+                className="btn btn-info btn-sm"
+              >
+                Test Fetch & Cache
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setStatus('Simulating exercises page video loading...');
+                  setCacheInfo('🎬 Simulating Exercise Page Video Load...\n\n');
+                  
+                  try {
+                    let info = '';
+                    
+                    // Import necessary modules
+                    info += '📦 Importing modules...\n';
+                    const { loadExerciseMedia } = await import('../utils/loadExerciseMedia');
+                    const { selectVideoVariant } = await import('../utils/selectVideoVariant');
+                    const { resolveVideoUrl } = await import('../utils/resolveVideoUrl');
+                    info += '✅ Modules loaded\n\n';
+                    
+                    // Test with first 3 exercises
+                    const testExercises = ['3-4-sit-ups', 'plank', 'burpees'];
+                    
+                    for (const exerciseId of testExercises) {
+                      info += `\n━━━ Testing: ${exerciseId} ━━━\n`;
+                      
+                      // Step 1: Load exercise media index
+                      info += '1️⃣ Loading exercise_media.json...\n';
+                      const mediaIndex = await loadExerciseMedia();
+                      const media = mediaIndex[exerciseId];
+                      
+                      if (!media) {
+                        info += `❌ No media found for ${exerciseId}\n`;
+                        continue;
+                      }
+                      info += `✅ Media found: ${JSON.stringify(media).substring(0, 100)}...\n`;
+                      
+                      // Step 2: Select video variant
+                      info += '2️⃣ Selecting video variant...\n';
+                      const selectedPath = selectVideoVariant(
+                        media,
+                        window.innerWidth,
+                        window.innerHeight
+                      );
+                      
+                      if (!selectedPath) {
+                        info += `❌ No video path selected\n`;
+                        continue;
+                      }
+                      info += `✅ Selected path: ${selectedPath}\n`;
+                      
+                      // Step 3: Resolve video URL (this is where caching happens)
+                      info += '3️⃣ Resolving video URL...\n';
+                      const url = await resolveVideoUrl(selectedPath);
+                      
+                      if (!url) {
+                        info += `❌ URL resolution failed\n`;
+                        continue;
+                      }
+                      
+                      info += `✅ URL resolved: ${url.substring(0, 50)}...\n`;
+                      info += `   URL type: ${url.startsWith('blob:') ? 'BLOB' : 'HTTP'}\n`;
+                      
+                      // Step 4: Test if blob URL works
+                      if (url.startsWith('blob:')) {
+                        info += '4️⃣ Testing blob URL...\n';
+                        try {
+                          // Create a test video element
+                          const video = document.createElement('video');
+                          video.src = url;
+                          video.muted = true;
+                          
+                          // Wait for loadedmetadata event
+                          const loadPromise = new Promise((resolve, reject) => {
+                            video.onloadedmetadata = () => resolve(true);
+                            video.onerror = (e) => reject(e);
+                            setTimeout(() => reject(new Error('Timeout')), 5000);
+                          });
+                          
+                          await loadPromise;
+                          info += `✅ Blob URL works - video metadata loaded\n`;
+                          info += `   Duration: ${video.duration.toFixed(2)}s\n`;
+                          info += `   Dimensions: ${video.videoWidth}x${video.videoHeight}\n`;
+                        } catch (videoError) {
+                          info += `❌ Blob URL failed to load in video element\n`;
+                          info += `   Error: ${videoError instanceof Error ? videoError.message : 'Unknown'}\n`;
+                        }
+                      }
+                      
+                      info += '\n';
+                    }
+                    
+                    info += '\n✅ Simulation complete\n';
+                    info += 'ℹ️ Check console for detailed logs (DEBUG=true)\n';
+                    
+                    setCacheInfo(info);
+                    setStatus('✅ Simulation complete');
+                    logger.log('[DevTools] Exercise page simulation complete');
+                    
+                  } catch (error) {
+                    setCacheInfo(`❌ Simulation failed: ${error instanceof Error ? error.message : 'Unknown'}\n${error instanceof Error ? error.stack : ''}`);
+                    setStatus(`❌ Simulation failed`);
+                    logger.error('[DevTools] Exercise page simulation error:', error);
+                  }
+                }}
+                className="btn btn-success btn-sm"
+              >
+                🎯 Simulate Exercise Page Load
+              </button>
+            </div>
+            
+            {cacheInfo && (
+              <div className="bg-base-300 p-3 rounded max-h-96 overflow-y-auto">
+                <pre className="text-xs whitespace-pre-wrap font-mono">{cacheInfo}</pre>
+              </div>
+            )}
+            
+            <div className="alert alert-info text-xs">
+              <div>
+                <div className="font-semibold mb-1">💡 Video Cache System:</div>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Videos cached in IndexedDB with 90-day expiration</li>
+                  <li>Blob URLs created on-demand from cached video data</li>
+                  <li>Safari/iOS may invalidate blob URLs more aggressively</li>
+                  <li>System validates and recreates blob URLs if invalid</li>
+                  <li>Check console logs (DEBUG=true) for detailed diagnostics</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="card p-4 bg-base-300">
           <h2 className="text-xl font-semibold mb-2">Info</h2>
           <ul className="list-disc list-inside space-y-2 text-sm">

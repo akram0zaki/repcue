@@ -5,6 +5,16 @@ import { VIDEO_CACHING_ENABLED } from '../config/features';
 import logger from './logger';
 
 /**
+ * Detect if running on iOS (iPhone, iPad, iPod)
+ * iOS WebKit has strict blob URL security restrictions in video elements,
+ * regardless of browser (Safari, Chrome, Firefox on iOS all use WebKit)
+ */
+function isIOS(): boolean {
+  const ua = navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test(ua);
+}
+
+/**
  * Resolves video URLs, handling:
  *  - Regular (http/https) URLs: check cache first, then fetch and cache (if caching enabled)
  *  - blob: URLs: returned directly (already resolved)
@@ -35,7 +45,10 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     const isRelativeUrl = videoUrl.startsWith('/');
     
     if (isHttpUrl || isRelativeUrl) {
-      if (VIDEO_CACHING_ENABLED) {
+      // iOS WebKit has issues with blob URLs in video elements, so disable caching on iOS
+      const useCaching = VIDEO_CACHING_ENABLED && !isIOS();
+      
+      if (useCaching) {
         const videoCacheService = VideoCacheService.getInstance();
         
         // Convert relative URLs to absolute URLs for caching
@@ -51,7 +64,10 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
         const fetchedUrl = await videoCacheService.fetchAndCache(absoluteUrl);
         return fetchedUrl;
       } else {
-        // Caching disabled, return URL directly (browser will fetch)
+        // Caching disabled or iOS detected - return URL directly (browser will fetch)
+        if (isIOS()) {
+          logger.log('🎥 [ResolveVideo] iOS detected - bypassing video cache, using direct URL');
+        }
         return videoUrl;
       }
     }

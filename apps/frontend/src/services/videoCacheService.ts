@@ -144,6 +144,8 @@ export class VideoCacheService {
       // Check memory cache first (instant)
       const memoryUrl = this.memoryCache.get(url);
       if (memoryUrl) {
+        // Trust memory cache - Safari blob URLs fail HEAD validation but work for video playback
+        // Validation was causing "Load failed" errors and breaking working blob URLs
         await this.updateAccessTime(url); // Update access time in background
         return memoryUrl;
       }
@@ -155,11 +157,27 @@ export class VideoCacheService {
       }
 
       // Check IndexedDB
-      await this.initialize();
-      if (!this.db) return null;
+      try {
+        await this.initialize();
+      } catch (initError) {
+        logger.error('[VideoCacheService] IndexedDB initialization failed:', initError);
+        return null;
+      }
+      
+      if (!this.db) {
+        logger.warn('[VideoCacheService] IndexedDB not initialized, cache unavailable');
+        return null;
+      }
 
       const id = await this.hashUrl(url);
-      const video = await this.getFromStore(id);
+      let video;
+      
+      try {
+        video = await this.getFromStore(id);
+      } catch (storeError) {
+        logger.error('[VideoCacheService] Failed to read from IndexedDB:', { url, error: storeError });
+        return null;
+      }
 
       if (video) {
         // Check expiration
@@ -169,8 +187,23 @@ export class VideoCacheService {
           return null;
         }
 
+        // Validate blob exists and is valid
+        if (!video.blob || !(video.blob instanceof Blob) || video.blob.size === 0) {
+          logger.error('[VideoCacheService] Invalid blob in IndexedDB, deleting:', { url, hasBlob: !!video.blob, blobType: typeof video.blob, size: video.blob?.size });
+          await this.deleteFromStore(id);
+          return null;
+        }
+
         // Create blob URL and cache in memory
-        const blobUrl = URL.createObjectURL(video.blob);
+        let blobUrl;
+        try {
+          blobUrl = URL.createObjectURL(video.blob);
+          logger.log('[VideoCacheService] Created fresh blob URL from IndexedDB:', { url, blobUrl, blobSize: video.blob.size, mimeType: video.mimeType });
+        } catch (blobError) {
+          logger.error('[VideoCacheService] Failed to create blob URL:', { url, error: blobError });
+          return null;
+        }
+        
         this.memoryCache.set(url, blobUrl);
 
         // Update access time in background
@@ -185,7 +218,7 @@ export class VideoCacheService {
       logger.log('[VideoCacheService] Cache MISS:', url);
       return null;
     } catch (error) {
-      logger.error('[VideoCacheService] Error getting video:', error);
+      logger.error('[VideoCacheService] Unexpected error in getVideo:', { url, error });
       return null;
     }
   }
@@ -279,19 +312,33 @@ export class VideoCacheService {
       
       const response = await fetch(url);
       if (!response.ok) {
+        logger.error('[VideoCacheService] Fetch failed - HTTP error:', { url, status: response.status, statusText: response.statusText });
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const blob = await response.blob();
+      if (!blob || blob.size === 0) {
+        logger.error('[VideoCacheService] Fetch returned empty blob:', { url, blobSize: blob?.size });
+        return null;
+      }
+
+      logger.log('[VideoCacheService] Fetched video blob:', { url, size: blob.size, type: blob.type });
       
       await this.cacheVideo(url, blob, {
         variant: metadata.variant,
         mimeType: response.headers.get('content-type') || blob.type,
       });
 
-      return this.memoryCache.get(url) || null;
+      const cachedUrl = this.memoryCache.get(url);
+      if (!cachedUrl) {
+        logger.error('[VideoCacheService] Failed to retrieve blob URL after caching:', url);
+        return null;
+      }
+
+      logger.log('[VideoCacheService] Successfully cached and created blob URL:', { url, blobUrl: cachedUrl });
+      return cachedUrl;
     } catch (error) {
-      logger.error('[VideoCacheService] Fetch failed:', error);
+      logger.error('[VideoCacheService] Fetch failed:', { url, error });
       return null;
     }
   }
