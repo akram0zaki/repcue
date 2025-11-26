@@ -82,18 +82,22 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
         if (exercise.custom_video_url) {
           // For custom exercises, resolve the custom video URL
-          // logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
-          //   exerciseId: exercise.id,
-          //   customVideoUrl: exercise.custom_video_url,
-          //   isSharedCopy: isSharedExercise(exercise.id)
-          // });
+          logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
+            exerciseId: exercise.id,
+            exerciseName: exercise.name,
+            customVideoUrl: exercise.custom_video_url,
+            isSharedCopy: isSharedExercise(exercise.id)
+          });
           url = await resolveVideoUrl(exercise.custom_video_url);
-          // logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
-          //   exerciseId: exercise.id,
-          //   originalUrl: exercise.custom_video_url,
-          //   resolvedUrl: url,
-          //   isBlob: url?.startsWith('blob:')
-          // });
+          logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
+            exerciseId: exercise.id,
+            exerciseName: exercise.name,
+            originalUrl: exercise.custom_video_url,
+            resolvedUrl: url,
+            urlLength: url?.length,
+            isBlob: url?.startsWith('blob:'),
+            isHttp: url?.startsWith('http') || url?.startsWith('/')
+          });
         } else {
           // For built-in exercises, load from exercise media
           const mediaIndex = await loadExerciseMedia();
@@ -171,6 +175,13 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           }
 
           if (isMounted) {
+            logger.log('🎥 [VideoThumbnail] Setting video URL:', {
+              exerciseId: exercise.id,
+              exerciseName: exercise.name,
+              url,
+              urlType: url.startsWith('blob:') ? 'blob' : url.startsWith('/') ? 'relative-http' : url.startsWith('http') ? 'absolute-http' : 'unknown',
+              willSetLoadedImmediately: url.startsWith('blob:')
+            });
             setVideoUrl(url);
             setHasError(false);
             // If URL is a blob (cached), mark as loaded immediately to skip loading state
@@ -181,7 +192,13 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         } else {
           if (isMounted) {
             setHasError(true);
-            logger.warn('🎥 [VideoThumbnail] No video URL resolved for exercise:', exercise.id);
+            logger.warn('🎥 [VideoThumbnail] No video URL resolved for exercise:', {
+              exerciseId: exercise.id,
+              exerciseName: exercise.name,
+              hasCustomVideo: !!exercise.custom_video_url,
+              customVideoUrl: exercise.custom_video_url,
+              hadMediaIndex: !!mediaMeta
+            });
           }
         }
       } catch (error) {
@@ -206,20 +223,53 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     const video = videoRef.current;
     if (!video || !videoUrl) return;
 
+    // iOS Safari often doesn't fire events for cached videos - use timeout as fallback
+    const loadingTimeout = setTimeout(() => {
+      logger.log('🎥 [VideoThumbnail] Loading timeout - marking as ready (iOS cached video workaround):', {
+        exerciseId: exercise.id,
+        videoUrl: videoUrl,
+        readyState: video?.readyState
+      });
+      setIsLoaded(true);
+    }, 1500); // 1.5 seconds - reasonable for cached videos
+
+    const clearTimeoutAndMarkLoaded = () => {
+      clearTimeout(loadingTimeout);
+      setIsLoaded(true);
+      onVideoLoad?.();
+    };
+
     const handleLoadedData = () => {
-      logger.log('🎥 [VideoThumbnail] Video loaded successfully:', {
+      logger.log('🎥 [VideoThumbnail] Video loadeddata event:', {
         exerciseId: exercise.id,
         videoUrl: videoUrl,
         videoDuration: video?.duration,
         videoWidth: video?.videoWidth,
         videoHeight: video?.videoHeight,
-        currentSrc: video?.currentSrc
+        currentSrc: video?.currentSrc,
+        readyState: video?.readyState
       });
-      setIsLoaded(true);
-      onVideoLoad?.();
+      clearTimeoutAndMarkLoaded();
+      
+      // Ensure first frame is shown for thumbnail
+      if (video && !isPlaying && video.currentTime === 0) {
+        video.currentTime = 0.1;
+      }
+    };
+
+    const handleLoadedMetadata = () => {
+      logger.log('🎥 [VideoThumbnail] Video loadedmetadata event (iOS-friendly):', {
+        exerciseId: exercise.id,
+        videoUrl: videoUrl,
+        videoDuration: video?.duration,
+        readyState: video?.readyState
+      });
+      // iOS Safari fires loadedmetadata more reliably than loadeddata
+      clearTimeoutAndMarkLoaded();
     };
 
     const handleError = (e: Event) => {
+      clearTimeout(loadingTimeout);
       const target = e.target as HTMLVideoElement;
       const videoError = target.error;
 
@@ -306,22 +356,37 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     };
 
     const handleCanPlay = () => {
-      // Ensure we show the first frame
-      if (video.currentTime === 0) {
+      logger.log('🎥 [VideoThumbnail] Video canplay event:', {
+        exerciseId: exercise.id,
+        readyState: video?.readyState
+      });
+      // canplay means video is ready to play - safe to show on iOS
+      clearTimeoutAndMarkLoaded();
+      
+      // Ensure we show the first frame for thumbnail display
+      // Only seek if video is not currently playing
+      if (!isPlaying && video.currentTime === 0) {
         video.currentTime = 0.1;
       }
     };
 
+    // iOS Safari event handling: Multiple event listeners for reliability
+    // loadedmetadata: Fires when video metadata is loaded (most reliable on iOS)
+    // loadeddata: Fires when first frame is ready (desktop)
+    // canplay: Fires when video can start playing (fallback)
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('error', handleError);
     video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('error', handleError);
 
     return () => {
+      clearTimeout(loadingTimeout);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('error', handleError);
       video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('error', handleError);
     };
-  }, [onVideoLoad, onVideoError, videoUrl, exercise.id]);
+  }, [onVideoLoad, onVideoError, videoUrl, exercise.id, isPlaying]);
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click events
@@ -365,11 +430,11 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         ref={videoRef}
         src={videoUrl || undefined}
         className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-lg bg-gray-100 dark:bg-gray-800`}
-        preload="auto" // Changed from metadata to auto to ensure video loads
+        preload="metadata" // Load metadata and first frame, not entire video
         muted
         loop // Videos will loop automatically when playing
         playsInline
-        poster="" // Empty poster to avoid default browser poster
+        // No poster attribute - let video show first frame naturally
       />
 
       {/* Loading State */}

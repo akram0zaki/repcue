@@ -46,6 +46,11 @@ Cloudflare R2 Origin
   - Updated video diagnostics to test HTTP URLs instead of assuming blob URLs
   - Updated info panel to explain HTTP-based caching system
   - "Simulate Exercise Page Load" now properly tests both HTTP and blob URLs
+- `apps/frontend/src/components/VideoThumbnail.tsx`:
+  - Enhanced logging for video URL resolution (diagnostic mode)
+  - Added detailed logs for custom video URL resolution
+  - Logs show exercise ID, URL type, and resolution status
+  - Helps diagnose "No Video" issues in production environment
 - R2 Pages Function (`functions/media/[[path]].ts`):
   - Already configured with proper Cache-Control headers:
     - Hashed files: `public, max-age=31536000, immutable` (1 year)
