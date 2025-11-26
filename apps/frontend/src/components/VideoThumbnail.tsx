@@ -61,6 +61,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [mediaMeta, setMediaMeta] = useState<ExerciseMedia | null>(null); // cached media entry for fallback
   const [attemptedFallback, setAttemptedFallback] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -73,6 +74,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     setIsLoaded(false);
     setHasError(false);
     setVideoUrl(null);
+    setThumbnailUrl(null);
     
     let isMounted = true;
     
@@ -82,22 +84,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
         if (exercise.custom_video_url) {
           // For custom exercises, resolve the custom video URL
-          logger.log('🎥 [VideoThumbnail] Resolving custom video URL:', {
-            exerciseId: exercise.id,
-            exerciseName: exercise.name,
-            customVideoUrl: exercise.custom_video_url,
-            isSharedCopy: isSharedExercise(exercise.id)
-          });
           url = await resolveVideoUrl(exercise.custom_video_url);
-          logger.log('🎥 [VideoThumbnail] Custom video URL resolved:', {
-            exerciseId: exercise.id,
-            exerciseName: exercise.name,
-            originalUrl: exercise.custom_video_url,
-            resolvedUrl: url,
-            urlLength: url?.length,
-            isBlob: url?.startsWith('blob:'),
-            isHttp: url?.startsWith('http') || url?.startsWith('/')
-          });
         } else {
           // For built-in exercises, load from exercise media
           const mediaIndex = await loadExerciseMedia();
@@ -106,6 +93,12 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
           
           setMediaMeta(media || null);
           if (media) {
+            // Extract thumbnail URL if available
+            if (media.thumbnail) {
+              setThumbnailUrl(media.thumbnail);
+              setIsLoaded(true); // Thumbnail shows immediately, no need to wait for video
+            }
+            
             const selectedPath = selectVideoVariant(
               media,
               typeof window !== 'undefined' ? window.innerWidth : undefined,
@@ -162,26 +155,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
             logger.warn('🎥 [VideoThumbnail] No accessible video variant found after probe attempts', { exerciseId: exercise.id });
             return;
           }
-          // Additional blob URL validation for shared exercises
-          const blobUrl = url || '';
-          if (blobUrl.startsWith('blob:') && isSharedExercise(exercise.id)) {
-            logger.log('🎥 [VideoThumbnail] Validating blob URL for shared exercise:', {
-              exerciseId: exercise.id,
-              blobUrl,
-              urlValid: blobUrl.length > 10, // Basic check that blob URL isn't truncated
-              hasProtocol: blobUrl.includes('://'),
-              hasOrigin: blobUrl.includes(window.location.origin)
-            });
-          }
-
           if (isMounted) {
-            logger.log('🎥 [VideoThumbnail] Setting video URL:', {
-              exerciseId: exercise.id,
-              exerciseName: exercise.name,
-              url,
-              urlType: url.startsWith('blob:') ? 'blob' : url.startsWith('/') ? 'relative-http' : url.startsWith('http') ? 'absolute-http' : 'unknown',
-              willSetLoadedImmediately: url.startsWith('blob:')
-            });
             setVideoUrl(url);
             setHasError(false);
             // If URL is a blob (cached), mark as loaded immediately to skip loading state
@@ -225,11 +199,6 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
 
     // iOS Safari often doesn't fire events for cached videos - use timeout as fallback
     const loadingTimeout = setTimeout(() => {
-      logger.log('🎥 [VideoThumbnail] Loading timeout - marking as ready (iOS cached video workaround):', {
-        exerciseId: exercise.id,
-        videoUrl: videoUrl,
-        readyState: video?.readyState
-      });
       setIsLoaded(true);
     }, 1500); // 1.5 seconds - reasonable for cached videos
 
@@ -240,15 +209,6 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     };
 
     const handleLoadedData = () => {
-      logger.log('🎥 [VideoThumbnail] Video loadeddata event:', {
-        exerciseId: exercise.id,
-        videoUrl: videoUrl,
-        videoDuration: video?.duration,
-        videoWidth: video?.videoWidth,
-        videoHeight: video?.videoHeight,
-        currentSrc: video?.currentSrc,
-        readyState: video?.readyState
-      });
       clearTimeoutAndMarkLoaded();
       
       // Ensure first frame is shown for thumbnail
@@ -258,12 +218,6 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     };
 
     const handleLoadedMetadata = () => {
-      logger.log('🎥 [VideoThumbnail] Video loadedmetadata event (iOS-friendly):', {
-        exerciseId: exercise.id,
-        videoUrl: videoUrl,
-        videoDuration: video?.duration,
-        readyState: video?.readyState
-      });
       // iOS Safari fires loadedmetadata more reliably than loadeddata
       clearTimeoutAndMarkLoaded();
     };
@@ -356,10 +310,6 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     };
 
     const handleCanPlay = () => {
-      logger.log('🎥 [VideoThumbnail] Video canplay event:', {
-        exerciseId: exercise.id,
-        readyState: video?.readyState
-      });
       // canplay means video is ready to play - safe to show on iOS
       clearTimeoutAndMarkLoaded();
       
@@ -409,8 +359,9 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     }
   };
 
-  // If no video or error, show placeholder
-  if (hasError || !videoUrl) {
+  // If no video AND no thumbnail, show placeholder
+  // With poster/thumbnail approach, we show thumbnail even if video isn't loaded yet
+  if ((hasError || !videoUrl) && !thumbnailUrl) {
     return (
       <div className={`relative ${className}`}>
         <ExercisePlaceholder size="md" />
@@ -429,16 +380,18 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         key={videoUrl} // Force re-render when URL changes
         ref={videoRef}
         src={videoUrl || undefined}
+        poster={thumbnailUrl || undefined} // Show thumbnail image immediately
         className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-lg bg-gray-100 dark:bg-gray-800`}
-        preload="metadata" // Load metadata and first frame, not entire video
+        preload="none" // Don't load video until user clicks play (saves bandwidth)
         muted
         loop // Videos will loop automatically when playing
         playsInline
-        // No poster attribute - let video show first frame naturally
+        // @ts-ignore - loading attribute is valid but not in React types yet
+        loading="eager" // Force immediate loading of poster images (no lazy loading)
       />
 
-      {/* Loading State */}
-      {!isLoaded && !hasError && (
+      {/* Loading State - Only show if thumbnail is not available */}
+      {!isLoaded && !hasError && !thumbnailUrl && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>

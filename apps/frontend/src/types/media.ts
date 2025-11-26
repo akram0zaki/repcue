@@ -42,6 +42,9 @@ export type ExerciseMedia = {
   fps: 24 | 30; // frames per second of source encode
   duration?: number; // accurate duration in seconds from video metadata (optional for backward compatibility)
   
+  // Thumbnail image (poster frame) for instant display
+  thumbnail?: string; // /thumbnails/<id>.jpg - extracted first frame for instant loading
+  
   // Legacy video paths (backward compatibility - will be deprecated)
   video?: {
     square?: string; // /videos/<file>.mp4 1:1
