@@ -9,7 +9,7 @@ This guide collects the must-knows, best practices, and day-to-day workflows for
 - **Canonical locale**: `en` (English). Every new key starts here; all other locales fall back to it.
 - **Supported locales**: `en`, `nl`, `fy`, `ar`, `ar-EG`, `de`, `es`, `fr` (see `supportedLngs` in `apps/frontend/src/i18n.ts`).
 - **Fallback logic**: `ar-EG → ar → en`, all others → `en`.
-- **Namespaces (files)**: `common`, `titles`, `a11y`, `exercises`, `auth`, `catalogs`. Each namespace maps to a JSON file per locale.
+- **Namespaces (files)**: `common`, `titles`, `a11y`, `exercises`, `auth`, `catalogs`, `legal` (in i18n.ts config). Additional namespace files exist: `aiWorkout`, `coaching`, `consent`, `copy`, `exerciseDetails`, `profile`, `rating`, `settings`, `video`. Each namespace maps to a JSON file per locale.
 - **Exercise catalog**: Uses `public/locales/{lng}/exercises.json` with structured entries per exercise ID.
 - **Primary tooling**: `pnpm i18n:scan` to detect missing keys; `pnpm test:ci` or `pnpm test:stable` to validate UI logic.
 - **Key naming**: Follow `docs/i18n/key-styleguide.md`—semantic, namespaced keys with `_one`/`_other` plural forms and named interpolations.
@@ -40,13 +40,22 @@ Services or utility modules that run outside React can import the shared i18n in
 ```
 apps/frontend/public/locales/
   en/
-    common.json
-    titles.json
     a11y.json
-    exerciseDetails.json
-    exercises.json
+    aiWorkout.json
     auth.json
     catalogs.json
+    coaching.json
+    common.json
+    consent.json
+    copy.json
+    exerciseDetails.json
+    exercises.json
+    legal.json
+    profile.json
+    rating.json
+    settings.json
+    titles.json
+    video.json
   nl/
     …same namespace files…
   fy/
@@ -60,6 +69,8 @@ apps/frontend/public/locales/
   fr/
 ```
 
+> **Note**: The `i18n.ts` configuration explicitly lists namespaces: `common`, `titles`, `a11y`, `exercises`, `auth`, `catalogs`, `legal`. Other namespace files are loaded on-demand when components request them via `useTranslation('namespace')`.
+
 ### Namespace purpose
 
 | Namespace | Purpose | Usage notes |
@@ -67,10 +78,19 @@ apps/frontend/public/locales/
 | `common` | Reusable UI primitives (`common.start`, `common.cancel`, etc.) | Prefer this namespace for shared terms across screens. |
 | `titles` | Page titles / route-level headings | Keeps document titles and large headings discoverable. |
 | `a11y` | Screen-reader text, `aria-label`s, visually-hidden helpers | Required for WCAG compliance; keep descriptive and short. |
-| `exerciseDetails` | The translations of all built-in exercises attributes and details | Includes exercise detail strings. |
-| `exercises` | Exercise catalog metadata and supporting UI copy | Includes exercise detail strings, filters, tags. |
+| `aiWorkout` | AI Workout Builder UI (onboarding, progress, results) | Used by AIWorkoutOnboardingPage and related components. |
 | `auth` | Authentication flow (magic links, errors, CTA text) | Keep security messaging consistent across locales. |
 | `catalogs` | Shared workout/exercise catalog UI (filters, sorting) | Used by listing and discovery pages. |
+| `coaching` | AI coaching features (PR celebration, history) | Used by PRHistoryPage and coaching components. |
+| `consent` | GDPR consent banner and privacy UI | Used by ConsentBanner component. |
+| `copy` | Exercise copying/sharing functionality | Used by CopyExerciseButton component. |
+| `exerciseDetails` | Built-in exercise attributes and details | Includes exercise names, descriptions, instructions. |
+| `exercises` | Exercise catalog metadata and supporting UI copy | Includes filters, tags, placeholder text. |
+| `legal` | Legal acceptance UI (terms, privacy policy) | Used by LegalGate component. |
+| `profile` | User profile settings and preferences | Profile-related UI strings. |
+| `rating` | Exercise rating system UI | Used by ExerciseRating component. |
+| `settings` | Settings page strings | Settings-specific UI copy. |
+| `video` | Video upload and playback UI | Used by VideoUploadWidget and video components. |
 
 ### Exercise locale files
 
@@ -183,6 +203,10 @@ apps/frontend/public/locales/
 | Task | Command | Notes |
 |------|---------|-------|
 | Detect missing keys | `pnpm i18n:scan` | Runs static analysis across locales; fix reported issues before committing. |
+| Generate i18n report | `pnpm i18n:report` | Same as scan but doesn't fail on missing keys (for review). |
+| Check locale parity | `pnpm i18n:parity` | Checks all locales have same keys as canonical (en). |
+| List all keys | `pnpm i18n:parity:list` | Lists all translation keys across locales. |
+| Exercise translations report | `pnpm i18n:exercises-report` | Reports on exercise-specific translation coverage. |
 | Unit/integration tests | `pnpm test:stable` | Windows-friendly runner, ensures components still render translations correctly. |
 | Linting | `pnpm lint` | Confirms no hardcoded strings or unused imports. |
 | Manual smoke test | `pnpm dev` | Switch languages via the settings screen and verify key flows (timer, workouts, auth). |

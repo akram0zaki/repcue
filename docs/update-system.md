@@ -65,27 +65,32 @@ Users can configure their update experience through three modes:
 ### Core Components
 
 #### 1. UpdateService (`src/services/updateService.ts`)
-The main orchestrator that handles:
+The main orchestrator (singleton pattern) that handles:
 - Periodic version checking (every 4 hours, 30 minutes for force updates)
-- Communication with the Supabase edge function
-- User preference management
-- Update state management
+- Communication with the Supabase `check-version` edge function
+- User preference management via `storageService` and `AppSettings`
+- Update state management with consent-aware persistence
 - Event emission for UI updates
-- Service worker coordination
+- Service worker coordination via `swEventEmitter`
+- Multi-tab coordination via `BroadcastChannel`
+- Debounced update checks to prevent excessive API calls
+- Comprehensive error handling with retry logic
 
 #### 2. ForceUpdateService (`src/services/forceUpdateService.ts`)
-Specialized service for force updates that:
-- Handles workout interruption gracefully
-- Manages auto-force countdown timers
-- Provides workout save/abandon options
-- Ensures force updates bypass normal flow
+Specialized service (singleton pattern) for force updates that:
+- Handles workout interruption gracefully with state preservation
+- Manages auto-force countdown timers (5 minute default)
+- Provides workout save/abandon options before update
+- Implements retry logic with exponential backoff (max 3 retries)
+- Ensures force updates proceed even in development mode
 
 #### 3. UpdateNotificationManager (`src/components/UpdateNotificationManager.tsx`)
 React component that orchestrates all update UI:
-- Integrates with `useUpdateNotifications` hook
+- Integrates with `useUpdateNotifications` hook for state management
 - Manages banner visibility for critical/optional updates
 - Handles force update modal display
 - Provides changelog and error recovery modals
+- Includes optional debug panel for development
 
 #### 4. UI Components
 
@@ -105,19 +110,29 @@ React component that orchestrates all update UI:
 #### 5. Backend Integration
 
 ##### Supabase Edge Function (`supabase/functions/check-version/index.ts`)
-- Handles version comparison requests
-- Manages the `app_versions` database table
-- Respects privacy preferences (only detailed info with consent)
-- Provides graceful degradation if database is unavailable
+- Handles version comparison requests via POST method
+- Queries the `app_versions` database table for the latest active version
+- Validates semantic version format (x.y.z)
+- Respects privacy preferences (detailed changelog only with consent or for force updates)
+- Provides graceful degradation if database is unavailable (returns `update_available: false`)
 - Returns appropriate update policies and changelog information
+- CORS-enabled for cross-origin requests
+
+There's also a `get-status` endpoint (GET) for lightweight version info retrieval.
 
 ##### Database Schema
 The system uses an `app_versions` table with:
-- `version_number`: Semantic version string
+- `id`: UUID primary key
+- `version_number`: Semantic version string (e.g., '1.2.3')
+- `build_number`: Build identifier string
 - `update_policy`: 'force' | 'critical' | 'optional'
 - `is_active`: Boolean flag for the current release
-- `changelog`: JSON object with categorized changes
+- `changelog`: JSON object with categorized changes (`new_features`, `improvements`, `bug_fixes`, `security_updates`)
 - `release_date`: Timestamp for ordering
+- `reviewer`: Reviewer/approver name
+- `git_commit_hash`: Optional Git commit reference
+- `metadata`: Optional JSON for additional data
+- `created_at`, `updated_at`: Timestamps
 
 ### Service Worker Integration
 
@@ -133,17 +148,35 @@ The update system uses a comprehensive event-driven architecture:
 
 ```typescript
 // Main UpdateService Events
-'update-available'           // New update detected
-'update-started'             // Update process initiated
-'update-progress'            // Progress updates (0-100)
-'update-completed'           // Update successfully applied
-'update-failed'              // Update failed with error
-'update-blocked-workout-force' // Force update blocked by workout
+'update-available'              // New update detected
+'no-update-available'           // Version check found no updates
+'update-started'                // Update process initiated
+'update-progress'               // Progress updates (0-100)
+'update-completed'              // Update successfully applied
+'update-failed'                 // Update failed with error
+'update-error-detailed'         // Detailed error with recovery options
+'update-blocked-workout-force'  // Force update blocked by active workout
+'update-deferred-workout'       // Update deferred until workout completes
+'update-blocked-metered'        // Update blocked due to metered connection
+'update-requires-confirmation'  // Update needs user confirmation
+'preferences-loaded'            // User preferences loaded
+'preferences-changed'           // User preferences updated
+'controller-changed'            // Service worker controller changed
+'other-tab-updating'            // Another browser tab is updating
+'other-tab-updated'             // Another tab completed update
+'recovery-action-completed'     // Error recovery action succeeded
+'recovery-action-failed'        // Error recovery action failed
 
 // ForceUpdateService Events
-'force-update-available'     // Force update detected
-'force-update-completed'     // Force update applied
-'force-update-failed'        // Force update failed
+'force-update-available'        // Force update detected with auto-countdown
+'force-update-started'          // Force update application started
+'force-update-progress'         // Force update progress
+'force-update-completed'        // Force update applied successfully
+'force-update-failed'           // Force update failed with retry info
+'force-update-acknowledged'     // User acknowledged force update
+'force-update-retry-scheduled'  // Retry scheduled with backoff
+'force-reload-initiated'        // Last-resort page reload
+'workout-state-saved'           // Workout state saved before update
 ```
 
 ## Implementation Locations
@@ -152,62 +185,68 @@ The update system uses a comprehensive event-driven architecture:
 ```
 apps/frontend/src/
 ├── services/
-│   ├── updateService.ts           # Main update orchestration
-│   ├── forceUpdateService.ts      # Force update handling
-│   └── updateErrorHandler.ts     # Error recovery logic
+│   ├── updateService.ts              # Main update orchestration (singleton)
+│   └── forceUpdateService.ts         # Force update handling (singleton)
 ├── components/
-│   ├── UpdateNotificationManager.tsx  # Main UI orchestrator
-│   ├── UpdateNotificationBanner.tsx   # Banner for critical/optional
-│   ├── ForceUpdateModal.tsx           # Modal for force updates
-│   ├── ChangelogModal.tsx             # Detailed changelog display
-│   └── UpdateErrorRecoveryModal.tsx   # Error handling UI
+│   ├── UpdateNotificationManager.tsx # Main UI orchestrator
+│   ├── UpdateNotificationBanner.tsx  # Banner for critical/optional
+│   ├── ForceUpdateModal.tsx          # Modal for force updates
+│   ├── ChangelogModal.tsx            # Detailed changelog display
+│   └── UpdateErrorRecoveryModal.tsx  # Error handling UI
 ├── hooks/
-│   └── useUpdateNotifications.ts      # React hook for update state
-└── utils/
-    ├── serviceWorker.ts               # SW integration utilities
-    └── updateErrorHandler.ts         # Error classification and recovery
+│   └── useUpdateNotifications.ts     # React hook for update state
+├── utils/
+│   ├── serviceWorker.ts              # SW integration utilities
+│   └── updateErrorHandler.ts         # Error classification and recovery
+└── types/
+    └── index.ts                       # UpdateInfo, UpdateState, UpdateError types
 ```
 
 ### Backend Components
 ```
 supabase/
 ├── functions/
-│   └── check-version/
-│       ├── index.ts                   # Version checking endpoint
-│       └── __tests__/
-│           └── index.test.ts          # Function tests
+│   ├── check-version/
+│   │   └── index.ts                   # Version checking endpoint (POST)
+│   └── get-status/
+│       └── index.ts                   # Lightweight status endpoint (GET)
 └── migrations/
-    └── [version]_create_app_versions.sql  # Database schema
+    └── [timestamp]_create_app_versions.sql  # Database schema
 ```
 
 ### Configuration and Build
 ```
 apps/frontend/
-├── vite.config.ts                     # PWA configuration
+├── vite.config.ts                     # PWA + VitePWA configuration
 ├── public/
-│   ├── manifest.json                  # PWA manifest
-│   └── sw-custom.js                   # Custom SW logic
-└── scripts/
-    └── version-management.mjs         # Version deployment scripts
+│   └── manifest.json                  # PWA manifest (auto-generated)
+├── scripts/
+│   └── version-management.mjs         # Version deployment scripts
+scripts/
+└── insert-new-version-template.sql    # SQL template for new versions
 ```
 
 ## Developer Guide
 
 ### Adding a New Update
 
-1. **Database Entry**: Add new version to `app_versions` table
+1. **Database Entry**: Add new version to `app_versions` table (see `scripts/insert-new-version-template.sql` for full template)
    ```sql
    INSERT INTO app_versions (
      version_number,
+     build_number,
      update_policy,
      is_active,
+     reviewer,
      changelog,
      release_date
    ) VALUES (
      '1.2.3',
+     '123',
      'critical',
      true,
-     '{"new_features": ["Feature 1"], "bug_fixes": ["Fix 1"]}',
+     'developer-name',
+     '{"new_features": ["Feature 1"], "bug_fixes": ["Fix 1"], "security_updates": [], "improvements": []}',
      NOW()
    );
    ```
@@ -224,30 +263,34 @@ apps/frontend/
 The system includes comprehensive testing:
 
 ```bash
-# Run update system tests
-pnpm --filter @repcue/frontend test src/**/*update*
+# Run update service unit tests
+pnpm --filter @repcue/frontend test src/services/__tests__/updateService.test.ts
 
-# Run E2E update tests
-pnpm test:e2e tests/e2e/cypress/e2e/update-system.cy.ts
+# Run all update-related tests
+pnpm --filter @repcue/frontend test --grep "update"
 
 # Test edge function locally
+cd supabase && supabase functions serve check-version
+
+# Or using pnpm from root
 pnpm supabase functions serve check-version
 ```
 
 ### Configuration
 
-#### Update Intervals
+#### Update Intervals (updateService.ts)
 ```typescript
-// In updateService.ts
 const UPDATE_CHECK_INTERVAL = 4 * 60 * 60 * 1000;      // 4 hours
 const FORCE_UPDATE_CHECK_INTERVAL = 30 * 60 * 1000;    // 30 minutes
 ```
 
-#### Force Update Timing
+Note: Minimum check interval is enforced (5 min for force, 30 min for others) to prevent excessive API calls.
+
+#### Force Update Timing (forceUpdateService.ts)
 ```typescript
-// In forceUpdateService.ts
-const AUTO_FORCE_DELAY = 5 * 60 * 1000;                // 5 minutes
-const MAX_RETRY_ATTEMPTS = 3;                           // 3 retries
+private static readonly AUTO_FORCE_DELAY = 5 * 60 * 1000;    // 5 minutes auto-force countdown
+private static readonly MAX_RETRY_ATTEMPTS = 3;               // 3 retries
+private static readonly RETRY_DELAY_BASE = 10000;             // 10 seconds base for exponential backoff
 ```
 
 ### Error Handling
@@ -263,39 +306,51 @@ The system implements comprehensive error handling:
 
 The update system respects RepCue's privacy-first approach:
 
-- **Consent-Based**: Detailed update info only provided with user consent
-- **No Tracking**: No analytics or usage tracking in update checks
-- **Local Storage**: Update preferences stored locally
-- **Graceful Degradation**: Works without cloud features for privacy-focused users
+- **Consent-Based**: Detailed update info (changelog, etc.) only provided with user consent; basic update notifications work without consent
+- **No Tracking**: No analytics or usage tracking in update checks; only version comparison
+- **Local Storage**: Update preferences stored in `AppSettings` via IndexedDB (consent-aware), with fallback to `sessionStorage` without consent
+- **Graceful Degradation**: Works without cloud features for privacy-focused users; service worker updates still function
+- **Version Storage**: Current app version stored in IndexedDB `app_settings` table, updated on successful update application
 
 ### Workflow Integration
 
 #### Active Workout Handling
 The system carefully handles active workouts:
 
-1. **Detection**: Monitors timer state through App.tsx integration
-2. **Deferral**: Non-force updates wait for workout completion
-3. **Interruption**: Force updates offer save/abandon options
-4. **Recovery**: Workout state preserved during updates when possible
+1. **Detection**: Monitors timer state through `setTimerStateRef()` integration in App.tsx
+2. **Deferral**: Non-force updates wait for workout completion (`shouldDeferUpdateForWorkout()`)
+3. **Interruption**: Force updates offer save/abandon options with workout state capture
+4. **Recovery**: Workout state preserved to localStorage before update, recoverable via `loadAndClearWorkoutRecovery()`
 
 #### Multi-Tab Coordination
+- Uses `BroadcastChannel` API to communicate between browser tabs
 - Prevents concurrent updates across browser tabs
-- Coordinates service worker updates between tabs
+- Coordinates service worker updates between tabs via `swEventEmitter`
 - Ensures version consistency across sessions
+- Broadcasts update status: 'update-starting', 'update-completed', 'update-failed'
 
 ### Monitoring and Debugging
 
 #### Logging
-The system uses the RepCue logger utility:
+The system uses the RepCue logger utility (`src/utils/logger.ts`):
 ```typescript
 import logger from '../utils/logger';
 
-// Debug messages (only when DEBUG=true)
+// Debug messages (only when DEBUG=true in features.ts)
 logger.log('📦 Update available:', updateInfo);
+logger.debug('Version check context:', { version, consent });
 
-// Always logged for monitoring
+// Info messages (always logged when DEBUG=true)
+logger.info('🚀 Starting update:', version);
+
+// Warning messages (always logged when DEBUG=true)
+logger.warn('⚠️ Metered connection detected');
+
+// Always logged for monitoring (regardless of DEBUG flag)
 logger.error('❌ Update failed:', error);
 ```
+
+Note: Use `logger.*` methods instead of `console.*` to respect the DEBUG feature flag.
 
 #### Console Messages
 Key console messages to monitor:
@@ -323,11 +378,13 @@ updateService.on('update-failed', (error) => {
 
 If migrating from a simpler update system:
 
-1. **Database Setup**: Create `app_versions` table with RLS policies
-2. **Edge Function Deployment**: Deploy the `check-version` function
-3. **Client Integration**: Replace existing update logic with `UpdateNotificationManager`
-4. **Testing**: Verify all update policies work as expected
-5. **Gradual Rollout**: Use optional updates first, then critical, finally force
+1. **Database Setup**: Create `app_versions` table with RLS policies (see migrations folder)
+2. **Edge Function Deployment**: Deploy the `check-version` and `get-status` functions
+3. **Version Initialization**: Set initial version in IndexedDB via `storageService.updateAppVersion()`
+4. **Client Integration**: Add `UpdateNotificationManager` to your app root
+5. **Timer Integration**: Call `updateService.setTimerStateRef()` and `forceUpdateService.setTimerStateRef()` from timer state
+6. **Testing**: Verify all update policies work (use `scripts/insert-new-version-template.sql`)
+7. **Gradual Rollout**: Use optional updates first, then critical, finally force
 
 ## Best Practices
 
@@ -343,25 +400,35 @@ If migrating from a simpler update system:
 ### Common Issues
 
 **Updates Not Appearing**:
-- Check network connectivity
-- Verify edge function is deployed
+- Check network connectivity (`navigator.onLine`)
+- Verify edge function is deployed (`supabase functions list`)
 - Check browser dev tools for console errors
-- Verify `app_versions` table has active entry
+- Verify `app_versions` table has an active entry (`is_active = true`)
+- Ensure version format is semantic (x.y.z)
+- Check minimum interval hasn't been reached (30 min for normal, 5 min for force)
 
 **Force Updates Not Working**:
-- Check `forceUpdateService` integration in App.tsx
-- Verify event listeners are properly set up
-- Check for React re-render loops
+- Verify `forceUpdateService` has `timerStateRef` set via `setTimerStateRef()` in App.tsx
+- Check that the update policy is 'force' in database
+- Check for event listener issues in console
+- Ensure `isForceUpdateActive` state is being set
+
+**Version Not Updating After Reload**:
+- Version is stored in IndexedDB `app_settings.app_version`
+- Use `updateService.debugVersionInfo()` in console to check state
+- Verify `storageService.updateAppVersion()` succeeded before reload
 
 **Service Worker Issues**:
-- Clear browser cache and service worker
-- Check `sw-custom.js` for errors
-- Verify manifest.json configuration
+- Clear browser cache and service worker: Settings → Application → Clear storage
+- Check for `swEventEmitter` registration in console
+- Verify VitePWA configuration in `vite.config.ts`
+- Test in incognito mode to rule out cache issues
 
 **Database Connection Issues**:
-- Check Supabase environment variables
-- Verify RLS policies allow public access to `app_versions`
-- Test edge function directly
+- Check Supabase environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)
+- Verify RLS policies allow public SELECT on `app_versions`
+- Test edge function directly with curl or Postman
+- Check Supabase dashboard for function logs
 
 ## Security Considerations
 

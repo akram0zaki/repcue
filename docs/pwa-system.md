@@ -131,10 +131,14 @@ RepCue works completely offline through intelligent caching:
 - ✅ Exercise data and user preferences
 
 **Cache Strategies:**
-- **Static assets** - Cache First (1 year expiry)
+- **Static assets** - Cache First (1 year expiry for fonts)
+- **Splash screens** - Cache First (30 days)
+- **UI images** - Cache First (90 days)
+- **Exercise videos** - Cache First (90 days, supports range requests)
 - **Translation files** - Stale While Revalidate (7 days)  
-- **Exercise videos** - Stale While Revalidate (30 days)
-- **API calls** - Network First with offline fallback
+- **Legal manifest** - Network First (1 hour, 3s timeout)
+- **Legal documents** - Stale While Revalidate (7 days)
+- **Default handler** - Network First with offline fallback
 
 ### 💾 Data Storage
 
@@ -201,11 +205,11 @@ RepCue's PWA is built with modern web standards:
 
 ```json
 {
-  "vite-plugin-pwa": "^0.17.0",    // PWA generation
-  "workbox-window": "^7.0.0",      // Service worker client
-  "dexie": "^3.2.4",               // IndexedDB wrapper
-  "react": "^19.0.0",              // UI framework
-  "react-i18next": "^13.5.0"       // Internationalization
+  "vite-plugin-pwa": "^1.0.1",     // PWA generation
+  "workbox-window": "^7.3.0",      // Service worker client
+  "dexie": "^4.0.11",              // IndexedDB wrapper
+  "react": "^19.1.0",              // UI framework
+  "react-i18next": "^15.6.1"       // Internationalization
 }
 ```
 
@@ -214,51 +218,86 @@ RepCue's PWA is built with modern web standards:
 **Vite PWA Plugin Configuration:**
 ```typescript
 VitePWA({
-  registerType: 'autoUpdate',
+  registerType: 'prompt',  // Let updateService control updates
+  strategies: 'injectManifest',  // Use custom service worker
+  srcDir: 'public',
+  filename: 'sw-custom.js',  // Custom service worker file
   includeAssets: [
     'favicon.ico', 
     'apple-touch-icon.png',
+    'favicon.svg',
     'splash/**/*',
-    'locales/**/*.json'
+    'images/**/*',
+    'manifest.json'
   ],
   workbox: {
+    skipWaiting: false,  // Let updateService handle this
+    clientsClaim: false, // Let updateService handle this
     globPatterns: [
       '**/*.{js,css,html,ico,png,svg,woff2}',
       'splash/*.{png,svg}',
-      'locales/**/*.json'
+      'images/*.{png,jpg,jpeg,svg}',
+      'locales/**/*.json',
+      'legal/**/*.{json,md}',
+      'manifest.json'
     ],
     runtimeCaching: [
-      // Font caching
-      // Translation files
-      // Exercise videos
-      // Splash screens
+      // Font caching (CacheFirst, 365 days)
+      // Splash screens (CacheFirst, 30 days)
+      // UI images (CacheFirst, 90 days)
+      // Exercise videos (CacheFirst, 90 days)
+      // Translation files (StaleWhileRevalidate, 7 days)
+      // Legal manifest (NetworkFirst, 1 hour)
+      // Legal documents (StaleWhileRevalidate, 7 days)
     ]
   }
 })
 ```
 
+**Custom Service Worker (`public/sw-custom.js`):**
+The application uses `injectManifest` strategy with a custom service worker that:
+- Extends Workbox-generated precaching with custom update handling
+- Listens for `SKIP_WAITING` messages from updateService
+- Handles `SW_UPDATED` and `SW_ACTIVATED` lifecycle events
+- Implements background sync for version checking
+- Supports push notifications for future update alerts
+
 ### 🎯 Service Worker Features
 
-**Custom Service Worker Utilities:**
+**Custom Service Worker (`sw-custom.js`):**
+- Workbox 7.3.0 integration with precaching
+- Navigation preload for faster loading
+- Custom message handling (`SKIP_WAITING`, `GET_VERSION`)
+- Lifecycle event broadcasting (`SW_UPDATED`, `SW_ACTIVATED`)
+- Background sync for version checking
+- Push notification support for updates
+
+**Service Worker Utilities (`serviceWorker.ts`):**
 - `forceRefreshFromServer()` - Complete cache reset
 - `clearPWACaches()` - Selective cache clearing
 - `forceUpdateServiceWorker()` - Manual SW updates
 - `registerServiceWorker()` - SW registration with error handling
 - `updateServiceWorker()` - Update management
 
-**Version Management Utilities:**
+**Version Management Utilities (`updateService.ts`):**
 - `getStatus()` - Lightweight server version check
 - `checkAndRefreshIfVersionNull()` - PWA refresh for null versions
 - `getCurrentAppVersion()` - Returns `string | null` for new installations
 - `updateAppVersion()` - Persists version to IndexedDB
+- `debugVersionInfo()` - Version diagnostics
 
 **Cache Management:**
 ```typescript
-// Multiple cache strategies
+// Cache strategies by resource type
 const cacheStrategies = {
-  static: 'CacheFirst',      // App shell, fonts
-  dynamic: 'StaleWhileRevalidate', // i18n, videos
-  api: 'NetworkFirst'        // Data endpoints
+  fonts: 'CacheFirst',           // 365 days
+  splash: 'CacheFirst',          // 30 days
+  uiImages: 'CacheFirst',        // 90 days
+  videos: 'CacheFirst',          // 90 days, range requests
+  locales: 'StaleWhileRevalidate', // 7 days
+  legalManifest: 'NetworkFirst', // 1 hour, 3s timeout
+  legalDocs: 'StaleWhileRevalidate', // 7 days
+  default: 'NetworkFirst'        // Fallback
 }
 ```
 
@@ -313,17 +352,24 @@ const {
 
 **Cache Naming Convention:**
 ```
-repcue-precache-v{version}     // Static app shell
-google-fonts-cache             // External fonts
-exercise-videos-cache          // Demo videos  
-i18n-locales-cache            // Translation files
-splash-screens-cache          // iOS splash screens
+repcue-precache-v{version}     // Static app shell (Workbox precaching)
+google-fonts-cache             // Google Fonts (10 entries, 365 days)
+gstatic-fonts-cache            // Google Fonts static files (10 entries, 365 days)
+splash-screens-cache           // iOS splash screens (50 entries, 30 days)
+ui-images-cache                // Hero banner, icons (20 entries, 90 days)
+exercise-videos-cache-v2       // Demo videos (100 entries, 90 days)
+i18n-locales-cache             // Translation files (50 entries, 7 days)
+legal-manifest-cache           // Legal manifest (5 entries, 1 hour)
+legal-docs-cache               // Legal documents (20 entries, 7 days)
+default-cache                  // Default NetworkFirst handler
 ```
 
 **Storage Quotas:**
-- Maximum 60 video entries (30-day TTL)
+- Maximum 100 video entries (90-day TTL, purgeOnQuotaError enabled)
 - Maximum 50 locale files (7-day TTL)
 - Maximum 10 font families (1-year TTL)
+- Maximum 20 legal documents (7-day TTL)
+- Maximum 20 UI images (90-day TTL)
 
 ### 🔒 Security Implementation
 
@@ -532,5 +578,5 @@ For additional technical details, see:
 - [Server Status Endpoint](../supabase/functions/get-status/index.ts)
 - [iOS Deep Linking Guide](./ios-pwa-magic-links.md)
 
-**Last Updated:** 2025-09-24
-**Version:** RepCue v1.0+ with Server-Based Versioning
+**Last Updated:** 2025-11-30
+**Version:** RepCue v1.0+ with Server-Based Versioning and injectManifest Strategy

@@ -2,13 +2,13 @@
 
 RepCue is a modern, privacy-first fitness tracking Progressive Web App (PWA) designed for interval training and exercise logging. Built with React, TypeScript, and Tailwind CSS, it delivers a native-like app experience while being optimized for mobile devices and perfect for self-hosting on Raspberry Pi.
 
-> Want details on the offline-first data layer? See the new **[Sync Architecture (v2)](./docs/sync.md)** guide for per-table cursors, conflict resolution, batching, and feature-flag rollout.
+> Want details on the offline-first data layer? See the new **[Sync Architecture (v2)](./docs/sync-system.md)** guide for per-table cursors, conflict resolution, batching, and feature-flag rollout.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - **Node.js 18+** (Download from [nodejs.org](https://nodejs.org))
-- **pnpm** (Install with: `pnpm install -g pnpm`)
+- **pnpm 10+** (Install with: `npm install -g pnpm`)
 
 ### Get Running in 3 Steps (monorepo)
 
@@ -18,7 +18,7 @@ git clone https://github.com/akram0zaki/repcue.git
 cd repcue
 
 # 2. Install dependencies at the repo root
-ppnpm install
+pnpm install
 
 # 3. Start the frontend dev server (Vite)
 pnpm dev
@@ -39,9 +39,10 @@ RepCue is your personal interval training companion that:
 
 - ⏱️ **Interval Timer**: Configurable workout timers (15s, 30s, 60s)
 - ⏳ **Pre-Timer Countdown**: Optional 0-10 second countdown before timer starts
-- 💪 **20 Core Exercises**: Across 5 categories (Core, Strength, Cardio, Flexibility, Balance)
+- 💪 **87+ Built-in Exercises**: Across multiple catalogs (General Fitness, Pilates, Zumba, Aikido, Women's Health)
+- 🏷️ **Multi-Catalog System**: Exercises organized into themed catalogs with smart filtering
 - 🎥 **Exercise Demo Videos (Experimental)**: Inline circular instructional loop (feature & setting gated, reduced‑motion aware, fully optional)
-- 🤖 **AI Coach (Phase 2)**: Intelligent workout insights powered by Mistral AI
+- 🤖 **AI Coach**: Intelligent workout insights powered by Mistral AI
 - 📊 **Smart Recommendations**: Advanced progression and recovery algorithms
 - 📱 **Mobile-First**: Responsive design optimized for phones and tablets
 - ♿ **Accessible**: WCAG 2.1 compliant for all users
@@ -121,7 +122,7 @@ RepCue's AI Coach combines rule-based algorithms with Mistral AI to provide pers
 - App automatically falls back to rule-based insights
 - Your experience is not degraded
 
-For more details, see [`docs/ai-coach-user-guide.md`](./docs/ai-coach-user-guide.md) (coming soon).
+For more details, see [`docs/ai-coach-user-guide.md`](./docs/ai-coach-user-guide.md).
 
 ---
 - **Disk Space**: ~200MB for dependencies + ~50MB for built app
@@ -134,7 +135,9 @@ For more details, see [`docs/ai-coach-user-guide.md`](./docs/ai-coach-user-guide
 
 ## 🌍 Internationalization (i18n)
 
-RepCue supports 6 languages (English, Dutch, Arabic, German, Spanish, French) with full RTL support for Arabic.
+RepCue supports 8 languages with full RTL support for Arabic:
+- **LTR Languages**: English (en), Dutch (nl), German (de), Spanish (es), French (fr), Frisian (fy)
+- **RTL Languages**: Arabic (ar), Arabic Egyptian (ar-EG)
 
 ### i18n Contributor & Dev Guide
 - All UI strings use i18n keys (see `/docs/i18n/key-styleguide.md`).
@@ -142,7 +145,7 @@ RepCue supports 6 languages (English, Dutch, Arabic, German, Spanish, French) wi
     1. Edit `public/locales/en/common.json` (or the correct namespace file).
     2. Run `pnpm i18n:scan` to check for missing keys in other locales.
     3. Add translations for all supported languages.
-    4. Test in the UI and with `ppnpm test`.
+    4. Test in the UI and with `pnpm test`.
 - For new languages, mirror the EN structure and add to `supportedLngs` in `src/i18n.ts`.
 - See `/docs/i18n/contributing.md` for full process, key naming, and RTL tips.
 
@@ -156,7 +159,6 @@ RepCue supports 6 languages (English, Dutch, Arabic, German, Spanish, French) wi
 - `/docs/i18n/contributing.md` — How to add/translate
 - `/docs/i18n/rtl.md` — RTL/Arabic tips
 - `/docs/i18n/string-inventory.md` — All keys
-- `/docs/i18n/CHANGELOG.md` — i18n structure changes
 - `/docs/i18n/screenshots/` — Screenshots for review
 
 ---
@@ -173,11 +175,7 @@ cd repcue
 
 #### 3. **Install Dependencies**
 ```bash
-# Using npm (recommended)
 pnpm install
-
-# Or using yarn
-yarn install
 ```
 
 This installs all required packages including:
@@ -219,16 +217,17 @@ pnpm preview
 | `pnpm pm2:restart` | Restart PM2 app | Update production app |
 | `pnpm pm2:logs` | View PM2 logs | Monitor production app |
 | `pnpm lint` | Lint frontend | Before committing |
-| `ppnpm test` | Run unit/integration tests | Development/CI |
-| `ppnpm test:ui` | Vitest UI | Debugging tests |
-| `ppnpm test:coverage` | Coverage report | QA |
-| `ppnpm test:unit` | Unit/integration only | Fast testing |
-| `ppnpm test:stable` | Stable mode on Windows | Flake-free runs |
+| `pnpm test` | Run unit/integration tests | Development/CI |
+| `pnpm test:ui` | Vitest UI | Debugging tests |
+| `pnpm test:coverage` | Coverage report | QA |
+| `pnpm test:unit` | Unit/integration only | Fast testing |
+| `pnpm test:stable` | Stable mode on Windows | Flake-free runs |
+| `pnpm test:ci` | CI mode (stable, silent) | CI pipelines |
 
 
 ## 🧪 Testing
 
-RepCue includes comprehensive test coverage with **98 tests** across all components.
+RepCue includes comprehensive test coverage across all components.
 
 ### Unit/Integration (frontend)
 ```bash
@@ -237,46 +236,48 @@ pnpm test
 
 ### Test with Coverage Report
 ```bash
-ppnpm test:coverage
+pnpm test:coverage
 ```
 
 ### Interactive Test UI
 ```bash
-ppnpm test:ui
+pnpm test:ui
 ```
 Opens a web interface for running and debugging tests.
+
+### CI Mode (Stable, Silent)
+```bash
+pnpm test:ci
+```
+Runs tests in CI-friendly mode with stable configuration.
 
 ### End-to-End (Cypress)
 Tests live under `tests/e2e`.
 
-Option A — build + preview + run Cypress:
 ```bash
-# 1) Build and preview frontend
-pnpm build
-pnpm preview
-
-# 2) In another terminal, run cypress from the e2e workspace
+# Option A: Run Cypress in headless mode
 pnpm cypress:run
-# or open the Cypress UI
+
+# Option B: Open Cypress interactive UI
 pnpm cypress:open
+
+# Option C: Full E2E with dev server (start-server-and-test)
+pnpm test:e2e
+
+# Accessibility tests only
+pnpm test:a11y
 ```
 
 ### Test Categories
-- **✅ Unit Tests**: Individual components (ConsentBanner, TimerPage, etc.)
-- **✅ Integration Tests**: Service layer (StorageService, AudioService, etc.)
-- **✅ Accessibility Tests**: WCAG 2.1 compliance verification
+- **✅ Unit Tests**: Individual components and utilities
+- **✅ Integration Tests**: Service layer (StorageService, AudioService, SyncService, etc.)
+- **✅ Accessibility Tests**: WCAG 2.1 compliance verification (via cypress-axe)
 - **✅ Timer Logic Tests**: Precision timing and state management
-- **✅ Video Demo Tests**: E2E coverage for render path, user toggle, reduced‑motion suppression, and global feature flag disable
+- **✅ Video Demo Tests**: E2E coverage for render path, user toggle, reduced‑motion suppression
+- **✅ Sync Tests**: Offline-first data synchronization with Supabase
+- **✅ i18n Tests**: Translation coverage and RTL layout verification
 
-### Test Results Overview
-```
-✅ ConsentBanner: 10/10 tests passing (GDPR compliance)
-✅ TimerPage: 22/24 tests passing (Core functionality)
-✅ AudioService: 19/25 tests passing (Sound & vibration)
-✅ StorageService: 16/23 tests passing (Data persistence)
-✅ ConsentService: 14/16 tests passing (Privacy management)
-✅ Video Demos (Cypress E2E): 4/4 scenarios passing (render, toggle off/on, reduced motion, global disable)
-```
+Run `pnpm test:ci` to see current test results.
 
 ---
 
@@ -290,9 +291,9 @@ pnpm cypress:open
 # Fix npm permissions (Linux/Mac)
 sudo chown -R $(whoami) ~/.npm
 
-# Or use yarn instead
-pnpm install -g yarn
-yarn install
+# Or reinstall pnpm
+npm install -g pnpm
+pnpm install
 ```
 
 #### **Issue**: Port 5173 already in use
@@ -312,7 +313,7 @@ pnpm dev -- --port 3000
 # In Chrome: F12 → Application → Clear Storage → Clear All
 
 # Restart development server
-npm run dev
+pnpm dev
 ```
 
 #### **Issue**: TypeScript errors during build
@@ -348,7 +349,7 @@ pnpm test -- --clearCache
 # Check if Tailwind classes are loading
 # Inspect element and look for 'dark:' classes
 # Rebuild if necessary
-npm run build
+pnpm build
 ```
 
 #### **Issue**: PM2 application not responding
@@ -377,7 +378,7 @@ pnpm pm2:restart
    # Full reset
    rm -rf node_modules package-lock.json
    pnpm install
-   npm run dev
+   pnpm dev
    ```
 
 ---
@@ -423,7 +424,7 @@ pm2 startup
 | Command | Purpose |
 |---------|---------|
 | `pnpm pm2:start` | Build and start application |
-| `npm run pm2:stop` | Stop the application |
+| `pnpm pm2:stop` | Stop the application |
 | `pnpm pm2:restart` | Restart the application |
 | `pnpm pm2:logs` | View application logs |
 | `pm2 status` | Check all PM2 processes |
@@ -444,7 +445,7 @@ The included `apps/backend/ecosystem.config.cjs` is optimized for Raspberry Pi d
 
 ```bash
 # Build frontend
-npm run build
+pnpm build
 
 # Start backend via PM2 (serves apps/frontend/dist)
 pnpm pm2:start
@@ -768,13 +769,15 @@ repcue/
 
 ### Key Technologies
 
-- **Frontend**: React 19 + TypeScript + Vite
-- **Styling**: Tailwind CSS v3 + Custom design system
+- **Frontend**: React 19 + TypeScript + Vite 7
+- **Styling**: Tailwind CSS v3 + Custom design tokens (`tokens.css`)
 - **Routing**: React Router v7
-- **Database**: Dexie.js (IndexedDB wrapper)
-- **Testing**: Vitest + React Testing Library
+- **Database (Local)**: Dexie.js (IndexedDB wrapper)
+- **Database (Cloud)**: Supabase PostgreSQL with Row Level Security
+- **Sync**: Custom offline-first sync engine with conflict resolution
+- **Testing**: Vitest + React Testing Library + Cypress
 - **Audio**: Web Audio API + Speech Synthesis
-- **PWA**: Service Worker ready (future enhancement)
+- **PWA**: VitePWA plugin with Workbox
 
 ### Core Components
 
@@ -822,7 +825,7 @@ import { ExerciseSelectorModal } from '../components/ExerciseSelector/ExerciseSe
 ### Development Workflow
 
 1. **Start Development**:
-   - Frontend: `npm run dev`
+   - Frontend: `pnpm dev`
    - Backend (optional): `pnpm dev:be`
 
 2. **Make Changes**: Edit files in `apps/frontend/src/`
@@ -835,7 +838,7 @@ import { ExerciseSelectorModal } from '../components/ExerciseSelector/ExerciseSe
 
 4. **Build & Test**:
    ```bash
-   npm run build && pnpm preview
+   pnpm build && pnpm preview
    ```
 
 5. **Deploy**: Use PM2 (`pnpm pm2:start`) to serve `apps/frontend/dist` via backend
@@ -862,14 +865,14 @@ import { ExerciseSelectorModal } from '../components/ExerciseSelector/ExerciseSe
 5) Install and validate:
 ```bash
 pnpm install
-npm run build
-npm run dev       # FE at 5173
-pnpm dev:be    # BE at 3001 (optional placeholder)
+pnpm build
+pnpm dev          # FE at 5173
+pnpm dev:be       # BE at 3001 (optional placeholder)
 ```
 
 6) PM2 on Pi/server:
 ```bash
-npm run build
+pnpm build
 pnpm pm2:start
 ```
 
@@ -885,7 +888,7 @@ pnpm cypress:run
 
 For a deep dive into how data sync works (high‑level and inner workings), plus steps to add new entities to the sync scope, see:
 
-- [Sync Architecture (v2)](docs/sync.md)
+- [Sync Architecture (v2)](docs/sync-system.md)
 
 ### Adding New Features
 
@@ -912,14 +915,15 @@ For a deep dive into how data sync works (high‑level and inner workings), plus
 
 RepCue is designed with privacy as the top priority:
 
-- **Local-Only Storage**: All data stays on your device/Pi
-- **No Tracking**: Zero analytics, cookies, or external requests
+- **Local-First Storage**: All data stored locally on your device first
+- **Optional Cloud Sync**: Sync to Supabase only when signed in and consented
+- **No Tracking**: Zero analytics, cookies, or external requests without consent
 - **GDPR Compliant**: Full consent management system with versioning
 - **Open Source**: Complete transparency in code
-- **Self-Hosted**: You control your data completely
+- **Self-Hosted Option**: Deploy to your own Raspberry Pi or server
 
 ### Robust Consent System
-RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[consent.md](docs/consent.md)** which covers:
+RepCue implements a comprehensive, regulation-compliant consent management system. For detailed information about our privacy implementation, see **[Consent System](docs/consent-system.md)** which covers:
 
 - GDPR/CCPA compliance features
 - Consent versioning and migration
@@ -929,15 +933,17 @@ RepCue implements a comprehensive, regulation-compliant consent management syste
 
 ### Data Stored Locally
 - Exercise preferences and favorites
-- Workout session logs
-- App settings (sound, theme, etc.)
+- Workout session logs and personal records
+- App settings (sound, theme, language)
 - User consent preferences
+- Cached exercise videos (for offline use)
 
-### No Data Shared
-- No cloud syncing
-- No user accounts
-- No external APIs
-- No telemetry or analytics
+### Cloud Sync (Optional, Requires Sign-In)
+- Exercises sync across devices
+- Activity logs with owner validation
+- Workouts and workout sessions
+- User preferences and settings
+- Row Level Security ensures data isolation
 
 ---
 
@@ -971,37 +977,36 @@ We welcome contributions! Here's how to get started:
 
 ## 🎯 Roadmap
 
-### Current Version (v0.4.0)
-- ✅ Core interval timer functionality
-- ✅ 20 exercise library with categories
-- ✅ Expandable exercise tags with smooth animations
+### Current Features
+- ✅ Core interval timer functionality with configurable durations
+- ✅ 87+ exercise library across multiple themed catalogs
+- ✅ Multi-catalog system (General Fitness, Pilates, Zumba, Aikido, Women's Health)
+- ✅ Exercise demo videos with reduced-motion support
 - ✅ Audio feedback and voice announcements
-- ✅ Activity logging and tracking
-- ✅ GDPR-compliant privacy controls
-- ✅ Mobile-responsive design
-- ✅ Dark mode support
+- ✅ Activity logging and tracking with personal records
+- ✅ GDPR-compliant privacy controls with consent versioning
+- ✅ Mobile-responsive design with 8 languages (including RTL)
+- ✅ Dark mode with smooth theme transitions
+- ✅ PWA with install prompts and offline capability
 - ✅ PM2 production deployment support
-- ✅ Express server with health monitoring
-- ✅ Nginx + Cloudflare tunnel integration
-- ✅ **PWA Platform Detection**: Cross-platform detection system with comprehensive browser/OS identification
-- ✅ **TypeScript Integration**: Fully typed platform utilities with 100% test coverage
+- ✅ Supabase backend with offline-first sync
+- ✅ AI Coach with Mistral AI integration
+- ✅ Workout builder and session management
+- ✅ WebAuthn/passkey authentication support
 
-### Planned Features (v0.5.0) - PWA Enhancement
-- 🔄 **Install Experience**: Smart install prompts for iOS, Android, and Desktop
-- 🔄 **Offline Functionality**: Full offline workout capability with background sync
-- 🔄 **App Shell Architecture**: Instant loading with persistent navigation
-- ✅ **Platform Detection**: Cross-platform detection system (Completed)
-- 🔄 Custom workout routines
-- 🔄 Exercise progression tracking
-- 🔄 Import/export workout data
+### In Development
+- 🔄 Advanced analytics and charts
+- 🔄 Achievement and gamification system
+- 🔄 AI-powered workout generation
+- 🔄 Social features and exercise sharing
 
 ### Future Enhancements
-- 📋 Workout scheduling
-- 📊 Advanced analytics and charts
-- 🏆 Achievement system
-- 🔊 Custom audio cues
-- 🔄 **Background Sync**: Automatic data sync when online
-- � **Push Notifications**: Workout reminders and achievements
+- 📋 Workout scheduling with calendar integration
+- 🏆 Achievement badges and workout streaks
+- 🔊 Custom audio cues and sound packs
+- 🔔 Push notifications for workout reminders
+- 📊 Detailed progress analytics with charts
+- 🤝 Community features and shared workouts
 
 ---
 

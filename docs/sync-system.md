@@ -49,17 +49,18 @@ RepCue implements an **offline-first synchronization architecture** that ensures
 |-----------|----------|----------------|
 | **CorrectSyncService** | `src/services/correctSyncService.ts` | Core sync orchestration, batching, conflict resolution |
 | **StorageService** | `src/services/storageService.ts` | IndexedDB CRUD operations, dirty marking, tombstones |
-| **SyncService** | `src/services/syncService.ts` | Legacy interface wrapper for backward compatibility |
-| **useSharedExercises** | `src/hooks/useSharedExercises.ts` | Hook for detecting shared exercises in UI |
+| **SyncService** | `src/services/syncService.ts` | High-level sync interface and event coordination |
+| **useSharedExercises** | `src/hooks/useSharedExercises.ts` | React hook for detecting shared exercises in UI |
 
 ### Server-Side (Supabase)
 
 | Component | Location | Responsibility |
 |-----------|----------|----------------|
 | **sync_v2 Edge Function** | `supabase/functions/sync_v2/index.ts` | Main sync endpoint with per-table pagination |
-| **save-shared-exercise** | `supabase/functions/save-shared-exercise/` | Creates exercise references for sharing |
-| **get-shared-exercise** | `supabase/functions/get-shared-exercise/` | Anonymous access to shared exercises with signed video URLs |
-| **download-shared-video** | `supabase/functions/download-shared-video/` | Permission-based video access |
+| **share-exercise** | `supabase/functions/share-exercise/` | Generates share tokens for exercises |
+| **save-shared-exercise** | `supabase/functions/save-shared-exercise/` | Creates exercise references in user_favorites |
+| **get-shared-exercise** | `supabase/functions/get-shared-exercise/` | Anonymous GET access to shared exercises with signed video URLs |
+| **download-shared-video** | `supabase/functions/download-shared-video/` | Authenticated POST for permission-based video download |
 | **RLS Policies** | Database | Row-level security for data isolation |
 
 ### Data Layer
@@ -132,9 +133,14 @@ The v2 sync engine (`CorrectSyncService`) provides robust, efficient synchroniza
 
 | Mode | Tables Synced | Use Case | Frequency |
 |------|---------------|----------|-----------|
-| **Light** | `user_preferences`, `app_settings`, `exercises`, `user_favorites` + dirty tables | Background sync | Every 10s (if changes) |
-| **Full** | All sync tables | Login, manual force, long intervals | On-demand |
-| **Priority** | Tables affected by user mutation | Immediate push after user action | Real-time |
+| **Light** | `user_preferences`, `app_settings`, `user_profiles`, `exercises` | Background sync | Suppressed if <10s since last and no dirty records |
+| **Full** | All 9 sync tables | Login, manual force, long intervals | On-demand |
+| **Priority** | Subset of tables specified in `priorityPush()` call | Immediate push after user action | Real-time |
+
+**Timing Constants**:
+- `MIN_LIGHT_INTERVAL_MS`: 10,000ms (10s) - Passive light sync suppression window
+- `EDGE_TIMEOUT_MS`: 15,000ms (15s) - Per-request timeout
+- `SYNC_TIMEOUT_MS`: 8,000ms (8s) - Overall sync timeout per invocation
 
 ### Per-Table Cursor System
 
@@ -169,18 +175,24 @@ The sync engine uses a **version-first** approach with timestamp tiebreakers:
 
 ### Batch Processing
 
-- **Push Limit**: Maximum 5 records per sync request
-- **Pull Limit**: 50 records per page, maximum 5 pages per table
-- **Security**: Payload size capped at 32KB
+- **Push Batch Size**: Maximum 5 records per sync request (`PUSH_BATCH_SIZE`)
+- **Pull Page Size**: 50 records per page (`PULL_PAGE_SIZE`)
+- **Pull Page Limit**: Maximum 5 pages per table per sync cycle (`PULL_PAGE_LIMIT`)
 - **Ownership**: Server enforces `owner_id` = authenticated user
+- **Built-in Filtering**: Client-side `isBuiltin()` and `isBuiltinCatalog()` filters prevent syncing built-in data
+- **Server Validation**: UUID pattern validation rejects non-UUID exercise IDs
 
 ### Backoff Strategy
 
 ```typescript
-// Exponential backoff with jitter
-const backoffSeconds = Math.min(60, Math.pow(2, consecutiveFailures)) * (0.8 + Math.random() * 0.4);
+// Exponential backoff with jitter (±10%)
+const backoffBase = [1, 2, 4, 8, 16, 32, 60]; // seconds
+const seconds = backoffBase[Math.min(backoffBase.length - 1, consecutiveFailures - 1)];
+const jitter = seconds * 0.2 * (Math.random() - 0.5);
+const backoffUntil = Date.now() + (seconds + jitter) * 1000;
 
 // Backoff schedule: 1s → 2s → 4s → 8s → 16s → 32s → 60s (max)
+// Priority mode bypasses backoff for immediate user actions
 ```
 
 ### Table Sync Order
@@ -189,14 +201,16 @@ const backoffSeconds = Math.min(60, Math.pow(2, consecutiveFailures)) * (0.8 + M
 const SYNC_ORDER = [
   'user_preferences',    // User settings and built-in exercise favorites
   'app_settings',        // Application preferences
-  'exercise_catalogs',   // Must sync before exercises (foreign key)
+  'user_profiles',       // User fitness profiles for AI Workout Builder
   'exercises',           // User-created exercises
   'user_favorites',      // Shared exercise references
-  'workouts',           // User-created workouts
-  'activity_logs',      // Exercise history
-  'workout_sessions',   // Workout tracking
-  'video_files'         // Custom video uploads
+  'workouts',            // User-created workouts
+  'activity_logs',       // Exercise history
+  'workout_sessions',    // Workout tracking
+  'video_files'          // Custom video uploads
 ];
+
+// Note: exercise_catalogs is NOT synced - built-in reference data only
 ```
 
 ---
@@ -304,12 +318,18 @@ async function pullExercisesWithShared(supabase, userId, cursor, limit, correlat
 The `useSharedExercises` hook provides shared exercise detection:
 
 ```typescript
-const { isSharedExercise, sharedExerciseIds } = useSharedExercises();
+import { useSharedExercises } from '../hooks/useSharedExercises';
 
-// Usage in components
-const showSharedBadge = isSharedExercise(exercise.id);
-const canEdit = !isSharedExercise(exercise.id) && exercise.owner_id === user.id;
-```
+function ExerciseCard({ exercise }) {
+  const { isSharedExercise, sharedExerciseIds, loading } = useSharedExercises();
+
+  // Usage in components
+  const showSharedBadge = isSharedExercise(exercise.id);
+  const canEdit = !isSharedExercise(exercise.id) && exercise.owner_id === user.id;
+  
+  // sharedExerciseIds is a Set<string> for bulk checks
+  const sharedCount = sharedExerciseIds.size;
+}
 
 #### Video URL Handling for Shared Exercises
 
@@ -353,7 +373,7 @@ if (exercise.custom_video_url && (
 
 RepCue implements **offline-first video handling** that allows immediate local access while syncing to cloud storage in the background.
 
-**Storage Configuration**: All videos are stored exclusively in the `exercise-videos` bucket for simplified architecture and consistent management. The system underwent a complete cleanup in September 2025, removing all legacy data from both buckets and eliminating the dual-bucket complexity that previously existed.
+**Storage Configuration**: All videos are stored exclusively in the `exercise-videos` bucket. The system uses a unified bucket architecture for simplified management and consistent access patterns.
 
 ### Video Flow Overview
 
@@ -736,8 +756,27 @@ CREATE POLICY "Users can download their own videos" ON storage.objects
 
 ### Edge Function Security
 
+#### Sync Tables Allow-list
+The sync_v2 edge function only processes these tables:
+
+```typescript
+const SYNC_TABLES = [
+  'user_preferences',
+  'app_settings',
+  'exercises',
+  'catalog_memberships',
+  'user_favorites',
+  'workouts',
+  'activity_logs',
+  'workout_sessions',
+  'video_files',
+  'personal_records'
+];
+// Note: exercise_catalogs is NOT synced - built-in reference data only
+```
+
 #### Field Allowlists
-The sync_v2 edge function enforces strict field allowlists:
+The sync_v2 edge function enforces strict field allowlists per table:
 
 ```typescript
 const MUTABLE_FIELD_ALLOWLIST = {
@@ -749,8 +788,10 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'custom_video_url', 'has_video', 'default_duration', 'default_sets', 'default_reps',
     'catalog_id', 'benefits', 'limitations', 'best_timing', 'suggested_combinations',
     'notes', 'exercise_references'
-  ])
-  // ... other tables
+  ]),
+  // Additional tables: user_preferences, app_settings, user_favorites,
+  // workouts, activity_logs, workout_sessions, video_files, personal_records,
+  // catalog_memberships - each with their own field allowlists
 };
 ```
 
@@ -758,13 +799,37 @@ const MUTABLE_FIELD_ALLOWLIST = {
 - Server overwrites `owner_id` with authenticated user ID
 - Foreign-owned records are skipped during updates
 - Batch size limited to 5 records maximum
-- Payload size capped at 32KB
+- Built-in exercises (non-UUID IDs) are rejected server-side
+
+#### HTTP Response Codes
+- **200 OK**: Full success - all operations completed
+- **207 Multi-Status**: Partial success - some operations failed (detailed errors in `sync_metadata.detailed_errors`)
+- **401 Unauthorized**: Invalid or expired JWT token
+- **500 Internal Error**: Server-side failure
 
 #### Token Security
 - Share tokens use 256 bits of entropy (64-character hex)
 - Cryptographically secure generation via `crypto.getRandomValues()`
 - Database uniqueness constraint prevents collisions
 - Optional expiration timestamps
+
+#### Sync Events
+The sync system dispatches browser events for UI coordination:
+
+```typescript
+// Dispatched when sync pulls new data from server
+window.dispatchEvent(new CustomEvent('sync:applied', { 
+  detail: { result: { success: true, pulled: 5, pushed: 2 } } 
+}));
+
+// Listen for sync completion to refresh UI
+window.addEventListener('sync:applied', (event) => {
+  const { result } = event.detail;
+  if (result.pulled > 0) {
+    // Refresh data from IndexedDB
+  }
+});
+```
 
 ---
 
@@ -803,21 +868,24 @@ db.version(X).stores({
 
 3. **Sync Service Integration**
 ```typescript
-// Add to SYNC_ORDER (mind dependencies)
+// Add to client-side SYNC_ORDER in correctSyncService.ts
 const SYNC_ORDER = [
   'user_preferences',
   'app_settings',
-  'exercise_catalogs',
+  'user_profiles',
   'exercises',
-  'your_table',        // Add here
   'user_favorites',
-  // ...
+  'your_table',        // Add here (mind dependencies)
+  'workouts',
+  'activity_logs',
+  'workout_sessions',
+  'video_files'
 ];
 ```
 
 4. **Edge Function Updates**
 ```typescript
-// Add to sync_v2 allowlist
+// Add to sync_v2 SYNC_TABLES in supabase/functions/sync_v2/index.ts
 const SYNC_TABLES = [
   // existing tables...
   'your_table'
@@ -891,20 +959,24 @@ describe('Sync Integration', () => {
 // In src/config/features.ts
 export const SYNC_DEBUG = true;
 
-// This enables detailed sync logging
+// This enables detailed sync logging via logger utility
+import logger from '../utils/logger';
 logger.debug('[sync:v2] Processing table:', table);
 logger.debug('[sync:v2] Conflict resolution:', { local, server, result });
 ```
 
 #### Check Sync State
 ```typescript
-// View current sync cursors
+// View current sync cursors (in browser console)
 const syncState = await correctSyncService.getSyncState();
 console.log('Per-table cursors:', syncState.perTable);
 console.log('Last sync times:', {
   light: syncState.lastLightSyncAt,
   full: syncState.lastFullSyncAt
 });
+
+// Reset sync state to trigger full resync
+await correctSyncService.resetState();
 ```
 
 #### Monitor Edge Function Logs

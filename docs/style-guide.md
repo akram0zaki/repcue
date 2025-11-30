@@ -5,7 +5,8 @@ This guide explains how styling works in RepCue, what files participate in the d
 Related references:
 - UI/UX specification: `docs/ui-ux/ui-specs.md`
 - i18n rules: `docs/i18n-guide.md`, `docs/i18n/key-styleguide.md`
-- Frontend styles: `apps/frontend/src/styles/tokens.css`
+- Design tokens: `apps/frontend/src/styles/tokens.css` (CSS variables, semantic utilities)
+- Component styles: `apps/frontend/src/index.css` (page-specific utilities, RTL, accessibility)
 - Tailwind config: `apps/frontend/tailwind.config.js`
 
 ---
@@ -27,24 +28,38 @@ Core principles (see UI spec):
 
 ### 2) Where styles live and what they do
 
-1) `apps/frontend/src/styles/tokens.css` (Single source of truth)
+1) `apps/frontend/src/styles/tokens.css` (Design tokens & semantic utilities)
    - CSS custom properties (colors, borders, shadows) for light/dark.
    - Semantic utility classes:
-     - Typography: `.text-h1`, `.text-h2`, `.text-h3`, `.text-body`, `.text-caption`, `.text-small`.
+     - Typography: `.text-h1`, `.text-h2`, `.text-h3`, `.text-body`, `.text-caption` (14px), `.text-small` (12px).
      - Buttons: `.btn-primary`, `.btn-secondary`, `.btn-neutral`, `.btn-danger`.
-     - Surfaces and borders: `.bg-surface-*`, `.border-*`, shadows.
+     - Surfaces and borders: `.bg-surface-*`, `.border-surface-*`, `.shadow-token-sm|md|lg`.
      - Status tokens: `.text-success/.bg-success-soft`, `.text-warning/.bg-warning-soft`, `.text-error/.bg-error-soft`.
-     - Progress system: `.progress`, `.progress__track`, `.progress__bar` (width via `--progress`).
+     - Badge utilities: `.badge-selected`, `.badge-unselected` (filters), `.badge-primary`, `.badge-success`, `.badge-warning` (status), `.muscle-group-badge`.
+     - Card classes: `.card`, `.insights-card`, `.upcoming-workout-card`, `.empty-state-card`.
+     - Text utilities: `.label-text`, `.help-text`, `.heading-text`, `.filter-button-text`, `.sort-label-text`, `.secondary-label-text`.
+     - Progress system: `.progress`, `.progress__track`, `.progress__bar` (width via `--progress`), `.progress--inverse` (for colored backgrounds).
      - Timer utilities: `.timer-text-shadow-lg|sm`, `.timer-square-280`, `.timer-rect-560x320`, `.video-inset-10`, `.gpu-accelerated`.
      - RTL protection: `.nav-more-button`, `.catalog-selector` targeting scroll buttons.
      - Accessibility: `.sr-only-live` (offscreen live region), spacing helpers like `.chart-gap`.
 
-2) Tailwind utility classes
+2) `apps/frontend/src/index.css` (Component & page utilities)
+   - Imports `tokens.css` and Tailwind layers.
+   - RTL-specific overrides and Arabic font support.
+   - Accessibility enhancements: skip links, focus styles, high contrast mode, reduced motion.
+   - Page-specific component classes:
+     - Additional buttons: `.btn-ghost`, `.btn-exercise`, `.btn-timer-start`.
+     - Exercise cards: `.exercise-card`, `.exercise-card.favorite`, `.exercise-card.selected`, `.exercise-card-custom`.
+     - AI coaching: `.ai-insight-card`, `.ai-badge`, `.ai-action-btn`.
+     - Duration controls: `.duration-option`, `.duration-option-active`, `.duration-badge`.
+     - Navigation: `.nav-container`, `.nav-item`, `.nav-item-active`, `.nav-dropdown`.
+
+3) Tailwind utility classes
    - Used for layout/spacing/structure (flex/grid/gap/padding), responsiveness (`sm:`, `lg:`), and modifiers (`hover:`, `focus:`).
    - Avoid ad-hoc color utilities (e.g., `bg-blue-600`, `text-gray-500`) for component styling. Prefer tokens from `tokens.css`.
    - Bracketed utility escape is allowed for rare vendor-specific rules, e.g., `[animation-direction:_reverse]`.
 
-3) Component code
+4) Component code
    - Pages/components compose token classes + Tailwind layout utilities.
    - Error/empty/loading states must also use token classes.
    - ARIA labels and user-visible strings must come from i18n.
@@ -56,20 +71,30 @@ Core principles (see UI spec):
 Use this quick checklist when building a UI element:
 
 1. Text?
-   - Headline or section: `.text-h1` / `.text-h2` / `.text-h3`.
-   - Body copy: `.text-body`.
-   - Labels/captions/smaller text: `.text-caption` or `.text-small`.
+   - Headline or section: `.text-h1` (32px) / `.text-h2` (24px) / `.text-h3` (20px).
+   - Body copy: `.text-body` (16px).
+   - Labels/captions: `.text-caption` (14px).
+   - Small text: `.text-small` (12px).
+   - Helper text classes: `.label-text`, `.help-text`, `.heading-text`, `.secondary-label-text`.
 
 2. Buttons?
    - Primary action: `.btn-primary`.
    - Secondary/outline: `.btn-secondary`.
    - Neutral/utility: `.btn-neutral`.
    - Destructive: `.btn-danger`.
+   - Subtle/minimal: `.btn-ghost` (for in-page actions).
+   - Timer controls: `.btn-timer-start` (large start button).
+   - Exercise actions: `.btn-exercise` (full-width, touch-friendly).
    - Do not handcraft button colors; use the button classes and add layout utilities (e.g., `w-full`, `text-sm`).
 
 3. Surfaces/cards?
-   - Containers: `.bg-surface-0` (light) and their dark-equivalents already apply via `:root`/`.dark` tokens.
-   - Add borders with `.border-*` tokens if needed; prefer tokenized text colors.
+   - Generic containers: `.bg-surface-0` (light) / `.bg-surface-800` (dark) with `.shadow-token-sm|md|lg`.
+   - Generic card: `.card` (auto-hover states, shadows).
+   - Exercise listings: `.exercise-card`, `.exercise-card.selected`, `.exercise-card.favorite`.
+   - Home page cards: `.upcoming-workout-card`, `.insights-card`.
+   - AI coaching: `.ai-insight-card` (left-border accent).
+   - Empty states: `.empty-state-card` (gradient background).
+   - Add borders with `.border-surface-*` tokens if needed; prefer tokenized text colors.
 
 4. Status/feedback (success/warn/error)?
    - Use status tokens: example warning card: `bg-warning-soft border border-warning text-warning`.
@@ -77,18 +102,25 @@ Use this quick checklist when building a UI element:
 
 5. Progress bars?
    - Use `.progress > .progress__track > .progress__bar`.
-   - Set width via CSS var: `<div class="progress__bar" style={{ ['--progress']: value }} />`.
+   - Set width via CSS var: `<div class="progress__bar" style={{ ['--progress' as unknown as string]: value }} />`.
+   - On colored backgrounds: Use `.progress--inverse` modifier for white track/bar.
 
-6. Timer display specifics?
+6. Badges/pills?
+   - Filter toggles: `.badge-selected`, `.badge-unselected`.
+   - Status badges: `.badge-primary`, `.badge-success`, `.badge-warning`.
+   - Muscle groups: `.muscle-group-badge`.
+
+7. Timer display specifics?
    - Use `.timer-text-shadow-lg|sm` for overlayed white text legibility.
    - Fixed demo sizes: `.timer-square-280`, `.timer-rect-560x320` (prefer responsive wrappers when possible).
+   - Position overlays: `.video-inset-10` (10px inset from all edges).
    - For video performance: `.gpu-accelerated`.
 
-7. RTL-sensitive icons/buttons?
+8. RTL-sensitive icons/buttons?
    - Apply `.nav-more-button` for the More menu; add `.catalog-selector` to scroll controls.
    - Do not use inline `style={{ direction: 'ltr' }}`.
 
-8. Accessibility helpers?
+9. Accessibility helpers?
    - Live region: `.sr-only-live` for offscreen assistive texts.
    - Respect reduced motion (`motion-reduce:*`) and avoid rapid, decorative animations.
 
@@ -131,11 +163,30 @@ Status banners (warning/error)
 
 Progress bar
 ```tsx
+// Standard progress bar
 <div className="progress">
   <div className="progress__track">
-    <div className="progress__bar" style={{ ['--progress' as unknown as string]: progress }} />
+    <div className="progress__bar" style={{ ['--progress' as unknown as string]: progress } as React.CSSProperties} />
   </div>
 </div>
+
+// Inverse variant (for use on colored backgrounds)
+<div className="progress progress--inverse">
+  <div className="progress__track">
+    <div className="progress__bar" style={{ ['--progress' as unknown as string]: progress } as React.CSSProperties} />
+  </div>
+</div>
+```
+
+Badges
+```tsx
+// Filter badges (toggle state)
+<button className={isSelected ? 'badge-selected' : 'badge-unselected'}>{label}</button>
+
+// Status badges
+<span className="badge-primary">{t('common.default')}</span>
+<span className="badge-success">{t('common.completed')}</span>
+<span className="badge-warning">{t('common.pending')}</span>
 ```
 
 Timer overlay text
@@ -182,7 +233,8 @@ When a new pattern is needed (and it doesn’t already exist):
    - If an existing tokenized class or pattern fits (e.g., `btn-*`, `text-*`, `progress`, status tokens), use it.
 
 2. If a new utility is truly needed
-   - Add it to `apps/frontend/src/styles/tokens.css` under the relevant section.
+   - Design tokens and semantic utilities: Add to `apps/frontend/src/styles/tokens.css`.
+   - Page-specific or component-specific styles: Add to `apps/frontend/src/index.css` under `@layer components` or `@layer utilities`.
    - Keep naming semantic and short: e.g., `.badge-neutral`, `.list-divider`, not `.bg-gray-50`.
    - Provide light/dark variants via CSS variables if color-related.
 

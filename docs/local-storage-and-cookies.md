@@ -22,6 +22,15 @@ Instead, RepCue stores data locally using `localStorage`, `IndexedDB` (via Dexie
 | `repcue-onboarding-state` | Tracks onboarding progress if you installed the PWA. | When onboarding starts. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
 | `repcue-first-launch` | Marks that the app has been launched at least once. | After your first launch. | Until cleared. | Clearing site storage. |
 | `repcue_video_errors_v1` | Local-only telemetry of exercise video load failures; written only when analytics consent is granted. | When a demo video fails to load and analytics consent is on. | Until cleared; bounded to last 50 records. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_device_id` | Unique device identifier for sync correlation. | On first sync operation. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_update_state` | Tracks PWA update state (version, check time, etc.). | When app checks for updates. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_update_preferences` | User preferences for automatic updates. | When you change update settings. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_previous_version` | Stores previous version for rollback scenarios. | During update process. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_rollback_available` | Flag indicating a rollback is available. | When an update completes with rollback support. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_workout_recovery_data` | Temporarily stores workout state for force-update recovery. | During a force update while workout is active. | Until workout is recovered. | After successful recovery or browser storage clear. |
+| `repcue_claim_ownership_done_{userId}` | Tracks whether ownership claim has been attempted for a user. | After first sync following authentication. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `repcue_dismissed_insights` | Tracks which AI Coach insights have been dismissed. | When you dismiss a coaching insight. | Dismissed insights expire after 24 hours. | Settings → Clear All Data & Reset App, or browser storage clear. |
+| `exercise-page-filters` | Persists exercise list filter state (catalog, search, badges). | When you apply filters on the Exercises page. | Until cleared. | Settings → Clear All Data & Reset App, or browser storage clear. |
 
 Notes:
 - All localStorage writes are client‑side only; the app does not send these values to any server.
@@ -33,11 +42,18 @@ RepCue uses IndexedDB for your exercise data. All writes require storage consent
 
 - `RepCueDB`
   - `exercises`: built‑in and user‑modified exercise data
-  - `activityLogs`: your activity/workout history
-  - `userPreferences`: UI preferences
-  - `appSettings`: timer, audio, appearance and feature toggles
-  - `workouts`: saved workouts
-  - `workoutSessions`: completed workout session summaries
+  - `catalog_memberships`: many-to-many relationships between exercises and catalogs
+  - `activity_logs`: your activity/workout history
+  - `user_preferences`: UI preferences (locale, units, etc.)
+  - `app_settings`: timer, audio, appearance, and feature toggles
+  - `user_favorites`: favorited exercises and workouts
+  - `workouts`: saved workout definitions
+  - `workout_sessions`: completed workout session summaries
+  - `video_files`: locally cached video files for offline use
+  - `exercise_catalogs`: exercise catalog metadata (seeded, not synced)
+  - `personal_records`: personal achievement records (max reps, duration, etc.)
+  - `user_profiles`: user fitness profiles for AI workout builder
+  - `sync_state`: sync cursors and metadata per user
   - TTL: persists until you clear data (Settings → Clear All Data & Reset App) or clear site storage in your browser.
 
 Note: For authenticated users with cloud sync enabled, legal document acceptances are also synced to Supabase (`legal_acceptances` table) to provide cross-device consistency. This sync is automatic and secure with Row Level Security policies.

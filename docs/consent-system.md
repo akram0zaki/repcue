@@ -77,14 +77,15 @@ interface ConsentV3 {
   cookiesAccepted: boolean;
   analyticsAccepted: boolean;
   marketingAccepted: boolean;
-  dataRetentionDays?: number;
+  dataRetentionDays: number;  // Required (default: 365)
+  consentDate?: Date | string;
   legalAcceptances: LegalAcceptance[];
 }
 
 interface LegalAcceptance {
   docId: string;              // Document identifier (e.g., 'terms_conditions')
   acceptedVersion: string;    // Version user accepted (e.g., '1.0.0')
-  contentHash: string;        // Hash of accepted content
+  contentHash: string;        // SHA-256 base64 hash of accepted content
   acceptedLocale: string;     // Locale user accepted (e.g., 'en', 'ar')
   acceptedAt: string;         // ISO timestamp of acceptance
 }
@@ -93,9 +94,10 @@ interface LegalAcceptance {
 **Key Changes in V3**:
 - Added `legalAcceptances` array for tracking document-level acceptance
 - Version-based tracking for Terms, Privacy Policy, Cookie Policy, etc.
-- Content hash validation to detect document changes
+- Content hash validation (SHA-256 base64) to detect document changes
 - Locale-specific acceptance tracking
 - Maintains all V2 consent features (cookies, analytics, marketing)
+- Controlled by `LEGAL_ACCEPTANCE_V3_ENABLED` feature flag (`src/config/features.ts`)
 
 ### Migration Strategy
 - **Automatic Migration**: Old consent data is automatically upgraded
@@ -157,22 +159,30 @@ The consent system is implemented as a singleton service (`ConsentService`) that
 #### 1. ConsentService
 ```typescript
 class ConsentService {
+  // Singleton pattern
+  static getInstance(): ConsentService
+  
   // Core consent management
   hasConsent(): boolean
-  setConsent(data: ConsentData): void
+  setConsent(data: Partial<Omit<CurrentConsentData, 'version' | 'timestamp'>>): void
+  grantConsent(includeAnalytics?: boolean): void  // Legacy compatibility
   revokeConsent(): void
+  resetConsent(): void
+  reloadConsentData(): void
   
   // Granular consent checking
   hasAnalyticsConsent(): boolean
   hasMarketingConsent(): boolean
+  shouldShowConsentBanner(): boolean
   
-  // Migration and versioning
+  // Data access
+  getConsentData(): CurrentConsentData | null
   getConsentStatus(): ConsentStatus
-  migrateConsentData(): void
   
-  // Data management
-  resetConsent(): void
-  reloadConsentData(): void
+  // Legal Acceptances (V3+)
+  getLegalAcceptances(): LegalAcceptance[]
+  setLegalAcceptances(acceptances: LegalAcceptance[]): boolean
+  updateLegalAcceptance(acceptance: LegalAcceptance): boolean
 }
 ```
 
@@ -261,14 +271,14 @@ const CONSENT_STORAGE_KEY = 'repcue_consent';
     {
       "docId": "terms_conditions",
       "acceptedVersion": "1.0.0",
-      "contentHash": "sha256_hash_of_content",
+      "contentHash": "K1TZx5J2MCWBYrh61Q5xNKxaPO09HBNdxJPefYN3Fv8=",
       "acceptedLocale": "en",
       "acceptedAt": "2025-10-22T10:30:00.000Z"
     },
     {
       "docId": "privacy_policy",
       "acceptedVersion": "1.0.0",
-      "contentHash": "sha256_hash_of_content",
+      "contentHash": "eHojbMyhlJjt+tL5/oXsNkBZCWOnXVM6MUQ5yOHDS/Y=",
       "acceptedLocale": "en",
       "acceptedAt": "2025-10-22T10:30:00.000Z"
     }
@@ -304,16 +314,18 @@ RepCue V3 introduces a comprehensive legal document acceptance system that manag
 ### Legal Document Types
 
 #### Required Documents
-Documents that users must accept to use the app:
+Documents that users must accept to use the app (as of current manifest):
 - **Terms & Conditions**: Legal agreement for app usage
 - **Privacy Policy**: How user data is handled
 - **Cookie Policy**: Cookie usage and preferences
-- **Data Processing Agreement**: (if applicable)
+- **Medical Disclaimer**: Health-related disclaimers for fitness app
+- **Liability Waiver**: Limitation of liability
 
 #### Optional Documents
 Informational documents that don't require acceptance:
-- **Imprint**: Legal business information (display only)
-- **Community Guidelines**: (for social features)
+- **Data Processing Agreement (DPA)**: For business/enterprise users
+- **Subscription & Payment Policy**: For premium features (future)
+- **Community Guidelines**: For social features (future)
 
 ### Document Manifest System
 
@@ -321,25 +333,30 @@ Informational documents that don't require acceptance:
 Static manifest file at `/legal/manifest.json` loaded on app boot:
 ```json
 {
-  "updatedAt": "2025-10-22T00:00:00.000Z",
+  "updatedAt": "2025-11-26T08:38:30.225Z",
   "documents": [
     {
       "id": "terms_conditions",
       "title": "Terms & Conditions",
       "version": "1.0.0",
       "required": true,
-      "policy": "force",
-      "effectiveFrom": "2025-10-15T00:00:00.000Z",
+      "policy": "deferred",
+      "effectiveFrom": "2025-11-01T00:00:00Z",
       "locales": [
         {
           "locale": "en",
-          "path": "/legal/01-terms_en.md",
-          "contentHash": "sha256_hash"
+          "path": "/legal/01-terms_conditions.en.md",
+          "contentHash": "K1TZx5J2MCWBYrh61Q5xNKxaPO09HBNdxJPefYN3Fv8="
         },
         {
           "locale": "ar",
-          "path": "/legal/01-terms_ar.md",
-          "contentHash": "sha256_hash"
+          "path": "/legal/01-terms_conditions.ar.md",
+          "contentHash": "O53l1/YOmqJsaEowAOjdJCpIXJwi/ikFbbDlO3B6+LI="
+        },
+        {
+          "locale": "nl",
+          "path": "/legal/01-terms_conditions.nl.md",
+          "contentHash": "o/pIVM633FZAO8h6EOQcVE76Me/dGTbn3k+cxY4vnSM="
         }
       ]
     }
@@ -348,11 +365,12 @@ Static manifest file at `/legal/manifest.json` loaded on app boot:
 ```
 
 #### Live Manifest (Future)
-Edge Function at `${SUPABASE_URL}/functions/v1/legal-manifest`:
-- Fetched after baseline loads
+Edge Function at `${VITE_SUPABASE_URL}/functions/v1/legal-manifest`:
+- Fetched after baseline loads (when `loadLiveManifest()` is called)
 - Provides real-time document updates
 - Uses ETag caching to minimize bandwidth
-- Falls back to baseline if unavailable
+- Falls back to baseline if unavailable or unauthorized
+- Requires `apikey` and `Authorization` headers
 
 ### Blocking Policies
 
@@ -365,7 +383,7 @@ Documents with `policy: "force"` block app access immediately when:
 **Use Case**: Critical legal changes that require immediate acceptance
 
 #### Defer Policy
-Documents with `policy: "defer"` allow continued app usage:
+Documents with `policy: "deferred"` allow continued app usage:
 - Shows notification banner about pending acceptance
 - User can continue using app during active workout
 - Becomes blocking only after workout completes or timeout
@@ -407,21 +425,27 @@ Documents with `policy: "defer"` allow continued app usage:
 ### Locale Fallback System
 
 #### Fallback Chain
-Arabic variants fall back to standard Arabic:
-- `ar-EG` (Egyptian) → `ar` (Standard Arabic) → `en` (English)
-- `ar-SA` (Saudi) → `ar` (Standard Arabic) → `en` (English)
-- All other locales → `en` (English)
+The system uses a two-level fallback for locale resolution:
+1. **Exact match**: Try user's exact locale (e.g., `ar-EG`)
+2. **Base locale**: Try base language if regional variant not found (e.g., `ar-EG` → `ar`)
+3. **English fallback**: Fall back to `en` if no match found
 
 #### Example
 ```typescript
 // User has locale 'ar-EG'
-// Document has locales: ['en', 'ar', 'fr']
+// Document has locales: ['en', 'ar', 'nl']
 // System loads: 'ar' (fallback from ar-EG)
 
 // User has locale 'de'
-// Document has locales: ['en', 'ar']
+// Document has locales: ['en', 'ar', 'nl']
 // System loads: 'en' (fallback for unsupported locale)
 ```
+
+#### Current Supported Locales
+Based on the manifest, documents are available in:
+- `en` (English) - Universal fallback
+- `ar` (Arabic)
+- `nl` (Dutch)
 
 ### Update Detection
 
@@ -478,16 +502,23 @@ interface LegalAcceptanceStatus {
 ### Developer Workflow
 
 #### Adding a New Document
-1. Create markdown files for each locale (`/legal/XX-docname_locale.md`)
-2. Add entry to manifest.json:
+1. Create markdown files for each locale (`/legal/XX-docname.locale.md`)
+   - Example: `09-newdoc.en.md`, `09-newdoc.ar.md`, `09-newdoc.nl.md`
+2. Add entry to `public/legal/manifest.json`:
    ```json
    {
      "id": "new_document",
      "title": "New Document Title",
      "version": "1.0.0",
      "required": true,
-     "policy": "defer",
-     "locales": [...]
+     "policy": "deferred",
+     "locales": [
+       {
+         "locale": "en",
+         "path": "/legal/09-new_document.en.md",
+         "contentHash": "sha256_base64_hash"
+       }
+     ]
    }
    ```
 3. Update Edge Function manifest (if using live updates)
@@ -516,12 +547,15 @@ interface LegalAcceptanceStatus {
 #### Testing Legal Changes
 ```bash
 # Unit tests (service logic)
-pnpm test legalDocsService
+pnpm --filter @repcue/frontend test legalDocsService
 
 # Integration tests (workflows)
-pnpm test legalDocsService.integration
+pnpm --filter @repcue/frontend test legalDocsService.integration
 
-# E2E tests (user experience)
+# All consent-related tests
+pnpm --filter @repcue/frontend test --grep "consent|legal"
+
+# E2E tests (user experience) - when available
 cd tests/e2e && pnpm cypress:run --spec "cypress/e2e/legal-acceptance.cy.ts"
 ```
 
@@ -554,38 +588,60 @@ Singleton service managing legal document operations:
 
 ```typescript
 class LegalDocsService {
+  // Singleton pattern
+  static getInstance(): LegalDocsService
+  
   // Initialization
-  initialize(): Promise<void>
-  loadLiveManifest(): Promise<LegalManifest | null>
+  initialize(): Promise<boolean>
+  loadLiveManifest(force?: boolean): Promise<LegalManifest | null>
+  getCurrentManifest(): LegalManifest | null
   
   // Document retrieval
   getRequiredDocuments(): LegalDoc[]
   getOptionalDocuments(): LegalDoc[]
-  getDocument(id: string, locale: string): LegalDoc | null
+  getDocument(docId: string, locale: string): LegalDoc | null
   
   // Acceptance tracking
   recordAcceptance(acceptance: LegalAcceptance): boolean
-  getAcceptanceStatus(docId: string, locale?: string): LegalAcceptanceStatus
+  getAcceptance(docId: string): LegalAcceptance | null
+  getAcceptanceStatus(docId: string, locale: string): LegalAcceptanceStatus
+  getAllAcceptanceStatuses(locale: string): LegalAcceptanceStatus[]
+  
+  // Status checks
+  hasUnacceptedRequired(locale: string): boolean
+  hasBlockingDocuments(locale: string): boolean
   
   // Update detection
-  detectUpdates(): DocumentUpdate[]
-  hasBlockingDocuments(): boolean
-  getDaysUntilEffective(docId: string): number | null
+  detectUpdates(): LegalDoc[]
+  getDaysUntilEffective(effectiveFrom?: string): number | null
+  
+  // Supabase sync (authenticated users)
+  syncOnSignIn(): Promise<boolean>
+  recordAcceptanceWithSync(acceptance: LegalAcceptance): Promise<boolean>
+  onSignOut(): void
+  
+  // Maintenance
+  clearAllAcceptances(): boolean
 }
 ```
 
 #### Integration with ConsentService
 ```typescript
-// ConsentService now includes legalAcceptances
+// ConsentService includes legalAcceptances in V3
 class ConsentService {
-  // V3 methods
+  // V3 methods for legal acceptance management
   getLegalAcceptances(): LegalAcceptance[]
-  updateLegalAcceptance(acceptance: LegalAcceptance): void
-  setLegalAcceptances(acceptances: LegalAcceptance[]): void
+  setLegalAcceptances(acceptances: LegalAcceptance[]): boolean
+  updateLegalAcceptance(acceptance: LegalAcceptance): boolean
   
   // Consent revocation clears legal acceptances too
-  revokeConsent(): void  // Also clears legalAcceptances
+  revokeConsent(): void  // Clears legalAcceptances and dispatches 'consent-revoked' event
 }
+
+// Custom events dispatched for UI coordination
+// 'consent-granted' - when consent is set
+// 'consent-revoked' - when consent is revoked
+// 'legal-acceptances-updated' - when legal acceptances change
 ```
 
 ### Compliance Benefits
