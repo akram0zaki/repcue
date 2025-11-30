@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "pnpm@10.15.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["cypress", "esbuild", "sharp", "supabase"]
+  },
   "scripts": {
     "dev": "pnpm --filter @repcue/frontend dev",
     "dev:be": "pnpm --filter @repcue/backend dev",
