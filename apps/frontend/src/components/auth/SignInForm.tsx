@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import logger from '../../utils/logger';
 
 interface SignInFormProps {
   onSwitchToSignUp: () => void;
@@ -15,7 +16,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
 }) => {
   const { t } = useTranslation(['auth', 'common']);
   const { 
-    signInWithPassword, 
     signInWithOAuth, 
     signInWithPasskey,
     isPasskeySupported,
@@ -24,11 +24,10 @@ export const SignInForm: React.FC<SignInFormProps> = ({
   } = useAuth();
   
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [passkeySupported, setPasskeySupported] = useState(false);
   const [platformAuthAvailable, setPlatformAuthAvailable] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
 
   // Check passkey availability on mount
   React.useEffect(() => {
@@ -45,26 +44,6 @@ export const SignInForm: React.FC<SignInFormProps> = ({
     checkPasskeySupport();
   }, [isPasskeySupported, isPlatformAuthenticatorAvailable]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!email.trim() || !password.trim()) {
-      setError(t('errors.allFieldsRequired'));
-      return;
-    }
-
-    const result = await signInWithPassword(email.trim(), password);
-    
-    if (!result.success) {
-      setError(result.error || t('errors.signInFailed'));
-    } else if (onClose) {
-      onClose();
-    }
-  };
-
-  const [oauthLoading, setOauthLoading] = useState<string | null>(null);
-
   const handleOAuthSignIn = async (provider: 'google' | 'apple' | 'github') => {
     setError('');
     setOauthLoading(provider);
@@ -77,8 +56,8 @@ export const SignInForm: React.FC<SignInFormProps> = ({
         setOauthLoading(null);
       }
       // Note: successful OAuth redirects to provider, so no need to clear loading state
-    } catch (error) {
-      console.error('OAuth error:', error);
+    } catch (err) {
+      logger.error('OAuth error:', err);
       setError(t('errors.signInFailed'));
       setOauthLoading(null);
     }
@@ -151,7 +130,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                    {t('orUseTraditionalMethod', 'Or use traditional method')}
+                    {t('orContinueWith')}
                   </span>
                 </div>
               </div>
@@ -159,112 +138,39 @@ export const SignInForm: React.FC<SignInFormProps> = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Only show email field if passkeys are not supported */}
-          {!passkeySupported && (
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t('fields.email')}
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                placeholder={t('placeholders.email')}
-                autoComplete="username"
-                disabled={loading}
-                required
-              />
-            </div>
-          )}
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('fields.password')}
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
-                placeholder={t('placeholders.password')}
-                autoComplete="current-password"
-                disabled={loading}
-                required
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
-              >
-                <span className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                  { }
-                  {showPassword ? '👁️' : '👁️‍🗨️'} {/* i18n-exempt: universal eye icons for password visibility */}
-                </span>
-              </button>
-            </div>
-          </div>
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => handleOAuthSignIn('google')}
+            disabled={loading || oauthLoading !== null}
+            className="btn-secondary w-full inline-flex justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          >
+            {oauthLoading === 'google' ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-gray-500 dark:text-gray-300" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {t('redirectingToProvider', 'Redirecting to Google...')}
+              </>
+            ) : (
+              <>
+                <span className="mr-2">🔍</span> {/* i18n-exempt: Google search icon */}
+                {t('continueWithGoogle')}
+              </>
+            )}
+          </button>
 
           <button
-            type="submit"
+            type="button"
+            onClick={onSwitchToMagicLink}
             disabled={loading}
-            className="btn-primary w-full flex justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-secondary w-full inline-flex justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? t('common:loading') : t('signIn.button')}
+            { }
+            <span className="mr-2">✉️</span> {/* i18n-exempt: universal email icon */}
+            {t('continueWithEmail')}
           </button>
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                {t('orContinueWith')}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-6 grid grid-cols-1 gap-3">
-            <button
-              type="button"
-              onClick={() => handleOAuthSignIn('google')}
-              disabled={loading || oauthLoading !== null}
-              className="btn-secondary w-full inline-flex justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-            >
-              {oauthLoading === 'google' ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-gray-500 dark:text-gray-300" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {t('redirectingToProvider', 'Redirecting to Google...')}
-                </>
-              ) : (
-                <>
-                  <span className="mr-2">🔍</span> {/* i18n-exempt: Google search icon */}
-                  {t('continueWithGoogle')}
-                </>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={onSwitchToMagicLink}
-              disabled={loading}
-              className="btn-secondary w-full inline-flex justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              { }
-              <span className="mr-2">✉️</span> {/* i18n-exempt: universal email icon */}
-              {t('continueWithEmail')}
-            </button>
-          </div>
         </div>
 
         <div className="mt-6 text-center">

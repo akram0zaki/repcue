@@ -16,14 +16,25 @@ const AuthCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-  const [provider, setProvider] = useState<string>('OAuth provider');
+  const [provider, setProvider] = useState<string>('');
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Extract provider from URL params for better UX
-        const providerParam = searchParams.get('provider') || 'OAuth provider';
-        setProvider(providerParam.charAt(0).toUpperCase() + providerParam.slice(1));
+        // Detect authentication type from URL hash or params
+        const hash = window.location.hash;
+        const isMagicLink = hash.includes('type=magiclink') || searchParams.get('type') === 'magiclink';
+        
+        // Extract provider from URL params or detect from auth type
+        let detectedProvider = searchParams.get('provider') || '';
+        if (!detectedProvider && isMagicLink) {
+          detectedProvider = 'email';
+        }
+        // Capitalize first letter for display
+        const displayProvider = detectedProvider 
+          ? detectedProvider.charAt(0).toUpperCase() + detectedProvider.slice(1)
+          : t('callback.defaultProvider', 'your account');
+        setProvider(displayProvider);
 
         // Check for OAuth error in URL params (common OAuth error pattern)
         const errorParam = searchParams.get('error');
@@ -146,7 +157,7 @@ const AuthCallbackPage: React.FC = () => {
               {t('callback.success', 'Sign-in successful!')} {/* i18n-exempt: fallback text provided */}
             </h2>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              {t('callback.successMessage', `Successfully signed in with ${provider}. Redirecting to your dashboard...`)} {/* i18n-exempt: fallback text provided */}
+              {t('callback.successMessage', { provider, defaultValue: `Successfully signed in with ${provider}. Redirecting to your dashboard...` })} {/* i18n-exempt: fallback text provided */}
             </p>
             <div className="mt-4">
               <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
@@ -204,7 +215,7 @@ const AuthCallbackPage: React.FC = () => {
             {t('callback.processing', 'Processing authentication...')} {/* i18n-exempt: fallback text provided */}
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {t('callback.processingMessage', `Completing sign-in with ${provider}. This should only take a moment.`)} {/* i18n-exempt: fallback text provided */}
+            {t('callback.processingMessage', { provider, defaultValue: `Completing sign-in with ${provider}. This should only take a moment.` })} {/* i18n-exempt: fallback text provided */}
           </p>
           <div className="mt-4">
             <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/20 dark:text-primary-400">

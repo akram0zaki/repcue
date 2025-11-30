@@ -2,7 +2,57 @@
 
 ### 2025-11-30
 
-#### 📚 Documentation Update - AGENTS.md
+#### � Authentication - Remove Password-Based Login
+
+**Changed**: Removed traditional password-based authentication in favor of passwordless methods
+
+**SignInForm Changes**:
+- Removed password field and form submission
+- Removed `signInWithPassword` from useAuth hook usage
+- Simplified UI to show only: Biometrics/Passkey, Google OAuth, Magic Link
+- Replaced `console.error` with `logger.error` for proper logging
+
+**SignUpForm Changes**:
+- Removed password fields (`password`, `confirmPassword`) and form submission
+- Removed `signUpWithPassword` from useAuth hook usage
+- Removed password validation logic (`validateForm`)
+- Simplified UI to show only: Biometrics/Passkey registration, Google OAuth, Magic Link
+
+**Supported Authentication Methods**:
+1. **Biometrics/Passkey** - Fingerprint, Face ID, or hardware security keys
+2. **Google OAuth** - Sign in with Google account
+3. **Magic Link** - Passwordless email link authentication
+
+---
+
+#### 🐛 Bug Fix - Magic Link Redirect URL
+
+**Fixed**: Magic link emails now redirect to the correct origin (localhost for dev, production URL for prod)
+
+**Problem**: Magic links always redirected to `dev.repcue.me` regardless of where the request originated, because `emailRedirectTo` was only set conditionally when a share token was present.
+
+**Solution**: Updated `authService.signInWithMagicLink()` to always set `emailRedirectTo` using the current origin, while preserving:
+- PWA mode detection with custom protocol `web+repcue://auth/callback`
+- Shared exercise token preservation via query parameter
+
+---
+
+#### 🐛 Bug Fix - Auth Callback Provider Display
+
+**Fixed**: Auth callback page now properly displays the provider name instead of raw `{{provider}}` placeholder
+
+**Problem**: The success message showed `{{provider}}` instead of the actual provider (e.g., "Email", "Google") because:
+1. Magic links didn't set a provider param
+2. Translation interpolation wasn't passing the provider variable correctly
+
+**Solution**:
+- Updated `AuthCallbackPage` to detect magic link auth type and set provider to "Email"
+- Fixed translation calls to pass `{ provider }` as interpolation option
+- Added `defaultProvider` translation key to all 8 locale files as fallback
+
+---
+
+#### �📚 Documentation Update - AGENTS.md
 
 **Updated**: `AGENTS.md` to reflect current implementation
 

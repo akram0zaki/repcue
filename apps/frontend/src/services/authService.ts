@@ -347,47 +347,37 @@ export class AuthService {
       // Check for pending shared exercise token that needs to be preserved
       const pendingShareToken = sessionStorage.getItem('pendingShareToken');
 
-      const otpOptions: {
-        shouldCreateUser: boolean;
-        emailRedirectTo?: string;
-        data: {
-          display_name: string;
-        };
-      } = {
-        shouldCreateUser: true,
-        data: {
-          display_name: email.split('@')[0]
-        }
-      };
+      // Build the redirect URL based on environment
+      let redirectUrl: string;
 
-      // Only set emailRedirectTo if we need to preserve a shared exercise token
-      // Otherwise, let Supabase use the referrer URL (default behavior)
+      // Check if we're in PWA mode (standalone display)
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                    ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
+
+      if (isPWA) {
+        // For PWA: use custom protocol for deep linking back to PWA
+        redirectUrl = `web+repcue://auth/callback`;
+      } else {
+        // For browser: use current origin to preserve domain context (works for localhost and production)
+        redirectUrl = `${this.getRedirectBase()}/auth/callback`;
+      }
+
+      // If there's a pending share token, add it to the redirect URL
       if (pendingShareToken) {
-        // For shared exercise flow, use the current origin (referrer) to maintain
-        // the same domain behavior as the default Supabase magic link flow
-        let redirectUrl: string;
-
-        // Check if we're in PWA mode (standalone display)
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-                      ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
-
-        if (isPWA) {
-          // For PWA: use custom protocol for deep linking back to PWA
-          redirectUrl = `web+repcue://auth/callback`;
-        } else {
-          // For browser: use current origin (referrer URL) to preserve domain context
-          redirectUrl = `${window.location.origin}/auth/callback`;
-        }
-
-        // Add the shared exercise token to the redirect URL
         const url = new URL(redirectUrl);
         url.searchParams.set('saveSharedExercise', pendingShareToken);
-        otpOptions.emailRedirectTo = url.toString();
+        redirectUrl = url.toString();
       }
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: otpOptions
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: redirectUrl,
+          data: {
+            display_name: email.split('@')[0]
+          }
+        }
       });
 
       if (error) {
