@@ -1,8 +1,108 @@
 ## Unreleased
 
+### 2025-12-01
+
+#### 🆕 New Feature - Background Video Upload Service
+
+**Added**: New `VideoUploadService` for offline-first custom exercise video uploads
+
+**Context**: After removing video_files from sync scope (to fix 5.2MB payload timeouts), a dedicated mechanism was needed for uploading custom exercise videos.
+
+**Architecture**:
+- **Offline-First**: Videos are stored immediately in IndexedDB when user uploads, work offline instantly
+- **Background Upload**: When online, `VideoUploadService` uploads pending videos to Supabase Storage
+- **Automatic Recovery**: Service listens for `online` events and automatically processes upload queue
+- **Status Tracking**: Uses URL schemes to track upload status:
+  - `blob-pending-sync://` → Video stored locally, upload pending
+  - `blob-video://` → Video stored locally AND uploaded to cloud
+
+**Implementation**:
+1. User uploads video → Stored in IndexedDB with `upload_pending: true`
+2. Video works offline immediately from IndexedDB blob
+3. When online → `VideoUploadService.uploadPendingVideos()` runs
+4. On success → Updates `storage_path` in IndexedDB, changes URL to `blob-video://`
+5. `storage_path` syncs normally via sync_v2 (just a string reference, not binary data)
+
+**Files Added**: 
+- [videoUploadService.ts](apps/frontend/src/services/videoUploadService.ts)
+
+**Files Changed**:
+- [authService.ts](apps/frontend/src/services/authService.ts) - Initializes video upload service after auth
+- [sync-system.md](docs/sync-system.md) - Updated documentation with new architecture
+
+---
+
+#### 🏗️ Architecture Change - Remove video_files from Sync Scope
+
+**Changed**: Video files are no longer synced via the sync_v2 edge function
+
+**Problem**: Sync requests were timing out due to massive payloads (5.2MB+) when video file binary data (`file_data`) was serialized into JSON.
+
+**Solution**: Removed `video_files` from sync scope entirely. Custom exercise videos should be uploaded directly to Supabase Storage using a dedicated upload mechanism, not via the general-purpose sync function.
+
+**Changes Made**:
+1. **Server-side (sync_v2)**: Removed `video_files` from `SYNC_TABLES` array
+2. **Client-side (correctSyncService.ts)**:
+   - Removed `video_files` from `SYNC_ORDER` array
+   - Removed `MAX_VIDEO_FILE_SIZE_BYTES` and `MAX_SYNC_PAYLOAD_SIZE_BYTES` constants
+   - Removed video file size checking and conversion logic from `collectDirtyBatch`
+   - Removed video_files deduplication logic from push phase
+
+**Architecture Note**: 
+- Built-in exercise videos are served from Cloudflare R2 (never synced)
+- Custom exercise videos should use direct Supabase Storage upload
+- Only the `storage_path` reference (a string) should be synced, not binary data
+
+**Files Changed**: 
+- [sync_v2/index.ts](supabase/functions/sync_v2/index.ts) (v66 dev, v37 prod)
+- [correctSyncService.ts](apps/frontend/src/services/correctSyncService.ts)
+
+---
+
 ### 2025-11-30
 
-#### � Authentication - Remove Password-Based Login
+#### 🐛 Bug Fix - iOS Safari Modal Scroll Bleed-Through
+
+**Fixed**: AI Workout Results modal now properly prevents background page scrolling on iOS Safari
+
+**Problem**: When viewing AI-generated workouts in the results modal on iPhone Safari, scrolling within the modal would cause the background page to scroll instead.
+
+**Solution**: 
+- Added `useEffect` hook to lock body scroll when modal is open using the iOS-specific fix pattern:
+  - Sets `position: fixed` on body to prevent scroll
+  - Saves and restores scroll position to avoid jump on close
+- Added `overscroll-contain` Tailwind class to the scrollable workout list container
+
+**Files Changed**: [AIWorkoutResultsModal.tsx](apps/frontend/src/components/AIWorkoutResultsModal.tsx)
+
+---
+
+#### ⚡ Performance Fix - sync_v2 Edge Function Timeout
+
+**Fixed**: sync_v2 edge function was timing out after 150 seconds on every request (including CORS preflight)
+
+**Root Cause**: Using deprecated Deno imports (`serve` from `deno.land/std@0.168.0`) causing massive cold start delays
+
+**Changes**:
+1. **Updated to modern Deno imports**:
+   - Changed from `import { serve } from "https://deno.land/std@0.168.0/http/server.ts"` 
+   - To `import "jsr:@supabase/functions-js/edge-runtime.d.ts"` + `Deno.serve()`
+   
+2. **Parallel pull queries**: Changed from sequential (10 tables one-by-one) to `Promise.all()` for all table pulls. Reduces pull phase from `10 × latency` to `1 × latency`
+
+3. **Native Supabase client**: Replaced `supabase.rpc('exec_sql', ...)` calls with native `.from().select()` queries for better performance
+
+4. **Parallel exercise queries**: In `pullExercisesWithShared`, own exercises and favorites queries now run in parallel
+
+5. **Optimized logging**: Removed JSON pretty-printing (`JSON.stringify(data, null, 2)` → `JSON.stringify(data)`)
+
+6. **Removed dead code**: Deleted unused `pullTableQuery` function
+
+**Files Changed**: [sync_v2/index.ts](supabase/functions/sync_v2/index.ts)
+
+---
+
+#### 🔐 Authentication - Remove Password-Based Login
 
 **Changed**: Removed traditional password-based authentication in favor of passwordless methods
 

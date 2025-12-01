@@ -275,6 +275,18 @@ export class AuthService {
           }).catch(error => {
             logger.warn('Failed to load sync service:', error);
           });
+
+          // Initialize video upload service to process any pending uploads
+          import('./videoUploadService').then(({ default: VideoUploadService }) => {
+            const videoUploadService = VideoUploadService.getInstance();
+            videoUploadService.initialize().then(() => {
+              logger.log('✅ Video upload service initialized');
+            }).catch(error => {
+              logger.warn('Failed to initialize video upload service:', error);
+            });
+          }).catch(error => {
+            logger.warn('Failed to load video upload service:', error);
+          });
         }, 2000); // 2 second delay to ensure app initialization completes
       }, 1000); // 1 second delay to ensure auth state is settled
     } catch (error) {

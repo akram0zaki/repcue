@@ -164,6 +164,7 @@ export class UpdateErrorHandler {
     if (
       message.includes('service worker') ||
       message.includes('sw.js') ||
+      message.includes('sw-custom.js') ||
       errorObj.name === 'ServiceWorkerError'
     ) {
       return 'service_worker_error';

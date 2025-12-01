@@ -371,41 +371,95 @@ if (exercise.custom_video_url && (
 
 ## Video Upload and Sync
 
-RepCue implements **offline-first video handling** that allows immediate local access while syncing to cloud storage in the background.
+RepCue implements **offline-first video handling** that allows immediate local access while uploading to cloud storage in the background.
 
 **Storage Configuration**: All videos are stored exclusively in the `exercise-videos` bucket. The system uses a unified bucket architecture for simplified management and consistent access patterns.
+
+> **⚠️ IMPORTANT**: Video binary data is **NOT** synced via the `sync_v2` edge function. Videos use a separate direct upload mechanism via `VideoUploadService` to avoid payload size limits (sync has ~2MB limit, videos can be 50MB+).
 
 ### Video Flow Overview
 
 ```
-User Upload → IndexedDB (immediate) → Sync Service → Cloud Storage → Cross-Device Access
-     ↓               ↓                     ↓              ↓              ↓
-  Instant       Local Playback      Background Sync   Permanent URL   All Devices
+User Upload → IndexedDB (immediate) → VideoUploadService → Supabase Storage → Cross-Device Access
+     ↓               ↓                       ↓                    ↓                  ↓
+  Instant       Local Playback        Direct Upload to       Permanent URL      All Devices
+                                      Storage (when online)
 ```
+
+### Architecture Components
+
+| Component | Location | Responsibility |
+|-----------|----------|----------------|
+| **VideoUploadService** | `src/services/videoUploadService.ts` | Background upload of pending videos to Supabase Storage |
+| **StorageService** | `src/services/storageService.ts` | Local IndexedDB storage for video files |
+| **sync_v2** | Edge function | Syncs metadata only (storage_path reference), NOT video binaries |
 
 ### Upload Process
 
 #### Phase 1: Local Storage (Immediate)
-1. **File Validation**: MP4, WebM, OGV formats supported
+1. **File Validation**: MP4, WebM, OGV formats supported (max 50MB)
 2. **Singleton Enforcement**: Delete existing video for exercise
-3. **IndexedDB Storage**: Store File object as Blob
+3. **IndexedDB Storage**: Store File object as Blob in `video_files` table
 4. **URL Generation**: Create `blob-pending-sync://exerciseId/fileName.mp4`
 5. **Immediate Playback**: Video available offline instantly
 
-#### Phase 2: Cloud Sync (Background)
-1. **Data Preparation**: Convert File → ArrayBuffer → Uint8Array
-2. **Batch Upload**: Include in sync payload as byte array
-3. **Server Processing**: Edge function uploads to Supabase Storage
+#### Phase 2: Background Upload (When Online)
+1. **Service Initialization**: `VideoUploadService` initializes after authentication
+2. **Pending Detection**: Queries `video_files` where `upload_pending = true`
+3. **Direct Upload**: Uploads File directly to Supabase Storage bucket
 4. **Path Generation**: `userId/exerciseId/fileName.mp4`
-5. **Database Update**: Mark `upload_pending: false`, set `storage_path`
-6. **URL Scheme Update**: Change exercise's `custom_video_url` from `blob-pending-sync://` to `blob-video://` to indicate sync completion
+5. **Local Update**: 
+   - Sets `upload_pending: false`
+   - Sets `storage_path` to cloud path
+   - Clears `file_data` (blob) to save space
+   - Updates `custom_video_url` to `blob-video://` scheme
+6. **Metadata Sync**: The `storage_path` string syncs normally via `sync_v2`
 
 #### Phase 3: Cross-Device Access
-1. **Sync Propagation**: Other devices receive video file records
+1. **Metadata Sync**: Other devices receive video file records with `storage_path`
 2. **Download Trigger**: `downloadVideoFileForOfflineAccess()` called
-3. **Storage Access**: Direct download for owned videos
+3. **Storage Access**: Direct download from Supabase Storage for owned videos
 4. **Local Caching**: Store in IndexedDB for offline access
 5. **URL Resolution**: Create blob URLs for video players
+
+### Why Videos Don't Sync via sync_v2
+
+The main sync function (`sync_v2`) has a **2MB payload limit** imposed by Supabase Edge Functions. Video files are typically 5-50MB, which would:
+- Cause timeouts during upload
+- Block other data from syncing
+- Waste bandwidth on failed attempts
+
+**Solution**: Videos upload directly to Supabase Storage via `VideoUploadService`, which:
+- Has no size limit (up to 50MB per video)
+- Supports progress tracking
+- Handles offline queuing with retry
+- Only syncs the `storage_path` reference string via `sync_v2`
+
+### VideoUploadService API
+
+```typescript
+import VideoUploadService from './services/videoUploadService';
+
+// Get singleton instance
+const uploadService = VideoUploadService.getInstance();
+
+// Initialize (called automatically after auth)
+await uploadService.initialize();
+
+// Subscribe to progress updates
+const unsubscribe = uploadService.onProgress((progress) => {
+  console.log(`${progress.fileName}: ${progress.status} (${progress.progress}%)`);
+});
+
+// Get pending upload count
+const pendingCount = await uploadService.getPendingCount();
+
+// Manually trigger uploads
+await uploadService.processPendingUploads();
+
+// Upload specific file immediately
+const result = await uploadService.uploadNow(videoFileId);
+```
 
 ### Shared Video Access
 
@@ -437,20 +491,28 @@ if (isSharedExercise) {
 
 ### Video Data Transformations
 
+**Upload Flow (via VideoUploadService)**:
 ```
 User File (File object)
     ↓
-IndexedDB (Blob storage)
+IndexedDB (Blob storage, upload_pending=true)
     ↓
-Sync Client (ArrayBuffer → Uint8Array → byte array)
+VideoUploadService (File → ArrayBuffer → Uint8Array)
     ↓
-Network Transfer (JSON with byte array)
+Direct Upload to Supabase Storage (binary file)
     ↓
-Edge Function (byte array → Uint8Array)
+Update IndexedDB (upload_pending=false, storage_path set)
     ↓
-Supabase Storage (binary file)
+Metadata syncs via sync_v2 (storage_path string only)
+```
+
+**Download Flow (on other devices)**:
+```
+sync_v2 pulls video_files record (metadata with storage_path)
     ↓
-Download Response (Blob via fetch().blob())
+downloadVideoFileForOfflineAccess() triggered
+    ↓
+Direct fetch from Supabase Storage (Blob via fetch().blob())
     ↓
 IndexedDB (File object recreation)
     ↓
@@ -463,13 +525,13 @@ RepCue uses custom URL schemes to track video sync status:
 
 | URL Scheme | Meaning | UI Behavior | When Used |
 |------------|---------|-------------|-----------|
-| `blob-pending-sync://exerciseId/fileName.mp4` | Video stored locally, not yet synced to cloud | Shows "Video ready offline - will sync when online" message | Immediately after user upload, before sync completes |
-| `blob-video://exerciseId/fileName.mp4` | Video stored locally AND synced to cloud | No pending message, shows "Local video (synced)" status | After successful cloud upload |
+| `blob-pending-sync://exerciseId/fileName.mp4` | Video stored locally, not yet uploaded to cloud | Shows "Video ready offline - will sync when online" message | Immediately after user upload, before upload completes |
+| `blob-video://exerciseId/fileName.mp4` | Video stored locally AND uploaded to cloud | No pending message, shows "Local video (synced)" status | After successful cloud upload |
 | `http://` or `https://` | Direct URL to cloud storage | Standard video player behavior | Fallback for legacy or external videos |
 
 **URL Lifecycle**:
 ```
-User Upload → blob-pending-sync:// → [Sync Success] → blob-video://
+User Upload → blob-pending-sync:// → [Upload Success] → blob-video://
                                    ↓
                             [IndexedDB stores File object]
                                    ↓
@@ -483,6 +545,11 @@ User Upload → blob-pending-sync:// → [Sync Success] → blob-video://
 
 ### Critical Implementation Notes
 
+#### Video Upload Architecture
+- **Videos NEVER go through sync_v2** - they would exceed payload limits (2MB max, videos are 5-50MB)
+- **VideoUploadService handles uploads directly** to Supabase Storage when online
+- **Only the `storage_path` reference syncs** via sync_v2 (just a string like `userId/exerciseId/file.mp4`)
+
 #### Video Corruption Prevention
 - **Always use `fetch().blob()`** for video downloads, never `supabase.functions.invoke()`
 - The Supabase SDK incorrectly parses binary data as UTF-8, causing corruption
@@ -492,6 +559,11 @@ User Upload → blob-pending-sync:// → [Sync Success] → blob-video://
 - One video per exercise maximum
 - Prevents storage bloat and simplifies UX
 - Enforced both client-side and server-side
+
+#### Offline Support
+- Videos work offline immediately after user upload (stored in IndexedDB)
+- When online, `VideoUploadService` uploads pending videos in background
+- On network reconnect, service automatically processes upload queue
 
 ---
 
