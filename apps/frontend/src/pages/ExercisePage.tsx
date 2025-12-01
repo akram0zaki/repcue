@@ -1006,6 +1006,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   exerciseName={loc.name}
                   ownerId={exercise.owner_id}
                   className="flex-shrink-0 text-text-700 dark:text-text-200 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  iconSize={18}
+                  iconClassName="sm:!w-5 sm:!h-5"
                 />
               )}
 
