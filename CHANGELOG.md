@@ -2,6 +2,107 @@
 
 ### 2025-12-01
 
+#### � Documentation - Exercise Sharing System
+
+**Added**: Comprehensive documentation for the exercise sharing module
+
+**Document**: [docs/exercise-sharing.md](docs/exercise-sharing.md)
+
+**Contents**:
+- Complete architecture diagram showing share and save flows
+- Database schema details (`exercise_shares`, `user_favorites`, `generate_share_token()`)
+- Step-by-step Share Flow (ShareButton → share-exercise → URL generation)
+- Step-by-step Save Flow (StandaloneSharedExercise → save-shared-exercise → user_favorites)
+- Video handling details (signed URLs, download on save, recovery mechanism)
+- Authentication integration (magic link flow with share token preservation)
+- All 4 Edge Functions documented with request/response formats
+- Frontend components (ShareButton, StandaloneSharedExercise, SharedExerciseVideo)
+- Key services and hooks (StorageService, useSharedExercises)
+- Security considerations (rate limiting, token security, access control)
+- Troubleshooting guide with SQL queries for debugging
+
+---
+
+#### 🗃️ Database - Add Unique Constraint for Video Files
+
+**Added**: Unique constraint on `video_files` table for upsert support
+
+**Migration**: [20251201_add_video_files_unique_constraint.sql](supabase/migrations/20251201_add_video_files_unique_constraint.sql)
+
+**Purpose**: Convert unique index to unique constraint so PostgreSQL upsert with `ON CONFLICT (exercise_id, owner_id)` works correctly.
+
+**Note**: Production had 61 duplicate records for one exercise which were cleaned up before applying the constraint.
+
+**Deployed**: ✅ Dev (repcue-dev) and ✅ Prod (RepCue)
+
+---
+
+#### 🎥 Enhancement - Auto-Hide Video Controls
+
+**Improved**: SharedExerciseVideo component now auto-hides controls during playback
+
+**Changes**:
+- Controls auto-hide after 2 seconds when video is playing
+- Controls stay visible when paused
+- Mouse enter/touch shows controls, mouse leave hides when playing
+- Cleanup timeout on unmount to prevent memory leaks
+
+**Files Changed**:
+- [SharedExerciseVideo.tsx](apps/frontend/src/components/SharedExerciseVideo.tsx)
+
+---
+
+#### �🐛 Bug Fix - Storage RLS Policies for Video Upload
+
+**Fixed**: Video uploads failing with "new row violates row-level security policy" error
+
+**Root Cause**: The `exercise-videos` storage bucket had INSERT, UPDATE, and DELETE policies but was missing SELECT policies. Supabase Storage operations require SELECT permissions for:
+- Checking if a file exists before upsert operations
+- Reading file metadata during upload operations
+
+**Solution**: Added two SELECT policies for the `exercise-videos` bucket:
+1. `Users can read own exercise-videos` - Authenticated users can read their own videos
+2. `Public can read exercise-videos` - Anyone can read (bucket is public for shared exercises)
+
+**Migration**: [20251201_add_exercise_videos_select_policy.sql](supabase/migrations/20251201_add_exercise_videos_select_policy.sql)
+
+**Deployed**: ✅ Dev (repcue-dev) and ✅ Prod (RepCue)
+
+---
+
+#### 🔧 Enhancement - Video Upload Service Improvements
+
+**Improved**: Enhanced debugging and reliability of `VideoUploadService`
+
+**Changes**:
+- Added detailed logging for all video files in IndexedDB during processing
+- Improved filtering logic to handle both boolean `true` and numeric `1` for `upload_pending`
+- Added `triggerVideoUpload()` helper in `StorageService` for immediate upload after video save
+- Service now triggers immediately when video is added (in addition to periodic checks)
+
+**Files Changed**:
+- [videoUploadService.ts](apps/frontend/src/services/videoUploadService.ts)
+- [storageService.ts](apps/frontend/src/services/storageService.ts)
+
+---
+
+#### 🐛 Bug Fix - TypeScript Build Errors with Supabase Types
+
+**Fixed**: Build errors due to renamed types in @supabase/supabase-js v2.81.1
+
+**Problem**: The `Session` and `User` types were renamed to `AuthSession` and `AuthUser` in supabase-js v2.81.1.
+
+**Solution**: Updated imports to use aliased exports:
+```typescript
+export type { AuthSession as Session, AuthUser as User } from '@supabase/supabase-js';
+```
+
+**Files Changed**:
+- [supabase.ts](apps/frontend/src/config/supabase.ts)
+- [authService.ts](apps/frontend/src/services/authService.ts)
+
+---
+
 #### 🆕 New Feature - Background Video Upload Service
 
 **Added**: New `VideoUploadService` for offline-first custom exercise video uploads

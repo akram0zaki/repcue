@@ -5,7 +5,7 @@ import type { Exercise } from './types';
 import {
   PlayIcon
 } from './components/icons/NavigationIcons';
-import { VideoThumbnail } from './components/VideoThumbnail';
+import { SharedExerciseVideo } from './components/SharedExerciseVideo';
 import { localizeExercise } from './utils/localizeExercise';
 import { getExerciseById } from './data/exercises';
 import { loadExerciseMedia } from './utils/loadExerciseMedia';
@@ -297,11 +297,9 @@ const StandaloneSharedExercise: React.FC = () => {
             {/* Video/Image Area - Matching catalog style */}
             <div className="mb-4">
               <div className="max-w-md mx-auto">
-                <VideoThumbnail
+                <SharedExerciseVideo
                   exercise={exercise}
-                  onVideoLoad={() => {}}
-                  onVideoError={() => {}}
-                  className="w-full"
+                  className="w-full aspect-video"
                 />
               </div>
             </div>

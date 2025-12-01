@@ -1524,6 +1524,10 @@ export class StorageService {
 
       logger.log('💾 [VideoFile] Video file saved to IndexedDB successfully');
       
+      // Trigger the video upload service to process this pending upload
+      // This is non-blocking - upload happens in background
+      this.triggerVideoUpload();
+      
       // Return the blob URL format that the VideoUploadWidget expects
       return `blob-pending-sync://${exerciseId}/${file.name}`;
     } catch (error) {
@@ -1535,6 +1539,25 @@ export class StorageService {
       });
       throw error;
     }
+  }
+
+  /**
+   * Trigger video upload service to process pending uploads
+   * Non-blocking - uploads happen in background
+   */
+  private triggerVideoUpload(): void {
+    // Delay slightly to ensure IndexedDB transaction is committed
+    setTimeout(async () => {
+      try {
+        const { default: VideoUploadService } = await import('./videoUploadService');
+        const uploadService = VideoUploadService.getInstance();
+        await uploadService.initialize();
+        logger.log('💾 [VideoFile] Triggering video upload service...');
+        await uploadService.processPendingUploads();
+      } catch (error) {
+        logger.warn('💾 [VideoFile] Failed to trigger video upload:', error);
+      }
+    }, 1000);
   }
 
   /**

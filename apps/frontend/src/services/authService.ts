@@ -1,4 +1,4 @@
-import type { Session } from '@supabase/supabase-js';
+import type { AuthSession as Session } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import type { AuthState, AuthUserProfile } from '../types';
 import { storageService } from './storageService';
@@ -58,7 +58,7 @@ export class AuthService {
       }
 
       // Listen for auth changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
         logger.log('Auth state changed:', event, session?.user?.id || 'no user');
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
