@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Exercise } from '../types';
@@ -12,6 +12,39 @@ import logger from '../utils/logger';
 import '../styles/exerciseDetailParallax.css';
 import type { AppSettings } from '../types';
 
+// Fullscreen icons
+const FullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+  </svg>
+);
+
+const ExitFullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+  </svg>
+);
+
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -23,6 +56,7 @@ const ExerciseDetailPage: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [videoFitMode, setVideoFitMode] = useState<'fit' | 'fill'>('fit');
 
@@ -60,6 +94,37 @@ const ExerciseDetailPage: React.FC = () => {
         // default remains 'fit'
       }
     })();
+  }, []);
+
+  // Toggle fullscreen
+  const handleToggleFullscreen = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const container = videoContainerRef.current;
+    if (!container) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await container.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      logger.error('[ExerciseDetailPage] Fullscreen toggle failed:', error);
+    }
+  }, []);
+
+  // Listen for fullscreen changes (e.g., user presses Escape)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, []);
 
   // Refresh favorite status when page regains focus or becomes visible
@@ -305,8 +370,9 @@ const ExerciseDetailPage: React.FC = () => {
             onVideoLoad={() => logger.log('Hero video loaded for exercise:', exercise.id)}
             onVideoError={() => logger.warn('Hero video failed to load for exercise:', exercise.id)}
           />
-          {/* Fit/Fill toggle overlay */}
-          <div className="absolute top-3 right-3 z-10">
+          {/* Video controls overlay */}
+          <div className="absolute top-3 right-3 z-10 flex gap-2">
+            {/* Fit/Fill toggle */}
             <button
               type="button"
               className="btn-ghost btn-sm border-2 border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
@@ -335,6 +401,17 @@ const ExerciseDetailPage: React.FC = () => {
               data-testid="toggle-video-fit-detail"
             >
               {videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+            </button>
+            {/* Fullscreen toggle */}
+            <button
+              type="button"
+              onClick={handleToggleFullscreen}
+              className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+              aria-label={isFullscreen ? t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' }) : t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+              title={isFullscreen ? t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' }) : t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+              data-testid="toggle-fullscreen-detail"
+            >
+              {isFullscreen ? <ExitFullscreenIcon size={18} /> : <FullscreenIcon size={18} />}
             </button>
           </div>
         </div>

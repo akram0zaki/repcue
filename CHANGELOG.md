@@ -2,6 +2,22 @@
 
 ### 2025-12-01
 
+
+#### 🎬 Enhancement - Fullscreen Video Button on Exercise Detail Page
+
+**Added**: Fullscreen toggle button to ExerciseDetailPage video section
+
+**Changes**:
+- Added FullscreenIcon and ExitFullscreenIcon SVG components (matching SharedExerciseVideo)
+- Added `isFullscreen` state and `handleToggleFullscreen` handler
+- Added fullscreen change event listener (handles Escape key exit)
+- Positioned button next to existing Fit/Fill toggle with flex layout
+
+**Files Changed**:
+- [ExerciseDetailPage.tsx](apps/frontend/src/pages/ExerciseDetailPage.tsx)
+
+---
+
 #### � Documentation - Exercise Sharing System
 
 **Added**: Comprehensive documentation for the exercise sharing module
