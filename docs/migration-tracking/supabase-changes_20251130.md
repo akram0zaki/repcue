@@ -10,12 +10,12 @@ Removed `video_files` from sync scope to fix timeout issues caused by large payl
 #### Development (repcue-dev)
 - **Project ID**: xwzrsfkzqxdybjrkkkvh
 - **Version**: 66
-- **Deployed**: 2025-01-30
+- **Deployed**: 2025-11-30
 
 #### Production (RepCue)
 - **Project ID**: zumzzuvfsuzvvymhpymk
 - **Version**: 37
-- **Deployed**: 2025-01-30
+- **Deployed**: 2025-11-30
 
 ### Changes Made
 1. **Removed `video_files` from `SYNC_TABLES`**

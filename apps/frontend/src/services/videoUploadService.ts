@@ -20,10 +20,10 @@ interface PendingVideoFile {
   id: string;
   exercise_id: string;
   file_name: string;
-  file_data: Blob | File;
+  file_data: Blob | File | null;
   file_size: number;
   mime_type: string;
-  owner_id: string;
+  owner_id?: string | null;
   upload_pending: boolean;
   storage_path?: string;
   created_at: string;
@@ -204,7 +204,7 @@ class VideoUploadService {
   private async getPendingVideoFiles(userId: string): Promise<PendingVideoFile[]> {
     try {
       // Dynamically import storage service to avoid circular dependency
-      const { default: StorageService } = await import('./storageService');
+      const { StorageService } = await import('./storageService');
       const storage = StorageService.getInstance();
       const db = storage.getDatabase();
 
@@ -217,7 +217,7 @@ class VideoUploadService {
       const pendingFiles = await db.video_files
         .where('upload_pending')
         .equals(1) // IndexedDB stores boolean as 1/0
-        .filter((vf: PendingVideoFile) => 
+        .filter((vf) => 
           vf.owner_id === userId && 
           !vf.deleted && 
           vf.file_data !== null &&
@@ -227,7 +227,7 @@ class VideoUploadService {
 
       // Also check for upload_pending: true (boolean)
       const pendingFilesBoolean = await db.video_files
-        .filter((vf: PendingVideoFile) => 
+        .filter((vf) => 
           vf.upload_pending === true &&
           vf.owner_id === userId && 
           !vf.deleted && 
@@ -240,7 +240,7 @@ class VideoUploadService {
       const allPending = [...pendingFiles, ...pendingFilesBoolean];
       const uniqueById = new Map(allPending.map(f => [f.id, f]));
       
-      return Array.from(uniqueById.values());
+      return Array.from(uniqueById.values()) as PendingVideoFile[];
     } catch (error) {
       logger.error('[VideoUpload] Error getting pending video files:', error);
       return [];
@@ -346,7 +346,7 @@ class VideoUploadService {
     fileName: string
   ): Promise<void> {
     try {
-      const { default: StorageService } = await import('./storageService');
+      const { StorageService } = await import('./storageService');
       const storage = StorageService.getInstance();
       const db = storage.getDatabase();
 
@@ -360,7 +360,7 @@ class VideoUploadService {
       await db.video_files.update(videoFileId, {
         upload_pending: false,
         storage_path: storagePath,
-        file_data: null, // Clear the blob data to save space (it's in cloud now)
+        file_data: undefined, // Clear the blob data to save space (it's in cloud now)
         updated_at: now,
         dirty: 1, // Mark dirty so metadata syncs
         op: 'upsert'

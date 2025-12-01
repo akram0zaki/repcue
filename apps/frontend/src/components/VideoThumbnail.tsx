@@ -386,7 +386,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         muted
         loop // Videos will loop automatically when playing
         playsInline
-        // @ts-ignore - loading attribute is valid but not in React types yet
+        // @ts-expect-error - loading attribute is valid but not in React types yet
         loading="eager" // Force immediate loading of poster images (no lazy loading)
       />
 
