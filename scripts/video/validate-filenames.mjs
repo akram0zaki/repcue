@@ -2,7 +2,7 @@
 /**
  * Validate filename patterns in exercise_media.json
  * Ensures R2 video paths follow the expected naming convention:
- * /media/{exerciseId}_v{version}_{resolution}_{hash}.{format}
+ * /media/{exerciseId}_v{version}_{width}x{height}.{format}
  * 
  * Usage: node scripts/video/validate-filenames.mjs
  */
@@ -12,8 +12,8 @@ import { resolve } from 'path';
 
 const MANIFEST_PATH = resolve(process.cwd(), 'apps/frontend/public/exercise_media.json');
 
-// Expected pattern: /media/exerciseId_v1_1080_abc12345.webm
-const R2_PATH_PATTERN = /^\/media\/[a-z0-9_-]+_v\d+_\d{3,4}_[a-f0-9]{8}\.(webm|mp4)$/i;
+// Expected pattern: /media/exerciseId_v1_1920x1080.mp4 or /media/exerciseId_v1_1080x1920.mp4
+const R2_PATH_PATTERN = /^\/media\/[a-z0-9_-]+_v\d+_\d{3,4}x\d{3,4}\.(webm|mp4)$/i;
 
 // Legacy path pattern (still valid during migration)
 const LEGACY_PATH_PATTERN = /^\/videos\/.+\.(webm|mp4)$/i;

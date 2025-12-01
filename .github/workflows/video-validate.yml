@@ -8,6 +8,11 @@ on:
       - 'scripts/video/**'
   workflow_dispatch: # Allow manual trigger
 
+# Required for PR comments
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   validate-manifest:
     name: Validate Video Manifest
