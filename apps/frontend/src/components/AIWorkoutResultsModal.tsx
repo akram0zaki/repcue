@@ -5,6 +5,7 @@
  * Shows list of workouts with details and action buttons.
  */
 
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { GeneratedWorkout } from '../types/aiWorkout';
@@ -15,6 +16,8 @@ interface AIWorkoutResultsModalProps {
   isOpen: boolean;
   /** Generated workouts to display */
   workouts: GeneratedWorkout[];
+  /** AI-generated feedback for the user */
+  feedback?: string;
   /** Callback to close modal */
   onClose: () => void;
   /** Callback to generate new workouts */
@@ -30,11 +33,49 @@ interface AIWorkoutResultsModalProps {
 export default function AIWorkoutResultsModal({
   isOpen,
   workouts,
+  feedback,
   onClose,
   onGenerateAgain,
 }: AIWorkoutResultsModalProps) {
   const { t } = useTranslation('aiWorkout');
   const navigate = useNavigate();
+
+  // Prevent body scroll when modal is open (iOS Safari fix)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Save current scroll position and body styles
+    const scrollY = window.scrollY;
+    const originalStyles = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+    };
+
+    // Lock body scroll - this combination works on iOS Safari
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+
+    return () => {
+      // Restore original styles
+      document.body.style.overflow = originalStyles.overflow;
+      document.body.style.position = originalStyles.position;
+      document.body.style.top = originalStyles.top;
+      document.body.style.left = originalStyles.left;
+      document.body.style.right = originalStyles.right;
+      document.body.style.width = originalStyles.width;
+      
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
@@ -143,28 +184,61 @@ export default function AIWorkoutResultsModal({
           </p>
         </div>
 
+        {/* AI Feedback Section (if available) */}
+        {feedback && (
+          <div className="px-6 py-4 bg-info-surface border-t border-b border-border">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-1">
+                <svg
+                  className="w-5 h-5 text-info"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-body font-semibold text-text-primary mb-1">
+                  {t('results.feedbackTitle', 'AI Coach Insights')}
+                </h3>
+                <p className="text-body text-text-secondary whitespace-pre-line">
+                  {feedback}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Workouts list */}
-        <div className="p-6 max-h-96 overflow-y-auto">
+        <div className="p-6 max-h-96 overflow-y-auto overscroll-contain">
           <div className="space-y-4">
             {workouts.map((workout) => (
               <div
                 key={workout.id}
                 className="p-4 bg-surface-secondary rounded-lg border border-border hover:border-accent-primary transition-colors"
               >
-                {/* Workout header */}
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex-1">
-                    <h3 className="text-body font-semibold text-text-primary mb-1">
-                      {workout.name}
-                    </h3>
-                    <p className="text-small text-text-secondary line-clamp-2">
-                      {workout.description}
-                    </p>
-                  </div>
-                  {/* AI badge */}
-                  <span className="flex-shrink-0 px-2 py-1 bg-accent-surface text-accent-primary text-small font-medium rounded">
+                {/* AI badge - separate line for better readability */}
+                <div className="mb-3">
+                  <span className="inline-block px-2 py-1 bg-accent-surface text-accent-primary text-small font-medium rounded">
                     {t('results.aiGeneratedBadge', 'AI-Generated')}
                   </span>
+                </div>
+
+                {/* Workout name and description */}
+                <div className="mb-2">
+                  <h3 className="text-body font-semibold text-text-primary mb-2">
+                    {workout.name}
+                  </h3>
+                  <p className="text-small text-text-secondary line-clamp-2">
+                    {workout.description}
+                  </p>
                 </div>
 
                 {/* Workout details */}

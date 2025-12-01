@@ -8,7 +8,13 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:3001'
+      '/api': 'http://localhost:3001',
+      // Proxy /media/* requests to deployed Pages Function for R2 video testing
+      '/media': {
+        target: 'https://repcue-dev.pages.dev',
+        changeOrigin: true,
+        secure: true
+      }
     }
   },
   assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg'],
@@ -83,16 +89,21 @@ export default defineConfig({
               }
             }
           },
-          // Phase 3 T-3.2: runtime caching for exercise demo videos
+          // Exercise videos - CacheFirst for instant playback (zero re-downloads)
+          // Videos cached permanently once downloaded (90 days expiration, refreshed on access)
           {
-            urlPattern: /^\/videos\/.*\.(mp4|webm|mov)$/i,
-            handler: 'StaleWhileRevalidate',
+            urlPattern: /^\/(videos|media)\/.*\.(mp4|webm|mov)$/i,
+            handler: 'CacheFirst',
             options: {
-              cacheName: 'exercise-videos-cache',
+              cacheName: 'exercise-videos-cache-v2',
               expiration: {
-                maxEntries: 60,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              }
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 90 // 90 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200, 206] // Cache successful and range requests
+              },
+              rangeRequests: true // Support video seeking
             }
           },
           // Cache locale files for offline i18n functionality

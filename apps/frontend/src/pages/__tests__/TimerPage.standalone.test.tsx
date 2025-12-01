@@ -91,10 +91,10 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
       </Router>
     );
 
-    // Check that rep/set progress is displayed in the timer
-    // For rep-based exercises not running, we should see the timer display ready state
-    expect(screen.getByTestId('timer-display')).toBeInTheDocument();
-    // Since the timer is not running, we expect to see the setup state rather than "Rep 1"
+    // Check that rep/set progress is displayed in the compact progress section
+    // For stopped rep-based exercises, we show the initial state
+    expect(screen.getByText('Rep 1/8')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
   });
 
   it('should show nested circles for standalone rep-based exercise', () => {
@@ -130,14 +130,13 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
       </Router>
     );
 
-    // Check that the timer display contains SVG elements for rep-based exercises
-    // The UI should show circular timer with nested progress rings
-    const timerDisplay = screen.getByTestId('timer-display');
-    expect(timerDisplay).toBeInTheDocument();
+    // For running rep-based exercises, we should see the compact progress section
+    expect(screen.getByText('Rep 1/8')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
 
-    // For running rep-based exercises, we should see the rep display
-    expect(screen.getByText('Rep 1')).toBeInTheDocument();
-    expect(screen.getByText(/of 8 in Set 1\/3/)).toBeInTheDocument();
+    // The timer display should NOT be present during active rep-based exercise (no text overlay)
+    expect(screen.queryByTestId('timer-display')).not.toBeInTheDocument();
   });
 
   it('should show exercise controls for standalone rep-based exercise', () => {
@@ -177,8 +176,9 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
     expect(screen.getByRole('button', { name: /start/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /reset/i })).toBeInTheDocument();
 
-    // The timer display should be present for the exercise
-    expect(screen.getByTestId('timer-display')).toBeInTheDocument();
+    // The compact progress section should show initial rep/set state
+    expect(screen.getByText('Rep 1/8')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
   });
 
   it('should display correct initial rep/set progress (1/8, 1/3)', () => {
@@ -214,11 +214,11 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
       </Router>
     );
 
-    // Check that the timer display exists and is properly configured for rep-based exercise
-    expect(screen.getByTestId('timer-display')).toBeInTheDocument();
+    // Check that the compact progress section shows the correct initial rep/set values (1-based for display)
+    expect(screen.getByText('Rep 1/8')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
 
-    // For a stopped rep-based exercise, the timer should show ready state
-    // We can verify it's a rep-based exercise by checking the selected exercise type
+    // Verify it's a rep-based exercise
     expect(mockRepBasedExercise.exercise_type).toBe('repetition_based');
   });
 
@@ -255,9 +255,10 @@ describe('TimerPage - Standalone Rep-Based Exercise', () => {
       </Router>
     );
 
-    // Check that the timer is running and displaying rep progress in the center
-    // For a running rep-based exercise with currentRep=2, we should see "Rep 3" (working on 3rd rep)
-    expect(screen.getByText('Rep 3')).toBeInTheDocument();
-    expect(screen.getByText(/of 8 in Set 1\/3/)).toBeInTheDocument();
+    // Check that the timer is running and displaying rep progress in the compact section
+    // For a running rep-based exercise with currentRep=2, we should see "Rep 3/8" (working on 3rd rep)
+    expect(screen.getByText('Rep 3/8')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
   });
 });

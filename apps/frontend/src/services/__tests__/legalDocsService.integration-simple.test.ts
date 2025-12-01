@@ -4,7 +4,7 @@
  * LA-REQ-004, LA-REQ-006
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, beforeAll, afterAll } from 'vitest';
 import { LegalDocsService } from '../legalDocsService';
 import { ConsentService } from '../consentService';
 import type { LegalManifest, LegalAcceptance } from '../../types';
@@ -54,6 +54,15 @@ vi.stubEnv('VITE_SUPABASE_URL', 'https://test.supabase.co');
 vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-anon-key');
 
 describe('LegalDocsService Integration Tests (Simplified)', () => {
+  // Freeze time so days-until-effective tests remain stable
+  beforeAll(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-10-22T00:00:00.000Z'));
+  });
+
+  afterAll(() => {
+    vi.useRealTimers();
+  });
   let legalDocsService: LegalDocsService;
   let consentService: ConsentService;
 
@@ -261,12 +270,14 @@ describe('LegalDocsService Integration Tests (Simplified)', () => {
     });
 
     it('should calculate days until effective correctly', () => {
-      // Test with future date (8 days from now)
-      const futureDate = '2025-10-30T00:00:00.000Z';
-      const daysUntil = legalDocsService.getDaysUntilEffective(futureDate);
+      // Use a relative future date (≈8 days ahead) to avoid date flakiness
+      const future = new Date();
+      future.setDate(future.getDate() + 8);
+      const daysUntil = legalDocsService.getDaysUntilEffective(future.toISOString());
 
-      expect(daysUntil).toBeGreaterThan(0);
-      expect(daysUntil).toBeLessThanOrEqual(8);
+      expect(daysUntil).not.toBeNull();
+      expect(daysUntil as number).toBeGreaterThan(0);
+      expect(daysUntil as number).toBeLessThanOrEqual(8);
     });
 
     it('should return null for past effective dates', () => {

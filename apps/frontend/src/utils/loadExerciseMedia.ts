@@ -31,4 +31,21 @@ export async function loadExerciseMedia(): Promise<ExerciseMediaIndex> {
   }
 }
 
+/**
+ * Get exercise duration from media index
+ * Returns the accurate duration in seconds from exercise_media.json
+ * Falls back to null if exercise not found
+ */
+export async function getExerciseDurationFromMedia(exerciseId: string): Promise<number | null> {
+  try {
+    const mediaIndex = await loadExerciseMedia();
+    const media = mediaIndex[exerciseId];
+    return media?.duration ?? null;
+  } catch (err) {
+    console.warn(`[exercise-media] Failed to get duration for ${exerciseId}:`, err);
+    return null;
+  }
+}
+
 export function clearExerciseMediaCache() { cache = null; }
+

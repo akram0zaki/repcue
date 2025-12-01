@@ -67,13 +67,22 @@
   "screen2": {
     "title": "Dyn doelen & foarkarren",
     "subtitle": "Wêr wurkest nei ta?",
-    "goal": {
-      "label": "Haaddoel",
+    "goals": {
+      "label": "Haaddoelen",
+      "helper": "Selektearje ien of mear doelen dy'st berikke wolst",
       "weightLoss": "Offalle",
       "muscleBuilding": "Spierbou",
       "healthMaintenance": "Sûnens hâlde",
       "flexibility": "Fleksibiliteit & mobiliteit",
-      "error": "Kies dyn haaddoel"
+      "marathonDesSables": "Marathon des Sables Tarieding",
+      "error": "Kies op syn minst ien doel"
+    },
+    "goalDuration": {
+      "label": "Tiid om doelen te berikken (Opsjoneel)",
+      "helper": "Hoefolle moannen hast om dyn doelen te berikken?",
+      "placeholder": "byg. 3, 6, 12",
+      "unit": "moannen",
+      "error": "Doelduer moat tusken 1 en 24 moannen wêze"
     },
     "fitnessLevel": {
       "label": "Hjoeddeistich fitheidsnivo",
@@ -103,6 +112,10 @@
   "screen3": {
     "title": "Sûnens & trainingstyl",
     "subtitle": "Wy hâlde it feilich en effektyf",
+    "saveToProfile": {
+      "label": "Bewarje yn myn profyl",
+      "description": "Bewarje dizze ynformaasje om takomstige AI Workout Builder-sesjes foarynfolje te kinnen. Jo kinne dit op elk momint wizigje yn jo profylynstellingen."
+    },
     "injuries": {
       "label": "Blessueres of beheiningen (opsjoneel)",
       "placeholder": "bgl. knieskea, legere rêchpine, skouderblessuere...",
@@ -156,6 +169,7 @@
   "results": {
     "title": "Dyn persoanlike trainingen",
     "subtitle": "AI-makke trainingen oanpast oan dyn doelen",
+    "feedbackTitle": "AI-Coach Ynsjoch",
     "aiGeneratedBadge": "AI-makke",
     "exerciseCount": "{{count}} oefeningen",
     "durationSeconds": "~{{seconds}} sek",

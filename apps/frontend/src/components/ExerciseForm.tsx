@@ -8,6 +8,7 @@ import { ConfirmationModal } from './ui/ConfirmationModal';
 import { useFeatureFlag } from '../hooks/useFeatureFlags';
 import { getCatalogBadges } from '../utils/catalogBadges';
 import { sanitizeTagValue } from '../utils/badgeValidation';
+import CatalogMultiSelector from './CatalogMultiSelector';
 import logger from '../utils/logger';
 
 interface ExerciseFormProps {
@@ -161,6 +162,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   const [equipmentNeeded, setEquipmentNeeded] = useState<string[]>(exercise?.equipment_needed || []);
   const [muscleGroups, setMuscleGroups] = useState<string[]>(exercise?.muscle_groups || []);
   const [tags, setTags] = useState<string[]>(exercise?.tags || []);
+  // New: distinguish base (catalog-agnostic) tags; initialize from legacy tags for migration
+  const [baseTags, setBaseTags] = useState<string[]>(exercise?.base_tags || exercise?.tags || []);
   const [instructions, setInstructions] = useState<ExerciseInstruction[]>(
     exercise?.instructions || [{ step: 1, text: '' }]
   );
@@ -170,6 +173,12 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   const [newEquipment, setNewEquipment] = useState('');
   const [newMuscleGroup, setNewMuscleGroup] = useState('');
   const [newTag, setNewTag] = useState('');
+  // Multi-catalog assignment (Phase 5)
+  const [selectedCatalogIds, setSelectedCatalogIds] = useState<string[]>(() => {
+    // Prefer explicit memberships (future), fallback to legacy catalogId prop
+    if (exercise?.catalogId) return [exercise.catalogId];
+    return [catalogId];
+  });
 
   // Modal states
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -191,13 +200,16 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       difficultyLevel,
       equipmentNeeded,
       muscleGroups,
+      // Persist both legacy & new tag state for resilience
       tags,
+      baseTags,
       instructions,
       isPublic,
       ...(canUploadVideos && { customVideoUrl }),
       newEquipment,
       newMuscleGroup,
       newTag,
+      selectedCatalogIds,
     };
 
     // Only save if form has content (avoid saving empty states)
@@ -207,8 +219,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
   }, [
     name, description, exerciseType, defaultDuration, defaultSets, 
     defaultReps, repDurationSeconds, difficultyLevel, equipmentNeeded, 
-    muscleGroups, tags, instructions, isPublic, customVideoUrl,
-    newEquipment, newMuscleGroup, newTag, persistenceKey, canUploadVideos
+    muscleGroups, tags, baseTags, instructions, isPublic, customVideoUrl,
+    newEquipment, newMuscleGroup, newTag, selectedCatalogIds, persistenceKey, canUploadVideos
   ]);
 
   // Update form state when exercise prop changes (for editing mode)
@@ -225,6 +237,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       setEquipmentNeeded(exercise.equipment_needed || []);
       setMuscleGroups(exercise.muscle_groups || []);
       setTags(exercise.tags || []);
+      setBaseTags(exercise.base_tags || exercise.tags || []);
       setInstructions(exercise.instructions || [{ step: 1, text: '' }]);
       setIsPublic(exercise.is_public || false);
       setCustomVideoUrl(exercise.custom_video_url || '');
@@ -276,6 +289,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         setEquipmentNeeded(parsedState.equipmentNeeded || []);
         setMuscleGroups(parsedState.muscleGroups || []);
         setTags(parsedState.tags || []);
+        setBaseTags(parsedState.baseTags || parsedState.tags || []);
         setInstructions(parsedState.instructions || [{ step: 1, text: '' }]);
         setIsPublic(parsedState.isPublic || false);
         if (canUploadVideos) {
@@ -313,6 +327,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     setEquipmentNeeded([]);
     setMuscleGroups([]);
     setTags([]);
+    setBaseTags([]);
     setInstructions([{ step: 1, text: '' }]);
     setIsPublic(false);
     if (canUploadVideos) {
@@ -322,6 +337,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     setNewMuscleGroup('');
     setNewTag('');
     setClearFormModalOpen(false);
+    setSelectedCatalogIds([catalogId]);
   };
 
   // Handle cancel with option to keep draft
@@ -420,6 +436,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         if (newTagItems.length > 0) {
           const updatedTags = [...tags, ...newTagItems];
           setTags(updatedTags);
+          // Keep baseTags in sync for migration period
+          setBaseTags(updatedTags);
           logger.log('🔧 DEBUG: Tags added, new array:', updatedTags);
         } else {
           logger.log('🔧 DEBUG: All tag items already exist');
@@ -438,9 +456,12 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       case 'muscleGroups':
         setMuscleGroups(muscleGroups.filter((_, i) => i !== index));
         break;
-      case 'tags':
-        setTags(tags.filter((_, i) => i !== index));
+      case 'tags': {
+        const filtered = tags.filter((_, i) => i !== index);
+        setTags(filtered);
+        setBaseTags(filtered);
         break;
+      }
     }
   };
 
@@ -451,9 +472,14 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     if (!name.trim()) {
       return;
     }
+    // Enforce at least one catalog selected (defensive; selector also enforces)
+    if (!selectedCatalogIds || selectedCatalogIds.length === 0) {
+      return;
+    }
     
     // Sanitize and validate tags
-    const sanitizedTags = tags
+    // Use baseTags as canonical source (tags kept for backward compatibility)
+    const sanitizedTags = baseTags
       .map(tag => {
         // For structured badge tags (e.g., "category:core"), sanitize the value part only
         if (tag.includes(':')) {
@@ -480,7 +506,11 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
       equipment_needed: equipmentNeeded,
       muscle_groups: muscleGroups,
       tags: sanitizedTags,
+      base_tags: sanitizedTags, // New canonical field
       is_public: isPublic,
+      // Provide selected catalogs for membership creation (handled by parent pages)
+      // @ts-expect-error: extended payload field during migration
+      selectedCatalogIds,
     };
 
     // Add type-specific fields
@@ -590,6 +620,26 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
             </div>
           </div>
           {/* End of basic information */}
+
+          {/* Catalog Assignment (Multi-select) */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('catalogs:assignmentHeading', { defaultValue: 'Catalog Assignment' })}</h3>
+            <CatalogMultiSelector
+              selectedCatalogIds={selectedCatalogIds}
+              onChange={setSelectedCatalogIds}
+              disabled={loading}
+              minSelected={1}
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('catalogs:assignmentHint', { defaultValue: 'Select catalogs to associate. Tags below apply as base tags (catalog-agnostic). Per-catalog overrides coming soon.' })}
+            </p>
+            {selectedCatalogIds.length === 0 && (
+              <p className="text-xs text-red-600 dark:text-red-400" role="alert">
+                {t('catalogs:minOneRequired', { defaultValue: 'At least one catalog must remain selected.' })}
+              </p>
+            )}
+          </div>
+          {/* End catalog assignment */}
 
           {/* Type-specific fields */}
           <div className="space-y-4">
@@ -833,7 +883,7 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           </div>
           {/* End of muscle groups section */}
 
-          {/* Tags Section with Badge Helpers */}
+          {/* Tags Section with Badge Helpers (Base Tags) */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('exercises:tagsHeading', t('exercises:tagsLabel', 'Tags'))}</h3>
             
@@ -883,9 +933,11 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
                                     if (badge.filterType === 'single') {
                                       // For single-select badges, remove other values of this badge first
                                       const updatedTags = tags.filter(t => !t.startsWith(prefix));
-                                      setTags([...updatedTags, tagValue]);
+                                        setTags([...updatedTags, tagValue]);
+                                        setBaseTags([...updatedTags, tagValue]);
                                     } else {
-                                      setTags([...tags, tagValue]);
+                                        setTags([...tags, tagValue]);
+                                        setBaseTags([...tags, tagValue]);
                                     }
                                   }
                                 }}
@@ -1090,10 +1142,10 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
         isOpen={cancelModalOpen}
         onClose={() => handleConfirmCancel(true)} // Keep draft when closing
         onConfirm={() => handleConfirmCancel(false)} // Discard changes when confirming
-        title={t('cancelTitle', 'Cancel Exercise Form')}
-        message={t('keepDraft', 'Keep your form draft for next time?')}
-        confirmText={t('discard', 'Discard Changes')}
-        cancelText={t('common.keepDraft', 'Keep Draft')}
+        title={t('exercises:cancelTitle', 'Cancel Exercise Form')}
+        message={t('exercises:keepDraft', 'Keep your form draft for next time?')}
+        confirmText={t('exercises:discard', 'Discard Changes')}
+        cancelText={t('common:common.keepDraft', 'Keep Draft')}
         variant="default"
       />
 

@@ -2,13 +2,23 @@
 
 ## Overview
 
-RepCue is excellently architected for static hosting deployment. The application is designed as a **privacy-first, offline-first PWA** that can run completely without a backend server, making it perfect for static hosting platforms.
+RepCue is deployed as a **privacy-first, offline-first PWA** on **Cloudflare Pages** with **Cloudflare R2** for video storage and **Supabase** for backend services (database, authentication, Edge Functions).
 
-## Can RepCue Run on Static Hosting?
+## Current Production Architecture
 
-**✅ YES** - The application can run completely on static page hosting without Express.
+**Production**: `repcue.me`  
+**Preview/Dev**: `dev.repcue.me` / `repcue-dev.pages.dev`
 
-## Current Architecture
+| Component | Service | Notes |
+|-----------|---------|-------|
+| Static Frontend | Cloudflare Pages | SPA with service worker |
+| Video Storage | Cloudflare R2 | `repcue-exercise-videos` bucket |
+| Video Proxy | Cloudflare Pages Functions | `/media/*` proxy to R2 |
+| Database | Supabase PostgreSQL | User data, exercises, workouts |
+| Authentication | Supabase Auth | WebAuthn, Magic Links |
+| Backend Functions | Supabase Edge Functions | sync_v2, analyze-progress, etc. |
+
+## Architecture
 
 RepCue uses a local-first architecture where:
 
@@ -17,15 +27,15 @@ RepCue uses a local-first architecture where:
 - **Optional features** (auth, sync) communicate directly with Supabase
 - **No custom backend API** required
 
-### Express Server Current Role
+### Express Server (Legacy/Development Only)
 
-The current Express server only provides:
+The Express server (`apps/backend/`) is now **only used for local development** or self-hosting scenarios:
 
-1. **Static file serving** → Replaceable by static hosting
-2. **Health check endpoint** (`/health`) → Optional, for monitoring only
-3. **SPA routing fallback** → Handled by static hosting configurations
-4. **Security headers** → Configurable in hosting provider settings
-5. **Compression** → Handled automatically by static hosts
+1. **Static file serving** → Handled by Cloudflare Pages in production
+2. **Health check endpoint** (`/health`) → Cloudflare provides monitoring
+3. **SPA routing fallback** → Handled by `_redirects` file
+4. **Security headers** → Configured via Cloudflare
+5. **Compression** → Automatic via Cloudflare
 
 ## Features That Work Without Server
 
@@ -53,54 +63,67 @@ The current Express server only provides:
 - Data synchronization via Supabase Edge Functions
 - No custom backend API endpoints required
 
-## Recommended Static Hosting Providers
+## Hosting Providers
 
-### Tier 1 - Perfect Matches
+### Current Production: Cloudflare Pages (✅ In Use)
+
+**Why Cloudflare Pages:**
+- ✅ Fast global CDN with edge locations
+- ✅ Native R2 integration for video storage
+- ✅ Pages Functions for serverless proxy (`/media/*`)
+- ✅ Automatic SPA routing via `_redirects`
+- ✅ Built-in DDoS protection
+- ✅ Free tier with generous limits
+- ✅ Preview deployments for PRs
+- ✅ Environment-specific builds (production/preview)
+
+### Alternative Providers (For Self-Hosting)
 
 **Vercel**
 - ✅ Automatic SPA routing
 - ✅ Excellent PWA support
 - ✅ Environment variable management
 - ✅ Global CDN
-- ✅ HTTPS by default
+- ⚠️ Would require separate video hosting solution
 
 **Netlify**
 - ✅ Built-in SPA redirects
 - ✅ Great React app support
-- ✅ Form handling (if needed later)
 - ✅ Branch previews
-- ✅ Edge functions support
+- ⚠️ Would require separate video hosting solution
 
-**Cloudflare Pages**
-- ✅ Fast global CDN
-- ✅ SPA routing support
-- ✅ Excellent performance
-- ✅ DDoS protection
-- ✅ Free tier with generous limits
-
-### Tier 2 - Also Suitable
-
-**GitHub Pages**
-- ✅ Free hosting
-- ✅ SPA routing support
-- ✅ Custom domains
-- ⚠️ Public repos only (free tier)
-
-**Firebase Hosting**
-- ✅ Google infrastructure
-- ✅ SPA configuration
-- ✅ SSL certificates
-- ✅ Performance monitoring
-
-**AWS S3 + CloudFront**
-- ✅ Highly scalable
+**Self-Hosted (Raspberry Pi / VPS)**
 - ✅ Full control
-- ⚠️ More complex setup
-- ⚠️ Requires AWS knowledge
+- ✅ PM2 + nginx setup documented
+- ✅ Cloudflare Tunnel for SSL
+- ⚠️ More complex maintenance
+- ⚠️ See `README.md` for Pi deployment guide
 
-## Configuration for Static Hosting
+## Configuration for Cloudflare Pages
 
-### 1. Build Configuration
+### 1. Wrangler Configuration
+
+The `wrangler.toml` in the project root configures Cloudflare Pages:
+
+```toml
+name = "repcue"
+compatibility_date = "2025-11-01"
+pages_build_output_dir = "apps/frontend/dist"
+
+# R2 Bucket binding for exercise demo videos
+[[r2_buckets]]
+binding = "VIDEOS"
+bucket_name = "repcue-exercise-videos"
+preview_bucket_name = "repcue-exercise-videos"
+
+[env.production]
+name = "repcue"
+
+[env.preview]
+name = "repcue-dev"
+```
+
+### 2. Build Configuration
 
 The current build process already generates static files:
 
@@ -121,13 +144,24 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### 3. SPA Routing Configuration
 
-#### Netlify
-Create `apps/frontend/public/_redirects`:
+#### Cloudflare Pages (Current Production)
+The `apps/frontend/public/_redirects` file handles SPA routing:
 ```
-/*    /index.html   200
+# Serve actual files directly
+/assets/*  200
+/legal/*   200
+/locales/* 200
+/videos/*  200
+/splash/*  200
+/icons/*   200
+/exercise_media.json  200
+/legal/manifest.json  200
+
+# Serve all other routes through index.html for SPA routing
+/*  /index.html  200
 ```
 
-#### Vercel
+#### Alternative: Vercel
 Create `apps/frontend/vercel.json`:
 ```json
 {
@@ -138,6 +172,12 @@ Create `apps/frontend/vercel.json`:
     }
   ]
 }
+```
+
+#### Alternative: Netlify
+Create `apps/frontend/public/_redirects`:
+```
+/*    /index.html   200
 ```
 
 #### Apache
@@ -170,7 +210,47 @@ Most static hosts allow custom headers. Example for Netlify in `_headers`:
 
 ## Deployment Steps
 
-### Option 1: Netlify (Recommended)
+### Cloudflare Pages (Current Production)
+
+Deployment is automatic via Cloudflare Pages connected to the GitHub repository:
+
+1. **Push to GitHub**
+   ```bash
+   git push origin main  # Production deployment
+   git push origin develop  # Preview deployment
+   ```
+
+2. **Cloudflare Pages Settings**
+   - Build command: `pnpm build:prod`
+   - Build output directory: `apps/frontend/dist`
+   - Root directory: `/`
+   - Node.js version: 18
+
+3. **Environment Variables** (set in Cloudflare dashboard)
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+
+4. **Pages Functions**
+   - `/media/*` proxy to R2 bucket
+   - Configured via `functions/media/[[path]].ts`
+
+### Alternative: Manual Deployment with Wrangler
+
+```bash
+# Install Wrangler CLI
+npm install -g wrangler
+
+# Login to Cloudflare
+wrangler login
+
+# Build the app
+pnpm build:prod
+
+# Deploy to Cloudflare Pages
+wrangler pages deploy apps/frontend/dist --project-name=repcue
+```
+
+### Alternative: Vercel
 
 1. **Connect Repository**
    ```bash
@@ -189,7 +269,7 @@ Most static hosts allow custom headers. Example for Netlify in `_headers`:
 4. **Deploy**
    - Automatic deployment on git push
 
-### Option 2: Vercel
+### Alternative: Netlify
 
 1. **Install Vercel CLI**
    ```bash
@@ -207,33 +287,32 @@ Most static hosts allow custom headers. Example for Netlify in `_headers`:
    - Set output directory: `dist`
    - Add environment variables
 
-### Option 3: GitHub Pages
+## Video Storage (R2 Integration)
 
-1. **Create Deploy Action**
-   Create `.github/workflows/deploy.yml`:
-   ```yaml
-   name: Deploy to GitHub Pages
-   on:
-     push:
-       branches: [ main ]
-   jobs:
-     deploy:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v3
-         - uses: actions/setup-node@v3
-           with:
-             node-version: 18
-         - run: npm install -g pnpm
-         - run: pnpm install
-         - run: cd apps/frontend && pnpm build:prod
-         - uses: peaceiris/actions-gh-pages@v3
-           with:
-             github_token: ${{ secrets.GITHUB_TOKEN }}
-             publish_dir: apps/frontend/dist
-   ```
+### R2 Bucket Configuration
 
-## Configuration Changes Needed
+Exercise demo videos are stored in Cloudflare R2 and served via a Pages Function proxy:
+
+- **Bucket**: `repcue-exercise-videos`
+- **Proxy**: `functions/media/[[path]].ts`
+- **URL Pattern**: `/media/{exerciseId}_v1_{width}x{height}_{hash}.{ext}`
+
+### Pages Function Features
+
+- Range request support (HTTP 206) for video seeking
+- Immutable cache headers for hashed filenames
+- Path validation and sanitization (OWASP A01)
+- Content-Type inference
+- Fallback from hashed to non-hashed filenames
+
+### Cache Headers
+
+| File Type | Cache-Control |
+|-----------|---------------|
+| Hashed videos | `public, max-age=31536000, immutable` |
+| Non-hashed videos | `public, max-age=3600, must-revalidate` |
+
+## Configuration Changes for Alternative Providers
 
 ### 1. Remove Vite Proxy (Optional)
 
@@ -265,15 +344,17 @@ Add static deployment scripts to `apps/frontend/package.json`:
 }
 ```
 
-## What You Lose vs Express
+## Cloudflare Pages vs Express
 
-| Feature | Express | Static Hosting | Mitigation |
-|---------|---------|----------------|------------|
-| Health Check | `/health` endpoint | ❌ | Use hosting provider monitoring |
-| Custom Headers | Middleware | ✅ | Configure in hosting settings |
-| Compression | Express middleware | ✅ | Automatic in most hosts |
-| Custom API | Possible | ❌ | Use Supabase Edge Functions |
-| Server Logs | Console output | ❌ | Use hosting analytics |
+| Feature | Express (Self-hosted) | Cloudflare Pages | Notes |
+|---------|----------------------|------------------|-------|
+| Health Check | `/health` endpoint | ❌ | Use Cloudflare analytics |
+| Custom Headers | Middleware | ✅ `_headers` file | Same capability |
+| Compression | Express middleware | ✅ Automatic | Better with CDN |
+| Custom API | Possible | ✅ Pages Functions | `/media/*` proxy |
+| Server Logs | Console output | ✅ Cloudflare dashboard | Better analytics |
+| Video Storage | Local filesystem | ✅ R2 bucket | Better scalability |
+| SSL | Manual or Tunnel | ✅ Automatic | Managed SSL |
 
 ## Performance Considerations
 
@@ -331,16 +412,43 @@ RepCue's architecture makes it ideal for static hosting deployment. The local-fi
 
 ### Common Issues
 
-1. **Routes not working** - Ensure SPA routing is configured
-2. **Environment variables missing** - Set them in hosting provider
-3. **PWA not installing** - Verify HTTPS and manifest.json
-4. **Assets not loading** - Check public directory structure
+1. **Routes not working** - Check `_redirects` file is in `public/` directory
+2. **Environment variables missing** - Set in Cloudflare Pages dashboard
+3. **PWA not installing** - Verify HTTPS and manifest.json accessible
+4. **Assets not loading** - Check `_redirects` allows static file paths
 5. **Supabase errors** - Verify environment variables and CORS settings
+6. **Videos not loading** - Check R2 bucket binding in `wrangler.toml`
+7. **R2 upload issues** - See `docs/R2-storage-issues.md` for credential help
 
 ### Debug Steps
 
 1. Check browser console for errors
-2. Verify all environment variables are set
+2. Verify all environment variables are set in Cloudflare dashboard
 3. Test offline functionality
 4. Validate service worker registration
 5. Check network tab for failed requests
+6. Check Cloudflare Pages deployment logs
+7. Verify R2 bucket permissions
+
+### Cloudflare Pages Debugging
+
+```bash
+# Check deployment status
+wrangler pages deployment list --project-name=repcue
+
+# View build logs
+wrangler pages deployment tail --project-name=repcue
+
+# Test Pages Function locally
+wrangler pages dev apps/frontend/dist
+```
+
+## Additional Resources
+
+- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
+- [Cloudflare R2 Documentation](https://developers.cloudflare.com/r2/)
+- [RepCue Video System Guide](./video-system.md)
+- [RepCue R2 Storage Issues](./R2-storage-issues.md)
+- [RepCue Environments Guide](./environments-guide.md)
+
+**Last Updated**: November 30, 2025

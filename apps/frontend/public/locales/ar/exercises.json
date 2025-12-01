@@ -10,6 +10,7 @@
   "tagsHeading": "علامات",
   "badgeTagsHelp": "علامات البطاقة:",
   "badgeTagsDescription": "استخدم وسومًا منظمة مثل category:core أو equipment:bodyweight للتصفية. أزرار الإضافة السريعة أدناه.",
+  "baseTagsPreview": "الوسوم الأساسية",
   "freeFormTags": "وسوم إضافية (نص حر)",
   "freeFormTagsHint": "أضف وسومًا مخصصة للبحث (مثل: إحماء، متقدم، منزلي)",
   "allTags": "جميع الوسوم",
@@ -180,6 +181,7 @@
   "videoSource": "مصدر الفيديو",
   "viewDetails": "عرض التفاصيل",
   "viewDetailsAria": "عرض تفاصيل التمرين",
+  "catalogBadgeAria": "شارة الكتالوج: {{badge}}",
   "visibility": "الخصوصية",
   "repDuration": "مدة التكرار",
   "types": {
@@ -277,5 +279,8 @@
     "full-body": "جسم كامل",
     "hands": "يدان",
     "mobility": "مرونة حركة"
-  }
+  },
+  "exerciseParameters": "معلمات التمرين",
+  "exerciseVideo": "فيديو التمرين",
+  "videoUploadAfterSave": "سيكون تحميل الفيديو متاحًا بعد حفظ التمرين."
 }

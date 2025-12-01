@@ -37,6 +37,7 @@ export default function AIWorkoutOnboardingPage() {
     isSubmitting,
     isSuccess,
     workouts,
+    feedback,
     submitError,
     updateData,
     goNext,
@@ -120,6 +121,7 @@ export default function AIWorkoutOnboardingPage() {
       <AIWorkoutResultsModal
         isOpen={true}
         workouts={workouts}
+        feedback={feedback || undefined}
         onClose={handleCloseResults}
         onGenerateAgain={handleGenerateAgain}
       />

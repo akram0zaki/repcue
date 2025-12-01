@@ -36,7 +36,7 @@ export const ExerciseBadgeDisplay: React.FC<ExerciseBadgeDisplayProps> = ({
   const { t } = useTranslation(['catalogs', 'common']);
   
   // Get catalog badges and extract exercise badges
-  const catalogBadges = getCatalogBadges(exercise.catalogId);
+  const catalogBadges = exercise.catalogId ? getCatalogBadges(exercise.catalogId) : [];
   const exerciseBadges = extractExerciseBadges(exercise, catalogBadges);
   
   // Don't render if no badges

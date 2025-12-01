@@ -1,284 +1,2018 @@
 [
   {
-    "id": "plank",
+    "id": "3-4-sit-ups",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/plank_v1_1080x1080.webm",
-      "portrait": "/videos/plank_v1_1080x1920.webm",
-      "landscape": "/videos/plank_v1_1920x1080.webm"
-    }
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/3-4-sit-ups_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/3-4-sit-ups.jpg"
   },
   {
-    "id": "side-plank",
+    "id": "air-twisting-crunch",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/side-plank_v1_1080x1080.webm",
-      "portrait": "/videos/side-plank_v1_1080x1920.webm",
-      "landscape": "/videos/side-plank_v1_1920x1080.webm"
-    }
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/air-twisting-crunch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/air-twisting-crunch.jpg"
   },
   {
-    "id": "mountain-climbers",
+    "id": "alternate-lying-floor-leg-raise",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/mountain-climbers_v1_1080x1080.webm",
-      "portrait": "/videos/mountain-climbers_v1_1080x1920.webm",
-      "landscape": "/videos/mountain-climbers_v1_1920x1080.webm"
-    }
+    "duration": 7.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/alternate-lying-floor-leg-raise_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/alternate-lying-floor-leg-raise.jpg"
   },
   {
-    "id": "bicycle-crunches",
+    "id": "arm-circles",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/bicycle-crunches_v1_1080x1080.webm",
-      "portrait": "/videos/bicycle-crunches_v1_1080x1920.webm",
-      "landscape": "/videos/bicycle-crunches_v1_1920x1080.webm"
-    }
+    "duration": 6.57,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/arm-circles_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/arm-circles.jpg"
   },
   {
-    "id": "push-ups",
+    "id": "assisted-lying-leg-raise-with-lateral-throw-down",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/push-ups_v1_1080x1080.webm",
-      "portrait": "/videos/push-ups_v1_1080x1920.webm",
-      "landscape": "/videos/push-ups_v1_1920x1080.webm"
-    }
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/assisted-lying-leg-raise-with-lateral-throw-down_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/assisted-lying-leg-raise-with-lateral-throw-down.jpg"
   },
   {
-    "id": "squats",
+    "id": "balance-board",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/squats_v1_1080x1080.webm",
-      "portrait": "/videos/squats_v1_1080x1920.webm",
-      "landscape": "/videos/squats_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "lunges",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/lunges_v1_1080x1080.webm",
-      "portrait": "/videos/lunges_v1_1080x1920.webm",
-      "landscape": "/videos/lunges_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "wall-sit",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/wall-sit_v1_1080x1080.webm",
-      "portrait": "/videos/wall-sit_v1_1080x1920.webm",
-      "landscape": "/videos/wall-sit_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "burpees",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/burpees_v1_1080x1080.webm",
-      "portrait": "/videos/burpees_v1_1080x1920.webm",
-      "landscape": "/videos/burpees_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "jumping-jacks",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/jumping-jacks_v1_1080x1080.webm",
-      "portrait": "/videos/jumping-jacks_v1_1080x1920.webm",
-      "landscape": "/videos/jumping-jacks_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "high-knees",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/high-knees_v1_1080x1080.webm",
-      "portrait": "/videos/high-knees_v1_1080x1920.webm",
-      "landscape": "/videos/high-knees_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "butt-kicks",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/butt-kicks_v1_1080x1080.webm",
-      "portrait": "/videos/butt-kicks_v1_1080x1920.webm",
-      "landscape": "/videos/butt-kicks_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "downward-dog",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/downward-dog_v1_1080x1080.webm",
-      "portrait": "/videos/downward-dog_v1_1080x1920.webm",
-      "landscape": "/videos/downward-dog_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "child-pose",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/child-pose_v1_1080x1080.webm",
-      "portrait": "/videos/child-pose_v1_1080x1920.webm",
-      "landscape": "/videos/child-pose_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "cat-cow",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/cat-cow_v1_1080x1080.webm",
-      "portrait": "/videos/cat-cow_v1_1080x1920.webm",
-      "landscape": "/videos/cat-cow_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "single-leg-stand",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/single-leg-stand_v1_1080x1080.webm",
-      "portrait": "/videos/single-leg-stand_v1_1080x1920.webm",
-      "landscape": "/videos/single-leg-stand_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "tree-pose",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/tree-pose_v1_1080x1080.webm",
-      "portrait": "/videos/tree-pose_v1_1080x1920.webm",
-      "landscape": "/videos/tree-pose_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "warrior-3",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/warrior-3_v1_1080x1080.webm",
-      "portrait": "/videos/warrior-3_v1_1080x1920.webm",
-      "landscape": "/videos/warrior-3_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "dead-bug",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/dead-bug_v1_1080x1080.webm",
-      "portrait": "/videos/dead-bug_v1_1080x1920.webm",
-      "landscape": "/videos/dead-bug_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "glute-bridges",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/glute-bridges_v1_1080x1080.webm",
-      "portrait": "/videos/glute-bridges_v1_1080x1920.webm",
-      "landscape": "/videos/glute-bridges_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "finger-roll",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/finger-roll_v1_1080x1080.webm",
-      "portrait": "/videos/finger-roll_v1_1080x1920.webm",
-      "landscape": "/videos/finger-roll_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "tricep-dips",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/tricep-dips_v1_1080x1080.webm",
-      "portrait": "/videos/tricep-dips_v1_1080x1920.webm",
-      "landscape": "/videos/tricep-dips_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "calf-raises",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/calf-raises_v1_1080x1080.webm",
-      "portrait": "/videos/calf-raises_v1_1080x1920.webm",
-      "landscape": "/videos/calf-raises_v1_1920x1080.webm"
-    }
-  },
-  {
-    "id": "russian-twists",
-    "repsPerLoop": 1,
-    "fps": 30,
-    "video": {
-      "square": "/videos/russian-twists_v1_1080x1080.webm",
-      "portrait": "/videos/russian-twists_v1_1080x1920.webm",
-      "landscape": "/videos/russian-twists_v1_1920x1080.webm"
-    }
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/balance-board_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/balance-board.jpg"
   },
   {
     "id": "bear-crawl",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "landscape": "/videos/bear-crawl_v1_848x480.mp4"
-    }
+    "duration": 19.83,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bear-crawl_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/bear-crawl.jpg"
   },
   {
-    "id": "forward-fold",
+    "id": "bicycle-crunches",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "square": "/videos/forward-fold_v1_1080x1080.webm",
-      "portrait": "/videos/forward-fold_v1_1080x1920.webm",
-      "landscape": "/videos/forward-fold_v1_1920x1080.webm"
-    }
+    "duration": 5.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bicycle-crunches_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/bicycle-crunches.jpg"
   },
   {
     "id": "bird-dog",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "landscape": "/videos/bird-dog_v1_848x480.mp4"
-    }
+    "duration": 8.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bird-dog_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/bird-dog.jpg"
+  },
+  {
+    "id": "bodyweight-pulse-squat",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 14.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bodyweight-pulse-squat_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/bodyweight-pulse-squat.jpg"
+  },
+  {
+    "id": "bodyweight-side-squat-step",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 24.43,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/bodyweight-side-squat-step_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/bodyweight-side-squat-step.jpg"
+  },
+  {
+    "id": "brachialis-narrow-pull-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/brachialis-narrow-pull-up_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/brachialis-narrow-pull-up.jpg"
+  },
+  {
+    "id": "brachialis-pull-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/brachialis-pull-up_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/brachialis-pull-up.jpg"
+  },
+  {
+    "id": "burpees",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/burpees_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/burpees.jpg"
+  },
+  {
+    "id": "butt-kicks",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/butt-kicks_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/butt-kicks.jpg"
+  },
+  {
+    "id": "butterfly-pull-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/butterfly-pull-up_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/butterfly-pull-up.jpg"
+  },
+  {
+    "id": "calf-raises",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/calf-raises_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/calf-raises.jpg"
+  },
+  {
+    "id": "calf-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/calf-stretch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/calf-stretch.jpg"
+  },
+  {
+    "id": "cat-cow",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.47,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/cat-cow_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/cat-cow.jpg"
   },
   {
     "id": "chair-squat",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "landscape": "/videos/chair-squat_v1_1920x1080.mp4"
-    }
+    "duration": 6.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/chair-squat_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/chair-squat.jpg"
+  },
+  {
+    "id": "chest-opener",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 2.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/chest-opener_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/chest-opener.jpg"
+  },
+  {
+    "id": "child-pose",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 10.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/child-pose_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/child-pose.jpg"
+  },
+  {
+    "id": "crab-twist-toe-touch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/crab-twist-toe-touch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/crab-twist-toe-touch.jpg"
+  },
+  {
+    "id": "dead-bug",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 11.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/dead-bug_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/dead-bug.jpg"
+  },
+  {
+    "id": "desk-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/desk-plank_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/desk-plank.jpg"
+  },
+  {
+    "id": "downward-dog",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/downward-dog_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/downward-dog.jpg"
+  },
+  {
+    "id": "elbow-flexion",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/elbow-flexion_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/elbow-flexion.jpg"
+  },
+  {
+    "id": "forearm-supination",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/forearm-supination_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/forearm-supination.jpg"
+  },
+  {
+    "id": "forward-fold",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 16.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/forward-fold_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/forward-fold.jpg"
+  },
+  {
+    "id": "front-plank-toe-tap",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/front-plank-toe-tap_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/front-plank-toe-tap.jpg"
+  },
+  {
+    "id": "front-scoops",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.43,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/front-scoops_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/front-scoops.jpg"
+  },
+  {
+    "id": "glute-bridges",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/glute-bridges_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/glute-bridges.jpg"
+  },
+  {
+    "id": "hamstring-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hamstring-stretch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/hamstring-stretch.jpg"
+  },
+  {
+    "id": "heel-to-toe-walk",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/heel-to-toe-walk_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/heel-to-toe-walk.jpg"
+  },
+  {
+    "id": "high-knees",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 2.63,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/high-knees_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/high-knees.jpg"
+  },
+  {
+    "id": "hip-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-crunch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/hip-crunch.jpg"
+  },
+  {
+    "id": "hip-opener",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 12.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-opener_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/hip-opener.jpg"
+  },
+  {
+    "id": "hip-roll-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-roll-plank_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/hip-roll-plank.jpg"
+  },
+  {
+    "id": "hip-swirls",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/hip-swirls_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/hip-swirls.jpg"
+  },
+  {
+    "id": "jumping-jacks",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/jumping-jacks_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/jumping-jacks.jpg"
+  },
+  {
+    "id": "jumping-jacks-modified",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/jumping-jacks-modified_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/jumping-jacks-modified.jpg"
+  },
+  {
+    "id": "kneeling-backward-hip-circles",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/kneeling-backward-hip-circles_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/kneeling-backward-hip-circles.jpg"
+  },
+  {
+    "id": "kneeling-thoracic-spine",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/kneeling-thoracic-spine_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/kneeling-thoracic-spine.jpg"
+  },
+  {
+    "id": "leg-pull-side",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/leg-pull-side_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/leg-pull-side.jpg"
+  },
+  {
+    "id": "lever-stepper",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lever-stepper_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/lever-stepper.jpg"
+  },
+  {
+    "id": "lunges",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.13,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lunges_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/lunges.jpg"
+  },
+  {
+    "id": "lying-abduction-leg-raise-on-floor",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-abduction-leg-raise-on-floor_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/lying-abduction-leg-raise-on-floor.jpg"
+  },
+  {
+    "id": "lying-back-extension",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-back-extension_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/lying-back-extension.jpg"
+  },
+  {
+    "id": "lying-floor-abduction",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-floor-abduction_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/lying-floor-abduction.jpg"
+  },
+  {
+    "id": "lying-prone-w-to-y",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.17,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/lying-prone-w-to-y_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/lying-prone-w-to-y.jpg"
+  },
+  {
+    "id": "marching-in-place",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 1.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/marching-in-place_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/marching-in-place.jpg"
+  },
+  {
+    "id": "modified-push-up",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/modified-push-up_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/modified-push-up.jpg"
+  },
+  {
+    "id": "mountain-climbers",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/mountain-climbers_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/mountain-climbers.jpg"
+  },
+  {
+    "id": "muscle-up-on-vertical-bar",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/muscle-up-on-vertical-bar_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/muscle-up-on-vertical-bar.jpg"
+  },
+  {
+    "id": "neck-rolls",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.43,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/neck-rolls_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/neck-rolls.jpg"
+  },
+  {
+    "id": "palm-up-palm-down-rotation",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/palm-up-palm-down-rotation_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/palm-up-palm-down-rotation.jpg"
+  },
+  {
+    "id": "pelvic-tilts",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/pelvic-tilts_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/pelvic-tilts.jpg"
+  },
+  {
+    "id": "plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/plank_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/plank.jpg"
+  },
+  {
+    "id": "plank-cross-body-touch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/plank-cross-body-touch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/plank-cross-body-touch.jpg"
+  },
+  {
+    "id": "power-clean-thruster",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.33,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/power-clean-thruster_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/power-clean-thruster.jpg"
+  },
+  {
+    "id": "prayer-push",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/prayer-push_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/prayer-push.jpg"
+  },
+  {
+    "id": "press-under",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.67,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/press-under_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/press-under.jpg"
+  },
+  {
+    "id": "push-up-jack",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/push-up-jack_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/push-up-jack.jpg"
+  },
+  {
+    "id": "push-ups",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/push-ups_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/push-ups.jpg"
+  },
+  {
+    "id": "quad-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/quad-stretch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/quad-stretch.jpg"
+  },
+  {
+    "id": "reverse-lunge-leg-kick",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.73,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/reverse-lunge-leg-kick_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/reverse-lunge-leg-kick.jpg"
+  },
+  {
+    "id": "russian-twists",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/russian-twists_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/russian-twists.jpg"
+  },
+  {
+    "id": "seated-cardio-arm-pumps",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-cardio-arm-pumps_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/seated-cardio-arm-pumps.jpg"
+  },
+  {
+    "id": "seated-circle-leg-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-circle-leg-crunch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/seated-circle-leg-crunch.jpg"
+  },
+  {
+    "id": "seated-neck-tap",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.8,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-neck-tap_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/seated-neck-tap.jpg"
+  },
+  {
+    "id": "seated-spinal-twist",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.83,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/seated-spinal-twist_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/seated-spinal-twist.jpg"
+  },
+  {
+    "id": "shin-box",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 10.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shin-box_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/shin-box.jpg"
+  },
+  {
+    "id": "shoulder-flexion",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shoulder-flexion_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/shoulder-flexion.jpg"
+  },
+  {
+    "id": "shoulder-rolls",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shoulder-rolls_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/shoulder-rolls.jpg"
+  },
+  {
+    "id": "shoulder-transverse-flexion",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/shoulder-transverse-flexion_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/shoulder-transverse-flexion.jpg"
+  },
+  {
+    "id": "side-bridge-bent-leg",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-bridge-bent-leg_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/side-bridge-bent-leg.jpg"
+  },
+  {
+    "id": "side-kick-burpee",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.47,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-kick-burpee_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/side-kick-burpee.jpg"
+  },
+  {
+    "id": "side-plank",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-plank_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/side-plank.jpg"
+  },
+  {
+    "id": "side-plank-rotation",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 11.97,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-plank-rotation_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/side-plank-rotation.jpg"
+  },
+  {
+    "id": "side-steps-cardio",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-steps-cardio_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/side-steps-cardio.jpg"
+  },
+  {
+    "id": "side-stretch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 9.37,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/side-stretch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/side-stretch.jpg"
+  },
+  {
+    "id": "single-leg-stand",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/single-leg-stand_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/single-leg-stand.jpg"
+  },
+  {
+    "id": "sitting-lotus-pose-hip-horizontal",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/sitting-lotus-pose-hip-horizontal_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/sitting-lotus-pose-hip-horizontal.jpg"
+  },
+  {
+    "id": "snatch-high",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 8.07,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/snatch-high_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/snatch-high.jpg"
+  },
+  {
+    "id": "squats",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/squats_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/squats.jpg"
+  },
+  {
+    "id": "standing-side-crunch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-side-crunch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/standing-side-crunch.jpg"
+  },
+  {
+    "id": "standing-side-crunch-elbow-to-knee",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 3.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-side-crunch-elbow-to-knee_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/standing-side-crunch-elbow-to-knee.jpg"
+  },
+  {
+    "id": "standing-side-leg-raise",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-side-leg-raise_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/standing-side-leg-raise.jpg"
+  },
+  {
+    "id": "standing-swimmer",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 4.33,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/standing-swimmer_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/standing-swimmer.jpg"
+  },
+  {
+    "id": "step-touch",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.03,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/step-touch_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/step-touch.jpg"
+  },
+  {
+    "id": "step-up-stair",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.87,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/step-up-stair_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/step-up-stair.jpg"
+  },
+  {
+    "id": "tree-pose",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 12.53,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/tree-pose_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/tree-pose.jpg"
+  },
+  {
+    "id": "tricep-dips",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 5.93,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/tricep-dips_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/tricep-dips.jpg"
   },
   {
     "id": "wall-push-up",
     "repsPerLoop": 1,
     "fps": 30,
-    "video": {
-      "landscape": "/videos/wall-push-up_v1_1920x1080.mp4"
-    }
+    "duration": 6,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/wall-push-up_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/wall-push-up.jpg"
+  },
+  {
+    "id": "wall-sit",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 7.63,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/wall-sit_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/wall-sit.jpg"
+  },
+  {
+    "id": "warrior-3",
+    "repsPerLoop": 1,
+    "fps": 30,
+    "duration": 6.23,
+    "video": {},
+    "variants": {
+      "landscape": {
+        "1080": {
+          "mp4": {
+            "url": "/media/warrior-3_v1_1920x1080.mp4"
+          }
+        }
+      }
+    },
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/warrior-3.jpg"
   }
 ]

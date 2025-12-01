@@ -14,16 +14,22 @@ const MIN_LIGHT_INTERVAL_MS = 10_000; // Passive light sync suppression window
 const EDGE_TIMEOUT_MS = 15_000; // Per-request timeout
 const SYNC_TIMEOUT_MS = 8_000; // Overall sync timeout per invocation (reduced to fail fast)
 
+// Sync payload size limit (safety check - normal payloads should be <100KB)
+const MAX_SYNC_PAYLOAD_SIZE_BYTES = 2 * 1024 * 1024; // 2MB max total payload size
+
 // Ordered tables (light/full filtering applied externally)
+// NOTE: video_files is excluded from sync - video uploads are handled via direct Supabase Storage upload
+// The exercise record's custom_video_url or storage_path reference is what gets synced, not the binary
 const SYNC_ORDER: readonly string[] = [
   'user_preferences',
   'app_settings',
+  'user_profiles', // User fitness profiles for AI Workout Builder
   'exercises',
   'user_favorites',
   'workouts',
   'activity_logs',
-  'workout_sessions',
-  'video_files'
+  'workout_sessions'
+  // 'video_files' - REMOVED: videos uploaded separately via Supabase Storage
 ];
 
 // Local sync_state in-memory shape (persisted via IndexedDB generic table added later if absent)
@@ -247,34 +253,7 @@ export class CorrectSyncService {
       for (const table of tableList) {
         const dirty = await this.collectDirtyBatch(table, PUSH_BATCH_SIZE, userId);
         if (dirty.upserts.length || dirty.deletes.length) {
-          // Deduplicate video_files by (exercise_id, file_name) keeping the most recent one
-          if (table === 'video_files' && dirty.upserts.length > 1) {
-            const dedupMap = new Map<string, Record<string, unknown>>();
-            for (const rec of dirty.upserts) {
-              const key = `${rec.exercise_id as string}|${rec.file_name as string}`;
-              const existing = dedupMap.get(key);
-              if (!existing) {
-                dedupMap.set(key, rec);
-              } else {
-                // Prefer larger version, then newer updated_at
-                const existingVersion = (existing as { version?: number }).version ?? 0;
-                const recVersion = (rec as { version?: number }).version ?? 0;
-                if (recVersion > existingVersion) {
-                  dedupMap.set(key, rec);
-                } else if (recVersion === existingVersion) {
-                  const existingUpdated = new Date((existing as { updated_at?: string }).updated_at || 0).getTime();
-                  const recUpdated = new Date((rec as { updated_at?: string }).updated_at || 0).getTime();
-                  if (recUpdated > existingUpdated) dedupMap.set(key, rec);
-                }
-              }
-            }
-            if (dirty.upserts.length !== dedupMap.size) {
-              // if (SYNC_DEBUG) logger.debug(`[sync:v2] Deduplicated video_files upserts ${dirty.upserts.length} -> ${dedupMap.size}`);
-            }
-            queues[table] = { upserts: [...dedupMap.values()], deletes: [...dirty.deletes] };
-          } else {
-            queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
-          }
+          queues[table] = { upserts: [...dirty.upserts], deletes: [...dirty.deletes] };
         }
       }
   // if (SYNC_DEBUG) logger.debug(`[sync:v2] collectDirty done in ${(performance.now()-collectStart).toFixed(0)}ms queues=${Object.entries(queues).map(([k,v])=>`${k}:${(v.upserts?.length||0)+(v.deletes?.length||0)}`).join(' ')}`);
@@ -484,9 +463,6 @@ export class CorrectSyncService {
           } else if (tableName === 'exercises') {
             // Apply exercises field mapping (catalogId → catalog_id)
             mappedRecord = this.mapExerciseFieldsToServer(this.filterUndefinedValues(clean));
-          } else if (tableName === 'video_files') {
-            // Special handling for video_files: convert File to serializable format
-            mappedRecord = await this.convertVideoFileForSync(clean);
           } else {
             // For tables without specific converters, apply universal undefined filtering
             mappedRecord = this.filterUndefinedValues(clean);
@@ -504,39 +480,6 @@ export class CorrectSyncService {
       logger.error(`[sync:v2] collect dirty failed ${tableName}`, e);
       return { upserts: [], deletes: [] };
     }
-  }
-
-  // Convert video file record for sync - handle File object serialization
-  private async convertVideoFileForSync(record: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const converted = { ...record };
-    
-    // Convert File object to ArrayBuffer for JSON serialization
-    if (converted.file_data && converted.file_data instanceof File) {
-      try {
-        if (SYNC_DEBUG) {
-          logger.debug(`[sync:v2] Converting File object to ArrayBuffer for sync:`, {
-            fileName: converted.file_data.name,
-            fileSize: converted.file_data.size,
-            fileType: converted.file_data.type
-          });
-        }
-        
-        // Convert File to ArrayBuffer, then to Array for JSON serialization
-        const arrayBuffer = await converted.file_data.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        converted.file_data = Array.from(uint8Array);
-        
-        if (SYNC_DEBUG) {
-          logger.debug(`[sync:v2] File converted to byte array, length:`, (converted.file_data as number[]).length);
-        }
-      } catch (error) {
-        logger.error(`[sync:v2] Failed to convert File to ArrayBuffer for sync:`, error);
-        // Remove file_data if conversion fails to prevent sync errors
-        converted.file_data = null;
-      }
-    }
-    
-    return this.filterUndefinedValues(converted);
   }
 
   // Fast dirty check across subset of tables for suppression logic
@@ -665,15 +608,40 @@ export class CorrectSyncService {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort('timeout'), EDGE_TIMEOUT_MS);
     let resp: Response;
+    
+    // Serialize payload and check size before sending
+    const serializedPayload = JSON.stringify(reqBody);
+    const payloadSizeBytes = serializedPayload.length;
+    
+    // Enhanced pre-fetch logging for debugging deployed site timeout issues
+    logger.log(`[sync:v2] 🚀 Making fetch request to: ${functionUrl}`);
+    logger.log(`[sync:v2] 📦 Request payload size: ${payloadSizeBytes} bytes (${(payloadSizeBytes / 1024 / 1024).toFixed(2)} MB)`);
+    
+    // Safety check: reject oversized payloads before they cause timeout
+    if (payloadSizeBytes > MAX_SYNC_PAYLOAD_SIZE_BYTES) {
+      clearTimeout(t);
+      const sizeInMB = (payloadSizeBytes / 1024 / 1024).toFixed(2);
+      const limitInMB = (MAX_SYNC_PAYLOAD_SIZE_BYTES / 1024 / 1024).toFixed(2);
+      logger.error(`[sync:v2] ❌ Payload too large: ${sizeInMB}MB exceeds ${limitInMB}MB limit. This is likely due to large video files in the sync batch.`);
+      throw new Error(`Sync payload too large (${sizeInMB}MB > ${limitInMB}MB limit). Try syncing without pending video uploads.`);
+    }
+    
+    const fetchStartTime = Date.now();
+    
     try {
       resp = await fetch(functionUrl, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${tokenToUse}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(reqBody),
+        body: serializedPayload,
         signal: controller.signal
       });
+      
+      logger.log(`[sync:v2] ✅ Fetch completed in ${Date.now() - fetchStartTime}ms with status ${resp.status}`);
     } catch (e) {
       clearTimeout(t);
+      const elapsed = Date.now() - fetchStartTime;
+      logger.error(`[sync:v2] ❌ Fetch failed after ${elapsed}ms:`, e);
+      
       // Enhanced error logging
       if (SYNC_DEBUG) {
         logger.debug(`[sync:v2] callEdge fetch failed:`, e);

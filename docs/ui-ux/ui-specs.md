@@ -493,17 +493,16 @@ body.rtl .catalog-selector button svg {
 
 ## 3. Navigation
 
-### Bottom Navigation Bar (5 Buttons) - SVG Icons
+### Bottom Navigation Bar (5 Buttons + More Menu)
 
 -   Icons for:
     -   **Home** -- Dashboard, featured workouts, recommendations
     -   **Exercises** -- Exercise library with filters
     -   **Timer** -- Exercise timer
-    -   **Workouts** -- Session builder
-    -   **Progress** -- Exercise and Workout history, streaks,
-        achievements
-        **More (vertical three dots)** -- to open an extended menu
-    -   **Settings** -- User profile, preferences, onboarding edits, app settings
+    -   **Workouts** -- Session builder and saved workouts
+    -   **Coach** -- AI coaching insights, progress tracking, activity log
+    -   **More (vertical three dots)** -- Opens extended menu
+        -   **Settings** -- User profile, preferences, onboarding edits, app settings
 -   Active icon: Highlighted in accent color + label
 -   Inactive: Gray
 

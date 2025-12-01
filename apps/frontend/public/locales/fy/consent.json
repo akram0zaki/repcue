@@ -1,0 +1,25 @@
+{
+  "title": "Jo privacy en juridyske tastimming",
+  "description": "RepCue hat jo tastimming nedich om oefengegevens op te slaan en fereasket akseptaasje fan ús betingsten en privacybelied om de bêste ûnderfining te bieden.",
+  "learnMore": "Mear ynformaasje oer hoe't wy jo privacy beskermje",
+  "viewLegalCenter": "Besjoch alle juridyske dokuminten yn it Juridysk Sintrum",
+  "showLess": "Minder toane",
+  "acceptAll": "Alles Akseptearje en Trochgean",
+  "acceptEssential": "Allinnich Essensjeel",
+  "processing": "Ferwurkje...",
+  "disclaimer": "Beide opsjes akseptearje automatysk alle fereaske juridyske dokuminten (Tsjinstfoarwearden, Privacybelied, ensfh.). Jo kinne dizze dokuminten op elk momint besjen yn it Juridysk Sintrum en jo foarkarren letter wizigje yn Ynstellings.",
+  "dataWeStore": {
+    "title": "Hokker gegevens slaan wy op?",
+    "preferences": "Jo oefenfoarkarren en favoriten",
+  "activityLogs": "Aktiviteitenlogboeken mei oefendoer en tiidsstempels",
+    "settings": "App-ynstellings (lûd, trillings, intervallen)",
+    "noPersonalData": "Gjin persoanlike ynformaasje of biometryske gegevens"
+  },
+  "dataPrivacy": {
+    "title": "Jo gegevens bliuwe privee",
+    "localStorage": "Alle gegevens wurde lokaal op jo apparaat opslein",
+    "noExternalServers": "Der wurdt neat nei eksterne servers stjoerd sûnder jo tastimming",
+    "exportDelete": "Jo kinne jo gegevens op elk momint eksportearje of fuortsmite",
+    "gdprCompliance": "Folsleine AVG-naleving mei jo rjochten"
+  }
+}

@@ -359,6 +359,25 @@ Object.defineProperty(window, 'scrollTo', {
   configurable: true,
 })
 
+// Mock IntersectionObserver for lazy loading components
+global.IntersectionObserver = class IntersectionObserver {
+  observe = vi.fn();
+  disconnect = vi.fn();
+  unobserve = vi.fn();
+  takeRecords = vi.fn();
+  root = null;
+  rootMargin = '';
+  thresholds = [];
+
+  constructor(
+    public callback: IntersectionObserverCallback,
+    public options?: IntersectionObserverInit
+  ) {
+    // Don't trigger callback automatically - let tests control intersection state
+    // This prevents flickering in real browser environments
+  }
+} as any
+
 
 // Mock logger to prevent "default.debug is not a function" errors
 vi.mock('../utils/logger', () => ({

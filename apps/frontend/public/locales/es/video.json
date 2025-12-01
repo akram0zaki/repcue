@@ -13,5 +13,19 @@
   "uploaded": "[es] Video uploaded",
   "uploadsNotAvailable": "[es] Video uploads are not available",
   "urlPlaceholder": "[es] Enter video URL",
-  "urlPlaceholderHelper": "[es] YouTube, Vimeo, or direct video URL"
+  "urlPlaceholderHelper": "[es] YouTube, Vimeo, or direct video URL",
+
+  "unsupportedFormat": "Formato de vídeo no compatible. Utilice el formato MP4, WebM u OGG para una mejor compatibilidad.",
+  "localVideoConfirmed": "Vídeo local confirmado",
+  "formatNotSupported": "Formato de vídeo no compatible con su navegador. Pruebe a usar MP4 con códec H.264.",
+  "codecNotSupported": "Este vídeo utiliza un códec no compatible. Pruebe a convertirlo al formato MP4 H.264 para una mejor compatibilidad con el navegador.",
+  "formatError": "Formato de vídeo no reconocido. Utilice un archivo de vídeo estándar MP4, WebM u OGG.",
+  "decodeError": "El archivo de vídeo parece estar dañado o utiliza una codificación no compatible. Pruebe a recodificar el vídeo.",
+  "networkError": "Error de red al cargar el vídeo. Compruebe su conexión e inténtelo de nuevo.",
+  "loadAborted": "La carga del vídeo fue interrumpida. Por favor, intente subirlo de nuevo.",
+  "codecSuggestion": "Recomendado: Utilice FFmpeg o HandBrake para convertir a MP4 con vídeo H.264 y audio AAC.",
+  "cannotDisplay": "No se puede mostrar el vídeo",
+  "localVideo": "Vídeo local (listo para sin conexión)",
+  "pendingSync": "Vídeo listo sin conexión - se sincronizará cuando esté en línea",
+  "videoWithIssues": "Vídeo con problemas"
 }

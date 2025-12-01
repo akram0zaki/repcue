@@ -263,13 +263,16 @@
     "exercise_references": ["Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/", "YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx"]
   }
   ,
+
   "ukemi-basics": {
     "name": "Ukemi Basics (Mae/Ushiro)",
     "description": "Forward/backward breakfalls and safe rolling fundamentals.",
     "benefits": "Builds confidence, safety, and body coordination.",
     "limitations": "Avoid if you have acute neck, shoulder, or back injuries.",
     "best_timing": "Warm-up at the start of class.",
-    "notes": "Focus on soft landings, chin tucked, smooth breathing."
+    "suggested_combinations": [],
+    "notes": "Focus on soft landings, chin tucked, smooth breathing.",
+    "exercise_references": []
   },
   "tai-sabaki": {
     "name": "Tai Sabaki (Irimi/Tenkan)",
@@ -277,7 +280,9 @@
     "benefits": "Improves positioning, timing, and balance.",
     "limitations": "Mind knee alignment; avoid twisting on a sticky mat.",
     "best_timing": "Early in practice to set movement quality.",
-    "notes": "Emphasize hip/center movement, not just feet."
+    "suggested_combinations": [],
+    "notes": "Emphasize hip/center movement, not just feet.",
+    "exercise_references": []
   },
   "shikko": {
     "name": "Shikkō (Knee-walking)",
@@ -285,7 +290,9 @@
     "benefits": "Strengthens hips/posture and develops center movement.",
     "limitations": "Use knee pads if needed; avoid pain on kneecaps.",
     "best_timing": "After warm-up, before suwari-waza techniques.",
-    "notes": "Stay tall; move from the hips, not shoulders."
+    "suggested_combinations": [],
+    "notes": "Stay tall; move from the hips, not shoulders.",
+    "exercise_references": []
   },
   "ikkyo-omote": {
     "name": "Ikkyo (Omote) - Shōmen-uchi",
@@ -293,7 +300,9 @@
     "benefits": "Kuzushi, posture control, and basic pin transitions.",
     "limitations": "Maintain shoulder safety for both nage and uke.",
     "best_timing": "After tai sabaki drills.",
-    "notes": "Keep elbows heavy; control line through uke’s center."
+    "suggested_combinations": [],
+    "notes": "Keep elbows heavy; control line through uke’s center.",
+    "exercise_references": []
   },
   "ikkyo-ura": {
     "name": "Ikkyo (Ura) - Shōmen-uchi",
@@ -301,7 +310,9 @@
     "benefits": "Blending and off-axis control with tenkan.",
     "limitations": "Avoid cranking uke’s shoulder; move their whole frame.",
     "best_timing": "Paired with omote version for contrast.",
-    "notes": "Lead with hips; hand path traces uke’s line."
+    "suggested_combinations": [],
+    "notes": "Lead with hips; hand path traces uke’s line.",
+    "exercise_references": []
   },
   "nikyo-omote": {
     "name": "Nikyo (Omote) - Katate-dori",
@@ -309,7 +320,9 @@
     "benefits": "Wrist spiral control, connection, and off-balance.",
     "limitations": "Be gentle on wrists; tap early.",
     "best_timing": "After ikkyo to build control progression.",
-    "notes": "Keep forearms connected; rotate through center."
+    "suggested_combinations": [],
+    "notes": "Keep forearms connected; rotate through center.",
+    "exercise_references": []
   },
   "sankyo-omote": {
     "name": "Sankyo (Omote) - Katate-dori",
@@ -317,7 +330,9 @@
     "benefits": "Forearm rotation, posture control, pin transition.",
     "limitations": "Mind uke’s elbow/shoulder line; avoid compression.",
     "best_timing": "With nikyo to compare spiral directions.",
-    "notes": "Lead with center, keep structure."
+    "suggested_combinations": [],
+    "notes": "Lead with center, keep structure.",
+    "exercise_references": []
   },
   "yonkyo-omote": {
     "name": "Yonkyo (Omote) - Katate-dori",
@@ -325,7 +340,9 @@
     "benefits": "Precision control, pain compliance, posture breaking.",
     "limitations": "High sensitivity—train slowly; watch for numbness.",
     "best_timing": "After sankyo; same entry, different finish.",
-    "notes": "Placement over radial nerve; keep forearm alignment."
+    "suggested_combinations": [],
+    "notes": "Placement over radial nerve; keep forearm alignment.",
+    "exercise_references": []
   },
   "kotegaeshi": {
     "name": "Kotegaeshi - Katate-dori",
@@ -333,7 +350,9 @@
     "benefits": "Rotation, timing, and safe projection mechanics.",
     "limitations": "Control uke’s fall path; protect their elbow/shoulder.",
     "best_timing": "Pair with nikyo to compare inside/outside spirals.",
-    "notes": "Keep elbow down; throw through the line, not the hand."
+    "suggested_combinations": [],
+    "notes": "Keep elbow down; throw through the line, not the hand.",
+    "exercise_references": []
   },
   "shihonage": {
     "name": "Shihōnage - Ryōte-dori",
@@ -341,7 +360,9 @@
     "benefits": "Axis control, shoulder line management, safe projection.",
     "limitations": "Respect uke’s shoulder; avoid hyperextension.",
     "best_timing": "Mid-class after sufficient warm-up.",
-    "notes": "Turn around your center; don’t muscle the arms."
+    "suggested_combinations": [],
+    "notes": "Turn around your center; don’t muscle the arms.",
+    "exercise_references": []
   },
   "iriminage": {
     "name": "Iriminage - Yokomen-uchi",
@@ -349,7 +370,9 @@
     "benefits": "Blending on the blind side; posture take.",
     "limitations": "Neck safety for uke; align head control gently.",
     "best_timing": "With shihonage for contrast of lines.",
-    "notes": "Cut the line with your center; keep spine tall."
+    "suggested_combinations": [],
+    "notes": "Cut the line with your center; keep spine tall.",
+    "exercise_references": []
   },
   "tenchinage": {
     "name": "Tenchinage - Katate-dori",
@@ -357,7 +380,9 @@
     "benefits": "Vertical separation, timing, and whole-body movement.",
     "limitations": "Watch lower back; use legs, not arms.",
     "best_timing": "With iriminage to study vertical vs. horizontal lines.",
-    "notes": "Hands separate from the center, not the shoulders."
+    "suggested_combinations": [],
+    "notes": "Hands separate from the center, not the shoulders.",
+    "exercise_references": []
   },
   "kokyunage": {
     "name": "Kokyunage - Various grips",
@@ -365,7 +390,9 @@
     "benefits": "Develops relaxed power and responsive blending.",
     "limitations": "High variance—choose safe fall options.",
     "best_timing": "Late class once bodies are warm.",
-    "notes": "Lead with connection, not force."
+    "suggested_combinations": [],
+    "notes": "Lead with connection, not force.",
+    "exercise_references": []
   },
   "jiyuwaza-2": {
     "name": "Jiyū-waza (Free practice) - Level 2",
@@ -373,7 +400,9 @@
     "benefits": "Integration, timing, and adaptive footwork.",
     "limitations": "Keep intensity appropriate; focus on safety.",
     "best_timing": "End of class as integration.",
-    "notes": "Agree intensity with partner before starting."
+    "suggested_combinations": [],
+    "notes": "Agree intensity with partner before starting.",
+    "exercise_references": []
   },
   "kaeshiwaza-intro": {
     "name": "Kaeshi-waza (Counters) - Intro",
@@ -381,7 +410,9 @@
     "benefits": "Awareness of vulnerabilities and recovery options.",
     "limitations": "Keep control; counters escalate risk quickly.",
     "best_timing": "Only with experienced partners; end of session.",
-    "notes": "Agree on frames to stop/reverse; prioritize ukemi."
+    "suggested_combinations": [],
+    "notes": "Agree on frames to stop/reverse; prioritize ukemi.",
+    "exercise_references": []
   },
   "jiyuwaza-1": {
     "name": "Jiyū-waza (Free practice) - Level 1",
@@ -389,6 +420,788 @@
     "benefits": "Stress-tests timing, distance, and composure.",
     "limitations": "Fatigue management; reduce intensity if form degrades.",
     "best_timing": "Capstone segment at the end of class.",
-    "notes": "Rotate partners to vary rhythm and size."
+    "suggested_combinations": [],
+    "notes": "Rotate partners to vary rhythm and size.",
+    "exercise_references": []
+  },
+  "lying-back-extension": {
+    "name": "Lying Back Extension",
+    "description": "Lie face down and lift your upper body off the floor by contracting your lower back muscles.",
+    "benefits": "Strengthens the lower back (erector spinae) and glutes, which helps improve posture and spinal support. Builds foundational back strength for more demanding exercises, and can reduce risk of lower back pain by targeting key stabilizer muscles.",
+    "limitations": "Avoid overextending the spine or jerking upwards, which can strain the back. Keep movements controlled. Individuals with existing lower back injuries should start with gentle range of motion or consult a professional before doing this exercise.",
+    "best_timing": "Perform in a core or back workout, often after warm-up. It can be used in rehab or beginner routines focusing on back strength. Avoid doing it when the lower back is already fatigued (e.g., after heavy deadlifts).",
+    "suggested_combinations": [
+      "bird-dog",
+      "glute-bridges"
+    ],
+    "notes": "Exhale as you lift your chest and squeeze your back muscles; inhale as you lower down. Keep your neck neutral (looking down) to avoid strain. Start with small lifts if you\\"
+  },
+  "front-plank-toe-tap": {
+    "name": "Front Plank Toe Tap",
+    "description": "Hold a forearm plank position while alternating each foot out to the side and back in, tapping the toe on the floor.",
+    "benefits": "Engages the entire core with added emphasis on the obliques and deep stabilizers due to the leg motion. The alternating toe taps also activate glutes and hip abductors, and involve upper-body stabilization (shoulders and arms), making it a more challenging plank variation for improved core strength and balance.",
+    "limitations": "Maintain a stable trunk; avoid rotating or lifting your hips as you move your foot, which can compromise form. Those with shoulder or lower back issues should be cautious and may need to perform a basic plank instead. Quality is more important than speed; perform taps slowly to keep the core engaged.",
+    "best_timing": "Use in a core workout or as part of a HIIT circuit. Its effective after mastering basic planks, or as a warm-up to activate the core. Can be timed (e.g., 30 seconds intervals) within circuits.",
+    "suggested_combinations": [
+      "plank",
+      "side-plank"
+    ],
+    "notes": "Keep hips level and core braced throughout. Breathe steadily. If tapping out to the side is too difficult, start with smaller side steps. Focus on not letting your midsection sag or pike up as you move your feet."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Crab Twist Toe Touch",
+    "description": "From a crab bridge position, lift one hand to touch the opposite foot, twisting your torso, then alternate sides.",
+    "benefits": "This full-body move builds core strength (especially the abs and obliques) while also working glutes and shoulders. It improves stability and coordination as you balance on one hand and opposite foot, and increases flexibility through the twisting motion and hamstring reach. Also elevates heart rate, adding a mild cardio component.",
+    "limitations": "Requires shoulder and wrist stability; those with shoulder or wrist problems should modify (keep hips lower or limit range of reach). Avoid dropping hipskeep your glutes engaged to maintain the bridge. Move in a controlled manner to avoid strain; don\\",
+    "best_timing": "Great in a core circuit or as a dynamic warm-up for full-body workouts. Can be included toward the middle of a workout when core and shoulders are warmed up. Because it challenges balance, it\\",
+    "suggested_combinations": [
+      "crab-twist-toe-touch",
+      "bird-dog"
+    ],
+    "notes": "Ensure your supporting hand is directly under your shoulder. Exhale as you reach toward your foot, inhale as you return to crab position. If needed, start by touching knee or shin instead of toe. Practice the movement slowly to master balance, then increase speed for more challenge."
+  },
+  "standing-side-crunch": {
+    "name": "Standing Side Crunch",
+    "description": "Stand upright and bend sideways at the waist, bringing your upper body toward your hip on one side, then return to center and repeat on the other side.",
+    "benefits": "Emphasizes the oblique muscles by working them through lateral flexion of the spine. This exercise helps strengthen the sides of your abdominals, contributing to a more stable core and better side-bending mobility. Because it\\",
+    "limitations": "Avoid leaning forward or backward the movement should be purely sideways. Do not jerk or bounce; use a controlled motion to prevent strain in the lower back. Individuals with lower back issues should bend only within a comfortable range. If balance is an issue, you can do this near a wall for support.",
+    "best_timing": "Use it in an abdominal or core workout, typically after heavier compound exercises. It also fits well into warm-ups to gently activate the obliques. Can be done daily due to low strain, or during breaks to alleviate stiffness from sitting.",
+    "suggested_combinations": [
+      "side-stretch",
+      "standing-side-crunch"
+    ],
+    "notes": "Place your hand on the side of your head (or slide it down your thigh) as you crunch to the side, and avoid shrugging your shoulder. Focus on the mind-muscle connection with your obliques feel them contract as you bend. Keep your core engaged and knees soft (not locked) during the movement."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Bodyweight Side Squat Step",
+    "description": "Step out to the side into a squat, lowering your hips back and down, then push back up and step feet together. Alternate or repeat on the same side as required.",
+    "benefits": "Strengthens the major muscles of the lower body, particularly the quadriceps, glutes, and hamstrings, while also engaging the inner thighs (adductors) due to the lateral movement. Side squats improve hip and groin flexibility and develop lateral movement capability, which is often neglected. This exercise can help balance muscle development between inner and outer thighs and enhance stability in side-to-side motions.",
+    "limitations": "Keep your knee tracking in line with your toes when you squat to the side (do not let it cave inward). Those with knee issues should start with a shallow squat or smaller step. Maintain an upright chest and flat back to avoid back strain. If balance is difficult, perform the movement with a shorter step or hold onto a stable object for support.",
+    "best_timing": "Include in lower-body strength workouts, often after bilateral squats or lunges. It\\",
+    "suggested_combinations": [
+      "lunges",
+      "standing-side-crunch"
+    ],
+    "notes": "Step out wider for more glute emphasis, or shorter if focusing on quads. Ensure your stepping foot is flat and weight is primarily on the stepping leg\\"
+  },
+  "hip-roll-plank": {
+    "name": "Hip Roll Plank",
+    "description": "From a forearm plank, rotate your hips and lower one side toward the floor, then lift back up and rotate to the other side (plank hip dips).",
+    "benefits": "Targets the obliques by adding a twisting motion to a standard plank, thus strengthening the sides of the core and improving spinal mobility in a controlled manner. Also challenges the deep core stabilizers and lower back as you fight to keep control during each dip. Shoulders and upper body benefit from holding the plank position throughout, building endurance in those areas. Overall, it enhances core stability with an element of rotational strength.",
+    "limitations": "Ensure the movement comes from your hips and core, not by swinging your arms. Avoid letting your hips sag too low as you rotate, which can strain the lower back maintain a slight tuck of the pelvis. Individuals with lower back or spine issues should twist only within a pain-free range or omit the rotation. As this is an advanced plank variation, build a solid basic plank first.",
+    "best_timing": "Place it in the middle of your core routine, after simpler plank holds but before any exhaustive static holds. It can also be used in circuit training for core. Avoid doing it when extremely fatigued, as maintaining form during the twist is crucial.",
+    "suggested_combinations": [
+      "side-plank",
+      "bicycle-crunches"
+    ],
+    "notes": "Move slowly and deliberately; a slow rotation engages the muscles more than a quick drop. Breathe out as your hip moves toward the floor, and breathe in as you come back through center. To modify, you can perform the motion from a knees-down plank position."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Bodyweight Pulse Squat",
+    "description": "Lower into a squat and hold the bottom position while performing small pulses up and down.",
+    "benefits": "Keeps constant tension on the quadriceps and glutes, which helps build muscular endurance and a deep burn that can contribute to muscle toning. Pulse squats also improve your ability to maintain proper squat form under fatigue and strengthen the muscles and connective tissues around the knees through the extended time under tension. This exercise is excellent for finishing off a leg workout to fully fatigue the thighs.",
+    "limitations": "Pulsing in a deep squat can be tough on the knees if done excessively or with poor form ensure your knees are tracking in line with your toes and not jutting far past them. Keep the range of the pulse moderate (avoid bouncing at the extreme bottom). Individuals with knee pain should use a higher squat position or avoid pulses. As with any squat, maintain a neutral spine (chest up, back flat).",
+    "best_timing": "Often used at the end of a leg workout or superset to burn out the quads and glutes. Also popular in barre or high-rep training routines. Because it induces a burn quickly, its typically done after heavier strength moves (like regular squats or lunges) as a finisher.",
+    "suggested_combinations": [
+      "wall-sit",
+      "squats"
+    ],
+    "notes": "Stay low: do not rise above halfway up during pulses. Focus on squeezing your glutes and quads throughout the movement. Start with a shorter duration (or fewer pulses) if you\\"
+  },
+  "side-plank-rotation": {
+    "name": "Side Plank Rotation",
+    "description": "Begin in a side plank (forearm on the ground). Rotate your torso downward, reaching your top arm under your body, then rotate back to side plank with your top arm raised.",
+    "benefits": "Combining a side plank with a twisting motion strengthens arms, shoulders, and obliques. It enhances core stability and upper body strength by adding dynamic rotation to the side plank.",
+    "limitations": "This is an advanced exercise; you should be comfortable holding a basic side plank first. Avoid dropping your hips as you rotate maintain a straight line. Those with shoulder issues should proceed cautiously, as the supporting shoulder bears significant load (consider doing it on your elbow or lowering the hips for a modification). Control the rotation to avoid torqueing the lower back.",
+    "best_timing": "Include in core workouts once you\\",
+    "suggested_combinations": [
+      "plank",
+      "bicycle-crunches"
+    ],
+    "notes": "Reach under slowly and feel your obliques contract, then open back up fully to the side plank. Exhale during the twist under to engage the core, inhale as you return to the side plank. If needed, drop your bottom knee to the ground as a regression. Keep the movement smooth to prevent wobbling."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Kneeling Backward Hip Circles",
+    "description": "On hands and knees, extend one leg back and make large circular motions with that leg going backward, making hip circles.",
+    "benefits": "Increases hip joint mobility by taking the hip through a wide range of motion. It warms up and loosens the gluteal muscles and hip rotators, which can improve performance in squats, kicks, and other lower-body exercises. This move also engages the core for stability (preventing torso movement as the hip moves), thereby gently strengthening abdominal muscles and lower back in a stabilizing role. Overall, it aids in improving hip flexibility and can help reduce stiffness in the hip and lower back region.",
+    "limitations": "Keep the rest of your body still; avoid swaying your lower back or shoulders as you make the circle the motion should isolate the hip. If you have hip impingement or pain, make smaller circles within a comfortable range. Ensure your supporting knee is on a cushioned surface to avoid discomfort. People with knee issues can place a pad under the knee or perform a standing version (leg swings) if kneeling is problematic.",
+    "best_timing": "Ideal as a dynamic warm-up exercise before any lower-body workout, running, or sports. It can also be part of a mobility routine on recovery days. Typically done early in a session to mobilize the joints before heavy activity.",
+    "suggested_combinations": [
+      "cat-cow",
+      "high-knees"
+    ],
+    "notes": "Perform circles slowly and deliberately, about 5 in one direction then 5 in the opposite direction for each leg. Imagine drawing a big circle with your knee. Keep your core engaged to minimize arching of the back. Look slightly forward (neutral neck) and keep hands pressed firmly into the floor to stabilize your upper body."
+  },
+  "lying-floor-abduction": {
+    "name": "Lying Floor Abduction & Adduction",
+    "description": "Lie on your back with legs extended up toward the ceiling and open your legs outward (abduction) then bring them back together (adduction).",
+    "benefits": "Strengthens the inner thigh muscles (adductors) as they work to pull the legs back together against gravity. Also engages the outer hip muscles during the opening phase and challenges the lower abs and core to stabilize the pelvis while the legs move. This exercise can improve hip flexibility and stability, and tone the inner thighs, which supports better knee alignment and overall leg strength.",
+    "limitations": "Press your lower back into the floor as much as possible to protect your spine if you feel your back arching or straining, limit the range of motion or bend your knees slightly. Avoid rapid or uncontrolled leg movements; move smoothly to prevent groin strain. If any pain in the hips or lower back occurs, reduce range or discontinue.",
+    "best_timing": "Can be included in a core or leg workout, often after multi-joint leg exercises as an isolation move for the inner thighs. Also useful in Pilates or yoga-inspired routines. It\\",
+    "suggested_combinations": [
+      "glute-bridges",
+      "lying-floor-abduction"
+    ],
+    "notes": "Exhale and engage your core when bringing the legs together think of using your inner thighs to \\"
+  },
+  "balance-board": {
+    "name": "Balance Board",
+    "description": "Stand on a balance board and try to maintain your balance, keeping the board as level as possible.",
+    "benefits": "Improves proprioception (body awareness) and balance by engaging the stabilizer muscles in your ankles, knees, and hips. Strengthens the lower leg muscles (ankles and calves) and activates the core as you constantly adjust to keep the board level. Regular practice can help prevent ankle injuries and improve overall coordination, benefiting athletic activities and everyday stability (like walking on uneven ground).",
+    "limitations": "Ensure the area around you is clear of hazards in case you step or fall off. Beginners should use a support (like a wall or chair) nearby to grab if needed. People with vestibular (inner ear) issues or who easily get dizzy should be cautious. Avoid locking your knees; keep a soft bend to better absorb movements. Progress gradually: start with shorter duration and increase as your balance improves.",
+    "best_timing": "Use at the beginning of a workout as part of a warm-up to activate stabilizers, or at the end for balance training. Its also effective as a standalone practice on non-training days. Performing it after leg workouts (when muscles are fatigued) can be more challenging, so be mindful of form. It\\",
+    "suggested_combinations": [
+      "single-leg-stand",
+      "single-leg-stand"
+    ],
+    "notes": "Focus your gaze on a fixed point in front of you to help maintain balance. Engage your core and make small adjustments with your ankles. As you improve, you can try shifting weight slightly or doing small knee bends on the board. Always step down carefully don\\"
+  },
+  "hip-swirls": {
+    "name": "Hip Swirls",
+    "description": "Stand with feet shoulder-width apart and hands on hips. Rotate your hips in a wide circular motion (like doing a hula-hoop) in one direction for several rotations, then repeat in the opposite direction.",
+    "benefits": "Increases flexibility and mobility in the hip joints and lumbar spine by gently moving through a full range of motion. Helps to loosen tight lower back and hip muscles, which can alleviate stiffness and improve posture. This movement also engages the core lightly as it works to stabilize the torso during the circular motion. As a warm-up, hip circles prepare the body for more intense lower-body activities and can reduce risk of injury by promoting joint lubrication and muscle elasticity.",
+    "limitations": "Avoid making fast, jerky movements the circles should be smooth and controlled to prevent any pinching or strain in the lower back. If you feel pain in the hips or back, reduce the range of motion. Those with balance issues can do this with a light fingertip support on a wall. Keep your feet planted firmly and knees slightly relaxed (not locked) during the movement.",
+    "best_timing": "Best used as part of a warm-up or mobility routine, especially before exercises that involve the hips and lower back (like squats, deadlifts, or running). Can also be done during breaks if you sit for long periods, to relieve tightness. Typically done early in a session for 510 slow rotations each direction.",
+    "suggested_combinations": [
+      "standing-side-crunch",
+      "high-knees"
+    ],
+    "notes": "Initiate the movement with your hips; imagine drawing a big circle with your tailbone. Breathe normally and focus on the sensation of stretching around the hip area. You can vary the size of the circle start with small circles and gradually increase diameter as you get more comfortable. Ensure equal rotations in both directions for balanced mobility."
+  },
+  "push-up-jack": {
+    "name": "Push-Up Jack",
+    "description": "Combine a push-up with a jumping jack motion of the legs: from plank, do a push-up while jumping feet out and in.",
+    "benefits": "Combines upper-body strength (push-up works chest, shoulders, triceps) with a cardio and leg component (jumping jack motion engages glutes, thighs, and raises heart rate). It\\",
+    "limitations": "This is a high-impact, advanced move; ensure you can do solid push-ups first. Maintain proper push-up form (flat back, core engaged) even as you jump the feet do not let hips sag or pike excessively. If you have wrist or shoulder issues, use push-up bars or perform on an incline to reduce strain, and step feet out one at a time instead of jumping. Land softly on your toes to cushion impact. Stop if form deteriorates (e.g., shoulders collapsing or lower back straining). Keep the movement controlled; avoid letting momentum slam your elbows at lockout.",
+    "best_timing": "Use in high-intensity circuit training or metabolic finishers. For example, include it in a HIIT round or as part of a full-body circuit. Typically placed mid-workout when you\\",
+    "suggested_combinations": [
+      "burpees",
+      "mountain-climbers"
+    ],
+    "notes": "Coordinate the movement: as you bend your elbows to lower, jump your feet out; as you push up, jump feet back together. Keep the core tight to minimize midsection sagging during the jump. Exhale when pushing up; inhale on the way down. If too challenging, break it into parts (do a plank jack then a push-up separately) and gradually combine once strong enough. Focus on quality reps over speed to avoid sloppy form."
+  },
+  "hip-crunch": {
+    "name": "Hip Crunch",
+    "description": "Lie on your back with knees bent at 90° (shins parallel to floor). Use your lower abs to lift your hips and tailbone off the floor in a small crunching motion, then lower back down.",
+    "benefits": "Primarily targets the lower portion of the rectus abdominis by curling the hips upward. Strengthens the muscles that tilt the pelvis, which can contribute to better core stability and help flatten the lower belly. It also engages the hip flexors slightly, and by lifting the hips, it reduces neck strain typical of regular crunches. Over time, hip crunches can improve pelvic control and are useful for developing a strong mind-muscle connection with the lower abs.",
+    "limitations": "Avoid using momentum (like swinging your legs); the lift should be driven by your abdominal contraction. Keep the movement small; you only need to lift your hips a few inches. Place your hands on the floor beside you for stability but do not push down excessively with them. If you have lower back issues, ensure your movement is slow and controlled, and stop if you feel discomfort. Breathe properly (exhale as you lift hips, inhale as you lower) to avoid holding breath and straining.",
+    "best_timing": "Include in core workouts, typically after bigger core moves like planks or leg raises. It works well in higher-rep ab circuits or towards the end of an abdominal session as a burnout for the lower abs. It can be done frequently (3-4 times per week) given it\\",
+    "suggested_combinations": [
+      "bicycle-crunches",
+      "dead-bug"
+    ],
+    "notes": "Place your hands under your lower back or grip a sturdy object behind your head if you need a bit of support to prevent swinging. Focus on tilting your pelvis towards your ribcage. A helpful cue is to imagine trying to lift your tailbone straight up. Keep your head and shoulders relaxed on the floor. Even if the movement seems small, as long as you feel the contraction in the lower abs, you\\"
+  },
+  "shin-box": {
+    "name": "Shin Box Switch",
+    "description": "Sit on the floor with one leg bent in front (90) and the other bent behind (90). Keep torso tall and rotate both legs to the other side, switching the 90/90 position to the opposite side. Repeat fluidly.",
+    "benefits": "Improves hip mobility by working both external rotation (front leg) and internal rotation (back leg) through the switching motion. Gently stretches and strengthens muscles around the hips and glutes, potentially reducing stiffness. Also engages core muscles for stability as you transition, helping with coordination. Regular practice can lead to better range of motion for activities like squatting and sitting cross-legged, and reduce lower back strain by addressing hip tightness.",
+    "limitations": "If very tight in the hips, use hands behind you for support as you switch to avoid falling back. Avoid forcing knees to the ground; work within your comfortable range and let mobility increase over time. If you have knee discomfort, adjust the angles (not a perfect 90/90) or place padding under knees. Move slowly and with control; the goal is mobility, not speed or brute force. It\\",
+    "best_timing": "Excellent as part of a warm-up or cool-down to mobilize the hips. It can also be used in dedicated mobility or yoga sessions. Using it before lower-body workouts can help open the hips and improve performance. Gentle enough to do daily or during breaks from sitting. Typically done early in a session for 510 smooth switches (each direction).",
+    "suggested_combinations": [
+      "forward-fold",
+      "forward-fold"
+    ],
+    "notes": "Keep your chest lifted and avoid rounding your back as you move. Exhale during the switch to help relax into the new position. You can start with your hands on the ground behind you for balance, then try hands-free as you get more comfortable. Over time, aim to let both knees touch the ground on each side to achieve full range, but be patient if you\\"
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Standing Side Crunch (Elbow to Knee",
+    "description": "Standing, bring one elbow down and the same-side knee up to meet at your side, crunching the obliques. Return to standing and repeat on the other side.",
+    "benefits": "Works the obliques through lateral flexion combined with a crunch, helping to tighten and strengthen the side abdominal wall. Lifting the knee engages the hip flexors and lower abs, and doing it standing challenges balance and engages stabilizers. This exercise improves functional core strength for movements involving side bending or knee lifting. It can also lightly elevate heart rate when done briskly, adding a small cardio element.",
+    "limitations": "Maintain good posture: avoid hunching forward as you bring elbow to knee; the movement is directly sideways. If balance is an issue, you can perform the crunch motion without lifting the foot fully off the ground (just sliding the foot inward). Avoid yanking on your neck with your hand (if hand is behind head) keep the tension in the obliques. Move in a controlled way to prevent any jerking that might tweak the lower back. If you have lower back problems, do a smaller range of motion to be safe.",
+    "best_timing": "This move can fit into an ab routine as a standing exercise between floor exercises, or in a warm-up for core activation. It\\",
+    "suggested_combinations": [
+      "high-knees",
+      "standing-side-crunch"
+    ],
+    "notes": "Perform the crunch deliberately focus on using your side abdominal muscles to bring your torso toward your hip. Exhale as the knee and elbow come together; inhale when returning to upright. Keep your supporting leg slightly bent and core engaged for balance. If you want more challenge, you can hold a light dumbbell behind your head or simply increase the tempo once form is mastered."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Seated Circle Leg Crunch",
+    "description": "Sit on the floor leaning back slightly (hands on floor for support). Lift both legs off ground and trace a circle in the air with your feet (moving legs together in a circular motion). Reverse direction after reps.",
+    "benefits": "Engages the entire core with emphasis on the lower abs and hip flexors as you keep legs elevated. The circular motion recruits the obliques and improves hip mobility and lower abdominal control. It also challenges coordination and balance in a semi-reclined position, requiring core stability throughout. Over time, it can increase lower abdominal strength, improve coordination of the hip flexors with the abs, and enhance overall core endurance. Its a dynamic move that also lightly works the lower back stabilizers as they prevent you from tipping over.",
+    "limitations": "Keep the movement controlled; don\\",
+    "best_timing": "Place in a core workout once you have some strength (after mastering simpler moves like basic crunches). Use it as a mid-section exercise in the middle or end of your routine for a focused burn. Because it\\",
+    "suggested_combinations": [
+      "bicycle-crunches",
+      "dead-bug"
+    ],
+    "notes": "Move legs together as one unit and draw the biggest circle you can control. Imagine you\\"
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Sitting Lotus Pose Hip Horizontal Rotation",
+    "description": "Sit in lotus or cross-legged position. Place hands on hips. Rotate your torso/hips in a horizontal circle while keeping spine upright. Do several circles one way, then reverse.",
+    "benefits": "Increases hip joint flexibility by gently mobilizing in circular motions while in an externally rotated position (lotus). Engages and stretches muscles around the hips (glutes, piriformis, deep rotators) and can relieve tension in the lower back and hips. Also promotes an upright posture by requiring you to maintain a straight spine while rotating. This exercise can improve comfort in seated poses (useful in yoga/meditation) and hip mobility for daily movements. It is calming and can reduce stiffness in the hip and lower back region when done slowly and mindfully.",
+    "limitations": "If you cannot sit in full lotus, a simple cross-legged position is fine; do not force your knees down or foot position as that can hurt the knees. Keep the movement gentle this is more of a mobility stretch, not a strength exercise. If you feel pinching in the hips, make smaller circles or stop. Those with hip replacements or significant hip issues should consult a professional before deep rotations like this. Focus on upright posture to avoid slouching which negates some benefits. Discomfort (mild stretch) is okay, but sharp pain is a red flag to stop.",
+    "best_timing": "Use during warm-up for yoga or mobility routines, or as a cool-down stretch to open the hips. It\\",
+    "suggested_combinations": [
+      "forward-fold",
+      "forward-fold"
+    ],
+    "notes": "Focus on moving from the hips imagine your bellybutton drawing a circle parallel to the floor. Keep your back straight and head in line with spine to maximize the hip movement. You can brace your hands on your hips to feel the motion or place them on your knees for a bit of support. Breathe deeply and slowly; exhale as you circle forward, inhale as you circle back (or whatever pattern feels natural). The movement should be slow and controlled, almost like a self-massage for your hips."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Lying Abduction Leg Raise on floor",
+    "description": "Lie on one side with bottom leg bent and top leg straight. Raise the top leg upward, then lower it back down. Repeat and switch sides.",
+    "benefits": "Strengthens the hip abductor muscles, primarily the gluteus medius and minimus, which are critical for hip stability and knee alignment. Toning these outer hip/thigh muscles can improve balance and support functional movements like walking and side-stepping. Also lightly engages the core to stabilize your torso. This exercise can help improve lateral hip strength, contributing to better knee tracking and injury prevention (for knees and ankles). It\\",
+    "limitations": "Avoid swinging the leg or using momentum; lift and lower in a controlled manner to ensure the hip muscles are doing the work. Don\\",
+    "best_timing": "Include in lower-body or glute workouts as an isolation for outer thighs after compound exercises. Also common in physical therapy or warm-ups to activate glutes before heavier activity. Doing 2-3 sets of 12-20 reps per side is typical. Can be performed multiple times per week (2-4x) since its low strain, especially if improving hip stability is a goal. Suitable for daily mini-sets for those rehabbing or desk workers trying to activate glutes, as long as there\\",
+    "suggested_combinations": [
+      "glute-bridges",
+      "side-plank"
+    ],
+    "notes": "Line up your body straight shoulders, hips, and legs in one line to ensure you\\"
+  },
+  "side-bridge-bent-leg": {
+    "name": "Side Bridge (Bent Leg)",
+    "description": "Lie on your side with knees bent 90°. Prop up on your forearm and lift hips, creating a straight line from shoulders to knees (knees stay on floor). Hold briefly, then lower. (Modified side plank on knees.)",
+    "benefits": "Strengthens the lateral core (obliques and quadratus lumborum) with reduced intensity compared to a full side plank, making it great for beginners. Emphasizes proper hip alignment and glute medius engagement with less strain. Builds foundational strength in the sides of the trunk and improves spinal stability. Also engages shoulder stabilizers (in supporting arm) and glutes (to keep hips forward). Regular practice can help balance core strength and is often used to progress toward full side planks or to support lower back health by targeting side-supporting muscles.",
+    "limitations": "Ensure your elbow is directly under your shoulder to avoid shoulder strain. Keep your body in one line from head to knees don\\",
+    "best_timing": "Often used early in a core routine as activation, or later as a burnout for the obliques. It\\",
+    "suggested_combinations": [
+      "plank",
+      "bird-dog"
+    ],
+    "notes": "Think about lifting your hip using your bottom-side oblique, not pushing too much through your arm. Keep the supporting shoulder away from your ear (don\\"
+  },
+  "leg-pull-side": {
+    "name": "Leg Pull Side",
+    "description": "From a side plank position (on one hand or forearm), lift the top leg straight up and down (like a side plank with leg raise).",
+    "benefits": "An advanced Pilates exercise that strengthens the core, shoulders, and hip flexors. Combines elements of a plank with side-lying leg raises to improve balance, stability, and strength particularly in the obliques and hip region. Lifting the top leg targets the outer hip (glute medius) and thigh as well. Builds considerable shoulder stability and total-body control, enhancing core and lateral hip strength beyond a basic side plank.",
+    "limitations": "Very challenging master regular side plank and simpler side leg raises first. Keep hips elevated and inline; avoid letting them sag when lifting the leg. The body should remain in one plane (don\\",
+    "best_timing": "Typically included in advanced core or Pilates routines. Best done when fresh (near start of core workout) because it demands coordination and strength; performing it after fatiguing exercises may risk form. Usually performed for low reps per side (e.g., 5-10 lifts) or short hold times, since it is quite strenuous. Training it 1-2 times a week is sufficient for benefits, as part of a comprehensive core program. Emphasize quality over quantity due to its difficulty.",
+    "suggested_combinations": [
+      "side-plank",
+      "plank"
+    ],
+    "notes": "Maintain a strong side plank alignment first shoulder over elbow or wrist, hips forward. As you lift the top leg, lead with the heel slightly to activate outer glutes, and only raise as high as you can without tilting your pelvis (a moderate height is fine). Inhale before lifting, exhale as you raise the leg. A common progression in Pilates is to hold the leg up for a moment or do small pulses. Keep the movement smooth. This exercise requires both strength and grace, so focus on precision rather than speed."
+  },
+  "power-clean-thruster": {
+    "name": "Power Clean Thruster",
+    "description": "Perform a power clean to bring a barbell from floor to shoulders, then immediately do a thruster (front squat + push press overhead).",
+    "benefits": "A highly efficient full-body exercise that develops strength, power, and cardiovascular endurance simultaneously. The power clean portion engages the hips, hamstrings, glutes, back, and arms explosively, while the thruster works the quads, glutes, shoulders, and triceps in a fluid squat-to-press motion. Together, this complex improves coordination and athletic power (triple extension and explosive leg/arm drive). It elevates heart rate, aiding conditioning, and trains the body to move a weight from ground to overhead using nearly every major muscle group.",
+    "limitations": "This is technically demanding; master cleans and thrusters separately first. Use a weight you can handle with good form too heavy can lead to injury especially as you fatigue. Maintain a flat back and engaged core during the clean to protect your spine, and ensure you catch the bar in a strong front rack (elbows up). In the thruster, squat at least to parallel, drive through heels, and lock out overhead without hyperextending your lower back. Those with mobility limitations in shoulders or wrists should address those before attempting full thrusters or modify (e.g., use dumbbells). Always drop the bar if you lose controlbetter to fail safely than risk injury by muscling through bad form. Keep repetitions relatively low to focus on explosive quality.",
+    "best_timing": "Often used in CrossFit or HIIT-style workouts due to its full-body nature. It can be the centerpiece of a workout (e.g., doing multiple sets of 3-6 reps for power) or part of a metabolic circuit. Best done early in a session, right after warm-up, when energy and focus are highest, as it requires coordination and explosiveness. Ensure significant rest between sets if training for power (2-3+ minutes). In circuit training, if used for conditioning, moderate weights and reps with incomplete rest might be programmed, but form must remain a priority.",
+    "suggested_combinations": [
+      "burpees",
+      "push-ups"
+    ],
+    "notes": "Break it into a smooth flow: perform the clean explosively but under control, and as you stand from the clean, go straight into the squat for the thruster, using that momentum to press overhead. Breathe in during the set-up, exhale during the explosive phases (clean pull and driving up in the thruster). Wear secure footwear and consider using bumper plates so you can drop the bar if needed. It\\"
+  },
+  "snatch-high": {
+    "name": "Snatch High Pull",
+    "description": "With a wide (snatch) grip, explosively pull a barbell from floor to chest height by extending hips and shrugging, keeping elbows high (like the first part of a snatch without the overhead catch).",
+    "benefits": "Develops explosive pulling power and strength in the posterior chain especially hamstrings, glutes, and lower back as well as the upper back and traps which are used to pull the bar high. It reinforces proper snatch technique (powerful hip extension and upright high elbows) for weightlifters, and even for general training it builds upper-body power and trap development. Improves coordination of triple extension (ankles, knees, hips) without the complexity of the full snatch. Over time it increases total body power output, benefiting athletic performance in jumps and pulls, and contributes to upper back strength and shoulder stability by dynamically engaging those regions.",
+    "limitations": "Requires good form to avoid injury: maintain a flat back and keep the bar close to your body; arms should only bend after hip extension is complete (don\\",
+    "best_timing": "Usually performed as part of Olympic weightlifting training or power-focused workouts. Place it early in a session (after warm-up) when power output is highest. Use low reps (2-5) for multiple sets since it\\",
+    "suggested_combinations": [
+      "squats",
+      "burpees"
+    ],
+    "notes": "Focus on leg drive and shrug: imagine trying to jump and shrug the bar up rather than \\"
+  },
+  "press-under": {
+    "name": "Press Under",
+    "description": "From a barbell on the front rack (shoulders), dip quickly and \\",
+    "benefits": "Trains the explosive **drive and catch phase** of lifting overhead (similar to a push jerk) developing upper-body power and speed under the bar. It teaches coordination: rapidly dropping into a squat while locking the bar overhead. Builds strong, stable shoulders and triceps from catching and holding the weight overhead. Also improves core and leg power by using the quick dip and drive from the legs. Essentially, it increases the amount of weight one can put overhead by utilizing the lower body and speed, and enhances athletic qualities like timing and agility.",
+    "limitations": "Complex movement master push press and basic jerks first. Keep torso upright during the dip; if you lean forward, the bar will go out front. Use only a light to moderate weight until timing is perfected; incorrect timing or footwork can cause missed lifts or injury. Your grip and shoulder mobility should allow a quick transition to locked arms if shoulder mobility is lacking, work on that to avoid strain. Those with shoulder impingement should be cautious, as the rapid overhead press can aggravate it. Always use bumper plates or spotters for safety if you need to bail. Land with knees bent to absorb the load, not stiff-legged. Breathe and brace on the dip, but avoid holding breath too long through multiple reps to prevent dizziness.",
+    "best_timing": "Usually practiced in Olympic weightlifting routines or athletic training sessions at the beginning when neuromuscular coordination is fresh. Do after thorough warm-up (especially shoulders and wrists). Typically done in low reps (2-5) for multiple sets, focusing on speed and precision rather than fatigue. Training 1-2 times per week is common if improving jerk technique or power. Because its technical, its not done in conditioning circuits; rather, in controlled sets with full recovery to ensure quality execution.",
+    "suggested_combinations": [
+      "push-ups",
+      "squats"
+    ],
+    "notes": "Think of it as pushing yourself under the bar, rather than pushing the bar up. From a slight knee bend (dip), extend explosively and simultaneously drive under your feet may momentarily lift. Punch hard to lock the arms as you drop. Practice with an empty bar to dial in the timing: dip, drive, press under. Ensure elbows start slightly forward in the rack position and finish locked with bar above and slightly behind head, torso straight under bar. Keep core tight to avoid any forward collapse. **Key cue**: legs extend then immediately knees re-bend as arms lock out."
+  },
+  "lever-stepper": {
+    "name": "Lever Stepper",
+    "description": "Use a lever (machine) stepper: stand on the pedals and grip the handles, then perform stepping motion (one foot presses down as the other rises) in a smooth rhythmic manner.",
+    "benefits": "Provides a low-impact cardio workout focused on the lower body. Simulates stair climbing or stepping to strengthen quads, hamstrings, glutes, and calves while raising heart rate. Using the lever handles can also involve the upper body slightly, increasing oxygen demand. Great for improving lower-body muscular endurance and cardiovascular fitness with minimal joint impact. Also improves coordination between arms and legs if handles are moving. It\\",
+    "limitations": "Maintain an upright posture and avoid leaning heavily on the handles (if present) using them too much can reduce the exercise\\",
+    "best_timing": "Ideal for cardio portions of a workout or as a warm-up. Can be used in HIIT (alternating intense stepping with slower pace) or steady-state cardio sessions. Commonly utilized for 10-30 minute durations depending on fitness level. Frequency could be 3-5 times a week if it\\",
+    "suggested_combinations": [
+      "jumping-jacks",
+      "marching-in-place"
+    ],
+    "notes": "Start stepping at a slow rate to get the machine moving, then find a rhythm where your breathing elevates but you can sustain it. Keep your core engaged and hips under your shoulders don\\"
+  },
+  "seated-neck-tap": {
+    "name": "Seated Neck Tap",
+    "description": "Sit upright. Tilt your head to one side and gently tap the side of your neck (just below ear) with your fingertips. Repeat on the other side. (This combines a light stretch with tapping massage.)",
+    "benefits": "Helps relieve tension in the neck muscles (especially upper trapezius and sternocleidomastoid) by combining a gentle stretch (tilting head) with light percussive massage (tapping). The tapping increases blood flow and can encourage the tight muscles to relax. This can improve neck mobility (side-bending range) and reduce feelings of stiffness or stress-related tightness in the neck and shoulders. It\\",
+    "limitations": "Perform the movement gently the neck is sensitive, so the tilt should be mild (just until a stretch is felt) and the taps should be light finger taps, not slaps. Avoid tapping directly on the spine or front of throat stick to the side muscles. Keep shoulders down while tilting to avoid shrugging and getting less of a stretch. If you have a serious neck condition (like a pinched nerve or cervical spine injury), do not perform without medical advice. Breathe slowly as you do it, since it\\",
+    "best_timing": "Perfect as a micro-break exercise during long periods of sitting, reading, or computer work. Can be done in the morning or evening to ease neck muscle tone, or as part of a cool-down after workouts that involve the neck/shoulders (like boxing, swimming, etc.). It\\",
+    "suggested_combinations": [
+      "neck-rolls",
+      "shoulder-rolls"
+    ],
+    "notes": "Sit tall and drop your right ear toward your right shoulder (without lifting the shoulder). With your right hand, you can tap along the left side of your neck (the stretched side) using your fingertips think of drumming lightly. Do this for a few seconds while breathing deeply, then slowly raise your head and repeat on the other side. The tapping should feel pleasant, not harsh; imagine you\\"
+  },
+  "elbow-flexion": {
+    "name": "Elbow - Flexion (Articulations)",
+    "description": "Stand or sit with one arm extended forward, palm up. Bend the elbow, bringing palm toward shoulder (like a biceps curl with no weight), then straighten arm. Repeat slowly.",
+    "benefits": "Maintains and improves range of motion in the elbow joint by repeatedly bending and straightening it. Gently engages the biceps and brachialis without weight, promoting synovial fluid movement and blood flow in the elbow. Regular elbow articulations can help prevent stiffness, especially important if you\\",
+    "limitations": "Move through a pain-free range: if you have an injury or arthritis and full flexion/extension hurts, only go as far as comfortable. Don\\",
+    "best_timing": "Use in warm-ups especially if you\\",
+    "suggested_combinations": [
+      "arm-circles",
+      "arm-circles"
+    ],
+    "notes": "Keep the upper arm fairly still (imagine your elbow is pinned at your side even if arm is forward) so that the hinge of the elbow is doing the work. You can support that by placing your opposite hand under your upper arm. Smoothly bend (imagine flexing to show your biceps) then smoothly extend. You can rotate your palm down as you extend (pronate) and palm up as you flex (supinate) to engage different forearm muscles too. This is essentially a pretend light dumbbell curl treat it as such and focus on the elbow\\"
+  },
+  "side-kick-burpee": {
+    "name": "Side Kick Burpee",
+    "description": "Do a standard burpee (squat down, jump to plank, push-up optional, jump feet back in) and as you stand up, throw a side kick with one leg. Alternate the kicking leg each burpee.",
+    "benefits": "Combines the full-body conditioning of a burpee with a martial-arts-style side kick for added leg power and lateral core engagement. Great for cardiovascular endurance and calorie burn, as burpees elevate heart rate rapidly. The side kick specifically works the hip abductors (glute medius), quads, and core (for stability during the kick) while also improving balance and agility. This move increases functional strength by training explosive leg power in the kick and total-body coordination. It\\",
+    "limitations": "High-intensity and complex: ensure you can do burpees with good form and have basic kicking technique before combining. When kicking, don\\",
+    "best_timing": "Use in high-intensity circuits or martial-arts-themed conditioning. It can be part of a HIIT round (e.g., AMRAP of side-kick burpees for 30 seconds, then rest). Because it\\",
+    "suggested_combinations": [
+      "jumping-jacks",
+      "mountain-climbers"
+    ],
+    "notes": "Focus on a proper side kick: after coming up from the burpee, chamber your knee, then snap the kick out to the side (aim hip height or higher if flexible), striking with your heel. Retract the kick with control. As soon as the kick is retracted, smoothly go back down into the next burpee. Try to alternate sides fluidly: e.g., burpee then right kick, next burpee then left kick. Breathe out sharply when kicking (like martial artists do). If you get winded, pause rather than doing half-hearted kicks. Quality burpee (with a straight-body plank and solid jump) plus a sharp kick each time beats doing double the number poorly."
+  },
+  "butterfly-pull-up": {
+    "name": "Butterfly Pull-up",
+    "description": "Hang from a pull-up bar and perform kipping pull-ups with a continuous circular motion (the \\",
+    "benefits": "Allows faster cycling of pull-ups, useful in CrossFit-style workouts to achieve more reps quickly. Primarily still works the latissimus dorsi, biceps, and upper back like a pull-up, but by using a cyclic kip, it also heavily engages the core and hip flexors to generate momentum. The benefit is improved muscular endurance and grip endurance you can do more pull-ups before fatigue by distributing effort. It also trains coordination and rhythm. While not as strict-strength-building as dead-hangs, butterfly pull-ups build a kind of functional stamina and teach efficient body movement. They are particularly useful for competitive fitness scenarios where economy of motion is key. Over time, practitioners develop better grip strength, aerobic capacity in upper body, and efficient kip timing.",
+    "limitations": "This is an advanced technique and should be learned only after mastering strict and kipping pull-ups attempting butterfly pull-ups without sufficient strength or technique can lead to injury (hands tears, shoulder strain). Form is crucial: a poor butterfly can stress the shoulders. Make sure to maintain an active shoulder (don\\",
+    "best_timing": "This move is specific to CrossFit/competitive settings typically used in WODs (Workouts of the Day) when large volumes of pull-ups are required. You\\",
+    "suggested_combinations": [
+      "brachialis-pull-up",
+      "dead-bug"
+    ],
+    "notes": "Focus on keeping a hollow-body to arch kip rhythm: as you cycle through, push the bar away at the top and pull through at the bottom to maintain momentum. The motion should be smooth and cyclic, like pedaling backward on a bike. Keep your gaze neutral (some look forward at bar). Practicing small sets (e.g., 3-5) to get the feel is better than trying a huge set initially. Grip the bar firmly but not death-grip to save forearms. Exhale on each pull, inhale as you fall through. If you start to lose rhythm, drop off, shake out, and re-set rather than flailing flailing can stress shoulders. Butterfly pull-ups are about finesse, not brute force."
+  },
+  "front-scoops": {
+    "name": "Front Scoops",
+    "description": "Stand with one leg forward (heel on ground, toes up). Hinge at the hips and \\",
+    "benefits": "A dynamic hamstring stretch often used in warm-ups to loosen the posterior chain. By \\",
+    "limitations": "Keep the movement flowing; avoid bouncing aggressively at the bottom to prevent muscle strain. Your reach should go until you feel a stretch in the hamstring you don\\",
+    "best_timing": "Best employed as part of a dynamic warm-up, particularly before running, sports, or leg workouts. Typically included after some light cardio, performing ~10 scoops (5 each leg alternating). It can be done for a couple sets if hamstrings are very tight. It\\",
+    "suggested_combinations": [
+      "lunges",
+      "high-knees"
+    ],
+    "notes": "Stand tall at the start, then as you step forward with your heel down, push your hips back and sweep your arms down as if trying to scoop under your toes. Keep your front leg fairly straight (slight bend) and back leg straight. You should feel a stretch but not pain. Rise up and step the back leg forward into the next scoop. Coordinate breath: exhale when scooping down, inhale as you come up. Keep movements smooth and continuous, like a gentle pendulum. If balance is an issue, do them in place by alternating feet forward without traveling forward. Over time, try to reach a bit further as flexibility improves."
+  },
+  "shoulder-flexion": {
+    "name": "Shoulder - Flexion (Articulations)",
+    "description": "Stand or sit with arms at your sides. Keeping arms straight, raise them forward and up above your head (palms facing in) as far as comfortable, then lower back down. Repeat slowly.",
+    "benefits": "Helps maintain and improve overhead range of motion by moving the shoulders through full flexion (overhead reach). It warms up the shoulder joint and lightly engages the front deltoids and traps without weight. This can improve posture (many people are tight and struggle to fully raise arms) and prepare the shoulders for exercises or daily tasks involving reaching up. Regular shoulder flexion movements can prevent stiffness from desk work and reduce risk of shoulder impingements by keeping the joint mobile and muscles balanced. Also, by actively raising arms, you\\",
+    "limitations": "Perform the raises in a pain-free range; if you feel pinching as arms near ears, only go to just before that point don\\",
+    "best_timing": "Use as part of a warm-up routine (especially before upper-body or shoulder workouts) to ensure the shoulders are ready for overhead motions. Also good as a quick break activity if you\\",
+    "suggested_combinations": [
+      "shoulder-rolls",
+      "wall-sit"
+    ],
+    "notes": "Stand with good posture (ears, shoulders, hips aligned). As you lift your arms, keep thumbs pointing forward or slightly out (some prefer palms facing each other) this externally rotates slightly and can be more comfortable. Think about keeping your ribs down (to prevent back arch). Raise until biceps are by your ears (or as far as you can without pain). Then return them down to your sides. You can inhale as arms go up, exhale as they go down. If doing one arm at a time, you can place the other hand on your ribcage to monitor that it\\"
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Shoulder - Transverse Flexion (Articulations)",
+    "description": "Stand with arms out to sides at shoulder height (like a T). Keep arms straight and bring them forward and together in front of you (like giving a hug), then return to the T. Alternate which arm is on top each time.",
+    "benefits": "Improves horizontal adduction flexibility of the shoulders and stretches the upper back. By opening and closing the arms (like a hug), you activate and stretch the pectoral muscles when arms are back, and stretch the rhomboids and rear delts when arms come forward. This helps maintain shoulder joint mobility in the transverse plane, which is important for healthy shoulders and posture. It can reduce tightness in the chest and front of shoulders (which often pull shoulders forward) and alleviate mild upper back tension by expanding those muscles. It\\",
+    "limitations": "Keep the movement controlled and avoid jerking your arms. When bringing arms back to the T, don\\",
+    "best_timing": "Use as a warm-up or mobility drill, especially before upper body workouts (prepping the shoulders and chest for pressing or throwing motions). Also great as a quick stretch during work or after workouts to keep shoulders loose. It\\",
+    "suggested_combinations": [
+      "shoulder-rolls",
+      "shoulder-rolls"
+    ],
+    "notes": "Stand tall, arms at shoulder height out to sides. When you cross in front, alternate which arm goes over/under the other to evenly mobilize both shoulders. Think of it as giving yourself a hug each time try to reach a little further around your back (but without straining). Then open back up until you feel a gentle stretch across your chest; imagine pinching a pencil between your shoulder blades when fully open. Breathe in as you open, breathe out as you hug (this can help deepen the stretch). Keep your head neutral and avoid jutting chin forward during the hug motion. Smooth rhythmical motion is the goal, not a static hold (though you can pause briefly in each position if it feels good)."
+  },
+  "forearm-supination": {
+    "name": "Forearm - Supination (Articulations)",
+    "description": "Stand or sit with elbows bent 90° at your sides, forearms extended forward. Rotate your forearms to turn palms up (supination) then palms down (pronation). Repeat.",
+    "benefits": "Enhances rotational mobility of the forearm (the radius and ulna twisting). Helps prevent stiffness in movements like turning a doorknob or screwdriver by working the pronator and supinator muscles in a gentle manner. It can improve overall forearm flexibility and can aid in rehab for elbow or forearm injuries by restoring normal pronation/supination range. Also warms up the wrist and elbow joints through the associated movement. Regular practice can reduce tension for those who do repetitive motions (like typing or wrenching) by moving joints through their full range, potentially decreasing risk of overuse injuries. It\\",
+    "limitations": "Only rotate as far as comfortable some people have more range. Avoid forcing your hands palm-up if your flexibility stops before fully up; with consistent practice range will improve. Keep elbows at your sides to isolate the movement to the forearm; if elbows drift, you\\",
+    "best_timing": "This articulation is great in warm-ups (for example, before weightlifting moves that require supination like biceps curls, or sports like badminton/tennis) and during breaks from repetitive tasks. In rehab, it might be done multiple times a day in very low intensity sets to regain movement. For general use, doing 1-2 sets of 10-15 rotations each way during your workout warm-up or morning stretch routine is plenty. It can be done daily as part of a joint mobility routine since it\\",
+    "suggested_combinations": [
+      "arm-circles",
+      "arm-circles"
+    ],
+    "notes": "Keep upper arms glued to your ribs and imagine a rod through your forearm that you\\"
+  },
+  "brachialis-pull-up": {
+    "name": "Brachialis Pull-up",
+    "description": "Hang from a bar with an underhand (chin-up) grip at shoulder-width. Pull up until chin is over bar, focusing on the tension in your arms, then lower down. (A narrow underhand pull-up targeting brachialis.)",
+    "benefits": "Emphasizes the brachialis muscle (deep elbow flexor) due to the underhand close grip, while still working the lats and biceps like a standard chin-up. By using a moderate shoulder-width supinated grip, it shifts more load to the arms (brachialis and biceps) and slightly less to the broad back muscles, making it great for arm strength and development. Strong brachialis adds to overall pulling power and arm size (it lies under the biceps and can push them up). Still, it engages the lats and middle back significantly, contributing to upper-body strength. Overall, this variation can improve your chin-up numbers and pulling endurance, and place extra stimulus on the arms for hypertrophy.",
+    "limitations": "As with any pull-up, use full range of motion but avoid fully locking out and relaxing at the bottom as that can strain elbows; keep shoulders engaged. An underhand grip can put more pressure on wrists ensure wrists are warmed up and you grip the bar firmly. Those with wrist or elbow tendinitis might prefer a neutral grip instead to reduce strain. Do not swing or kip; keep it strict to really hit the brachialis. If you cant complete a rep with good form, use a band or assist until stronger don\\",
+    "best_timing": "Use in upper-body or arm-focused workouts, typically in the middle or towards the end (since compound back moves might come first). You might do 2-4 sets of 4-8 reps with added weight (if strong enough) or bodyweight for hypertrophy. Training frequency can be 1-2 times a week, similar to other pull-up variations, allowing rest for the arms. It\\",
+    "suggested_combinations": [
+      "brachialis-pull-up",
+      "brachialis-pull-up"
+    ],
+    "notes": "Use a shoulder-width grip (not as narrow as possible, which is a different variation) this alignment will hit brachialis well while being easier on wrists than ultra-narrow. Imagine pulling with your elbows driving them down and back to engage arms and back together. Squeeze at the top for a second to maximize tension on the arms, then lower slowly (around 2 seconds down) to increase brachialis time under tension. Keep chest up and shoulders away from ears (do not shrug as you pull). If your grip gives out before your arms, consider straps to allow brachialis to reach fatigue. Always balance these with some neutral or pronated grip pulls in your program to keep elbows healthy."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Brachialis Narrow Pull-ups",
+    "description": "Hang from a bar with a very close underhand grip (hands only a few inches apart). Pull up until chin is over bar, then lower. (An extreme close-grip chin-up emphasizing arms.)",
+    "benefits": "The extremely narrow, supinated grip shifts the pull-up focus even more to the elbow flexors (brachialis and biceps), while still engaging the lats. This intense arm positioning can heighten brachialis activation due to mechanical disadvantage of lats in that position. Its great for targeting the inner portion of the biceps and brachialis for strength and hypertrophy. Youll also involve the forearms heavily (for grip and supination effort). Overall it builds upper-body pulling strength, but is often used as an arm specialization exercise. It can also highlight any left-right strength imbalances if one arm tends to dominate in the close grip. Building strength here can carry over to stronger standard pull-ups and improve arm muscularity.",
+    "limitations": "The close hand position can be stressful on wrists ensure a thorough warm-up and don\\",
+    "best_timing": "Use sparingly in training maybe at the end of back/biceps workout for 2-3 sets of as many quality reps as possible (which might be low). Frequency 1x/week is enough for most, as it\\",
+    "suggested_combinations": [
+      "brachialis-pull-up",
+      "brachialis-pull-up"
+    ],
+    "notes": "Keep your hands supinated (palms facing you) and literally almost touching on the bar. From a dead hang (but active shoulders), initiate by pulling shoulder blades down, then bend elbows driving them straight down until your chin clears. Because hands are so close, you\\"
+  },
+  "prayer-push": {
+    "name": "Prayer Push",
+    "description": "Stand or sit upright. Press your palms together in front of your chest (prayer position). Push them firmly against each other and slowly raise them overhead while maintaining pressure, then return to chest level. This engages chest isometrically.",
+    "benefits": "Primarily provides an isometric contraction for the chest (pectorals) and front shoulders by pressing the palms together. It helps activate and strengthen the chest muscles without any equipment useful for beginners or as an activation drill. Overhead movement adds a bit of shoulder mobility and engages shoulder stabilizers and triceps lightly. While it won\\",
+    "limitations": "Because it\\",
+    "best_timing": "Often used as a finisher at the end of a chest workout or as an at-home exercise when no weights are available. Can be done daily since it\\",
+    "suggested_combinations": [
+      "wall-push-up",
+      "shoulder-rolls"
+    ],
+    "notes": "Stand tall and press your palms like you\\"
+  },
+  "lying-prone-w-to-y": {
+    "name": "Lying Prone W to Y",
+    "description": "Lie face down with arms bent, elbows by sides (W shape). Lift chest slightly and raise arms off floor, then extend arms forward into Y position overhead. Return arms to W and lower.",
+    "benefits": "Strengthens the mid/lower trapezius and rhomboids by squeezing shoulder blades in the W position, then the lower traps and shoulders by reaching into the Y. Excellent for improving posture and counteracting rounded shoulders by activating the back muscles that pull the shoulder blades down and back. Also strengthens the rear deltoids and rotator cuff stabilizers. It improves shoulder blade mobility and stability, aiding overhead movements. As a bodyweight exercise, it\\",
+    "limitations": "Keep the movements small and controlled don\\",
+    "best_timing": "Include in upper-body or back workouts, or as part of prehab/rehab routine. Often done for 2-3 sets of 8-12 slow reps, focusing on the contraction. It\\",
+    "suggested_combinations": [
+      "shoulder-rolls",
+      "shoulder-rolls"
+    ],
+    "notes": "At the W, think of pulling your shoulder blades into your back pockets (down and together), with elbows at about 45° from your body. Then, as you transition to Y, keep shoulder blades engaged and raise arms overhead in a Y shape (about 30° out from ears). Focus on not shrugging the movement comes from the mid-back, not the neck. Imagine you\\"
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Palm Up - Palm Down Rotation",
+    "description": "Extend one or both arms forward at chest height. Rotate the forearm(s) so palm goes from facing up to facing down, and repeat (like turning a doorknob back and forth).",
+    "benefits": "Encourages and maintains flexibility in forearm pronation and supination (rotational movements). It\\",
+    "limitations": "Keep movements smooth; don\\",
+    "best_timing": "Use in warm-ups for any arm-intensive workout or sport as part of a comprehensive wrist/elbow routine. Could also be done during breaks at work for someone who types all day to move the forearms. Frequency can be daily; it\\",
+    "suggested_combinations": [
+      "arm-circles",
+      "brachialis-pull-up"
+    ],
+    "notes": "Extend arms comfortably (straight forward or slightly down) and rotate palms up (supination) then down (pronation). Try to get full rotation each way without moving upper arms. You can imagine holding a bowl of soup (palms up) then pouring it out (palms down) to visualize. Doing it with arms extended adds slight shoulder rotation, which is fine for a gentle stretch; if you want pure forearm isolation, keep elbows bent at 90. For variety, you can also do an alternating pattern: one palm up while other is down, then switch this creates a bit of coordination challenge too. Breathe normally and keep shoulders relaxed away from ears. It\\"
+  },
+  "air-twisting-crunch": {
+    "name": "Air Twisting Crunch",
+    "description": "Lie on back with legs raised (knees bent). Lift shoulders and twist, bringing right shoulder toward left knee, then alternate left shoulder to right knee (like bicycle crunch without pedaling legs).",
+    "benefits": "Engages the entire abdominal wall, particularly targeting the obliques through the twisting motion. The crunch component activates the rectus abdominis (six-pack muscles), while the rotation engages internal and external obliques. Keeping legs raised adds lower ab engagement isometrically and prevents rest between sides, increasing intensity. It\\",
+    "limitations": "Maintain pressure of your lower back towards the ground to avoid arching and straining it. If you feel your neck straining, ensure you are leading the motion with your shoulder (not just elbow) and support your head lightly with one hand (not yanking). Avoid using momentum; it\\",
+    "best_timing": "Place in the middle of an ab workout or circuit (since it can be intense). Often done for higher reps (e.g., 15-30 total touches) or time (30+ seconds) since it\\",
+    "suggested_combinations": [
+      "bicycle-crunches",
+      "russian-twists"
+    ],
+    "notes": "Think of lifting your shoulder toward the opposite knee, not elbow this helps engage obliques more. Keep the movement controlled; a common error is to flail elbows without really twisting the torso. To maximize results, pause for a split second at the top of each twist and really squeeze your abs. Keep your chin off your chest (imagine an apple under your chin) to protect your neck. If you want to intensify it, you can extend the opposite leg straight each time (like a full bicycle crunch) or hold a light medicine ball in your hands but baseline exercise already is effective. Remember to breathe: exhale on each twist upward (it\\"
+  },
+  "standing-swimmer": {
+    "name": "Standing Swimmer",
+    "description": "Stand with arms extended forward. Mimic a swimming stroke: either alternate arm circles (freestyle) or simultaneous broad arm sweeps (breaststroke) in a continuous motion.",
+    "benefits": "Acts as a dynamic warm-up for the shoulders and upper back by mimicking swimming motions. The large arm circles/sweeps improve shoulder joint mobility and engage the shoulder muscles (rotator cuff, deltoids) across a wide range. It also promotes coordination and a gentle increase in heart rate. For those who swim, it activates relevant muscles on land. For others, it serves to open the chest (especially with breaststroke motion) and loosen tight lats and pecs while engaging the mid-back. Overall, it enhances flexibility of the shoulders (especially in circumduction) and can help reduce shoulder stiffness. As a low-intensity movement, it can also help relieve mild shoulder fatigue or stress by \\",
+    "limitations": "If doing forward crawl motion, ensure you have space because one arm will be back while the other is forward. Move within a comfortable range some people with shoulder impingement might find full overhead circle painful; if so, reduce range or do more of a breaststroke (which stays below shoulder level mostly). Keep movements fluid, not jerky, to avoid muscle strain. If you have a history of shoulder dislocations, be cautious with the extreme ranges of a full circle; perhaps stick to partial circles. And as always, don\\",
+    "best_timing": "Great during warm-ups (especially for upper body or full-body workouts) to prepare shoulders. Swimmers use it before hitting the water, but in general it can be part of any dynamic warm-up sequence. Time-based execution (20-40 seconds of continuous movement or a set number of arm circles like 10 each direction) is common. Doing it daily is fine, since it\\",
+    "suggested_combinations": [
+      "arm-circles",
+      "standing-side-crunch"
+    ],
+    "notes": "For freestyle simulation: alternate forward circles with your arms, as if you were doing an exaggerated slow-motion crawl stroke coordinate so when one arm is circling forward, the other is circling backward overhead. Keep your torso mostly facing forward (you can allow a slight rotation for natural movement). For breaststroke simulation: push arms forward (palms together), then sweep them out to the sides and back (as if pushing water behind you) and bring together at chest repeat fluidly. Stand tall and engage your core lightly to avoid arching your back excessively during big circles. If you like, you can also do backstroke motions. The key is fluidity imagine moving through water. This not only warms muscles but also can be somewhat meditative if done rhythmically with breathing."
+  },
+  "3-4-sit-ups": {
+    "name": "3/4 Sit-Up",
+    "description": "Lie on your back with knees bent. Perform a sit-up but stop about 3/4 of the way up (before sitting fully upright) to keep tension on abs, then lower back down.",
+    "benefits": "By not going all the way up, the abs remain engaged throughout the movement, making it more effective for building abdominal endurance and strength in the targeted mid-range. This reduces hip flexor involvement compared to a full sit-up, placing more load on the abs and less on the lower back. It\\",
+    "limitations": "Even though you don\\",
+    "best_timing": "Great for mid or end of an ab workout when you want to thoroughly fatigue the abs. Could be done 2-3 times a week as part of a core routine. Often programmed for higher reps (15-20 or more) since it\\",
+    "suggested_combinations": [
+      "bicycle-crunches",
+      "plank"
+    ],
+    "notes": "Lie in the standard sit-up position (maybe anchor feet under something if needed, though try without anchoring to minimize hip flexor help). Cross arms over chest or touch hands to temples. As you sit up, do it slowly and stop when your lower back is about 30 off the ground (roughly when abs are maximally contracted, before hip flexors really take over). Then control the descent; don\\"
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Alternate Lying Floor Leg Raise",
+    "description": "Lie on back with legs straight. Keep one leg on floor as you raise the other straight up, then lower and switch legs. (One-leg-at-a-time leg raises.)",
+    "benefits": "Strengthens the lower abdominals and hip flexors by lifting one leg at a time, which is more accessible than lifting both together. This exercise also challenges the core to keep the torso stable while the legs move alternately, engaging the transverse abdominis and obliques as stabilizers. Alternating legs reduces strain compared to double leg raises, making it suitable for building up strength. It helps improve pelvic control and lower abdominal endurance. Over time, it can serve as a progression toward full two-leg raises. It also stretches the hamstring of the active leg slightly at the top of the motion. Overall, it\\",
+    "limitations": "Press your lower back towards the floor throughout the movement if you feel it arching off the floor as a leg lowers, don\\",
+    "best_timing": "Include in beginner core routines or as a warm-up for more advanced moves. It\\",
+    "suggested_combinations": [
+      "bicycle-crunches",
+      "dead-bug"
+    ],
+    "notes": "Place your hands under the natural arch of your lower back or by your sides for added support if needed (especially if your back tends to arch). As you lift one leg, keep the other leg either flat on floor or at least keep that foot in contact this gives you a reference for keeping your pelvis stable. Lift until the raised leg is about vertical or as high as you comfortably can without bending it much. Then lower with control until it almost touches the floor, while simultaneously starting to lift the other leg. It can feel like a gentle scissor motion. Focus on using your lower abs to initiate the leg movement, not just your quads. Keep your head and upper back relaxed on the floor. If doing all reps on one side then switching, be consistent on range and speed both sides. As strength increases, you can transition to lifting both legs together or holding both slightly off floor between reps to increase challenge."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Assisted Lying Leg Raise With Lateral Throw Down",
+    "description": "Lie on back and hold onto a partner\\",
+    "benefits": "Highly engages the entire core, with emphasis on the lower abs and obliques, by adding an unpredictable lateral force. The partner\\",
+    "limitations": "This is an advanced move you should be very comfortable with regular leg raises and have a strong core. Communication with the partner is key: they should apply firm but controlled force, not a sudden jerk that could injure you. Start with moderate pushes until you know you can handle more. Keep your lower back pressed into the floor especially when legs are thrown down; if you feel it hyperextend or you lose control, stop or have partner reduce force. Do not let your legs actually slam to the floor the goal is to catch them before and lift back up. Breathe (exhale) when pushing legs back up. Those with lower back problems or weak core should avoid this until stronger. Also, do equal throws to both sides to avoid imbalances.",
+    "best_timing": "Typically used in advanced athletic conditioning workouts, not as a daily drill. Because it\\",
+    "suggested_combinations": [
+      "dead-bug",
+      "bicycle-crunches"
+    ],
+    "notes": "Ensure a tight grip on the partner (or heavy object behind head) this anchors your upper body. Keep your legs as straight as possible, and when the partner pushes them, don\\"
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Kneeling Thoracic Spine Extension",
+    "description": "Kneel on all fours facing a bench. Place elbows on bench, hands together. Sink your chest down and head through your arms, stretching your upper back. (Like a prayer stretch for thoracic spine.)",
+    "benefits": "Targets the thoracic spine mobility by stretching the upper back into extension and the shoulders into flexion. This helps improve posture (countering forward slouch) and can alleviate upper back and neck stiffness. It also stretches the lats and triceps to some degree because you\\",
+    "limitations": "Be gentle and don\\",
+    "best_timing": "Use it as part of warm-up routine (especially before overhead lifts, front squats, or if you know your t-spine is stiff). Also great as a cool-down stretch or in the evening to counteract sitting posture. Frequency can be daily since it\\",
+    "suggested_combinations": [
+      "cat-cow",
+      "child-pose"
+    ],
+    "notes": "Place a rolled towel under your elbows if you want to increase stretch or ease discomfort. When sinking down, think about bringing your chest toward the floor *between* your arms and dropping your head through your arms. Try to keep your hips directly above knees (don\\"
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Reverse Lunge Leg Kick",
+    "description": "Step back into a reverse lunge, then push up and immediately kick the back leg forward into a front kick. Return to standing and repeat (alternating or same side).",
+    "benefits": "Combines lower-body strength and balance from the reverse lunge with explosive power and dynamic flexibility from the front kick. The lunge portion works quads, glutes, and hamstrings of the front leg, building strength and stability. Transitioning into a leg kick activates the hip flexors and quadriceps of the kicking leg and requires core engagement for balance. This improves coordination and agility, as you move from a controlled movement to an explosive one. It also raises heart rate, adding a cardio element. For athletes, it mimics actions needed in sports (lunging and quickly extending the leg). Over time, it enhances single-leg stability (on the supporting leg during the kick) and develops better neuromuscular control, while also providing a mobility benefit through the high kick. It's a functional move bridging strength and martial skill.",
+    "limitations": "Master standard reverse lunges first (with good knee tracking and posture) before adding the kick. During the kick, don't hyperextend your knee snap it forward but stop at near full extension to protect the joint. If your balance is shaky, perform the move slowly: lunge, then as you stand, do a controlled knee-up instead of a full kick initially. Be mindful of the supporting knee; do not twist on it when kicking, you naturally turn the supporting foot out a bit. Those with knee issues should monitor how deep they lunge and perhaps limit the speed of the kick. Clear your surroundings; you're effectively doing a front snap kick and need space. Ensure you engage your core when kicking to avoid arching your back. Breathing: exhale sharply on the kick (like martial artists kiai) to keep it strong and controlled.",
+    "best_timing": "Great in a functional circuit or as part of a leg workout finisher. Could be done for moderate reps like 10 each side or timed intervals (30s each side) as it also challenges endurance. Frequency can be 2-3 times a week, as it's bodyweight (though if you're very sore, give it a rest day). Often used in bootcamp or martial-arts inspired classes. Typically you alternate legs each rep or do a set number on one leg then switch. It's fairly high-intensity due to the balance + power combo, so do it earlier in a workout if form is priority (or as part of HIIT when fresh). It pairs well after simpler moves like squats to add variety. Avoid doing right after heavy weighted lunges though, as balance might be compromised by fatigue.",
+    "suggested_combinations": [
+      "jump-lunges",
+      "high-knees"
+    ],
+    "notes": "As you step back into the lunge, keep your torso upright and weight in the heel of the front foot. In one motion, drive through the front heel to come up and simultaneously swing your back knee forward and up. Then extend that leg into a kick, leading with the ball of the foot (as if kicking open a door). Aim roughly waist to chest height with the kick, depending on flexibility. Re-chamber the leg (bring it back) and step immediately into the next lunge or return to start. Find a rhythm: lunge, kick, lunge, kick... The arm opposite the kicking leg can naturally swing forward for counterbalance. Start slower to nail balance, then speed up as confident. Think \"explode\" on the kick but \"control\" on the lunge. If needed, reset briefly between reps to gather balance. Over time, you'll be able to flow them together smoothly."
+  },
+  "chair-squat": {
+    "name": "Chair Squat",
+    "description": "Sit-to-stand using a chair for support and guidance",
+    "benefits": "Strengthens the major lower-body muscles (quadriceps, glutes, hamstrings) through a functional movement pattern that mimics daily activities. Highly accessible for beginners, older adults, or those recovering from injury as it provides a safe way to build leg strength with built-in support. Helps build confidence in squat mechanics and improves leg strength for essential daily tasks like standing from chairs, getting in/out of cars, or climbing stairs. May support bone density when practiced regularly, which is particularly valuable during menopause and aging when bone loss accelerates. The chair provides a consistent depth target, making it easier to maintain proper form.",
+    "limitations": "Avoid if experiencing acute knee pain or severe joint inflammation. Use a higher chair if mobility is limited—kitchen chairs are typically easier than low sofas. Ensure the chair is stable and won't slide—place it against a wall if needed for safety. If you have balance concerns, position the chair near a wall or counter where you can reach for hand support if necessary. Stop immediately if you feel sharp pain in knees or hips. Those with hip replacements should check with their surgeon about safe squat depth and whether this exercise is appropriate for their recovery stage.",
+    "best_timing": "Perfect for morning routines to activate legs and wake up the body after sleep. Excellent during work breaks to counteract prolonged sitting and re-energize—can help reduce stiffness from desk work. Can be done 2-3 times per week as part of structured strength training, or daily in smaller sets (1-2 sets) for mobility maintenance and functional fitness. Ideal to perform before longer walks or activities requiring leg strength to prime the muscles. Also works well before grocery shopping or other errands that involve standing and walking.",
+    "suggested_combinations": ["wall-push-up", "glute-bridges", "step-up-stair"],
+    "notes": "Focus on controlled movements—sit down slowly and deliberately, and stand up using leg muscles rather than momentum or rocking forward. Keep knees aligned with toes throughout the movement and avoid letting them cave inward (valgus collapse). Push through heels when standing rather than the balls of your feet. Start with a higher chair if needed and progress to lower seats as strength improves—this provides a clear progression path. Aim to barely touch the chair seat before standing back up (hovering just above) as you get stronger. Keep your chest up and core engaged throughout. This exercise is excellent for maintaining independence in daily life and preventing falls.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "National Institute on Aging – Chair Exercises"]
+  },
+  "wall-push-up": {
+    "name": "Wall Push-Up",
+    "description": "Standing push-up performed against a wall",
+    "benefits": "Builds upper-body strength in the chest, shoulders, and triceps without the intensity or difficulty of floor push-ups. Excellent progression exercise for those working toward standard push-ups—the angle can be gradually decreased as strength improves. Ideal for individuals with limited upper-body strength, including those new to resistance training. Engages core muscles for stability while standing, promoting better posture and core awareness. Places minimal stress on wrists compared to floor push-ups, making it accessible for those with wrist issues. Particularly suitable for postpartum recovery, allowing new mothers to rebuild upper-body strength safely, for seniors maintaining functional upper-body strength, or anyone beginning their fitness journey.",
+    "limitations": "Avoid if you have active shoulder injuries, impingement, or acute inflammation in the shoulder joint. Use a sturdy, non-slip wall that won't move or mark—avoid walls with decorations or switches. If you feel shoulder impingement or pain during the movement, reduce your range of motion by staying closer to the wall, or adjust your hand position (try narrower or wider). Those with wrist discomfort can try a slightly wider hand placement to reduce wrist extension angle. If you experience rotator cuff issues, keep the movement slow and controlled. Stop immediately if you experience any sharp pain or clicking in the shoulders.",
+    "best_timing": "Can be performed anytime throughout the day—excellent during work breaks to combat desk posture, before or after meals for a quick strength boost, or as part of a morning routine to wake up the upper body. Because it's relatively low-intensity, it can be done daily without overtraining concerns or need for extended recovery. Use it early in a workout to warm up the upper body and activate shoulder stabilizers, or at the end of a workout as a finishing exercise to accumulate volume. Works especially well for multiple short sets throughout the day rather than one long session.",
+    "suggested_combinations": ["chair-squat", "desk-plank", "modified-push-up"],
+    "notes": "Stand arm's length from the wall with feet hip-width apart. Place hands on the wall slightly wider than shoulders at about chest height. Keep your body straight from head to heels—don't let your hips sag or pike up (imagine holding a plank position while standing). Lower your chest toward the wall with control, keeping elbows at about 45 degrees from your body rather than flared straight out. Push back to starting position by straightening arms. Breathe in as you lower toward the wall, breathe out as you push away. To progress and make it harder, gradually move your feet further from the wall to increase the angle and resistance. Keep shoulders away from ears throughout the movement.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "American Council on Exercise – Wall Push-Up Progression"]
+  },
+  "desk-plank": {
+    "name": "Desk Plank",
+    "description": "Elevated plank position with forearms on desk",
+    "benefits": "Develops core strength and stability with less intensity than floor planks due to the elevated angle, making it more accessible while still highly effective. Strengthens the abs, obliques, and deep core muscles (transverse abdominis) while engaging shoulders and upper back for support. Perfect for office workers or those with limited floor space—can be done right at your desk. The incline reduces the percentage of body weight supported, making it ideal for beginners or those building back to full planks after injury. Helps improve posture by training proper body alignment and spinal stability, which can reduce lower back strain from prolonged sitting. Teaches body awareness and the feeling of proper core engagement.",
+    "limitations": "Avoid if you have acute shoulder or wrist pain—the elevated position still requires upper-body support, though less than floor planks. Ensure your desk or surface is stable, at appropriate height (roughly waist to chest height), and won't slip or roll. If you feel lower back discomfort during the hold, it likely indicates your hips are sagging; engage your core more actively, squeeze your glutes, or reduce hold time. Those with high blood pressure should breathe steadily throughout and avoid very long holds that might cause breath-holding. If you have carpal tunnel syndrome, pay attention to wrist position and stop if numbness occurs.",
+    "best_timing": "Excellent during midday work breaks to counteract prolonged sitting, re-energize, and reset posture. Can be done 2-3 times per week as part of structured core training for strength building, or daily for shorter durations (15-20 seconds) as a posture and core activation exercise. Works well performed before or after desk work sessions to activate core muscles and improve focus—many people find it helps mental clarity. Use it in morning routines to wake up the body and prepare for the day. Can also serve as a gentle core warm-up before more intense exercises.",
+    "suggested_combinations": ["wall-push-up", "bird-dog", "modified-push-up"],
+    "notes": "Place forearms flat on desk, parallel to each other and shoulder-width apart. Step feet back until your body forms a straight line from head to heels (check your position in a window reflection if possible). Engage abs by pulling belly button toward spine, squeeze glutes firmly, and avoid letting hips sag toward the desk or pike up toward the ceiling. Keep neck in a neutral position by looking down at the desk rather than forward. Breathe steadily throughout the hold—never hold your breath as this can spike blood pressure. If you feel your form breaking (hips dropping), end the set. Start with shorter holds (15-20 seconds) and gradually increase duration as core strength improves. Quality of position is more important than duration.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "ACE Fitness – Plank Progressions"]
+  },
+  "bird-dog": {
+    "name": "Bird-Dog",
+    "description": "On hands and knees, extend opposite arm and leg simultaneously",
+    "benefits": "Excellent exercise for core stability and spinal alignment, strengthening the deep muscles that protect your back including multifidus and transverse abdominis. Improves balance and coordination through contralateral movement pattern (opposite limbs working together), which is fundamental to walking and many daily activities. Engages glutes, lower back extensors, abs, and shoulders simultaneously in a functional, integrated pattern. Particularly valuable for postpartum recovery as it gently rebuilds core strength without excessive intra-abdominal pressure, for rehabilitation after back injury, or for prevention of lower back pain. Helps correct muscle imbalances between left and right sides of the body and promotes better posture through enhanced spinal stability.",
+    "limitations": "Avoid if you have acute wrist pain, carpal tunnel issues, or tendinitis—you can modify by performing on forearms instead of hands if needed. Keep movements slow and controlled; rushing reduces effectiveness, challenges balance unnecessarily, and can compromise form. If you have severe lower back pain, start with very small range of motion, keeping limbs closer to the floor, or perform arm-only or leg-only versions until core is stronger. Those with knee discomfort or pain should use a well-padded surface, folded towel, or yoga mat under knees. Avoid if you feel sharp pain during the movement. The exercise should feel challenging but controlled, never painful.",
+    "best_timing": "Ideal for morning routines to activate core and back muscles before the day begins, setting good postural patterns. Excellent as a warm-up before strength training to activate deep stabilizers and prepare the spine for loaded movements. Can be done daily due to its low intensity and high functional value—it's gentle enough for everyday practice. Works particularly well in physical therapy routines or postpartum exercise programs as a foundational movement. Perform when relatively fresh (not exhausted) for better balance control and movement quality. Can be used before activities requiring core stability like running or lifting.",
+    "suggested_combinations": ["glute-bridges", "cat-cow", "dead-bug"],
+    "notes": "Start on hands and knees with hands directly under shoulders and knees under hips. Establish and maintain a neutral spine throughout (maintain your natural spinal curves, don't round or arch excessively). Slowly extend opposite arm forward and opposite leg backward until both are parallel to the floor—imagine lengthening through fingertips and heel rather than lifting high. Hold the extended position for 2-3 seconds, focusing on keeping your torso completely still. Return to starting position with control and repeat on the other side. The primary goal is stability and control, not achieving maximum range—keep hips level without any rotation, and don't allow torso to twist. Focus on quality over quantity. Engage your core by imagining you're bracing against a gentle push to your side.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "Mayo Clinic – Core Exercises"]
+  },
+  "modified-push-up": {
+    "name": "Modified Push-Up (Knee Push-Up)",
+    "description": "Push-up performed with knees on the ground",
+    "benefits": "Builds upper-body strength in chest, shoulders, and triceps with significantly reduced load compared to standard push-ups—approximately 50% less resistance. Excellent progression exercise for building toward full push-ups, allowing you to develop proper form and strength at a manageable intensity. Engages core muscles for stability throughout the movement while minimizing lower-body involvement. Particularly suitable for postpartum women who are rebuilding core and upper-body strength after pregnancy and delivery, beginners starting their fitness journey, or those with limitations that prevent full push-ups. Helps develop proper push-up mechanics including scapular control, elbow positioning, and body alignment in a more accessible format.",
+    "limitations": "Avoid if experiencing acute wrist pain or carpal tunnel symptoms—you can use push-up handles, grip hex dumbbells, or perform on fists if needed to maintain more neutral wrist position. Ensure knees are comfortably cushioned on a mat, folded towel, or soft surface to prevent bruising or discomfort. If you feel shoulder impingement or pinching, reduce range of motion, widen hand placement slightly, or adjust body angle. Keep core actively engaged throughout to avoid lower back sagging—if you feel strain in lower back, you may need to build more core strength first. Those with recent abdominal surgery (including C-section) should get medical clearance before attempting push-up variations.",
+    "best_timing": "Can be performed anytime throughout the day as part of strength training routines. Works well in circuit training or as a standalone upper-body exercise. Best performed 2-3 times per week with at least one rest day between sessions for adequate recovery and strength adaptation. Can be included in morning routines or during work breaks for strength maintenance. Perform when upper body is relatively fresh (not fatigued) for better form and maximum strength development. Once you can complete 15-20 reps with good form, you're ready to progress toward incline or full push-ups.",
+    "suggested_combinations": ["chair-squat", "glute-bridges", "wall-push-up"],
+    "notes": "Kneel on a mat with hands placed slightly wider than shoulders. Position your knees far enough back that your body forms a straight line from knees to head—your body should create a diagonal line, not an L-shape. Lower your chest toward the floor with control, keeping elbows at approximately 45-degree angle from your body (not flared straight out to sides). Lower until chest is close to floor or as far as comfortable, then push back up to starting position. Keep core tight and engaged throughout—actively pull belly button toward spine to prevent hips from sagging. Shoulders should stay away from ears. Breathe in as you lower, breathe out as you push up. Keep neck neutral by looking slightly ahead rather than straight down. Focus on controlled movement throughout the full range of motion.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "American Council on Exercise – Push-Up Modifications"]
+  },
+  "arm-circles": {
+    "name": "Arm Circles",
+    "description": "Circular arm movements performed forward and backward",
+    "benefits": "Increases blood flow to shoulder muscles and improves range of motion in the shoulder joints through dynamic movement. Excellent for warming up before upper-body workouts or sports activities involving the arms and shoulders. Helps maintain shoulder flexibility and mobility, which can reduce stiffness from prolonged sitting, desk work, or computer use. The dynamic movement activates rotator cuff muscles and all three heads of the deltoids (anterior, lateral, posterior). Can help relieve tension in shoulders and upper back. Particularly useful for relieving premenstrual tension that often settles in the upper body and neck region. Simple enough to perform almost anywhere without equipment.",
+    "limitations": "Avoid making large circles if you have active shoulder pain, impingement syndrome, or recent shoulder injury—start with very small circles and only increase size if completely pain-free. Those with rotator cuff issues or tears should move slowly and stay within comfortable range, potentially keeping circles small throughout. If you feel clicking, grinding (crepitus), or catching sensations in shoulders, reduce circle size immediately or stop. Keep movements controlled and deliberate—avoid forceful or ballistic motions that could strain the joint. People with frozen shoulder should work with a physical therapist on appropriate range. Never push through sharp pain.",
+    "best_timing": "Perfect for warm-ups before any upper-body exercise, swimming, throwing sports, or activities involving overhead movements. Excellent during micro-breaks at work to counteract desk posture and prevent shoulder stiffness—can be done every hour if needed. Can be performed first thing in the morning to loosen shoulders after sleep. Use before swimming, tennis, baseball, volleyball, or any overhead activities. Particularly effective during premenstrual phase to ease upper-body tension and improve circulation. Can be performed multiple times daily without concern—it's gentle enough for frequent use throughout the day.",
+    "suggested_combinations": ["shoulder-rolls", "wall-push-up", "neck-rolls"],
+    "notes": "Stand with feet shoulder-width apart for stable base. Extend arms straight out to sides at shoulder height, forming a T-shape with your body. Make slow, controlled circles, starting with small circles (6-12 inch diameter) and gradually increasing size only if comfortable and pain-free. Perform circles moving forward for half the duration (typically 15-30 seconds), then reverse direction to move backward circles for the remaining time. Keep shoulders relaxed and down (don't shrug them up toward ears). Maintain gentle core engagement and upright posture throughout—avoid leaning or swaying. Breathe naturally and continuously. If shoulders are stiff or tight, keep circles small throughout. Can be done with light weights (1-3 lbs) for added challenge once mobility is good.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "American Council on Exercise – Shoulder Mobility"]
+  },
+  "step-up-stair": {
+    "name": "Step-Up (Using Stairs)",
+    "description": "Step onto a stair or platform, alternating legs",
+    "benefits": "Highly functional exercise that strengthens quadriceps, glutes, and hamstrings through a movement pattern used in daily life. Directly improves ability to climb stairs, hike, or get up from low seats—translates immediately to real-world activities. Improves single-leg balance, stability, and proprioception, which helps prevent falls. Builds leg power and muscular endurance. The unilateral (one-sided) nature helps identify and correct strength imbalances between left and right legs that often develop unknowingly. Excellent for maintaining independence in daily activities, especially important for older adults at risk of mobility decline. Can also improve cardiovascular fitness when performed at higher tempo or for longer durations. Minimal equipment needed—just a stair or step.",
+    "limitations": "Avoid if you have acute knee pain or recent knee injury until cleared by healthcare provider. Start with a lower step (4-6 inches) if you have knee concerns, patellar pain, or are new to exercise, then progress gradually to standard stair height (7-8 inches). Ensure the step or stair is stable, non-slip, and secure—never use a wobbly or unstable surface. If balance is an issue, perform near a railing, wall, or sturdy furniture where you can reach for support if needed. Those with hip problems should ensure the full range of motion is pain-free before adding resistance or increasing height. Stop immediately if you feel sharp pain in knees, hips, or ankles. People with significant osteoarthritis should check with their doctor about appropriate step height.",
+    "best_timing": "Excellent for morning or afternoon routines to build functional leg strength for daily activities. Can be incorporated 2-3 times per week as part of lower-body training within a structured program. Works well performed before walks or activities requiring leg strength to prime and activate the muscles. Can be done daily at lower intensity (fewer sets/reps) for functional maintenance and fall prevention. Best performed when legs are relatively fresh for good form and balance control. Avoid when legs are heavily fatigued from other exercises as form may suffer. Can be used as active recovery between upper-body exercises in circuits.",
+    "suggested_combinations": ["chair-squat", "calf-raises", "lunges"],
+    "notes": "Place entire foot firmly on the step with toes pointing forward—not just the ball of your foot. Push through the heel of the elevated leg to step up, engaging glutes and quads—avoid pushing off aggressively with the back foot (let the top leg do the primary work). Step up with control, stand tall on the step briefly with both feet if needed for balance, then step down with control. Keep the knee of the working leg aligned with toes, tracking forward without caving inward. Maintain upright posture throughout with chest up and core engaged—don't lean excessively forward. You can alternate legs each rep (step up right, down right, step up left, down left) or complete all reps on one leg before switching for more intensity. Use a handrail initially if needed for confidence and safety. As you improve, try not to rest the trailing foot fully on the step.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "National Institute on Aging – Balance Exercises"]
+  },
+  "neck-rolls": {
+    "name": "Neck Rolls (Neck Circles)",
+    "description": "Gentle circular movements of the head and neck",
+    "benefits": "Relieves tension and stiffness in neck muscles caused by poor posture, extended desk work, driving, or stress. Improves neck mobility and range of motion through gentle circular movement in all planes. Increases blood flow to neck muscles, which can help reduce frequency and intensity of tension headaches. Helps release trigger points and tightness in upper trapezius, levator scapulae, and other neck muscles. Particularly valuable for desk workers, drivers, or anyone who holds static neck positions for extended periods. Can provide immediate relief from neck discomfort and improve head position awareness for better posture throughout the day.",
+    "limitations": "Avoid completely if you have acute neck injury, recent whiplash, or severe cervical spine issues without medical clearance. Move very slowly and gently—never force the movement or make it fast/ballistic as this can strain delicate neck structures. If you feel dizziness, vertigo, or lightheadedness, stop immediately and consult a healthcare provider before continuing. Those with disc problems, stenosis, or arthritis in the cervical spine should get clearance from their doctor before doing full circles; may need to do partial range movements instead (like slow side-to-side or front-to-back). Stop if you feel sharp pain, shooting pain down arms, numbness, tingling, or any unusual sensations. Never force head backward into extension if it causes pain or dizziness.",
+    "best_timing": "Perfect for morning routines to loosen neck stiffness accumulated during sleep and establish good range of motion for the day. Excellent during work breaks or after work, especially valuable for desk workers who maintain static head/neck positions for hours. Can be done multiple times throughout the day as needed for relief—every hour during desk work is reasonable. Particularly helpful after long drives or any activity involving sustained neck position (reading, phone use). Works well before bed to release daily tension and promote relaxation for better sleep. Can be done anytime you notice neck tension building.",
+    "suggested_combinations": ["shoulder-rolls", "seated-spinal-twist", "arm-circles"],
+    "notes": "Sit or stand tall with shoulders relaxed and down, away from ears. Slowly lower chin toward chest first, feeling a gentle stretch in the back of the neck. Slowly roll head to one side (ear toward shoulder), then continue rolling head back, around to the other side, and back to center in a smooth circle. Keep shoulders completely still—all movement should occur only in the neck. Breathe naturally and never hold your breath during the movement. Make the circles small and controlled initially, gradually increasing size only if comfortable and no pain occurs. Reverse direction halfway through your set (if doing 8 circles, do 4 each direction). The movement should be fluid and continuous, not jerky. Stop immediately at any position if you feel pinching, sharp pain, or dizziness. You can pause briefly at any point if needed.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "Cleveland Clinic – Neck Exercises"]
+  },
+  "seated-spinal-twist": {
+    "name": "Seated Spinal Twist",
+    "description": "Seated rotational stretch of the torso",
+    "benefits": "Improves spinal rotation and thoracic (mid-back) flexibility, which is essential for daily movements like reaching behind you, looking over your shoulder while driving, or getting items from car backseats. Gently stretches the muscles along the spine (erector spinae), obliques, and intercostal muscles between ribs. Can help improve overall posture by counteracting the forward-hunched positioning that results from prolonged sitting at computers or in cars. May aid digestion and relieve constipation through gentle compression and massage of abdominal organs—the twisting motion stimulates the digestive system. Often provides relief from bloating and discomfort during menstruation. Releases tension in the mid and upper back. Promotes better breathing by opening the chest and rib cage.",
+    "limitations": "Avoid if you have herniated discs, severe spinal stenosis, acute disc injuries, or acute back injury without medical clearance. Move gently and never force the twist—stop at your natural comfortable range, which varies greatly between individuals. If you have osteoporosis or osteopenia, check with a healthcare provider as twisting movements can pose fracture risk if done aggressively. Those with hip replacements should ensure the twist doesn't create excessive stress on the hip joint. People with significant scoliosis should be gentle and may notice one side twists more easily than the other. Stop if you feel sharp pain, shooting pain down legs, numbness, or tingling. The stretch should feel mild and comfortable, never painful.",
+    "best_timing": "Excellent for evening stretching routines to release accumulated tension from the day and promote relaxation before bed. Works well during long periods of sitting or immediately after—every 30-60 minutes during desk work is beneficial. Can be done during work breaks or between tasks to reset posture and spinal mobility. Particularly helpful during menstruation for bloating relief and digestive comfort. Also beneficial in morning routines to mobilize the spine after sleep and establish good range of motion. Can be performed multiple times daily without concern—it's gentle enough for frequent use throughout the day.",
+    "suggested_combinations": ["neck-rolls", "shoulder-rolls", "side-stretch"],
+    "notes": "Sit tall on a chair or cross-legged on the floor with very good upright posture—spine long and shoulders back. Keep hips facing directly forward throughout (hip bones should not rotate). Slowly rotate torso to one side, leading with your chest and shoulders. Use your arms to gently deepen the twist by placing one hand on the opposite knee or chair back and the other hand behind you for support. Breathe deeply throughout—inhale to lengthen and straighten your spine even more, exhale to gently twist a little deeper if comfortable. Keep both shoulders relaxed and level (don't let one shoulder hike up). Hold the position steady without bouncing or pulsing. The stretch should be felt along your spine and side body. Return to center slowly and mindfully, then repeat on the other side. Focus on rotating from the thoracic spine (mid-back), not just turning your shoulders while keeping your spine still.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "Yoga Journal – Seated Twist Benefits"]
+  },
+  "hamstring-stretch": {
+    "name": "Hamstring Stretch",
+    "description": "Stretch targeting the back of the thigh",
+    "benefits": "Lengthens tight hamstring muscles at the back of the thigh, which commonly become shortened and tight from prolonged sitting, cycling, running, or other activities. Improves flexibility in the entire posterior chain (hamstrings and lower back), enhancing overall mobility for daily activities like bending to pick things up, tying shoes, or walking with proper gait mechanics. Better hamstring flexibility can significantly reduce lower back pain by allowing proper hip hinge mechanics and reducing compensatory stress on the lumbar spine. Supports better posture by addressing muscle tightness that can pull the pelvis into posterior tilt. Reduces risk of hamstring strains and tears during physical activity. Particularly important for maintaining functional mobility and independence as we age.",
+    "limitations": "Avoid if you have acute hamstring tear or recent hamstring injury—allow proper healing time (typically 4-6 weeks minimum) before stretching. Never bounce in the stretch (ballistic stretching); use static holds or very gentle dynamic movement only. If you have lower back issues or sciatica, be cautious not to round your spine excessively; instead hinge from hips with a relatively flat back to avoid aggravating the condition. Those with sciatica should stretch gently and stop immediately if symptoms increase (numbness, tingling, radiating pain). Very tight hamstrings are extremely common—don't force the stretch into pain. Remember that flexibility improvements take weeks of consistent practice. People with hypermobility should focus on control rather than maximum range.",
+    "best_timing": "Excellent after workouts when muscles are thoroughly warm to improve flexibility and prevent tightness. Can be done in morning routines to reduce overnight stiffness from sleep, though muscles will be less pliable when cold. Perfect for post-work stretching if you sit all day—helps counteract the shortening effects of prolonged sitting. Perform daily if hamstrings are chronically tight or you sit for long periods. Best done after at least 5-10 minutes of light movement or warm-up rather than on completely cold muscles for safety and effectiveness. Can be performed before bed to ease tension and promote relaxation. Hold stretches longer (30-60 seconds) for better results.",
+    "suggested_combinations": ["calf-stretch", "quad-stretch", "hip-opener"],
+    "notes": "Can be performed standing, seated, or lying down—choose based on comfort and available space. For standing version: place one heel on a low step, stool, or chair with leg relatively straight. Keep that leg's knee soft (not hyperextended). Hinge forward from your hips, not your waist, keeping your back relatively flat rather than rounding excessively. You should feel the stretch in the back of the elevated thigh. For seated version: sit with one leg extended and other bent, reach toward the extended foot. For supine version: lie on back and use a strap or towel around the foot to gently pull leg toward you. Hold steady position without bouncing—static stretching is safest. Breathe deeply and try to relax into the stretch with each exhale, allowing muscles to gradually release. A slight bend in the knee is perfectly acceptable if hamstrings are very tight. Switch legs and repeat. Consistency over weeks is key for flexibility gains.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Council on Exercise – Flexibility Training"]
+  },
+  "calf-stretch": {
+    "name": "Calf Stretch",
+    "description": "Stretch targeting the back of the lower leg",
+    "benefits": "Stretches the gastrocnemius (larger, more superficial calf muscle) and soleus (deeper calf muscle) at the back of the lower leg, which often become tight from walking, running, standing for long periods, or wearing heels. Improves ankle dorsiflexion range of motion (ability to bring toes toward shin), which is essential for proper squatting mechanics, climbing stairs comfortably, walking uphill, and maintaining good gait. Better calf flexibility can reduce risk of Achilles tendon injuries and plantar fasciitis by reducing excessive strain on these structures. Helps alleviate calf cramps, soreness, and the heavy-leg feeling after long periods of standing or walking. Particularly helpful after wearing high heels which shorten the calf muscles. Supports better balance and more fluid walking mechanics.",
+    "limitations": "Avoid if you have acute Achilles tendinitis or recent Achilles rupture—allow proper healing time (months, typically) before stretching. If you have plantar fasciitis, proceed very gently as aggressive calf stretching can sometimes aggravate foot pain, though gentle stretching often helps. Never bounce in the stretch—use static holds only. Those with calf strains should wait until completely healed before resuming stretching. Start gently if calves are very tight, cramping frequently, or if you're prone to calf strains. Stop if you feel sharp pain specifically in the Achilles tendon (back of ankle) or if you feel unusual sensations. Pregnant women should be gentle as hormonal changes can affect ligament laxity.",
+    "best_timing": "Can be performed anytime throughout the day with no special timing requirements. Especially helpful after long periods of standing or walking to relieve tightness and heaviness. Excellent after workouts involving legs such as running, cycling, hiking, or leg strength training to prevent tightness and aid recovery. Perfect before bed to prevent nighttime calf cramps, which are common in older adults and pregnant women. Works well in morning routines to loosen calves after sleep, particularly if you tend to wake with tight calves. Particularly valuable after wearing heels to restore normal calf length. Can be done daily or even multiple times per day without concern—gentle enough for very frequent use.",
+    "suggested_combinations": ["hamstring-stretch", "quad-stretch", "hip-opener"],
+    "notes": "Face a wall and place both hands on it at shoulder height for support and stability. Step one leg straight back 2-3 feet, keeping that leg completely straight with heel flat on the ground. The front knee bends slightly for stability. Push your hips forward gently and lean into the wall until you feel a moderate stretch in the back calf—specifically in the upper, bulky part of the calf (gastrocnemius). Keep the back heel firmly planted and toes pointing straight forward (not turned out), which ensures proper stretch. Hold the position steady for 20-30 seconds without bouncing. To additionally stretch the deeper soleus muscle (important for ankle mobility), slightly bend the back knee while keeping heel down—you'll feel the stretch move lower in the calf toward the ankle. Breathe naturally and try to relax into the stretch. Switch legs and repeat. For tighter calves, you may need to move the back foot closer to the wall initially.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Orthopaedic Foot & Ankle Society – Stretching"]
+  },
+  "quad-stretch": {
+    "name": "Quad Stretch (Standing)",
+    "description": "Stretch targeting the front of the thigh while standing on one leg",
+    "benefits": "Stretches the quadriceps muscles at the front of the thigh (rectus femoris, vastus lateralis, vastus medialis, vastus intermedius), which commonly become tight from activities like running, cycling, hiking, or sitting for extended periods. Improves hip flexor and overall knee mobility, which is important for proper squat depth, lunging mechanics, and comfortable stair climbing. The single-leg standing position challenges and improves balance and proprioception. Better quad flexibility can reduce knee pain, particularly anterior knee pain (pain at front of knee), and improve overall knee mechanics. Helps maintain healthy patellar (kneecap) tracking. Can improve posture by preventing anterior pelvic tilt, which often results from tight hip flexors and quads pulling the pelvis forward.",
+    "limitations": "Avoid if you have acute knee pain, recent knee injury, patellar tendinitis, or quad strains until cleared by healthcare provider. If you have significant balance issues or vestibular problems, perform the stretch near a wall, sturdy chair, or counter where you can hold on for support with your free hand. Those with very tight quads or hip flexors may feel uncomfortable in this position—don't force it; you can bend the standing leg slightly if needed for comfort. If you feel pain in the kneecap or front of knee (sharp pain, not stretching sensation), ease off the stretch immediately. People with hip replacements should verify with their surgeon that this amount of hip flexion is safe for their specific implant type and recovery stage. Never pull aggressively on the ankle or foot.",
+    "best_timing": "Perfect after workouts, especially those heavily involving legs such as running, cycling, squats, or lunges—muscles are warm and receptive to stretching. Can be performed during cool-down routines to prevent post-exercise tightness. Helpful after long periods of sitting to counteract hip flexor tightness that accompanies prolonged sitting. Works well in morning mobility routines to improve range of motion for the day, though muscles will be less pliable when cold. Can be performed daily without concern. Best done after at least some light movement or activity rather than completely cold for optimal safety and effectiveness. Particularly beneficial for athletes in running, cycling, and jumping sports.",
+    "suggested_combinations": ["hamstring-stretch", "calf-stretch", "hip-opener"],
+    "notes": "Stand tall near a wall or sturdy chair if you need balance support. Bend one knee and reach back to grab that ankle or top of foot with your hand on the same side (right hand, right foot). Pull your heel toward your glutes (buttocks) while keeping knees close together—don't let the bent knee drift out to the side away from the standing leg. Engage your core and keep your hips facing directly forward (don't let hip of bent leg open to the side). Push your hips slightly forward to increase the stretch in the front of the thigh and hip flexor—this anterior pelvic tilt increases the stretch significantly. Stand tall and upright throughout—avoid leaning forward which reduces effectiveness. Keep the knee of your bent leg pointing straight down toward the ground. Hold the stretched position steady for 20-30 seconds without pulling aggressively or bouncing. Breathe normally and try to relax into the stretch. Switch legs and repeat. Focus on feeling a stretch sensation in the front thigh, not pain in the knee.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Council on Exercise – Lower Body Flexibility"]
+  },
+  "hip-opener": {
+    "name": "Hip Opener (Butterfly Stretch)",
+    "description": "Seated stretch with soles of feet together and knees falling to sides",
+    "benefits": "Opens the hips and deeply stretches inner thigh muscles (adductors), which often become tight from sitting with legs crossed, cycling, running, or horseback riding. Improves hip mobility, flexibility, and external rotation range of motion, which is essential for many daily movements, exercises like squats and lunges, and activities requiring hip mobility. This gentle, grounding stretch can help reduce lower back tension by improving hip flexibility—tight hips often contribute to compensatory lower back stress. The relaxing, meditative nature of the stretch helps reduce stress and promote calm through its resemblance to seated meditation poses. Often provides significant relief from menstrual cramps and pelvic tension due to increased blood flow to the pelvic region. Helps prepare hips for activities requiring mobility such as yoga, martial arts, or dance.",
+    "limitations": "Avoid if you have groin strain, hip labral tears, acute hip pain, or hip impingement without medical guidance. Never force knees toward the floor—let gravity and time gradually do the work over weeks of consistent practice. If you have very tight hips (knees are high off the ground), sit on a cushion, yoga block, or folded blanket to elevate your hips, which makes the position much more comfortable and accessible. Those with hip replacements should absolutely check with their orthopedic surgeon about safe hip positions and whether this stretch is appropriate given their specific implant and surgical approach. Stop if you feel sharp pain in hips, groin, or inner knee discomfort—pain in inner knees means you're pushing too aggressively. Pregnant women in later stages should be careful with wide hip positions.",
+    "best_timing": "Excellent for evening relaxation and wind-down routines before bed—the calming nature makes it ideal for promoting sleep. Perfect before bed to release daily tension accumulated in hips and lower back. Can be done during menstruation for natural cramp relief and pelvic relaxation. Works well after yoga, Pilates, or dance practice when hips are warm and open. Great for recovery days or rest periods when you want gentle movement. Can be held for extended periods (1-3 minutes or longer) as a meditative, restorative stretch. Particularly helpful after activities that tighten hips like running, cycling, or prolonged sitting. Best done after some movement when muscles are slightly warm.",
+    "suggested_combinations": ["cat-cow", "glute-bridges", "seated-spinal-twist"],
+    "notes": "Sit on the floor (or on a cushion if hips are tight) with soles of your feet pressed together, allowing knees to fall open to the sides naturally into a diamond or butterfly shape. Hold onto your feet or ankles gently with your hands. Sit tall with a straight spine and open chest (use a cushion under hips if needed to maintain upright posture without rounding). Let knees relax toward the floor under their own weight—absolutely never force or press them down. For a deeper stretch, you can hinge forward from your hips while keeping your back relatively straight (avoid rounding spine excessively). Many people prefer to stay upright and simply breathe deeply into the stretch. Breathe slowly and deeply, focusing on relaxing with each exhale and visualizing tension releasing from your hips. You can gently pulse your knees up and down in very small movements (like butterfly wings) to add gentle dynamic stretching. Focus on releasing tension rather than forcing range of motion. The stretch should feel mild and comfortable, creating a meditative, calming experience.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "Yoga Journal – Hip Opening Benefits"]
+  },
+  "side-stretch": {
+    "name": "Side Stretch (Lateral Flexion)",
+    "description": "Standing or seated stretch with arm reaching overhead to one side",
+    "benefits": "Lengthens the lateral muscles of the torso including obliques (side abdominals), intercostal muscles between ribs, and latissimus dorsi (large back muscle). Improves lateral flexion mobility of the spine, a movement plane that is often neglected in daily life but important for overall spinal health. Opens up the entire side body, creating valuable space in the ribcage for deeper, fuller breathing and better lung capacity. Can help improve posture by counteracting the forward slump and rounded shoulders that result from desk work, driving, and phone use. Often provides significant relief from bloating, gas, and menstrual cramps through gentle stretching and decompression of abdominal muscles and organs. Releases accumulated tension in the lower back, obliques, and sides of the torso.",
+    "limitations": "Avoid if you have acute lower back pain, especially pain that radiates down the leg (sciatica) or sharp stabbing sensations. Move gently and never force the stretch beyond your natural comfortable range—stop when you feel a moderate stretch sensation. If you have osteoporosis or significant osteopenia (low bone density), be cautious with spinal flexion movements and check with your healthcare provider about safety. Those with shoulder issues should keep the reaching arm lower, bent, or skip the overhead position if it causes shoulder pain. Don't lean forward or backward during the stretch—keep the stretch purely lateral (side-to-side) for effectiveness and safety. Stop if you feel sharp pain, unusual sensations, or increased discomfort.",
+    "best_timing": "Perfect for morning routines to wake up the body, establish good range of motion for the day, and improve breathing capacity before daily activities. Excellent during work breaks every 30-60 minutes to counteract sitting posture, open the ribcage, and re-energize. Great in evening stretching routines to release accumulated daily tension and decompress the spine before bed. Particularly helpful during menstruation for bloating relief and digestive comfort. Can be done multiple times throughout the day whenever you notice tension building in your sides or back. Works well before or after activities involving lateral movements or rotation. No special timing needed—can be done anytime, anywhere.",
+    "suggested_combinations": ["seated-spinal-twist", "cat-cow", "hip-opener"],
+    "notes": "Stand or sit tall with feet hip-width apart and excellent upright posture—spine long, shoulders back and down. Reach one arm overhead while the other arm rests on your hip, slides down your thigh for support, or hangs at your side. Gently bend your torso to the side away from the raised arm, creating a smooth C-curve shape with your entire torso from hip to fingertips. Keep your hips and shoulders facing directly forward throughout—resist any temptation to twist or lean forward/backward (stay in one plane of motion). Focus on lengthening through the raised arm rather than simply compressing down into the opposite side. Feel the stretch along the entire side of your body from your hip all the way up through your armpit and extended arm. Breathe deeply and consciously into the stretched side, allowing your ribcage to expand fully. Hold the position without bouncing or pulsing for 15-30 seconds. Return to center slowly and mindfully, then repeat on the other side. You should feel an opening sensation, never sharp pain.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Council on Exercise – Flexibility Training"]
+  },
+  "marching-in-place": {
+    "name": "Marching in Place",
+    "description": "Stationary marching with knees lifting",
+    "benefits": "Low-impact cardiovascular exercise that gently raises heart rate and improves circulation throughout the entire body without stressing joints. Excellent for warming up muscles before exercise or for achieving gentle cardio activity on rest or recovery days. Engages hip flexors, quadriceps, calves, and core muscles through the marching motion. Helps combat fatigue, afternoon energy slumps, and brain fog by increasing blood flow and oxygen delivery to tissues and brain. Particularly beneficial during PMS and menstruation when energy and mood are low—it can boost mood, reduce fatigue, and increase energy through endorphin release. Safe and accessible for virtually all fitness levels and requires absolutely no equipment or special space. Can help reduce leg swelling and improve circulation in people who sit or stand for long periods.",
+    "limitations": "Avoid if you have acute hip or knee pain that worsens with movement or weight-bearing. If balance is a significant concern or you have vestibular issues, perform the exercise near a wall, counter, or sturdy furniture where you can reach for support if needed. Those with very low fitness or significant deconditioning should start with just 20-30 seconds and gradually build duration over weeks. If you feel dizzy, lightheaded, or excessively breathless, slow down significantly or take a break—don't push through these symptoms. People with joint replacements (hip or knee) should ensure movements are completely pain-free. Not suitable during acute injury flare-ups or severe arthritis episodes when movement aggravates symptoms.",
+    "best_timing": "Perfect for morning warm-ups to wake up the body, increase core temperature, and prepare cardiovascular system for the day ahead. Excellent before any workout to gradually and safely elevate heart rate and warm muscles. Can be done throughout the day during activity breaks, especially helpful for desk workers who need to interrupt prolonged sitting every hour. Use during PMS or menstruation when energy is low but movement would be beneficial—even light marching can significantly improve energy and mood. Works well as a standalone quick 2-5 minute cardio session on very busy days when you can't do a full workout. Can be done while watching TV, during phone calls, or while waiting for something to cook.",
+    "suggested_combinations": ["arm-circles", "step-touch", "jumping-jacks-modified"],
+    "notes": "Stand tall with excellent upright posture, core gently engaged, and shoulders relaxed. Lift one knee to a comfortable height (ideally aiming for waist level or hip height if possible), then lower that foot and immediately lift the other knee in a rhythmic marching pattern. Swing arms naturally in opposition to legs (right arm forward when left leg lifts) as you would when walking normally—this contralateral movement pattern is natural and helps with balance and coordination. Keep your core engaged and shoulders relaxed throughout. Start at a very comfortable, easy pace and gradually increase speed only if desired and comfortable. Focus on bringing knees up actively rather than just shifting weight from foot to foot. Breathe naturally and continuously throughout—never hold your breath. To increase intensity and work your upper body simultaneously, you can add arm movements such as reaching overhead, punching forward, or doing bicep curls. Land softly on each foot.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "American Heart Association – Low-Impact Exercise"]
+  },
+  "step-touch": {
+    "name": "Step Touch",
+    "description": "Side-to-side stepping with light touch",
+    "benefits": "Gentle cardiovascular exercise that raises heart rate moderately without high impact on joints, making it accessible for people of all ages and fitness levels. Improves coordination, rhythm, and lateral movement patterns through the side-to-side motion. Engages hip abductors (muscles on the outside of hips), legs, and core while being extremely easy on the knees, ankles, and hips. Excellent for maintaining cardiovascular fitness during recovery from injury, during low-energy days, or as active recovery. Can improve lateral movement patterns and agility, which decline with age if not practiced. Safe and accessible for beginners, older adults, people with joint concerns, those recovering from injury, and anyone looking for very gentle cardio activity. Creates minimal impact stress while still providing cardiovascular benefits.",
+    "limitations": "Avoid if you have severe hip or knee pain that worsens with any lateral movement or weight-bearing activity. If balance is an issue or you have vestibular problems, reduce the range of stepping (take smaller steps), slow the pace significantly, or perform the exercise near a wall, counter, or other support. Those with acute ankle sprains should wait until the injury is fully healed before resuming lateral movements. Not suitable during severe arthritis flare-ups when movement significantly increases pain. Generally extremely safe due to low-impact nature, but stop if you feel any sharp joint pain or unusual discomfort. Wear supportive athletic shoes if exercising on hard surfaces to provide cushioning and stability.",
+    "best_timing": "Perfect for gentle warm-ups before more intense exercise to gradually raise body temperature and heart rate. Excellent during work breaks or as active recovery between strength exercises to keep heart rate elevated without excessive fatigue. Can be done anytime throughout the day for quick movement breaks and to interrupt prolonged sitting—every hour is beneficial. Works extremely well for morning routines to gently elevate heart rate and energize the body. Particularly suitable during lower-energy phases like menstruation, PMS, or recovery weeks when you want movement without intensity. Can be performed multiple times daily without any overtraining concerns due to gentle nature.",
+    "suggested_combinations": ["marching-in-place", "arm-circles", "jumping-jacks-modified"],
+    "notes": "Stand with feet together, knees soft (slightly bent), and core gently engaged. Step your right foot out to the right side (hip-width or slightly wider), then lightly touch your left foot next to your right foot (keeping most weight on the right foot). Immediately step the left foot back to the left, then touch the right foot next to the left. Continue this rhythmic side-to-side pattern at a steady, comfortable pace. To increase upper body engagement and calorie burn, add coordinated arm movements such as reaching arms to the sides as you step, raising arms overhead, or any other comfortable arm patterns. Keep your core engaged and maintain upright posture with shoulders back—avoid leaning side to side excessively. Knees should stay soft throughout, never locked. Start at a slow, controlled pace to establish rhythm and balance, then gradually increase pace as comfortable and confident. Focus on smooth, flowing movements with good posture. Adding music with a clear beat can make the exercise more enjoyable and help maintain consistent rhythm.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "American Heart Association – Moderate-Intensity Activity"]
+  },
+  "jumping-jacks-modified": {
+    "name": "Jumping Jacks (Modified/Low-Impact)",
+    "description": "Stepping version of jumping jacks without actual jumping",
+    "benefits": "Provides the cardiovascular benefits and full-body engagement of traditional jumping jacks without the high impact of actual jumping, protecting joints while still elevating heart rate effectively. Particularly accessible for seniors, people with joint issues (knee, hip, ankle problems), those recovering from injury, or anyone who needs to avoid high-impact exercise. Engages both upper and lower body simultaneously through coordinated arm and leg movements, working shoulders, chest, legs, and core. Improves coordination and balance through the alternating stepping pattern combined with arm movements. Strengthens shoulders and legs through repeated motion while being much gentler than plyometric exercises. Excellent for maintaining fitness and cardiovascular health during periods when high-impact exercise isn't appropriate, such as injury recovery, arthritis flares, or osteoporosis management.",
+    "limitations": "Avoid if you have severe hip, knee, or shoulder pain that worsens even with low-impact movement. Even without jumping, the lateral stepping motion may aggravate some joint conditions—modify range (take smaller steps) or reduce arm height as needed for comfort. If shoulder mobility is significantly limited, reduce arm range of motion, keep hands at shoulder height rather than overhead, or omit arm movements entirely. Those with balance concerns should perform the exercise near a wall, sturdy chair, or counter for support if needed. Stop if you feel any joint pain, excessive fatigue, or unusual discomfort. Generally extremely safe due to its low-impact, controlled nature—one of the safest cardiovascular exercises available.",
+    "best_timing": "Perfect for morning routines to energize the body, wake up muscles, and raise heart rate to start the day actively. Excellent during midday energy slumps for a quick 1-2 minute activity boost to increase alertness and productivity. Can be used as a gentle warm-up before other exercises to prepare the cardiovascular system and warm muscles. Works well in circuit training as a lower-intensity cardio interval between strength exercises. Suitable for daily performance without any overtraining concerns due to low impact and moderate intensity. Particularly great during recovery weeks when you're scaling back exercise intensity but want to maintain movement habits. Can be done while watching TV or during commercial breaks.",
+    "suggested_combinations": ["marching-in-place", "step-touch", "arm-circles"],
+    "notes": "Stand with feet together and arms at your sides in a relaxed starting position. Step one foot out to the side (hip-width or wider) while simultaneously raising arms overhead, out to sides to shoulder height, or to any comfortable height. Return that foot and your arms back to the starting position with control. Immediately step the other foot out to the side with arms up again in a continuous, rhythmic pattern. Continue alternating feet in a steady rhythm. Keep all movements controlled and coordinated—avoid rushing or moving frantically. Focus on achieving full range of motion in both your arms (reaching fully overhead if shoulder mobility allows) and legs (stepping out to a comfortable distance). Breathe naturally and continuously throughout the exercise—establish a breathing pattern that matches your movement rhythm (breathe in for two steps, out for two steps). Can increase pace gradually for more cardiovascular challenge while maintaining excellent control and form. Adding upbeat music with a clear beat can make the exercise more enjoyable and help you maintain a consistent tempo.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "National Institute on Aging – Exercise Modifications"]
+  },
+  "side-steps-cardio": {
+    "name": "Side Steps (Lateral Steps)",
+    "description": "Rhythmic side-to-side stepping with emphasis on lateral movement",
+    "benefits": "Combines cardiovascular conditioning with valuable lateral movement training that is often neglected in typical forward-focused exercise. Specifically targets and strengthens the gluteus medius and hip abductors (muscles on outside of hips), which are absolutely crucial for hip stability, preventing knee valgus (knees caving in), and reducing injury risk. Improves coordination, agility, and lateral movement control through rhythmic side-to-side motion. The low-impact nature makes it extremely joint-friendly while still effectively elevating heart rate and providing cardio benefits. Helps strengthen stabilizing muscles around hips and ankles that are often weak and contribute to falls, poor balance, and walking instability. Particularly beneficial for seniors, people focused on functional fitness and fall prevention, and athletes in sports requiring lateral movement (basketball, tennis, soccer). Can significantly improve walking stability, balance during daily activities, and confidence in movement.",
+    "limitations": "Avoid if you have acute hip or knee pain that worsens specifically with lateral (side-to-side) movements. Those with ankle instability, chronic ankle sprains, or weak ankles should move carefully, consider wearing ankle support, and may need to take smaller steps initially. If balance is a concern, reduce the size of steps significantly, slow the pace, or perform near a wall, railing, or sturdy furniture for support. People with hip bursitis (trochanteric bursitis) should check whether lateral movements aggravate symptoms—some find it helpful, others find it irritating. Stop if you feel sharp pain in hips, knees, ankles, or any unusual discomfort. Generally very safe due to its controlled, low-impact, predictable nature—one of the safest cardiovascular and lateral training exercises.",
+    "best_timing": "Excellent for warm-ups to activate hip muscles, improve hip stability, and prepare the body for exercise—particularly valuable before activities requiring lateral movement or lower-body strength. Works well in cool-downs to maintain movement and keep heart rate slightly elevated while reducing intensity gradually. Perfect during activity breaks throughout the day to interrupt sitting and maintain hip strength. Can be used as a standalone gentle cardio session lasting 5-10 minutes. Particularly suitable during lower-energy phases, recovery periods, or when you need gentle movement without high intensity. Great for seniors as part of daily movement routines for fall prevention and functional fitness. Can be performed multiple times daily without overtraining concerns.",
+    "suggested_combinations": ["marching-in-place", "step-touch", "hip-opener"],
+    "notes": "Stand with feet together and slight bend in knees (never locked). Step one foot out to the side, then bring the other foot to meet it (can touch or tap next to the stepping foot). Continue stepping in one direction for several steps (typically 3-5 steps), then reverse direction and step back the other way. Alternatively, you can step side-to-side in place without traveling laterally. Keep your core engaged and maintain upright posture throughout with chest up and shoulders back—avoid leaning or tilting. To increase gluteus medius engagement and effectiveness, add a slight quarter-squat or pulse as you step, bending knees more deeply. Can coordinate arm movements with legs—pump arms in opposition, reach arms side to side, or swing naturally. Focus on pushing off powerfully with the trailing leg (the leg doing the work) rather than just passively moving feet back and forth. Start at a comfortable, controlled pace to establish balance and coordination, then increase speed as you feel confident and stable. Using rhythmic music helps maintain tempo and makes the exercise more enjoyable and sustainable.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "American Council on Exercise – Lateral Movement Training"]
+  },
+  "pelvic-tilts": {
+    "name": "Pelvic Tilts",
+    "description": "Gentle rocking motion of the pelvis while lying on back",
+    "benefits": "Gentle, accessible exercise that strengthens deep core muscles including transverse abdominis and lower back stabilizers while improving awareness of pelvic positioning and spinal movement. Helps develop conscious control over pelvic alignment, which is fundamental to good posture and spinal health. Excellent for postpartum recovery, helping new mothers reconnect with core muscles and pelvic floor after the significant changes of pregnancy and delivery. Can alleviate lower back pain by teaching proper neutral pelvic positioning and engaging core stabilizers that support the spine. Improves overall posture by addressing excessive anterior pelvic tilt (arched lower back), which often causes back pain. The gentle rocking motion can provide relief for lower back tension, stiffness, and discomfort. Strengthens the important mind-muscle connection between breath and core engagement, which is fundamental to all core training.",
+    "limitations": "Avoid during acute lower back pain flare-ups, especially if accompanied by sharp, stabbing pain or radiating symptoms—wait until acute symptoms subside before resuming. If lying completely flat causes discomfort or pain in your lower back, place a pillow or rolled towel under your knees for support, which reduces strain. Those with sacroiliac joint dysfunction should move very gently and stop immediately if it aggravates symptoms (pain in lower back/buttock area). Pregnant women should get clearance from their healthcare provider before performing, especially in the second and third trimesters when lying flat on the back may not be recommended. If you feel any sharp pain, unusual discomfort, or increased symptoms, reduce range of motion or stop. Generally extremely safe and gentle when performed correctly with control.",
+    "best_timing": "Perfect for morning routines to gently wake up and activate core and back muscles after sleep, establishing good movement patterns for the day. Excellent before bed to release accumulated lower back tension from the day and decompress the spine for better sleep quality. Ideal during the postpartum recovery period as one of the earliest safe core reconnection exercises—typically can begin within days after delivery with medical clearance. Can be done daily without concern due to gentle nature. Works extremely well as part of physical therapy programs for chronic lower back pain. Great during menstruation if experiencing lower back discomfort or cramping. Can be performed before or after other exercises as either activation (before) or recovery (after).",
+    "suggested_combinations": ["glute-bridges", "cat-cow", "bird-dog"],
+    "notes": "Lie on your back on a mat or comfortable surface with knees bent and feet flat on the floor about hip-width apart. Arms rest comfortably by your sides, palms down. Start with your spine in neutral position (natural, small curve in lower back—not pressed flat, not excessively arched). Gently tilt your pelvis upward and backward by engaging your abdominal muscles and pressing your lower back toward the floor—imagine tucking your tailbone under toward your heels. Your hips will lift very slightly off the floor (maybe half an inch or less). Hold this tilted position for 2-3 seconds, feeling your abs engage and lower back flatten. Then slowly return to the neutral starting position with the natural curve. The movement is small, controlled, and deliberate—not forceful or aggressive. Breathe out as you tilt the pelvis (engage abs), breathe in as you return to neutral. Focus on feeling your core muscles engage and work rather than pushing hard or forcing large movement. You can place one hand under your lower back to physically feel it press down during the tilt. Quality and control matter far more than range of motion or speed.",
+    "exercise_references": ["NHS Women's Health", "American Physical Therapy Association – Core Exercises"]
+  },
+  "shoulder-rolls": {
+    "name": "Shoulder Rolls",
+    "description": "Controlled circular rolling motion of the shoulders to release tension",
+    "benefits": "Effectively relieves tension and tightness in the upper trapezius, levator scapulae, and other muscles that commonly become tight from stress, poor posture, or prolonged sitting. Improves shoulder mobility and range of motion through controlled circular movement that takes the joint through its full range. Increases blood flow to the shoulder area, bringing oxygen and nutrients that help reduce muscle soreness and promote tissue health. Can help prevent or reduce tension headaches that originate from tight neck and shoulder muscles. Particularly valuable for desk workers, computer users, and anyone who spends significant time in forward-leaning positions that create shoulder tension. Provides immediate stress relief through the rhythmic, soothing nature of the movement combined with conscious breathing. Easy to perform anywhere without equipment, making it an accessible daily habit for maintaining shoulder health and reducing chronic tension patterns.",
+    "limitations": "Avoid if you have acute shoulder inflammation, active bursitis, or severe rotator cuff injuries—consult a healthcare provider first. Those with shoulder impingement syndrome should move through a pain-free range only and avoid forcing the movement if it causes pinching sensations. If you experience clicking, popping, or grinding sensations during shoulder rolls, reduce the size and speed of the circles and focus on controlled, smooth movement—these sounds can indicate underlying shoulder issues that may need evaluation. People with rotator cuff tears should get medical clearance before performing, as certain movements may aggravate the injury. If shoulder rolls cause increased pain, sharp discomfort, or unusual symptoms, stop immediately and consult a healthcare provider. Generally very safe when performed gently and within a comfortable range. Start with small circles and gradually increase size as tolerated.",
+    "best_timing": "Perfect for morning routines to wake up shoulder muscles, improve circulation, and release overnight stiffness accumulated during sleep. Excellent during work breaks every 30-60 minutes to interrupt prolonged sitting and prevent shoulder tension from building throughout the day. Very effective after any period of static positioning (driving, sitting at desk, reading) when shoulders tend to round forward and create tension. Great before bed as part of a relaxation routine to release accumulated daily tension and prepare the body for restful sleep. Works well as a warm-up before upper body exercise or stretching to prepare shoulder joints and increase synovial fluid for better joint function. Can be used during stressful moments as an immediate tension-relief technique combined with deep breathing. Safe to perform multiple times throughout the day whenever shoulders feel tight or tense.",
+    "suggested_combinations": ["neck-rolls", "arm-circles", "chest-opener"],
+    "notes": "Stand or sit with good upright posture, spine neutral, chest open, and core gently engaged. Keep your arms relaxed and hanging naturally by your sides—shoulders should be relaxed, not held up near your ears. Begin by slowly lifting your shoulders up toward your ears in a shrugging motion. From the elevated position, roll your shoulders back, squeezing your shoulder blades together as you bring shoulders down and back. Complete the circle by bringing shoulders forward and then up again to the starting elevated position. Move through 8-10 slow, controlled circles in this backward direction. Then reverse the direction and roll your shoulders forward in circles (up, forward, down, back) for another 8-10 repetitions. Keep the movement smooth, controlled, and deliberate—avoid jerky or rapid movements. Breathe naturally and continuously throughout, or coordinate breathing with the movement (inhale as shoulders rise, exhale as they lower). Keep your head in neutral alignment (not tilted or rotated) and avoid tensing your neck. Focus on making large, full circles using your maximum comfortable range of motion. The movement should feel releasing and pleasant, not painful or straining.",
+    "exercise_references": ["American Council on Exercise – Shoulder Mobility", "Mayo Clinic – Posture Exercises"]
+  },
+  "chest-opener": {
+    "name": "Chest Opener",
+    "description": "Standing or seated stretch with hands clasped behind back to open the chest",
+    "benefits": "Excellent stretch for the pectoralis major and minor muscles (chest muscles) that commonly become shortened and tight from forward-leaning postures, desk work, driving, and device use. Helps correct rounded shoulders and forward head posture by pulling shoulders back and opening the chest. Improves breathing capacity and lung expansion by stretching the chest and allowing the rib cage to expand more fully—particularly valuable for those with shallow breathing patterns. Can significantly reduce upper back pain between the shoulder blades that often results from tight chest muscles pulling shoulders forward. Enhances shoulder mobility and flexibility through the active shoulder extension and external rotation involved in clasping hands behind the back. Can improve mood and energy levels—research suggests that opening the chest and expanding posture has positive psychological effects, reducing feelings of stress and fatigue. Directly counteracts the common 'computer posture' of rounded shoulders and collapsed chest that dominates modern life.",
+    "limitations": "Avoid if you have rotator cuff injuries, acute shoulder pain, or significant shoulder mobility limitations that prevent you from comfortably bringing hands together behind your back. If you cannot clasp your hands together behind your back, use a towel, yoga strap, or resistance band between your hands—hold each end and work on gradually bringing hands closer over time. Move into the stretch gradually and gently—forcing the position or stretching aggressively can strain shoulder ligaments or aggravate existing shoulder problems. Those with very tight shoulders should expect this to feel challenging initially and should work within a comfortable range, gradually improving over weeks. Pregnant women in later stages may find balance challenging and should perform seated or ensure stable positioning. Stop immediately if you experience sharp pain, tingling, numbness, or unusual discomfort in shoulders, arms, or hands. Generally safe when approached with patience and proper progression.",
+    "best_timing": "Perfect for morning routines to counteract overnight shoulder rounding and set good posture for the day ahead. Excellent during work breaks every 1-2 hours to interrupt prolonged forward-leaning positions and reset posture throughout the workday. Ideal after any period of hunched-over activity such as computer work, phone use, reading, driving, or cooking. Great before bed to release accumulated chest tightness and shoulder tension from the day. Works well after upper body workouts, especially those involving pushing movements (push-ups, bench press), to restore balance and prevent chest tightness. Can be performed before presentations, meetings, or important events—the open chest posture can boost confidence and improve breathing. Safe and beneficial to perform daily or even multiple times per day. Hold for 20-30 seconds and repeat 2-3 times.",
+    "suggested_combinations": ["shoulder-rolls", "neck-rolls", "cat-cow"],
+    "notes": "Stand or sit with good upright posture, feet hip-width apart (if standing), core gently engaged. Bring your arms behind your back and clasp your hands together with fingers interlaced (if you cannot reach, use a towel or strap). Straighten your arms as much as comfortably possible without locking elbows and gently lift your clasped hands up and away from your body. As you lift your arms, focus on squeezing your shoulder blades together and lifting your chest up toward the ceiling. Keep your head in neutral alignment—avoid jutting your chin forward or tilting your head back. The stretch should be felt across the front of your chest and possibly in the front of your shoulders. Hold the position for 20-30 seconds while breathing deeply and fully—use the stretch as an opportunity to practice deep breathing, which further enhances the chest-opening effect. Release slowly and repeat 2-3 times. For a deeper stretch, you can gently pull your shoulders back and down while maintaining the lifted arm position. If standing, avoid arching your lower back excessively—keep core engaged to protect your spine. Some people find it helpful to perform this stretch in a doorway or have a partner gently assist by applying light pressure to help open the chest further (communicate clearly to ensure proper intensity).",
+    "exercise_references": ["American Council on Exercise – Flexibility Training", "Mayo Clinic – Posture Exercises"]
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Seated Cardio (Arm Pumps)",
+    "description": "Seated marching with arm pumping motion to raise heart rate",
+    "benefits": "Provides cardiovascular benefits and raises heart rate while remaining seated, making it accessible for people with mobility limitations, recent surgery, or severe joint issues. Engages upper body muscles including shoulders, arms, and upper back through the pumping arm movements. Activates hip flexors and core through the marching motion. Excellent for improving circulation in the legs, which is particularly important during long periods of sitting like flights, car trips, or desk work—helps prevent blood pooling and reduces risk of deep vein thrombosis (DVT). Increases energy levels and combats fatigue without requiring standing or complex movements. Particularly valuable for older adults, postoperative patients, wheelchair users, or anyone with lower-body limitations who still wants to maintain cardiovascular fitness. Can help reduce leg swelling and the heavy feeling from prolonged sitting.",
+    "limitations": "Avoid if you have severe shoulder pain, rotator cuff tears, or acute upper-body injuries that worsen with arm movement. Those with very low cardiovascular fitness or recent cardiac events should start with just 20-30 seconds and gradually build duration. If you have uncontrolled high blood pressure, monitor intensity and stop if you feel dizzy, lightheaded, or experience chest discomfort. People with severe balance issues should ensure their chair is stable and won't tip. Those recovering from surgery should get medical clearance about appropriate intensity and whether this exercise is safe for their recovery stage. Stop if you experience unusual shortness of breath, chest pain, or dizziness. Generally very safe due to seated, low-impact nature.",
+    "best_timing": "Perfect during long office days—can be done every 1-2 hours to break up prolonged sitting and maintain energy. Excellent during flights, long car trips, or train rides to maintain circulation and prevent stiffness. Works well during TV commercial breaks or while waiting for something. Ideal for morning routines if standing exercises are not possible or appropriate. Can be used as a gentle warm-up before seated strength exercises. Particularly helpful during afternoon energy slumps when you need a boost but can't leave your desk. Can be performed multiple times daily—every hour during long sitting periods is reasonable. Suitable even on very low-energy days or during recovery when standing exercise isn't feasible.",
+    "suggested_combinations": ["seated-spinal-twist", "arm-circles"],
+    "notes": "Sit tall at the edge of a sturdy chair with feet flat on floor (or feet supported on footrest if needed) and core gently engaged. Begin marching in place by alternating lifting your knees—lift one knee up as high as comfortable (ideally bringing thigh parallel to floor if possible), then lower and lift the other knee. Simultaneously pump your arms in opposition to your legs (right arm forward when left knee lifts, like natural walking motion). Bend elbows to about 90 degrees and pump arms with purpose—drive your elbows back on each pump to engage upper back. Keep shoulders relaxed and down, away from ears. Maintain good upright posture throughout—don't slouch or round forward. Start at a comfortable, moderate pace and gradually increase speed as you warm up. Focus on controlled, rhythmic movements rather than frantic motion. Breathe naturally and continuously—establish a breathing pattern that matches your movement (in for 2 counts, out for 2 counts). To increase intensity, pump arms higher (reaching overhead) or lift knees higher. Can be done while watching TV, during phone calls, or any seated activity.",
+    "exercise_references": ["WHO Physical Activity Guidelines"]
+  },
+  "heel-to-toe-walk": {
+    "name": "Heel-to-Toe Walk",
+    "description": "Walking in a straight line with heel directly touching toe on each step",
+    "benefits": "Significantly improves balance, coordination, and proprioception (body awareness in space) through a challenging narrow base of support. Strengthens stabilizing muscles in the ankles, knees, hips, and core that are essential for preventing falls. Highly functional exercise that directly translates to better balance during daily activities like walking on uneven surfaces, navigating stairs, or catching yourself if you trip. Particularly valuable for fall prevention in older adults—studies show that balance training like heel-to-toe walking can reduce fall risk by up to 30%. Helps improve gait (walking pattern) and stride length, which often decline with age. Engages the vestibular system (inner ear balance), visual system, and proprioceptive system simultaneously, training all three balance systems. Can help identify balance issues early—if you find this very difficult, it may indicate need for more balance training or medical evaluation.",
+    "limitations": "Avoid if you have active vertigo, severe dizziness, or inner ear problems without medical clearance—this narrow walking pattern can trigger symptoms. Those with significant balance impairments, recent falls, or fear of falling should perform this exercise near a wall, railing, or with a spotter where they can reach for support if needed. Not suitable during acute ankle sprains or knee injuries when weight-bearing is painful. People with neuropathy (numbness in feet) should be very cautious as reduced foot sensation makes balance more challenging. Those with significant vision problems should ensure the path is clear and well-lit. Stop immediately if you feel dizzy, lose your balance repeatedly, or experience unusual symptoms. Start with just 5-6 steps and build gradually—this is harder than it looks.",
+    "best_timing": "Excellent for morning routines to activate balance systems and improve body awareness for the day ahead. Perfect as part of a daily balance training program—consistency is key for fall prevention benefits. Can be done before walks or activities requiring good balance to prime the stabilizing muscles. Works well as a functional assessment—perform monthly to track balance improvements over time. Ideal to include in physical therapy or rehabilitation programs for balance disorders. Best performed when you're alert and not fatigued—balance control deteriorates with fatigue. Can be done 3-5 times per week as part of a comprehensive fall prevention program. Particularly important for adults over 65 or anyone at increased fall risk.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Find a clear, straight path of at least 10-15 feet with nothing to trip over—a hallway works well. For safety, walk along a wall or have a sturdy surface nearby where you can reach for support if needed. Stand with feet together and choose a spot at the end of your path to focus on (this helps with balance). Place your right heel directly in front of your left toes, so that the heel and toes are touching or nearly touching. Step forward by placing your left heel directly in front of your right toes. Continue walking in this heel-to-toe pattern, like you're walking on a tightrope. Keep your arms out to the sides slightly for balance (or touch the wall lightly if needed). Walk slowly and deliberately—this is about control, not speed. Focus your eyes on a point ahead of you, not down at your feet (looking down makes balance harder). Keep your core engaged and posture upright. If you lose your balance, pause, reset your feet, and continue. Count your steps and try to increase the number you can do without losing balance. To make it easier initially, allow a small gap between heel and toe. To make it harder, try it with eyes closed (only if you're near a wall for safety).",
+    "exercise_references": ["Mayo Clinic – Balance Training"]
+  },
+  "plank-cross-body-touch": {
+    "name": "Plank Cross Body Touch",
+    "description": "From a front plank position, lift one hand to reach toward the opposite foot, tapping if possible, then return to plank and alternate sides",
+    "benefits": "Strengthens the entire core with particular emphasis on obliques (side abdominal muscles) and deep stabilizers like the transverse abdominis. The cross-body reaching movement creates rotational challenges that build anti-rotation strength—the ability to resist twisting forces, which is crucial for spine protection during daily activities and sports. Significantly improves coordination and balance through the single-arm support phase, where you must maintain stability on three points of contact. Enhances shoulder stability and strength as the supporting arm must control the full body weight during the reach phase. Develops functional core strength that translates directly to real-world movements involving rotation like reaching across your body, swinging sports equipment, or twisting while carrying objects. The dynamic nature improves proprioception (body awareness) and teaches the core muscles to work as an integrated unit rather than isolated muscles. Particularly effective for athletes in rotational sports like golf, tennis, baseball, or martial arts. Helps improve posture by strengthening the deep core muscles that support proper spinal alignment.",
+    "limitations": "Requires solid plank holding ability and shoulder stability as foundation—if you cannot hold a standard front plank for at least 30 seconds with good form, build that capacity first before attempting this more challenging variation. Avoid if you have acute wrist pain, carpal tunnel syndrome, or wrist injuries as the single-arm support phase increases stress on the supporting wrist. Those with shoulder impingement, rotator cuff problems, or shoulder instability should proceed cautiously or modify by reducing the reach distance. People with lower-back issues must be particularly careful to maintain neutral spine and avoid excessive rotation or sagging through the hips—if your form breaks down, stop and rest. Not suitable during pregnancy beyond the first trimester due to prolonged prone position and core stress. Those with significant balance challenges may find the single-arm phase too unstable initially and should build up with simpler plank variations first. Stop immediately if you experience sharp pain in shoulders, wrists, or lower back, or if you feel your form deteriorating significantly (hips rotating excessively, shoulders collapsing, or back sagging).",
+    "best_timing": "Ideal in the middle of a workout session when your core is activated and warm but not yet fatigued—performing this exercise early in a workout when muscles are cold can increase injury risk, while doing it when exhausted leads to poor form. Works excellently as part of a comprehensive core training circuit, alternating with exercises that challenge the core from different angles. Perfect inclusion in functional fitness routines or athletic training programs that emphasize rotational strength and stability. Can be incorporated into mixed full-body strength sessions as the core-focused element. Also effective as part of a dynamic warm-up sequence for sports requiring rotation (golf, tennis, martial arts), performed after general cardiovascular warm-up but before sport-specific drills. Perform 2-3 sets of 6-10 repetitions per side, with 30-60 seconds rest between sets. Best done 2-3 times per week with at least one rest day between sessions to allow recovery. Avoid as the very last exercise in a workout when fatigue has compromised your ability to maintain proper form.",
+    "suggested_combinations": ["front-plank-toe-tap", "bird-dog", "plank", "mountain-climbers"],
+    "notes": "Begin in a proper front plank position—hands directly under shoulders, body forming a straight line from head to heels, feet hip-width apart (wider foot position makes this easier by providing a more stable base). Engage your core by pulling your belly button toward your spine and squeeze your glutes to prevent hips from sagging or piking up. Before attempting the reach, ensure you're rock-solid stable in this base plank position. Keeping your hips as level as possible (this is crucial—resist the urge to rotate your hips significantly as you reach), slowly lift your right hand off the ground and reach it toward your left foot. The goal is to tap your left foot if flexibility and control allow, but reaching toward the knee or shin is perfectly acceptable—the key is maintaining stability, not how far you reach. As you reach, you will naturally shift more weight to your left arm—ensure that shoulder stays stable and doesn't collapse inward. Return your right hand slowly to the ground, re-establishing your stable plank position before reaching with the left hand toward the right foot. Move slowly and deliberately with complete control—this is not a race. Focus on maintaining a neutral spine throughout (not rounding or excessively arching your back). Breathe continuously and rhythmically—exhale as you reach toward your foot (the harder phase) and inhale as you return to plank. Keep your gaze directed slightly forward and down rather than looking back at your feet, which helps maintain neutral neck and spine alignment. If you find your hips rotating excessively, reduce the distance of your reach or widen your foot position for more stability. Quality of movement trumps quantity—perform fewer repetitions with excellent form rather than many with poor form. To make it easier: widen your feet for a more stable base, reach only as far as your knee instead of your foot, or perform the movement from an elevated surface (hands on a bench or box) to reduce the load. To make it harder: bring your feet closer together for a narrower, less stable base, or pause for 2-3 seconds at the reach position before returning.",
+    "exercise_references": ["American Council on Exercise – Core Training Guidelines", "National Academy of Sports Medicine – Functional Movement Patterns"]
   }
 }

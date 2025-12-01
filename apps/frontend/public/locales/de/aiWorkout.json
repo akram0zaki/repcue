@@ -69,13 +69,22 @@
     "title": "Ihre Ziele und Präferenzen",
     "subtitle": "Woran arbeiten Sie?",
     "description": "Was sind Ihre Fitnessziele?",
-    "goal": {
-      "label": "Hauptziel",
+    "goals": {
+      "label": "Hauptziele",
+      "helper": "Wählen Sie ein oder mehrere Ziele aus, die Sie erreichen möchten",
       "weightLoss": "Gewichtsverlust",
       "muscleBuilding": "Muskelaufbau",
       "healthMaintenance": "Gesundheitserhaltung",
       "flexibility": "Flexibilität & Mobilität",
-      "error": "Bitte wählen Sie Ihr Hauptziel"
+      "marathonDesSables": "Marathon des Sables Vorbereitung",
+      "error": "Bitte wählen Sie mindestens ein Ziel"
+    },
+    "goalDuration": {
+      "label": "Zeit zum Erreichen der Ziele (Optional)",
+      "helper": "Wie viele Monate haben Sie, um Ihre Ziele zu erreichen?",
+      "placeholder": "z.B. 3, 6, 12",
+      "unit": "Monate",
+      "error": "Die Zieldauer muss zwischen 1 und 24 Monaten liegen"
     },
     "fitnessLevel": {
       "label": "Aktuelles Fitnessniveau",
@@ -106,6 +115,10 @@
     "title": "Gesundheit & Trainingsstil",
     "subtitle": "Bleiben Sie sicher und effektiv",
     "description": "Helfen Sie uns, Ihre Workouts an Ihre Bedürfnisse anzupassen",
+    "saveToProfile": {
+      "label": "In meinem Profil speichern",
+      "description": "Speichern Sie diese Informationen, um zukünftige KI-Workout-Builder-Sitzungen vorauszufüllen. Sie können dies jederzeit in Ihren Profileinstellungen ändern."
+    },
     "injuries": {
       "label": "Verletzungen oder Einschränkungen (Optional)",
       "placeholder": "z.B. Knieschmerzen, unterer Rücken, Schulterverletzung...",
@@ -159,6 +172,7 @@
   "results": {
     "title": "Ihre personalisierten Workouts",
     "subtitle": "KI-generierte Workouts für Ihre Ziele",
+    "feedbackTitle": "KI-Trainer-Einblicke",
     "aiGeneratedBadge": "KI-generiert",
     "exerciseCount": "{{count}} Übungen",
     "durationSeconds": "~{{seconds}} sec",

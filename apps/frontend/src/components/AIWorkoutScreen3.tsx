@@ -186,6 +186,27 @@ export default function AIWorkoutScreen3({ data, errors, onChange }: AIWorkoutSc
           </p>
         )}
       </div>
+
+      {/* Save to Profile Checkbox */}
+      <div className="pt-4 border-t border-border">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={data.saveToProfile ?? true}
+            onChange={(e) => onChange({ ...data, saveToProfile: e.target.checked })}
+            className="mt-1 w-4 h-4 rounded border-border text-accent-primary focus:ring-2 focus:ring-accent-primary cursor-pointer"
+            aria-describedby="save-profile-description"
+          />
+          <div className="flex-1">
+            <span className="text-body font-medium text-text-primary">
+              {t('screen3.saveToProfile.label', 'Save to my profile')}
+            </span>
+            <p id="save-profile-description" className="text-small text-text-secondary mt-1">
+              {t('screen3.saveToProfile.description', 'Save this information to pre-fill future AI Workout Builder sessions. You can change this anytime in your profile settings.')}
+            </p>
+          </div>
+        </label>
+      </div>
     </div>
   );
 }

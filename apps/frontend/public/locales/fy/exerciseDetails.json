@@ -261,5 +261,650 @@
     "suggested_combinations": ["downward-dog", "child-pose"],
     "notes": "Untspan jo nekke folslein en lit jo holle swier hingje as jo bûge binne. Ferspried it gewicht nei de ballen fan jo fuotten (net allinich de hakken) om in bettere hamstringstretch te krijen. Jo kinne tsjinoerstelde ellebogen fêsthâlde en sêft fan side nei side swaaie om ekstra spanning los te litten. Adem stadich en djip; mei elke útademing sjoch dan oft jo jo romp wat tichter by jo dijen sakje litte kinne. Om oerein te kommen, span jo kearn oan en rôlje stadich op, ien wervel tagelyk, om dizigens te foarkommen.",
     "exercise_references": ["Rishikulyogshala – Forward Fold Benefits; https://www.rishikulyogshala.org/top-7-health-benefits-of-uttanasana-standing-forward-bend-pose/", "YogaDownload – Benefits of Forward Folds; https://www.yogadownload.com/Blog/TabId/424/PostId/1106/physical-psychological-benefits-of-forward-folds.aspx"]
+  },
+  "lying-back-extension": {
+    "name": "Rêchstriking Lizgjend",
+    "description": "Lizgjend op buik, boarst en earms fan grûn heffe",
+    "benefits": "Fersterket ûnderrêch en rêchbonkespieren. Ferbetteret hâlding en stretcht buik en boarst.",
+    "limitations": "Mije by akute rêchblessuere. Net te heech heffe.",
+    "best_timing": "Nei opwaarming of oan ein fan workout.",
+    "suggested_combinations": ["child-pose", "cat-cow"],
+    "notes": "Hâld nekke neutraal en foarkom nei boppe sjen."
+  },
+  "front-plank-toe-tap": {
+    "name": "Frontplank mei Tean Tap",
+    "description": "Fanút plankposysje, wikseljend tean reitsje mei krúswize hân",
+    "benefits": "Fersterket kearn en skouders, ferbetteret lykwicht en koördinaasje.",
+    "limitations": "Hâld heupen stabyl. Mije by polspine.",
+    "best_timing": "Yn kearnworkouts of HIIT sirkels.",
+    "suggested_combinations": ["plank", "mountain-climbers"],
+    "notes": "Bewege stadich en behâld fêste plankposysje."
+  },
+  "crab-twist-toe-touch": {
+    "name": "Crab Twist mei Tean Touch",
+    "description": "Fanút crab-posysje (ôfkears sitten), heupen heffe en tsjinoerstelde skonk reitsje",
+    "benefits": "Wurket kearn, bilspieren en skouders. Ferbetteret mobiliteit en koördinaasje.",
+    "limitations": "Wês foarsichtich mei polsen en skouders.",
+    "best_timing": "Yn krêft- of mobiliteitsirkels.",
+    "suggested_combinations": ["glute-bridges", "bear-crawl"],
+    "notes": "Heffe heupen heech en span bilspieren oan."
+  },
+  "standing-side-crunch": {
+    "name": "Steande Side Crunch",
+    "description": "Steande, knibbel lateraal nei elleboog bringe",
+    "benefits": "Rjochtet obliques en ferbetteret lykwicht.",
+    "limitations": "Behâld lykwicht. Mije lûde bewegingen.",
+    "best_timing": "Yn kearnworkouts of as opwaarming.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Span obliques oan boppe-oan beweging."
+  },
+  "bodyweight-side-squat-step": {
+    "name": "Sidestap Squat",
+    "description": "Laterale stap meitsje en knibbel bûge yn squat, dan werom",
+    "benefits": "Fersterket skonken en bilspieren. Ferbetteret laterale mobiliteit.",
+    "limitations": "Hâld knibbels efter teannen.",
+    "best_timing": "Yn skonkworkouts of HIIT sirkels.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Druk troch hakken en hâld boarst omheech."
+  },
+  "hip-roll-plank": {
+    "name": "Plank mei Heup Rôlje",
+    "description": "Fanút plankposysje, heupen fan lofts nei rjochts rôlje",
+    "benefits": "Fersterket kearn en obliques. Ferbetteret kearnstabiliteit.",
+    "limitations": "Hâld skouders stabyl.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["plank", "side-plank"],
+    "notes": "Bewege stadich en behâld kontrôle."
+  },
+  "bodyweight-pulse-squat": {
+    "name": "Pulse Squat",
+    "description": "Lege squatposysje hâlde en omheech en omleech pulse",
+    "benefits": "Bouwt spierúthâldingsfermogen yn skonken en bilspieren op.",
+    "limitations": "Kin fermoeijend wêze. Begjin mei minder pulses.",
+    "best_timing": "As finisher foar skonkworkout.",
+    "suggested_combinations": ["squats", "wall-sit"],
+    "notes": "Hâld pulses lyts en kontrolearre."
+  },
+  "side-plank-rotation": {
+    "name": "Side Plank mei Rotaasje",
+    "description": "Fanút side plank, romp draaie en earm ûnder lichem troch bringe",
+    "benefits": "Fersterket obliques en skouders. Ferbetteret kearnmobiliteit.",
+    "limitations": "Hâld heupen stabyl.",
+    "best_timing": "Nei meistering fan reguliere side plank.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Bewege stadich mei folsleine kontrôle."
+  },
+  "kneeling-backward-hip-circles": {
+    "name": "Knielende Efterútgean Heup Sirkels",
+    "description": "Fanút knielposysje, sirkels meitsje mei heupen",
+    "benefits": "Ferbetteret heupmobiliteit en ferhelpt spanning.",
+    "limitations": "Begjin mei lytse sirkels.",
+    "best_timing": "As opwaarming of stretch.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Hâld beweging floeiend en kontrolearre."
+  },
+  "lying-floor-abduction": {
+    "name": "Lizgjende Skonk Abduksje",
+    "description": "Op side lizgjend, boppeste skonk heffe",
+    "benefits": "Fersterket bûtenste heupen en bilspieren.",
+    "limitations": "Behâld lichaamsynstelling.",
+    "best_timing": "Yn skonk- of bilspierworkouts.",
+    "suggested_combinations": ["glute-bridges", "squats"],
+    "notes": "Gjin swaaien, kontrolearre beweging."
+  },
+  "balance-board": {
+    "name": "Lykwichtsbord",
+    "description": "Steane op lykwichtsbord en stabiliteit behâlde",
+    "benefits": "Ferbetteret lykwicht en enkelstabiliteit.",
+    "limitations": "Begjin by stipe foar feiligens.",
+    "best_timing": "As aparte lykwichtstraining.",
+    "suggested_combinations": ["single-leg-stand", "tree-pose"],
+    "notes": "Begjin mei koarte tiden en ferheegje stadichoan."
+  },
+  "hip-swirls": {
+    "name": "Heup Swirls",
+    "description": "Steande, grutte sirkulêre bewegingen meitsje mei heupen",
+    "benefits": "Ferbetteret heupmobiliteit en beriedt foar training.",
+    "limitations": "Net te fluch draaie.",
+    "best_timing": "As dynamyske opwaarming.",
+    "suggested_combinations": ["cat-cow", "squats"],
+    "notes": "Hâld beweging floeiend en kontrolearre."
+  },
+  "push-up-jack": {
+    "name": "Push-up Jack",
+    "description": "Push-up dwaan wylst gelyktiidich skonken útjaan",
+    "benefits": "Kombinearret boppelichaamskrêft mei cardio.",
+    "limitations": "Dreech foar begjinners.",
+    "best_timing": "Yn HIIT workouts of krêftsirkels.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Behâld fêste plankposysje."
+  },
+  "hip-crunch": {
+    "name": "Heup Crunch",
+    "description": "Fanút side plank, knibbel nei boarst bringe",
+    "benefits": "Wurket obliques en kearn.",
+    "limitations": "Freget goede kearnkrêft.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["side-plank", "bicycle-crunches"],
+    "notes": "Behâld lykwicht en kontrôle."
+  },
+  "shin-box": {
+    "name": "Shin Box",
+    "description": "Sittend mei knibbels op 90 graden, tusken kanten wikselje",
+    "benefits": "Ferbetteret heupmobiliteit en lykwicht.",
+    "limitations": "Kin dreech wêze foar knibbels.",
+    "best_timing": "As stretch of mobiliteit.",
+    "suggested_combinations": ["hip-swirls", "cat-cow"],
+    "notes": "Bewege stadich en behâld hâlding."
+  },
+  "standing-side-crunch-elbow-to-knee": {
+    "name": "Steande Side Crunch Elleboog-nei-Knibbel",
+    "description": "Steande, knibbel lateraal bringe en reitsje mei tsjinoerstelde elleboog",
+    "benefits": "Rjochtet obliques en ferbetteret lykwicht.",
+    "limitations": "Mije lûde bewegingen.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["standing-side-crunch", "bicycle-crunches"],
+    "notes": "Span obliques oan boppe-oan."
+  },
+  "seated-circle-leg-crunch": {
+    "name": "Sittende Sirkel Skonk Crunch",
+    "description": "Sittend, skonken heffe en yn sirkels draaie",
+    "benefits": "Fersterket kearn en obliques.",
+    "limitations": "Dreech foar begjinners.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["russian-twists", "dead-bug"],
+    "notes": "Hâld beweging stadich en kontrolearre."
+  },
+  "sitting-lotus-pose-hip-horizontal": {
+    "name": "Sittende Lotus Heupen Horizontaal",
+    "description": "Sittend mei skonken krúst, nei foaren hingje",
+    "benefits": "Stretcht heupen en binnenkant dijen.",
+    "limitations": "Freget goede heupfleksibiliteit.",
+    "best_timing": "As stretch nei workout.",
+    "suggested_combinations": ["forward-fold", "child-pose"],
+    "notes": "Net forsearje, sêft strekke."
+  },
+  "lying-abduction-leg-raise-on-floor": {
+    "name": "Lizgjende Abduksje Skonk Heffe",
+    "description": "Op side lizgjend, boppeste skonk heffe",
+    "benefits": "Fersterket bûtenste heupen.",
+    "limitations": "Hâld lichem rjocht.",
+    "best_timing": "Yn bilspierworkouts.",
+    "suggested_combinations": ["glute-bridges", "lying-floor-abduction"],
+    "notes": "Kontrolearre beweging, gjin swaaien."
+  },
+  "side-bridge-bent-leg": {
+    "name": "Side Bridge mei Bûgde Skonk",
+    "description": "Side plank mei ûnderste skonk bûgd foar stipe",
+    "benefits": "Oanpaste side plank. Fersterket kearn.",
+    "limitations": "Makliker as folsleine side plank.",
+    "best_timing": "Foar begjinners of opwaarming.",
+    "suggested_combinations": ["side-plank", "plank"],
+    "notes": "Hâld heupen heech en lichem rjocht."
+  },
+  "leg-pull-side": {
+    "name": "Skonk Pull Side",
+    "description": "Fanút side plank, boppeste skonk heffe",
+    "benefits": "Fersterket kearn, heupen en skouders.",
+    "limitations": "Avansearre oefening.",
+    "best_timing": "Nei meistering fan side plank.",
+    "suggested_combinations": ["side-plank-rotation", "side-plank"],
+    "notes": "Behâld stabiliteit en kontrôle."
+  },
+  "power-clean-thruster": {
+    "name": "Power Clean Thruster",
+    "description": "Gearstalde beweging: clean fan grûn nei skouders, dan push oerheid",
+    "benefits": "Folsleine-lichaams krêft en eksplosjyf fermogen.",
+    "limitations": "Komplekse technyk, freget training.",
+    "best_timing": "Yn avansearre krêftworkouts.",
+    "suggested_combinations": ["squats", "push-ups"],
+    "notes": "Leare korrekte technyk foar swiere lasten."
+  },
+  "snatch-high": {
+    "name": "Snatch High",
+    "description": "Rappe lift fan grûn nei oerheid yn ien beweging",
+    "benefits": "Ûntwikkelt eksplosjyf fermogen en folsleine-lichaams koördinaasje.",
+    "limitations": "Hiel avansearre technyk.",
+    "best_timing": "Allinich foar treine atleten.",
+    "suggested_combinations": ["power-clean-thruster", "squats"],
+    "notes": "Freget poerbêste mobiliteit en technyk."
+  },
+  "press-under": {
+    "name": "Press Under",
+    "description": "Ûnder stang dûke wylst omheech drukke",
+    "benefits": "Ferbetteret oergongsnelheid en boppelichaamskrêft.",
+    "limitations": "Avansearre Olympyske hefttechnyk.",
+    "best_timing": "As aksessuere oefening foar Olympysk hefjen.",
+    "suggested_combinations": ["snatch-high", "power-clean-thruster"],
+    "notes": "Freget spesjalisearre training."
+  },
+  "lever-stepper": {
+    "name": "Lever Stepper Masine",
+    "description": "Steppermasine brûke foar cardio mei kuier beweging",
+    "benefits": "Leech-ympakt cardio, fersterket skonken.",
+    "limitations": "Freget steppermasine.",
+    "best_timing": "As aparte cardiosesje.",
+    "suggested_combinations": ["squats", "lunges"],
+    "notes": "Begjin stadich en ferheegje yntensiteit stadichoan."
+  },
+  "seated-neck-tap": {
+    "name": "Sittende Nekke Tap",
+    "description": "Sittend, sêft kanten fan nekke tikke",
+    "benefits": "Ferhelpt spanning en ferbetteret sirkulaasje.",
+    "limitations": "Wês hiel foarsichtich.",
+    "best_timing": "As stretch of ûntspanning.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Gjin sterke druk op nekke."
+  },
+  "elbow-flexion": {
+    "name": "Elleboog Fleksje",
+    "description": "Elleboog bûge om hân nei skouder te bringen",
+    "benefits": "Fersterket biceps en foarerms.",
+    "limitations": "Kin lichte gewichten brûke.",
+    "best_timing": "Yn earmworkouts.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Hâld elleboog stabyl tsjin lichem."
+  },
+  "side-kick-burpee": {
+    "name": "Burpee mei Side Kick",
+    "description": "Burpee dwaan en side kick tafoegje boppe-oan",
+    "benefits": "Kombinearret krêft, cardio en ferdigenigskeunsten.",
+    "limitations": "Avansearre heech-yntensiteit oefening.",
+    "best_timing": "Yn avansearre HIIT workouts.",
+    "suggested_combinations": ["burpees", "high-knees"],
+    "notes": "Behâld lykwicht tidens kick."
+  },
+  "butterfly-pull-up": {
+    "name": "Butterfly Pull-up",
+    "description": "Pull-up mei sirkulêr swaaie beweging",
+    "benefits": "Ûntwikkelt rêch- en earmkrêft mei dynamyske beweging.",
+    "limitations": "Avansearre CrossFit technyk.",
+    "best_timing": "Foar treine atleten.",
+    "suggested_combinations": ["push-ups", "burpees"],
+    "notes": "Freget goede boppelichaamskrêft."
+  },
+  "front-scoops": {
+    "name": "Front Scoops",
+    "description": "Sirkulêre earmbewegingen fan ûnder nei boppe",
+    "benefits": "Waarmje skouders op en ferbetteret gewrichtsmobiliteit.",
+    "limitations": "Bewege sêft.",
+    "best_timing": "As skouder opwaarming.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Hâld beweging floeiend."
+  },
+  "shoulder-flexion": {
+    "name": "Skouder Fleksje",
+    "description": "Earms nei foaren heffe op skoulderhichte",
+    "benefits": "Fersterket foarkant fan skouder.",
+    "limitations": "Kin lichte gewichten brûke.",
+    "best_timing": "Yn skouderworkouts.",
+    "suggested_combinations": ["push-ups", "shoulder-rolls"],
+    "notes": "Hâld elleboog licht bûgd."
+  },
+  "shoulder-transverse-flexion": {
+    "name": "Skouder Transversale Fleksje",
+    "description": "Earm horizontaal oer lichem bewege",
+    "benefits": "Rjochtet boarstspieren en foarkant skouder.",
+    "limitations": "Mije lûde bewegingen.",
+    "best_timing": "Yn boppelichaamworkouts.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Behâld kontrôle tidens beweging."
+  },
+  "forearm-supination": {
+    "name": "Foarerms Supinaasje",
+    "description": "Foarerms draaie fan binnen nei bûten",
+    "benefits": "Fersterket foaeremspieren en ferbetteret grip.",
+    "limitations": "Kin lichte gewichten brûke.",
+    "best_timing": "Yn foarermsworkouts.",
+    "suggested_combinations": ["elbow-flexion", "tricep-dips"],
+    "notes": "Bewege stadich en mei kontrôle."
+  },
+  "brachialis-pull-up": {
+    "name": "Brachialis Pull-up",
+    "description": "Pull-up mei neutrale grip (palmen tsjinoer inoar)",
+    "benefits": "Rjochtet brachialis en bicepsspieren.",
+    "limitations": "Freget boppelichaamskrêft.",
+    "best_timing": "Yn rêch- en earmworkouts.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Hâld beweging stadich en kontrolearre."
+  },
+  "brachialis-narrow-pull-up": {
+    "name": "Brachialis Narrow Pull-up",
+    "description": "Pull-up mei nauwe en neutrale grip",
+    "benefits": "Ferheget fokus op brachialis.",
+    "limitations": "Dreger as normale pull-up.",
+    "best_timing": "Yn avansearre earmworkouts.",
+    "suggested_combinations": ["brachialis-pull-up", "push-ups"],
+    "notes": "Nauwe grip kin útdaagjend wêze."
+  },
+  "prayer-push": {
+    "name": "Prayer Push",
+    "description": "Palmens fan hannen stevich gear drukke foar boarst",
+    "benefits": "Fersterket boarst en earms isometrysk.",
+    "limitations": "Leech-ympakt isometryske oefening.",
+    "best_timing": "Op elk momint, sels op kantoar.",
+    "suggested_combinations": ["push-ups", "tricep-dips"],
+    "notes": "Druk stevich en hâld pear sekonden."
+  },
+  "lying-prone-w-to-y": {
+    "name": "Lizgjende W nei Y",
+    "description": "Lizgjend op buik, earms bewege fan W nei Y foarm",
+    "benefits": "Fersterket boppeste rêch en skouders.",
+    "limitations": "Kin ûngemaklik wêze foar nekke.",
+    "best_timing": "Yn rêchworkouts of hâldingskorrekje.",
+    "suggested_combinations": ["lying-back-extension", "child-pose"],
+    "notes": "Hâld nekke neutraal."
+  },
+  "palm-up-palm-down-rotation": {
+    "name": "Palm Omheech Palm Omleech Rotaasje",
+    "description": "Foarerms draaie fan palm omheech nei palm omleech",
+    "benefits": "Ferbetteret foarerms mobiliteit en fleksibiliteit.",
+    "limitations": "Lichte mobiliteitsefening.",
+    "best_timing": "As opwaarming of stretch.",
+    "suggested_combinations": ["forearm-supination", "finger-roll"],
+    "notes": "Bewege sêft en stadich."
+  },
+  "air-twisting-crunch": {
+    "name": "Air Twisting Crunch",
+    "description": "Sittend, romp draaie wylst knibbels heffe",
+    "benefits": "Rjochtet obliques en abdominalen.",
+    "limitations": "Net oan nekke lûke.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["bicycle-crunches", "russian-twists"],
+    "notes": "Fokus op romprotaasje."
+  },
+  "standing-swimmer": {
+    "name": "Steande Swimmer",
+    "description": "Steande, earms yn wikselende swimbeweging bewege",
+    "benefits": "Fersterket rêch en skouders. Ferbetteret hâlding.",
+    "limitations": "Soargje foar romte om hinne.",
+    "best_timing": "As opwaarming of lichte oefening.",
+    "suggested_combinations": ["shoulder-rolls", "cat-cow"],
+    "notes": "Hâld beweging floeiend en kontrolearre."
+  },
+  "3-4-sit-ups": {
+    "name": "3/4 Sit-ups",
+    "description": "Crunch mei parsjele beweging (3/4 fan folsleine beweging)",
+    "benefits": "Ferleget druk op rêch wylst buikspieren aktivearje.",
+    "limitations": "Makliker as folsleine sit-up.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["plank", "dead-bug"],
+    "notes": "Net folslein omheech, stopje by 3/4."
+  },
+  "alternate-lying-floor-leg-raise": {
+    "name": "Wikselende Lizgjende Skonk Heffe",
+    "description": "Lizgjend, ien skonk tagelyk heffe",
+    "benefits": "Fersterket ûnderste buikspieren.",
+    "limitations": "Hâld ûnderrêch op grûn.",
+    "best_timing": "Yn kearnworkouts.",
+    "suggested_combinations": ["dead-bug", "plank"],
+    "notes": "Bewege stadich en behâld kontrôle."
+  },
+  "assisted-lying-leg-raise-with-lateral-throw-down": {
+    "name": "Assistearre Skonk Heffe mei Laterale Smite",
+    "description": "Skonken heffe en maat lit se lateraal smite",
+    "benefits": "Fersterket kearn en obliques.",
+    "limitations": "Freget trainingsmaat.",
+    "best_timing": "Yn avansearre kearnworkouts.",
+    "suggested_combinations": ["russian-twists", "bicycle-crunches"],
+    "notes": "Maat helpt mei kontrolearre smite."
+  },
+  "kneeling-thoracic-spine": {
+    "name": "Knielende Thoracale Rêchbonke Stretch",
+    "description": "Knielend, ellebogen op stoel, boarst omleech bringe",
+    "benefits": "Ferbetteret thoracale rêchbonke mobiliteit en stretcht skouders.",
+    "limitations": "Wês foarsichtich, net forsearje.",
+    "best_timing": "As opwaarming of stretch.",
+    "suggested_combinations": ["cat-cow", "child-pose"],
+    "notes": "Adem djip en strek sêft."
+  },
+  "reverse-lunge-leg-kick": {
+    "name": "Reverse Lunge mei Skonk Kick",
+    "description": "Efterút stapje yn lunge, dan efterste skonk nei foaren kicke",
+    "benefits": "Kombinearret skonkkrêft, lykwicht en eksplosjyf fermogen. Ferbetteret koördinaasje en behendichheid.",
+    "limitations": "Meister earst normale lunges. Wês foarsichtich mei stipe knibbel.",
+    "best_timing": "Yn funksjonele sirkels of as skonk finisher.",
+    "suggested_combinations": ["lunges", "high-knees"],
+    "notes": "Adem krêftich út by kick. Begjin stadich en ferheegje snelheid."
+  },
+  "chair-squat": {
+    "name": "Stoel-squat",
+    "description": "Fan sitten nei stean mei in stoel as stipe en rjochting",
+    "benefits": "Fersterket de wichtichste spieren fan de legere lichemsdiel (quadriceps, billen en hamstrings) mei in funksjoneel patroan dat liket op deistige bewegingen. Tige tagonklik foar begjinners, âldere minsken of minsken dy’t herstelle fan in blessuere, om’t de stoel ekstra feiligens en stipe jout. Helpt fertrouwen op te bouwen yn de squat-technyk en ferbetteret de krêft yn de skonken foar deistige taken lykas oerein komme út in stoel, yn en út de auto stappen of treppen rinne. Kin de bonkdeigens stypje as it regelmjittich dien wurdt, wat benammen weardefol is by de menopauze en by it âlder wurden as bonkferlies hurder giet. De stoel jout in fêste djipte, wat it makliker makket om goede technyk te hâlden.",
+    "limitations": "Net dwaan by akute knibbelpijn of swiere gewrichtsûnstekking. Brûk in hegere stoel as de mobiliteit beheind is—kookstoelen binne meast makliker as lege banken. Soargje dat de stoel stabyl is en net weiglidet—set him eventueel tsjin in muorre. By balansproblemen de stoel ticht by in muorre of oanrjocht sette, sadatst dy fêsthâlde kinst. Stop direkt by skerpe pine yn knibbels of heupen. Minsken mei in heupprotese moatte mei harren sjirurch oerlizze oer feilige squat-djipte en oft dizze oefening by harren herstelstadium past.",
+    "best_timing": "Ideaal yn de moarntiid om de skonken te aktivearjen en it lichem wekker te meitsjen. Tige goed yn wurkpauzes om lang sitten te ûnderbrekken en wer enerzjy te krijen—kin stivens troch buro-ark wurk ferminderje. Kin 2–3 kear yn ’e wike dien wurde as ûnderdiel fan krêfttraining, of alle dagen yn lytse sets (1–2 sets) foar mobiliteit en funksjonele fitens. Gaadlik foarôfgeand oan langere kuiers of aktiviteiten dêr’t de skonken in soad dwaan moatte. Ek handich foarôfgeand oan boadskippen of oare karwei’tst in protte stean en rinne moatst.",
+    "suggested_combinations": ["wall-push-up", "glute-bridges", "step-up-stair"],
+    "notes": "Rjochtsje dy op kontroleare bewegingen—set dy bewust en stadich del en kom oerein mei de beenspieren, net troch foarút te swaaien. Hâld de knibbels yn line mei de teannen en foarkom dat se nei binnen sakje. Duw benammen troch de hakken by it oerein kommen. Begjin mei in hegere stoel as dat nedich is en wurkje stadichoan nei legere sitten as de krêft tanimt. As it makliker wurdt, kinst de stoel allinnich licht oanreitsje foardatst wer oerein komst (krekt boppe de sithichte ‘hingje’). Hâld de boarst omheech en de core oanspand. Dizze oefening is poerbêst om selsstannigens yn it deistich libben te hâlden en falrisiko te ferminderjen.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "National Institute on Aging – Chair Exercises"]
+  },
+  "wall-push-up": {
+    "name": "Muorre-push-up",
+    "description": "Steande push-up tsjin in muorre",
+    "benefits": "Bouwt krêft op yn boarst, skouders en triceps sûnder de yntinsiteit fan push-ups op ’e flier. In perfekte tuskenstap foar wa’t nei gewoane push-ups ta wurkje wol—de hoeke kin stadichoan lytser makke wurde as de krêft tanimt. Gaadlik foar minsken mei beheinde krêft yn it boppeliif, ynklusyf begjinners yn krêfttraining. Aktiviearret de core foar stabiliteit wylstst steast, wat de hâlding en core-bewustwêzen ferbetteret. Leit minder druk op de polsen as push-ups op ’e flier, wat it tagonkliker makket foar minsken mei polsproblemen. Tige geskikt nei de befalling om boppeliifkrêft feilich wer op te bouwen, foar senioaren of elkenien dy’t krekt begjint mei fitaal beweegjen.",
+    "limitations": "Net dwaan by aktive skouderblessueren, impingement of akute ûntstekkingen yn it skoudergewricht. Brûk in stevige, net-glêde muorre dy’t net ferskoot of skansearre wurdt—meitsje de hannen net boppe stopkontakten of skeakels. By skouderpine of impingement: ferminderje de bewegingsôfstan troch tichter by de muorre te stean of feroarje de hânposysje (wat breder of smeller). By polsûnbehagen kinst de hannen wat breder sette om de polshoeke te ferminderjen. By rotator-cuff-problemen is in stadige, kontroleare beweging wichtich. Stop direkt by skerpe pine of ‘klikjende’ skouders.",
+    "best_timing": "Kin op elts momint fan ’e dei dien wurde—tige gaadlik yn wurkpauzes om burohâlding tsjin te gean, foar of nei it iten as koarte krêftprikkel of as ûnderdiel fan in moarntydsrutine. Omdat it relatyf leech-yntinsyf is, kin de oefening hast alle dagen sûnder grut oerbelastingsrisiko. Brûk him oan it begjin fan in training om skouders en stabilisatoren op te waarmjen, of oan ’e ein as ôfsluter. Wurket faak goed yn meardere koarte sets ferspraat oer de dei ynstee fan ien lange sesje.",
+    "suggested_combinations": ["chair-squat", "desk-plank", "modified-push-up"],
+    "notes": "Stean op earmlingte fan de muorre mei fuotten op heupbreedte. Set de hannen wat breder as skouderbreedte op boarsthichte tsjin de muorre. Hâld it lichem yn in rjochte line fan holle oant hakken—lit de heupen net hingje en set se net omheech. Lit de boarst kontroleare nei de muorre sakje, mei de ellebogen sa’n 45 graden fan it lichem. Duw werom nei de startposysje troch de earms te strekken. Adem yn by it sakjen en út by it fuortduwen. Om it swierder te meitsjen, set de fuotten stadichoan fierder fan de muorre ôf. Hâld de skouders fuort fan de earen.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "American Council on Exercise – Wall Push-Up Progression"]
+  },
+  "desk-plank": {
+    "name": "Buro-plank",
+    "description": "Ferhege plankposysje mei de ûnderearms op in buro",
+    "benefits": "Fersterket de core en rompstabiliteit mei minder yntinsiteit as in plank op ’e flier troch de ferhege posysje, mar bliuwt tige effektyf. Fersterket de búkspieren, skuorre búkspieren en djippe rompspieren (transversus abdominis) en belûkt skouders en boppeste rêch foar stipe. Perfekt foar kantoarwurkers of minsken mei bytsje flierromte—kin gewoan oan it buro. De hoeke ferminderet it persintaazje lichemgewicht datst drage moatst, ideaal foar begjinners of foar wa’t nei in blessuere wer opbout. Helpt de hâlding te ferbetterjen troch korrekte útlinening en rêchstabiliteit te trainen, wat de ûnder­rêch ûntlast nei lang sitten. Ferbetteret lichem-bewustwêzen en it gefoel fan ‘core oan’.",
+    "limitations": "Net dwaan by akute skouder- of polspine—de posysje fereasket noch altiten stipe fan it boppeliif. Soargje dat it buro stabyl is, op in gaadlike hichte (rûchwei tusken taille- en boarsthichte) en net fuort rôlet of skoot. By ûngemak yn de ûnder­rêch sakje de heupen wierskynlik troch; span de core mear oan, knyp de billen oan of ferminderje de hâldtiid. Minsken mei hege bloeddruk moatte trochgeande, rêstige sykheljen hâlde en gjin hiel lange hâlden dwaan wêrby’t se de azem ynhâlde. By carpaletunnel-syndroam goed op de polsposysje lette en stopje by tinteljen of dom gefoel.",
+    "best_timing": "Tige gaadlik yn pauzes midden op ’e dei om lang sitten te ûnderbrekken, enerzjy werom te krijen en de hâlding te resetten. Kin 2–3 kear yn ’e wike as ûnderdiel fan coretraining, of hast alle dagen foar koarte hâldingen (15–20 sekonden) as hâldings- en aktivatie-oefening. Wurket goed foar of nei buroblokken om de core te aktivearjen en de fokus te ferbetterjen. Fyn yn de moarntiid om it lichem wekker te meitsjen en dy foar te bereiden op de dei. Kin ek as sêfte core-warming-up foar yntinsivere oefeningen tsjinst dwaan.",
+    "suggested_combinations": ["wall-push-up", "bird-dog", "modified-push-up"],
+    "notes": "Set de ûnderearms op de râne fan it buro, paralleel en op skouderbreedte. Set de fuotten werom oant dyn lichem in rjochte line foarmet fan holle oant hakken (eventueel kontrolearje yn in rút). Span de búkspieren oan troch de navel rjochting rêchbonke te lûken en knyp de billen oan. Foarkom dat de heupen hingje of omheech stekke. Hâld de nekke neutraal troch nei it bûroblêd te sjen ynstee fan foarút. Blijf rêstich sykheljen—hâld de azem net fêst. As de foarm fuortfalt (heupen sakje, rêch wurdt hol), einigje dan de set. Begjin mei koarte hâldingen en bou stadich op. Kwaliteit fan de posysje is wichtiger as de tiid.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "ACE Fitness – Plank Progressions"]
+  },
+  "bird-dog": {
+    "name": "Bird-dog",
+    "description": "Op hannen en knibbels, tsjinoerstelde arm en skonk tagelyk útstrekke",
+    "benefits": "Poerbêste oefening foar corestabiliteit en útlinening fan de rêchbonke. Fersterket de djippe spieren dy’t de rêch beskermje, lykas multifidus en transversus abdominis. Ferbetteret balans en koördinaasje troch in kontralateraal patroan (tsjinoerstelde ledematen), fundamintaal foar rinnen en in soad deistige bewegingen. Aktiviearret billen, rêchstrekkers, búkspieren en skouders tagelyk yn in funksjoneel patroan. Weardefol nei de befalling om de core stadich wer op te bouwen sûnder te folle buikdruk, by revalidaasje nei rêchblessueren, of as previnsje fan legere rêchpijn. Helpt links-rjochts-ûnjefterhichten te korrizjearjen en ferbetteret de hâlding troch bettere rêchstabiliteit.",
+    "limitations": "Net dwaan by akute polspine, carpaletunnel of peesûnstekking; feroarje dan nei in ferzje op de ûnderearms. Beweeg stadich en kontroleare; te hurd wurkjen makket de oefening minder effektyf en de balans ûnnedich lestich. By swiere legere rêchpijn begjinne mei in lytsere beweging, mei earst allinnich de arm of allinnich de skonk, of tichter by de flier bliuwe. By knibbelûngemak in dikke mat, handoek of yogamat ûnder de knibbels brûke. Stop by skerpe pine—de oefening mei útdaagjend, mar net pynlik wêze.",
+    "best_timing": "Ideaal yn ’e moarntiid om core- en rêchspieren te aktivearjen en goede hâldingspatroanen foar de dei te setten. Tige gaadlik as warming-up foar krêfttraining, om de djippe stabilisatoren te wekjen en de rêch op lading ta te rieden. Kin hast alle dagen dien wurde troch de lege yntinsiteit en hege funksjonele wearde. Wurket goed yn fysioterapyprogramma’s of postpartum-skemas as basisbeweging. Doch him leaver asst noch net útput bist, sadat de kwaliteit en balans goed bliuwe. Kin ek foar rinnen of tillen brûkt wurde as tarieding.",
+    "suggested_combinations": ["glute-bridges", "cat-cow", "dead-bug"],
+    "notes": "Begjin op hannen en knibbels mei hannen ûnder de skouders en knibbels ûnder de heupen. Hâld de rêchbonke neutraal (net te bol en net te hol). Strek stadich in arm nei foaren en de tsjinoerstelde skonk nei efteren oant se likernôch parallel oan ’e flier binne—tink oan ‘lang meitsje’ fan fingers oant hak ynstee fan heech optille. Hâld 2–3 sekonden wylst de romp sa stil mooglik bliuwt. Kom kontroleare werom nei de startposysje en wikselje fan kant. It doel is stabiliteit en kontrôle, net sa fier mooglik. Hâld de heupen sa horizontaal mooglik en foarkom dat de romp draait. Focus op kwaliteit ynstee fan it tal herhellingen.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "Mayo Clinic – Core Exercises"]
+  },
+  "modified-push-up": {
+    "name": "Push-up op knibbels",
+    "description": "Push-up útfierd mei de knibbels op ’e grûn",
+    "benefits": "Fersterket boarst, skouders en triceps mei folle minder lading as in folsleine push-up—sawat de helte fan de wjerstân. In poerbêste tuskenstap nei folsleine push-ups, om’tst technyk en krêft op in behearsber nivo kinst opbouwe. Aktiviearret de core foar stabiliteit wylst de legere lichemsdiel minder belêste wurdt. Tige gaadlik foar froulju nei de befalling, begjinners, of minsken mei beheiningen dy’t gjin folsleine push-ups dwaan kinne. Helpt goede push-up-meganika oan te learen, ynklusyf scapulakontrole, elleboogposysje en lichemútlinening.",
+    "limitations": "Net dwaan by akute polspine of carpaletunnel-symptomen; brûk eventueel push-up-handgrepen, hex-dumbbells of fûsten om de polsen neutraal te hâlden. Soargje dat de knibbels op in sêfte ûndergrûn lizze (mat of handoek) om pine te foarkommen. By skouder-impingement of knypjende pine: ferminderje de djipte, set de hannen wat breder of pas de lichemshoeke oan. Hâld de core aktyf oanspand om trochhingjen fan de ûnder­rêch te foarkommen. By resinte búkoperaasjes (ynklusyf keizersneed) earst medysk tastimming freegje.",
+    "best_timing": "Kin op hast elts momint fan ’e dei dien wurde as ûnderdiel fan in krêfttrainingsskema. Wurket goed yn circuits of as losse boppeliifoefening. Ideaal 2–3 kear yn ’e wike mei teminsten ien rêstdei tusken de sesjes. Kin yn ’e moarntiid of yn wurkpauzes brûkt wurde om krêft te ûnderhâlden. Doch de oefening leaver as it boppeliif noch relatyf fris is, foar bettere technyk. Asst 15–20 herhellings mei goede foarm kinst dwaan, kinst fierder nei incline- of folsleine push-ups.",
+    "suggested_combinations": ["chair-squat", "glute-bridges", "wall-push-up"],
+    "notes": "Gean op de knibbels op in mat en set de hannen wat breder as skouderbreedte. Skow de knibbels sa fier werom dat dyn lichem in rjochte diagonalene line foarmet fan knibbels oant holle. Lit de boarst kontroleare nei de flier sakje mei de ellebogen sa’n 45 graden fan it lichem. Sakje oant de boarst ticht by de flier is of oant it noflik is en duw dan werom nei de start. Hâld de core strak—lûk de navel nei de rêchbonke om trochhingjen te foarkommen. Skouders fuort fan de earen hâlde. Adem yn by it sakjen en út by it omheechkommen. Hâld de nekke neutraal troch in stikje foar dy op ’e flier te sjen.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "American Council on Exercise – Push-Up Modifications"]
+  },
+  "arm-circles": {
+    "name": "Earmcirkels",
+    "description": "Rûne earmpatroanen foarút en achterút",
+    "benefits": "Fergruttet de bloedstream nei de skouderspieren en ferbetteret de bewegingsfriheid yn de skoudergewrichten troch dynamyske beweging. Utstekend as warming-up foar boppeliiftrainings of sporten mei in soad earm- en skouderbewegings. Helpt skoudermobiliteit en -fleksibiliteit te behâlden en kin stivens troch lang sitten, buro- of kompjûterwurk ferminderje. Aktiviearret de rotator cuff en alle trije koppen fan de deltoïdeus. Kin spanning yn skouders en boppeste rêch ferleegje. Benammen nuttich by spanning yn it boppeliif en de nekke, bygelyks om de menstruaasje hinne. Sa ienfâldich datst it oeral sûnder apparatuer dwaan kinst.",
+    "limitations": "Meitsje gjin grutte sirkels by aktive skouderpine, impingement of resinte skouderblessueren—begjin mei hiel lytse sirkels en fergrutsje allinnich as it hielendal pinefrij is. By rotator-cuff-problemen stadich en kontroleare bewege en binnen in noflike bewegingsrange bliuwe. By klikken, skuren of ‘knarsjende’ sensaasjes yn de skouder de sirkel fuort lytser meitsje of ophâlde. Beweeg kontroleare, net skokkerich of eksplosyf. Minsken mei frozen shoulder wurkje it bêste mei in fysioterapeut oan in passend berik. Druk nea troch skerpe pine hinne.",
+    "best_timing": "Ideaal as warming-up foar elke boppeliiftraining, swimmen of sporten mei overheadbewegingen. Tige goed as mikro-pauze ûnder it wurk om burohâlding tsjin te gean en stivens foar te kommen—kin alle oeren. Fyn yn ’e moarntiid om de skouders los te meitsjen nei de nacht. Handich foar swimmen, tennis, volleybal, ensfh. Wurket goed yn de premenstruele faze om spanning te ferlichtsjen. Kin meardere kearen deis dien wurde; de oefening is sêft genôch.",
+    "suggested_combinations": ["shoulder-rolls", "wall-push-up", "neck-rolls"],
+    "notes": "Stean mei fuotten op skouderbreedte. Stek de earms op skouderhichte rjocht út nei de siden, sadatst in T-foarm makest. Meitsje stadige, kontroleare sirkels—begjin lyts (sa’n 15–30 sm diameter) en fergrutsje allinnich as it noflik bliuwt. Doch de helte fan de tiid foarút en de oare helte achterút. Hâld de skouders ûntspand en leech. Hâld de core licht oanspand en de romp rjochtop. Adem rustig en kontinu. As de skouders stivich binne, hâld de sirkels lyts. Eventueel letter lytse gewichtjes tafoegje as de mobiliteit goed is.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "American Council on Exercise – Shoulder Mobility"]
+  },
+  "step-up-stair": {
+    "name": "Step-up op trep",
+    "description": "Op in trep of platfoarm opstean mei wikseljende skonken",
+    "benefits": "Tige funksjonele oefening dy’t quadriceps, billen en hamstrings fersterket mei in patroan dat streekrjocht oanslút by de deistige praktyk. Ferbettert it fermogen om treppen te rinnen, te kuierjen yn heuvelich terrein of op te stean út lege sitten. Ferbettert ien-skongsbalâns, stabiliteit en propriosepsje, wat helpt om fallen foar te kommen. Boud krêft en úthâldingsfermogen yn de skonken op. Omdat mar ien skonk tagelyk wurket, helpt de oefening sterke en swakke kant út inoar te heljen en te korrizjearjen. Tige wichtich foar it behâld fan selsstannigens, foaral by âldere minsken. Kin ek de kondysje ferbetterje as er langer of yn heger tempo dien wurdt. Hast gjin apparatuer nedich—inkeld in trep of stap.",
+    "limitations": "Net dwaan by akute knibbelpine of resinte knibbelblessueren sûnder goedkarring fan in dokter of fysio. Begjin mei in lege trep (10–15 sm) by knibbelsoargen of asst nys begjinst, en wurkje stadich nei standerthichte. Soargje dat de trep of it platfoarm stabyl en net glêd is. By balansproblemen de oefening ticht by in leuning, muorre of stevich meubel útfiere. Minsken mei heupproblemen moatte soargje dat de beweging folslein pinefrij is foardat se de hichte of ekstra gewicht fergrutsje. Stop direkt by skerpe pine yn knibbel, heup of enkel. By swiere artrose earst medysk advys freegje.",
+    "best_timing": "Gaadlik yn moarn- of middeisroutines om funksjonele krêft yn de skonken op te bouwen. Kin 2–3 kear yn ’e wike as ûnderdiel fan legere-lichems-training. Wurket goed foarôfgeand oan kuiers of aktiviteiten mei in soad legkrêft. Kin alle dagen op leech yntensititsnivo dien wurde foar funksjoneel ûnderhâld en falprevinsje. Doch it leaver net as de skonken al tige wurch binne fan oare oefeningen. Kin ek brûkt wurde as aktive herstelbeweging tusken boppeliifoefeningen yn in circuit.",
+    "suggested_combinations": ["chair-squat", "calf-raises", "lunges"],
+    "notes": "Set de hiele foet stevich op de trep mei de teannen nei foaren—net allinnich de bal fan de foet. Duw fanút de hak fan it boppeste been om op te stean en aktivearje billen en quadriceps—foarkom datst tefolle ôfsetst mei de efterste foet. Stap kontroleare op, stean eventueel efkes folslein op de trep foar balâns, en stap dan wer del. Hâld de knibbel fan it wurkjende been yn line mei de teannen en foarkom dat it nei binnen falt. Hâld de romp rjochtop mei de boarst omheech en de core oanspand. Do kinst by elke herhelling fan skonk wikselje of earst alle herhellingen oan ien kant dwaan foar mear yntinsiteit. Brûk yn it begjin in leuning foar ekstra feiligens. Asst sterker wurdst, kinst besykje de efterste foet net folslein op de trep te setten.",
+    "exercise_references": ["NHS Fitness Studio Exercises", "National Institute on Aging – Balance Exercises"]
+  },
+  "neck-rolls": {
+    "name": "Nekrollen",
+    "description": "Sêfte rûne bewegingen fan holle en nekke",
+    "benefits": "Ferlicht spanning en stivens yn de nekspieren troch minne hâlding, lang buro- of rydwurk of stress. Fergruttet de mobiliteit en bewegingsberik fan de nekke yn alle rjochtingen. Ferbettert de bloedstream nei de nekspieren, wat de frekwinsje en yntinsiteit fan spanningshoofdpinen ferminderje kin. Helpt triggerpoints en knopen yn de boppeste trapezius, levator scapulae en oare nekspieren los te litten. Benammen weardefol foar buro- en bestjoerders of elkenien dy’t lang yn deselde holleposysje sit. Kin direkte reliëf jaan by nekûnbehagen en dyn bewustwêzen fan holle- en nekhâlding ferbetterje.",
+    "limitations": "Net dwaan by akute nekblessueren, resinte whiplash of swiere nekproblemen sûnder medyske tastimming. Beweeg tige stadich en sêft—noait twang, gjin jerks of snel draaien. By duizeligheid, lichtheid yn ’e holle of evenwichtsproblemen fuort stopje en in dokter rieplachtsje. Minsken mei hernia’s, stenose of artrose yn de nekke moatte mooglik allinnich partiële bewegingen dwaan (bygelyks stadich links-rjochts of foar-achter). Stop by skerpe pine, útstrieljende pine nei de earms, dom gefoel, tinteljen of oare frjemde sensaasjes. Forcearje de holle nea fier nei achteren as dat pine of duizeligheid jout.",
+    "best_timing": "Ideaal yn ’e moarntiid om stivens nei de nacht los te meitsjen en in goed berik foar de dei te krijen. Tige gaadlik yn wurkpauzes of dernei, benammen foar minsken dy’t oeren achter in kompjûter sitte. Kin meardere kearen deis dien wurde—sels elk oere by lang sitten. Nuttich nei lange autoritten of aktiviteiten mei in fêste nekposysje (lêzen, telefonsjen). Wurket goed foar it sliepen gean om spanning fan de dei los te litten. Doch it elke kear datst merkst dat de nekke stiif of sear wurdt.",
+    "suggested_combinations": ["shoulder-rolls", "seated-spinal-twist", "arm-circles"],
+    "notes": "Sit of stean rjochtop mei skouders ûntspand en leech. Lit de kin stadich nei de boarst sakje oantst in sêfte rek yn de efterkant fan de nekke fielst. Rol de holle stadich nei de iene kant (ear rjochting skouder), dan nei achteren, nei de oare kant en werom nei it sintrum yn in floeiende sirkel. Hâld de skouders hielendal stil—de beweging komt allinnich út de nekke. Adem natuerlik en hâld de azem net fêst. Hâld de sirkels earst lyts en fergrutsje allinnich as it noflik bliuwt. Draai healwei de set de kant om (bygelyks 4 sirkels linksom, 4 rjochtsom). De beweging moat glêd en trochgeand wêze, net jerky. Stop fuort by pine of duizeligheid.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "Cleveland Clinic – Neck Exercises"]
+  },
+  "seated-spinal-twist": {
+    "name": "Sittende rêchdraai",
+    "description": "Sittende draaien fan de romp",
+    "benefits": "Ferbettert rotaasje yn de rêchbonke en fleksibiliteit yn de boppeste en middenrêch, wichtich foar bewegingen lykas achter dy sjen, oer de skouder sjen by it autoriden of wat fan de efterbank pakke. Rekt de lange rêchspieren (erector spinae), skuorre búkspieren en tuskenribspieren. Kin de hâlding ferbetterje troch de foarút-bûgde kompjûterhâlding tsjin te gean. Kin de spiisfertarring stypje en obstipaasje ferlichtsje troch sêfte kompresje en massage fan de búkorganen. Jout faak reliëf by in opgeblazen gefoel en menstruasjepine. Lit spanning yn de midden- en boppeste rêch los en befoarderet djipper sykheljen troch de boarstkas te iepenjen.",
+    "limitations": "Net dwaan by hernia’s, swiere spinale stenose, akute discusblessueren of akute rêchblessueren sûnder medyske tastimming. Beweeg sêft en foarkom twang—stop by dyn eigen noflike grinzen. By osteoporose of osteopeny earst medysk advys; hurde twisten kinne it fraktuerisiko fergrutsje. Minsken mei heupprothesen moatte soargje dat de draai gjin oermjittige stress op de heup legt. By scoliose sêft bewege; it kin wêze dat ien kant makliker draait as de oare. Stop by skerpe pine, útstrieljende pine nei de skonken, dom gefoel of tinteljen. De stretch moat licht en noflik wêze, net pynlik.",
+    "best_timing": "Tige gaadlik yn de jûn as ûnderdiel fan in stretchingrutine om spanning fan de dei los te litten en te ûntspannen foar it sliepen gean. Wurket goed tidens of nei lange sithâlding, bygelyks elke 30–60 minuten achter it buro. Kin brûkt wurde tusken taken troch om hâlding en rêchmobiliteit te resetten. Benammen nuttich by menstruasjeblaze en spiisfertarringsûnbehagen. Ek goed yn ’e moarntiid om de rêch nei de nacht wer soepel te meitsjen. Kin meardere kearen deis dien wurde.",
+    "suggested_combinations": ["neck-rolls", "shoulder-rolls", "side-stretch"],
+    "notes": "Sit rjochtop op in stoel of krús-sittend op ’e flier mei in lange rêch en iepen boarst. Hâld de heupen rjocht foarút (bekken net meidwaaie litte). Draai de romp stadich nei ien kant, begjinnend út boarst en skouders. Brûk de earms om de draai sêft te ferdjipjen troch ien hân op de tsjinoerstelde knibbel of stoelrêch te setten en de oare efter dy. Adem djip—by ynademen de rêch ferlingje, by útademen eventueel in bytsje fierder draaie as dat noflik is. Hâld beide skouders ûntspand en op gelikense hichte. Hâld de posysje sûnder te bounsen. De stretch moat yn de rêch en side fan de romp te fielen wêze. Kom stadich werom nei it sintrum en herhelje oan de oare kant.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "Yoga Journal – Seated Twist Benefits"]
+  },
+  "hamstring-stretch": {
+    "name": "Hamstring-stretch",
+    "description": "Stretch foar de efterkant fan it boppebein",
+    "benefits": "Ferlinget strakke hamstrings oan de achterkant fan it boppebein, dy’t faak koart wurde troch lang sitten, fytsen, rinnen of oare sporten. Ferbetteret fleksibiliteit fan de hiele efterkeatling (hamstrings en ûnder­rêch) en makket deistige bewegingen lykas bûge, bûge om skoanen te strikken of kuierjen mei goede technyk makliker. Bettere hamstringfleksibiliteit kin legere rêchpyn dúdlik ferminderje troch in bettere heuphinge en minder kompensaasje yn de lumbale rêch. Stypet in bettere hâlding troch spanning dy’t it bekken efteroer lûkt tsjin te gean. Ferminderet it risiko op hamstring­ferrekkingen en -skuorren by ynspanning. Benammen wichtich foar it behâld fan mobiliteit en selsstannigens by it âlder wurden.",
+    "limitations": "Net dwaan by in akute hamstring­skuorre of resinte blessuere—gun de spier tenminste 4–6 wiken herstel foar’tst wer serieus stretcht. Meitsje gjin stuiterjende (ballistyske) bewegingen; brûk statyske of hiel sêfte dynamyske stretch. By rêchproblemen of ischias foarkomme datst de rêch te bot rûnest; bûg fanút de heupen mei in relatyf rjochte rêch. Minsken mei ischias moatte foarsichtich stretche en direkt stopje as symptomen (tinteljen, útstrieljende pine) fergrutsje. Tige strakke hamstrings binne hiel gewoan—twang net yn pine. Fleksibiliteit ferbetteret allinnich troch wiken fan konsekwinte, sêfte oefening. By hypermobiliteit mear rjochtsje op kontrôle as op maksimaal berik.",
+    "best_timing": "Tige gaadlik nei workouts as de spieren waarm binne om fleksibiliteit te ferbetterjen en stivens foar te kommen. Kin yn ’e moarntiid dien wurde om stivens nei de nacht te ferminderjen, al binne de spieren dan wat minder soepel. Nuttich nei in dei fan folle sitten om it koarter wurden fan de hamstrings tsjin te gean. By chronysk strakke hamstrings of in protte sitten is deistich stretchen oan te rieden. Doch it leaver nei 5–10 minuten lichte beweging of warming-up as op hiel kâlde spieren. Kin ek foar bêdtiid dien wurde om spanning los te litten en te ûntspannen. Hâld de stretch leafst 30–60 sekonden foar optimaal effekt.",
+    "suggested_combinations": ["calf-stretch", "quad-stretch", "hip-opener"],
+    "notes": "Kin steand, sittend of lizzen útfierd wurde—kies wat foar dy it bêste fielt. Steande ferzje: set in hak op in lege trep, krukje of stoel mei it been relatyf rjocht. Hâld de knibbel licht bûgd (net op slot). Hinge fanút de heupen nei foaren mei in rjochtere rêch ynstee fan sterk te rûnen. De rek moatst efter yn it boppebein fiele. Sittende ferzje: sit mei ien skonk rjocht en de oare bûgd, en reach rjochting de foet fan it rjochte been. Lizze ferzje: lis op ’e rêch en brûk in riem of handoek om de foet sêft nei dy ta te lûken. Hâld de posysje sûnder te bounsen en adem djip, wylstst by elke útademing probearrest mear te ûntspannen. In lichte knik yn de knibbel is prima by tige strakke hamstrings. Wikselje fan kant en herhelje.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Council on Exercise – Flexibility Training"]
+  },
+  "calf-stretch": {
+    "name": "Kuit-stretch",
+    "description": "Stretch foar de efterkant fan it ûnderbein",
+    "benefits": "Stretcht de gastrocnemius (grutte bûtenste kuitspier) en de djipere soleus, dy’t faak strak wurde troch rinnen, kuierjen, lang stean of it dragen fan hakken. Ferbetteret dorsaalfleksje (teannen rjochting skien) wat essinsjeel is foar goed squatgedrach, trepgebrûk, heuvelrinnen en in sûn kuierpatroan. Bettere kuitfleksibiliteit kin it risiko op achillespeesblessueren en fasciitis plantaris ferlytsje troch minder spanning op dizze struktueren. Helpt kuitkrampen, swiere skonken en stivens nei lang stean of rinnen te ferlichtsjen. Benammen nuttich nei it dragen fan hegere hakken, dy’t de kuitspieren koarter meitsje. Stypet bettere balans en floeiender kuierjen.",
+    "limitations": "Net dwaan by akute achillespees-ûnstekking of resinte ruptuer—dêrfoar is meastal in lange revalidaasje nedich. By fasciitis plantaris tige sêft begjinne; sêfte rek helpt faak, mar te agressive rek kin de pijn slim meitsje. Meitsje gjin stuiterjende bewegingen—statysk hâlde is feiliger. By kuitferrekkingen wachtsje oant de blessuere genezen is. Begjin sêft as de kuiten tige strak binne of faak krampen. Stop by skerpe pine yn de achillespees of oare frjemde sensaasjes. Swangere froulju moatte net te hurd rekken troch feroare ligamentlaxiteit.",
+    "best_timing": "Kin op elk momint fan ’e dei dien wurde. Benammen nuttich nei lang stean of rinnen om spanning en swiere skonken te ferlichtsjen. Tige gaadlik nei legere-lichems-workouts (rinnen, fytsen, squat, ensfh.) om stivens foar te kommen en herstel te stypjen. Ideaal foar it sliepen gean om nachtlike kuitkrampen te foarkommen. Goed yn ’e moarntiid om strakke kuiten los te meitsjen, benammen asst mei ‘trekkende’ kuiten wekker wurdst. Benammen nuttich nei it dragen fan hakken om de normale lingte fan de kuitspier te herstellen. Kin alle dagen en sels ferskate kearen deis dien wurde.",
+    "suggested_combinations": ["hamstring-stretch", "quad-stretch", "hip-opener"],
+    "notes": "Stean foar in muorre en set beide hannen op skouderhichte tsjin ’e muorre. Stap mei ien skonk sa’n 60–90 sm nei achter, mei dat been rjocht en de hak plat op ’e flier. De foarste knibbel licht bûge. Duw de heupen wat nei foaren en leun tsjin de muorre oantst in matige rek fiele meist yn de kuit fan it efterste been, benammen boppe yn de spier. Hâld de efterste hak plat op ’e grûn en de teannen rjocht foarút. Hâld 20–30 sekonden sûnder te bounsen. Foar mear rek fan de soleus bûg de efterste knibbel licht wylst de hak op ’e grûn bliuwt—de rek ferpleatst dan nei leger by de enkel. Adem natuerlik en ûntspan yn de stretch. Wikselje fan skonk en herhelje.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Orthopaedic Foot & Ankle Society – Stretching"]
+  },
+  "quad-stretch": {
+    "name": "Quadriceps-stretch (steand)",
+    "description": "Steande stretch foar de foarkant fan it boppebein op ien skonk",
+    "benefits": "Stretcht de quadriceps oan de foarkant fan it boppebein (rectus femoris, vastus lateralis, vastus medialis, vastus intermedius), dy’t faak strak wurde troch rinnen, fytsen, heuvelkuiers of lang sitten. Ferbetteret de mobiliteit fan heupbúgers en knibbels, wichtich foar squatdjipte, lunges en komfortabel trepgebrûk. De ien-skongs­posysje daagt balans en propriosepsje út. Bettere quadricepsfleksibiliteit kin kniepine (benammen foarop) ferminderje en de kniemeganika ferbetterje. Helpt in sûne patellafolging te behâlden. Kin de hâlding ferbetterje troch in te grutte foarút kanteling fan it bekken (troch strakke heupbúgers en quads) tsjin te gean.",
+    "limitations": "Net dwaan by akute knibbelpine, resinte knibbelblessueren, patellapees-ûnstekking of akute quadricepsferrekking sûnder tastimming. By swiere balansproblemen of lykwichtssteurnissen altyd ticht by in muorre of stoel stean om dy fêst te hâlden. Hiel strakke quads of heupbúgers kinne de posysje ûngemaklik meitsje—twang nea; bûg eventueel it steande been licht. By skerpe pine yn of efter de knibbel fuort ophâlde. Minsken mei heupprothesen moatte mei de sjirurch oerlizze oft dizze hoemannichte heupfleksje feilich is. Lûk nea hurd oan de enkel of foet.",
+    "best_timing": "Ideaal nei workouts, foaral dy mei folle legere-lichemswurk (rinnen, fytsen, squats, lunges) as de spieren waarm binne. Tige gaadlik yn de cooling-down om stivens foar te kommen. Nuttich nei lang sitten om strakke heupbúgers tsjin te gean. Wurket goed yn in moarntydsmobiliteitsrutine om de bewegingsfriheid foar de dei te ferbetterjen, al binne spieren dan wat stoffer. Kin alle dagen dien wurde. Doch it leaver nei wat ljochte beweging ynstee fan op hiel kâlde spieren.",
+    "suggested_combinations": ["hamstring-stretch", "calf-stretch", "hip-opener"],
+    "notes": "Stean rjochtop ticht by in muorre of stevige stoel as stipe. Bûg ien knibbel en pak mei de hân oan deselde kant de enkel of wreef (rjochterhân, rjochterfoet). Lûk de hak rjochting billen wylstst de knibbels neistinoar hâldst—lit it bûgde been net nei bûten útwaaie. Span de core oan en hâld de heupen rjocht foarút rjochte. Duw de heupen licht nei foaren om mear rek yn de foarkant fan it boppebein en de heupbúger te fielen. Hâld de romp rjochtop—foarút bûgjen ferminderet de rek. De knibbel fan it bûgde been wiist rjochting flier. Hâld 20–30 sekonden sûnder te bounsen en adem rêstich troch. Wikselje fan kant en herhelje.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Council on Exercise – Lower Body Flexibility"]
+  },
+  "hip-opener": {
+    "name": "Heup-opener (flintersit)",
+    "description": "Sittende stretch mei fuotsoallen tsjin elkoar en knibbels nei de siden",
+    "benefits": "Iepent de heupen en stretcht de binnenkant fan de dijen (adductoren), dy’t faak strak wurde troch mei krúste skonken sitten, fytsen, rinnen of oare sporten. Ferbetteret heupmobiliteit, fleksibiliteit en eksterne rotaasje, wat wichtich is foar deistige bewegingen, squats, lunges en aktiviteiten mei in soad heupbeweging. De kalme, ‘ierde’ natuer fan de stretch kin spanning yn de ûnder­rêch ferminderje troch de heupen frijer te meitsjen—strakke heupen soargje faak foar kompensaasje yn de rêch. It liket op in meditative sittende posysje en helpt stress te ferminderjen en rêst te jaan. Jout faak dúdlik reliëf by menstruaasjekrampen en bekken­spanning troch ferhege bloedstream yn it bekkengebiet. Tariedend foar yoga, martial arts of dûns wêr’t heupmobiliteit wichtich is.",
+    "limitations": "Net dwaan by liesblessueren, labrumskeuren yn it heupgewricht, akute heuppine of impingement sûnder medysk advys. Druk de knibbels nea aktyf nei de flier—lit swiertekrêft en tiid it wurk dwaan oer wiken fan oefening. As de heupen tige strak binne (knibbels heech), sit dan op in kessen, blok of opfold tekken om it bekken te ferheegjen; dat makket de posysje folle nofliker. Minsken mei heupprothesen moatte mei harren ortopedysk sjirurch oerlizze oft dizze posysje tastien is. Stop by skerpe pine yn heup, lies of binnenkant knibbel (dat betsjut tefolle druk op it knibbelgewricht). Swangere froulju yn de lettere trimesters moatte foarsichtich wêze mei brede heupstân.",
+    "best_timing": "Tige gaadlik as jûnsstretch om te ûntspannen foar bêdtiid—de kalme natuer makket it ideaal foar bettere sliep. Perfekt foar it sliepen gean om deistige spanning yn heupen en ûnder­rêch los te litten. Kin tidens de menstruaasje brûkt wurde foar natuerlike krampferlichting en bekkenrelaksasje. Wurket goed nei yoga, pilates of dûns as de heupen al wat waarm en iepen binne. Ideaal op rêst- en hersteldagen as sêfte beweging. Kin langere tiid (1–3 minuten of langer) as meditative, restorativer stretch holden wurde. Benammen nuttich nei aktiviteiten dy’t de heupen strak meitsje, lykas rinnen, fytsen of lang sitten.",
+    "suggested_combinations": ["cat-cow", "glute-bridges", "seated-spinal-twist"],
+    "notes": "Sit op de flier (of op in kessen as de heupen strak binne) mei de fuotsoallen tsjin elkoar, sadat de knibbels nei de kanten falle yn in flinter- of diamântfoarm. Hâld de fuotten of enkels sêft fêst mei de hannen. Sit rjochtop mei in lange rêch en iepen boarst (gebrûk in ferheging ûnder it bekken as it oars te swier is). Lit de knibbels ûnder harren eigen gewicht sakje—druk se net mei de hannen nei ûnderen. Foar mear rek kinst licht fanút de heupen nei foaren hingje mei in relatyf rjochte rêch. In protte minsken fine it noflik om simpelwei rjochtop te bliuwen en djip te sykheljen. Adem stadich en djip, en stel dy by elke útademing foar dat spanning út de heupen weisakket. Do kinst de knibbels hiel ljocht op en del bewege as flinterwjukjes foar in sêfte dynamyske stretch. Focus mear op loslitten as op grut berik.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "Yoga Journal – Hip Opening Benefits"]
+  },
+  "side-stretch": {
+    "name": "Sy-stretch (laterale bûging)",
+    "description": "Steand of sittend mei in earm boppe de holle en bûgen nei de side",
+    "benefits": "Ferlinget de sydspieren fan de romp, ynklusyf de skuorre búkspieren, tuskenribspieren en de latissimus dorsi. Ferbetteret laterale bûging fan de rêchbonke, in beweechflak dat faak fergetten wurdt mar wichtich is foar rêch­sûnens. Iepent de hiele side fan it lichem en makket mear romte yn de ribbenkast foar djipper en voller sykheljen. Kin de hâlding ferbetterje troch de foarút-ynsakke burohâlding tsjin te gean. Jout faak dúdlik reliëf by opgeblazen gefoel, gas en menstruaasjekrampen troch sêfte stretching en decompressie fan de búkregio. Lit spanning yn ûnder­rêch, skuorre búkspieren en side fan de romp los.",
+    "limitations": "Net dwaan by akute legere rêchpyn, benammen mei útstrieling nei de skonk (ischias) of skerpe stekende pine. Beweeg sêft en twang de stretch net bûten dyn noflike berik—stop by in matige rek. By osteoporose of swiere osteopeny foarsichtich wêze mei rêchbonkebeweging en eventueel medysk advys freegje. By skouderproblemen kin men de earm leger hâlde, bûge of de overheadposysje foarkomme. Bûg net foarút of efterút—hâld de beweging suver sywaarts. Stop by skerpe pine of frjemde sensaasjes.",
+    "best_timing": "Poerbêst yn ’e moarntiid om it lichem wekker te meitsjen, bewegingsberik op te bouwen en de sykheljen te ferdjipjen. Tige gaadlik yn wurkpauzes (elk 30–60 minuten) om sit­hâlding te kompensearjen, de boarstkas te iepenjen en enerzjy werom te krijen. Fyn yn de jûn as ûnderdiel fan in stretchingrutine om spanning los te litten en de rêch te ûntspannen foar it sliepen gean. Benammen nuttich by menstruaasje foar reliëf fan opgeblazen gefoel en búkûnbehagen. Kin meardere kearen deis dien wurde asst spanning yn side of rêch fielt. Wurket goed foar of nei aktiviteiten mei sybewegingen of rotaasje.",
+    "suggested_combinations": ["seated-spinal-twist", "cat-cow", "hip-opener"],
+    "notes": "Stean of sit rjochtop mei fuotten op heupbreedte en in goede hâlding—lange rêch, skouders omheech en dan nei achteren en nei ûnderen. Stek ien earm boppe de holle wylst de oare earm op de heup, del oer it liif of frij hinget. Bûg de romp sêft nei de tsjinoerstelde side fan de opstekke earm en meitsje in glêde C-foarm fan heup oant fingertoppen. Hâld heupen en skouders rjocht foarút; foarkom draaien of foarút/efterút hellen. Fokus op ‘lang meitsje’ fan de opstekke earm ynstee fan yn de oare side yn te stoarten. Fiel de stretch fanút de heup oant yn de oksel en earm. Adem djip en rjochtsje de azem nei de stretchside. Hâld 15–30 sekonden sûnder te bounsen. Kom stadich werom nei it sintrum en doch deselde oan de oare kant.",
+    "exercise_references": ["Mayo Clinic – Healthy Lifestyle: Fitness", "American Council on Exercise – Flexibility Training"]
+  },
+  "marching-in-place": {
+    "name": "Op it plak marsjearje",
+    "description": "Stasjonêr marsjearjen mei knibbels optild",
+    "benefits": "Leech-ynpakte cardio dy’t de hartslach sêft ferheget en de sirkulaasje ferbettert sûnder de gewrichten swier te belêstjen. Poerbêst as warming-up foar oare oefeningen of as sêfte cardio op rêst- en hersteldagen. Aktiviearret heupbúgers, quadriceps, kuiten en core troch de marsbeweging. Helpt tsjinoer wurgens, middeis-dip en ‘brain fog’ troch mear bloed en soerstof nei weefsels en harsens te stjoeren. Benammen nuttich by PMS en menstruaasje as enerzjy en stimming leger binne—kin stimming ferbetterje en enerzjy ferheegje troch endorfinefrijlitting. Tige feilich en tagonklik foar hast alle fitheidsnivo’s en fereasket gjin apparatuer. Kin swollens yn de skonken ferminderje en de sirkulaasje by lang sitten of stean ferbetterje.",
+    "limitations": "Net dwaan by akute heup- of knibbelpine dy’t slimmer wurdt troch beweging of belêsting. By grutte balansproblemen of vestibulêre steurnissen it bêste ticht by in muorre, oanrjocht of stevich meubel marsjearje. Minsken mei heul lege kondysje of sterke deconditionering begjinne better mei mar 20–30 sekonden en bouwe dan stadichoan op. By duizeligheid, licht yn ’e holle of ekstreme koartazem fuort tempo ferleegje of stopje—net trochdrukke. Minsken mei heup- of knibbelprothesen moatte soargje dat de beweging hielendal pinefrij is.",
+    "best_timing": "Perfekt yn ’e moarntiid as warming-up om it lichem wekker te meitsjen, de lichemstemperatuer te ferheegjen en it hart-longsysteem te aktivearjen. Tige gaadlik foarôfgeand oan elke workout om de hartslach stadichoan te ferheegjen. Kin as beweegpauze brûkt wurde troch de dei hinne, benammen foar kantoarwurkers dy’t alle oeren efkes omrinne wolle. Handich by PMS of menstruaasje as enerzjy leech is, mar lichte beweging goed docht—sels 1–2 minuten marsjearjen kin in ferskil meitsje. Wurket goed as koarte cardio fan 2–5 minuten op smoarfolle dagen. Kin by it tv-sjen, telefoanpetearen of wachtsjen op iten dien wurde.",
+    "suggested_combinations": ["arm-circles", "step-touch", "jumping-jacks-modified"],
+    "notes": "Stean rjochtop mei in goede hâlding, core licht oanspand en skouders ûntspand. Til ien knibbel nei in noflike hichte (yn ’t ideaal rjochting heuphichte) en set de foet del wylstst daliks de oare knibbel optilst yn in ritmysk patroan. Lit de earms natuerlik meidwaaie yn tsjinoerstelde fase (rjochterearm foarút by linkerskonk). Hâld de core aktyf en skouders ûntspand. Begjin mei in noflik tempo en ferheegje eventueel de snelheid as it goed fielt. Fokus op aktyf optillen fan de knibbels ynstee fan allinnich gewicht fersetten. Adem natuerlik en kontinu. Foar mear yntinsiteit kinst armbewegingen tafoegje, lykas boppe de holle reitsje of foarút stjitten.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "American Heart Association – Low-Impact Exercise"]
+  },
+  "step-touch": {
+    "name": "Stap-tik (sywaarts)",
+    "description": "Sywaarts stappen mei in ljochte tik fan de oare foet",
+    "benefits": "Sêfte cardio dy’t de hartslach moderat ferheget sûnder hege ynpakte op de gewrichten, en dêrom tagonklik is foar alle leeftiden en fitheidsnivo’s. Ferbetteret koördinaasje, ritme en sy-bewegingspatroanen troch de side-to-side beweging. Aktiviearret heupabduktoren, skonken en core wylst de knibbels, enkels en heupen sparre wurde. Tige geskikt om de kondysje te hâlden tidens herstel fan blessueres, op lege-enerzjy-dei of as aktive herstelbeweging. Kin sy-bewegingspatroanen en wendberens ferbetterje dy’t mei it âlder wurden faak efterút gean. Feilich foar begjinners, senioaren, minsken mei gewrichtssoargen en elkenien dy’t op syk is nei hiel sêfte cardio.",
+    "limitations": "Net dwaan by swiere heup- of knibbelpine dy’t slimmer wurdt troch sywaartse beweging of belêsting. By balansproblemen: de staplengte ferminderje, it tempo ferleegje en ticht by in muorre, oanrjocht of reling oefenje. By akute enkelblessueren pas wer begjinne as de enkel folslein hersteld en stabil is. Net geskikt by swiere artritis-opflakkeringen as beweging de pine merkber fergruttet. Yn it generaal lykwols tige feilich troch de leech-ynpakte natuer.",
+    "best_timing": "Perfekt as sêfte warming-up foar yntinsivere training om lichemstemperatuer en hartslach stadichoan te ferheegjen. Tige gaadlik yn wurkpauzes of as aktive herstelbeweging tusken krachtoefeningen. Kin op elk momint fan de dei dien wurde om lang sitten te ûnderbrekken—elk oere is winst. Wurket goed yn in moarntydsrutine om de hartslach sêft omheech te bringen. Benammen gaadlik yn lege-enerzjyfazen lykas menstruaasje, PMS of herstelwiken. Kin meardere kearen deis sûnder oertrainingssoargen dien wurde.",
+    "suggested_combinations": ["marching-in-place", "arm-circles", "jumping-jacks-modified"],
+    "notes": "Stean mei fuotten byinoar, knibbels licht bûgd en core licht oanspand. Stap mei de rjochter foet sywaarts (ongefaar heupbreed of wat breder) en tik de lofter foet ljocht neist de rjochter, wylst it measte gewicht op de rjochter foet bliuwt. Stap dan mei de lofter foet werom nei lofterkant en tik de rjochter der by. Hâld dit ritme oan. Foar mear boppeliifaktiviteit kinst armbewegingen tafoegje, lykas earms sywaarts of boppe de holle. Hâld de core aktyf en de romp rjochtop—foarkom oerdreaun sywaarts ‘hingjen’. Knibbels bliuwe licht bûgd, net op slot. Begjin mei in stadich, kontroleare tempo en ferheegje dit allinnich asst dy feilich en stabyl fielst. Muziek mei dúdlike beat kin helpe.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "American Heart Association – Moderate-Intensity Activity"]
+  },
+  "jumping-jacks-modified": {
+    "name": "Modifisearre jumping jacks (sûnder springen)",
+    "description": "Stapferzje fan jumping jacks sûnder sprong",
+    "benefits": "Jout in protte fan de cardiovoardielen en folsleine lichem­aktiviteit fan tradisjonele jumping jacks, mar sûnder de hege ynpakte fan springen, wat de gewrichten beskermet en dochs de hartslach goed ferheget. Benammen tagonklik foar senioaren, minsken mei gewrichtsproblemen (knibbel, heup, enkel), minsken yn herstel fan blessueres of elkenien dy’t hege ynpakte mije moat. Belûkt boppeliif en legere lichemsdiel tagelyk troch gecoördinearre earm- en skonkbewegingen (skouders, boarst, skonken en core). Ferbetteret koördinaasje en balans troch de wikseljende stapbeweging mei earms. Fersterket skouders en skonken troch repetysje, mar is folle sêfter as plyometryske oefeningen.",
+    "limitations": "Net dwaan by swiere heup-, knibbel- of skouderpine dy’t ek by low-impact beweging al optreedt. Ek sûnder sprong kin de sywaartse stapbeweging guon gewrichten irritearje—meitsje de stappen lyts en ferleegje de armhichte as it nedich is. By beheinde skoudermobiliteit kinst de earms op boarst- of skouderhichte hâlde ynstee fan folslein boppe de holle, of se hielendal weilitte. By balansproblemen de oefening ticht by in muorre, stoel of oanrjocht dwaan. Stop by gewrichtspine, ekstreme wurgens of frjemde klachten.",
+    "best_timing": "Poerbêst yn de moarntiid om it lichem te aktivearjen, spieren te wekjen en de hartslach te ferheegjen. Tige gaadlik yn in middagsdip as koarte (1–2 minuten) energizer om alertheid en produktiviteit te ferbetterjen. Kin as sêfte warming-up brûkt wurde foar oare oefeningen. Wurket goed yn circuittraining as legere-intensiteit cardio-ynterfal tusken krachtoefeningen. Gaadlik foar deistich gebrûk sûnder grut risiko op oertraining troch de leech-ynpakte, moderate intensiteit. Ideaal yn herstelwiken asst wol yn beweging bliuwe wolst mar minder hurd traine.",
+    "suggested_combinations": ["marching-in-place", "step-touch", "arm-circles"],
+    "notes": "Stean mei fuotten byinoar en earms lâns it lichem. Stap mei ien foet sywaarts (heupbreed of wat breder) wylstst tagelyk de earms optilst—boppe de holle, nei de siden of oant in noflike hichte. Kom werom nei de startposysje mei foet en earms. Stap dan mei de oare foet sywaarts en til de earms wer op, yn in trochgeand ritme. Hâld alle bewegingen kontroleare en gecoördinearre—net slaan of fladderje. Rjochtsje dy op folsleine, mar noflike beweging fan earms en skonken. Adem natuerlik en fyn in sykhelritme dat by it tempo past. Kinst it tempo stadichoan ferheegje foar mear cardioprikkel, wylstst goede foarm behâldst. Muzyk mei in dúdlike beat makket it leuker en makliker om it ritme fêst te hâlden.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "National Institute on Aging – Exercise Modifications"]
+  },
+  "side-steps-cardio": {
+    "name": "Sy-stappen (cardio, lateraal)",
+    "description": "Ritmyske sywaartse stappen mei klam op laterale beweging",
+    "benefits": "Kombinearret cardiokondysje mei weardefolle sywaartse training, wat faak ûntbrekt yn typyske foarút-rjochte oefeningen. Rjochtet him benammen op de gluteus medius en heupabduktoren, tige wichtich foar heupstabiliteit, it foarkommen fan ynsakkende knibbels en it ferminderjen fan blessuererisiko. Ferbetteret koördinaasje, wendberens en kontrôle oer sywaartse beweging troch ritmyske steps. De leech-ynpakte natuer makket it gewrichtsfreonlik, mar do krigest dochs in goede cardioprikkel. Fersterket stabilisearjende spieren om heupen en enkels hinne dy’t faak swak binne en bydrage oan fallen, minne balans en ûnwis kuierjen. Benammen nuttich foar senioaren, minsken dy’t rjochtsje op funksjonele fitens en falprevinsje, en atleten yn sporten mei in soad side-to-side beweging (basketbal, tennis, fuotbal).",
+    "limitations": "Net dwaan by akute heup- of knibbelpine dy’t slimmer wurdt troch sywaartse beweging. Minsken mei ûnstevige enkels, kronyske enkelverzwikkingen of swakke enkels moatte foarsichtich, mei lytsere stappen begjinne en eventueel enkelsupport brûke. By balansproblemen: staplingte ferminderje, tempo ferleegje en ticht by in muorre, reling of stevich meubel bliuwe. Minsken mei trochanter-bursitis moatte sels sjen oft de beweging helpt of krekt pine jout. Stop by skerpe pine yn heup, knibbel, enkel of oare frjemde sensaasjes. Yn it generaal tige feilich troch it kontroleare, foarsisbere en leech-ynpakte karakter.",
+    "best_timing": "Tige gaadlik as warming-up om heupspieren te aktivearjen, heupstabiliteit te ferbetterjen en it lichem op training ta te rieden—benammen foar aktiviteiten mei sybeweging of legere-lichemskrêft. Wurket goed yn de cooling-down om beweging der yn te hâlden wylst de hartslach stadich saket. Ideaal as beweegpauze troch de dei hinne om sitten te ûnderbrekken en heupkrêft te behâlden. Kin as selsstannige sêfte cardiotraining fan 5–10 minuten brûkt wurde. Benammen gaadlik yn leech-enerzjyfazen, herstelperioaden of asst sêft bewege wolst sûnder hege yntinsiteit. Tige goed foar senioaren as ûnderdiel fan deistige falprevinsje.",
+    "suggested_combinations": ["marching-in-place", "step-touch", "hip-opener"],
+    "notes": "Stean mei fuotten byinoar en knibbels licht bûgd. Stap mei ien foet sywaarts en bring de oare foet derby (se kinne inoar reitsje of krekt neist inoar komme). Doch meardere stappen efterinoar yn deselde rjochting (bygelyks 3–5), en gean dan werom yn de oare rjochting. Do kinst ek op it plak sywaarts hinne en wer stapje sûnder echt te ‘reizgjen’. Hâld de core oanspand en de romp rjochtop mei de boarst omheech en skouders nei achteren. Foar mear gluteus-medis-aktiviteit kinst in lichte harksposysje of mini-squat tafoegje by elke stap. Koördinear de earms mei de skonken—bygelyks natuerlik mei­swaaien of sywaarts útstekke. Focus op aktyf ôfsetten mei it efterste been ynstee fan de fuotten passyf te skowen. Begjin mei in noflik tempo en ferheegje de snelheid pas asst dy stabyl fielst. Ritmyske muzyk helpt om tempo en motivaasje heech te hâlden.",
+    "exercise_references": ["WHO Physical Activity Guidelines", "American Council on Exercise – Lateral Movement Training"]
+  },
+  "pelvic-tilts": {
+    "name": "Bekkenkanteljen",
+    "description": "Sêfte rockjende beweging fan it bekken yn lizzende posysje",
+    "benefits": "Sêfte, tagonklike oefening dy’t de djippe core­spieren fersterket (transversus abdominis en legere rêchstabilisatoren) en it bewustwêzen fan bekkenposysje en rêchbeweging ferbetteret. Helpt by it ûntwikkeljen fan bewuste kontrôle oer bekkenútlinening, wat essinsjeel is foar goede hâlding en rêchsûnens. Tige gaadlik nei de befalling om de ferbining mei core en bekkenflier wer op te bouwen nei de grutte feroarings fan swangerskip en befalling. Kin legere rêchpyn ferlichtsje troch in neutrale bekkenposysje oan te learen en de stabilisearjende rompspieren te fersterkjen. Ferbetteret de hâlding troch oermjittige holle ûnder­rêch (foarút kanteling fan it bekken) tsjin te gean. De sêfte rocking kin spanning, stivens en ûngemak yn de legere rêch ferleegje. Fersterket de mind-muscle connectie tusken sykheljen en core-aktivitaasje, de basis fan goede coretraining.",
+    "limitations": "Net dwaan by akute, swiere legere rêchpyn, benammen by skerpe, stekende pine of útstrieljende klachten. As plat op ’e rêch lizzen ûngemak jout, leg dan in kessen of opfold tekken ûnder de knibbels om de druk te ferminderjen. Minsken mei SI-gewrichtsproblemen moatte tige sêft bewege en stopje as de klachten (pine yn legere rêch/bilregio) slimmer wurde. Swangere froulju moatte medysk advys freegje, benammen yn twadde en tredde trimester as lang op ’e rêch lizzen net oanrikkemandearre wurdt. Stop by skerpe pine, frjemde sensaasjes of ferheging fan symptomen en ferminderje oars de bewegingsôfstan.",
+    "best_timing": "Perfekt yn ’e moarntiid om core- en rêchspieren sêft te aktivearjen nei de nacht en goede bewegingspatroanen foar de dei te setten. Tige gaadlik foar it sliepen gean om spanning yn de legere rêch los te litten en de rêchbonke te ûntlasten foar bettere sliepkwaliteit. Ideaal yn de postpartumperioade as iene fan de earste feilige core-oefeningen (meast nei medyske goedkarring). Kin alle dagen dien wurde troch de sêfte aard. Wurket tige goed yn fysioprogramma’s foar chronyske legere rêchpyn. Handich tidens menstruaasje by legere rêchpyn of krampen. Kin foar of nei oare oefeningen brûkt wurde—foar aktivearje, nei as ûntspanning.",
+    "suggested_combinations": ["glute-bridges", "cat-cow", "bird-dog"],
+    "notes": "Lis op dyn rêch op in mat of komfortabele ûndergrûn mei knibbels bûgd en fuotten plat op ’e grûn op heupbreedte. Earms lizze ûntspand neist it lichem mei palmen nei ûnderen. Begjin yn in neutrale rêchposysje (lytse natuerlike holte yn de legere rêch—net folslein tsjin de flier drukt, mar ek net tige hol). Kantel it bekken sêft nei achteren troch de búkspieren oan te spannen en de legere rêch rjochting flier te drukken—stel dy foar datst it sturtbonkje ûnder dy nei de hakken ta ‘tuckst’. De heupen komme miskien in heale sintimeter fan de flier. Hâld dizze posysje 2–3 sekonden wylstst de core fielst wurkjen, en kom dan stadich werom nei neutraal. De beweging is lyts, rêstich en kontroleare—net grut of agressyf. Adem út by it kanteljen (core oanspanne) en yn by it weromgean nei neutraal. Fokus op it fielen fan de rompspieren yn plak fan grut berik. Do kinst ien hân ûnder de legere rêch lizze om te fielen hoe’t dy tsjin de flier drukt by de kantel.",
+    "exercise_references": ["NHS Women's Health", "American Physical Therapy Association – Core Exercises"]
+  },
+  "shoulder-rolls": {
+    "name": "Skouderrole (Shoulder Rolls)",
+    "description": "Kontrolearre sirkelfoarmige beweging fan de skouders om spanning los te litten",
+    "benefits": "Ferlichtet effektyf spanning en stivens yn de boppeste trapezius, levator scapulae, en oare spieren dy't faak strak wurde troch stress, minne hâlding, of lang sitten. Ferbetteret de **skouderbeweging** en berik fan beweging troch kontrolearre sirkelfoarmige beweging dy't it gewricht troch syn folsleine berik nimt. Fergruttet de **bloedstream** nei it skoudergebiet, wêrtroch soerstof en fiedingsstoffen brocht wurde dy't helpe om spierpine te ferminderjen en weefselsûnens te befoarderjen. Kin helpe om **spanningshollepine** te foarkommen of te ferminderjen dy't ûntstiet út strakke nekke- en skouderspieren. Bysûnder weardefol foar buro-arbeiders, kompjûterbrûkers, en elkenien dy't in soad tiid trochbringt yn foarút bûgde posysjes dy't skouderspanning feroarsaakje. Biedt direkte **stressferlichting** troch de ritmyske, kalmerende aard fan de beweging kombinearre mei bewuste sykheljen. Maklik oeral út te fieren sûnder apparatuer, wat it in tagonklike deistige gewoante makket foar it behâld fan de skoudersûnens en it ferminderjen fan chronyske spanningspatroanen.",
+    "limitations": "Mije as jo akute skouderûntstekking, aktive bursitis, of slimme rotator cuff blessueres hawwe; rieplachtsje earst in soarchoanbieder. Dyjingen mei it skouder-impingement-syndroom moatte allinich bewege binnen in **pinefrije berik** en foarkomme dat de beweging twongen wurdt as it knypende sensaasjes feroarsaket. As jo klikken, knappen, of wriuwende sensaasjes ûnderfine by it skouderrollen, ferminderje dan de grutte en snelheid fan de sirkels en rjochtsje jo op kontrolearre, glêde beweging; dizze lûden kinne wize op ûnderlizzende skouderproblemen dy't miskien beoardieling nedich hawwe. Minsken mei Rotator Cuff triennen moatte medyske goedkarring krije foardat se it útfiere, om't bepaalde bewegingen de blessuere kinne fergrutsje. As skouderrollen ferhege pine, skerpe ûngemak, of ûngewoane symptomen feroarsaakje, **stopje dan fuortendaliks** en rieplachtsje in soarchoanbieder. Oer it algemien tige feilich as it sêft en binnen in noflik berik útfierd wurdt. Begjin mei lytse sirkels en fergrutsje de grutte stadichoan as it tolerearre wurdt.",
+    "best_timing": "Perfekt foar **moarnsroutines** om skouderspieren wekker te meitsjen, de sirkulaasje te ferbetterjen en oernachtich opboude stivens los te litten. Utstekend by **wurkpauzes** elke 30-60 minuten om lang sitten te ûnderbrekken en te foarkommen dat skouderspanning him opbout de hiele dei. Hiel effektyf nei elke perioade fan statyske posisjonearring (autoriden, sitten oan it buro, lêzen) as skouders de neiging hawwe om foarút te rûnjen en spanning te meitsjen. Geweldich **foar it sliepen gean** as ûnderdiel fan in ûntspanningsroutine om opboude deistige spanning los te litten en it lichem foar te bereiden op rêstige sliep. Wurket goed as in **opwaarming** foar oefeningen of strekkingen fan it boppelichem om skoudergewrichten foar te bereiden en synoviale flüssigens te fergrutsjen foar bettere gewrichtsfunksje. Kin brûkt wurde op stressfolle mominten as in direkte technyk foar **spanningsferlichting** kombinearre mei djippe sykheljen. Feilich om meardere kearen deis út te fieren as skouders strak of spand fiele.",
+    "suggested_combinations": ["neck-rolls", "arm-circles", "chest-opener"],
+    "notes": "Stean of sit rjochtop, mei neutrale rêchbonke, iepen boarst, en kearn sêft ynskeakele. Hâld jo earms ûntspannen en hingje natuerlik by jo siden; skouders moatte ûntspannen wêze, net omheech holden by jo earen. Begjin troch jo skouders stadich omheech te tillen nei jo earen yn in skodderbeweging. Fanút de ferhege posysje, **rolje jo skouders werom**, wêrby't jo jo skouderblêden byinoar knipe as jo skouders nei ûnderen en efteren bringe. Foltôgje de sirkel troch skouders nei foaren en dan wer omheech te bringen nei de earste ferhege posysje. Doch 8-10 stadige, kontrolearre sirkels yn dizze **efterút rjochting**. Kear dan de rjochting om en **rolje jo skouders foarút** yn sirkels (omheech, foarút, omleech, efterút) foar nochris 8-10 werhellingen. Hâld de beweging **glêd, kontrolearre en bewust**; mije rukkerige of rappe bewegingen. Adem natuerlik en kontinu troch, of koördinearje it sykheljen mei de beweging (ynademje as skouders opkomme, útademje as se sakje). Hâld jo holle yn neutrale rjochting (net kantele of rotearre) en mije jo nekke oan te spannen. Fokus op it meitsjen fan grutte, folsleine sirkels mei jo maksimale noflike berik fan beweging. De beweging moat loslittend en noflik fiele, **net pynlik of anstrengend**.",
+    "exercise_references": ["American Council on Exercise – Shoulder Mobility", "Mayo Clinic – Posture Exercises"]
+  },
+  "chest-opener": {
+    "name": "Boarståpener (Chest Opener)",
+    "description": "Steande of sittende strekking mei hannen achter de rêch ferbûn om de boarst te iepenjen",
+    "benefits": "Utsûnderlike strekking foar de pectoralis major en minor spieren (boarstspieren) dy't faak ferkoarte en strak wurde troch foarút bûgde hâldingen, buro-arbeid, autoriden, en it brûken fan apparaten. Helpt om **rûne skouders** en foarút stekkende holle hâlding te korrigearjen troch skouders werom te lûken en de boarst te iepenjen. Ferbetteret de **ademkapasiteit** en longútwreiding troch de boarst te strekken en it ribbekast mooglik te meitsjen folsleiner út te wreidzjen; bysûnder weardefol foar dyjingen mei ûndjippe ademhalingspatroanen. Kin de **pine yn de boppeste rêch** tusken de skouderblêden signifikant ferminderje, dy't faak it gefolch is fan strakke boarstspieren dy't de skouders nei foaren lûke. Ferbetteret de skoudermobiliteit en fleksibiliteit troch de aktive skouderferlinging en eksterne rotaasje dy't belutsen binne by it ferbinen fan de hannen efter de rêch. Kin de stimming en enerzjynivo's ferbetterje; ûndersyk suggerearret dat it iepenjen fan de boarst en it útwreidzjen fan de hâlding **positive psychologyske effekten** hat, wêrby't gefoelens fan stress en wurgens fermindere wurde. Wurket direkt de gewoane 'kompjûterhâlding' fan rûne skouders en ynsakke boarst tsjin dy't it moderne libben dominearret.",
+    "limitations": "Mije as jo rotator cuff blessueres, akute skouderpine, of wichtige skoudermobiliteit beheiningen hawwe dy't jo foarkomme om hannen noflik efter de rêch byinoar te bringen. As jo de hannen net achter de rêch **ferbine kinne**, brûk dan in handoek, yogariem, of fersetsbân tusken jo hannen; hâld elk ein fêst en wurkje oan it stadichoan byinoar bringen fan de hannen oer de tiid. Gean stadichoan en sêft yn de strekking; it twingen fan de posysje of agressyf strekken kin skouderligaminten belêste of besteande skouderproblemen fergrutsje. Dyjingen mei heul strakke skouders moatte ferwachtsje dat dit yn 't earstoan útdaagjend fielt en moatte wurkje binnen in noflik berik, stadichoan ferbetterjen oer wiken. Swangere froulju yn letter stadia kinne lykwicht dreech fine en moatte sittend útfiere of soargje foar stabile posysjonearring. **Stopje fuortendaliks** as jo skerpe pine, tinteljen, dofheid, of ûngewoane ûngemak yn skouders, earms, of hannen ûnderfine. Oer it algemien feilich as it mei geduld en juste progresje benadere wurdt.",
+    "best_timing": "Perfekt foar **moarnsroutines** om it rûnjen fan de skouders oer nacht tsjin te gean en in goede hâlding yn te stellen foar de kommende dei. Utstekend by **wurkpauzes** elke 1-2 oeren om lange foarút bûgde posysjes te ûnderbrekken en de hâlding de hiele wurkdei werom te setten. Ideaal nei elke perioade fan kromme aktiviteit lykas kompjûterwurk, tillefoangebrûk, lêzen, autoriden, of koken. Geweldich **foar it sliepen gean** om opboude boarststivens en skouderspanning fan de dei los te litten. Wurket goed nei oefeningen foar it boppelichem, benammen dy mei triuwbewegingen (push-ups, bankdrukken), om lykwicht te herstellen en boarststivens te foarkommen. Kin útfierd wurde foar presintaasjes, gearkomsten, of wichtige eveneminten; de iepen boarsthâlding kin it **selsfertrouwen ferheegje** en it sykheljen ferbetterje. Feilich en foardielich om **deistich** of sels meardere kearen deis út te fieren. Hâld 20-30 sekonden fêst en werhelje 2-3 kear.",
+    "suggested_combinations": ["shoulder-rolls", "neck-rolls", "cat-cow"],
+    "notes": "Stean of sit rjochtop, fuotten op heupbreedte útinoar (as jo stean), kearn sêft ynskeakele. Bring jo earms efter jo rêch en **ferbine jo hannen** mei de fingers yninoar (as jo net kinne berikke, brûk dan in handoek of riem). Strek jo earms safolle as noflik mooglik sûnder de ellebogen te beskoatteljen en til jo ferbûne hannen sêft **omheech en fuort fan jo lichem**. By it tillen fan jo earms, rjochtsje jo op it **byinoar knipen fan jo skouderblêden** en it omheech tillen fan jo boarst nei it plafond. Hâld jo holle yn neutrale rjochting; mije jo kin nei foaren te stekken of jo holle efteroer te kantele. De strekking moat fiele oer de foarkant fan jo boarst en mooglik yn de foarkant fan jo skouders. Hâld de posysje 20-30 sekonden fêst wylst jo **djip en folslein sykhelje**; brûk de strekking as in kâns om djip sykheljen te oefenjen, wat it boarståpenjende effekt fierder fersterket. Lit stadich los en werhelje 2-3 kear. Foar in djippere strekking kinne jo jo skouders sêft werom en omleech lûke wylst jo de ferhege earmposysje behâlde. As jo steane, mije it oermjittich hol lûken fan jo ûnderrêch; hâld de kearn ynskeakele om jo rêchbonke te beskermjen. Guon minsken fine it nuttich om dizze strekking yn in doarpost út te fieren of in partner sêft assistearje te litten troch lichte druk út te oefenjen om de boarst fierder te iepenjen (kommunisearje dúdlik om de juste yntensiteit te garandearjen).",
+    "exercise_references": ["American Council on Exercise – Flexibility Training", "Mayo Clinic – Posture Exercises"]
+  },
+  "seated-cardio-arm-pumps": {
+    "name": "Sittende Cardio (Earmpompen) (Seated Cardio / Arm Pumps)",
+    "description": "Sittende marsjearjen mei earmpompende beweging om de hertslach te ferheegjen",
+    "benefits": "Biedt **kardiovaskulêre foardielen** en ferheget de hertslach wylst jo sittend bliuwe, wat it tagonklik makket foar minsken mei mobiliteitsbeheiningen, resinte operaasje, of slimme gewrichtsproblemen. Skeakelet de boppelichemsspieren yn, ynklusyf skouders, earms en bopperêch, troch de pompende earmbewegingen. Aktivearret heupfleksoren en kearn troch de marsjearjende beweging. Utsûnderlik foar it **ferbetterjen fan de sirkulaasje** yn de skonken, wat benammen wichtich is by lange perioaden fan sitten lykas flechten, autoreizen, of buro-arbeid; helpt om bloedstagnaasje te foarkommen en ferminderet it risiko op djippe feintrombose (DFT). Fergruttet enerzjynivo's en bestriidt wurgens sûnder stean of komplekse bewegingen te fereaskjen. Bysûnder weardefol foar **âldere folwoeksenen, postoperative pasjinten, rolstoelbrûkers** of elkenien mei beheiningen oan de ûnderste helte fan it lichem dy't dochs kardiovaskulêre fitness behâlde wol. Kin helpe om skonkswelling en it swiere gefoel fan lang sitten te ferminderjen.",
+    "limitations": "Mije as jo slimme skouderpine, rotator cuff triennen, of akute blessueres fan it boppelichem hawwe dy't slimmer wurde mei earmbeweging. Dyjingen mei heul lege kardiovaskulêre fitness as resinte kardiale eveneminten moatte begjinne mei mar 20-30 sekonden en de doer stadichoan opbouwe. As jo in net-kontrolearre hege bloeddruk hawwe, kontrolearje dan de yntensiteit en stopje as jo jo duizelig fiele, ljocht yn de holle, of ûngemak yn 'e boarst ûnderfine. Minsken mei slimme lykwichtssteuringen moatte derfoar soargje dat har **stoel stabyl** is en net omfalle sil. Dyjingen dy't herstelle fan in operaasje moatte medyske goedkarring krije oer de passende yntensiteit en oft dizze oefening feilich is foar har herstelfaze. Stopje as jo ûngewoane koartheid fan sykheljen, boarstpine of duizeligheid ûnderfine. Oer it algemien tige feilich fanwege de sittende, lege-ynfloed aard.",
+    "best_timing": "Perfekt tidens lange kantoardagen; kin elke 1-2 oeren dien wurde om lang sitten te ûnderbrekken en enerzjy te behâlden. Utsûnderlik tidens **flechten, lange autoreizen of treinreizen** om sirkulaasje te behâlden en stivens te foarkommen. Wurket goed tidens TV-reklamepauzes of wylst jo op wat wachtsje. Ideaal foar moarnsroutines as steande oefeningen net mooglik of passend binne. Kin brûkt wurde as in **sêfte opwaarming** foar sittende sterkte-oefeningen. Bysûnder nuttich tidens enerzjydips yn de middei as jo in ympuls nedich hawwe, mar jo buro net ferlitte kinne. Kin meardere kearen deis útfierd wurde; elk oere tidens lange sittende perioaden is ridlik. Geskikt sels op dagen mei heul lege enerzjy of tidens herstel as steande oefening net helber is.",
+    "suggested_combinations": ["seated-spinal-twist", "arm-circles"],
+    "notes": "Sit rjochtop oan de râne fan in **stevige stoel** mei fuotten plat op de flier (of fuotten stipe op in fuotsteun as nedich) en kearn sêft ynskeakele. Begjin mei it **marsjearjen op it plak** troch wikseljend jo knibbels op te tillen; til ien knibbel sa heech mooglik op (ideaal besykje de dij parallel oan de flier te bringen as mooglik), sakje dan en til de oare knibbel op. **Pomp tagelyk jo earms** yn opposysje ta jo skonken (rjochter earm foarút as de linker knibbel optilt, lykas natuerlike kuierbeweging). Buig de ellebogen nei sawat 90 graden en pomp earms mei opsetsin; driuw jo ellebogen werom by elke pomp om de bopperêch yn te skeakeljen. Hâld skouders ûntspannen en omleech, fuort fan earen. Behâld de hiele tiid in **goede rjochtopsteande hâlding**; net hingje of nei foaren rûnje. Begjin op in noflik, matich tempo en fergrutsje de snelheid stadichoan as jo opwaarmje. Fokus op kontrolearre, ritmyske bewegingen yn stee fan frantic beweging. Adem natuerlik en kontinu; fêstigje in sykheljenpatroan dat oerienkomt mei jo beweging (yn foar 2 tellen, út foar 2 tellen). Om yntensiteit te fergrutsjen, pomp earms heger (boppe de holle berikke) of til knibbels heger op. Kin dien wurde by it sjen fan TV, tidens telefoantsjes, as elke sittende aktiviteit.",
+    "exercise_references": ["WHO Physical Activity Guidelines"]
+  },
+  "heel-to-toe-walk": {
+    "name": "Hak-nei-Tien Rinne (Heel-to-Toe Walk)",
+    "description": "Rinne yn in rjochte line mei de hak direkt de tien oanreitsjend by elke stap",
+    "benefits": "Ferbetteret signifikant it **lykwicht, de koördinaasje en proprioepsje** (lichemsoanwêzigens yn 'e romte) troch in útdaagjende smelle basis fan stipe. Fersterket de stabilisearjende spieren yn de ankels, knibbels, heupen en kearn dy't essinsjeel binne foar it **foarkommen fan fallen**. Heech funksjonele oefening dy't direkt resultearret yn better lykwicht tidens deistige aktiviteiten lykas kuierjen op ûnjefene oerflakken, treppen navigearje, of josels fange as jo stroffelje. Bysûnder weardefol foar **fallenprevinsje by âldere folwoeksenen**; stúdzjes litte sjen dat lykwichtstraining lykas hak-nei-tien rinne it risiko op fallen mei maksimaal 30% ferminderje kin. Helpt om de gong (rinpatroan) en staplingte te ferbetterjen, dy't faak ôfnimme mei leeftyd. Skeakelet it vestibulêre systeem (binneneare lykwicht), fisueel systeem, en propriozeptive systeem tagelyk yn, wêrby't alle trije lykwichtssystemen traind wurde. Kin helpe om lykwichtsproblemen betiid te identifisearjen; as jo dit heul lestich fine, kin it wize op de needsaak foar mear lykwichtstraining of medyske beoardieling.",
+    "limitations": "Mije as jo aktive fertigo, slimme duizeligheid, of problemen mei de binneneare hawwe sûnder medyske goedkarring; dit smelle rinpatroan kin symptomen útlûke. Dyjingen mei signifikante lykwichtsbeheiningen, resinte fallen, of eangst foar fallen moatte dizze oefening útfiere **by in muorre, reling, of mei in helpe** dêr't se stipe kinne berikke as nedich. Net geskikt by akute ankelferstuikingen of knibbelblessueres as it dragen fan gewicht pynlik is. Minsken mei neuropaty (dofheid yn 'e fuotten) moatte tige foarsichtich wêze, om't in fermindere foetsensaasje it lykwicht útdaagjender makket. Dyjingen mei signifikante fisyproblemen moatte derfoar soargje dat it paad dúdlik en goed ferljochte is. **Stopje fuortendaliks** as jo duizelig fiele, werhelle kearen jo lykwicht ferlieze, of ûngewoane symptomen ûnderfine. Begjin mei mar 5-6 stappen en bou stadichoan op; dit is dreger dan it liket.",
+    "best_timing": "Utsûnderlik foar **moarnsroutines** om lykwichtssystemen te aktivearjen en lichemsoanwêzigens te ferbetterjen foar de kommende dei. Perfekt as ûnderdiel fan in **deistich lykwichtstreningsprogramma**; konsistinsje is de kaai foar foardielen fan fallenprevinsje. Kin dien wurde foar it kuierjen of aktiviteiten dy't goed lykwicht fereaskje om de stabilisearjende spieren foar te bereiden. Wurket goed as in funksjonele beoardieling; doch moanliks om lykwichtsferbetteringen oer de tiid te folgjen. Ideaal om op te nimmen yn fysioterapy- of rehabilitaasjeprogramma's foar lykwichtssteuringen. Best útfierd as jo **alert en net wurch** binne; lykwichtskontrôle ferswaket mei wurgens. Kin 3-5 kear yn 'e wike dien wurde as ûnderdiel fan in wiidweidich programma foar fallenprevinsje. Bysûnder wichtich foar folwoeksenen boppe de 65 of elkenien mei in ferhege risiko op fallen.",
+    "suggested_combinations": ["single-leg-stand", "calf-raises"],
+    "notes": "Fyn in dúdlik, rjocht paad fan op syn minst 3-5 meter sûnder wat om oer te stroffeljen; in gong wurket goed. Foar feiligens, rin **by in muorre lâns** of hawwe in stevich oerflak yn 'e buert dêr't jo stipe kinne berikke as nedich. Stean mei de fuotten byinoar en kies in punt oan it ein fan jo paad om op te fokusjen (dit helpt mei lykwicht). Pleats jo rjochter hak **direkt foar jo linker teannen**, sadat de hak en teannen elkoar oanreitsje of hast oanreitsje. Stap foarút troch jo linker hak direkt foar jo rjochter teannen te pleatsen. Bliuw rinne yn dit **hak-nei-tien patroan**, as rinne jo op in strakke tou. Hâld jo earms in bytsje nei de siden foar lykwicht (of oanreitsje de muorre licht as nedich). Rin **stadich en bewust**; it giet om kontrôle, net snelheid. Fokus jo eagen op in punt foar jo, net nei ûnderen op jo fuotten (nei ûnderen sjen makket lykwicht dreger). Hâld jo kearn ynskeakele en hâlding rjochtop. As jo jo lykwicht ferlieze, stopje dan, set jo fuotten werom, en gean troch. Tel jo stappen en besykje it oantal te fergrutsjen dat jo kinne dwaan sûnder lykwicht te ferliezen. Om it yn 't earstoan makliker te meitsjen, tastean dan in lytse spleet tusken hak en tien. Om it dreger te meitsjen, besykje it mei eagen ticht (allinich as jo tichtby in muorre binne foar feiligens).",
+    "exercise_references": ["Mayo Clinic – Balance Training"]
+  },
+  "plank-cross-body-touch": {
+    "name": "Planke mei Oerkrús Lichems Oanreitsjen (Plank Cross Body Touch)",
+    "description": "Fanút in foarste planke-posysje, til ien hân op om nei de tsjinoerstelde foet te reitsjen, oanreitsje as mooglik, gean dan werom nei de planke en wikselje fan kant",
+    "benefits": "Fersterket de hiele kearn (core) mei bysûndere klam op de obliques (side-abdomele spieren) en djippe stabilisators lykas de transverse abdominis. De oerkrús-berikbeweging skept rotaasje-útdagings dy't anty-rotaasjekrêft opbouwe – it fermogen om draaikrêften te wjerstean, wat krúsjaal is foar beskerming fan de rêchbonke by deistige aktiviteiten en sporten. Ferbetteret de **koördinaasje en it lykwicht** signifikant troch de ienearmige stipefaze, wêrby't jo stabiliteit op trije kontaktpunten behâlde moatte. Ferbetteret de skouderstabiliteit en -krêft, om't de stypjende earm it folsleine lichemsgewicht kontrolearje moat tidens de berikfaze. Untwikkelt funksjonele kearnkrêft dy't direkt oerset wurdt nei bewegingen yn 'e echte wrâld dy't rotaasje omfetsje, lykas it berikken oer jo lichem, swingende sportapparatuer, of draaien by it dragen fan objekten. De dynamyske aard ferbetteret proprioepsje (lichemsoanwêzigens) en leart de kearnspieren om as in yntegrearre ienheid te wurkjen ynstee fan isolearre spieren. Bysûnder effektyf foar atleten yn rotaasjesporten lykas golf, tennis, honkbal, of fjochtsport. Helpt om de hâlding te ferbetterjen troch de djippe kearnspieren te fersterkjen dy't juste rêchbonke-rjochting stypje.",
+    "limitations": "Fereasket solide planke-hâldfetsje en skouderstabiliteit as basis – as jo in standert foarste planke net foar op syn minst 30 sekonden mei goede foarm hâlde kinne, bou dan earst dy kapasiteit op foardat jo dizze mear útdaagjende fariaasje besykje. Mije as jo akute polspine, karpaltunnelsyndroom, of polsblessueres hawwe, om't de ienearmige stipefaze de spanning op 'e stypjende pols fergruttet. Dyjingen mei skouder-impingement, rotator cuff problemen, of skouderinstabiliteit moatte foarsichtich trochgean of oanpasse troch de berikôfstân te ferminderjen. Minsken mei **ûnderrêchproblemen** moatte benammen foarsichtich wêze om neutrale rêchbonke te behâlden en oermjittige rotaasje of trochhingjen troch de heupen te foarkommen – as jo foarm ôfbrekt, stopje dan en rêst. Net geskikt tidens swangerskip nei it earste trimester fanwegen ferlingde búklizzing en kearnstress. Dyjingen mei signifikante lykwichtsútdagings kinne de ienearmige faze yn 't earstoat te ynstabyl fine en moatte earst opbouwe mei ienfâldiger planke-fariaasjes. Stopje fuortendaliks as jo skerpe pine ûnderfine yn skouders, polsen, of ûnderrêch, of as jo fiele dat jo foarm signifikant efterút giet (heupen rotearje tefolle, skouders sakje yn, of rêch hinget troch).",
+    "best_timing": "Ideaal **yn 'e midden fan in trainingssesje** as jo kearn aktivearre en waarm is, mar noch net wurch – it útfieren fan dizze oefening betiid yn in training as spieren kâld binne, kin it blessuererisiko fergrutsje, wylst it dwaan as jo útput binne, liedt ta minne foarm. Wurket útsûnderlik as ûnderdiel fan in wiidweidich kearntrainingssirkwy, wikseljend mei oefeningen dy't de kearn út ferskate hoeken útdaagje. Perfekte oanfolling yn funksjonele fitnessroutines of atletyske trainingsprogramma's dy't rotaasjekrêft en stabiliteit beklamje. Kin opnommen wurde yn mingde folslein lichem sterkte sesjes as it kearn-rjochte elemint. Ek effektyf as ûnderdiel fan in **dynamyske opwaarmingssekwinsje** foar sporten dy't rotaasje fereaskje (golf, tennis, fjochtsport), útfierd nei algemiene kardiovaskulêre opwaarming, mar foar sportspesifike oefeningen. Doch 2-3 sets fan 6-10 werhellingen per kant, mei 30-60 sekonden rêst tusken sets. Bêste dien 2-3 kear yn 'e wike mei op syn minst ien rêstdei tusken sesjes om herstel mooglik te meitsjen. Mije as de alderlêste oefening yn in training as wurgens jo fermogen om juste foarm te behâlden kompromittearre hat.",
+    "suggested_combinations": ["front-plank-toe-tap", "bird-dog", "plank", "mountain-climbers"],
+    "notes": "Begjin yn in juste **foarste planke-posysje** – hannen direkt ûnder skouders, lichem foarmet in rjochte line fan holle nei hakken, fuotten op heupbreedte útinoar (in bredere fuotposysje makket dit makliker troch in stabiler basis te leverjen). Skeakelje jo kearn yn troch jo navel nei jo rêchbonke te lûken en knyp jo glutes byinoar om te foarkommen dat heupen trochhingje of omheech pike. Foardat jo it berikken besykje, soargje derfoar dat jo yn dizze basis planke-posysje rotstefast stabyl binne. Hâld jo heupen sa nivo mooglik (dit is krúsjaal – wjerstean de oanstriid om jo heupen signifikant te rotearjen as jo reitsje), til jo rjochterhân stadich fan 'e grûn en **reitsje it nei jo linkerfoet**. It doel is om jo linkerfoet oan te reitsjen as fleksibiliteit en kontrôle it tastean, mar reitsje nei de knibbel of skynbonke is folslein akseptabel – de kaai is it behâld fan stabiliteit, net hoe fier jo reitsje. As jo reitsje, sille jo natuerlik mear gewicht ferskowe nei jo linker earm – soargje derfoar dat dat skouder stabyl bliuwt en net nei binnen saket. Bring jo rjochterhân stadich werom nei de grûn, herstel jo stabile planke-posysje foardat jo mei de linkerhân nei de rjochterfoet reitsje. Bewege **stadich en bewust** mei folsleine kontrôle – dit is gjin race. Fokus op it trochgeande behâld fan in neutrale rêchbonke (net rûn of oermjittich hol lûken fan jo rêch). Adem kontinu en ritmysk – útademje as jo nei de foet reitsje (de swierdere faze) en ynademje as jo weromgean nei de planke. Hâld jo blik licht nei foaren en nei ûnderen rjochte ynstee fan werom te sjen nei jo fuotten, wat helpt om neutrale nekke- en rêchbonke-rjochting te behâlden. As jo fine dat jo heupen tefolle rotearje, ferminderje dan de ôfstân fan jo berik of ferbreedzje jo fuotposysje foar mear stabiliteit. **Kwaliteit fan beweging giet boppe kwantiteit** – doch minder werhellingen mei treflike foarm ynstee fan in soad mei minne foarm. Om it makliker te meitsjen: ferbreedzje jo fuotten foar in stabilere basis, reitsje allinich nei jo knibbel ynstee fan jo foet, of doch de beweging fan in ferhege oerflak (hannen op in bank of doaze) om de lading te ferminderjen. Om it dreger te meitsjen: bring jo fuotten tichter byinoar foar in smellere, minder stabile basis, of pauzearje foar 2-3 sekonden op 'e berikposysje foardat jo weromgean.",
+    "exercise_references": ["American Council on Exercise – Core Training Guidelines", "National Academy of Sports Medicine – Functional Movement Patterns"]
   }
 }

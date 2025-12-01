@@ -102,8 +102,8 @@ describe('TimerPage - Exercise Display Improvements', () => {
       workoutMode: mockWorkoutMode
     });
 
-    // Check that the exercise counter is displayed in the timer area
-    expect(screen.getByText('Exercise 1/1')).toBeInTheDocument();
+    // Check that the exercise counter is displayed in the workout header badge
+    expect(screen.getByText('1/1')).toBeInTheDocument();
   });
 
   it('should display workout progress indicator', () => {
@@ -123,10 +123,6 @@ describe('TimerPage - Exercise Display Improvements', () => {
     // The workout header should not be present
     const workoutHeader = screen.queryByText('Upper Body Workout');
     expect(workoutHeader).not.toBeInTheDocument();
-
-    // Exercise counter should also not be present
-    const exerciseCounter = screen.queryByText('Exercise 1/1');
-    expect(exerciseCounter).not.toBeInTheDocument();
   });
 
   it('should handle normal workout mode display', () => {
@@ -134,10 +130,9 @@ describe('TimerPage - Exercise Display Improvements', () => {
       workoutMode: mockWorkoutMode
     });
 
-    // Should display workout name and progress
+    // Should display workout name and progress in workout header
     expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
     expect(screen.getByText('1/1')).toBeInTheDocument();
-    expect(screen.getByText('Exercise 1/1')).toBeInTheDocument();
   });
 
   it('should display workout header correctly', () => {
@@ -145,12 +140,9 @@ describe('TimerPage - Exercise Display Improvements', () => {
       workoutMode: mockWorkoutMode
     });
 
-    // Check workout header is present
+    // Check workout header is present with exercise counter badge
     expect(screen.getByText('Upper Body Workout')).toBeInTheDocument();
     expect(screen.getByText('1/1')).toBeInTheDocument();
-
-    // Check exercise counter is displayed in timer area
-    expect(screen.getByText('Exercise 1/1')).toBeInTheDocument();
   });
 
   it('should handle missing exercise gracefully', () => {

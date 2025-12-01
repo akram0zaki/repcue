@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Exercise } from '../types';
@@ -9,6 +9,8 @@ import { getExerciseById } from '../data/exercises';
 import { VideoThumbnail } from '../components/VideoThumbnail';
 import { useAuth } from '../hooks/useAuth';
 import logger from '../utils/logger';
+import '../styles/exerciseDetailParallax.css';
+import type { AppSettings } from '../types';
 
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +22,9 @@ const ExerciseDetailPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const [videoFitMode, setVideoFitMode] = useState<'fit' | 'fill'>('fit');
 
   useEffect(() => {
     if (!id) {
@@ -34,6 +39,27 @@ const ExerciseDetailPage: React.FC = () => {
   useEffect(() => {
     // Scroll to top when page loads
     window.scrollTo(0, 0);
+
+    // Handle scroll for parallax effect
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Load video fit mode from settings
+  useEffect(() => {
+    (async () => {
+      try {
+        const settings = await storageService.getAppSettings();
+        const mode = settings?.video_fit_mode === 'fill' ? 'fill' : 'fit';
+        setVideoFitMode(mode);
+      } catch {
+        // default remains 'fit'
+      }
+    })();
   }, []);
 
   // Refresh favorite status when page regains focus or becomes visible
@@ -246,46 +272,97 @@ const ExerciseDetailPage: React.FC = () => {
     return null;
   }
 
-  return (
-    <div className="min-h-screen bg-surface-0 dark:bg-surface-900">
-      {/* Hero Video/Image Section */}
-      <div className="relative h-[480px] rounded-b-3xl overflow-hidden">
-        {/* Back Button Overlay */}
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-6 left-6 z-20 p-2 bg-black/20 rounded-full text-white hover:bg-black/30 transition-colors"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
+  // Calculate video dimensions
+  const videoHeight = videoContainerRef.current?.offsetHeight || 600;
+  const initialOverlap = videoHeight * 0.10; // Content starts covering 10% of video from bottom
+  const minVisibleVideo = videoHeight * 0.25; // Keep 25% of video visible when fully collapsed
+  const maxScroll = videoHeight - minVisibleVideo - initialOverlap; // Maximum amount content can slide up
 
-        {/* Exercise Video Thumbnail */}
+  return (
+    <div className="exercise-detail-container bg-surface-0 dark:bg-surface-900">
+      {/* Fixed Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="exercise-detail-back-button"
+        aria-label={t('common.back', 'Back')}
+        title={t('common.back', 'Back')}
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      {/* Hero Video Section - Fixed position, stays in place */}
+      <div 
+        ref={videoContainerRef}
+        className="exercise-detail-video-container"
+      >
         <div className="w-full h-full">
           <VideoThumbnail
             exercise={exercise}
-            className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:object-cover [&>div]:h-full [&>div]:aspect-auto"
+            className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:w-full [&>div]:h-full [&>div]:aspect-auto"
+            objectFit={videoFitMode === 'fit' ? 'contain' : 'cover'}
             onVideoLoad={() => logger.log('Hero video loaded for exercise:', exercise.id)}
             onVideoError={() => logger.warn('Hero video failed to load for exercise:', exercise.id)}
           />
+          {/* Fit/Fill toggle overlay */}
+          <div className="absolute top-3 right-3 z-10">
+            <button
+              type="button"
+              className="btn-ghost btn-sm border-2 border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
+              onClick={async () => {
+                const next = videoFitMode === 'fit' ? 'fill' : 'fit';
+                setVideoFitMode(next);
+                try {
+                  const current = await storageService.getAppSettings();
+                  if (current) {
+                    const nextSettings: AppSettings = {
+                      ...current,
+                      video_fit_mode: next,
+                      version: (current.version || 1) + 1,
+                      updated_at: new Date().toISOString(),
+                      dirty: 1,
+                      op: 'upsert'
+                    } as AppSettings;
+                    await storageService.saveAppSettings(nextSettings);
+                  }
+                } catch (e) {
+                  logger.warn('Failed to persist video_fit_mode setting from ExerciseDetailPage', e);
+                }
+              }}
+              aria-label={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+              title={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+              data-testid="toggle-video-fit-detail"
+            >
+              {videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Content Section with reference-style layout but keeping all existing functionality */}
-      <div className="px-6 py-6 bg-surface-0 dark:bg-surface-800 rounded-t-3xl -mt-6 relative z-10 min-h-screen">
-
-        {/* Use the existing ExerciseDetailContent component to preserve all functionality */}
-        <ExerciseDetailContent
-          exercise={exercise}
-          isFavorite={isFavorite}
-          isOwner={isOwner}
-          onToggleFavorite={handleToggleFavorite}
-          onRatingChange={handleRatingChange}
-          onStartTimer={handleStartTimer}
-          onEdit={handleEdit}
-          showActions={true}
-          className=""
-        />
+      {/* Content Section - Positioned to slide up over video */}
+      <div 
+        className="exercise-detail-content-panel"
+        // Initial position: covering bottom 10% of video, slides up as page scrolls
+        style={{ 
+          top: `${videoHeight - initialOverlap}px`,
+          transform: `translateY(-${Math.min(scrollY, maxScroll)}px)`
+        }}
+      >
+        <div className="px-6 py-6">
+          {/* Use the existing ExerciseDetailContent component to preserve all functionality */}
+          <ExerciseDetailContent
+            exercise={exercise}
+            isFavorite={isFavorite}
+            isOwner={isOwner}
+            onToggleFavorite={handleToggleFavorite}
+            onRatingChange={handleRatingChange}
+            onStartTimer={handleStartTimer}
+            onEdit={handleEdit}
+            showActions={true}
+            className=""
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach, beforeAll, afterAll } from 'vitest';
 import { LegalDocsService } from '../legalDocsService';
 import { ConsentService } from '../consentService';
 import type { LegalManifest, LegalAcceptance } from '../../types/legal';
@@ -29,6 +29,15 @@ vi.mock('../../utils/logger', () => ({
 }));
 
 describe('LegalDocsService', () => {
+  // Freeze system time to keep date-based tests deterministic
+  beforeAll(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-10-22T00:00:00.000Z'));
+  });
+
+  afterAll(() => {
+    vi.useRealTimers();
+  });
   let legalDocsService: LegalDocsService;
   let consentService: ConsentService;
 
@@ -355,10 +364,13 @@ describe('LegalDocsService', () => {
     });
 
     it('should calculate days until effective', () => {
-      // terms_conditions effectiveFrom: 2025-11-01
-      const days = legalDocsService.getDaysUntilEffective('2025-11-01T00:00:00.000Z');
+      // Use a relative future date to avoid coupling to wall clock
+      const future = new Date();
+      future.setDate(future.getDate() + 10);
+      const days = legalDocsService.getDaysUntilEffective(future.toISOString());
       
-      expect(days).toBeGreaterThan(0);
+      expect(days).not.toBeNull();
+      expect(days as number).toBeGreaterThan(0);
     });
 
     it('should return null for already effective documents', () => {

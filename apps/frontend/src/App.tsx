@@ -18,6 +18,7 @@ import { useSharedExercises } from './hooks/useSharedExercises';
 import { useSnackbar } from './components/SnackbarProvider';
 import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
+import { LegalGate } from './components/legal/LegalGate';
 import MigrationSuccessBanner from './components/MigrationSuccessBanner';
 import AppShell from './components/AppShell';
 import ScrollToTop from './components/ScrollToTop';
@@ -25,16 +26,16 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthModal } from './components/auth/AuthModal';
 import { ForceUpdateModal } from './components/ForceUpdateModal';
 import { UpdateNotificationManager } from './components/UpdateNotificationManager';
-import { LegalGate } from './components/legal/LegalGate';
-import type { UpdateInfo, UpdateError } from './types';
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
+import type { UpdateInfo, UpdateError } from './types';
 import type { PersonalRecord } from './types/coaching';
 import { Routes as AppRoutes } from './types';
 import { DEFAULT_APP_SETTINGS, BASE_REP_TIME, REST_TIME_BETWEEN_SETS, type TimerPreset } from './constants';
 import { computeWorkoutDurations } from './utils/workoutDuration';
+import { getExerciseDurationFromMedia } from './utils/loadExerciseMedia';
 import i18n from './i18n';
 import logger from './utils/logger';
 import { isCustom } from './utils/syncFilters';
@@ -63,6 +64,7 @@ import {
   LegalCenterPage,
   ChunkErrorBoundary,
 } from './router/LazyRoutes';
+import DevToolsPage from './pages/DevToolsPage';
 import { preloadCriticalRoutes, createRouteLoader } from './router/routeUtils';
 import { PRCelebration } from './components/coaching/PRCelebration';
 import { PostWorkoutSurvey } from './components/PostWorkoutSurvey';
@@ -85,6 +87,7 @@ const TimerPageWrapper: React.FC<{
   onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
   onStartWorkoutMode: (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => Promise<void>;
+  onUpdateSettings?: (patch: Partial<AppSettings>) => void;
 }> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -260,6 +263,9 @@ function App() {
   const [showWorkoutForceUpdateModal, setShowWorkoutForceUpdateModal] = useState(false);
   const [workoutForceUpdateData, setWorkoutForceUpdateData] = useState<UpdateInfo | null>(null);
   
+  // Legal documents state
+  const [showLegalGate, setShowLegalGate] = useState(false);
+  
   // Authentication state
   // Auth state consumed indirectly via sync:applied listener
   const { user } = useAuth();
@@ -277,9 +283,6 @@ function App() {
   // Post-workout survey state
   const [showPostWorkoutSurvey, setShowPostWorkoutSurvey] = useState(false);
   const [surveyActivityLog, setSurveyActivityLog] = useState<ActivityLog | null>(null);
-
-  // Legal gate state
-  const [showLegalGate, setShowLegalGate] = useState(false);
 
   // Handle pending share token after authentication
   useEffect(() => {
@@ -314,9 +317,11 @@ function App() {
   });
 
   // Helper function to check if we're on a shared exercise route that doesn't require consent
-  const isPublicShareRoute = useCallback(() => {
+  // Check if current route should be accessible without consent (public routes + legal center)
+  const isPublicOrLegalRoute = useCallback(() => {
     if (typeof window !== 'undefined' && window.location) {
-      return window.location.pathname.startsWith('/share/');
+      const path = window.location.pathname;
+      return path.startsWith('/share/') || path === '/legal';
     }
     return false;
   }, []);
@@ -386,14 +391,31 @@ function App() {
   const initStartedRef = useRef<boolean>(false);
 
   // Effect to ensure correct duration for rep-based exercises
+  // Reads accurate duration from exercise_media.json instead of globalExercises.ts
   useEffect(() => {
-    if (selectedExercise?.exercise_type === 'repetition_based' && appSettings.rep_speed_factor) {
-    const baseRep = selectedExercise.rep_duration_seconds || BASE_REP_TIME;
-    const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
+    if (!selectedExercise?.exercise_type || selectedExercise.exercise_type !== 'repetition_based' || !appSettings.rep_speed_factor) {
+      return;
+    }
+
+    const updateDuration = async () => {
+      // Fetch accurate duration from exercise media index
+      const mediaDuration = await getExerciseDurationFromMedia(selectedExercise.id);
+      const baseRep = mediaDuration ?? selectedExercise.rep_duration_seconds ?? BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
       if (selectedDuration !== repDuration) {
         setSelectedDuration(repDuration as TimerPreset);
       }
-    }
+    };
+
+    updateDuration().catch(err => {
+      logger.warn('[timer-duration] Failed to update duration from media:', err);
+      // Fallback to original duration calculation
+      const baseRep = selectedExercise.rep_duration_seconds ?? BASE_REP_TIME;
+      const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
+      if (selectedDuration !== repDuration) {
+        setSelectedDuration(repDuration as TimerPreset);
+      }
+    });
   }, [selectedExercise, appSettings.rep_speed_factor, selectedDuration]);
 
   // Timer refs for interval management
@@ -539,6 +561,10 @@ function App() {
       alert('Please select an exercise first');
       return;
     }
+
+    // Log the rep speed factor value (debug logger respects DEBUG flag)
+    logger.log('🎬 [TIMER START] Rep Speed Factor:', appSettings.rep_speed_factor);
+    logger.log('🎬 [TIMER START] Video Playback Rate should be:', 1 / appSettings.rep_speed_factor);
 
     // Request wake lock to keep screen active at the start
     if (wakeLockSupported) {
@@ -1609,6 +1635,11 @@ function App() {
                 }
                 
                 // Stop the timer - exercise complete
+                // Ensure UI reflects completion (currentTime === targetTime) for rep-based standalone completion
+                setTimerState(prev => ({
+                  ...prev,
+                  currentTime: prev.targetTime || prev.currentTime
+                }));
                 stopTimer(true);
               }
             }
@@ -1750,6 +1781,10 @@ function App() {
             }
             
             // Stop timer completely - all reps and sets done
+            setTimerState(prev => ({
+              ...prev,
+              currentTime: prev.targetTime || prev.currentTime
+            }));
             stopTimer(true);
           }
         } else {
@@ -1852,6 +1887,25 @@ function App() {
         currentExercise: undefined
       }));
     }
+
+    // BUGFIX: Clear stale targetTime/currentTime when switching between exercise types
+    // Scenario: After completing a rep-based exercise (targetTime = repDuration, e.g. 4s) with no pre-countdown,
+    // startActualTimer reuses prev.targetTime because it was set and we go directly to startActualTimer.
+    // Selecting a new time-based exercise then incorrectly keeps the old small targetTime.
+    // Fix: When selecting a new exercise (and timer not running, not in workout mode), clear targetTime so
+    // startTimer/startActualTimer uses the newly selectedDuration instead of stale previous value.
+    if (!timerState.isRunning && !timerState.workoutMode) {
+      setTimerState(prev => ({
+        ...prev,
+        targetTime: undefined,
+        currentTime: 0,
+        // Clear any standalone rep tracking state to avoid leaking into time-based selection
+        currentSet: undefined,
+        totalSets: undefined,
+        currentRep: undefined,
+        totalReps: undefined
+      }));
+    }
     
     setSelectedExercise(exercise);
     updateAppSettings({ last_selected_exercise_id: exercise ? exercise.id : null });
@@ -1869,14 +1923,21 @@ function App() {
         const repDuration = Math.round(baseRep * appSettings.rep_speed_factor);
         setSelectedDuration(repDuration as TimerPreset);
       }
+    } else if (exercise?.exercise_type === 'time_based') {
+      // Ensure selecting a new time-based exercise resets duration to its default
+      // Prime directive: selecting an exercise should reflect its canonical default duration
+      const defaultDuration = exercise.default_duration || 30;
+      if (selectedDuration !== defaultDuration) {
+        setSelectedDuration(defaultDuration as TimerPreset);
+      }
     }
   }, [updateAppSettings, timerState.workoutMode, timerState.currentExercise, timerState.currentSet, timerState.currentRep, timerState.totalSets, timerState.totalReps, appSettings.rep_speed_factor]);
 
   // Initialize app data after consent (run once when consent is granted)
   useEffect(() => {
-    // Skip initialization for public share routes - they don't need local data
-    if (isPublicShareRoute()) {
-      logger.log('[init] Skipping initialization for public share route');
+    // Skip initialization for public share routes and legal center - they don't need local data
+    if (isPublicOrLegalRoute()) {
+      logger.log('[init] Skipping initialization for public/legal route');
       setIsLoading(false);
       return;
     }
@@ -2034,6 +2095,12 @@ function App() {
           // logger.log('[init] Ensuring exercise catalogs and exercises are seeded');
           await storageService.ensureCatalogsSeeded();
           await storageService.ensureExercisesSeeded();
+          // For v25+ global exercise repository, ensure catalog memberships are seeded
+          try {
+            await storageService.ensureCatalogMembershipsSeeded();
+          } catch (e) {
+            logger.warn('[init] ensureCatalogMembershipsSeeded failed:', e);
+          }
           const seedMs = Date.now() - tSeedStart;
           if (seedMs > 1000) logger.warn(`[init] seeding took ${seedMs}ms`); else logger.log(`[init] seeding took ${seedMs}ms`);
 
@@ -2159,39 +2226,7 @@ function App() {
       logger.warn('Version recovery check failed:', error);
     }
   }, 5000); // Check after 5 seconds
-  }, [hasConsent, isPublicShareRoute]);
-
-  // Check for blocking legal documents
-  useEffect(() => {
-    const checkLegalGate = async () => {
-      logger.log('[Legal Gate Check] Starting check - hasConsent:', hasConsent, 'isLoading:', isLoading);
-      
-      if (!hasConsent || isLoading) {
-        logger.log('[Legal Gate Check] Skipping - waiting for consent or app to load');
-        return;
-      }
-
-      try {
-        const locale = i18n.language || 'en';
-        logger.log('[Legal Gate Check] Checking for blocking documents in locale:', locale);
-        
-        const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
-        logger.log('[Legal Gate Check] Has blocking documents:', hasBlocking);
-        
-        if (hasBlocking) {
-          logger.log('📄 Blocking legal documents detected, showing legal gate');
-          setShowLegalGate(true);
-        } else {
-          logger.log('[Legal Gate Check] No blocking documents found');
-          setShowLegalGate(false);
-        }
-      } catch (error) {
-        logger.error('❌ Failed to check legal gate:', error);
-      }
-    };
-
-    checkLegalGate();
-  }, [hasConsent, isLoading, i18n.language]);
+  }, [hasConsent, isPublicOrLegalRoute]);
 
   // Handle shared exercise save from redirect
   useEffect(() => {
@@ -2435,10 +2470,10 @@ useEffect(() => {
     const tryRehydrate = async () => {
       if (isLoading || exercises.length > 0) return;
       // If consent missing, we can still safely peek built-ins to hydrate UI without storing anything
-      // But skip this entirely for public share routes since they don't need local exercises
+      // But skip this entirely for public share routes and legal center since they don't need local exercises
       if (!hasConsent) {
-        if (isPublicShareRoute()) {
-          logger.log('[rehydrate] Skipping exercise rehydration for public share route');
+        if (isPublicOrLegalRoute()) {
+          logger.log('[rehydrate] Skipping exercise rehydration for public/legal route');
           return;
         }
         try {
@@ -2480,12 +2515,14 @@ useEffect(() => {
     };
     void tryRehydrate();
     return () => { cancelled = true; };
-  }, [hasConsent, isLoading, exercises.length, isPublicShareRoute]);
+  }, [hasConsent, isLoading, exercises.length, isPublicOrLegalRoute]);
 
   // Listen for consent changes
   useEffect(() => {
     const handleConsentGranted = () => {
       setHasConsent(true);
+      // When consent is granted, close legal gate if open
+      setShowLegalGate(false);
     };
 
     const handleConsentRevoked = () => {
@@ -2506,9 +2543,51 @@ useEffect(() => {
     };
   }, []);
 
+  // Check for legal document updates and blocking status
+  useEffect(() => {
+    const checkLegalDocumentStatus = async () => {
+      // Only check after initial load and when user has consent
+      if (isLoading || !hasConsent || isPublicOrLegalRoute()) {
+        return;
+      }
+
+      try {
+        // CRITICAL: Always re-initialize to ensure we have the latest manifest
+        // This prevents race conditions where ConsentBanner loads fresh manifest
+        // but this check uses stale cached data
+        const initialized = await legalDocsService.initialize();
+
+        if (!initialized) {
+          logger.warn('Legal documents service not initialized, skipping status check');
+          return;
+        }
+
+        // Get current language
+        const locale = i18n.language || 'en';
+
+        // Check if there are any blocking documents (documents with required acceptance)
+        const hasBlocking = legalDocsService.hasBlockingDocuments(locale);
+        const hasUnaccepted = legalDocsService.hasUnacceptedRequired(locale);
+
+        if (hasBlocking || hasUnaccepted) {
+          setShowLegalGate(true);
+        }
+      } catch (error) {
+        logger.error('Error checking legal document status:', error);
+      }
+    };
+
+    checkLegalDocumentStatus();
+  }, [hasConsent, isLoading, i18n.language]); // Removed showLegalGate to prevent circular dependency
+
   // Handle consent banner
   const handleConsentGranted = () => {
     setHasConsent(true);
+  };
+
+  // Handle legal gate acceptance
+  const handleLegalGateAccepted = () => {
+    setShowLegalGate(false);
   };
 
   
@@ -2709,44 +2788,26 @@ useEffect(() => {
     }
   }, [appSettings.dark_mode, hasConsent]);
 
-  // Show consent banner if no consent (except for public share routes)
-  if (!hasConsent && !isPublicShareRoute()) {
-    return <ConsentBanner onConsentGranted={handleConsentGranted} />;
-  }
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-surface-secondary flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-body font-medium">Loading RepCue...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Block app rendering if Legal Gate is open (blocking documents must be accepted first)
-  if (showLegalGate) {
-    return (
-      <>
-        <LegalGate
-          isOpen={showLegalGate}
-          onContinue={() => {
-            logger.log('📄 Legal gate accepted, continuing to app');
-            setShowLegalGate(false);
-          }}
-        />
-      </>
-    );
-  }
-
   // JSDOM can miss origin/href; BrowserRouter will throw. Provide minimal fallback.
   const canUseBrowserRouter = typeof window !== 'undefined' && !!(window.location && (window.location as Location).href);
 
   return (
     <ThemeProvider appSettings={appSettings} onSettingsChange={updateAppSettings}>
-      {canUseBrowserRouter ? (
+      {/* Show consent banner if no consent (except for public share routes and legal center) */}
+      {!hasConsent && !isPublicOrLegalRoute() ? (
+        <ConsentBanner onConsentGranted={handleConsentGranted} />
+      ) : showLegalGate && hasConsent && !isPublicOrLegalRoute() ? (
+        // Show legal gate if documents need acceptance (blocking documents detected)
+        <LegalGate isOpen={showLegalGate} onContinue={handleLegalGateAccepted} />
+      ) : isLoading ? (
+        // Show loading state
+        <div className="min-h-screen bg-surface-secondary flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-body font-medium">Loading RepCue...</p>
+          </div>
+        </div>
+      ) : canUseBrowserRouter ? (
         <Router>
         <ScrollToTop />
         <ChunkErrorBoundary>
@@ -2847,6 +2908,7 @@ useEffect(() => {
                       onStopTimer={stopTimer}
                       onResetTimer={resetTimer}
                       onStartWorkoutMode={startWorkoutMode}
+                      onUpdateSettings={updateAppSettings}
                     />
                   </Suspense>
                 } 
@@ -2877,6 +2939,10 @@ useEffect(() => {
                     <CoachPage appSettings={appSettings} exercises={exercises} />
                   </Suspense>
                 } 
+              />
+              <Route 
+                path="/dev-tools" 
+                element={<DevToolsPage />} 
               />
               <Route 
                 path={AppRoutes.PR_HISTORY} 
@@ -2942,13 +3008,16 @@ useEffect(() => {
         </ChunkErrorBoundary>
       )}
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode="signin"
-      />
+      {/* Modals and overlays - show only when not in consent flow */}
+      {hasConsent && (
+        <>
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            initialMode="signin"
+          />
 
-      <ForceUpdateModal
+          <ForceUpdateModal
         isOpen={showForceUpdateModal}
         updateInfo={forceUpdateData || undefined}
         onApplyUpdate={async () => {
@@ -3047,6 +3116,8 @@ useEffect(() => {
           }}
           isSubmitting={false}
         />
+      )}
+        </>
       )}
     </ThemeProvider>
   );

@@ -108,6 +108,9 @@ export class AuthService {
         }
       } catch {}
 
+  // Create user profile if it doesn't exist (non-blocking)
+  this.ensureUserProfile(userProfile).catch(err => logger.warn('Profile creation failed (non-blocking):', err));
+
   // Claim ownership of anonymous data on first sign-in (non-blocking with guard)
   this.claimAnonymousData().catch(err => logger.warn('Ownership claim failed (non-blocking):', err));
 
@@ -137,6 +140,36 @@ export class AuthService {
       refreshToken: undefined
     };
     this.notifyListeners();
+  }
+
+  /**
+   * Ensure user profile exists (create if needed)
+   */
+  private async ensureUserProfile(userProfile: AuthUserProfile): Promise<void> {
+    try {
+      const existingProfile = await storageService.getUserProfile();
+      
+      if (!existingProfile) {
+        logger.log('Creating initial user profile...');
+        const initialProfile = {
+          user_id: userProfile.id,
+          name: userProfile.displayName || undefined,
+          join_date: userProfile.createdAt?.toISOString() || new Date().toISOString(),
+          last_active: new Date().toISOString(),
+        };
+        
+        await storageService.saveUserProfile(initialProfile);
+        logger.log('✅ Initial user profile created');
+      } else {
+        // Update last_active timestamp
+        await storageService.saveUserProfile({
+          ...existingProfile,
+          last_active: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      logger.error('Failed to ensure user profile:', error);
+    }
   }
 
   /**
@@ -242,6 +275,18 @@ export class AuthService {
           }).catch(error => {
             logger.warn('Failed to load sync service:', error);
           });
+
+          // Initialize video upload service to process any pending uploads
+          import('./videoUploadService').then(({ default: VideoUploadService }) => {
+            const videoUploadService = VideoUploadService.getInstance();
+            videoUploadService.initialize().then(() => {
+              logger.log('✅ Video upload service initialized');
+            }).catch(error => {
+              logger.warn('Failed to initialize video upload service:', error);
+            });
+          }).catch(error => {
+            logger.warn('Failed to load video upload service:', error);
+          });
         }, 2000); // 2 second delay to ensure app initialization completes
       }, 1000); // 1 second delay to ensure auth state is settled
     } catch (error) {
@@ -314,47 +359,37 @@ export class AuthService {
       // Check for pending shared exercise token that needs to be preserved
       const pendingShareToken = sessionStorage.getItem('pendingShareToken');
 
-      const otpOptions: {
-        shouldCreateUser: boolean;
-        emailRedirectTo?: string;
-        data: {
-          display_name: string;
-        };
-      } = {
-        shouldCreateUser: true,
-        data: {
-          display_name: email.split('@')[0]
-        }
-      };
+      // Build the redirect URL based on environment
+      let redirectUrl: string;
 
-      // Only set emailRedirectTo if we need to preserve a shared exercise token
-      // Otherwise, let Supabase use the referrer URL (default behavior)
+      // Check if we're in PWA mode (standalone display)
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                    ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
+
+      if (isPWA) {
+        // For PWA: use custom protocol for deep linking back to PWA
+        redirectUrl = `web+repcue://auth/callback`;
+      } else {
+        // For browser: use current origin to preserve domain context (works for localhost and production)
+        redirectUrl = `${this.getRedirectBase()}/auth/callback`;
+      }
+
+      // If there's a pending share token, add it to the redirect URL
       if (pendingShareToken) {
-        // For shared exercise flow, use the current origin (referrer) to maintain
-        // the same domain behavior as the default Supabase magic link flow
-        let redirectUrl: string;
-
-        // Check if we're in PWA mode (standalone display)
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-                      ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
-
-        if (isPWA) {
-          // For PWA: use custom protocol for deep linking back to PWA
-          redirectUrl = `web+repcue://auth/callback`;
-        } else {
-          // For browser: use current origin (referrer URL) to preserve domain context
-          redirectUrl = `${window.location.origin}/auth/callback`;
-        }
-
-        // Add the shared exercise token to the redirect URL
         const url = new URL(redirectUrl);
         url.searchParams.set('saveSharedExercise', pendingShareToken);
-        otpOptions.emailRedirectTo = url.toString();
+        redirectUrl = url.toString();
       }
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: otpOptions
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: redirectUrl,
+          data: {
+            display_name: email.split('@')[0]
+          }
+        }
       });
 
       if (error) {

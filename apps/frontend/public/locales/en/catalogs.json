@@ -1,4 +1,9 @@
 {
+  "assignCatalogs": "Assign to catalogs",
+  "assignHint": "Select one or more catalogs to organize where this exercise appears.",
+  "assignmentHeading": "Catalog Assignment",
+  "assignmentHint": "Choose catalogs to include this exercise in. You can change this anytime.",
+  "minOneRequired": "Select at least one catalog to continue.",
   "selectCatalog": "Exercise Catalog",
   "selectDescription": "Choose an exercise catalog to view exercises",
   "general-fitness": {

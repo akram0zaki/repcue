@@ -67,13 +67,22 @@
   "screen2": {
     "title": "Je doelen & voorkeuren",
     "subtitle": "Waar werk je naartoe?",
-    "goal": {
-      "label": "Primair doel",
+    "goals": {
+      "label": "Primaire doelen",
+      "helper": "Selecteer een of meer doelen die je wilt bereiken",
       "weightLoss": "Afvallen",
       "muscleBuilding": "Spieropbouw",
       "healthMaintenance": "Gezondheid behouden",
       "flexibility": "Flexibiliteit & mobiliteit",
-      "error": "Selecteer je primaire doel"
+      "marathonDesSables": "Marathon des Sables Voorbereiding",
+      "error": "Selecteer minimaal één doel"
+    },
+    "goalDuration": {
+      "label": "Tijd om doelen te bereiken (Optioneel)",
+      "helper": "Hoeveel maanden heb je om je doelen te bereiken?",
+      "placeholder": "bijv. 3, 6, 12",
+      "unit": "maanden",
+      "error": "Doelduur moet tussen 1 en 24 maanden zijn"
     },
     "fitnessLevel": {
       "label": "Huidig fitnessniveau",
@@ -102,8 +111,10 @@
   },
   "screen3": {
     "title": "Gezondheid & trainingsstijl",
-    "subtitle": "Laten we het veilig en effectief houden",
-    "injuries": {
+    "subtitle": "Laten we het veilig en effectief houden",    "saveToProfile": {
+      "label": "Opslaan in mijn profiel",
+      "description": "Sla deze informatie op om toekomstige AI Workout Builder-sessies vooraf in te vullen. Je kunt dit op elk moment wijzigen in je profielinstellingen."
+    },    "injuries": {
       "label": "Blessures of beperkingen (optioneel)",
       "placeholder": "bijv. knieklachten, lage rugpijn, schouderblessure...",
       "description": "Laat ons weten of je blessures of fysieke beperkingen hebt, zodat we veilige oefeningen kunnen aanbevelen.",
@@ -156,6 +167,7 @@
   "results": {
     "title": "Jouw gepersonaliseerde trainingen",
     "subtitle": "AI-gegenereerde trainingen afgestemd op jouw doelen",
+    "feedbackTitle": "AI-Coach Inzichten",
     "aiGeneratedBadge": "AI-gegenereerd",
     "exerciseCount": "{{count}} oefeningen",
     "durationSeconds": "~{{seconds}} sec",

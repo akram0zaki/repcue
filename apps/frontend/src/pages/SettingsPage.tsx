@@ -7,6 +7,7 @@ import type { AppSettings } from '../types';
 import { audioService } from '../services/audioService';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { VideoCacheService } from '../services/videoCacheService';
 import { SpeakerIcon, DocumentTextIcon } from '../components/icons/NavigationIcons';
 import Toast from '../components/Toast';
 import LanguageSwitcher from '../components/LanguageSwitcher';
@@ -36,12 +37,16 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
   const [showClearDataToast, setShowClearDataToast] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [showForceRefreshToast, setShowForceRefreshToast] = useState(false);
+  const [showExportSuccessToast, setShowExportSuccessToast] = useState(false);
+  const [showExportErrorToast, setShowExportErrorToast] = useState(false);
+  const [showClearVideoCacheToast, setShowClearVideoCacheToast] = useState(false);
   const { isAuthenticated } = useAuth();
   const [isManualSyncing, setIsManualSyncing] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isForceFullSyncing, setIsForceFullSyncing] = useState(false);
   const [isResettingSyncState, setIsResettingSyncState] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  const [isClearingVideoCache, setIsClearingVideoCache] = useState(false);
 
   const handleVolumeChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const volume = parseFloat(event.target.value);
@@ -77,17 +82,31 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
       }
       URL.revokeObjectURL(url);
 
-      // Show success message
-      alert(t('settings.exportSuccess', 'Data exported successfully'));
+      // Show success toast
+      setShowExportSuccessToast(true);
     } catch (error) {
       logger.error('Failed to export data:', error);
-      // Show error message to user
-      alert(t('settings.exportError', 'Failed to export data. Please try again.'));
+      // Show error toast
+      setShowExportErrorToast(true);
     }
   };
 
   const handleClearData = async () => {
     setShowClearDataToast(true);
+  };
+
+  const handleClearVideoCache = async () => {
+    try {
+      setIsClearingVideoCache(true);
+      const videoCacheService = VideoCacheService.getInstance();
+      await videoCacheService.clearAll();
+      setShowClearVideoCacheToast(true);
+      logger.log('[Settings] Video cache cleared successfully');
+    } catch (error) {
+      logger.error('[Settings] Failed to clear video cache:', error);
+    } finally {
+      setIsClearingVideoCache(false);
+    }
   };
 
   const handleSyncNow = async () => {
@@ -244,31 +263,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           </div>
         </div>
 
-        {/* Legal Section (separate, directly below Language) */}
-        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
-          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
-            <DocumentTextIcon size={20} className="section-icon" />
-            {t('legal:title')}
-          </h2>
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => navigate('/legal')}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
-              data-testid="open-legal-center"
-              aria-label={t('a11y.navigateTo', { label: t('legal:title'), defaultValue: 'Navigate to {{label}}' })}
-            >
-              <span className="flex items-center gap-2 text-text-900 dark:text-text-50">
-                <DocumentTextIcon size={18} />
-                {t('legal:title')}
-              </span>
-              <svg className="w-5 h-5 text-text-500 dark:text-text-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
         {/* Audio Settings */}
   <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
           <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
@@ -412,6 +406,36 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
           <p className="text-xs help-text mt-1">
             {t('settings.ringTimerHelp')}
           </p>
+
+          {/* Rep Speed Factor */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="rep-speed-factor" className="label-text">
+                {t('settings.repSpeedFactor')}
+              </label>
+              <span className="text-sm text-text-500 dark:text-text-400">
+                {appSettings.rep_speed_factor.toFixed(1)}x
+              </span>
+            </div>
+            <input
+              id="rep-speed-factor"
+              type="range"
+              min="0.5"
+              max="2.0"
+              step="0.1"
+              value={appSettings.rep_speed_factor}
+              onChange={(e) => onUpdateSettings({ rep_speed_factor: parseFloat(e.target.value) })}
+              className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between mt-2 text-xs help-text">
+              <span>0.5x {t('settings.faster')}</span>
+              <span>1.0x</span>
+              <span>2.0x {t('settings.slower')}</span>
+            </div>
+            <p className="text-sm help-text mt-1">
+              {t('settings.repSpeedFactorHelp')}
+            </p>
+          </div>
         </div>
 
         {/* Appearance Settings */}
@@ -477,6 +501,31 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
               onChange={() => onUpdateSettings({ horizontal_exercise_layout: !appSettings.horizontal_exercise_layout })}
               dataTestId="toggle-horizontal-exercise-layout"
             />
+          </div>
+        </div>
+
+        {/* Legal Section */}
+        <div className="bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-3 flex items-center gap-2">
+            <DocumentTextIcon size={20} className="section-icon" />
+            {t('legal:title')}
+          </h2>
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={() => navigate('/legal')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+              data-testid="open-legal-center"
+              aria-label={t('a11y.navigateTo', { label: t('legal:title'), defaultValue: 'Navigate to {{label}}' })}
+            >
+              <span className="flex items-center gap-2 text-text-900 dark:text-text-50">
+                <DocumentTextIcon size={18} />
+                {t('legal:title')}
+              </span>
+              <svg className="w-5 h-5 text-text-500 dark:text-text-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -965,6 +1014,20 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
             </div>
           </div>
 
+          {/* Clear Video Cache Button */}
+          <div className="mb-4">
+            <button
+              onClick={handleClearVideoCache}
+              disabled={isClearingVideoCache}
+              className="w-full btn-secondary"
+            >
+              {isClearingVideoCache ? t('settings.clearing') : t('settings.clearVideoCache')}
+            </button>
+            <p className="text-xs help-text mt-1">
+              {t('settings.clearVideoCacheHelp')}
+            </p>
+          </div>
+
           {/* Clear Data Button */}
           <div>
             <button
@@ -1045,6 +1108,33 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ appSettings, onUpdateSettin
         message={t('settings.forceRefreshConfirm')}
         confirmText={t('settings.forceRefreshApp')}
         cancelText={t('common.cancel')}
+      />
+
+      {/* Export Data Success Toast */}
+      <Toast
+        isOpen={showExportSuccessToast}
+        onClose={() => setShowExportSuccessToast(false)}
+        type="info"
+        message={t('settings.exportSuccess')}
+        confirmText={t('common.ok')}
+      />
+
+      {/* Export Data Error Toast */}
+      <Toast
+        isOpen={showExportErrorToast}
+        onClose={() => setShowExportErrorToast(false)}
+        type="danger"
+        message={t('settings.exportError')}
+        confirmText={t('common.ok')}
+      />
+
+      {/* Clear Video Cache Success Toast */}
+      <Toast
+        isOpen={showClearVideoCacheToast}
+        onClose={() => setShowClearVideoCacheToast(false)}
+        type="info"
+        message={t('settings.videoCacheCleared', { defaultValue: 'Video cache cleared successfully' })}
+        confirmText={t('common.ok')}
       />
 
       {/* Delete Account Modal */}

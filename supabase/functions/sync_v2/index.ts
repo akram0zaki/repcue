@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 // @ts-nocheck // Edge function executed in Deno runtime; Deno types provided at runtime
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // CORS headers
@@ -13,10 +13,10 @@ const corsHeaders = {
 
 // Enhanced logging with correlation ID and per-table status tracking
 function logWithContext(correlationId: string, level: string, message: string, data: any = null) {
-  const timestamp = new Date().toISOString();
-  const prefix = `[${correlationId}] [${level}] [COMPREHENSIVE]`;
+  const prefix = `[${correlationId}] [${level}]`;
   if (data) {
-    console.log(`${prefix} ${message}`, JSON.stringify(data, null, 2));
+    // Use compact JSON for performance (no pretty printing)
+    console.log(`${prefix} ${message}`, JSON.stringify(data));
   } else {
     console.log(`${prefix} ${message}`);
   }
@@ -41,16 +41,18 @@ async function validateJWT(jwt: string): Promise<string | null> {
 }
 
 // Allow-list of tables (exercise_catalogs removed - built-in reference data only)
+// Note: video_files removed - video uploads handled via direct Supabase Storage, not sync
+// Note: personal_records removed - table does not exist in database yet
 const SYNC_TABLES = [
   'user_preferences',
   'app_settings',
   'exercises',
+  'catalog_memberships',
   'user_favorites',
   'workouts',
   'activity_logs',
-  'workout_sessions',
-  'video_files',
-  'personal_records'
+  'workout_sessions'
+  // 'video_files' - REMOVED: handled via dedicated storage upload
 ];
 
 // Shared UUID validation pattern (defense-in-depth: prevents any slug / built-in IDs from being processed server-side)
@@ -91,6 +93,11 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'catalog_id', 'benefits', 'limitations', 'best_timing', 'suggested_combinations',
     'notes', 'exercise_references'
   ]),
+  catalog_memberships: new Set([
+    'id', 'exercise_id', 'catalog_id', 'catalog_tags', 'display_order', 'featured',
+    'custom_name_key', 'custom_description_key', 'owner_id', 'created_at', 'updated_at',
+    'version', 'deleted'
+  ]),
   user_favorites: new Set([
     'id', 'owner_id', 'item_id', 'item_type', 'exercise_type',
     'created_at', 'updated_at', 'version', 'deleted'
@@ -114,11 +121,6 @@ const MUTABLE_FIELD_ALLOWLIST = {
     'id', 'owner_id', 'exercise_id', 'file_name', 'file_data', 'file_size',
     'mime_type', 'upload_pending', 'storage_path', 'created_at', 'updated_at',
     'deleted', 'version'
-  ]),
-  personal_records: new Set([
-    'id', 'exercise_id', 'exercise_name', 'record_type', 'value',
-    'achieved_at', 'workout_id', 'previous_record', 'improvement_percentage',
-    'owner_id', 'created_at', 'updated_at', 'version', 'deleted'
   ])
 };
 
@@ -404,14 +406,40 @@ async function enforceVideoFileSingleton(supabase: any, userId: string, exercise
 // Pull exercises including shared exercises referenced in user_favorites
 async function pullExercisesWithShared(supabase: any, userId: string, cursor: any, limit: number, correlationId: string): Promise<any> {
   try {
-    logWithContext(correlationId, 'INFO', 'Pulling exercises with shared exercises', { userId, cursor, limit });
+    logWithContext(correlationId, 'INFO', 'Pulling exercises with shared exercises');
 
-    // First, get user's own exercises
-    const { query: ownQuery, params: ownParams } = pullTableQuery('exercises', userId, cursor, limit);
-    const { data: ownExercises, error: ownError } = await supabase.rpc('exec_sql', {
-      sql: ownQuery,
-      params: ownParams
-    });
+    // Build own exercises query using native Supabase client
+    let ownQuery = supabase
+      .from('exercises')
+      .select('*')
+      .eq('owner_id', userId)
+      .neq('deleted', true)
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .limit(limit);
+
+    // Apply cursor pagination if provided
+    if (cursor?.lastUpdatedAt) {
+      ownQuery = ownQuery.or(`updated_at.gt.${cursor.lastUpdatedAt},and(updated_at.eq.${cursor.lastUpdatedAt},id.gt.${cursor.lastId || ''})`);
+    }
+
+    // Build favorites query
+    const favoritesQuery = supabase
+      .from('user_favorites')
+      .select('item_id')
+      .eq('owner_id', userId)
+      .eq('item_type', 'exercise')
+      .eq('exercise_type', 'shared')
+      .neq('deleted', true);
+
+    // Run own exercises and favorites queries IN PARALLEL
+    const [ownResult, favoritesResult] = await Promise.all([
+      ownQuery,
+      favoritesQuery
+    ]);
+
+    const { data: ownExercises, error: ownError } = ownResult;
+    const { data: favoritesData, error: favoritesError } = favoritesResult;
 
     if (ownError) {
       logWithContext(correlationId, 'ERROR', 'Failed to pull own exercises', { error: ownError.message });
@@ -426,16 +454,6 @@ async function pullExercisesWithShared(supabase: any, userId: string, cursor: an
 
     logWithContext(correlationId, 'INFO', `Found ${ownExercises?.length || 0} own exercises`);
 
-    // Get shared exercise references from user_favorites
-    const favoritesQuery = `
-      SELECT item_id FROM user_favorites
-      WHERE owner_id = $1 AND item_type = 'exercise' AND exercise_type = 'shared' AND deleted != true
-    `;
-    const { data: favoritesData, error: favoritesError } = await supabase.rpc('exec_sql', {
-      sql: favoritesQuery,
-      params: [userId]
-    });
-
     if (favoritesError) {
       logWithContext(correlationId, 'WARN', 'No shared exercise favorites found', { error: favoritesError.message });
       // Continue with just own exercises
@@ -448,7 +466,7 @@ async function pullExercisesWithShared(supabase: any, userId: string, cursor: an
     }
 
     // Extract shared exercise IDs
-    const sharedExerciseIds = new Set();
+    const sharedExerciseIds = new Set<string>();
     if (favoritesData && favoritesData.length > 0) {
       for (const favRecord of favoritesData) {
         if (favRecord.item_id) {
@@ -460,21 +478,18 @@ async function pullExercisesWithShared(supabase: any, userId: string, cursor: an
     logWithContext(correlationId, 'INFO', `Found ${sharedExerciseIds.size} shared exercise IDs in favorites`);
 
     // Get shared exercises that user doesn't own
-    let sharedExercises = [];
+    let sharedExercises: any[] = [];
     if (sharedExerciseIds.size > 0) {
-      const ownExerciseIds = new Set((ownExercises || []).map(ex => ex.id));
+      const ownExerciseIds = new Set((ownExercises || []).map((ex: any) => ex.id));
       const externalSharedIds = Array.from(sharedExerciseIds).filter(id => !ownExerciseIds.has(id));
 
       if (externalSharedIds.length > 0) {
-        const placeholders = externalSharedIds.map((_, i) => `$${i + 1}`).join(', ');
-        const sharedQuery = `
-          SELECT * FROM exercises
-          WHERE id IN (${placeholders}) AND deleted != true
-        `;
-        const { data: sharedData, error: sharedError } = await supabase.rpc('exec_sql', {
-          sql: sharedQuery,
-          params: externalSharedIds
-        });
+        // Use native Supabase client with IN filter
+        const { data: sharedData, error: sharedError } = await supabase
+          .from('exercises')
+          .select('*')
+          .in('id', externalSharedIds)
+          .neq('deleted', true);
 
         if (sharedError) {
           logWithContext(correlationId, 'WARN', 'Failed to pull shared exercises', { error: sharedError.message });
@@ -515,25 +530,6 @@ async function pullExercisesWithShared(supabase: any, userId: string, cursor: an
   }
 }
 
-// Regular table pull query
-function pullTableQuery(table: string, userId: string, cursor: any, limit: number): { query: string; params: any[] } {
-  let query = `
-    SELECT * FROM ${table}
-    WHERE owner_id = $1 AND deleted != true
-  `;
-  const params = [userId];
-
-  if (cursor?.lastUpdatedAt) {
-    query += ` AND (updated_at > $${params.length + 1} OR (updated_at = $${params.length + 1} AND id > $${params.length + 2}))`;
-    params.push(cursor.lastUpdatedAt, cursor.lastId || '');
-  }
-
-  query += ` ORDER BY updated_at ASC, id ASC LIMIT $${params.length + 1}`;
-  params.push(limit);
-
-  return { query, params };
-}
-
 // Generate next cursor for pagination
 function generateNextCursor(records: any[], limit: number): any {
   if (!records || records.length === 0 || records.length < limit) {
@@ -546,16 +542,26 @@ function generateNextCursor(records: any[], limit: number): any {
   };
 }
 
-// Generic table pull with cursor-based pagination
+// Generic table pull with cursor-based pagination using native Supabase client
 async function pullTableWithCursor(supabase: any, table: string, userId: string, cursor: any, limit: number, correlationId: string): Promise<any> {
   try {
-    logWithContext(correlationId, 'INFO', `Pulling ${table} for user ${userId}`, { cursor });
+    // Build query using native Supabase client (faster than exec_sql RPC)
+    let query = supabase
+      .from(table)
+      .select('*')
+      .eq('owner_id', userId)
+      .neq('deleted', true)
+      .order('updated_at', { ascending: true })
+      .order('id', { ascending: true })
+      .limit(limit);
 
-    const { query, params } = pullTableQuery(table, userId, cursor, limit);
-    const { data, error } = await supabase.rpc('exec_sql', {
-      sql: query,
-      params: params
-    });
+    // Apply cursor pagination if provided
+    if (cursor?.lastUpdatedAt) {
+      // Composite cursor: (updated_at, id) for stable pagination
+      query = query.or(`updated_at.gt.${cursor.lastUpdatedAt},and(updated_at.eq.${cursor.lastUpdatedAt},id.gt.${cursor.lastId || ''})`);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       logWithContext(correlationId, 'ERROR', `Pull operation failed for ${table}`, { error: error.message });
@@ -572,7 +578,7 @@ async function pullTableWithCursor(supabase: any, table: string, userId: string,
     const nextCursor = generateNextCursor(records, limit);
     const hasMore = records.length === limit;
 
-    logWithContext(correlationId, 'INFO', `Pulled ${records.length} records from ${table}`, { hasMore });
+    logWithContext(correlationId, 'INFO', `Pulled ${records.length} records from ${table}`);
 
     return {
       records,
@@ -592,12 +598,12 @@ async function pullTableWithCursor(supabase: any, table: string, userId: string,
   }
 }
 
-serve(async (req) => {
-  console.log(`🚀 COMPREHENSIVE sync_v2 edge function called: ${req.method} ${req.url}`);
+Deno.serve(async (req: Request) => {
+  console.log(`🚀 sync_v2 edge function called: ${req.method} ${req.url}`);
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   // Generate correlation ID for request tracing
@@ -929,15 +935,16 @@ serve(async (req) => {
     logWithContext(correlationId, 'INFO', `Push phase completed: ${pushSuccesses} successes, ${pushErrors} errors`);
 
     // PHASE 2: Pull changes per table with pagination via composite cursor
+    // Run pulls in PARALLEL for performance (instead of sequential)
     let pullErrors = 0;
     let pullSuccesses = 0;
 
-    logWithContext(correlationId, 'INFO', `Pull phase: processing ${SYNC_TABLES.length} tables`);
+    logWithContext(correlationId, 'INFO', `Pull phase: processing ${SYNC_TABLES.length} tables in parallel`);
 
-    for (const table of SYNC_TABLES) {
+    // Create pull promises for all tables
+    const pullPromises = SYNC_TABLES.map(async (table) => {
       const tableStatus = tableStatuses[table];
       tableStatus.pull_attempted = true;
-
       const cursor = since[table] || null;
 
       try {
@@ -949,52 +956,30 @@ serve(async (req) => {
           pullResult = await pullTableWithCursor(supabase, table, userId, cursor, PULL_PAGE_SIZE, correlationId);
         }
 
-        if (pullResult.error) {
-          logWithContext(correlationId, 'ERROR', `Pull failed for ${table}`, { error: pullResult.errorMessage });
-          tableStatus.pull_errors++;
-          tableStatus.error_messages.push(`Pull: ${pullResult.errorMessage}`);
-          pullErrors++;
-
-          // Add to detailed errors array for client visibility
-          detailedErrors.push({
-            table,
-            record_id: 'unknown',
-            operation: 'pull',
-            error: pullResult.errorMessage
-          });
-
-          // Continue with empty result for this table
-          response.tables[table] = {
-            upserts: [],
-            deletes: [],
-            nextCursor: cursor,
-            more: false
-          };
-        } else {
-          logWithContext(correlationId, 'INFO', `Pull successful for ${table}: ${pullResult.records.length} records`);
-          tableStatus.pull_records = pullResult.records.length;
-          tableStatus.pull_success = true;
-          pullSuccesses++;
-
-          response.tables[table] = {
-            upserts: pullResult.records,
-            deletes: [],
-            nextCursor: pullResult.nextCursor,
-            more: pullResult.hasMore
-          };
-        }
+        return { table, cursor, pullResult, error: null };
       } catch (e) {
-        logWithContext(correlationId, 'ERROR', `Pull exception for ${table}`, { error: e.message });
+        return { table, cursor, pullResult: null, error: e };
+      }
+    });
+
+    // Wait for all pulls to complete
+    const pullResults = await Promise.all(pullPromises);
+
+    // Process results
+    for (const { table, cursor, pullResult, error } of pullResults) {
+      const tableStatus = tableStatuses[table];
+
+      if (error) {
+        logWithContext(correlationId, 'ERROR', `Pull exception for ${table}`, { error: error.message });
         tableStatus.pull_errors++;
-        tableStatus.error_messages.push(`Pull exception: ${e.message}`);
+        tableStatus.error_messages.push(`Pull exception: ${error.message}`);
         pullErrors++;
 
-        // Add to detailed errors array for client visibility
         detailedErrors.push({
           table,
           record_id: 'unknown',
           operation: 'pull',
-          error: e.message
+          error: error.message
         });
 
         response.tables[table] = {
@@ -1002,6 +987,37 @@ serve(async (req) => {
           deletes: [],
           nextCursor: cursor,
           more: false
+        };
+      } else if (pullResult.error) {
+        logWithContext(correlationId, 'ERROR', `Pull failed for ${table}`, { error: pullResult.errorMessage });
+        tableStatus.pull_errors++;
+        tableStatus.error_messages.push(`Pull: ${pullResult.errorMessage}`);
+        pullErrors++;
+
+        detailedErrors.push({
+          table,
+          record_id: 'unknown',
+          operation: 'pull',
+          error: pullResult.errorMessage
+        });
+
+        response.tables[table] = {
+          upserts: [],
+          deletes: [],
+          nextCursor: cursor,
+          more: false
+        };
+      } else {
+        logWithContext(correlationId, 'INFO', `Pull successful for ${table}: ${pullResult.records.length} records`);
+        tableStatus.pull_records = pullResult.records.length;
+        tableStatus.pull_success = true;
+        pullSuccesses++;
+
+        response.tables[table] = {
+          upserts: pullResult.records,
+          deletes: [],
+          nextCursor: pullResult.nextCursor,
+          more: pullResult.hasMore
         };
       }
     }

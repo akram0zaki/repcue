@@ -38,7 +38,7 @@ RTL language support can interfere with SVG icon rendering due to:
 /* Exclude navigation buttons from global RTL button padding */
 body.rtl .btn-primary,
 body.rtl .btn-secondary,
-body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]) {
+body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"]):not([data-carousel-indicator]) {
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
@@ -46,8 +46,8 @@ body.rtl button:not(.nav-more-button):not(.nav-item):not([aria-label*="Scroll"])
 /* RTL-safe navigation buttons - override global button padding */
 body.rtl .nav-more-button,
 body.rtl .nav-item,
-body.rtl nav button {
-  padding: 4px 1px !important;
+body.rtl nav button:not(.nav-dropdown-item) {
+  padding: 6px 2px !important;
   direction: ltr !important;
 }
 
@@ -170,7 +170,8 @@ it('should render navigation icons in RTL mode', () => {
 ## Related Files
 
 - `apps/frontend/src/components/icons/NavigationIcons.tsx` - Icon components
-- `apps/frontend/src/index.css` - RTL-safe CSS rules
+- `apps/frontend/src/index.css` - RTL-safe CSS rules (component layer)
+- `apps/frontend/src/styles/tokens.css` - RTL protection in design tokens
 - `apps/frontend/src/components/Navigation.tsx` - Main navigation implementation
 - `apps/frontend/src/components/CatalogSelector.tsx` - Horizontal navigation example
 - `docs/ui-ux/ui-specs.md` - Full UI specification including RTL guidelines

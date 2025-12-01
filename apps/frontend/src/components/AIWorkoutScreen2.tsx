@@ -2,13 +2,14 @@
  * AIWorkoutScreen2 Component
  *
  * Goals & Preferences form (Screen 2/3):
- * - Primary Goal (Single select chips: Weight Loss, Muscle Building, Health Maintenance, Flexibility)
+ * - Primary Goals (Multi-select chips: Weight Loss, Muscle Building, Health Maintenance, Flexibility, Marathon des Sables)
+ * - Goal Duration (Optional: Time in months to achieve goals)
  * - Fitness Level (Single select chips: Beginner, Intermediate, Advanced)
  * - Preferred Training Time (Single select chips: Morning, Afternoon, Evening, Mixed)
  */
 
 import { useTranslation } from 'react-i18next';
-import type { Screen2Data, Screen2ValidationErrors } from '../types/aiWorkout';
+import type { Screen2Data, Screen2ValidationErrors, FitnessGoal } from '../types/aiWorkout';
 
 interface AIWorkoutScreen2Props {
   /** Current form data */
@@ -25,8 +26,18 @@ interface AIWorkoutScreen2Props {
 export default function AIWorkoutScreen2({ data, errors, onChange }: AIWorkoutScreen2Props) {
   const { t } = useTranslation('aiWorkout');
 
-  const handleGoalChange = (goal: Screen2Data['goal']) => {
-    onChange({ ...data, goal });
+  const handleGoalToggle = (goal: FitnessGoal) => {
+    const currentGoals = data.goals || [];
+    const newGoals = currentGoals.includes(goal)
+      ? currentGoals.filter(g => g !== goal)
+      : [...currentGoals, goal];
+    onChange({ ...data, goals: newGoals });
+  };
+
+  const handleGoalDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const duration = value === '' ? undefined : parseInt(value, 10);
+    onChange({ ...data, goalDuration: duration });
   };
 
   const handleFitnessLevelChange = (fitnessLevel: Screen2Data['fitnessLevel']) => {
@@ -37,11 +48,12 @@ export default function AIWorkoutScreen2({ data, errors, onChange }: AIWorkoutSc
     onChange({ ...data, trainingTime });
   };
 
-  const goals: Array<{ value: Screen2Data['goal']; labelKey: string }> = [
-    { value: 'weight_loss', labelKey: 'screen2.goal.weightLoss' },
-    { value: 'muscle_building', labelKey: 'screen2.goal.muscleBuilding' },
-    { value: 'health_maintenance', labelKey: 'screen2.goal.healthMaintenance' },
-    { value: 'flexibility', labelKey: 'screen2.goal.flexibility' },
+  const goals: Array<{ value: FitnessGoal; labelKey: string }> = [
+    { value: 'weight_loss', labelKey: 'screen2.goals.weightLoss' },
+    { value: 'muscle_building', labelKey: 'screen2.goals.muscleBuilding' },
+    { value: 'health_maintenance', labelKey: 'screen2.goals.healthMaintenance' },
+    { value: 'flexibility', labelKey: 'screen2.goals.flexibility' },
+    { value: 'marathon_des_sables', labelKey: 'screen2.goals.marathonDesSables' },
   ];
 
   const fitnessLevels: Array<{ value: Screen2Data['fitnessLevel']; labelKey: string; descKey: string }> = [
@@ -59,19 +71,22 @@ export default function AIWorkoutScreen2({ data, errors, onChange }: AIWorkoutSc
 
   return (
     <div className="space-y-5">
-      {/* Primary Goal */}
+      {/* Primary Goals (Multi-select) */}
       <div>
         <label className="block text-sm font-medium text-text-900 dark:text-text-50 mb-2">
-          {t('screen2.goal.label', 'Primary Goal')} <span className="text-red-600">*</span>
+          {t('screen2.goals.label', 'Primary Goals')} <span className="text-red-600">*</span>
         </label>
+        <p className="text-xs text-text-600 dark:text-text-400 mb-2">
+          {t('screen2.goals.helper', 'Select one or more goals you want to achieve')}
+        </p>
         <div className="grid grid-cols-2 gap-2">
           {goals.map(({ value, labelKey }) => {
-            const isSelected = data.goal === value;
+            const isSelected = (data.goals || []).includes(value);
             return (
               <button
                 key={value}
                 type="button"
-                onClick={() => handleGoalChange(value)}
+                onClick={() => handleGoalToggle(value)}
                 className={`
                   touch-target px-3 py-2.5 rounded-lg border-2 transition-all
                   text-xs font-medium text-center break-words
@@ -81,16 +96,50 @@ export default function AIWorkoutScreen2({ data, errors, onChange }: AIWorkoutSc
                       : 'border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-800 text-text-900 dark:text-text-50 hover:border-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20'
                   }
                 `}
-                role="radio"
+                role="checkbox"
                 aria-checked={isSelected}
                 aria-label={t(labelKey, value)}
               >
-                {t(labelKey, value.replace('_', ' '))}
+                {t(labelKey, value.replace(/_/g, ' '))}
               </button>
             );
           })}
         </div>
-        {errors.goal && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.goal}</p>}
+        {errors.goals && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.goals}</p>}
+      </div>
+
+      {/* Goal Duration */}
+      <div>
+        <label htmlFor="goal-duration" className="block text-sm font-medium text-text-900 dark:text-text-50 mb-2">
+          {t('screen2.goalDuration.label', 'Time to Achieve Goals (Optional)')}
+        </label>
+        <p className="text-xs text-text-600 dark:text-text-400 mb-2">
+          {t('screen2.goalDuration.helper', 'How many months do you have to achieve your goals?')}
+        </p>
+        <div className="relative">
+          <input
+            id="goal-duration"
+            type="number"
+            min="1"
+            max="24"
+            value={data.goalDuration || ''}
+            onChange={handleGoalDurationChange}
+            placeholder={t('screen2.goalDuration.placeholder', 'e.g., 3, 6, 12')}
+            className="
+              w-full px-4 py-2.5 rounded-lg border-2
+              border-surface-300 dark:border-surface-600
+              bg-surface-0 dark:bg-surface-800
+              text-text-900 dark:text-text-50
+              placeholder:text-text-400 dark:placeholder:text-text-500
+              focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20
+              transition-colors
+            "
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-text-500 dark:text-text-400">
+            {t('screen2.goalDuration.unit', 'months')}
+          </span>
+        </div>
+        {errors.goalDuration && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.goalDuration}</p>}
       </div>
 
       {/* Fitness Level */}

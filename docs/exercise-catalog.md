@@ -1,5 +1,7 @@
 # Exercise Catalog System (Multi-Catalog with Badge System)
 
+> **✅ IMPLEMENTED**: This system uses a global exercise repository with many-to-many catalog memberships. The migration has been completed. See `docs/implementation-plans/global-exercise-repository.md` for architecture details.
+
 This document explains the architecture and implementation of RepCue's multi-catalog exercise system with flexible badge-based filtering, and provides a concise developer guide for adding or modifying catalogs and exercises.
 
 ## Architecture Overview
@@ -7,7 +9,9 @@ This document explains the architecture and implementation of RepCue's multi-cat
 The multi-catalog system consists of:
 
 - Exercise catalogs (metadata + badges): `apps/frontend/src/data/catalogs.ts`
-- Exercise definitions per catalog: `apps/frontend/src/data/exercises/*.ts` with an aggregator at `apps/frontend/src/data/exercises.ts`
+- Global exercise definitions: `apps/frontend/src/data/globalExercises.ts` (87 unique exercises)
+- Catalog memberships: `apps/frontend/src/data/memberships/*.ts` (141 memberships, many-to-many)
+- Legacy aggregator (backward compatibility): `apps/frontend/src/data/exercises.ts` exports `INITIAL_EXERCISES`
 - Badge system utilities: `apps/frontend/src/utils/catalogBadges.ts`
 - Badge components: `apps/frontend/src/components/BadgeFilterGroup.tsx`, `apps/frontend/src/components/BadgeFilter.tsx`
 - Localization
@@ -22,17 +26,19 @@ The multi-catalog system consists of:
 - Types: `apps/frontend/src/types/index.ts` and `apps/frontend/src/types/catalog.ts`
   - `Exercise` includes `catalogId`, `tags` (for badge values), and extended metadata: `benefits`, `limitations`, `best_timing`, `suggested_combinations`, `notes`, `exercise_references`.
   - **Note**: The `category` field has been **removed**. Categories are now managed via the badge system using tags like `'category:core'`.
-  - `ExerciseCatalog` includes `id`, `nameKey`, `descriptionKey`, `isDefault`, `isPremium`, `displayOrder`, `icon?`, `colorTheme?`, `pictureUrl?`, `badges?` (array of badge definitions), and `groupByBadge?` (specifies which badge to use for grouping on listing page).
+  - `ExerciseCatalog` includes `id`, `nameKey`, `descriptionKey`, `isDefault`, `isPremium`, `displayOrder`, `icon?`, `colorTheme?`, `pictureUrl?`, `badges?` (array of badge definitions), `groupByBadge?` (specifies which badge to use for grouping on listing page), `isVisible?` (controls UI visibility, default true), and `isIncludedInAI?` (controls AI export inclusion, default true).
   - `CatalogBadge` defines a filterable/displayable badge with `id`, `label`, `filterType`, `values`, `tagPattern`, `dynamicDiscovery`, and `computed` flags.
   - `BadgeValue` defines individual badge values with `id`, `label`, `labelParams`, `icon`, and `fallbackLabel`.
 
 - Catalogs: `apps/frontend/src/data/catalogs.ts`
   - Exports `EXERCISE_CATALOGS` with badge definitions per catalog.
-  - Helpers: `getDefaultCatalog()`, `getCatalogById()`, `getAllCatalogs()`, `getAvailableCatalogs()`.
+  - Helpers: `getDefaultCatalog()`, `getCatalogById()`, `getAllCatalogs()`, `getAvailableCatalogs()`, `getAIIncludedCatalogs()`.
 
-- Exercises: `apps/frontend/src/data/exercises/*.ts`
-  - One file per catalog (e.g. `generalFitness.ts`, `womenHealth.ts`, `taiChi.ts`, `zumba.ts`, `aikido.ts`). Each uses a `createExercise({...})` helper and sets `catalogId` and `tags` explicitly.
-  - Aggregator `apps/frontend/src/data/exercises.ts` exports `INITIAL_EXERCISES` by concatenating all catalog arrays.
+- Exercises: Global Exercise Repository (many-to-many model)
+  - `apps/frontend/src/data/globalExercises.ts`: 87 unique `GlobalExercise` records with `base_tags` (catalog-agnostic)
+  - `apps/frontend/src/data/memberships/*.ts`: One file per catalog (`generalFitness.ts`, `womenHealth.ts`, `taiChi.ts`, `zumba.ts`, `aikido.ts`) containing `CatalogMembership` records with `catalog_tags`
+  - `apps/frontend/src/data/memberships/index.ts`: Aggregates all memberships into `ALL_CATALOG_MEMBERSHIPS`
+  - Legacy aggregator `apps/frontend/src/data/exercises.ts` exports `INITIAL_EXERCISES` by converting global exercises + memberships back to legacy `Exercise` format via `convertToLegacyExercises()`
 
 ## Badge System
 
@@ -60,9 +66,9 @@ Used when you have a known set of values and want simple tag matching.
   id: 'category',
   label: 'catalogs:general-fitness.badges.category.label',
   values: [
-    { id: 'core', label: 'common:categories.core' },
-    { id: 'strength', label: 'common:categories.strength' },
-    { id: 'cardio', label: 'common:categories.cardio' },
+    { id: 'core', label: 'exercises:categories.core' },
+    { id: 'strength', label: 'exercises:categories.strength' },
+    { id: 'cardio', label: 'exercises:categories.cardio' },
     // ...
   ],
   tagPattern: { prefix: 'category:' }
@@ -88,21 +94,21 @@ Used when the tag format is more complex and requires regex extraction.
   id: 'kyuLevel',
   label: 'catalogs:aikido.badges.kyuLevel.label',
   values: [
-    { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.6', labelParams: { level: 6 } },
-    { id: 5, label: 'catalogs:aikido.badges.kyuLevel.values.5', labelParams: { level: 5 } },
-    // ...
+    { id: 1, label: 'catalogs:aikido.badges.kyuLevel.values.kyu1' },
+    { id: 2, label: 'catalogs:aikido.badges.kyuLevel.values.kyu2' },
+    { id: 3, label: 'catalogs:aikido.badges.kyuLevel.values.kyu3' },
+    { id: 4, label: 'catalogs:aikido.badges.kyuLevel.values.kyu4' },
+    { id: 5, label: 'catalogs:aikido.badges.kyuLevel.values.kyu5' },
+    { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.kyu6' },
   ],
-  tagPattern: { 
-    prefix: 'kyu:',
-    extractPattern: /^kyu:(\d+)$/ 
-  }
+  tagPattern: { prefix: 'kyu:' }
 }
 ```
 
 **Exercise tags**: `['kyu:6', 'stance:tachi']`
 
 **How it works**:
-- Badge uses regex to extract numeric value from `kyu:6`
+- Badge looks for tags starting with `kyu:` prefix
 - Matches extracted value (6) against badge values
 - Displays as "Kyu Level: 6th Kyu (White Belt)" with parameterized translation
 
@@ -282,9 +288,11 @@ For dynamic discovery, provide `fallbackLabel`:
 ### IndexedDB Schema
 
 - `exercise_catalogs` table stores local catalog metadata (seeded, not synced).
-- `exercises` table schema (v22+) includes:
-  - Multi-entry index on `tags`: `*tags`
-  - Compound index for badge filtering: `[catalogId+*tags]`
+- `catalog_memberships` table (v25+) stores exercise-to-catalog relationships with `catalog_tags`.
+- `exercises` table schema (v25+) includes:
+  - Multi-entry index on `base_tags`: `*base_tags`
+  - Supports many-to-many relationship via `catalog_memberships`
+- Legacy compatibility: `catalogId` and `tags` fields are reconstructed from memberships
 
 **Seeding**:
 - `StorageService.ensureCatalogsSeeded()` seeds catalog metadata.
@@ -305,12 +313,12 @@ For dynamic discovery, provide `fallbackLabel`:
 
 **Edge Function**: `supabase/functions/sync_v2/index.ts`
 - `exercises` table allowlist includes `catalog_id` and `tags`
-- Server-side tag validation:
+- `catalog_memberships` table allowlist includes `catalog_tags`
+- Server-side tag validation via `validateAndSanitizeTags()`:
   - Type checking (array of strings)
-  - Length limits (max 100 tags, each max 100 chars)
-  - Format validation (alphanumeric + `:`, `-`, `_`)
-  - XSS prevention (strips `<`, `>`, `&`)
-  - Deduplication
+  - Length limits (max 20 tags, each max 100 chars)
+  - Format validation: `/^[a-z0-9-]{1,30}:[a-z0-9-_]{1,50}$/i`
+  - XSS prevention (rejects dangerous patterns like `<script`, `javascript:`, etc.)
 
 **Supabase Schema** (PostgreSQL):
 - `tags` column: `TEXT[]` (array of strings)
@@ -418,56 +426,57 @@ For dynamic discovery, provide `fallbackLabel`:
 
 ### Add Exercises to a Catalog
 
-1. **Create exercise file** `apps/frontend/src/data/exercises/pilates.ts`:
+With the Global Exercise Repository model, adding exercises involves two steps:
+
+1. **Add global exercise** to `apps/frontend/src/data/globalExercises.ts`:
 
 ```typescript
-import type { Exercise } from '../../types';
-import { ExerciseType } from '../../types';
+import type { GlobalExercise } from '../types';
+import { ExerciseType } from '../types';
 
-function createExercise(exerciseData: Omit<Exercise, /* sync metadata fields */> & { id: string }): Exercise {
-  return {
-    ...exerciseData,
-    updated_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    deleted: false,
-    version: 1,
-    dirty: 0,
-    op: 'INSERT',
-    synced_at: null,
-    owner_id: null
-  };
-}
+// In the GLOBAL_EXERCISES array:
+createGlobalExercise({
+  id: 'pilates-hundred',
+  name: 'The Hundred',
+  description: 'Classic Pilates breathing exercise',
+  exercise_type: ExerciseType.TIME_BASED,
+  default_duration: 60,
+  is_favorite: false,
+  has_video: false,
+  muscle_groups: ['core', 'abs'],
+  base_tags: ['breathing', 'mat', 'isometric'], // Catalog-agnostic tags only
+  benefits: 'Warms up the body, strengthens core, improves breathing control.',
+  // ... other metadata
+}),
+```
 
-export const PILATES_EXERCISES: Exercise[] = [
-  createExercise({
-    id: 'pilates-hundred',
-    name: 'The Hundred',
-    description: 'Classic Pilates breathing exercise',
-    exercise_type: ExerciseType.TIME_BASED,
-    catalogId: 'pilates',
-    default_duration: 60,
-    is_favorite: false,
-    has_video: false,
-    tags: ['category:core', 'level:beginner', 'breathing', 'mat'], // Badge tags + free-form
-    benefits: 'Warms up the body, strengthens core, improves breathing control.',
-    // ... other metadata
+2. **Create catalog membership** in `apps/frontend/src/data/memberships/pilates.ts`:
+
+```typescript
+import type { CatalogMembership } from '../../types';
+
+export const PILATES_MEMBERSHIPS: CatalogMembership[] = [
+  createMembership({
+    exercise_id: 'pilates-hundred',
+    catalog_id: 'pilates',
+    catalog_tags: ['category:core', 'level:beginner'], // Catalog-specific badge tags
+    display_order: 1,
   }),
-  // ... more exercises
 ];
 ```
 
-2. **Update aggregator** `apps/frontend/src/data/exercises.ts`:
+3. **Update memberships index** `apps/frontend/src/data/memberships/index.ts`:
 
 ```typescript
-import { PILATES_EXERCISES } from './exercises/pilates';
+import { PILATES_MEMBERSHIPS } from './pilates';
 
-export const INITIAL_EXERCISES: Exercise[] = [
-  ...GENERAL_FITNESS_EXERCISES,
-  ...WOMEN_HEALTH_EXERCISES,
-  ...TAI_CHI_EXERCISES,
-  ...ZUMBA_EXERCISES,
-  ...AIKIDO_EXERCISES,
-  ...PILATES_EXERCISES // Add here
+export const ALL_CATALOG_MEMBERSHIPS: CatalogMembership[] = [
+  ...GENERAL_FITNESS_MEMBERSHIPS,
+  ...WOMEN_HEALTH_MEMBERSHIPS,
+  ...TAI_CHI_MEMBERSHIPS,
+  ...ZUMBA_MEMBERSHIPS,
+  ...AIKIDO_MEMBERSHIPS,
+  ...PILATES_MEMBERSHIPS // Add here
 ];
 ```
 
@@ -505,10 +514,10 @@ export const INITIAL_EXERCISES: Exercise[] = [
 - `level:beginner`
 
 **Validation Rules** (enforced client + server):
-- Max 100 tags per exercise
-- Max 100 characters per tag
-- Allowed chars: `a-z`, `0-9`, `:`, `-`, `_`
-- Format: `[a-z0-9_-]+:[a-z0-9_-]+` (for structured badges)
+- Max 20 tags per exercise (`MAX_TAGS_PER_EXERCISE = 20`)
+- Max 100 characters per tag (`MAX_TAG_LENGTH = 100`)
+- Format regex: `/^[a-z0-9-]{1,30}:[a-z0-9-_]{1,50}$/i` (case-insensitive)
+- XSS prevention: rejects tags containing `<script`, `javascript:`, `on*=`, etc.
 
 **Client-side Utilities**:
 - `sanitizeTagValue(value)`: Cleans user input
@@ -570,9 +579,9 @@ extractExerciseBadges(
 - [ ] `public/images/catalogs/*` picture added (if used)
 
 ### New Exercise (in a Catalog)
-- [ ] `apps/frontend/src/data/exercises/<catalog>.ts` updated
-- [ ] Exercise has proper `tags` array with structured badge tags (e.g., `category:core`)
-- [ ] `apps/frontend/src/data/exercises.ts` aggregator updated
+- [ ] `apps/frontend/src/data/globalExercises.ts` updated with new `GlobalExercise` (with `base_tags`)
+- [ ] `apps/frontend/src/data/memberships/<catalog>.ts` updated with `CatalogMembership` (with `catalog_tags`)
+- [ ] `apps/frontend/src/data/memberships/index.ts` imports and exports new memberships
 - [ ] `apps/frontend/public/locales/*/exerciseDetails.json` entries added
 - [ ] `apps/frontend/public/exercise_media.json` updated (if `has_video: true`)
 - [ ] Videos copied to `apps/frontend/public/videos/` (3 variants)
@@ -641,8 +650,8 @@ extractExerciseBadges(
   id: 'category',
   label: 'catalogs:general-fitness.badges.category.label',
   values: [
-    { id: 'core', label: 'common:categories.core' },
-    { id: 'strength', label: 'common:categories.strength' }
+    { id: 'core', label: 'exercises:categories.core' },
+    { id: 'strength', label: 'exercises:categories.strength' }
   ],
   tagPattern: { prefix: 'category:' }
 }
@@ -658,7 +667,7 @@ extractExerciseBadges(
 
 **UI Display**: "Category: Core" (translated)
 
-### Example 2: Aikido Kyu Level Badge (Regex)
+### Example 2: Aikido Kyu Level Badge (Prefix-Based)
 
 **Catalog Definition**:
 ```typescript
@@ -666,12 +675,12 @@ extractExerciseBadges(
   id: 'kyuLevel',
   label: 'catalogs:aikido.badges.kyuLevel.label',
   values: [
-    { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.6', labelParams: { level: 6 } }
+    { id: 1, label: 'catalogs:aikido.badges.kyuLevel.values.kyu1' },
+    { id: 2, label: 'catalogs:aikido.badges.kyuLevel.values.kyu2' },
+    // ... values 3-6
+    { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.kyu6' }
   ],
-  tagPattern: { 
-    prefix: 'kyu:',
-    extractPattern: /^kyu:(\d+)$/ 
-  }
+  tagPattern: { prefix: 'kyu:' }
 }
 ```
 
@@ -683,7 +692,7 @@ extractExerciseBadges(
 }
 ```
 
-**UI Display**: "Kyu Level: 6th Kyu (White Belt)" (parameterized translation)
+**UI Display**: "Kyu Level: 6th Kyu" (translated via `catalogs:aikido.badges.kyuLevel.values.kyu6`)
 
 ### Example 3: Dynamic Discovery Badge
 
@@ -708,4 +717,8 @@ extractExerciseBadges(
 
 ---
 
-**For questions or clarifications, refer to the implementation in `apps/frontend/src/data/catalogs.ts` and `apps/frontend/src/utils/catalogBadges.ts`.**
+**For questions or clarifications, refer to the implementation in:**
+- `apps/frontend/src/data/catalogs.ts` - Catalog definitions
+- `apps/frontend/src/data/globalExercises.ts` - Global exercise repository
+- `apps/frontend/src/data/memberships/` - Catalog memberships (many-to-many)
+- `apps/frontend/src/utils/catalogBadges.ts` - Badge utilities

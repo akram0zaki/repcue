@@ -237,8 +237,8 @@ describe('ExercisePage Shared Exercise Filtering', () => {
     const exerciseCard = screen.getByText('Shared Exercise').closest('[data-testid="exercise-card"]');
     expect(exerciseCard).toBeInTheDocument();
     
-    // The Custom badge should not be in the exercise card
-    const customBadgeInCard = exerciseCard?.querySelector('.bg-blue-100');
+    // The Custom badge should not be in the exercise card (use specific class for custom badge)
+    const customBadgeInCard = exerciseCard?.querySelector('.exercise-custom-badge');
     expect(customBadgeInCard).toBeNull();
   });
 

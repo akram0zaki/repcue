@@ -177,5 +177,26 @@ export interface ExerciseCatalog {
    * Zero or more badges can be defined per catalog
    */
   badges?: CatalogBadge[];
+  
+  /** 
+   * Optional badge ID to use for grouping exercises on the listing page.
+   * If specified, exercises will be grouped by this badge's values.
+   * If omitted, exercises are displayed in a flat list.
+   * @example 'category' - groups by category badge
+   * @example 'kyuLevel' - groups by Aikido Kyu level
+   */
+  groupByBadge?: string;
+  
+  /** 
+   * Whether this catalog should be visible/rendered in the UI
+   * @default true
+   */
+  isVisible?: boolean;
+  
+  /** 
+   * Whether this catalog should be included in AI export scripts (CSV generation)
+   * @default true
+   */
+  isIncludedInAI?: boolean;
 }
 

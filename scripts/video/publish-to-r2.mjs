@@ -1,33 +1,66 @@
 #!/usr/bin/env node
-/*
-publish-to-r2.mjs
-
-- Uploads encoded exercise videos in a local directory to Cloudflare R2 via S3 API
-- Updates apps/frontend/public/exercise_media.json automatically
-- Sets has_video=true for matching exercises across all catalogs under apps/frontend/src/data/exercises/**
-
-Assumptions
-- Filenames follow: <exercise_id>_v1_1920x1080.<ext>
-  - ext is one of: webm, mp4 (mp4 preferred for compatibility)
-- Videos are landscape (1920x1080). Adjust if you later support other shapes.
-
-Env
-- CLOUDFLARE_ACCOUNT_ID
-- R2_ACCESS_KEY_ID
-- R2_SECRET_ACCESS_KEY
-
-Usage
-node scripts/video/publish-to-r2.mjs --dir "C:/path/to/videos/out" --bucket repcue-videos --dry-run=false
-
-Notes
-- Uses immutable key equal to the basename. If you later add hashes, the key becomes hashed accordingly.
-*/
+/**
+ * RepCue Video Publisher - Upload exercise videos to Cloudflare R2 (LEGACY AWS SDK VERSION)
+ * 
+ * ⚠️ DEPRECATED: Use publish-to-r2-wrangler.mjs instead (simpler, no credentials needed)
+ * 
+ * This script uses AWS SDK v3 for R2 uploads. Requires complex credential setup.
+ * Kept for reference only.
+ * 
+ * Recommended: Use wrangler CLI version (publish-to-r2-wrangler.mjs)
+ * 
+ * Usage:
+ *   node scripts/video/publish-to-r2.mjs [options]
+ * 
+ * Options:
+ *   --dir=<path>          Source directory for encoded videos (default: scripts/video/encoded)
+ *   --bucket=<name>       R2 bucket name (default: repcue-videos)
+ *   --dry-run[=true]      Show actions without uploading
+ *   --force               Upload even if file exists (skip HEAD check)
+ *   --manifest-update     Update exercise_media.json after upload
+ * 
+ * Environment Variables (required):
+ *   CLOUDFLARE_ACCOUNT_ID   Your Cloudflare account ID
+ *   R2_ACCESS_KEY_ID        R2 access key ID (from Account API Token)
+ *   R2_SECRET_ACCESS_KEY    R2 secret access key (SHA-256 hash of token)
+ * 
+ * File Naming Convention (input):
+ *   exerciseId_v1_<resolution>.<ext>
+ *   Examples: plank_v1_1080.webm, pushup_v1_720.mp4
+ *   Or legacy: exerciseId_v1_1920x1080.webm
+ * 
+ * File Naming Convention (output in R2):
+ *   exerciseId_v1_<resolution>_<hash>.<ext>
+ *   Hash: First 8 chars of SHA256 for immutability
+ */
 
 import fs from 'node:fs/promises';
 import fscb from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { createHash } from 'node:crypto';
 import { S3Client, HeadObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+
+// Load .env file if it exists
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const envPath = path.resolve(__dirname, '../../.env');
+if (fscb.existsSync(envPath)) {
+  const envContent = fscb.readFileSync(envPath, 'utf-8');
+  envContent.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+    const [key, ...valueParts] = trimmed.split('=');
+    if (key && valueParts.length > 0) {
+      const value = valueParts.join('=').trim();
+      if (!process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  });
+}
 
 const args = Object.fromEntries(process.argv.slice(2).map(s => {
   const [k, v] = s.startsWith('--') ? s.slice(2).split('=') : [s, true];
@@ -64,18 +97,73 @@ function contentTypeFor(file) {
   return 'application/octet-stream';
 }
 
+/**
+ * Compute SHA256 hash of file content
+ */
+async function computeFileHash(filePath) {
+  const buffer = await fs.readFile(filePath);
+  const hash = createHash('sha256').update(buffer).digest('hex');
+  return hash;
+}
+
+/**
+ * Check file size against performance budget
+ */
+async function checkPerformanceBudget(filePath, ext) {
+  const MAX_SIZE_MP4 = 3 * 1024 * 1024; // 3 MB
+  const MAX_SIZE_WEBM = 2 * 1024 * 1024; // 2 MB
+  
+  const stats = await fs.stat(filePath);
+  const maxSize = ext === 'mp4' ? MAX_SIZE_MP4 : MAX_SIZE_WEBM;
+  
+  if (stats.size > maxSize) {
+    const sizeMB = (stats.size / 1024 / 1024).toFixed(2);
+    const maxMB = (maxSize / 1024 / 1024).toFixed(2);
+    console.warn(`⚠️  File exceeds budget: ${path.basename(filePath)} (${sizeMB} MB > ${maxMB} MB)`);
+    return false;
+  }
+  return true;
+}
+
 function inferFromName(filename) {
-  // <exercise_id>_v1_1920x1080.<ext>
+  // Support both formats:
+  // New: <exercise_id>_v1_1080.<ext> or <exercise_id>_v1_720.<ext>
+  // Legacy: <exercise_id>_v1_1920x1080.<ext>
   const base = path.basename(filename);
-  const m = base.match(/^(.+?)_v(\d+)_(\d+)x(\d+)\.(webm|mp4)$/i);
+  
+  // Try new format first (resolution only)
+  let m = base.match(/^(.+?)_v(\d+)_(\d{3,4}p?)\.(webm|mp4)$/i);
+  if (m) {
+    const [, exerciseId, vStr, resStr, ext] = m;
+    const resolution = resStr.replace('p', ''); // Remove 'p' if present
+    const resNum = parseInt(resolution, 10);
+    return {
+      exerciseId,
+      version: Number(vStr),
+      resolution,
+      width: resNum >= 1080 ? (resNum === 1080 ? 1920 : resNum * 16 / 9) : 1280,
+      height: resNum,
+      aspect: 'landscape', // Assume landscape for resolution-only format
+      ext: ext.toLowerCase(),
+      key: base,
+    };
+  }
+  
+  // Try legacy format (widthxheight)
+  m = base.match(/^(.+?)_v(\d+)_(\d+)x(\d+)\.(webm|mp4)$/i);
   if (!m) return null;
+  
   const [, exerciseId, vStr, wStr, hStr, ext] = m;
+  const width = Number(wStr);
+  const height = Number(hStr);
+  
   return {
     exerciseId,
     version: Number(vStr),
-    width: Number(wStr),
-    height: Number(hStr),
-    aspect: Number(wStr) >= Number(hStr) ? 'landscape' : 'portrait',
+    resolution: String(height), // Use height as resolution identifier
+    width,
+    height,
+    aspect: width >= height ? 'landscape' : (width / height < 0.75 ? 'portrait' : 'square'),
     ext: ext.toLowerCase(),
     key: base,
   };
@@ -199,30 +287,80 @@ async function updateCatalogHasVideo(exerciseIds) {
 
   const grouped = new Map(); // id -> { mp4: key, webm: key }
 
+  const uploadResults = [];
+  const warnings = [];
+  
   for (const full of all) {
     const info = inferFromName(full);
     if (!info) {
       console.warn('Skipping (unsupported name):', full);
       continue;
     }
-    const key = path.basename(full);
-    const rel = key; // Object key in R2 equals basename
+    
+    // Compute hash for immutable filename
+    const fullHash = await computeFileHash(full);
+    const shortHash = fullHash.slice(0, 8);
+    
+    // Generate hashed key: exerciseId_v1_resolution_hash.ext
+    const hashedKey = `${info.exerciseId}_v1_${info.resolution}_${shortHash}.${info.ext}`;
+    
+    // Check performance budget
+    const budgetOk = await checkPerformanceBudget(full, info.ext);
+    if (!budgetOk) {
+      warnings.push(path.basename(full));
+    }
+    
+    console.log(`📹 ${path.basename(full)}`);
+    console.log(`   → ${hashedKey}`);
 
-    // Upload if not exists
-    const exists = await headObjectIfExists(rel);
-    if (exists) {
-      console.log('SKIP exists in R2:', rel);
+    // Upload if not exists (unless force flag)
+    const exists = await headObjectIfExists(hashedKey);
+    if (exists && !args.force) {
+      console.log('   ✓ Already exists (skipped)\n');
     } else if (DRY_RUN) {
-      console.log('[DRY] PUT', rel);
+      console.log('   🔵 Would upload (dry-run)\n');
     } else {
       const body = await fs.readFile(full);
-      await putObject(rel, body, contentTypeFor(full));
-      console.log('UPLOADED', rel);
+      await putObject(hashedKey, body, contentTypeFor(full));
+      console.log('   ✅ Uploaded\n');
     }
 
-    const rec = grouped.get(info.exerciseId) || { mp4: null, webm: null, width: info.width, height: info.height };
-    rec[info.ext] = `/media/${rel}`;
+    // Track for manifest update
+    const rec = grouped.get(info.exerciseId) || { 
+      mp4: null, 
+      webm: null, 
+      width: info.width, 
+      height: info.height,
+      resolution: info.resolution,
+      aspect: info.aspect,
+    };
+    rec[info.ext] = `/media/${hashedKey}`;
+    rec[`${info.ext}_hash`] = fullHash;
     grouped.set(info.exerciseId, rec);
+    
+    uploadResults.push({
+      original: path.basename(full),
+      key: hashedKey,
+      exerciseId: info.exerciseId,
+      resolution: info.resolution,
+      format: info.ext,
+      aspect: info.aspect,
+      hash: fullHash,
+      url: `/media/${hashedKey}`,
+    });
+  }
+  
+  // Summary
+  console.log('\n📈 Summary:');
+  console.log(`   📹 Processed: ${all.length} files`);
+  console.log(`   ✅ Successful: ${uploadResults.length}`);
+  console.log(`   ⚠️  Warnings: ${warnings.length}`);
+  
+  // Save mapping file for manifest builder
+  if (uploadResults.length > 0 && !DRY_RUN) {
+    const mappingPath = path.join(INPUT_DIR, 'upload-mapping.json');
+    await fs.writeFile(mappingPath, JSON.stringify(uploadResults, null, 2));
+    console.log(`\n💾 Mapping saved to: ${mappingPath}`);
   }
 
   // Load existing manifest

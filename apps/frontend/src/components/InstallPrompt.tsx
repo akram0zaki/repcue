@@ -208,9 +208,12 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   }, [animationDuration]);
 
   /**
-   * Show banner with animation
+   * Show banner with animation - now more conservative for iOS
    */
   const showBanner = useCallback((): void => {
+    // Prevent multiple simultaneous show operations
+    if (isVisible && !isAnimating) return;
+    
     setIsAnimating(true);
     setIsVisible(true);
     
@@ -256,7 +259,7 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
         hideBanner();
       }, autoHideAfter);
     }
-  }, [animationDuration, autoHideAfter, hideBanner]);
+  }, [animationDuration, autoHideAfter, hideBanner, isVisible, isAnimating]);
 
   /**
    * Handle iOS instruction navigation
@@ -301,15 +304,25 @@ export const InstallPrompt: React.FC<InstallPromptProps> = ({
   }, [showOnPages]);
 
   /**
-   * Initialize banner visibility
+   * Initialize banner visibility with debouncing to prevent flashing
    */
   useEffect(() => {
-    if (isAvailable && canShowPrompt && shouldShowOnCurrentPage()) {
-      showBanner();
-    } else {
-      hideBanner();
-    }
-  }, [isAvailable, canShowPrompt, showBanner, hideBanner, shouldShowOnCurrentPage]);
+    // Debounce rapid state changes to prevent flashing
+    const timeoutId = setTimeout(() => {
+      const shouldShow = isAvailable && canShowPrompt && shouldShowOnCurrentPage();
+      logger.debug('Install banner: visibility check - shouldShow =', shouldShow, 'isAvailable =', isAvailable, 'canShowPrompt =', canShowPrompt, 'currentPage =', shouldShowOnCurrentPage(), 'isVisible =', isVisible);
+      
+      if (shouldShow && !isVisible) {
+        logger.debug('Install banner: showing banner');
+        showBanner();
+      } else if (!shouldShow && isVisible) {
+        logger.debug('Install banner: hiding banner');
+        hideBanner();
+      }
+    }, 100); // 100ms debounce to stabilize rapid state changes
+
+    return () => clearTimeout(timeoutId);
+  }, [isAvailable, canShowPrompt, isVisible, showBanner, hideBanner, shouldShowOnCurrentPage]);
 
   /**
    * Clear error and timers when component unmounts

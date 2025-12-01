@@ -1,6 +1,6 @@
 # AI Coach - User Guide
 
-**Last Updated**: January 9, 2025  
+**Last Updated**: November 30, 2025  
 **Version**: Phase 2 (v1.0)
 
 Welcome to RepCue's AI Coach! This guide will help you understand and make the most of your personalized workout insights.
@@ -137,7 +137,7 @@ RepCue uses a **hybrid approach**:
 **AI Insights Appear When**:
 - ✅ You're signed in
 - ✅ AI toggle is enabled in Settings
-- ✅ You haven't exceeded the rate limit (100/day)
+- ✅ You haven't exceeded the rate limit (10/hour)
 - ✅ Network connection is available
 - ✅ Edge Function is operational
 
@@ -162,31 +162,31 @@ RepCue uses a **hybrid approach**:
 
 ### Rate Limits
 
-**Daily Limit**: 100 AI requests per day per user
+**Hourly Limit**: 10 AI requests per hour per user
 
-**Reset Time**: Midnight UTC
+**Reset Time**: Rolling window (resets 1 hour after first request)
 
 **What Happens When You Hit the Limit**:
 - AI insights stop fetching
 - Rule-based insights continue working
-- You see a message: "Rate limit exceeded. Try again after midnight UTC."
+- You see a message: "Rate limit exceeded. Try again after the limit resets."
 - Your Coach page still shows insights (rule-based only)
 
 **Tips to Manage Rate Limit**:
-- Insights are cached for 5 minutes - avoid refreshing too often
+- Insights are cached for 24 hours - avoid refreshing too often
 - Check the Coach page 2-3 times per day maximum
 - Rule-based insights are unlimited and always available
 
 ### Caching Behavior
 
-**Cache Duration**: 5 minutes
+**Cache Duration**: 24 hours (aligned with server-side cache)
 
 **What This Means**:
-- First visit to Coach page: Fetches fresh AI insights (~1-2 seconds)
-- Subsequent visits within 5 minutes: Instant load from cache (<100ms)
-- After 5 minutes: Cache expires, next visit fetches fresh insights
+- First visit to Coach page: Fetches fresh AI insights (~2-5 seconds)
+- Subsequent visits within 24 hours: Instant load from cache (<100ms)
+- After 24 hours: Cache expires, next visit fetches fresh insights
 
-**Manual Cache Clear**: Not available in UI (automatic expiration only)
+**Manual Cache Clear**: Use "Force Refresh" button on Coach page to bypass cache and fetch fresh insights
 
 ### Privacy & Data Usage
 
@@ -233,14 +233,14 @@ RepCue uses a **hybrid approach**:
 
 #### "Rate limit exceeded"
 
-**Problem**: You've reached 100 AI requests for the day
+**Problem**: You've reached 10 AI requests for the hour
 
 **Solution**:
-- **Wait**: Rate limit resets at midnight UTC
+- **Wait**: Rate limit resets 1 hour after your first request
 - **Use Rule-Based**: Coach page still shows rule-based insights
 - **Reduce Frequency**: Check Coach page 2-3 times per day max
 
-**Prevention**: Let caching work for you - avoid refreshing within 5 minutes
+**Prevention**: Let caching work for you (24-hour cache) - avoid refreshing frequently
 
 ---
 
@@ -261,9 +261,9 @@ RepCue uses a **hybrid approach**:
 **Checklist**:
 - ✅ Are you signed in? (Settings → Authentication)
 - ✅ Is AI toggle ON? (Settings → AI Coach)
-- ✅ Do you have workout history? (Need at least 3 sessions in last 21 days)
+- ✅ Do you have workout history? (Need at least a few sessions in the last month)
 - ✅ Is your network connected?
-- ✅ Have you exceeded rate limit? (100/day)
+- ✅ Have you exceeded rate limit? (10/hour)
 
 If all checked and still no insights:
 1. Close and reopen the app
@@ -300,7 +300,7 @@ If all checked and still no insights:
 2. **Review Insights After Workouts**
    - Check the Coach page after completing a workout
    - Insights update based on your latest session
-   - Cache expires after 5 minutes, so you get fresh analysis
+   - Cache lasts 24 hours - use "Force Refresh" if needed after new workouts
 
 3. **Trust the Recovery Insights**
    - High severity warnings are serious - take them!
@@ -350,9 +350,10 @@ If all checked and still no insights:
 ### Technical Details
 
 - **Service Layer**: `apps/frontend/src/services/insightsService.ts`
-- **Algorithms**: `apps/frontend/src/utils/coachingAlgorithms.ts`
+- **Analytics Service**: `apps/frontend/src/services/analyticsService.ts`
 - **UI Components**: `apps/frontend/src/pages/CoachPage.tsx`
-- **Edge Function**: `supabase/functions/ai-insights-v2/index.ts`
+- **Edge Function**: `supabase/functions/analyze-progress/index.ts`
+- **Types**: `apps/frontend/src/types/coaching.ts`
 
 ### Support
 
@@ -369,10 +370,10 @@ If all checked and still no insights:
 Before expecting AI insights, ensure:
 - [ ] Signed in (Settings → Authentication)
 - [ ] AI toggle enabled (Settings → AI Coach)
-- [ ] At least 3 workouts in last 21 days
+- [ ] Have some workout history in the last month
 - [ ] Network connection available
-- [ ] Under rate limit (100 requests/day)
-- [ ] Cache has expired (if checking within 5 minutes)
+- [ ] Under rate limit (10 requests/hour)
+- [ ] Cache has expired (24 hours since last fetch, or use Force Refresh)
 
 ### Insight Action Guide
 
@@ -391,9 +392,9 @@ Before expecting AI insights, ensure:
 
 | Status | AI Requests Used | Action |
 |--------|------------------|--------|
-| ✅ Available | 0-90/100 | Normal usage |
-| ⚠️ Approaching Limit | 91-99/100 | Use sparingly |
-| 🔴 Limit Reached | 100/100 | Wait until midnight UTC |
+| ✅ Available | 0-8/10 | Normal usage |
+| ⚠️ Approaching Limit | 9/10 | Use sparingly |
+| 🔴 Limit Reached | 10/10 | Wait 1 hour from first request |
 
 ---
 

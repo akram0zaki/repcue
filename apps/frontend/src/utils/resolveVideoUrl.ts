@@ -4,11 +4,14 @@ import logger from './logger';
 
 /**
  * Resolves video URLs, handling:
- *  - Regular (http/https/blob) URLs: returned directly
+ *  - Regular (http/https) URLs: returned as-is, browser handles caching via HTTP
+ *  - blob: URLs: returned directly (already resolved)
  *  - blob-pending-sync://{exerciseId}/{filename}: local file stored, upload still pending
  *  - blob-video://{exerciseId}/{filename}: local file stored & cloud-confirmed (stable scheme)
  *  - shared-video://{originalExerciseId}/{originalOwnerId}: reuse another exercise's video
  *
+ * Note: Video caching now relies on standard HTTP Cache-Control headers and browser/CDN caching.
+ * This is more reliable than IndexedDB blob URLs, especially on iOS/Safari.
  * For blob-* schemes we look up IndexedDB (via storageService) and materialize a runtime blob: URL.
  * If the binary is missing but a storage_path exists we attempt a download (covers recovery cases).
  * For shared videos we reference the original exercise's stored video file.
@@ -16,8 +19,27 @@ import logger from './logger';
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
 
-  // For regular URLs (http, https, blob, etc.), return them directly
-  if (!videoUrl.startsWith('blob-pending-sync://') && !videoUrl.startsWith('blob-video://') && !videoUrl.startsWith('shared-video://')) {
+  // For already resolved blob URLs, return them directly
+  if (videoUrl.startsWith('blob:')) {
+    return videoUrl;
+  }
+
+  // Handle custom schemes first (blob-pending-sync, blob-video, shared-video)
+  if (videoUrl.startsWith('blob-pending-sync://') || videoUrl.startsWith('blob-video://') || videoUrl.startsWith('shared-video://')) {
+    // Handle these schemes below (don't return early)
+  } else {
+    // For regular HTTP/HTTPS/relative URLs, return as-is
+    // Browser will handle caching via standard HTTP Cache-Control headers
+    // This works reliably across all platforms including iOS
+    const isHttpUrl = videoUrl.startsWith('http://') || videoUrl.startsWith('https://');
+    const isRelativeUrl = videoUrl.startsWith('/');
+    
+    if (isHttpUrl || isRelativeUrl) {
+      logger.log('🎥 [ResolveVideo] Using direct URL - browser/CDN will handle caching', { videoUrl });
+      return videoUrl;
+    }
+    
+    // Unknown URL format, return as-is
     return videoUrl;
   }
 

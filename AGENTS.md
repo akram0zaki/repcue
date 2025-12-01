@@ -1,17 +1,14 @@
 # AGENTS.md - AI Agent Guide for RepCue
 
-**Last Updated- **Database** | Supabase PostgreSQL | - | User data, exercises, workouts |
-- **Authentication** | Supabase Auth | - | User management |
-- **Storage** | IndexedDB (Dexie) | - | Client-side data persistence |
-- **Cloud Sync** | Supabase (dual env) | - | Dev: xwzrsfkzqxdybjrkkkvh, Prod: zumzzuvfsuzvvymhpymk | 2025-09-06  
-**Version**: 2.0.0  
+**Last Updated**: 2025-11-30  
+**Version**: 2.1.0  
 **For**: AI Agents working on the RepCue codebase
 
 ---
 
 ## 🏗️ Project Overview
 
-**RepCue** is a privacy-first fitness tracking Progressive Web App (PWA) for interval training, built as a monorepo with React 19 + TypeScript + Vite + Tailwind CSS. It's optimized for mobile devices and designed for self-hosting on Raspberry Pi with production deployment to Amazon EC2.
+**RepCue** is a privacy-first fitness tracking Progressive Web App (PWA) for interval training, built as a monorepo with React 19 + TypeScript + Vite 7 + Tailwind CSS. It's optimized for mobile devices and deployed to **Cloudflare Pages** (static) + **Cloudflare R2** (video storage) + **Supabase** (database/auth/Edge Functions).
 
 ### 🎯 Core Mission
 - **UX First**: User experience is the primary directive - never regress timer feel/clarity
@@ -53,16 +50,16 @@ repcue/
 |-------------|---------------|-------------|-------------|
 | **Runtime** | Node.js | 18+ | Development & build environment |
 | **Package Manager** | pnpm | 10.15.0 | Monorepo dependency management |
-| **Frontend Framework** | React | 19+ | UI library |
-| **Language** | TypeScript | Latest | Type safety |
-| **Build Tool** | Vite | Latest | Fast development & bundling |
-| **Styling** | Tailwind CSS | Latest | Utility-first CSS framework |
-| **PWA** | VitePWA | Latest | Service worker & manifest generation |
+| **Frontend Framework** | React | 19.1.0 | UI library |
+| **Language** | TypeScript | 5.8.3 | Type safety |
+| **Build Tool** | Vite | 7.0.0 | Fast development & bundling |
+| **Styling** | Tailwind CSS | 3.4.17 | Utility-first CSS framework |
+| **PWA** | VitePWA | 1.0.1 | Service worker & manifest generation |
 | **Database** | Supabase PostgreSQL | - | User data, exercises, workouts |
-| **Authentication** | Supabase Auth | - | User management |
-| **Storage** | IndexedDB (Dexie) | - | Client-side data persistence |
-| **Testing** | Vitest, Cypress | Latest | Unit & E2E testing |
-| **Deployment** | PM2, nginx | - | Production process management |
+| **Authentication** | Supabase Auth + WebAuthn | - | User management + passkeys |
+| **Storage** | IndexedDB (Dexie 4.0.11) | - | Client-side data persistence |
+| **Testing** | Vitest 3.2.4, Cypress 14.5.2 | - | Unit & E2E testing |
+| **Deployment** | Cloudflare Pages + R2 | - | Production hosting |
 
 ---
 
@@ -134,7 +131,9 @@ pnpm pm2:start            # Start with PM2 (Raspberry Pi)
 | `apps/frontend/src/types/media.ts` | Media-related types | Video demo types |
 | `apps/frontend/src/constants/index.ts` | App constants | BASE_REP_TIME, categories, etc. |
 | `apps/frontend/src/services/` | Business logic services | Singleton pattern with .getInstance() |
-| `apps/frontend/src/data/exercises.ts` | Built-in exercise definitions | Static exercise catalog |
+| `apps/frontend/src/data/globalExercises.ts` | Built-in exercise repository | 87 exercises, catalog-agnostic |
+| `apps/frontend/src/data/catalogs.ts` | Exercise catalogs | General Fitness, Pilates, Zumba, etc. |
+| `apps/frontend/src/data/themes.ts` | Theme definitions | Winter Chill, Ocean Breeze, etc. |
 | `apps/frontend/src/config/features.ts` | Feature flags | Control experimental features |
 | `apps/frontend/src/config/supabase.ts` | Supabase client config | Database connection |
 | `apps/frontend/public/locales/` | i18n translation files | 8 languages supported |
@@ -190,11 +189,17 @@ src/
 ### 🏁 Feature Flags (`src/config/features.ts`)
 ```typescript
 export const FEATURES = {
-  DEBUG: false,                    // Debug logging
-  VIDEO_DEMOS: true,              // Exercise demo videos
-  CUSTOM_VIDEO_UPLOAD: true,      // User video uploads
-  COMMUNITY_FEATURES: true,       // Social features
-  ANALYTICS: false                // Usage analytics
+  DEBUG: false,                     // Debug logging
+  SYNC_DEBUG: false,               // Extra-verbose sync diagnostics
+  VIDEO_DEMOS_ENABLED: true,       // Exercise demo videos
+  AI_WORKOUT_BUILDER: true,        // AI Assistant feature
+  LEGAL_ACCEPTANCE_V3_ENABLED: true,  // Versioned legal document acceptance
+  THEME_CUSTOMIZATION_ENABLED: true,  // Theme customization
+  VIDEO_R2_ENABLED: true,          // Cloudflare R2 video hosting
+  VIDEO_CACHING_ENABLED: true,     // Persistent IndexedDB video caching
+  INSTALL_PROMPT_ENABLED: false,   // PWA install prompts (disabled)
+  SYNC_ENABLED: true,              // Cloud sync via Supabase
+  SYNC_ENGINE: 'v2'                // Sync engine version (permanent)
 };
 ```
 
@@ -260,10 +265,13 @@ CREATE TABLE exercises (
 | `storageService.ts` | IndexedDB operations | `getExercises()`, `saveWorkout()` |
 | `consentService.ts` | GDPR compliance | `hasConsent()`, `clearAllData()` |
 | `audioService.ts` | Timer sounds | `playBeep()`, `playCompletionSound()` |
-| `syncService.ts` | Cloud sync | `syncExercises()`, `uploadWorkout()` |
+| `syncService.ts` | Cloud sync (v2 engine) | `sync()`, `pushChanges()` |
 | `authService.ts` | User authentication | `signIn()`, `signOut()`, `getUser()` |
-| `featureFlagService.ts` | Feature management | `isEnabled()`, `getAllFlags()` |
-| `securityService.ts` | Security hardening | `sanitizeInput()`, `validateCSP()` |
+| `insightsService.ts` | AI Coach insights | `getProgressionInsights()`, `getRecoveryInsights()` |
+| `themeService.ts` | Theme management | `getTheme()`, `setTheme()` |
+| `videoCacheService.ts` | Video caching | `cacheVideo()`, `getCachedVideo()` |
+| `updateService.ts` | PWA updates | `checkForUpdates()`, `applyUpdate()` |
+| `legalDocsService.ts` | Legal document tracking | `hasAccepted()`, `acceptDocument()` |
 
 ### 🎯 Usage Pattern
 ```typescript
@@ -376,15 +384,17 @@ pnpm pm2:start          # Start with PM2 process manager
 
 | **Environment** | **Platform** | **Process Manager** | **Notes** |
 |----------------|-------------|-------------------|-----------|
-| **Development** | Windows 11 | N/A | PowerShell, local development |
-| **Production** | Raspberry Pi 5 | PM2 + nginx | Self-hosted, Cloudflare tunnel |
-| **Future** | Amazon EC2 | PM2 + nginx | Scalable cloud deployment |
+| **Development** | Windows 11 / macOS | N/A | PowerShell or zsh, local development |
+| **Production** | Cloudflare Pages + R2 | - | Static hosting + video CDN |
+| **Backend** | Supabase | Edge Functions | Database, auth, sync API |
+| **Legacy** | Raspberry Pi 5 | PM2 + nginx | Self-hosted option (maintained) |
 
 ### 🔧 Production Configuration
-- **PM2**: `ecosystem.config.cjs` for process management  
-- **nginx**: Reverse proxy with gzip compression
-- **Cloudflare**: CDN + SSL termination
-- **Environment**: `.env.production` with production Supabase
+- **Cloudflare Pages**: Auto-deploy from GitHub, `wrangler.toml` config
+- **Cloudflare R2**: Video storage with `/media/*` proxy function
+- **Supabase**: Dual environments (dev/prod) with Edge Functions
+- **Environment**: `.env.production` with production Supabase keys
+- **PM2**: `ecosystem.config.cjs` for self-hosted deployments (optional)
 
 ---
 
@@ -512,7 +522,7 @@ logger.error('Error occurred:', error);
 - Reliability: Correlation IDs, comprehensive error handling
 
 ## Exercise Types & Sync Behavior
-1. Built-in: Local-only, never synced, managed from exercises.ts
+1. Built-in: Local-only, never synced, managed from `globalExercises.ts`
 2. User-created: Full CRUD sync with ownership validation
 3. Shared: Reference-based via user_favorites table
 
@@ -531,8 +541,10 @@ logger.error('Error occurred:', error);
 - **i18n Workflow**: `docs/i18n/contributing.md`
 - **Video Demos**: `cypress/e2e/videoDemos.cy.ts`  
 - **Security**: `docs/implementation-plans/owasp-implementation-plan.md`
-- **PWA Features**: `docs/pwa.md`
-- **Deployment**: `docs/hosting.md`
+- **PWA Features**: `docs/pwa-system.md`
+- **Deployment**: `docs/hosting-guide.md`
+- **Sync System**: `docs/sync-system.md`
+- **AI Coach**: `docs/ai-coach-user-guide.md`
 
 ### 🔗 External Resources
 - **React 19**: Latest React features and patterns

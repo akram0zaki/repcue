@@ -183,6 +183,11 @@ export function useExerciseFilter(
     return false;
   }, [user?.id, isSharedExercise]);
 
+  // Type guard: Detect ExerciseInCatalog shape (membership join result)
+  const hasMembership = (ex: Exercise): ex is Exercise & { membership: { catalog_id: string; catalog_tags?: string[] } } => {
+    return Boolean(ex && typeof ex === 'object' && 'membership' in ex && ex.membership && typeof (ex.membership as { catalog_id?: string }).catalog_id === 'string');
+  };
+
   // Filter and sort exercises
   const filteredExercises = useMemo(() => {
     const term = filterState.searchTerm.trim().toLowerCase();
@@ -200,7 +205,10 @@ export function useExerciseFilter(
       }
 
       // Filter by catalog
-      const matchesCatalog = exercise.catalogId === filterState.selectedCatalogId;
+      const exerciseCatalogId = hasMembership(exercise)
+        ? exercise.membership.catalog_id
+        : (exercise as Exercise & { catalogId?: string }).catalogId;
+      const matchesCatalog = exerciseCatalogId === filterState.selectedCatalogId;
 
       // Filter by badges (AND logic across different badges, OR within each badge)
       let matchesBadges = true;
@@ -209,8 +217,22 @@ export function useExerciseFilter(
         
         const badge = catalogBadges.find(b => b.id === badgeId);
         if (!badge) continue; // Skip if badge not found in catalog
-        
-        if (!matchesBadgeFilter(exercise, badge, selectedValues)) {
+
+        // Build a temporary view with merged tags when using membership join
+        const exWithTagsForBadge = exercise as Exercise & { effectiveTags?: string[]; base_tags?: string[]; tags?: string[] };
+        const mergedTags = hasMembership(exercise)
+          ? (exWithTagsForBadge.effectiveTags
+              || [
+                ...(exWithTagsForBadge.base_tags || exWithTagsForBadge.tags || []),
+                ...(exercise.membership?.catalog_tags || [])
+              ])
+          : (exWithTagsForBadge.tags || []);
+
+        const exerciseForBadge = hasMembership(exercise)
+          ? { ...exercise, tags: mergedTags }
+          : exercise;
+
+        if (!matchesBadgeFilter(exerciseForBadge as Exercise, badge, selectedValues)) {
           matchesBadges = false;
           break; // AND logic: if any badge doesn't match, exclude exercise
         }
@@ -218,10 +240,18 @@ export function useExerciseFilter(
 
       // Filter by search term (localized search)
       const loc = localizeExercise(exercise, t);
+      const exWithTags = exercise as Exercise & { effectiveTags?: string[]; base_tags?: string[]; tags?: string[] };
+      const searchTags: string[] = hasMembership(exercise)
+        ? (exWithTags.effectiveTags
+            || [
+              ...(exWithTags.base_tags || exWithTags.tags || []),
+              ...(exercise.membership?.catalog_tags || [])
+            ])
+        : (exWithTags.tags || []);
       const matchesSearch = term.length === 0
         || loc.name.toLowerCase().includes(term)
         || (loc.description || '').toLowerCase().includes(term)
-        || (exercise.tags || []).some(tag => tag.toLowerCase().includes(term));
+        || searchTags.some(tag => String(tag).toLowerCase().includes(term));
 
       // Filter by favorites
       const matchesFavorites = !filterState.showFavoritesOnly || exercise.is_favorite;

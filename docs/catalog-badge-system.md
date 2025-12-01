@@ -1,7 +1,7 @@
 # Catalog Badge System - Developer Guide
 
-**Version**: 1.0
-**Date**: 2025-01-13
+**Version**: 1.1
+**Date**: 2025-11-30
 **Status**: Production
 
 ## Table of Contents
@@ -128,7 +128,8 @@ function matchesAllBadges(exercise, selectedBadges) {
   values: [
     { id: 'bodyweight', label: 'catalogs:general-fitness.badges.equipment.values.bodyweight' },
     { id: 'dumbbells', label: 'catalogs:general-fitness.badges.equipment.values.dumbbells' },
-    { id: 'resistance-band', label: 'catalogs:general-fitness.badges.equipment.values.resistanceBand' }
+    { id: 'resistance-band', label: 'catalogs:general-fitness.badges.equipment.values.resistanceBand' },
+    { id: 'none', label: 'catalogs:general-fitness.badges.equipment.values.none' }
   ],
   tagPattern: { prefix: 'equipment:' }
 }
@@ -149,12 +150,15 @@ function matchesAllBadges(exercise, selectedBadges) {
   id: 'kyuLevel',
   label: 'catalogs:aikido.badges.kyuLevel.label',
   values: [
-    { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.6', labelParams: { level: 6 } },
-    { id: 5, label: 'catalogs:aikido.badges.kyuLevel.values.5', labelParams: { level: 5 } }
+    { id: 1, label: 'catalogs:aikido.badges.kyuLevel.values.kyu1' },
+    { id: 2, label: 'catalogs:aikido.badges.kyuLevel.values.kyu2' },
+    { id: 3, label: 'catalogs:aikido.badges.kyuLevel.values.kyu3' },
+    { id: 4, label: 'catalogs:aikido.badges.kyuLevel.values.kyu4' },
+    { id: 5, label: 'catalogs:aikido.badges.kyuLevel.values.kyu5' },
+    { id: 6, label: 'catalogs:aikido.badges.kyuLevel.values.kyu6' }
   ],
   tagPattern: {
-    prefix: 'kyu:',
-    extractPattern: /^kyu:(\d+)$/
+    prefix: 'kyu:'
   }
 }
 ```
@@ -218,9 +222,16 @@ function matchesAllBadges(exercise, selectedBadges) {
 ```typescript
 {
   id: 'pilates',
-  nameKey: 'catalogs:pilates.name',
-  descriptionKey: 'catalogs:pilates.description',
+  nameKey: 'pilates.name',
+  descriptionKey: 'pilates.description',
+  isDefault: false,
+  isPremium: true,
   displayOrder: 5,
+  icon: 'pilates',
+  colorTheme: 'teal',
+  pictureUrl: '/images/catalogs/pilates-square.png',
+  isVisible: true,
+  isIncludedInAI: true,
   groupByBadge: 'level', // Optional: group exercises by this badge
   badges: [
     {
@@ -238,14 +249,28 @@ function matchesAllBadges(exercise, selectedBadges) {
       id: 'category',
       label: 'catalogs:pilates.badges.category.label',
       values: [
-        { id: 'core', label: 'common:categories.core' },
-        { id: 'flexibility', label: 'common:categories.flexibility' }
+        { id: 'core', label: 'exercises:categories.core' },
+        { id: 'flexibility', label: 'exercises:categories.flexibility' }
       ],
       tagPattern: { prefix: 'category:' }
     }
   ]
 }
 ```
+
+**Catalog Fields**:
+- `id`: Unique identifier
+- `nameKey`, `descriptionKey`: i18n keys (without `catalogs:` prefix)
+- `isDefault`: Whether this is the default catalog (only one)
+- `isPremium`: Whether premium access is required
+- `displayOrder`: Sort order in catalog list
+- `icon`: Icon name for display
+- `colorTheme`: Theme color (blue, pink, black, green, purple, etc.)
+- `pictureUrl`: Path to catalog image
+- `isVisible`: Whether to show in catalog selection
+- `isIncludedInAI`: Whether to include in AI workout generation
+- `groupByBadge`: Badge ID to group exercises by on listing page
+- `badges`: Array of badge definitions
 
 ### Step 2: Add Translations
 
@@ -377,10 +402,16 @@ const exerciseBadges = extractExerciseBadges(exercise, catalogBadges);
 
 #### `useBadgeValues(exercises, catalogId, badge): BadgeValue[]`
 
-Memoized hook for badge value discovery.
+Memoized hook for badge value discovery. Handles three badge types:
+1. **Predefined static badges** - Returns `badge.values` directly
+2. **Dynamic discovery badges** - Scans exercise tags to discover values
+3. **Computed badges** - Derives values from exercise properties (e.g., `hasVideo` from media index)
+
+**Note**: For computed badges like `hasVideo`, the hook loads the media index asynchronously to check real video availability.
 
 ```typescript
 const BadgeFilter = ({ exercises, catalogId, badge }) => {
+  // Memoized badge values with async media index loading for computed badges
   const values = useBadgeValues(exercises, catalogId, badge);
 
   return (
@@ -393,13 +424,18 @@ const BadgeFilter = ({ exercises, catalogId, badge }) => {
 };
 ```
 
+**Supported Computed Badge Types**:
+- `hasVideo`: Checks `custom_video_url` or media index for R2/legacy videos
+- `durationRange`: Derives from `default_duration` field (0-5min, 5-15min, 15-30min, 30min+)
+- `difficultyLevel`: Returns `difficulty_level` field values
+
 ### Filter Hook
 
 **File**: `apps/frontend/src/hooks/useExerciseFilter.ts`
 
 #### `useExerciseFilter(exercises, options): ExerciseFilterResult`
 
-Main filtering hook with badge support.
+Main filtering hook with badge support. Handles both direct `tags` array and `CatalogMembership` joins.
 
 ```typescript
 const {
@@ -407,10 +443,13 @@ const {
   filterState,
   toggleBadgeValue,
   clearBadge,
-  clearFilters
+  clearFilters,
+  setCatalog,
+  updateFilter
 } = useExerciseFilter(exercises, {
   persistFilters: true,
-  storageKey: 'exerciseFilters'
+  storageKey: 'exerciseFilters',
+  excludeExercises: [] // Optional: exercises to exclude from results
 });
 
 // Toggle a badge value
@@ -419,8 +458,27 @@ toggleBadgeValue('category', 'core');
 // Clear all selections for a badge
 clearBadge('category');
 
-// Clear all filters
+// Clear all filters (except catalog)
 clearFilters();
+
+// Change catalog (optionally reset other filters)
+setCatalog('aikido', true);
+```
+
+**Filter Logic**:
+- **Catalog filter**: Exercises must match `selectedCatalogId`
+- **Badge filter**: AND across badges, OR within each badge
+- **Search filter**: Matches name, description, or tags
+- **Favorites filter**: Optional `showFavoritesOnly`
+- **Exercise type filter**: `all`, `built-in`, `custom`, `shared`
+
+**CatalogMembership Support**:
+When exercises use the GlobalExercise + CatalogMembership model, tags are merged:
+```typescript
+const mergedTags = [
+  ...(exercise.base_tags || []),
+  ...(exercise.membership?.catalog_tags || [])
+];
 ```
 
 ### Validation Utilities
@@ -739,5 +797,5 @@ For more examples, see `apps/frontend/src/data/catalogs.ts` and existing badge i
 
 ---
 
-**Last Updated**: 2025-01-13
+**Last Updated**: 2025-11-30
 **Maintained By**: RepCue Development Team

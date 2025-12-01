@@ -1,0 +1,12 @@
+{
+  "reviews": "reviews",
+  "yourRating": "Your Rating",
+  "rateThis": "Rate This Exercise",
+  "addReview": "Add Review",
+  "hideReview": "Hide Review",
+  "reviewPlaceholder": "Write your review (optional)...",
+  "characters": "characters",
+  "submitError": "Failed to submit rating",
+  "submitting": "Submitting...",
+  "loginToRate": "Sign in to rate and review exercises"
+}

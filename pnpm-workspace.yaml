@@ -1,4 +1,12 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
-  - 'tests/e2e'
+  - apps/*
+  - packages/*
+  - tests/e2e
+
+ignoredBuiltDependencies:
+  - cypress
+  - esbuild
+  - sharp
+  - supabase
+
+onlyBuiltDependencies: cypress esbuild sharp supabase

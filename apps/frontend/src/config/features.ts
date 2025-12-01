@@ -17,7 +17,7 @@ export const SYNC_ENGINE = 'v2' as const;
 
 // Global debug logging flag: set true for verbose console output during development only.
 // SECURITY: Do not leak sensitive data into logs. This flag gates verbosity, not secrets.
-export const DEBUG = false;
+export const DEBUG = true;
 // Extra-verbose sync diagnostics. Set to true temporarily when triaging sync issues.
 export const SYNC_DEBUG = false;
 
@@ -34,7 +34,22 @@ export const LEGAL_ACCEPTANCE_V3_ENABLED = true;
 
 // Theme Customization System
 // Default theme ID - used for new users and fallback
-export const DEFAULT_THEME_ID = 'default' as const;
+export const DEFAULT_THEME_ID = 'winter-chill' as const;
 // Enable/disable theme customization feature
 // Starting enabled (true) on feature branch for development and testing
 export const THEME_CUSTOMIZATION_ENABLED = true;
+
+// Video R2 Hosting Migration
+// Enable Cloudflare R2-based video hosting with /media/* proxy
+// When enabled, uses new variants structure; when disabled, falls back to legacy video paths
+export const VIDEO_R2_ENABLED = true; // Enabled for testing R2 video hosting
+
+// Smart Video Caching System
+// Enable persistent IndexedDB caching for instant video playback and offline access
+// When enabled, videos are cached locally and never re-downloaded (40x faster load times)
+export const VIDEO_CACHING_ENABLED = true; // Enabled for persistent video caching
+
+// PWA Install Prompt Controls
+// Completely disabled due to persistent flashing bug across platforms
+export const INSTALL_PROMPT_ENABLED = false; // Globally disabled until flashing issue resolved
+export const INSTALL_PROMPT_IOS_ENABLED = false; // iOS-specific disable (kept for future)

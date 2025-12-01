@@ -65,12 +65,11 @@ describe('TimerPage - Rep Logic Edge Cases', () => {
       />
     );
 
-    // UPDATED EXPECTATIONS: Component shows rep progress in timer display area
-    // Timer display should show "Rep 8" (current rep being worked on)
-    expect(screen.getByText('Rep 8')).toBeInTheDocument();
-    
-    // Timer display should show "of 8 in Set 2/2" (rep progress and set info)
-    expect(screen.getByText('of 8 in Set 2/2')).toBeInTheDocument();
+    // UPDATED EXPECTATIONS: Component shows rep progress in compact progress section
+    // Progress section should show "Rep 8/8" (current rep being worked on)
+    expect(screen.getByText('Rep 8/8')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 2/2')).toBeInTheDocument();
   });
 
   it('should show correct progress when last rep is completed', () => {
@@ -96,10 +95,10 @@ describe('TimerPage - Rep Logic Edge Cases', () => {
       />
     );
 
-    // UPDATED EXPECTATIONS: Component shows time-based display when exercise is completed
-    // Timer display should show time countdown (00:03 of 00:03)
-    expect(screen.getByText('00:03')).toBeInTheDocument();
-    expect(screen.getByText('of 00:03')).toBeInTheDocument();
+    // UPDATED EXPECTATIONS: When stopped after completion, compact section shows final state
+    // Progress section should show completed reps (capped at 8/8, not 9/8)
+    expect(screen.getByText('Rep 8/8')).toBeInTheDocument();
+    expect(screen.getByText('Set 2/2')).toBeInTheDocument();
   });
 
   it('should show correct progress during rest between sets', () => {

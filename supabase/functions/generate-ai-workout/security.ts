@@ -78,7 +78,8 @@ export function sanitizeInput(request: any): any {
       age: request.responses.age,
       height: request.responses.height,
       weight: request.responses.weight,
-      goal: request.responses.goal,
+      goals: request.responses.goals,
+      goalDuration: request.responses.goalDuration,
       fitnessLevel: request.responses.fitnessLevel,
       trainingTime: request.responses.trainingTime,
       trainingStyle: request.responses.trainingStyle,
@@ -165,9 +166,23 @@ export function validateRequest(request: any): ValidationResult {
     }
   }
 
-  // Validate goal
-  if (!['weight_loss', 'muscle_building', 'health_maintenance', 'flexibility'].includes(responses.goal)) {
-    errors.push('goal must be one of: weight_loss, muscle_building, health_maintenance, flexibility');
+  // Validate goals (multi-select array)
+  if (!responses.goals || !Array.isArray(responses.goals) || responses.goals.length === 0) {
+    errors.push('goals must be a non-empty array');
+  } else {
+    const validGoals = ['weight_loss', 'muscle_building', 'health_maintenance', 'flexibility', 'marathon_des_sables'];
+    for (const goal of responses.goals) {
+      if (!validGoals.includes(goal)) {
+        errors.push(`Invalid goal in array: ${goal}. Must be one of: ${validGoals.join(', ')}`);
+      }
+    }
+  }
+
+  // Validate goalDuration (optional)
+  if (responses.goalDuration !== undefined && responses.goalDuration !== null) {
+    if (typeof responses.goalDuration !== 'number' || responses.goalDuration < 1 || responses.goalDuration > 24) {
+      errors.push('goalDuration must be a number between 1 and 24 months');
+    }
   }
 
   // Validate fitness level

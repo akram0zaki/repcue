@@ -4,10 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "pnpm@10.15.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["cypress", "esbuild", "sharp", "supabase"]
+  },
   "scripts": {
     "dev": "pnpm --filter @repcue/frontend dev",
     "dev:be": "pnpm --filter @repcue/backend dev",
-  "build": "pnpm --filter @repcue/frontend build",
+    "export-exercises": "npx tsx scripts/export-exercises-for-ai.ts",
+    "build": "pnpm --filter @repcue/frontend build",
     "preview": "pnpm --filter @repcue/frontend preview",
     "start": "pnpm --filter @repcue/backend start",
     "build:serve": "pnpm --filter @repcue/frontend build && pnpm --filter @repcue/backend start",
@@ -37,7 +41,8 @@
   "devDependencies": {
     "@playwright/test": "^1.55.0",
     "husky": "^9.1.6",
-    "lint-staged": "^15.2.10"
+    "lint-staged": "^15.2.10",
+    "tsx": "^4.20.6"
   },
   "lint-staged": {
     "apps/frontend/**/*.{ts,tsx,js,jsx,css,scss}": [
@@ -47,5 +52,14 @@
     "apps/frontend/src/**/*.{ts,tsx}": [
       "node apps/frontend/scripts/i18n-scan.mjs"
     ]
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.927.0",
+    "color-convert": "^3.1.2",
+    "color-name": "^2.1.0",
+    "color-string": "^2.1.2"
+  },
+  "comments": {
+    "@aws-sdk/client-s3": "LEGACY: Used by deprecated publish-to-r2.mjs. Use wrangler CLI (publish-to-r2-wrangler.mjs) instead."
   }
 }

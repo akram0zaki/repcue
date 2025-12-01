@@ -56,23 +56,17 @@ export class LegalDocsService {
     }
 
     try {
-      logger.log('Initializing LegalDocsService...');
-      
-      // Load baseline manifest (always available offline)
-      this.baselineManifest = await this.loadBaselineManifest();
+      // In dev mode, always reload to pick up manifest changes
+      // In production, only load if not already loaded
+      if (import.meta.env.DEV || !this.baselineManifest) {
+        // Load baseline manifest (always available offline)
+        this.baselineManifest = await this.loadBaselineManifest();
+      }
       
       if (!this.baselineManifest) {
         logger.error('Failed to load baseline manifest');
         return false;
       }
-
-      logger.log(`Loaded baseline manifest with ${this.baselineManifest.documents.length} documents`);
-      logger.log('Baseline manifest updatedAt:', this.baselineManifest.updatedAt);
-      
-      // Log each document's details
-      this.baselineManifest.documents.forEach(doc => {
-        logger.log(`  - ${doc.id} v${doc.version} (required: ${doc.required}, policy: ${doc.policy}, effectiveFrom: ${doc.effectiveFrom || 'immediate'})`);
-      });
       
       return true;
     } catch (error) {
@@ -88,13 +82,18 @@ export class LegalDocsService {
    */
   private async loadBaselineManifest(): Promise<LegalManifest | null> {
     try {
-      // In development, add cache-busting query param
+      // In development, add cache-busting query param AND force reload headers
       const url = import.meta.env.DEV 
-        ? `${BASELINE_MANIFEST_PATH}?t=${Date.now()}`
+        ? `${BASELINE_MANIFEST_PATH}?t=${Date.now()}&r=${Math.random()}`
         : BASELINE_MANIFEST_PATH;
       
       const response = await fetch(url, {
-        cache: import.meta.env.DEV ? 'no-cache' : 'force-cache'
+        cache: import.meta.env.DEV ? 'reload' : 'force-cache',
+        headers: import.meta.env.DEV ? {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        } : {}
       });
 
       if (!response.ok) {
@@ -213,29 +212,17 @@ export class LegalDocsService {
       return null;
     }
 
-    logger.log(`[getDocument] Looking for docId: ${docId}, locale: ${locale}`);
-    logger.log(`[getDocument] Available locales:`, doc.locales.map(l => l.locale).join(', '));
-
     // Try exact locale match first
     let localeData = doc.locales.find(l => l.locale === locale);
-    
-    if (localeData) {
-      logger.log(`[getDocument] ✅ Found exact locale match: ${locale}`);
-    }
     
     // Try base locale (e.g., ar-EG → ar)
     if (!localeData && locale.includes('-')) {
       const baseLocale = locale.split('-')[0];
-      logger.log(`[getDocument] Trying base locale fallback: ${baseLocale}`);
       localeData = doc.locales.find(l => l.locale === baseLocale);
-      if (localeData) {
-        logger.log(`[getDocument] ✅ Found base locale match: ${baseLocale}`);
-      }
     }
     
     // Fallback to English
     if (!localeData) {
-      logger.log(`[getDocument] Falling back to English`);
       localeData = doc.locales.find(l => l.locale === 'en');
     }
 
@@ -243,8 +230,6 @@ export class LegalDocsService {
       logger.warn(`No locale data found for document ${docId} (locale: ${locale})`);
       return null;
     }
-
-    logger.log(`[getDocument] Returning document with locale: ${localeData.locale}, path: ${localeData.path}`);
 
     return {
       ...doc,
@@ -273,7 +258,6 @@ export class LegalDocsService {
    */
   public recordAcceptance(acceptance: LegalAcceptance): boolean {
     try {
-      logger.log(`Recording acceptance for ${acceptance.docId} v${acceptance.acceptedVersion}`);
       return this.consentService.updateLegalAcceptance(acceptance);
     } catch (error) {
       logger.error('Failed to record acceptance:', error);
@@ -296,7 +280,6 @@ export class LegalDocsService {
   public getAcceptanceStatus(docId: string, locale: string): LegalAcceptanceStatus {
     const doc = this.getDocument(docId, locale);
     if (!doc) {
-      logger.log(`[getAcceptanceStatus] Document ${docId} not found for locale ${locale}`);
       return {
         docId,
         accepted: false,
@@ -310,26 +293,11 @@ export class LegalDocsService {
     const acceptance = this.getAcceptance(docId);
     const localeData = doc.locales[0]; // Already selected by getDocument
     
-    logger.log(`[getAcceptanceStatus] ${docId}:`, {
-      hasAcceptance: !!acceptance,
-      effectiveFrom: doc.effectiveFrom,
-      policy: doc.policy,
-      required: doc.required,
-      version: doc.version
-    });
-    
     if (!acceptance) {
       // Never accepted
       const isEffective = this.isEffectiveNow(doc.effectiveFrom);
       const policy = doc.policy || 'deferred';
       const isBlocking = doc.required && isEffective && policy === 'force';
-      
-      logger.log(`[getAcceptanceStatus] ${docId} never accepted:`, {
-        isEffective,
-        policy,
-        isBlocking,
-        required: doc.required
-      });
       
       return {
         docId,
@@ -392,25 +360,8 @@ export class LegalDocsService {
    * Check if any required documents are blocking
    */
   public hasBlockingDocuments(locale: string): boolean {
-    logger.log('[legalDocsService] hasBlockingDocuments called with locale:', locale);
-    
     const statuses = this.getAllAcceptanceStatuses(locale);
-    logger.log('[legalDocsService] Got acceptance statuses:', statuses.length, 'documents');
-    
-    statuses.forEach(status => {
-      logger.log('[legalDocsService] Document:', status.docId, {
-        accepted: status.accepted,
-        requiresAcceptance: status.requiresAcceptance,
-        isBlocking: status.isBlocking,
-        currentVersion: status.currentVersion,
-        acceptedVersion: status.acceptedVersion
-      });
-    });
-    
-    const hasBlocking = statuses.some(s => s.isBlocking);
-    logger.log('[legalDocsService] Has blocking documents:', hasBlocking);
-    
-    return hasBlocking;
+    return statuses.some(s => s.isBlocking);
   }
 
   /**

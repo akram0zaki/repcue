@@ -4,6 +4,7 @@
     "stop": "بطّل",
     "cancel": "سيب",
     "confirm": "تأكيد",
+    "ok": "تمام",
     "delete": "حذف",
     "signIn": "تسجيل الدخول",
     "reset": "ابدأ من جديد",
@@ -110,6 +111,10 @@
     "horizontalExerciseLayoutHelp": "ورّي التمارين في قايمة عرضية تتسكرول مرتبة حسب الفئة، زي تصفح نتفليكس.",
     "ringTimer": "مؤقت الحلقة",
     "ringTimerHelp": "غيّر بين المؤقت الدايري بالحلق أو المؤقت المستطيل مع شريط التقدم.",
+    "repSpeedFactor": "سرعة التكرار",
+    "repSpeedFactorHelp": "ضبط معامل السرعة للتمارين القائمة على التكرار. القيم الأقل تجعل التكرارات أسرع، والقيم الأعلى تجعلها أبطأ.",
+    "faster": "أسرع",
+    "slower": "أبطأ",
     "language": "اللغة",
     "selectLanguage": "اختار اللغة",
     "languageHelp": "اختار لغتك اللي بتحبها. البرنامج هيفتكر اختيارك.",
@@ -147,6 +152,9 @@
     "updateServiceWorker": "دوّر على تحديثات",
     "updateServiceWorkerHelp": "دوّر على تحديثات service worker وطبقها على طول.",
     "forceRefreshConfirm": "الإجبار على التحديث هيمسح كل البيانات المحفوظة ويحمّل البرنامج من جديد. ده ممكن يقطع جلستك الحالية. تكمل؟",
+    "clearVideoCache": "امسح كاش الفيديوهات",
+    "clearVideoCacheHelp": "شيل كل فيديوهات التمارين المتخزّنة علشان توفر مساحة. الفيديوهات هتتحمّل تاني لمّا تحتاجها.",
+    "clearing": "بيمسح...",
     "clearAllDataAndReset": "امسح كل حاجة واعمل ريست للبرنامج",
     "clearAllDataHelp": "امسح كل البيانات نهائياً، اعمل ريست للموافقة، وارجع للشاشة الرئيسية",
     "clearAllDataMessage": "متأكد إنك عايز تمسح كل حاجة؟ مش هتقدر ترجع في الكلام ده. هنوديك للشاشة الرئيسية ونطلب موافقتك تاني.",
@@ -235,8 +243,10 @@
     "categoriesSelected_other": "{{count}} فئات مختارة",
     "exercisesRemaining_one": "باقي {{count}} تمرين",
     "exercisesRemaining_other": "باقي {{count}} تمرين",
-    "repProgress": "تقدم العدات",
-    "getReadyStartsIn_one": "استعد! المؤقت هيبدأ في {{count}} ثانية",
+    "repProgress": "تقدم العدات",    "rep": "تكرار",
+    "set": "مجموعة",
+    "active": "نشط",
+    "rest": "راحة",    "getReadyStartsIn_one": "استعد! المؤقت هيبدأ في {{count}} ثانية",
     "getReadyStartsIn_other": "استعد! المؤقت هيبدأ في {{count}} ثانية",
     "getReadyEllipsis": "استعد...",
     "exerciseComplete": "تمرين {{total}}/{{total}} - خلص!",
@@ -255,7 +265,9 @@
     "beepInterval45": "كل 45 ثانية",
     "beepInterval60": "كل 60 ثانية",
     "wakeLock": "قفل الشاشة",
-    "selectExercise": "اختار التمرين"
+    "selectExercise": "اختار التمرين",
+    "fit": "احتواء",
+    "fill": "ملء"
   },
   "weekday": {
     "monday": "الإتنين",
@@ -618,6 +630,11 @@
     "localVideo": "ملف الفيديو المحلي",
     "pendingSync": "الفيديو في انتظار المزامنة",
     "videoWithIssues": "الفيديو به مشكلات"
+  },
+  "exercise": {
+    "noEquipment": "لا معدات",
+    "startEx": "ابدأ",
+    "startExercise": "ابدأ التمرين"
   },
   "profile": {
     "title": "البروفايل",

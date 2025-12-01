@@ -133,7 +133,8 @@ describe('TimerPage - Workout Mode', () => {
 
     expect(screen.getByText('Test Workout')).toBeInTheDocument();
     expect(screen.getByText('1/2')).toBeInTheDocument();
-    expect(screen.getByText('Rep 1')).toBeInTheDocument();
+    // Check compact progress section
+    expect(screen.getByText('Rep 1/15')).toBeInTheDocument();
   });
 
   it('should show workout progress bar', () => {
@@ -180,9 +181,10 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    // UPDATED EXPECTATIONS: Component shows rep progress in timer display area
-    expect(screen.getByText('Rep 1')).toBeInTheDocument();
-    expect(screen.getByText('of 15 in Set 1/3')).toBeInTheDocument();
+    // UPDATED EXPECTATIONS: Component shows rep progress in compact progress section
+    expect(screen.getByText('Rep 1/15')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
   });
 
   it('should show workout controls in workout mode', () => {
@@ -193,9 +195,10 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    // UPDATED EXPECTATIONS: Component shows rep progress in timer display area
-    expect(screen.getByText('Rep 1')).toBeInTheDocument();
-    expect(screen.getByText('of 15 in Set 1/3')).toBeInTheDocument();
+    // UPDATED EXPECTATIONS: Component shows rep progress in compact progress section
+    expect(screen.getByText('Rep 1/15')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
   });
 
   it('should hide exercise selection in workout mode', () => {
@@ -245,6 +248,9 @@ describe('TimerPage - Workout Mode', () => {
     // Use a timer state with the second exercise (time-based, not rep-based)
     const timeBasedWorkoutState = {
       ...mockWorkoutTimerState,
+      isRunning: true, // Make it running so timer display shows
+      currentTime: 10,
+      targetTime: 45,
       workoutMode: {
         ...mockWorkoutTimerState.workoutMode!,
         currentExerciseIndex: 1, // Second exercise (time-based)
@@ -260,9 +266,11 @@ describe('TimerPage - Workout Mode', () => {
       <TimerPage
         {...defaultProps}
         timerState={timeBasedWorkoutState}
+        selectedExercise={mockExercises[1]} // Select the time-based exercise (Plank)
       />
     );
 
+    // For time-based exercises, timer display shows the exercise counter
     expect(screen.getByText('Exercise 2/2')).toBeInTheDocument();
   });
 
@@ -274,9 +282,10 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
-    // Component shows rep progress in timer display area
-    expect(screen.getByText('Rep 1')).toBeInTheDocument();
-    expect(screen.getByText('of 15 in Set 1/3')).toBeInTheDocument();
+    // Component shows rep progress in compact progress section
+    expect(screen.getByText('Rep 1/15')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    expect(screen.getByText('Set 1/3')).toBeInTheDocument();
   });
 
   it('should call onResetTimer when Reset button is clicked', () => {
@@ -323,6 +332,9 @@ describe('TimerPage - Workout Mode', () => {
   it('should handle time-based exercises in workout mode', () => {
     const timeBasedWorkoutState: TimerState = {
       ...mockWorkoutTimerState,
+      isRunning: true, // Running so timer display shows
+      currentTime: 20,
+      targetTime: 45,
       workoutMode: {
         ...mockWorkoutTimerState.workoutMode!,
         currentExerciseIndex: 1, // Move to plank (time-based)
@@ -341,9 +353,10 @@ describe('TimerPage - Workout Mode', () => {
       />
     );
 
+    // For time-based exercises, timer display shows the exercise counter
     expect(screen.getByText('Exercise 2/2')).toBeInTheDocument();
-    expect(screen.queryByText('Set Progress')).not.toBeInTheDocument();
-    expect(screen.queryByText('Rep Progress')).not.toBeInTheDocument();
+    // Compact progress section doesn't show for time-based exercises
+    expect(screen.queryByText('Rep 1/15')).not.toBeInTheDocument();
   });
 
   it('should show resting state UI when in rest period', () => {

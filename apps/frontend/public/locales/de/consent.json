@@ -1,0 +1,25 @@
+{
+  "title": "Ihre Privatsphäre und rechtliche Zustimmung",
+  "description": "RepCue benötigt Ihre Erlaubnis, um Trainingsdaten zu speichern und erfordert die Annahme unserer Bedingungen und Datenschutzrichtlinie, um die beste Erfahrung zu bieten.",
+  "learnMore": "Erfahren Sie mehr über den Schutz Ihrer Privatsphäre",
+  "viewLegalCenter": "Alle rechtlichen Dokumente im Rechtszentrum anzeigen",
+  "showLess": "Weniger anzeigen",
+  "acceptAll": "Alle Akzeptieren und Fortfahren",
+  "acceptEssential": "Nur Notwendiges",
+  "processing": "Verarbeitung...",
+  "disclaimer": "Beide Optionen akzeptieren automatisch alle erforderlichen rechtlichen Dokumente (Nutzungsbedingungen, Datenschutzrichtlinie usw.). Sie können diese Dokumente jederzeit im Rechtszentrum einsehen und Ihre Einstellungen später in den Einstellungen ändern.",
+  "dataWeStore": {
+    "title": "Welche Daten speichern wir?",
+    "preferences": "Ihre Übungseinstellungen und Favoriten",
+    "activityLogs": "Aktivitätsprotokolle mit Übungsdauer und Zeitstempeln",
+    "settings": "App-Einstellungen (Ton, Vibration, Intervalle)",
+    "noPersonalData": "Keine persönlichen Informationen oder biometrischen Daten"
+  },
+  "dataPrivacy": {
+    "title": "Ihre Daten bleiben privat",
+    "localStorage": "Alle Daten werden lokal auf Ihrem Gerät gespeichert",
+    "noExternalServers": "Nichts wird ohne Ihre Erlaubnis an externe Server gesendet",
+    "exportDelete": "Sie können Ihre Daten jederzeit exportieren oder löschen",
+    "gdprCompliance": "Vollständige DSGVO-Konformität mit Ihren Rechten"
+  }
+}

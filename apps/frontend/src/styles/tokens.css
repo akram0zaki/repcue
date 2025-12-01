@@ -482,6 +482,23 @@
   box-shadow: 0 0 0 2px #1f2937, 0 0 0 4px var(--color-primary);
 }
 
+/* Generic empty state card that adapts to theme */
+.empty-state-card {
+  background: linear-gradient(
+    to bottom right,
+    color-mix(in srgb, var(--color-primary) 16%, var(--color-surface-primary)),
+    color-mix(in srgb, var(--color-primary) 32%, var(--color-surface-secondary))
+  );
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.75rem; /* 12px */
+  padding: 1.5rem; /* 24px */
+  box-shadow: var(--shadow-md);
+}
+
+.dark .empty-state-card {
+  border-color: var(--color-border-secondary);
+}
+
 /* Status badges using default theme colors */
 .badge-primary {
   background-color: var(--color-primary-surface);

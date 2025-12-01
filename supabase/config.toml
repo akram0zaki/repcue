@@ -252,6 +252,10 @@ verify_jwt = false
 [functions.legal-manifest]
 verify_jwt = false
 
+[functions.generate-ai-workout]
+verify_jwt = true
+static_files = ["./functions/generate-ai-workout/exercises.csv"]
+
 # Experimental features may be deprecated any time
 [experimental]
 # Configures Postgres storage-engine with an S3-compatible object store

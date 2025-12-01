@@ -37,7 +37,8 @@ interface GeneratedWorkout {
     aiGenerated: boolean;
     generatedAt: string;
     generationParams: {
-      goal: string;
+      goals: Array<'weight_loss' | 'muscle_building' | 'health_maintenance' | 'flexibility' | 'marathon_des_sables'>;
+      goalDuration?: number;
       fitnessLevel: string;
       trainingStyle: string;
       timeAvailability: string;
@@ -63,6 +64,7 @@ interface AIWorkoutResponse {
     scheduledDays?: string[];
     estimatedDuration: number;
   }>;
+  feedback?: string;
 }
 
 /**
@@ -222,7 +224,8 @@ function convertToGeneratedWorkouts(
       aiGenerated: true,
       generatedAt: now,
       generationParams: {
-        goal: userProfile.goal,
+        goals: userProfile.goals,
+        goalDuration: userProfile.goalDuration,
         fitnessLevel: userProfile.fitnessLevel,
         trainingStyle: userProfile.trainingStyle,
         timeAvailability: userProfile.timeAvailability
@@ -237,13 +240,13 @@ function convertToGeneratedWorkouts(
  * @param request - User request with profile data
  * @param userId - User ID for logging
  * @param correlationId - Correlation ID for request tracking
- * @returns Array of generated workouts
+ * @returns Object with workouts array and optional feedback message
  */
 export async function generateWorkouts(
   request: { responses: any; locale: string },
   userId: string,
   correlationId: string
-): Promise<GeneratedWorkout[]> {
+): Promise<{ workouts: GeneratedWorkout[]; feedback?: string }> {
   logInfo(correlationId, 'Starting workout generation', { userId });
 
   // Step 1: Fetch exercise catalog (filtered by user's catalog access)
@@ -262,7 +265,8 @@ export async function generateWorkouts(
     age: request.responses.age,
     height: request.responses.height,
     weight: request.responses.weight,
-    goal: request.responses.goal,
+    goals: request.responses.goals,
+    goalDuration: request.responses.goalDuration,
     fitnessLevel: request.responses.fitnessLevel,
     trainingTime: request.responses.trainingTime,
     injuries: request.responses.injuries,
@@ -391,5 +395,10 @@ export async function generateWorkouts(
     totalExercises: workouts.reduce((sum, w) => sum + w.exercises.length, 0)
   });
 
-  return workouts;
+  // Future: optionally return AI feedback/coaching tips when provider supports it
+  // Return workouts with optional feedback
+  return {
+    workouts,
+    feedback: parsedResponse.feedback
+  };
 }

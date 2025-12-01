@@ -26,13 +26,14 @@ describe('ConsentService', () => {
 
     it('should return true when valid current consent is stored', () => {
       const consentData: CurrentConsentData = {
-        version: 2,
+        version: 3,
         timestamp: new Date().toISOString(),
         hasConsented: true,
         cookiesAccepted: true,
         analyticsAccepted: false,
         marketingAccepted: false,
-        dataRetentionDays: 365
+        dataRetentionDays: 365,
+        legalAcceptances: []
       }
       
       localStorage.setItem('repcue_consent', JSON.stringify(consentData))
@@ -65,7 +66,7 @@ describe('ConsentService', () => {
       consentService.reloadConsentData()
       
       const status = consentService.getConsentStatus()
-      expect(status.version).toBe(2)
+      expect(status.version).toBe(3)
       expect(status.isLatestVersion).toBe(true)
       expect(consentService.hasConsent()).toBe(true)
     })
@@ -86,7 +87,7 @@ describe('ConsentService', () => {
       consentService.reloadConsentData()
       
       const data = consentService.getConsentData()
-      expect(data?.version).toBe(2)
+      expect(data?.version).toBe(3)
       expect(data?.marketingAccepted).toBe(false) // Should default to false
       expect(data?.dataRetentionDays).toBe(365)   // Should default to 365
       expect(consentService.hasConsent()).toBe(true)
@@ -123,7 +124,7 @@ describe('ConsentService', () => {
       })
 
       const data = consentService.getConsentData()
-      expect(data?.version).toBe(2)
+      expect(data?.version).toBe(3)
       expect(data?.hasConsented).toBe(true)
       expect(data?.analyticsAccepted).toBe(true)
       expect(data?.marketingAccepted).toBe(false)
@@ -146,7 +147,7 @@ describe('ConsentService', () => {
       expect(data?.cookiesAccepted).toBe(true)
       expect(data?.analyticsAccepted).toBe(false)
       expect(data?.marketingAccepted).toBe(false)
-      expect(data?.version).toBe(2)
+      expect(data?.version).toBe(3)
     })
 
     it('should include analytics consent when specified', () => {
@@ -175,7 +176,7 @@ describe('ConsentService', () => {
       expect(consentService.hasConsent()).toBe(false)
       const data = consentService.getConsentData()
       expect(data?.hasConsented).toBe(false)
-      expect(data?.version).toBe(2)
+      expect(data?.version).toBe(3)
       
       // Verify localStorage was cleared (except consent)
       expect(localStorage.getItem('test_data')).toBeNull()
@@ -247,7 +248,7 @@ describe('ConsentService', () => {
       const data = consentService.getConsentData()
       
       expect(data).toMatchObject({
-        version: 2,
+        version: 3,
         hasConsented: true,
         cookiesAccepted: true,
         analyticsAccepted: true,
@@ -255,6 +256,8 @@ describe('ConsentService', () => {
         dataRetentionDays: 365
       })
       expect(data?.timestamp).toBeTruthy()
+      // v3 adds legalAcceptances
+      expect(Array.isArray(data?.legalAcceptances)).toBe(true)
     })
   })
 
@@ -277,7 +280,7 @@ describe('ConsentService', () => {
       
       expect(status).toMatchObject({
         hasConsent: true,
-        version: 2,
+        version: 3,
         isLatestVersion: true,
         requiresUpdate: false
       })

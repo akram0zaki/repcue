@@ -1,71 +1,89 @@
 # RepCue — AI Coding Agent Playbook
 
-RepCue is a privacy-first fitness tracking PWA for interval training, optimized for mobile devices and self-hosting on Raspberry Pi with future plans to host it on Amazon EC2.
+RepCue is a privacy-first fitness tracking PWA for interval training. **UX first, WCAG 2.1 AA compliance, never regress timer feel.**
 
-- **Monorepo Structure**: pnpm workspace with `apps/frontend/` (React + Vite), `apps/backend/` (Express), `packages/shared/` (types), `tests/e2e/` (Cypress)
-- **Stack**: React 19 + TypeScript + Vite + Tailwind. PWA served by Express in prod. Dev on Windows 11 (PowerShell); deploy to Raspberry Pi 5 with PM2.
-- **Prime directive**: UX first and WCAG 2.1 AA. Never regress timer feel/clarity. Respect reduced motion.
+## Quick Reference
+- **Stack**: React 19 + TypeScript + Vite + Tailwind | pnpm monorepo | Supabase backend
+- **Package manager**: pnpm (use `pnpm` commands, not npm)
+- **Dev**: `pnpm dev` (port 5173) | **Tests**: `pnpm test:ci` | **Build**: `pnpm build`
+- **Host OS**: Development on Windows 11 (PowerShell) or macOS (zsh). Use appropriate terminal syntax for the detected environment.
 
-## Architecture you must know
-- **Monorepo Layout**: `apps/frontend/` (React UI), `apps/backend/` (Express server), `packages/shared/` (types), `tests/e2e/` (Cypress)
-- **State Management**: Lives in `apps/frontend/src/App.tsx` (no Redux). All business logic in singleton services under `src/services/**` with `.getInstance()` pattern.
-- **Data Flow**: `App.tsx → Services → IndexedDB (Dexie)` guarded by `ConsentService`. Services return booleans/null; avoid throws.
-- **Timer Semantics** (critical):
-  - Rep-based uses completed counts. `currentRep` = completed reps; `currentSet` is 0-indexed. Display shows completed values.
-  - Preserve `timerState.workoutMode` on all updates; never set it to `undefined` mid‑workout. Always `clearInterval` before creating new ones.
-  - Durations: `repDurationSeconds || BASE_REP_TIME` from `src/constants/index.ts`; apply `settings.repSpeedFactor`.
-- **Video Demos** (feature-gated): flag in `src/config/features.ts` + user setting + reduced‑motion. Loader: `src/utils/loadExerciseMedia.ts`; variant: `src/utils/selectVideoVariant.ts`; hook: `src/hooks/useExerciseVideo.ts`; UI in `src/pages/TimerPage.tsx`.
-- **Authentication**: Supabase auth with magic links, OAuth providers. PWA-aware deep linking via custom protocol handlers (`web+repcue://`)
-- **Supabase Environments**: Dual environment setup (dev: xwzrsfkzqxdybjrkkkvh, prod: zumzzuvfsuzvvymhpymk). ALWAYS verify environment synchronization before major changes - production can lag significantly in schema and edge functions. Use MCP tools to compare and sync environments.
+## Architecture Essentials
 
-## Project conventions
-- **File Structure**: Types in `apps/frontend/src/types/index.ts` (+ `src/types/media.ts`). Constants in `src/constants/index.ts`.
-- **Testing**: Tests colocated under `src/**/__tests__` and `src/__tests__`. Browser APIs mocked in `src/test/setup.ts`.
-- **Data Attributes**: Navigation test hooks like `data-testid="nav-more"`, `nav-settings` exist—prefer real UI flows where possible.
-- **Security/Privacy**: Same‑origin media only. No third‑party calls. Consent‑aware persistence and erase paths. Follow `.github/instructions/owasp.instructions.md`.
-- **Internationalization**: 6 languages (EN, NL, AR, DE, ES, FR) with RTL support. All UI strings use i18n keys (see `docs/i18n/key-styleguide.md`).
+### Data Flow
+```
+App.tsx (state) → Services (singleton .getInstance()) → IndexedDB (Dexie) ← ConsentService guard
+```
+- State lives in `apps/frontend/src/App.tsx` (no Redux/Zustand)
+- Services return booleans/null, avoid throws
+- Three exercise types: Built-in (local-only), User-created (synced), Shared (via user_favorites)
 
-## Daily workflows (Windows PowerShell)
-- **Dev**: `pnpm dev` (frontend 5173), `pnpm dev:be` (backend 3001)
-- **Tests**: `pnpm test` (interactive), `pnpm test:ci` (non‑interactive). Stable Windows mode: `pnpm test:stable`.
-- **Lint/typecheck**: `pnpm lint` and `npx tsc --noEmit` when needed.
-- **Build**: `pnpm build` (includes splash copy). Prod/Pi: `pnpm build:prod`; serve `pnpm build:serve` or `pnpm start` (Express).
-- **Deploy (Pi)**: `pnpm build:prod; pnpm pm2:start`.
-- **E2E**: `pnpm build && pnpm preview` then `pnpm cypress:run` from `tests/e2e/`
-- **Supabase Sync Check**: Use `mcp_supabase_list_tables` vs `mcp_supabase-prod_list_tables` and similar MCP tools to verify environment parity before major feature work.
+### Timer Logic (Critical)
+- `currentRep` = completed reps (0-based); `currentSet` = 0-indexed
+- **NEVER** set `timerState.workoutMode` to `undefined` mid-workout
+- **ALWAYS** `clearInterval()` before creating new ones
+- Duration: `repDurationSeconds || BASE_REP_TIME` × `settings.repSpeedFactor`
+- **Example (2×8 workout)**: Start set=0, rep=0 → after 8th rep: rep=8 triggers rest → after rest: set=1, rep=0 → complete after final set
+- **Common pitfalls**: off-by-one errors, premature set increment, forgetting rest trigger, not clearing intervals
 
-## What to check when touching timer logic
-- Rep progression for a 2×8 example:
-  - Start: set=0, rep=0 → display Set 1/2, Rep 0/8
-  - After 8th rep: rep=8 → trigger rest (isResting=true)
-  - After rest: set=1, rep=0 → continue; complete after final set
-- Common pitfalls: off‑by‑one on reps/sets; premature set increment; forgetting rest trigger; not clearing intervals; clearing `workoutMode`.
-- Workout parity: standalone and workout paths must behave identically for rep advancement, rest, and completion.
+### Supabase Dual Environments
+- **Dev**: `repcue-dev` (xwzrsfkzqxdybjrkkkvh) via `mcp_supabase_*` tools
+- **Prod**: `RepCue` (zumzzuvfsuzvvymhpymk) via `mcp_supabase-prod_*` tools
+- **CRITICAL**: Verify environment sync before major changes—prod can lag behind dev
 
-## Where things live (quick map)
-- **Timer orchestration**: `apps/frontend/src/App.tsx`, UI in `src/pages/TimerPage.tsx`.
-- **Services**: `audioService.ts`, `storageService.ts`, `consentService.ts`, `syncService.ts`, `queueService.ts`.
-- **PWA/build**: `apps/frontend/vite.config.ts`, `vitest.config.ts`, `apps/backend/server.js`, `ecosystem.config.cjs`, `public/manifest.json`.
-- **Media index**: `public/exercise_media.json`; videos under `public/videos/**`.
-- **E2E Tests**: `tests/e2e/cypress/e2e/`, run via `pnpm cypress:run`
+## Project Conventions
 
-## Adding exercises or workouts (examples)
-- **New exercise**: add to `apps/frontend/src/data/exercises.ts` with required `Exercise` fields; include `repDurationSeconds` if custom; set `hasVideo` when media exists and add entry to `public/exercise_media.json`.
-- **New workout**: compose `Workout` with `WorkoutExercise.customSets/customReps/customRestTime`; persist via `StorageService`; launching a workout sets `timerState.workoutMode`.
+### File Locations
+| What | Where |
+|------|-------|
+| Types | `src/types/index.ts`, `src/types/media.ts` |
+| Constants | `src/constants/index.ts` |
+| Services | `src/services/*.ts` (singleton pattern) |
+| Tests | Colocated in `__tests__/` folders |
+| i18n | `public/locales/{lang}/*.json` (8 languages, RTL support) |
 
-## Testing focus areas
-- **Rep logic edge cases**: `src/pages/__tests__/TimerPage.rep-edge-cases.test.tsx` and related tests.
-- **Video demos E2E**: `cypress/e2e/videoDemos.cy.ts` (gating, reduced motion, toggle, override via `window.__VIDEO_DEMOS_DISABLED__`).
-- **i18n**: run `pnpm i18n:scan` before merging locale changes; docs under `docs/i18n/**`.
+### Logging (Mandatory)
+```typescript
+import logger from '../utils/logger';
+logger.log('...');  // DEBUG=true only
+logger.error('...'); // Always shown
+```
+**Never use `console.log()` directly.**
 
-## Security & privacy defaults
-- Never hardcode secrets; use env vars in server paths. HTTPS for network calls. Parameterize any DB queries (Dexie used). Sanitize any HTML via DOMPurify before `dangerouslySetInnerHTML` (rare; prefer text).
+### Change Management
+1. Write Supabase changes to workspace first, then apply via MCP tools
+2. Track migrations in `docs/migration-tracking/supabase-changes_yyyyMMdd.md`
+3. Update `CHANGELOG.md` after implementing features
+4. Run `pnpm test:ci` before committing
 
-## When in doubt
-- Check CHANGELOG.md for recent behavior changes (timer, workouts, i18n). Keep UX consistent and accessibility compliant.
+## Essential Commands
+```bash
+pnpm dev              # Start frontend dev server
+pnpm test:ci          # Run tests (CI mode, non-interactive)
+pnpm lint             # ESLint with auto-fix
+pnpm i18n:scan        # Check for missing translation keys
+pnpm build:prod       # Production build
+```
 
-## Debug Logging
-- Never use console.log() directly. Always use the logger utility from apps/frontend/src/utils/logger.ts which respects the DEBUG feature flag. 
-- Import: `import logger from '../utils/logger';` then use `logger.log()`, `logger.warn()`, `logger.error()`, etc.
-- Logger methods: `logger.log()`, `logger.info()`, `logger.debug()`, `logger.warn()` (only when DEBUG=true), `logger.error()` (always shown)
+## Key Files Quick Map
+- **Timer**: `src/App.tsx` (orchestration), `src/pages/TimerPage.tsx` (UI)
+- **Exercises**: `src/data/exercises.ts` (built-in), `public/exercise_media.json` (video index)
+- **Services**: `audioService`, `storageService`, `consentService`, `syncService`
+- **Config**: `src/config/features.ts` (feature flags), `vite.config.ts`, `vitest.config.ts`
+
+## Security & Privacy
+- Same-origin media only, no third-party calls
+- Consent-aware persistence (ConsentService gates all storage)
+- See `.github/instructions/owasp.instructions.md` for security patterns
+- GDPR compliant with data erasure support
+
+## External Dependencies (Not in Repo)
+- **Exercise videos**: Source videos stored externally; thumbnails generated via `scripts/generate-thumbnails.mjs` and committed to `public/thumbnails/`
+- **Video index**: `public/exercise_media.json` maps exercise IDs to video/thumbnail paths
+- **Environment variables**: `SUPABASE_DB_PASSWORD`, `SUPABASE_ACCESS_TOKEN` for MCP tools; Supabase keys in `.env` files
+
+## When in Doubt
+- Check `CHANGELOG.md` for recent behavior changes
+- Check `AGENTS.md` for comprehensive agent documentation
+- Preserve UX consistency and accessibility compliance
 

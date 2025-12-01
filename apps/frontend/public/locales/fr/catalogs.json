@@ -1,4 +1,9 @@
 {
+  "assignCatalogs": "Attribuer aux catalogues",
+  "assignHint": "Sélectionnez un ou plusieurs catalogues pour organiser où apparaît cet exercice.",
+  "assignmentHeading": "Affectation aux catalogues",
+  "assignmentHint": "Choisissez les catalogues dans lesquels inclure cet exercice. Vous pourrez modifier ce choix plus tard.",
+  "minOneRequired": "Sélectionnez au moins un catalogue pour continuer.",
   "selectCatalog": "Catalogue d’exercices",
   "selectDescription": "Choisissez un catalogue pour afficher les exercices disponibles",
   "general-fitness": {

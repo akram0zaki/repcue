@@ -1,4 +1,5 @@
 import type { AppSettings } from '../types';
+import { DEFAULT_THEME_ID } from '../config/features';
 
 // Application Constants
 export const APP_NAME = 'RepCue';
@@ -33,6 +34,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   auto_start_next: false,
   horizontal_exercise_layout: true, // default to horizontal category listing
   ring_timer: false, // default to rectangular timer layout
+  video_fit_mode: 'fit', // default to fit to avoid cropping in portrait
   app_version: null, // Will be set from server on first launch
   // AI Coach settings (opt-in by default for Phase 1)
   coach_enabled: true, // Default enabled for Phase 1 rollout
@@ -45,7 +47,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   coach_show_recovery: true,
   coach_show_suggestions: true,
   coach_intro_seen: false, // Show intro dialog on first CoachPage visit
-  coach_ai_insights_enabled: false, // AI insights opt-in (requires auth + consent)
+  coach_ai_insights_enabled: true, // AI insights enabled by default (requires auth)
   coach_persona: 'zen', // Default coach personality (Enhancement E1.2)
   coach_post_workout_survey_enabled: true, // Post-workout survey for gamification (Phase 1)
   celebration_sounds_enabled: false, // Default off (Enhancement E1.1)
@@ -53,7 +55,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   update_mode: 'automatic', // PWA update mode: automatic, notify, or manual
   allow_auto_updates: true, // Enable automatic updates
   update_on_metered: false, // Prevent updates on metered connections by default
-  theme_id: 'default', // Default theme for new users (Theme Customization Feature)
+  theme_id: DEFAULT_THEME_ID, // Default theme for new users (set in config/features.ts)
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,

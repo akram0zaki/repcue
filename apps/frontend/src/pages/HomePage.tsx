@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: file already uses t(); any remaining literals are app constants or non-user-visible */
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Exercise, AppSettings, Workout } from '../types';
 import { Routes, Weekday } from '../types';
@@ -19,6 +19,8 @@ import { useCoachingInsights } from '../hooks/useCoachingInsights';
 import InsightsCarousel from '../components/InsightsCarousel';
 import Imprint from '../components/Imprint';
 import logger from '../utils/logger';
+import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import type { ExerciseMediaIndex } from '../types/media';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -60,6 +62,15 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   } | null>(null);
   const [hasConsent, setHasConsent] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Media index to detect video availability independent of legacy has_video
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+  useEffect(() => { loadExerciseMedia().then(setMediaIndex).catch(() => setMediaIndex({} as ExerciseMediaIndex)); }, []);
+
+  const hasAnyVideo = useCallback((ex: Exercise): boolean => {
+    if (ex.custom_video_url) return true;
+    if (mediaIndex && ex.id && mediaIndex[ex.id]) return true;
+    return false;
+  }, [mediaIndex]);
 
   useEffect(() => {
     const checkConsentAndLoadUpcoming = async () => {
@@ -164,7 +175,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
     return exercises
       .filter(exercise =>
         exercise.catalogId === 'general-fitness' &&
-        (exercise.has_video || exercise.custom_video_url)
+        hasAnyVideo(exercise)
       )
       .slice(0, 3);
   };
@@ -201,7 +212,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
           <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-1">
             {APP_NAME}
           </h1>
-          <p className="text-sm text-text-600 dark:text-text-300">
+          <p className="text-sm text-text-600 dark:text-text-100">
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
@@ -295,21 +306,21 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-6 text-white shadow-lg">
+              <div className="upcoming-workout-card">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex-shrink-0 self-center sm:self-start">
                     <CalendarIcon size={48} className="drop-shadow-sm" />
                   </div>
                   <div className="flex-1 text-center sm:text-start-rtl">
-                    <h2 className="text-h3 font-bold mb-3 leading-tight">
+                    <h2 className="text-h3 font-bold mb-3 leading-tight heading-text">
                       {t('home.noScheduleTitle')}
                     </h2>
-                    <p className="text-body text-white/90 mb-5 leading-relaxed">
+                    <p className="text-body text-secondary mb-5 leading-relaxed">
                       {t('home.noScheduleBody')}
                     </p>
                     <button
                       onClick={() => navigate(Routes.WORKOUTS)}
-                      className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-lg text-caption font-semibold transition-all duration-200 border border-white/20 hover:border-white/30 shadow-sm touch-target"
+                      className="btn-primary touch-target"
                     >
                       {t('home.addWorkout')}
                     </button>

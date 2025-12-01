@@ -17,7 +17,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
   onVideoUploaded,
   className = ''
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('video');
   const { flags } = useFeatureFlags();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -117,7 +117,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
     const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
       logger.warn('🎥 [VideoUpload] File too large', { size: file.size, maxSize });
-      setError(t('video.fileTooLarge'));
+      setError(t('fileTooLarge'));
       return;
     }
 
@@ -136,7 +136,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
         type: file.type,
         supportedTypes 
       });
-      setError(t('video.unsupportedFormat'));
+      setError(t('unsupportedFormat'));
       return;
     }
 
@@ -186,7 +186,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
 
     } catch (error) {
       logger.error('🎥 [VideoUpload] Failed to create local blob URL:', error);
-      setError(error instanceof Error ? error.message : t('video.uploadFailed'));
+      setError(error instanceof Error ? error.message : t('uploadFailed'));
     } finally {
       // Clean up after short delay to show completion
       setTimeout(() => {
@@ -237,31 +237,31 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
     setVideoLoadError(true);
     
     // Provide specific error messages based on MediaError codes and messages
-    let userFriendlyError = t('video.loadError', 'Failed to load video.');
+    let userFriendlyError = t('loadError', 'Failed to load video.');
     let shouldDeleteFile = false;
     
     if (errorCode === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED
       shouldDeleteFile = true; // Delete files that can't be played
       if (errorMessage?.includes('DEMUXER_ERROR_NO_SUPPORTED_STREAMS')) {
-        userFriendlyError = t('video.codecNotSupported', 
+        userFriendlyError = t('codecNotSupported', 
           'This video uses an unsupported codec. Try converting to H.264 MP4 format for better browser compatibility.') + 
-          ' ' + t('video.codecSuggestion', 'Recommended: Use FFmpeg or HandBrake to convert to MP4 with H.264 video and AAC audio.');
+          ' ' + t('codecSuggestion', 'Recommended: Use FFmpeg or HandBrake to convert to MP4 with H.264 video and AAC audio.');
       } else if (errorMessage?.includes('FORMAT_ERROR')) {
-        userFriendlyError = t('video.formatError', 
+        userFriendlyError = t('formatError', 
           'Video format not recognized. Please use a standard MP4, WebM, or OGG video file.');
       } else {
-        userFriendlyError = t('video.formatNotSupported', 
+        userFriendlyError = t('formatNotSupported', 
           'Video format not supported by your browser. Try using MP4 with H.264 codec.');
       }
     } else if (errorCode === 3) { // MEDIA_ERR_DECODE
       shouldDeleteFile = true; // Delete corrupted files
-      userFriendlyError = t('video.decodeError', 
+      userFriendlyError = t('decodeError', 
         'Video file appears corrupted or uses unsupported encoding. Try re-encoding the video.');
     } else if (errorCode === 2) { // MEDIA_ERR_NETWORK
-      userFriendlyError = t('video.networkError', 
+      userFriendlyError = t('networkError', 
         'Network error while loading video. Check your connection and try again.');
     } else if (errorCode === 1) { // MEDIA_ERR_ABORTED
-      userFriendlyError = t('video.loadAborted', 
+      userFriendlyError = t('loadAborted', 
         'Video loading was interrupted. Please try uploading again.');
     }
     
@@ -294,17 +294,17 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       <div className={`video-upload-disabled space-y-3 ${className}`}>
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
           <h4 className="font-medium text-gray-900 dark:text-white mb-2">
-            {t('video.exerciseVideo')}
+            {t('exerciseVideo')}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            {t('video.uploadsNotAvailable')}
+            {t('uploadsNotAvailable')}
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            {t('video.urlPlaceholderHelper')}
+            {t('urlPlaceholderHelper')}
           </p>
           <input
             type="url"
-            placeholder={t('video.urlPlaceholder')}
+            placeholder={t('urlPlaceholder')}
             defaultValue={currentVideoUrl}
             onChange={(e) => onVideoUploaded(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
@@ -341,7 +341,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-primary-500 rounded-full animate-pulse"></div>
                       <span className="text-sm text-blue-800 dark:text-blue-200">
-                        {t('video.pendingSync', 'Video ready offline - will sync when online')}
+                        {t('pendingSync', 'Video ready offline - will sync when online')}
                       </span>
                     </div>
                   </div>
@@ -353,7 +353,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                   <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('video.cannotDisplay', 'Cannot display video')}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('cannotDisplay', 'Cannot display video')}</p>
                 </div>
               </div>
             );
@@ -362,15 +362,15 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {(() => {
                 if (videoLoadError) {
-                  return t('video.videoWithIssues', 'Video with issues');
+                  return t('videoWithIssues', 'Video with issues');
                 }
                 if (currentVideoUrl.startsWith('blob-pending-sync://')) {
-                  return t('video.localVideo', 'Local video (offline-ready)');
+                  return t('localVideo', 'Local video (offline-ready)');
                 }
                 if (currentVideoUrl.startsWith('blob-video://')) {
-                  return t('video.localVideoConfirmed', 'Local video (synced)');
+                  return t('localVideoConfirmed', 'Local video (synced)');
                 }
-                return t('video.currentVideo');
+                return t('currentVideo');
               })()}
             </span>
             <button 
@@ -378,7 +378,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
               onClick={handleRemoveVideo}
               className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
             >
-              {t('video.removeVideo')}
+              {t('removeVideo')}
             </button>
           </div>
         </div>
@@ -413,7 +413,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                 })()}
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {uploadProgress}% {t('video.uploaded')}
+                {uploadProgress}% {t('uploaded')}
               </p>
             </div>
           ) : (
@@ -439,13 +439,13 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {t('video.clickToUpload')}
+                    {t('clickToUpload')}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {t('video.supportedFormats')}
+                    {t('supportedFormats')}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {t('video.maxFileSize')}
+                    {t('maxFileSize')}
                   </p>
                 </div>
               </label>
@@ -455,7 +455,7 @@ export const VideoUploadWidget: React.FC<VideoUploadWidgetProps> = ({
       )}
       
       <p className="text-sm text-gray-600 dark:text-gray-400">
-        {t('video.uploadHint')}
+        {t('uploadHint')}
       </p>
     </div>
   );

@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 interface ToastProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  title: string;
+  onConfirm?: () => void;
+  title?: string;
   message: string;
   confirmText?: string;
   cancelText?: string;
@@ -37,7 +37,9 @@ const Toast: React.FC<ToastProps> = ({
   const handleConfirm = () => {
     setIsVisible(false);
     setTimeout(() => {
-      onConfirm();
+      if (onConfirm) {
+        onConfirm();
+      }
       onClose();
     }, 300);
   };
@@ -49,30 +51,30 @@ const Toast: React.FC<ToastProps> = ({
       case 'danger':
         return {
           icon: '⚠️',
-          iconBg: 'bg-red-100 dark:bg-red-900/30',
-          iconColor: 'text-red-600 dark:text-red-400',
-          confirmButton: 'bg-red-600 hover:bg-red-700 focus:ring-red-500',
+          iconBg: 'bg-[color:var(--color-error-background)]',
+          iconColor: 'text-[color:var(--color-error)]',
+          confirmButton: 'bg-[color:var(--color-error)] hover:bg-[color:var(--color-error-hover)] focus:ring-[color:var(--color-error-focus)]',
         };
       case 'warning':
         return {
           icon: '⚠️',
-          iconBg: 'bg-yellow-100 dark:bg-yellow-900/30',
-          iconColor: 'text-yellow-600 dark:text-yellow-400',
-          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+          iconBg: 'bg-[color:var(--color-warning-background)]',
+          iconColor: 'text-[color:var(--color-warning)]',
+          confirmButton: 'bg-[color:var(--color-warning)] hover:bg-[color:var(--color-warning-hover)] focus:ring-[color:var(--color-warning-focus)]',
         };
       case 'info':
         return {
           icon: 'ℹ️',
-          iconBg: 'bg-blue-100 dark:bg-blue-900/30',
-          iconColor: 'text-blue-600 dark:text-blue-400',
-          confirmButton: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+          iconBg: 'bg-[color:var(--color-surface-100)]',
+          iconColor: 'text-[color:var(--color-primary)]',
+          confirmButton: 'bg-[color:var(--color-primary)] hover:bg-[color:var(--color-primary-hover)] focus:ring-[color:var(--color-primary-focus)]',
         };
       default:
         return {
           icon: '⚠️',
-          iconBg: 'bg-yellow-100 dark:bg-yellow-900/30',
-          iconColor: 'text-yellow-600 dark:text-yellow-400',
-          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+          iconBg: 'bg-[color:var(--color-warning-background)]',
+          iconColor: 'text-[color:var(--color-warning)]',
+          confirmButton: 'bg-[color:var(--color-warning)] hover:bg-[color:var(--color-warning-hover)] focus:ring-[color:var(--color-warning-focus)]',
         };
     }
   };
@@ -83,15 +85,15 @@ const Toast: React.FC<ToastProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-          isVisible ? 'opacity-50' : 'opacity-0'
+        className={`absolute inset-0 bg-[color:var(--color-overlay-bg)] transition-opacity duration-300 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={handleClose}
       />
       
       {/* Toast Card */}
       <div
-        className={`relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all duration-300 ${
+        className={`relative bg-[color:var(--color-surface-0)] rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all duration-300 ${
           isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
         role="dialog"
@@ -108,15 +110,17 @@ const Toast: React.FC<ToastProps> = ({
               </span>
             </div>
             <div className="ml-4 flex-1">
-              <h3 
-                id="toast-title"
-                className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"
-              >
-                {title}
-              </h3>
+              {title && (
+                <h3 
+                  id="toast-title"
+                  className="text-lg font-medium text-[color:var(--color-text-900)] mb-2"
+                >
+                  {title}
+                </h3>
+              )}
               <p 
                 id="toast-message"
-                className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
+                className="text-sm text-[color:var(--color-text-700)] leading-relaxed"
               >
                 {message}
               </p>
@@ -125,18 +129,29 @@ const Toast: React.FC<ToastProps> = ({
 
           {/* Action Buttons */}
           <div className="mt-6 flex space-x-3 justify-end">
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-            >
-              {cancelText}
-            </button>
-            <button
-              onClick={handleConfirm}
-              className={`px-4 py-2 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${styles.confirmButton}`}
-            >
-              {confirmText}
-            </button>
+            {onConfirm ? (
+              <>
+                <button
+                  onClick={handleClose}
+                  className="px-4 py-2 text-sm font-medium text-[color:var(--color-text-700)] bg-[color:var(--color-surface-100)] border border-[color:var(--color-border-primary)] rounded-lg hover:bg-[color:var(--color-surface-200)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[color:var(--color-border-focus)] focus:ring-offset-[color:var(--color-surface-0)] transition-colors"
+                >
+                  {cancelText}
+                </button>
+                <button
+                  onClick={handleConfirm}
+                  className={`px-4 py-2 text-sm font-medium text-[color:var(--color-text-50)] rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[color:var(--color-surface-0)] transition-colors ${styles.confirmButton}`}
+                >
+                  {confirmText}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleClose}
+                className={`px-4 py-2 text-sm font-medium text-[color:var(--color-text-50)] rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[color:var(--color-surface-0)] transition-colors ${styles.confirmButton}`}
+              >
+                {confirmText}
+              </button>
+            )}
           </div>
         </div>
       </div>

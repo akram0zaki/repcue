@@ -6,122 +6,257 @@ This document explains how the exercise video feature works end-to-end, includin
 - Keep videos optional: if unavailable or disabled, UI falls back gracefully with no UX regression.
 - Same-origin delivery: client requests `/media/...` paths; no third-party domains.
 - Cross-browser playback: prefer WebM, fall back to MP4 when needed.
-- Deterministic, cacheable delivery using immutable filenames (content hash) where enabled.
+- Multi-tier caching: Memory → IndexedDB → Service Worker for instant playback.
+- Deterministic, cacheable delivery using content-hash filenames where enabled.
 
 ## Architecture Overview
-- Encoding (local): source clips → ffmpeg → WebM (VP9) + MP4 (H.264), short seamless loops
-- Storage: Cloudflare R2 bucket (public objects)
-- Delivery: Cloudflare Pages Function proxy at `/media/*` (supports Range requests and sets cache headers)
-- Manifest: `apps/frontend/public/exercise_media.json` (references `/media/...` keys and describes variants)
-- Client: selects the right format and aspect, respects reduced motion, and integrates with the timer
+- **Encoding** (local): source clips → ffmpeg → MP4 (H.264), short seamless loops with watermark
+- **Storage**: Cloudflare R2 bucket `repcue-videos` (public objects)
+- **Delivery**: Cloudflare Pages Function proxy at `/media/*` (supports Range requests and cache headers)
+- **Manifest**: `apps/frontend/public/exercise_media.json` (array of media entries with variants)
+- **Caching**: `VideoCacheService` provides IndexedDB-based persistent blob caching with LRU eviction
+- **Client**: selects the right format and aspect, respects reduced motion, and integrates with the timer
 
 ## Feature Flags & Settings
-- `FEATURES.VIDEO_DEMOS`: master on/off for rendering videos
-- `FEATURES.VIDEO_R2`: toggles use of `variants` and `/media/*` proxy (legacy path uses direct `/videos/...` URLs)
-- User setting: "Show demo videos when available" (UI toggle)
+Feature flags are defined in `apps/frontend/src/config/features.ts`:
+
+- `VIDEO_DEMOS_ENABLED`: master on/off for rendering videos (default: `true`)
+- `VIDEO_R2_ENABLED`: toggles use of `variants` and `/media/*` proxy (default: `true`); when disabled, falls back to legacy `/videos/...` URLs
+- `VIDEO_CACHING_ENABLED`: enables persistent IndexedDB caching for instant playback (default: `true`)
+- User setting: "Show Exercise Demo Videos" toggle in Settings page (`appSettings.show_exercise_videos`)
 - Reduced motion: if `prefers-reduced-motion: reduce` → video feature disabled automatically
+- Test override: `window.__VIDEO_DEMOS_DISABLED__ = true` for E2E testing
 
 ## File Naming & Variants
-- Pre-upload (encoded locally):
-  - `exerciseId_v1_1920x1080.mp4`
-  - `exerciseId_v1_1080x1920.webm`
-  - `exerciseId_v1_1080x1080.webm`
-- Immutable (R2): uploader may append a short hash to create immutable keys, e.g.
-  - `exerciseId_v1_1920x1080_ab12cd34.mp4`
+Current naming convention (non-hashed):
+- **Pattern**: `exerciseId_v1_WIDTHxHEIGHT.ext`
+- **Example**: `burpees_v1_1920x1080.mp4`
+
+Hash-based naming (optional, for immutable caching):
+- **Pattern**: `exerciseId_v1_WIDTHxHEIGHT_hash8.ext`
+- **Example**: `burpees_v1_1920x1080_95dc97e6.webm`
 
 Notes:
 - Version (`v1`) increments if content meaningfully changes.
 - Hash-based names enable `Cache-Control: public, max-age=31536000, immutable`.
+- Non-hashed names use `Cache-Control: public, max-age=3600, must-revalidate`.
+- The Pages Function validates paths against both patterns.
 
 ## Manifest Format
-Legacy (supported):
-```json
-{
-  "pushup": {
-    "id": "pushup",
-    "video": { "landscape": "/videos/pushup.mp4" }
-  }
-}
-```
+The manifest is an **array** of `ExerciseMedia` objects stored in `apps/frontend/public/exercise_media.json`.
 
-R2 variants (preferred):
+Current format:
 ```json
-{
-  "pushup": {
+[
+  {
     "id": "pushup",
     "repsPerLoop": 1,
     "fps": 30,
+    "duration": 5.93,
+    "video": {},
     "variants": {
       "landscape": {
-        "1080": { "webm": "/media/pushup_v1_1080_ab12cd34.webm", "mp4": "/media/pushup_v1_1080_ab12cd34.mp4" },
-        "720":   { "webm": "/media/pushup_v1_720_de34fa56.webm" }
-      },
-      "portrait": {
-        "1080": { "webm": "/media/pushup_v1_1080x1920_9a8b7c6d.webm" }
-      },
-      "square": {
-        "1080": { "webm": "/media/pushup_v1_1080x1080_11223344.webm" }
+        "1080": {
+          "mp4": {
+            "url": "/media/pushup_v1_1920x1080.mp4"
+          }
+        }
       }
     },
-    "default": { "aspect": "landscape", "res": "1080" }
+    "default": {
+      "aspect": "landscape",
+      "res": "1080"
+    },
+    "thumbnail": "/thumbnails/pushup.jpg"
   }
+]
+```
+
+TypeScript types (from `src/types/media.ts`):
+```typescript
+export type ExerciseMedia = {
+  id: string;                    // matches Exercise.id
+  repsPerLoop: 1 | 2;           // reps per video loop
+  fps: 24 | 30;                 // source framerate
+  duration?: number;            // accurate duration in seconds
+  thumbnail?: string;           // /thumbnails/<id>.jpg - poster frame
+  video?: { ... };              // legacy paths (deprecated)
+  variants?: AspectVariants;    // R2-based variants
+  default?: DefaultVariant;     // recommended variant
+};
+```
+
+Legacy format (still supported for backward compatibility):
+```json
+{
+  "id": "pushup",
+  "video": { "landscape": "/videos/pushup.mp4" }
 }
 ```
 
-Backward compatibility: if `variants` is absent, the client uses legacy `video.square|portrait|landscape`.
-
 ## Client Selection Logic
-- Aspect: choose by viewport (portrait for tall screens, landscape for wide, else square)
-- Resolution: prefer default (e.g., 1080) then descend (720, etc.)
-- Format: probe via `HTMLVideoElement.canPlayType` → prefer WebM; if unsupported, use MP4
-- Reduced motion: video disabled and UI falls back to ring-only
-- Timer sync: for rep-based loops with `repsPerLoop: 1`, the client listens for loop boundaries (time wrap) to trigger a visual rep pulse; authoritative rep logic remains in timer state
+Video selection is handled by `src/utils/selectVideoVariant.ts`:
+
+- **Aspect ratio**: chosen by viewport dimensions:
+  - Portrait: aspect ratio < 0.75 (tall screens)
+  - Landscape: aspect ratio > 1.33 (wide screens)
+  - Square: everything else
+- **Resolution**: prefer native or next higher resolution, fallback to highest available
+- **Format**: probe via `HTMLVideoElement.canPlayType` → prefer WebM (VP9); if unsupported, use MP4 (H.264)
+- **Feature flag**: if `VIDEO_R2_ENABLED` is `true` and `variants` present, use R2 paths; otherwise fall back to legacy `video.*` paths
+- **Reduced motion**: if `prefers-reduced-motion: reduce`, video feature is disabled entirely
+- **Timer sync**: for rep-based loops with `repsPerLoop`, the client detects loop boundaries via `timeupdate` event to trigger a visual rep pulse; authoritative rep logic remains in timer state
+- **Playback rate**: video playback rate is adjusted based on `repSpeedFactor` (inverse: 0.5 factor = 2x playback speed)
+
+## Video Caching System
+RepCue includes a multi-tier caching system via `VideoCacheService` (`src/services/videoCacheService.ts`):
+
+### Cache Tiers
+1. **Memory cache**: In-memory Map of URL → blob URL (instant access)
+2. **IndexedDB**: Persistent blob storage with 90-day expiration
+3. **Service Worker**: Runtime cache for `/media/*` paths
+
+### Features
+- **LRU eviction**: Automatically removes least-recently-used videos when storage is full
+- **Storage quota monitoring**: Respects 80% max quota, keeps 10% free
+- **De-duplication**: Concurrent fetches for same URL share a single network request
+- **Blob URL lifecycle**: Automatic cleanup of blob URLs on component unmount
+- **Consent-aware**: Respects user consent via ConsentService
+
+### URL Resolution
+The `resolveVideoUrl` utility (`src/utils/resolveVideoUrl.ts`) handles multiple URL schemes:
+- Regular HTTP/HTTPS URLs: returned as-is (browser handles caching)
+- `blob:` URLs: returned directly
+- `blob-pending-sync://` / `blob-video://`: custom exercises stored locally
+- `shared-video://`: references another exercise's video file
 
 ## Proxy & Headers (Cloudflare Pages Functions)
-- Path: `/media/<key>` → fetches from R2 bucket
-- Range support: responds with `206 Partial Content` when `Range: bytes=start-end` is provided
-- Headers:
-  - `Content-Type`: set from object metadata (e.g., `video/webm`, `video/mp4`)
-  - `Cache-Control`: `public, max-age=31536000, immutable` for hashed names
+The media proxy is implemented in `functions/media/[[path]].ts`:
+
+- **Path**: `/media/<key>` → fetches from R2 bucket `repcue-videos`
+- **Range support**: responds with `206 Partial Content` when `Range: bytes=start-end` is provided
+- **Headers**:
+  - `Content-Type`: inferred from extension or R2 metadata (`video/webm`, `video/mp4`)
+  - `Cache-Control`: 
+    - Hashed names: `public, max-age=31536000, immutable`
+    - Non-hashed names: `public, max-age=3600, must-revalidate`
   - `Accept-Ranges`: `bytes`
   - `X-Content-Type-Options`: `nosniff`
-- Validation: reject keys containing traversal patterns; enforce expected filename regex
+- **Validation**: 
+  - Rejects paths containing traversal patterns (`..`, `\\`, `//`)
+  - Enforces filename regex: `^[a-z0-9_-]+_v1_\d{3,4}x\d{3,4}(_[a-f0-9]{8,})?\.(mp4|webm)$`
+- **Fallback**: If hashed file not found, automatically tries non-hashed variant
 
 ## Encoding Guidelines (ffmpeg)
-- MP4 (H.264): use `-movflags +faststart`, target CRF ~23–25
-- WebM (VP9): CRF ~32–36; 2-pass optional for tricky content
-- Loop duration: keep short (≤4s), clean background, clear movement
-- Watermark: scaled proportionally to width; applied after chroma key compositing (if used)
+Current production workflow produces MP4 (H.264) with watermark:
+- **Format**: MP4 with `-movflags +faststart` for progressive playback
+- **CRF**: ~23–25 for quality/size balance
+- **Watermark**: scaled proportionally, semi-transparent, positioned with padding
+- **Loop duration**: keep short (≤8s), clean background, clear movement
+
+WebM (VP9) encoding (optional, for future use):
+- CRF ~32–36; 2-pass optional for tricky content
+- Better compression but less universal browser support
 
 ## Caching & Prefetch
-- Service worker: runtime cache for `/media/*` (stale-while-revalidate), bounded entries
-- Prefetch: add `<link rel="prefetch" as="video">` for “up next” exercise during rest/countdown
-- Immutable keys enable long-lived CDN/browser caching; new content uses a new hash/path
+- **VideoCacheService**: IndexedDB-based persistent caching (90-day expiration, LRU eviction)
+- **Service worker**: Runtime cache for `/media/*` (stale-while-revalidate), bounded entries
+- **Prefetch**: During rest/countdown, next exercise video URL can be pre-resolved
+- **Cache-Control headers**: Immutable keys enable long-lived CDN/browser caching; new content uses a new hash/path
+- **Blob URL cleanup**: Automatic revocation when component unmounts or video URL changes
 
 ## Security & Privacy
 - Same-origin proxy avoids third-party domains in CSP
-- Enforce strict path validation and headers; deny-by-default for unexpected keys
+- Strict path validation with regex enforcement; deny-by-default for unexpected keys
+- Path traversal prevention (rejects `..`, `\\`, `//`)
 - No tracking; videos are public instructional content
+- Consent-aware caching: IndexedDB caching respects ConsentService
 - Keys in CI are scoped to R2 only and rotated per policy
 
 ## Developer Workflows
-1) Encode videos (local): use the provided PowerShell/ffmpeg scripts; export WebM + MP4 variants at target resolutions
-2) Rename to convention (if needed): `exerciseId_v1_<WxH>.<ext>`
-3) Upload to R2: `scripts/video/publish-to-r2.mjs --dir=encoded --dry-run` (remove `--dry-run` to upload)
-   - Required env vars: `CLOUDFLARE_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`
-4) Update manifest: run the manifest builder or enable `--manifest-update` during upload
-5) Verify locally: feature flags on; test Chrome/Firefox/Safari + mobile; check seeking (Range)
-6) Commit manifest changes; CI validates schema and asset patterns
+
+### Video Processing Pipeline
+See `scripts/video/README.md` for detailed steps:
+
+1. **Encode videos with watermark** (PowerShell):
+   ```powershell
+   .\scripts\video\Process-RepcueVideos.ps1 -InputDir "path/to/source" -WatermarkPath "path/to/logo.png" -WatermarkScale 0.3 -WatermarkOpacity 0.6
+   ```
+
+2. **Rename to convention** (PowerShell):
+   ```powershell
+   .\scripts\video\Rename_Video_Files.ps1 -InputDir "path/to/encoded" -MappingCsv .\scripts\video\exercise-video-id-mapping.csv
+   ```
+
+3. **Upload to R2** (Node.js, requires wrangler CLI):
+   ```bash
+   # Dry-run first
+   node scripts/video/publish-to-r2-wrangler.mjs --dir="path/to/videos" --dry-run
+   
+   # Actual upload
+   node scripts/video/publish-to-r2-wrangler.mjs --dir="path/to/videos"
+   ```
+   - Outputs `upload-mapping.json` with metadata (duration, dimensions, hashes)
+
+4. **Generate manifest**:
+   ```bash
+   node scripts/video/manifest-build.mjs
+   ```
+   - Reads `upload-mapping.json`
+   - Updates `apps/frontend/public/exercise_media.json`
+
+5. **Verify and commit**:
+   - Test locally with feature flags enabled
+   - Test Chrome/Firefox/Safari + mobile
+   - Check seeking (Range requests) in DevTools
+   - Commit manifest changes
+
+### Utility Scripts
+| Script | Purpose |
+|--------|---------|
+| `publish-to-r2-wrangler.mjs` | Upload videos to R2 via wrangler CLI |
+| `manifest-build.mjs` | Generate/update exercise_media.json |
+| `verify-media-existence.mjs` | Check manifest entries exist in R2 |
+| `validate-filenames.mjs` | Validate filename conventions |
+| `purge-media-cache.mjs` | Purge Cloudflare cache for videos |
 
 ## Troubleshooting
-- Video not playing in Safari: ensure MP4 fallback exists and `+faststart` is set
-- Choppy playback: check CRF/bitrate; reduce resolution or simplify background
-- 404 from `/media/...`: confirm object key; check manifest path and R2 upload logs
-- Seeking broken: verify Range header handling; test with DevTools network panel for 206 responses
+- **Video not playing in Safari**: ensure MP4 fallback exists and `+faststart` is set; check blob URL validity
+- **Choppy playback**: check CRF/bitrate; reduce resolution or simplify background
+- **404 from `/media/...`**: confirm object key in R2; check manifest path and upload logs
+- **Seeking broken**: verify Range header handling; test with DevTools network panel for 206 responses
+- **IndexedDB cache issues**: check browser storage quota; clear via `VideoCacheService.clearAll()`
+- **Blob URL "Load failed"**: Safari-specific issue; blob URLs may fail HEAD validation but work for playback
+
+## Implementation Files
+
+### Core Files
+| File | Purpose |
+|------|---------|
+| `src/config/features.ts` | Feature flags (`VIDEO_DEMOS_ENABLED`, `VIDEO_R2_ENABLED`, `VIDEO_CACHING_ENABLED`) |
+| `src/types/media.ts` | TypeScript types for media manifest |
+| `src/utils/loadExerciseMedia.ts` | Loads and caches `exercise_media.json` |
+| `src/utils/selectVideoVariant.ts` | Viewport-aware variant selection |
+| `src/utils/resolveVideoUrl.ts` | URL resolution for various schemes |
+| `src/hooks/useExerciseVideo.ts` | React hook for video playback integration |
+| `src/services/videoCacheService.ts` | IndexedDB-based persistent video caching |
+| `src/pages/TimerPage.tsx` | Timer UI with video integration |
+| `public/exercise_media.json` | Video manifest (array format) |
+| `functions/media/[[path]].ts` | Cloudflare Pages Function proxy |
+
+### Scripts
+| File | Purpose |
+|------|---------|
+| `scripts/video/Process-RepcueVideos.ps1` | Encode and watermark videos |
+| `scripts/video/Rename_Video_Files.ps1` | Rename to RepCue schema |
+| `scripts/video/publish-to-r2-wrangler.mjs` | Upload to R2 via wrangler |
+| `scripts/video/manifest-build.mjs` | Generate manifest from upload mapping |
+| `scripts/video/exercise-video-id-mapping.csv` | Source filename to exercise ID mapping |
 
 ## References
-- Implementation plan: `docs/implementation-plans/video-hosting/video-hosting-implementation-plan.md`
-- PRD: `docs/implementation-plans/video-hosting/video-hosting-prd.md`
-- Catalogs & badges: `docs/exercise-catalog.md`
+- Implementation plan: `docs/implementation-plans/video-implementation-plan.md`
+- Video hosting PRD: `docs/implementation-plans/video-hosting/video-hosting-prd.md`
+- R2 migration tracking: `docs/migration-tracking/r2-video-migration_20251109.md`
+- Exercise catalog: `docs/exercise-catalog.md`
 - PWA & caching: `docs/pwa-system.md`
-- Hosting: `docs/hosting-guide.md`
+- Hosting guide: `docs/hosting-guide.md`

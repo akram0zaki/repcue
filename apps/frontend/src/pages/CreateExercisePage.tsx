@@ -21,6 +21,7 @@ export const CreateExercisePage: React.FC = () => {
     setLoading(true);
 
     try {
+      const selectedCatalogIds: string[] = (exerciseData as Exercise & { selectedCatalogIds?: string[] }).selectedCatalogIds || ['general-fitness'];
       // Create exercise via IndexedDB storage service (offline-first)
       // The sync service will handle pushing to server later
       // If offline (no user), set owner_id to null - sync will update when user logs in
@@ -31,11 +32,12 @@ export const CreateExercisePage: React.FC = () => {
         owner_id: user?.id || null, // Allow null for offline creation
         name: exerciseData.name || '',
         exercise_type: exerciseData.exercise_type || 'repetition_based',
-        catalogId: 'general-fitness', // Default to general fitness catalog for user-created exercises
+        catalogId: selectedCatalogIds[0] || 'general-fitness', // Legacy field retained for compatibility
         // Optional fields with defaults
         description: exerciseData.description,
         instructions: exerciseData.instructions || [],
-        tags: exerciseData.tags || [],
+        tags: (exerciseData.tags as string[]) || (exerciseData.base_tags as string[]) || [],
+        base_tags: (exerciseData.base_tags as string[]) || (exerciseData.tags as string[]) || [],
         muscle_groups: exerciseData.muscle_groups || [],
         equipment_needed: exerciseData.equipment_needed || [],
         difficulty_level: exerciseData.difficulty_level || 'beginner',
@@ -68,6 +70,18 @@ export const CreateExercisePage: React.FC = () => {
       // Save to IndexedDB (this will mark it as dirty for sync)
       await storageService.saveExercise(exercisePayload);
 
+      // Create catalog memberships for selected catalogs (Phase 5)
+      for (const cid of selectedCatalogIds) {
+        try {
+          await storageService.addExerciseToCatalog(exercisePayload.id, cid, {
+            // Start with empty catalog-specific tags; base_tags cover generic filtering
+            catalog_tags: [],
+          });
+        } catch (e) {
+          logger.warn('Failed to add exercise to catalog', cid, e);
+        }
+      }
+
       // Notify App.tsx to refresh exercises
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('exercise-created', { 
@@ -75,7 +89,7 @@ export const CreateExercisePage: React.FC = () => {
         }));
       }
 
-      showSnackbar(t('exercises.createSuccess', 'Exercise created successfully!'), {
+      showSnackbar(t('exercises:createSuccess', 'Exercise created successfully!'), {
         type: 'success'
       });
 
@@ -86,7 +100,7 @@ export const CreateExercisePage: React.FC = () => {
     } catch (error) {
       logger.error('Failed to create exercise:', error);
       showSnackbar(
-        t('exercises.createError', 'Failed to create exercise. Please try again.'),
+        t('exercises:createError', 'Failed to create exercise. Please try again.'),
         { type: 'error' }
       );
     } finally {
@@ -111,7 +125,7 @@ export const CreateExercisePage: React.FC = () => {
                 {t('errors.featureNotAvailable', 'Feature Not Available')}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                {t('exercises.createNotEnabled', 'Exercise creation is not currently enabled.')}
+                {t('exercises:createNotEnabled', 'Exercise creation is not currently enabled.')}
               </p>
               <button 
                 onClick={() => navigate('/exercises')} 

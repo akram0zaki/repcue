@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabaseFunctionBaseUrl } from './config/supabase';
 import type { Exercise } from './types';
@@ -6,9 +6,10 @@ import {
   PlayIcon
 } from './components/icons/NavigationIcons';
 import { VideoThumbnail } from './components/VideoThumbnail';
-import { ExercisePlaceholder } from './components/ExercisePlaceholder';
 import { localizeExercise } from './utils/localizeExercise';
 import { getExerciseById } from './data/exercises';
+import { loadExerciseMedia } from './utils/loadExerciseMedia';
+import type { ExerciseMediaIndex } from './types/media';
 
 interface ShareInfo {
   sharedBy: string;
@@ -68,6 +69,19 @@ const StandaloneSharedExercise: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showVideo, setShowVideo] = useState(false);
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+
+  useEffect(() => {
+    loadExerciseMedia().then(setMediaIndex).catch(() => setMediaIndex({} as ExerciseMediaIndex));
+  }, []);
+
+  const hasAnyVideo = useMemo(() => {
+    const ex = sharedData?.exercise;
+    if (!ex) return false;
+    if (ex.custom_video_url) return true;
+    if (mediaIndex && ex.id && mediaIndex[ex.id]) return true;
+    return false;
+  }, [sharedData?.exercise, mediaIndex]);
 
   // Load shared exercise data
   useEffect(() => {
@@ -282,20 +296,14 @@ const StandaloneSharedExercise: React.FC = () => {
 
             {/* Video/Image Area - Matching catalog style */}
             <div className="mb-4">
-              {(exercise.has_video || exercise.custom_video_url) ? (
-                <div className="max-w-md mx-auto">
-                  <VideoThumbnail
-                    exercise={exercise}
-                    onVideoLoad={() => {}}
-                    onVideoError={() => {}}
-                    className="w-full"
-                  />
-                </div>
-              ) : (
-                <div className="max-w-md mx-auto">
-                  <ExercisePlaceholder size="lg" />
-                </div>
-              )}
+              <div className="max-w-md mx-auto">
+                <VideoThumbnail
+                  exercise={exercise}
+                  onVideoLoad={() => {}}
+                  onVideoError={() => {}}
+                  className="w-full"
+                />
+              </div>
             </div>
 
             {/* Default Values */}
@@ -405,8 +413,8 @@ const StandaloneSharedExercise: React.FC = () => {
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {t('exercises:hasVideo', { defaultValue: 'Video Demo' })}:
                   </span>
-                  <span className={(exercise.has_video || exercise.custom_video_url) ? 'badge-success' : 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}>
-                    {(exercise.has_video || exercise.custom_video_url)
+                  <span className={hasAnyVideo ? 'badge-success' : 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}>
+                    {hasAnyVideo
                       ? t('exercises:hasVideoDemo', { defaultValue: 'Available' })
                       : t('exercises:noVideoDemo', { defaultValue: 'Not Available' })
                     }
@@ -653,6 +661,7 @@ const StandaloneSharedExercise: React.FC = () => {
               <button
                 onClick={() => setShowVideo(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label={t('common.close', 'Close')}
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

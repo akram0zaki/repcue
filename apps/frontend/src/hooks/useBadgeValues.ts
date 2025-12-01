@@ -5,8 +5,10 @@
  * Provides performance optimization through caching and regex compilation.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import type { Exercise, CatalogBadge, BadgeValue } from '../types';
+import { loadExerciseMedia } from '../utils/loadExerciseMedia';
+import type { ExerciseMediaIndex } from '../types/media';
 
 /**
  * Hook for retrieving badge values with memoization for performance
@@ -41,6 +43,13 @@ export function useBadgeValues(
   catalogId: string,
   badge: CatalogBadge
 ): BadgeValue[] {
+  // Load media index once so computed badges (like hasVideo) can reflect real availability
+  const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    loadExerciseMedia().then(idx => { if (mounted) setMediaIndex(idx); }).catch(() => { if (mounted) setMediaIndex({} as ExerciseMediaIndex); });
+    return () => { mounted = false; };
+  }, []);
   // Compile regex once and reuse (cost control for extractPattern)
   // Only recompile if badge changes
   const compiledRegex = useMemo(() => {
@@ -55,7 +64,7 @@ export function useBadgeValues(
 
     // Handle computed badges (read-only, derived from other data)
     if (badge.computed) {
-      return computeBadgeValues(exercises, catalogId, badge);
+      return computeBadgeValues(exercises, catalogId, badge, mediaIndex);
     }
 
     // Discover values from tags
@@ -111,7 +120,8 @@ export function useBadgeValues(
 function computeBadgeValues(
   exercises: Exercise[],
   catalogId: string,
-  badge: CatalogBadge
+  badge: CatalogBadge,
+  mediaIndex: ExerciseMediaIndex | null
 ): BadgeValue[] {
   const values = new Set<string>();
 
@@ -121,8 +131,8 @@ function computeBadgeValues(
     // Handle different computed badge types
     switch (badge.id) {
       case 'hasVideo':
-        // Derived from has_video or custom_video_url fields
-        if (exercise.has_video || exercise.custom_video_url) {
+        // Derived from real availability: custom_video_url OR media index entry (R2/legacy)
+        if (exercise.custom_video_url || (mediaIndex && !!mediaIndex[exercise.id])) {
           values.add('yes');
         } else {
           values.add('no');

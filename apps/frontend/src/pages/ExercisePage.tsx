@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: page already uses t() for user-visible text; remaining literals are units, icons, or fallback defaults */
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Exercise, ExerciseCategory, AppSettings } from '../types';
+import type { Exercise, ExerciseCategory, AppSettings, CatalogMembership } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
 import { 
@@ -28,7 +28,6 @@ import type { AuthUserProfile } from '../types';
 import { localizeExercise } from '../utils/localizeExercise';
 import getVideoSources from '../utils/videoSources';
 import { VideoThumbnail } from '../components/VideoThumbnail';
-import { ExercisePlaceholder } from '../components/ExercisePlaceholder';
 import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useSnackbar } from '../components/SnackbarProvider';
 import { recordVideoLoadError } from '../telemetry/videoTelemetry';
@@ -37,8 +36,10 @@ import { ShareButton } from '../components/ShareButton';
 import CatalogSelector from '../components/CatalogSelector';
 import BadgeFilterGroup from '../components/BadgeFilterGroup';
 import { EXERCISE_CATALOGS } from '../data/catalogs';
+import { storageService } from '../services/storageService';
 import { useExerciseFilter } from '../hooks/useExerciseFilter';
 import { getCatalogBadges, getExerciseBadgeValues } from '../utils/catalogBadges';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 
 interface ExercisePageProps {
   exercises: Exercise[];
@@ -54,6 +55,18 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
   const { isSharedExercise } = useSharedExercises();
+
+  // Bulk load all exercise memberships to prevent N+1 query problem
+  const [exerciseMemberships, setExerciseMemberships] = useState<Map<string, CatalogMembership[]>>(new Map());
+  
+  useEffect(() => {
+    const loadMemberships = async () => {
+      const exerciseIds = exercises.map(ex => ex.id);
+      const memberships = await storageService.getAllExerciseMemberships(exerciseIds);
+      setExerciseMemberships(memberships);
+    };
+    loadMemberships();
+  }, [exercises]);
 
   // Use the centralized exercise filter hook with badge support
   const {
@@ -650,6 +663,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                                 onNavigateToExercise={handleNavigateToExercise}
                                 currentUser={user}
                                 isSharedExercise={isSharedExercise}
+                                memberships={exerciseMemberships.get(exercise.id) || []}
                               />
                             </div>
                           ))}
@@ -692,6 +706,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                           onNavigateToExercise={handleNavigateToExercise}
                           currentUser={user}
                           isSharedExercise={isSharedExercise}
+                          memberships={exerciseMemberships.get(exercise.id) || []}
                         />
                       ))}
                     </div>
@@ -717,6 +732,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 onNavigateToExercise={handleNavigateToExercise}
                 currentUser={user}
                 isSharedExercise={isSharedExercise}
+                memberships={exerciseMemberships.get(exercise.id) || []}
               />
             ))}
           </div>
@@ -744,7 +760,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
     </div>
     {/* Preview Modal */}
     {previewOpen && (
-      <div className="fixed inset-0 z-[100]" aria-hidden={!previewOpen}>
+      <div className="fixed inset-0 z-[100]">
         <div
           className="absolute inset-0 bg-black/50"
           onClick={closePreview}
@@ -842,6 +858,7 @@ interface ExerciseCardProps {
   onNavigateToExercise: (exerciseId: string) => void;
   currentUser?: AuthUserProfile; // User from auth hook
   isSharedExercise: (exerciseId: string) => boolean; // Function to check if exercise is shared
+  memberships?: CatalogMembership[]; // Pre-loaded memberships to prevent N+1 queries
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({
@@ -853,10 +870,28 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   onDelete,
   onNavigateToExercise,
   currentUser,
-  isSharedExercise
+  isSharedExercise,
+  memberships
 }) => {
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const loc = localizeExercise(exercise, t);
+  
+  // Use pre-loaded memberships to determine catalog IDs (prevents N+1 query problem)
+  const catalogIds = useMemo(() => {
+    if (memberships && memberships.length > 0) {
+      return Array.from(new Set(memberships.map(m => m.catalog_id)));
+    }
+    return exercise.catalogId ? [exercise.catalogId] : [];
+  }, [memberships, exercise.catalogId]);
+  
+  // Lazy load video thumbnails using intersection observer
+  // Note: freezeOnceVisible=true is safe because VideoCacheService persists blob URLs
+  // The async cleanup (isMounted flag) in VideoThumbnail prevents race conditions
+  const { ref: cardRef, isIntersecting } = useIntersectionObserver<HTMLDivElement>({
+    threshold: 0,
+    rootMargin: '300px', // Start loading 300px before visible
+    freezeOnceVisible: true // Optimization: once visible, stay visible (blob URLs persist)
+  });
   
   // Check if the exercise is user-created and belongs to the current user
   // Built-in exercises have slug IDs (like 'plank'), user-created have UUID IDs
@@ -873,7 +908,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const isSharedExerciseCard = isSharedExercise(exercise.id);
 
   return (
-    <div className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+    <div 
+      ref={cardRef}
+      className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
       isUserCreated
         ? 'exercise-card-custom'
         : 'border border-surface-200 dark:border-surface-700'
@@ -884,22 +921,55 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         <div className="mb-1">
           <div className="flex items-start justify-between gap-3">
             {/* Left Side - Exercise Details and Tags - Allow wrapping */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 flex-1 min-w-0">
+            <div className="flex flex-col gap-y-1 flex-1 min-w-0">
               {/* Exercise Details - Left-aligned */}
               <span className="text-sm font-medium text-text-800 dark:text-text-100">
                 {formatSimplifiedDetails(exercise)}
               </span>
-              {/* Custom/Shared Tags */}
-              {isUserCreated && (
-                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium exercise-custom-badge rounded-full whitespace-nowrap">
-                  {t('exercises:custom', { defaultValue: 'Custom' })}
-                </span>
-              )}
-              {currentUser && isSharedExerciseCard && (
-                <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full whitespace-nowrap">
-                  {t('exercises:shared', { defaultValue: 'Shared' })}
-                </span>
-              )}
+              
+              {/* Category Badges Section - Fixed 2 lines with overflow indicator */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 h-[3rem] overflow-hidden relative">
+                {/* Custom/Shared Tags */}
+                {isUserCreated && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium exercise-custom-badge rounded-full whitespace-nowrap">
+                    {t('exercises:custom', { defaultValue: 'Custom' })}
+                  </span>
+                )}
+                {currentUser && isSharedExerciseCard && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full whitespace-nowrap">
+                    {t('exercises:shared', { defaultValue: 'Shared' })}
+                  </span>
+                )}
+                {/* Catalog badges (multi-catalog) */}
+                {(() => {
+                  const MAX_VISIBLE_BADGES = 3;
+                  const visibleCatalogIds = catalogIds.slice(0, MAX_VISIBLE_BADGES);
+                  const hiddenCount = catalogIds.length - MAX_VISIBLE_BADGES;
+                  
+                  return (
+                    <>
+                      {visibleCatalogIds.map(cid => {
+                        const catalog = EXERCISE_CATALOGS.find(c => c.id === cid);
+                        const label = catalog ? t(catalog.nameKey, { ns: 'catalogs', defaultValue: cid }) : cid;
+                        return (
+                          <span
+                            key={cid}
+                            className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 whitespace-nowrap"
+                            aria-label={t('exercises:catalogBadgeAria', { catalog: label, defaultValue: `Catalog: ${label}` })}
+                          >
+                            {label}
+                          </span>
+                        );
+                      })}
+                      {hiddenCount > 0 && (
+                        <span className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full bg-surface-200 dark:bg-surface-600 text-text-700 dark:text-text-200 whitespace-nowrap">
+                          +{hiddenCount}
+                        </span>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
             </div>
 
             {/* Right Side - Action Buttons */}
@@ -962,10 +1032,40 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             {loc.name}
           </button>
         </div>
+        {/* Base tags preview - Fixed 2 lines with overflow indicator */}
+        {Array.isArray((exercise as Exercise & { base_tags?: string[] }).base_tags) && (exercise as Exercise & { base_tags?: string[] }).base_tags!.length > 0 ? (
+          <div className="mb-2 h-[3rem] overflow-hidden relative" aria-label={t('exercises:baseTagsPreview', { defaultValue: 'Base tags' })}>
+            <div className="flex flex-wrap gap-1">
+              {(() => {
+                const baseTags = (exercise as Exercise & { base_tags?: string[] }).base_tags!;
+                const MAX_VISIBLE_TAGS = 6;
+                const visibleTags = baseTags.slice(0, MAX_VISIBLE_TAGS);
+                const hiddenCount = baseTags.length - MAX_VISIBLE_TAGS;
+                
+                return (
+                  <>
+                    {visibleTags.map((tag: string) => (
+                      <span key={tag} className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-100 dark:bg-surface-700 text-text-700 dark:text-text-200 rounded whitespace-nowrap">
+                        {tag}
+                      </span>
+                    ))}
+                    {hiddenCount > 0 && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-medium bg-surface-200 dark:bg-surface-600 text-text-700 dark:text-text-200 rounded whitespace-nowrap">
+                        +{hiddenCount}
+                      </span>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        ) : (
+          <div className="mb-2 h-[3rem]" aria-hidden="true" />
+        )}
 
-        {/* Video/Image Area */}
+        {/* Video/Image Area - Lazy loaded when visible */}
         <div className="mb-2">
-          {(exercise.has_video || exercise.custom_video_url) ? (
+          {isIntersecting ? (
             <VideoThumbnail
               exercise={exercise}
               onVideoLoad={() => {}}
@@ -973,7 +1073,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               className="w-full aspect-square"
             />
           ) : (
-            <ExercisePlaceholder size="md" />
+            // Lightweight placeholder while off-screen
+            <div className="w-full aspect-square bg-surface-100 dark:bg-surface-700 rounded-lg animate-pulse" />
           )}
         </div>
 
