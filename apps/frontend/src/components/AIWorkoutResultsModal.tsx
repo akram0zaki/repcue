@@ -5,6 +5,7 @@
  * Shows list of workouts with details and action buttons.
  */
 
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { GeneratedWorkout } from '../types/aiWorkout';
@@ -38,6 +39,43 @@ export default function AIWorkoutResultsModal({
 }: AIWorkoutResultsModalProps) {
   const { t } = useTranslation('aiWorkout');
   const navigate = useNavigate();
+
+  // Prevent body scroll when modal is open (iOS Safari fix)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Save current scroll position and body styles
+    const scrollY = window.scrollY;
+    const originalStyles = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+    };
+
+    // Lock body scroll - this combination works on iOS Safari
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+
+    return () => {
+      // Restore original styles
+      document.body.style.overflow = originalStyles.overflow;
+      document.body.style.position = originalStyles.position;
+      document.body.style.top = originalStyles.top;
+      document.body.style.left = originalStyles.left;
+      document.body.style.right = originalStyles.right;
+      document.body.style.width = originalStyles.width;
+      
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
@@ -179,7 +217,7 @@ export default function AIWorkoutResultsModal({
         )}
 
         {/* Workouts list */}
-        <div className="p-6 max-h-96 overflow-y-auto">
+        <div className="p-6 max-h-96 overflow-y-auto overscroll-contain">
           <div className="space-y-4">
             {workouts.map((workout) => (
               <div
