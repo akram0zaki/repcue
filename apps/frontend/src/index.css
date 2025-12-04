@@ -1,6 +1,9 @@
 /* Import design tokens */
 @import './styles/tokens.css';
 
+/* Import platform-specific component styles */
+@import './styles/platform.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

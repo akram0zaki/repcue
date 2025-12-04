@@ -1,5 +1,45 @@
 ## Unreleased
 
+### 2025-12-05
+
+#### 🏗️ Feature - Platform Abstraction Layer for iOS/Android/Web
+
+**Added**: Cross-platform UI components that automatically adapt to iOS, Android, or Web
+
+**Purpose**: Single codebase that renders platform-native experiences - iOS gets iOS-style UI, Android gets Material design, Web gets browser-appropriate styling. This replaces the previous iOS-only component approach.
+
+**New Components**:
+- `PlatformContext.tsx` - React context providing platform detection throughout the app
+- `PlatformSpinner.tsx` - Adaptive spinner (8-segment iOS style, Material circle for Android, CSS spinner for web)
+- `PlatformModal.tsx` - Sheet-style modal on mobile (slides from bottom), centered overlay on web
+- `PlatformConfirmDialog.tsx` - Styled confirmation dialog for web platforms
+- `PlatformConfirmationModal.tsx` - Drop-in replacement using native dialogs on iOS/Android
+
+**New Hooks**:
+- `usePlatform()` - Access platform detection (isNative, isIOS, isAndroid, isWeb, platform)
+- `usePlatformClasses()` - Utility for conditional platform-specific CSS classes
+- `usePlatformConfirm()` - Imperative confirmation dialogs with native support
+
+**Platform-Specific Features**:
+- **iOS**: Native dialogs via Capacitor, 8-segment activity indicator, sheet modals with safe areas
+- **Android**: Native dialogs via Capacitor, Material Design circular progress, elevated sheets
+- **Web**: Styled modal dialogs, CSS-based spinners, backdrop blur effects
+
+**CSS Additions** (`platform.css`):
+- Platform-specific keyframe animations
+- Safe area padding utilities
+- Touch action optimizations for mobile
+
+**Backward Compatibility**:
+- Existing `ConfirmationModal` component now wraps `PlatformConfirmationModal`
+- No changes required to existing code using ConfirmationModal
+
+**Tests**: 29 unit tests for platform components (all passing)
+
+**Documentation**: Updated [iOS App Implementation Plan](docs/implementation-plans/ios-app/ios-app-implementation-plan.md)
+
+---
+
 ### 2025-12-04
 
 #### 📱 Feature - iOS App (Capacitor Integration)
