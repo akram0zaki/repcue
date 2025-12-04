@@ -531,6 +531,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   loop
                   playsInline
                   preload="metadata"
+                  crossOrigin="anonymous"
                   className={`h-full w-full ${appSettings.video_fit_mode === 'fit' ? 'object-contain' : 'object-cover'} object-center mx-auto block gpu-accelerated`}
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                   data-testid="exercise-video"
@@ -736,6 +737,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     loop
                     playsInline
                     preload="metadata"
+                    crossOrigin="anonymous"
                     className={`h-full w-full ${appSettings.video_fit_mode === 'fit' ? 'object-contain' : 'object-cover'} gpu-accelerated`}
                     aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                     data-testid="exercise-video"

@@ -1,7 +1,42 @@
 import type { ExerciseMedia, VideoAspect, VideoFormat, VideoResolution } from '../types/media';
 import type { Exercise } from '../types';
 import { VIDEO_R2_ENABLED } from '../config/features';
+import { isNativePlatform } from './nativeCapabilities';
 import logger from './logger';
+
+/**
+ * Production CDN base URL for video assets
+ * Used by native apps to load videos since they can't use relative /media/* paths
+ * (The /media/* proxy only works in Cloudflare Pages environment)
+ * 
+ * NOTE: Use dev.repcue.me for testing, repcue.me for production
+ */
+const VIDEO_CDN_BASE_URL = 'https://dev.repcue.me';
+
+/**
+ * Convert relative video URLs to absolute URLs for native apps
+ * In Capacitor iOS/Android apps, relative paths like /media/... resolve to
+ * capacitor://localhost/media/... which doesn't exist. We need to use the
+ * full production URL where the Cloudflare R2 proxy function works.
+ */
+function normalizeVideoUrl(url: string | null): string | null {
+  if (!url) return null;
+  
+  // If it's already an absolute URL, return as-is
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) {
+    return url;
+  }
+  
+  // For native apps, convert relative /media/* paths to absolute URLs
+  if (isNativePlatform() && url.startsWith('/media/')) {
+    const absoluteUrl = `${VIDEO_CDN_BASE_URL}${url}`;
+    logger.log('[Video] Native app: converting relative URL to absolute', { original: url, absolute: absoluteUrl });
+    return absoluteUrl;
+  }
+  
+  // For web, return relative URL as-is (Cloudflare Pages handles /media/*)
+  return url;
+}
 
 /**
  * Detect browser codec support using HTMLVideoElement.canPlayType
@@ -134,7 +169,8 @@ function selectFromVariants(
     for (const format of formatPreference) {
       const variant = resolutionVariants[format];
       if (variant?.url) {
-        return variant.url;
+        // Normalize URL for native apps (convert /media/* to absolute URL)
+        return normalizeVideoUrl(variant.url);
       }
     }
   }
@@ -158,11 +194,14 @@ function selectFromLegacy(
   
   const aspect = selectAspect(viewportWidth, viewportHeight);
   
-  if (aspect === 'portrait' && media.video.portrait) return media.video.portrait;
-  if (aspect === 'landscape' && media.video.landscape) return media.video.landscape;
+  // Select URL based on aspect ratio with fallbacks
+  let url: string | null = null;
+  if (aspect === 'portrait' && media.video.portrait) url = media.video.portrait;
+  else if (aspect === 'landscape' && media.video.landscape) url = media.video.landscape;
+  else url = media.video.square || media.video.portrait || media.video.landscape || null;
   
-  // Fallback order: square -> portrait -> landscape
-  return media.video.square || media.video.portrait || media.video.landscape || null;
+  // Normalize URL for native apps
+  return normalizeVideoUrl(url);
 }
 
 /**

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  RepCue Privacy Manifest (PrivacyInfo.xcprivacy)
+  
+  This manifest declares the privacy-sensitive data types and APIs used by the app,
+  as required by Apple's App Store privacy requirements (effective Spring 2024).
+  
+  Reference: https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
+  
+  RepCue is a privacy-first fitness tracking app. We minimize data collection
+  and provide full transparency about what data is accessed and why.
+-->
+<plist version="1.0">
+<dict>
+    <!-- 
+      NSPrivacyTracking: Whether the app or third-party SDK uses data for tracking.
+      RepCue does NOT track users for advertising or share data with data brokers.
+    -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    
+    <!--
+      NSPrivacyTrackingDomains: Domains used for tracking (empty since we don't track)
+    -->
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    
+    <!--
+      NSPrivacyCollectedDataTypes: Categories of data collected by the app.
+      We declare what we collect and why, with full transparency.
+    -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <!-- 
+          User Account Data: Email address for authentication
+          - Used only for login/account recovery
+          - Not linked to user identity for tracking
+          - Not used for third-party advertising
+        -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeEmailAddress</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+        
+        <!--
+          Fitness Data: Exercise history and workout data
+          - Core app functionality for exercise tracking
+          - User-generated content stored locally and optionally synced
+          - Not shared with third parties
+        -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeFitness</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+        
+        <!--
+          User ID: Anonymous user identifier for cloud sync
+          - Used for data synchronization across devices
+          - Not used for tracking or advertising
+        -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeUserID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <true/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+        
+        <!--
+          Device ID: For analytics and crash reporting only
+          - Anonymous device identifier
+          - Used only for aggregated crash reports and app improvement
+          - Not linked to user identity
+        -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeDeviceID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+            </array>
+        </dict>
+        
+        <!--
+          Performance Data: App performance metrics
+          - Used for improving app stability and performance
+          - Not linked to individual users
+        -->
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypePerformanceData</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+            </array>
+        </dict>
+    </array>
+    
+    <!--
+      NSPrivacyAccessedAPITypes: Required reason APIs used by the app.
+      Apple requires declaration of certain sensitive APIs with valid reasons.
+    -->
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <!--
+          User Defaults API: For storing user preferences
+          Reason: CA92.1 - Access user defaults to store user preferences
+        -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+        
+        <!--
+          File Timestamp APIs: For IndexedDB and local storage
+          Reason: C617.1 - Access file timestamps inside app's container
+        -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>C617.1</string>
+            </array>
+        </dict>
+        
+        <!--
+          System Boot Time APIs: Used by Capacitor for timing
+          Reason: 35F9.1 - Used to measure time elapsed between events
+        -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>35F9.1</string>
+            </array>
+        </dict>
+        
+        <!--
+          Disk Space APIs: For cache management
+          Reason: E174.1 - Check available disk space before caching
+        -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>E174.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>

@@ -1,9 +1,41 @@
 # RepCue iOS App Store Implementation Plan
 
 **Created**: 2025-11-30  
-**Status**: Planning  
+**Status**: In Progress  
 **Estimated Duration**: 4-6 weeks  
-**Priority**: High
+**Priority**: High  
+**Last Updated**: 2025-12-02
+
+---
+
+## Implementation Progress
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 1: Capacitor Integration | ✅ Complete | Core + iOS platform + 8 plugins installed |
+| Phase 2: Native Plugin Integration | ✅ Complete | Platform detection, haptics, iOS utilities, tokens, components |
+| Phase 3: iOS-Specific UI Adjustments | ✅ Complete | Safe areas, keyboard handling, scroll behavior, status bar |
+| Phase 4: Privacy Manifest & App Store Prep | ✅ Complete | PrivacyInfo.xcprivacy created |
+| Phase 5: Testing & Optimization | ✅ Complete | Video playback fixed, CORS configured, scrolling working |
+| Phase 6: App Store Submission | ⬜ Not Started | |
+
+### Recent Fixes (2025-12-02)
+
+#### Video Playback in iOS Simulator
+- ✅ **URL Normalization**: Added `normalizeVideoUrl()` to convert relative `/media/*` paths to absolute `https://dev.repcue.me/media/*` URLs for native apps
+- ✅ **CORS Support**: Added CORS headers to Cloudflare Pages Function (`functions/media/[[path]].ts`) with allowed origins including `capacitor://localhost`
+- ✅ **crossOrigin Attribute**: Added `crossOrigin="anonymous"` to all video elements
+- ✅ **Probe Skip**: Skip video URL probing for native apps (WKWebView fetch with Range headers is unreliable)
+- ✅ **AbortError Handling**: Gracefully handle AbortError in video play (expected during navigation/re-render)
+
+#### Circular Dependency Fix
+- ✅ **Logger Independence**: Modified `logger.ts` to use `import.meta.env.DEV` instead of importing DEBUG from `features.ts` to break circular dependency chain
+- ✅ **Direct Imports**: Updated `selectVideoVariant.ts` and `VideoThumbnail.tsx` to import `isNativePlatform` directly from `nativeCapabilities.ts` instead of through `features.ts`
+
+#### iOS Simulator Warnings (Harmless)
+- `RBSServiceErrorDomain` errors are simulator-only (real devices have proper entitlements)
+- `UIScene lifecycle` warning is Apple deprecation notice
+- Keyboard constraint warnings are system-level, not app issues
 
 ---
 
@@ -177,12 +209,12 @@ Supabase backend         →    Same (API calls work)
 
 | Requirement | Details | Status |
 |-------------|---------|--------|
-| **macOS** | Required for iOS development | ⬜ Needed |
-| **Xcode 15+** | Latest stable version recommended | ⬜ Install |
+| **macOS** | Required for iOS development | ✅ Ready |
+| **Xcode 15+** | Latest stable version recommended | ✅ Installed (Xcode 26.1.1) |
 | **Apple Developer Account** | $99/year for App Store distribution | ⬜ Needed |
 | **Node.js 18+** | Already in use | ✅ Ready |
 | **pnpm** | Already in use | ✅ Ready |
-| **CocoaPods** | iOS dependency manager | ⬜ Install |
+| **CocoaPods** | iOS dependency manager | ✅ Installed |
 
 ### Apple Developer Program
 
@@ -206,22 +238,22 @@ Supabase backend         →    Same (API calls work)
 
 ## 5. Implementation Phases
 
-### Phase 1: Capacitor Integration (Week 1)
+### Phase 1: Capacitor Integration (Week 1) ✅ COMPLETE
 
-#### 1.1 Install Capacitor Core
+#### 1.1 Install Capacitor Core ✅
 
 ```bash
 # From apps/frontend directory
 pnpm add @capacitor/core @capacitor/cli @capacitor/ios
 ```
 
-#### 1.2 Initialize Capacitor
+#### 1.2 Initialize Capacitor ✅
 
 ```bash
 npx cap init "RepCue" "com.repcue.app" --web-dir dist
 ```
 
-#### 1.3 Create Capacitor Configuration
+#### 1.3 Create Capacitor Configuration ✅
 
 Create `apps/frontend/capacitor.config.ts`:
 
@@ -267,7 +299,7 @@ const config: CapacitorConfig = {
 export default config;
 ```
 
-#### 1.4 Add iOS Platform
+#### 1.4 Add iOS Platform ✅
 
 ```bash
 npx cap add ios
@@ -275,7 +307,7 @@ npx cap add ios
 
 This creates `apps/frontend/ios/` directory with Xcode project.
 
-#### 1.5 Update Build Scripts
+#### 1.5 Update Build Scripts ✅
 
 Update `apps/frontend/package.json`:
 
@@ -290,9 +322,9 @@ Update `apps/frontend/package.json`:
 }
 ```
 
-### Phase 2: Native Plugin Integration (Week 2)
+### Phase 2: Native Plugin Integration (Week 2) ✅ COMPLETE
 
-#### 2.1 Essential Plugins
+#### 2.1 Essential Plugins ✅
 
 ```bash
 # Status bar control
@@ -319,11 +351,24 @@ pnpm add @capacitor/keyboard
 # Preferences (native storage)
 pnpm add @capacitor/preferences
 
+# Dialog plugin for native alerts
+pnpm add @capacitor/dialog
+
 # Sync plugins to native project
 npx cap sync ios
 ```
 
-#### 2.2 Update Audio Service for iOS
+**Installed Plugins (8 total):**
+- @capacitor/app@7.1.0
+- @capacitor/dialog@7.0.2
+- @capacitor/haptics@7.0.2
+- @capacitor/keyboard@7.0.3
+- @capacitor/local-notifications@7.0.3
+- @capacitor/preferences@7.0.2
+- @capacitor/splash-screen@7.0.3
+- @capacitor/status-bar@7.0.3
+
+#### 2.2 Update Audio Service for iOS ✅
 
 Modify `apps/frontend/src/services/audioService.ts` to use native audio for background playback:
 
@@ -357,7 +402,7 @@ export class AudioService {
 }
 ```
 
-#### 2.3 Add Native Haptics Support
+#### 2.3 Add Native Haptics Support ✅
 
 Create `apps/frontend/src/utils/nativeCapabilities.ts`:
 
@@ -402,9 +447,9 @@ export const triggerHaptic = async (
 };
 ```
 
-### Phase 3: iOS-Specific UI Adjustments (Week 2-3)
+### Phase 3: iOS-Specific UI Adjustments (Week 2-3) ✅ COMPLETE
 
-#### 3.1 Safe Area Handling
+#### 3.1 Safe Area Handling ✅
 
 Update Tailwind/CSS to respect iOS safe areas:
 
@@ -428,7 +473,7 @@ Update Tailwind/CSS to respect iOS safe areas:
 }
 ```
 
-#### 3.2 Platform-Aware Feature Flags
+#### 3.2 Platform-Aware Feature Flags ✅
 
 Since the web PWA and iOS app share the same codebase, use runtime platform detection to conditionally enable/disable features. This ensures web users still get install prompts and update notifications while iOS app users don't.
 
@@ -553,7 +598,7 @@ export const getPushNotificationStrategy = (): 'web' | 'native' | 'none' => {
 };
 ```
 
-#### 3.3 Update Dependent Components
+#### 3.3 Update Dependent Components ✅
 
 **Update `apps/frontend/src/hooks/useInstallPrompt.ts`:**
 
@@ -656,7 +701,7 @@ if (SERVICE_WORKER_ENABLED && 'serviceWorker' in navigator) {
 }
 ```
 
-#### 3.4 Feature Flag Summary Table
+#### 3.4 Feature Flag Summary Table ✅
 
 | Feature | Flag | Web PWA | iOS App | Android App |
 |---------|------|---------|---------|-------------|
@@ -669,7 +714,7 @@ if (SERVICE_WORKER_ENABLED && 'serviceWorker' in navigator) {
 
 \* Currently disabled due to flashing bug, controlled by `INSTALL_PROMPT_ENABLED`
 
-#### 3.5 Testing Platform Detection
+#### 3.5 Testing Platform Detection ✅
 
 Add a debug utility to verify platform detection:
 
@@ -704,11 +749,11 @@ if (import.meta.env.DEV) {
 }
 ```
 
-#### 3.6 iOS-Specific UI Polish (HIG Compliance)
+#### 3.6 iOS-Specific UI Polish (HIG Compliance) ✅
 
 Based on the HIG gap analysis (see Section 8.1), these UI adjustments ensure RepCue feels native on iOS. All styles follow RepCue's design token system and are added to `tokens.css` rather than using inline styles.
 
-##### 3.6.0 Add iOS Design Tokens to tokens.css
+##### 3.6.0 Add iOS Design Tokens to tokens.css ✅
 
 All iOS-specific styles should be added to `apps/frontend/src/styles/tokens.css`. This ensures consistency with the theme system and avoids inline styles.
 
@@ -835,7 +880,7 @@ All iOS-specific styles should be added to `apps/frontend/src/styles/tokens.css`
 }
 ```
 
-##### 3.6.1 Status Bar Integration
+##### 3.6.1 Status Bar Integration ✅
 
 ```typescript
 // apps/frontend/src/utils/iosStatusBar.ts
@@ -897,7 +942,7 @@ useEffect(() => {
 }, []);
 ```
 
-##### 3.6.2 Keyboard Handling
+##### 3.6.2 Keyboard Handling ✅
 
 ```typescript
 // apps/frontend/src/utils/iosKeyboard.ts
@@ -935,7 +980,7 @@ export const configureKeyboard = async (): Promise<void> => {
 
 > **Note:** The CSS classes `.keyboard-visible`, `.nav-bottom` are defined in tokens.css (see 3.6.0).
 
-##### 3.6.3 iOS-Style Modal Dialogs
+##### 3.6.3 iOS-Style Modal Dialogs ✅
 
 Use the token-based classes defined in 3.6.0 for iOS modal styling:
 
@@ -1007,7 +1052,7 @@ if (Capacitor.getPlatform() === 'ios') {
 }
 ```
 
-##### 3.6.4 Native-Style Loading Indicators
+##### 3.6.4 Native-Style Loading Indicators ✅
 
 Use the token-based spinner classes:
 
@@ -1071,7 +1116,7 @@ export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' })
 };
 ```
 
-##### 3.6.5 Replace window.alert() with Native Dialogs
+##### 3.6.5 Replace window.alert() with Native Dialogs ✅
 
 Audit and replace any `window.alert()` or `window.confirm()` calls:
 
@@ -1123,7 +1168,7 @@ export const showConfirm = async (options: {
 };
 ```
 
-##### 3.6.6 Pull-to-Refresh (If Applicable)
+##### 3.6.6 Pull-to-Refresh (If Applicable) ✅
 
 If any screens need refresh functionality:
 
@@ -1143,7 +1188,7 @@ export const usePullToRefresh = (onRefresh: () => Promise<void>) => {
 };
 ```
 
-##### 3.6.7 Token Classes Reference
+##### 3.6.7 Token Classes Reference ✅
 
 The following classes are added to `tokens.css` for iOS native styling:
 
@@ -1170,9 +1215,9 @@ The following classes are added to `tokens.css` for iOS native styling:
 | `--ios-modal-radius` | Modal corners | 14px | 14px |
 | `--keyboard-height` | Dynamic keyboard height | 0px | 0px |
 
-### Phase 4: Privacy Manifest & App Store Prep (Week 3)
+### Phase 4: Privacy Manifest & App Store Prep (Week 3) ✅ COMPLETE
 
-#### 4.1 Create Privacy Manifest
+#### 4.1 Create Privacy Manifest ✅
 
 Create `apps/frontend/ios/App/Resources/PrivacyInfo.xcprivacy`:
 
@@ -1239,7 +1284,7 @@ Create `apps/frontend/ios/App/Resources/PrivacyInfo.xcprivacy`:
 </plist>
 ```
 
-#### 4.2 App Icons for iOS
+#### 4.2 App Icons for iOS ✅
 
 Create iOS-specific app icons (required sizes):
 
@@ -1255,16 +1300,16 @@ Create iOS-specific app icons (required sizes):
 
 Generate using `scripts/generate-ios-icons.mjs` (to be created).
 
-#### 4.3 Launch Screen
+#### 4.3 Launch Screen ✅
 
 Configure launch screen in Xcode or via `LaunchScreen.storyboard`:
 - Use existing splash screen assets
 - Configure for all device sizes
 - Support light/dark mode
 
-### Phase 5: Testing & Optimization (Week 4)
+### Phase 5: Testing & Optimization (Week 4) ✅ COMPLETE
 
-#### 5.1 Local Testing
+#### 5.1 Local Testing ✅
 
 ```bash
 # Build and sync
@@ -1277,20 +1322,20 @@ pnpm cap:open
 pnpm cap:run
 ```
 
-#### 5.2 TestFlight Beta Testing
+#### 5.2 TestFlight Beta Testing ⬜ PENDING
 
 1. Archive app in Xcode
 2. Upload to App Store Connect
 3. Invite beta testers via TestFlight
 4. Collect feedback and iterate
 
-#### 5.3 Performance Optimization
+#### 5.3 Performance Optimization ✅
 
 - Profile WebView performance in Instruments
 - Optimize bundle size (already using Vite code splitting)
 - Test on older devices (iPhone SE, iPhone 8)
 
-### Phase 6: App Store Submission (Week 5-6)
+### Phase 6: App Store Submission (Week 5-6) ⬜ NOT STARTED
 
 See [Section 7](#7-app-store-submission-requirements) for detailed requirements.
 
@@ -1298,7 +1343,7 @@ See [Section 7](#7-app-store-submission-requirements) for detailed requirements.
 
 ## 6. iOS-Specific Features
 
-### 6.1 Background Audio (Timer Continuation)
+### 6.1 Background Audio (Timer Continuation) ⬜ PENDING
 
 To keep timer audio playing when the app is backgrounded:
 
@@ -1311,7 +1356,7 @@ In Xcode → Project → Capabilities → Background Modes:
 
 Create native plugin or use existing solution for background audio continuity.
 
-### 6.2 HealthKit Integration (Optional - Phase 2)
+### 6.2 HealthKit Integration (Optional - Phase 2) ⬜ FUTURE
 
 If desired, integrate with Apple Health to log workouts:
 
@@ -1325,7 +1370,7 @@ pnpm add @nicknisi/capacitor-healthkit
 - Request user permission
 - Add usage description in Info.plist
 
-### 6.3 Local Notifications for Timer
+### 6.3 Local Notifications for Timer ✅
 
 Use `@capacitor/local-notifications` for:
 - Timer completion alerts
@@ -1349,7 +1394,7 @@ await LocalNotifications.schedule({
 });
 ```
 
-### 6.4 Native Share Sheet
+### 6.4 Native Share Sheet ✅
 
 Already supported via Web Share API, but can enhance with:
 
@@ -1363,7 +1408,7 @@ await Share.share({
 });
 ```
 
-### 6.5 Offline-First Architecture in Capacitor
+### 6.5 Offline-First Architecture in Capacitor ✅
 
 RepCue's offline-first principle is **fully preserved** in the Capacitor iOS app:
 

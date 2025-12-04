@@ -1,5 +1,60 @@
 ## Unreleased
 
+### 2025-12-04
+
+#### 📱 Feature - iOS App (Capacitor Integration)
+
+**Added**: Native iOS app wrapper using Capacitor for App Store distribution
+
+**Approach**: Hybrid architecture wrapping the existing React PWA in a native iOS container via Capacitor 7.4.4, sharing 99% of code between web and iOS.
+
+**Phases Completed**:
+- ✅ **Phase 1**: Capacitor Integration - Core setup, iOS platform, 8 native plugins
+- ✅ **Phase 2**: Native Plugin Integration - Platform detection, haptics, iOS utilities
+- ✅ **Phase 3**: iOS-Specific UI Adjustments - Safe areas, keyboard handling, status bar
+- ✅ **Phase 4**: Privacy Manifest & App Store Prep - PrivacyInfo.xcprivacy created
+- ✅ **Phase 5**: Testing & Optimization - Video playback, CORS, scrolling fixes
+
+**Capacitor Plugins Installed (8)**:
+- @capacitor/app (lifecycle, back button)
+- @capacitor/dialog (native alerts/confirms)
+- @capacitor/haptics (haptic feedback)
+- @capacitor/keyboard (keyboard events)
+- @capacitor/local-notifications (timer alerts)
+- @capacitor/preferences (native storage)
+- @capacitor/splash-screen (launch screen)
+- @capacitor/status-bar (status bar styling)
+
+**New Utility Modules**:
+- `nativeCapabilities.ts` - Platform detection (`isNativePlatform()`, `isIOS()`) + haptic feedback
+- `nativeDialog.ts` - Native iOS-style alerts and confirms
+- `iosStatusBar.ts` - Status bar theming
+- `iosKeyboard.ts` - Keyboard handling
+
+**Video Playback Fixes for iOS**:
+- URL normalization for native apps (convert relative `/media/*` to absolute URLs)
+- CORS headers in Cloudflare Pages Function with `capacitor://localhost` origin
+- `crossOrigin="anonymous"` on all video elements
+- Probe skip for WKWebView (Range header fetch unreliable)
+- AbortError graceful handling during navigation
+
+**Circular Dependency Fix**:
+- Modified `logger.ts` to use `import.meta.env.DEV` instead of importing from `features.ts`
+- Updated `selectVideoVariant.ts` and `VideoThumbnail.tsx` for direct imports
+
+**Privacy Manifest** (`PrivacyInfo.xcprivacy`):
+- No tracking declared
+- Collected data: Email, fitness data, user ID (app functionality only)
+- API usage: UserDefaults, file timestamps, boot time, disk space
+
+**Documentation**:
+- [iOS App Developer Guide](docs/ios-app.md) - Build, run, debug, troubleshoot, App Store submission
+- [iOS Implementation Plan](docs/implementation-plans/ios-app/ios-app-implementation-plan.md) - Detailed phases
+
+**Remaining**: Phase 6 (App Store Submission) - TestFlight beta testing, then production release
+
+---
+
 ### 2025-12-01
 
 

@@ -7,12 +7,14 @@
  * - Path validation and sanitization (OWASP A01: Broken Access Control)
  * - Content-Type inference
  * - Error handling (404 for missing, no directory listing)
+ * - CORS support for Capacitor native apps
  * 
  * Security:
  * - Same-origin serving preserves CSP
  * - No directory enumeration
  * - Strict filename pattern validation
  * - Rate limiting via Cloudflare
+ * - CORS limited to specific origins
  */
 
 import { ReadableStream } from 'stream/web';
@@ -55,6 +57,37 @@ const CONTENT_TYPES: Record<string, string> = {
   'webm': 'video/webm',
   'mp4': 'video/mp4',
 };
+
+// Allowed CORS origins for native apps and web
+const ALLOWED_ORIGINS = [
+  'https://repcue.me',
+  'https://www.repcue.me',
+  'https://dev.repcue.me',
+  'capacitor://localhost',  // iOS Capacitor app
+  'http://localhost',       // Android Capacitor app
+  'http://localhost:5173',  // Vite dev server
+];
+
+/**
+ * Get CORS headers for the response
+ * Returns appropriate Access-Control headers for allowed origins
+ */
+function getCorsHeaders(request: Request): Record<string, string> {
+  const origin = request.headers.get('Origin');
+  
+  // Check if origin is allowed
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    return {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+      'Access-Control-Allow-Headers': 'Range, Accept, Content-Type',
+      'Access-Control-Expose-Headers': 'Content-Length, Content-Range, Accept-Ranges',
+      'Access-Control-Max-Age': '86400', // Cache preflight for 24 hours
+    };
+  }
+  
+  return {};
+}
 
 /**
  * Sanitize and validate the requested path
@@ -120,12 +153,27 @@ export const onRequest: PagesFunction<Env> = async (context: any) => {
   const url = new URL(request.url);
   const debug = env.DEBUG === 'true';
   
+  // Get CORS headers for this request
+  const corsHeaders = getCorsHeaders(request);
+  
+  // Handle CORS preflight (OPTIONS) requests
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...corsHeaders,
+        'Content-Length': '0',
+      },
+    });
+  }
+  
   // Check if R2 binding is available
   if (!env.VIDEOS) {
     console.error('[Media Proxy] R2 bucket binding "VIDEOS" is not configured');
     return new Response('Service configuration error: R2 bucket not available', { 
       status: 503,
       headers: { 
+        ...corsHeaders,
         'Cache-Control': 'no-store',
         'Content-Type': 'text/plain'
       }
@@ -143,7 +191,7 @@ export const onRequest: PagesFunction<Env> = async (context: any) => {
     }
     return new Response('Invalid path', { 
       status: 400,
-      headers: { 'Cache-Control': 'no-store' }
+      headers: { ...corsHeaders, 'Cache-Control': 'no-store' }
     });
   }
   
@@ -172,7 +220,7 @@ export const onRequest: PagesFunction<Env> = async (context: any) => {
       }
       return new Response('Not Found', { 
         status: 404,
-        headers: { 'Cache-Control': 'no-store' }
+        headers: { ...corsHeaders, 'Cache-Control': 'no-store' }
       });
     }
     
@@ -186,8 +234,9 @@ export const onRequest: PagesFunction<Env> = async (context: any) => {
     // Determine Content-Type (use R2 metadata or infer from extension)
     const contentType = object.httpMetadata?.contentType || inferContentType(usedKey);
     
-    // Prepare response headers
+    // Prepare response headers (include CORS headers)
     const headers = new Headers({
+      ...corsHeaders,
       'Content-Type': contentType,
       'Accept-Ranges': 'bytes',
       'X-Content-Type-Options': 'nosniff',
@@ -214,7 +263,7 @@ export const onRequest: PagesFunction<Env> = async (context: any) => {
       if (!partialObject) {
         return new Response('Range Not Satisfiable', { 
           status: 416,
-          headers: { 'Content-Range': `bytes */${fileSize}` }
+          headers: { ...corsHeaders, 'Content-Range': `bytes */${fileSize}` }
         });
       }
       
@@ -247,7 +296,7 @@ export const onRequest: PagesFunction<Env> = async (context: any) => {
     console.error(`[Media Proxy] Error serving ${key}:`, error);
     return new Response('Internal Server Error', { 
       status: 500,
-      headers: { 'Cache-Control': 'no-store' }
+      headers: { ...corsHeaders, 'Cache-Control': 'no-store' }
     });
   }
 };

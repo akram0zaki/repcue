@@ -6,12 +6,21 @@ import { ExercisePlaceholder } from './ExercisePlaceholder';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
+import { isNativePlatform } from '../utils/nativeCapabilities';
 import type { Exercise } from '../types';
 import type { ExerciseMedia } from '../types/media';
 import logger from '../utils/logger';
 
 // Helper: quick existence probe (first byte) to detect 404/missing objects
+// Skipped for native apps where WKWebView fetch with Range headers can be unreliable
 const probe = async (probeUrl: string): Promise<boolean> => {
+  // Skip probe for native apps - trust the resolved URLs
+  // WKWebView cross-origin fetch with Range headers is unreliable
+  if (isNativePlatform()) {
+    logger.log('🎥 [VideoThumbnail] Skipping probe for native app, trusting URL', { probeUrl });
+    return true;
+  }
+  
   try {
     const res = await fetch(probeUrl, {
       method: 'GET',
@@ -350,9 +359,20 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       video.pause();
       setIsPlaying(false);
     } else {
+      // Store ref to current video element to check if it's still the same after async play
+      const currentVideo = video;
       video.play().then(() => {
-        setIsPlaying(true);
+        // Only update state if the video element is still the same (not re-rendered)
+        if (videoRef.current === currentVideo) {
+          setIsPlaying(true);
+        }
       }).catch((error) => {
+        // AbortError is expected when video is interrupted (e.g., component re-render, user navigates away)
+        // Don't treat it as a real error
+        if (error.name === 'AbortError') {
+          logger.log('🎥 [VideoThumbnail] Play interrupted (AbortError) - this is expected during navigation/re-render');
+          return;
+        }
         logger.error('🎥 [VideoThumbnail] Video play failed:', { exerciseId: exercise.id, error });
         setHasError(true);
       });
@@ -386,6 +406,7 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
         muted
         loop // Videos will loop automatically when playing
         playsInline
+        crossOrigin="anonymous" // Required for loading videos from external CDN (repcue.me) in native apps
         // @ts-expect-error - loading attribute is valid but not in React types yet
         loading="eager" // Force immediate loading of poster images (no lazy loading)
       />

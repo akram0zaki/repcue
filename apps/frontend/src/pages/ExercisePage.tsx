@@ -797,6 +797,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   muted
                   loop
                   playsInline
+                  crossOrigin="anonymous"
                   onError={handleVideoError}
                   ref={videoRef}
                 >

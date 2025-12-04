@@ -1,4 +1,7 @@
-import { DEBUG } from '../config/features'
+// Import DEBUG directly to avoid circular dependency with features.ts
+// (features.ts -> nativeCapabilities.ts -> logger.ts -> features.ts)
+// We inline the DEBUG value here to break the cycle
+const DEBUG = import.meta.env.DEV || (typeof window !== 'undefined' && (window as Window & { __DEBUG__?: boolean }).__DEBUG__ === true);
 
 type LogFn = (...args: unknown[]) => void
 

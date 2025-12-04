@@ -347,6 +347,7 @@ export const SharedExerciseVideo: React.FC<SharedExerciseVideoProps> = ({
         muted
         loop
         playsInline
+        crossOrigin="anonymous"
       />
 
       {/* Loading State - Only show for custom videos without loaded state */}

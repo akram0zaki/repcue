@@ -1,7 +1,16 @@
 import logger from '../utils/logger'
+import { 
+  isNativePlatform, 
+  triggerHaptic, 
+  triggerNotificationHaptic, 
+  triggerImpactHaptic 
+} from '../utils/nativeCapabilities';
+
 /**
  * Audio and haptic feedback service for exercise intervals
  * Handles beeps, vibrations, and accessibility announcements
+ * 
+ * Enhanced for iOS native app with Capacitor Haptics plugin
  */
 export class AudioService {
   private static instance: AudioService;
@@ -139,19 +148,39 @@ export class AudioService {
 
   /**
    * Trigger vibration if supported
+   * Enhanced for iOS with native haptics via Capacitor
    */
   public vibrate(pattern: number | number[] = 200): void {
+    // Use native haptics on iOS for better feel
+    if (isNativePlatform()) {
+      // Convert pattern to appropriate haptic type
+      const intensity = Array.isArray(pattern) 
+        ? pattern.reduce((a, b) => a + b, 0) 
+        : pattern;
+      
+      if (intensity > 150) {
+        triggerImpactHaptic('heavy').catch(() => {});
+      } else if (intensity > 50) {
+        triggerImpactHaptic('medium').catch(() => {});
+      } else {
+        triggerImpactHaptic('light').catch(() => {});
+      }
+      return;
+    }
+
+    // Fallback to web vibration API
     if ('vibrate' in navigator) {
       try {
         navigator.vibrate(pattern);
       } catch (error) {
-  logger.warn('Vibration not supported or failed:', error);
+        logger.warn('Vibration not supported or failed:', error);
       }
     }
   }
 
   /**
    * Play interval feedback (sound + vibration)
+   * Enhanced for iOS with native haptics
    */
   public async playIntervalFeedback(soundEnabled: boolean, vibrationEnabled: boolean, volume: number = 0.45): Promise<void> {
     const promises: Promise<void>[] = [];
@@ -161,7 +190,12 @@ export class AudioService {
     }
 
     if (vibrationEnabled) {
-      this.vibrate(100); // Short vibration
+      if (isNativePlatform()) {
+        // Use native haptic for crisp feedback on iOS
+        promises.push(triggerHaptic('medium'));
+      } else {
+        this.vibrate(100); // Short vibration for web
+      }
     }
 
     await Promise.all(promises);
@@ -169,6 +203,7 @@ export class AudioService {
 
   /**
    * Play start feedback (sound + vibration)
+   * Enhanced for iOS with success haptic
    */
   public async playStartFeedback(soundEnabled: boolean, vibrationEnabled: boolean): Promise<void> {
     const promises: Promise<void>[] = [];
@@ -178,7 +213,12 @@ export class AudioService {
     }
 
     if (vibrationEnabled) {
-      this.vibrate([100, 50, 100]); // Double vibration
+      if (isNativePlatform()) {
+        // Use success haptic for workout start on iOS
+        promises.push(triggerNotificationHaptic('success'));
+      } else {
+        this.vibrate([100, 50, 100]); // Double vibration for web
+      }
     }
 
     await Promise.all(promises);
@@ -186,6 +226,7 @@ export class AudioService {
 
   /**
    * Play stop feedback (sound + vibration)
+   * Enhanced for iOS with success haptic
    */
   public async playStopFeedback(soundEnabled: boolean, vibrationEnabled: boolean): Promise<void> {
     const promises: Promise<void>[] = [];
@@ -195,7 +236,12 @@ export class AudioService {
     }
 
     if (vibrationEnabled) {
-      this.vibrate([100, 100, 100, 100, 200]); // Finish vibration pattern
+      if (isNativePlatform()) {
+        // Use success haptic for workout completion on iOS
+        promises.push(triggerNotificationHaptic('success'));
+      } else {
+        this.vibrate([100, 100, 100, 100, 200]); // Finish vibration pattern for web
+      }
     }
 
     await Promise.all(promises);
@@ -203,6 +249,7 @@ export class AudioService {
 
   /**
    * Play rest start feedback (different tone to indicate rest period)
+   * Enhanced for iOS with warning haptic
    */
   public async playRestStartFeedback(soundEnabled: boolean, vibrationEnabled: boolean): Promise<void> {
     const promises: Promise<void>[] = [];
@@ -212,7 +259,12 @@ export class AudioService {
     }
 
     if (vibrationEnabled) {
-      this.vibrate([200, 100, 200]); // Rest start vibration pattern
+      if (isNativePlatform()) {
+        // Use warning haptic to indicate rest period on iOS
+        promises.push(triggerNotificationHaptic('warning'));
+      } else {
+        this.vibrate([200, 100, 200]); // Rest start vibration pattern for web
+      }
     }
 
     await Promise.all(promises);
@@ -220,6 +272,7 @@ export class AudioService {
 
   /**
    * Play rest end feedback (different tone to indicate rest ending)
+   * Enhanced for iOS with success haptic
    */
   public async playRestEndFeedback(soundEnabled: boolean, vibrationEnabled: boolean): Promise<void> {
     const promises: Promise<void>[] = [];
@@ -229,7 +282,12 @@ export class AudioService {
     }
 
     if (vibrationEnabled) {
-      this.vibrate([100, 50, 100, 50, 300]); // Rest end vibration pattern
+      if (isNativePlatform()) {
+        // Use success haptic for rest end on iOS (get ready!)
+        promises.push(triggerNotificationHaptic('success'));
+      } else {
+        this.vibrate([100, 50, 100, 50, 300]); // Rest end vibration pattern for web
+      }
     }
 
     await Promise.all(promises);
@@ -324,8 +382,13 @@ export class AudioService {
 
   /**
    * Check if vibration is supported
+   * Enhanced to include native haptics support
    */
   public isVibrationSupported(): boolean {
+    // Native platforms always support haptics via Capacitor
+    if (isNativePlatform()) {
+      return true;
+    }
     return 'vibrate' in navigator;
   }
 

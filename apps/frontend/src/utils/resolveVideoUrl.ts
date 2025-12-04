@@ -1,6 +1,13 @@
 import { storageService } from '../services/storageService';
 import { supabase } from '../config/supabase';
+import { isNativePlatform } from '../config/features';
 import logger from './logger';
+
+/**
+ * Production CDN base URL for video assets
+ * Used by native apps to load videos since they can't use relative /media/* paths
+ */
+const VIDEO_CDN_BASE_URL = 'https://repcue.me';
 
 /**
  * Resolves video URLs, handling:
@@ -15,6 +22,10 @@ import logger from './logger';
  * For blob-* schemes we look up IndexedDB (via storageService) and materialize a runtime blob: URL.
  * If the binary is missing but a storage_path exists we attempt a download (covers recovery cases).
  * For shared videos we reference the original exercise's stored video file.
+ * 
+ * Native App Handling:
+ * For Capacitor iOS/Android apps, relative /media/* paths are converted to absolute URLs
+ * pointing to the production CDN where the Cloudflare R2 proxy function works.
  */
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
@@ -35,6 +46,16 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
     const isRelativeUrl = videoUrl.startsWith('/');
     
     if (isHttpUrl || isRelativeUrl) {
+      // For native apps, convert relative /media/* paths to absolute URLs
+      if (isNativePlatform() && isRelativeUrl && videoUrl.startsWith('/media/')) {
+        const absoluteUrl = `${VIDEO_CDN_BASE_URL}${videoUrl}`;
+        logger.log('🎥 [ResolveVideo] Native app: converting to absolute URL', { 
+          original: videoUrl, 
+          absolute: absoluteUrl 
+        });
+        return absoluteUrl;
+      }
+      
       logger.log('🎥 [ResolveVideo] Using direct URL - browser/CDN will handle caching', { videoUrl });
       return videoUrl;
     }

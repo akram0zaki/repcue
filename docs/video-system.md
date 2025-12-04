@@ -8,14 +8,16 @@ This document explains how the exercise video feature works end-to-end, includin
 - Cross-browser playback: prefer WebM, fall back to MP4 when needed.
 - Multi-tier caching: Memory → IndexedDB → Service Worker for instant playback.
 - Deterministic, cacheable delivery using content-hash filenames where enabled.
+- **Native app support**: Capacitor iOS/Android apps load videos from production CDN with CORS.
 
 ## Architecture Overview
 - **Encoding** (local): source clips → ffmpeg → MP4 (H.264), short seamless loops with watermark
 - **Storage**: Cloudflare R2 bucket `repcue-videos` (public objects)
-- **Delivery**: Cloudflare Pages Function proxy at `/media/*` (supports Range requests and cache headers)
+- **Delivery**: Cloudflare Pages Function proxy at `/media/*` (supports Range requests, cache headers, and CORS)
 - **Manifest**: `apps/frontend/public/exercise_media.json` (array of media entries with variants)
 - **Caching**: `VideoCacheService` provides IndexedDB-based persistent blob caching with LRU eviction
 - **Client**: selects the right format and aspect, respects reduced motion, and integrates with the timer
+- **Native Apps**: Capacitor iOS/Android apps use absolute URLs to production CDN (`https://repcue.me/media/*`)
 
 ## Feature Flags & Settings
 Feature flags are defined in `apps/frontend/src/config/features.ts`:
@@ -107,6 +109,7 @@ Video selection is handled by `src/utils/selectVideoVariant.ts`:
 - **Reduced motion**: if `prefers-reduced-motion: reduce`, video feature is disabled entirely
 - **Timer sync**: for rep-based loops with `repsPerLoop`, the client detects loop boundaries via `timeupdate` event to trigger a visual rep pulse; authoritative rep logic remains in timer state
 - **Playback rate**: video playback rate is adjusted based on `repSpeedFactor` (inverse: 0.5 factor = 2x playback speed)
+- **Native app URL normalization**: For Capacitor iOS/Android apps, relative `/media/*` URLs are automatically converted to absolute `https://repcue.me/media/*` URLs via `normalizeVideoUrl()` function
 
 ## Video Caching System
 RepCue includes a multi-tier caching system via `VideoCacheService` (`src/services/videoCacheService.ts`):
@@ -135,6 +138,11 @@ The media proxy is implemented in `functions/media/[[path]].ts`:
 
 - **Path**: `/media/<key>` → fetches from R2 bucket `repcue-videos`
 - **Range support**: responds with `206 Partial Content` when `Range: bytes=start-end` is provided
+- **CORS support**: Allows cross-origin requests from native apps and web origins:
+  - `https://repcue.me`, `https://www.repcue.me`, `https://dev.repcue.me`
+  - `capacitor://localhost` (iOS Capacitor apps)
+  - `http://localhost` (Android Capacitor apps)
+  - `http://localhost:5173` (Vite dev server)
 - **Headers**:
   - `Content-Type`: inferred from extension or R2 metadata (`video/webm`, `video/mp4`)
   - `Cache-Control`: 
@@ -142,10 +150,14 @@ The media proxy is implemented in `functions/media/[[path]].ts`:
     - Non-hashed names: `public, max-age=3600, must-revalidate`
   - `Accept-Ranges`: `bytes`
   - `X-Content-Type-Options`: `nosniff`
+  - `Access-Control-Allow-Origin`: Set to requesting origin if in allowed list
+  - `Access-Control-Allow-Methods`: `GET, HEAD, OPTIONS`
+  - `Access-Control-Expose-Headers`: `Content-Length, Content-Range, Accept-Ranges`
 - **Validation**: 
   - Rejects paths containing traversal patterns (`..`, `\\`, `//`)
   - Enforces filename regex: `^[a-z0-9_-]+_v1_\d{3,4}x\d{3,4}(_[a-f0-9]{8,})?\.(mp4|webm)$`
 - **Fallback**: If hashed file not found, automatically tries non-hashed variant
+- **Preflight**: Handles OPTIONS requests for CORS preflight with 204 response
 
 ## Encoding Guidelines (ffmpeg)
 Current production workflow produces MP4 (H.264) with watermark:
@@ -172,6 +184,40 @@ WebM (VP9) encoding (optional, for future use):
 - No tracking; videos are public instructional content
 - Consent-aware caching: IndexedDB caching respects ConsentService
 - Keys in CI are scoped to R2 only and rotated per policy
+- CORS restricted to specific allowed origins for native app support
+
+## Native App Support (Capacitor iOS/Android)
+
+### URL Resolution
+In Capacitor native apps, relative `/media/*` paths resolve to `capacitor://localhost/media/*` which doesn't exist locally. The video system handles this by:
+
+1. **URL Normalization** (`selectVideoVariant.ts`): The `normalizeVideoUrl()` function detects native platforms via `isNativePlatform()` and converts relative URLs to absolute production CDN URLs:
+   ```typescript
+   // /media/burpees_v1_1920x1080.mp4 → https://repcue.me/media/burpees_v1_1920x1080.mp4
+   ```
+
+2. **CORS Headers**: The Cloudflare Pages Function includes `capacitor://localhost` in the allowed origins list, enabling cross-origin video loading.
+
+3. **Video Element Configuration**: All `<video>` elements include:
+   - `playsInline`: Required for inline playback on iOS (prevents fullscreen takeover)
+   - `crossOrigin="anonymous"`: Enables CORS requests to external CDN
+
+### iOS-Specific Configuration
+- **Info.plist**: App Transport Security exceptions for `repcue.me` and `supabase.co` domains
+- **Capacitor Config**: `allowNavigation` includes `https://repcue.me/*` and `https://*.repcue.me/*`
+- **WKWebView**: Configured for inline media playback via Capacitor defaults
+
+### Video Probe Behavior
+The `VideoThumbnail` component normally probes video URLs with a Range request to verify they exist before displaying. For native apps, this probe is **skipped** because:
+- WKWebView's `fetch()` with Range headers is unreliable for cross-origin requests
+- The resolved URLs are trusted (we control the CDN)
+- Skipping the probe improves load performance
+
+### Debugging Native Video Issues
+- Check Xcode console for `[Video] Native app: converting relative URL to absolute` logs
+- Look for `Skipping probe for native app, trusting URL` to confirm probe skip is working
+- Verify CORS headers in network requests (should see `Access-Control-Allow-Origin: capacitor://localhost`)
+- Ensure production Cloudflare Pages deployment includes the CORS-enabled proxy function
 
 ## Developer Workflows
 
@@ -227,22 +273,33 @@ See `scripts/video/README.md` for detailed steps:
 - **Seeking broken**: verify Range header handling; test with DevTools network panel for 206 responses
 - **IndexedDB cache issues**: check browser storage quota; clear via `VideoCacheService.clearAll()`
 - **Blob URL "Load failed"**: Safari-specific issue; blob URLs may fail HEAD validation but work for playback
+- **Native app video white screen**: Check that CORS headers are deployed to Cloudflare; verify `crossOrigin="anonymous"` on video elements
+- **iOS video not loading**: Ensure Info.plist has ATS exceptions; check that URL normalization is working (look for absolute URLs in logs)
+- **Android video issues**: Verify `http://localhost` is in CORS allowed origins; check for mixed content warnings
 
 ## Implementation Files
 
 ### Core Files
 | File | Purpose |
 |------|---------|
-| `src/config/features.ts` | Feature flags (`VIDEO_DEMOS_ENABLED`, `VIDEO_R2_ENABLED`, `VIDEO_CACHING_ENABLED`) |
+| `src/config/features.ts` | Feature flags (`VIDEO_DEMOS_ENABLED`, `VIDEO_R2_ENABLED`, `VIDEO_CACHING_ENABLED`) + native platform detection |
 | `src/types/media.ts` | TypeScript types for media manifest |
 | `src/utils/loadExerciseMedia.ts` | Loads and caches `exercise_media.json` |
-| `src/utils/selectVideoVariant.ts` | Viewport-aware variant selection |
-| `src/utils/resolveVideoUrl.ts` | URL resolution for various schemes |
+| `src/utils/selectVideoVariant.ts` | Viewport-aware variant selection + native app URL normalization |
+| `src/utils/resolveVideoUrl.ts` | URL resolution for various schemes (including native app handling) |
 | `src/hooks/useExerciseVideo.ts` | React hook for video playback integration |
 | `src/services/videoCacheService.ts` | IndexedDB-based persistent video caching |
 | `src/pages/TimerPage.tsx` | Timer UI with video integration |
+| `src/components/VideoThumbnail.tsx` | Video thumbnail with `crossOrigin` attribute |
 | `public/exercise_media.json` | Video manifest (array format) |
-| `functions/media/[[path]].ts` | Cloudflare Pages Function proxy |
+| `functions/media/[[path]].ts` | Cloudflare Pages Function proxy (with CORS support) |
+
+### iOS/Capacitor Configuration
+| File | Purpose |
+|------|---------|
+| `capacitor.config.ts` | Capacitor config with `allowNavigation` for CDN |
+| `ios/App/App/Info.plist` | App Transport Security exceptions |
+| `ios/App/App/AppDelegate.swift` | WKWebView configuration |
 
 ### Scripts
 | File | Purpose |
