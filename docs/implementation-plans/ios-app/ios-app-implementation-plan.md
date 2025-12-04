@@ -4,20 +4,35 @@
 **Status**: In Progress  
 **Estimated Duration**: 4-6 weeks  
 **Priority**: High  
-**Last Updated**: 2025-12-02
+**Last Updated**: 2025-12-04
 
 ---
 
 ## Implementation Progress
 
+### Launch Phase (MVP for App Store)
+
 | Phase | Status | Notes |
 |-------|--------|-------|
 | Phase 1: Capacitor Integration | ✅ Complete | Core + iOS platform + 8 plugins installed |
-| Phase 2: Native Plugin Integration | ✅ Complete | Platform detection, haptics, iOS utilities, tokens, components |
-| Phase 3: iOS-Specific UI Adjustments | ✅ Complete | Safe areas, keyboard handling, scroll behavior, status bar |
+| Phase 2: Native Plugin Integration | ✅ Complete | Platform detection, haptics, audio service integration |
+| Phase 3: Core iOS Adjustments | ✅ Complete | Safe areas, keyboard handling, scroll behavior, status bar |
 | Phase 4: Privacy Manifest & App Store Prep | ✅ Complete | PrivacyInfo.xcprivacy created |
 | Phase 5: Testing & Optimization | ✅ Complete | Video playback fixed, CORS configured, scrolling working |
-| Phase 6: App Store Submission | ⬜ Not Started | |
+| Phase 6: App Store Submission | ⬜ Not Started | TestFlight beta, then production |
+
+### Post-Launch Phase (Platform UI Polish)
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Platform-Aware Dialogs | ⬜ Planned | Native dialogs on iOS/Android, web modal fallback |
+| Platform-Aware Spinners | ⬜ Planned | iOS/Android native style, web default |
+| Platform-Aware Modals | ⬜ Planned | Sheet-style on mobile, overlay on web |
+| Android Support | ⬜ Planned | Add Android platform, same codebase |
+
+> **Note**: iOS-specific UI components (`IOSModal`, `IOSSpinner`) were created but not integrated. 
+> Post-launch, these will be replaced with **platform-abstracted components** that automatically 
+> adapt to iOS, Android, or Web - avoiding iOS-only code paths.
 
 ### Recent Fixes (2025-12-02)
 
@@ -449,6 +464,11 @@ export const triggerHaptic = async (
 
 ### Phase 3: iOS-Specific UI Adjustments (Week 2-3) ✅ COMPLETE
 
+> **Scope Clarification**: This phase covers core layout and behavior adjustments required for 
+> the app to function correctly on iOS. Visual polish (iOS-style modals, spinners, etc.) is 
+> deferred to Post-Launch Platform UI Polish phase to enable a unified approach across iOS, 
+> Android, and Web.
+
 #### 3.1 Safe Area Handling ✅
 
 Update Tailwind/CSS to respect iOS safe areas:
@@ -749,11 +769,24 @@ if (import.meta.env.DEV) {
 }
 ```
 
-#### 3.6 iOS-Specific UI Polish (HIG Compliance) ✅
+#### 3.6 iOS-Specific UI Polish (HIG Compliance) 🔄 DEFERRED TO POST-LAUNCH
 
-Based on the HIG gap analysis (see Section 8.1), these UI adjustments ensure RepCue feels native on iOS. All styles follow RepCue's design token system and are added to `tokens.css` rather than using inline styles.
+> **Status Update (2025-12-04)**: iOS-specific UI components (`IOSModal`, `IOSSpinner`, iOS tokens) 
+> were created but NOT integrated into the main UI. This is intentional - integrating iOS-only 
+> components would create code paths that need to be duplicated for Android.
+>
+> **Post-Launch Strategy**: Create **platform-abstracted components** that automatically render:
+> - iOS-style UI on iOS
+> - Material-style UI on Android  
+> - Current web UI on browsers
+>
+> This approach uses a single component API with platform detection inside, keeping the codebase 
+> maintainable across all three platforms.
 
-##### 3.6.0 Add iOS Design Tokens to tokens.css ✅
+The following sections describe the iOS tokens and components that were created (and can be 
+leveraged in the platform abstraction layer later):
+
+##### 3.6.0 Add iOS Design Tokens to tokens.css ✅ CREATED (not actively used)
 
 All iOS-specific styles should be added to `apps/frontend/src/styles/tokens.css`. This ensures consistency with the theme system and avoids inline styles.
 
@@ -880,7 +913,7 @@ All iOS-specific styles should be added to `apps/frontend/src/styles/tokens.css`
 }
 ```
 
-##### 3.6.1 Status Bar Integration ✅
+##### 3.6.1 Status Bar Integration ✅ IMPLEMENTED
 
 ```typescript
 // apps/frontend/src/utils/iosStatusBar.ts
@@ -942,7 +975,7 @@ useEffect(() => {
 }, []);
 ```
 
-##### 3.6.2 Keyboard Handling ✅
+##### 3.6.2 Keyboard Handling ✅ IMPLEMENTED
 
 ```typescript
 // apps/frontend/src/utils/iosKeyboard.ts
@@ -980,7 +1013,9 @@ export const configureKeyboard = async (): Promise<void> => {
 
 > **Note:** The CSS classes `.keyboard-visible`, `.nav-bottom` are defined in tokens.css (see 3.6.0).
 
-##### 3.6.3 iOS-Style Modal Dialogs ✅
+##### 3.6.3 iOS-Style Modal Dialogs ⬜ CREATED (not integrated)
+
+> Component `IOSModal.tsx` exists but is not used by the app. Will be integrated via platform abstraction layer post-launch.
 
 Use the token-based classes defined in 3.6.0 for iOS modal styling:
 
@@ -1052,7 +1087,9 @@ if (Capacitor.getPlatform() === 'ios') {
 }
 ```
 
-##### 3.6.4 Native-Style Loading Indicators ✅
+##### 3.6.4 Native-Style Loading Indicators ⬜ CREATED (not integrated)
+
+> Component `IOSSpinner.tsx` exists but is not used by the app. Will be integrated via platform abstraction layer post-launch.
 
 Use the token-based spinner classes:
 
@@ -1116,7 +1153,9 @@ export const Spinner: React.FC<SpinnerProps> = ({ size = 'md', className = '' })
 };
 ```
 
-##### 3.6.5 Replace window.alert() with Native Dialogs ✅
+##### 3.6.5 Replace window.alert() with Native Dialogs ⬜ CREATED (not integrated)
+
+> Utility `nativeDialog.ts` exists with `showAlert()` and `showConfirm()` but no components use it yet. Will be integrated via platform abstraction layer post-launch.
 
 Audit and replace any `window.alert()` or `window.confirm()` calls:
 
@@ -1168,7 +1207,9 @@ export const showConfirm = async (options: {
 };
 ```
 
-##### 3.6.6 Pull-to-Refresh (If Applicable) ✅
+##### 3.6.6 Pull-to-Refresh (If Applicable) ⬜ NOT IMPLEMENTED
+
+> Not needed for current app functionality. Can be added post-launch if required.
 
 If any screens need refresh functionality:
 
@@ -1188,9 +1229,9 @@ export const usePullToRefresh = (onRefresh: () => Promise<void>) => {
 };
 ```
 
-##### 3.6.7 Token Classes Reference ✅
+##### 3.6.7 Token Classes Reference ✅ CREATED
 
-The following classes are added to `tokens.css` for iOS native styling:
+The following classes are added to `tokens.css` for iOS native styling (available for future use):
 
 | Class | Purpose | Applied When |
 |-------|---------|--------------|
@@ -1623,18 +1664,22 @@ Apple's Human Interface Guidelines are critical for App Store approval. Apps tha
 | **8pt Grid System** | Spacing tokens follow 8pt grid | ✅ Compliant |
 | **Haptic Feedback** | Vibration API used for timer events | ✅ Compliant |
 
-#### ⚠️ **Areas Needing Attention for iOS Native**
+#### ⚠️ **Areas Needing Attention for iOS Native** (Post-Launch Polish)
 
-| HIG Requirement | Current State | Action Required |
-|-----------------|---------------|-----------------|
-| **Navigation Bar Style** | Custom bottom tab bar | Review against iOS tab bar patterns |
-| **Status Bar** | Theme color set, but no native control | Add Capacitor Status Bar plugin |
-| **System Fonts** | Inter font family | Consider SF Pro for true iOS feel (optional) |
-| **Pull-to-Refresh** | Not implemented | Add native-feeling refresh if applicable |
-| **Swipe Gestures** | Limited swipe support | Consider swipe-to-delete/dismiss patterns |
-| **Loading States** | Custom spinners | Consider native-style activity indicators |
-| **Alerts/Modals** | Custom styled modals | Ensure consistent with iOS modal patterns |
-| **Keyboard Avoidance** | CSS-based | Add Capacitor Keyboard plugin for better handling |
+> **Note**: These items enhance the iOS experience but are NOT required for App Store approval.
+> They are deferred to the Post-Launch Platform UI Polish phase to enable a unified approach 
+> across iOS, Android, and Web.
+
+| HIG Requirement | Current State | Post-Launch Plan |
+|-----------------|---------------|------------------|
+| **Navigation Bar Style** | Custom bottom tab bar | Review as part of platform abstraction |
+| **Status Bar** | ✅ Capacitor Status Bar plugin integrated | Done |
+| **System Fonts** | Inter font family | Optional - Inter is fine for hybrid apps |
+| **Pull-to-Refresh** | Not implemented | Add if user feedback requests it |
+| **Swipe Gestures** | Limited swipe support | Consider for list interactions |
+| **Loading States** | Custom spinners | Platform-aware spinner component |
+| **Alerts/Modals** | Custom styled modals | Platform-aware dialog component |
+| **Keyboard Avoidance** | ✅ Capacitor Keyboard plugin integrated | Done |
 
 #### 🔴 **Critical HIG Requirements for App Store Approval**
 
@@ -1642,19 +1687,20 @@ These are non-negotiable for avoiding rejection:
 
 1. **App Must Provide Value Beyond Website**
    - ✅ RepCue has: Timer functionality, offline support, haptic feedback
-   - 🔧 Add: Background audio, native notifications, potentially HealthKit
+   - ✅ Native notifications via Capacitor plugin
+   - ⬜ Background audio (future enhancement)
 
 2. **No Placeholder Content**
    - ✅ RepCue has: 87 real exercises, full functionality
-   - Check: All demo content should be real, not lorem ipsum
+   - ✅ All content is real, no lorem ipsum
 
 3. **All Features Must Work**
    - ✅ Run full test suite before submission
-   - Test: Offline mode, sync, timer, all user flows
+   - ✅ Offline mode, sync, timer, all user flows tested
 
 4. **Privacy Compliance**
    - ✅ Privacy policy exists
-   - 🔧 Add: Privacy manifest, App Tracking Transparency if needed
+   - ✅ Privacy manifest (PrivacyInfo.xcprivacy) created
 
 5. **No Web-Only Behaviors**
    - 🔧 Hide: Browser-specific UI (install prompts, etc.)
