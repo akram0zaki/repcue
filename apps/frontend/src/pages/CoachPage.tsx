@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import CoachingCard from '../components/CoachingCard';
 import WeeklyStreakCalendar from '../components/WeeklyStreakCalendar';
 import ProgressChart from '../components/ProgressChart';
+import { PullToRefresh } from '../components/platform';
 import { useCoachingInsights } from '../hooks/useCoachingInsights';
 import { StorageService } from '../services/storageService';
 import type { ActivityLog, AppSettings, Exercise, Workout } from '../types';
@@ -372,7 +373,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
           {/* Show progress section even when no insights */}
           {logs.length > 0 && (
             <>
-              <div id="progress-section" className="mt-6 space-y-4">
+              <div id="progress-section" className="mt-4 space-y-3">
                 <h2 className="text-h2">
                   {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
                 </h2>
@@ -385,18 +386,18 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
               </div>
 
               {/* Activity Log section */}
-              <div className="mt-6 space-y-4">
+              <div className="mt-4 space-y-3">
                 <h2 className="text-h2">
                   {t('common:activity.title', { defaultValue: 'Activity Log' })}
                 </h2>
                 
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {Object.entries(groupedLogs)
                     .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
                     .slice(0, 3) /* Show only last 3 days in empty state */
                     .map(([date, dateLogs]) => (
                       <div key={date}>
-                        <div className="sticky top-0 bg-background-50 dark:bg-background-900 py-2 mb-3">
+                        <div className="sticky top-0 bg-background-50 dark:bg-background-900 py-1.5 mb-2">
                           <h3 className="text-caption font-semibold text-text-900 dark:text-text-50">
                             {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
                               weekday: 'long', 
@@ -406,14 +407,14 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                           </h3>
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {dateLogs
                             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                             .map((log) => (
                               <div key={log.id}>
                                 {log.is_workout ? (
                                   // Workout entry - simplified version
-                                  <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                                  <div className="bg-surface-100 dark:bg-surface-800 rounded-xl p-3 shadow-sm border border-slate-300 dark:border-surface-700">
                                     <div className="grid grid-cols-[1fr,auto] gap-2 sm:gap-3 items-start mb-2">
                                       <div className="flex items-center gap-2 min-w-0">
                                         <span className="inline-block w-3 h-3 rounded-full activity-log-dot shrink-0"></span>
@@ -461,10 +462,10 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                   </div>
                                 ) : (
                                   // Individual exercise entry
-                                  <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                                  <div className="bg-surface-100 dark:bg-surface-800 rounded-xl p-3 shadow-sm border border-slate-300 dark:border-surface-700">
                                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                                       <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex items-center gap-2 mb-1">
                                           <span className="inline-block w-3 h-3 rounded-full activity-log-dot"></span>
                                           <h4 className="text-h3 truncate">
                                             {(() => {
@@ -513,29 +514,30 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
    * Main content with insights
    */
   return (
-    <div className="min-h-screen bg-background-50 dark:bg-background-900 p-3 sm:p-4 pb-16 sm:pb-20">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          {/* Row 1: Title + Refresh button */}
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <h1 className="text-h1">
-              {t('coaching:title', { defaultValue: 'Your Coach' })}
-            </h1>
-            <button
-              onClick={handleRefresh}
-              disabled={isRefreshing}
-              className="flex-shrink-0 p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900 disabled:opacity-50"
-              style={{ direction: 'ltr' }}
-              aria-label={t('common:refresh', { defaultValue: 'Refresh' })}
-            >
-              <svg 
-                className={`section-icon ${isRefreshing ? 'animate-spin' : ''}`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24" 
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
+    <PullToRefresh onRefresh={handleRefresh} testId="coach-pull-to-refresh">
+      <div className="min-h-screen bg-background-50 dark:bg-background-900 p-3 sm:p-4 pb-16 sm:pb-20">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-6">
+            {/* Row 1: Title + Refresh button */}
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h1 className="text-h1">
+                {t('coaching:title', { defaultValue: 'Your Coach' })}
+              </h1>
+              <button
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+                className="flex-shrink-0 p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-surface-900 disabled:opacity-50"
+                style={{ direction: 'ltr' }}
+                aria-label={t('common:refresh', { defaultValue: 'Refresh' })}
+              >
+                <svg 
+                  className={`section-icon ${isRefreshing ? 'animate-spin' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
@@ -556,7 +558,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
         </div>
 
         {/* Insights list */}
-        <div className="space-y-4 mb-6">
+        <div className="space-y-3 mb-4">
           {(() => {
             // Group insights by source
             const aiInsights = insights.filter(i => i.source === 'ai');
@@ -611,7 +613,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
 
         {/* Progress section */}
         {logs.length > 0 && (
-          <div id="progress-section" className="space-y-4 mb-6">
+          <div id="progress-section" className="space-y-3 mb-4">
             <h2 className="text-h2">
               {t('coaching:progress.title', { defaultValue: 'Your Progress' })}
             </h2>
@@ -626,17 +628,17 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
 
         {/* Activity Log section */}
         {logs.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <h2 className="text-h2">
               {t('common:activity.title', { defaultValue: 'Activity Log' })}
             </h2>
             
-            <div className="space-y-6">
+            <div className="space-y-4">
               {Object.entries(groupedLogs)
                 .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
                 .map(([date, dateLogs]) => (
                   <div key={date}>
-                    <div className="sticky top-0 z-10 bg-background-50 dark:bg-background-900 py-2 mb-3 shadow-sm">
+                    <div className="sticky top-0 z-10 bg-background-50 dark:bg-background-900 py-1.5 mb-2">
                       <h3 className="text-small font-semibold">
                         {new Date(date).toLocaleDateString(i18n.resolvedLanguage || i18n.language || undefined, { 
                           weekday: 'long', 
@@ -646,14 +648,14 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                       </h3>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {dateLogs
                         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                         .map((log) => (
                           <div key={log.id}>
                             {log.is_workout ? (
                               // Workout entry with expandable exercises
-                              <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                              <div className="bg-surface-100 dark:bg-surface-800 rounded-xl p-3 shadow-sm border border-slate-300 dark:border-surface-700">
                                 <div 
                                   className="cursor-pointer"
                                   onClick={() => toggleWorkoutExpansion(log.id)}
@@ -728,12 +730,12 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                 
                                 {/* Expandable exercise list */}
                                 {expandedWorkouts.has(log.id) && log.exercises && (
-                                  <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700">
-                                      <h5 className="text-body font-medium mb-2">{t('common:activity.exercisesHeading', { defaultValue: 'Exercises' })}</h5>
-                                    <div className="space-y-2">
+                                  <div className="mt-3 pt-3 border-t border-slate-300 dark:border-surface-700">
+                                      <h5 className="text-body font-medium mb-1.5">{t('common:activity.exercisesHeading', { defaultValue: 'Exercises' })}</h5>
+                                    <div className="space-y-1.5">
                                       {log.exercises.map((exercise, index) => (
-                                        <div key={index} className="bg-surface-0 dark:bg-surface-800 rounded-lg p-3 border border-surface-200 dark:border-surface-700">
-                                          <div className="flex items-center gap-2 mb-2">
+                                        <div key={index} className="bg-surface-50 dark:bg-surface-700 rounded-lg p-2.5 border border-slate-300 dark:border-surface-600">
+                                          <div className="flex items-center gap-2 mb-1">
                                             <span className="inline-block w-2 h-2 rounded-full shrink-0 activity-log-dot"></span>
                                             <span className="text-body font-medium break-words flex-1">{(() => {
                                               const ex = exercises.find(e => e.id === exercise.exercise_id);
@@ -742,7 +744,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                                               return t(`exerciseDetails:${base}.name`, { defaultValue: ex.name });
                                             })()}</span>
                                           </div>
-                                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-small text-text-tertiary">
+                                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-small text-text-tertiary ltr:ml-4 rtl:mr-4">
                                             {exercise.sets && exercise.reps && (
                                               <span className="whitespace-nowrap">{exercise.sets}×{exercise.reps}</span>
                                             )}
@@ -764,10 +766,10 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
                               </div>
                             ) : (
                               // Individual exercise entry
-                              <div className="bg-surface-0 dark:bg-surface-800 rounded-xl p-3 sm:p-4 shadow-sm border border-surface-200 dark:border-surface-700">
+                              <div className="bg-surface-100 dark:bg-surface-800 rounded-xl p-3 shadow-sm border border-slate-300 dark:border-surface-700">
                                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0">
                                   <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-2">
+                                    <div className="flex items-center gap-2 mb-1">
                                       <span
                                         className="inline-block w-3 h-3 rounded-full activity-log-dot"
                                       ></span>
@@ -816,8 +818,9 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 };
 

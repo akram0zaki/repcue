@@ -1,12 +1,30 @@
 /* Exercise Detail Page - Parallax Collapsing Header Effect */
+/* 
+ * iOS Safari/WKWebView has known issues with position:fixed elements:
+ * 1. Fixed elements create their own stacking contexts
+ * 2. Mixing fixed + absolute positioning causes z-index conflicts
+ * 3. Tab bar can disappear behind fixed content
+ * 
+ * Solution: Use CSS sticky positioning for iOS which works better with
+ * the native scroll behavior and doesn't break stacking contexts.
+ */
+
+/* ================================
+   Web/Desktop: Original parallax effect
+   ================================ */
 
 .exercise-detail-container {
+  position: relative;
   min-height: 100vh;
+  /* Use fixed stacking context to prevent z-index leaking */
+  isolation: isolate;
 }
 
 .exercise-detail-back-button {
   position: fixed;
   top: 1.5rem;
+  /* Account for safe area at top */
+  top: calc(1.5rem + env(safe-area-inset-top, 0px));
   left: 1.5rem;
   z-index: 50;
   padding: 0.5rem;
@@ -16,6 +34,9 @@
   border-radius: 9999px;
   color: white;
   transition: background-color 200ms ease-in-out;
+  /* GPU acceleration to prevent flickering on iOS */
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .exercise-detail-back-button:hover {
@@ -27,10 +48,16 @@
   top: 0;
   left: 0;
   right: 0;
-  height: calc(100vh - 80px);
-  max-height: 600px;
+  height: 60vh;
+  max-height: 500px;
   overflow: hidden;
-  will-change: transform;
+  /* GPU acceleration */
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Lower z-index than content panel and tab bar */
+  z-index: 1;
 }
 
 .exercise-detail-content-panel {
@@ -38,26 +65,25 @@
   left: 0;
   right: 0;
   width: 100%;
+  /* Above video, below tab bar */
   z-index: 10;
   background-color: var(--color-surface-primary);
   border-top-left-radius: 1.5rem;
   border-top-right-radius: 1.5rem;
   box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -2px rgba(0, 0, 0, 0.1);
-  min-height: 100vh;
-  will-change: transform;
+  min-height: calc(100vh + 200px);
+  /* GPU acceleration */
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Add padding for bottom navigation */
+  padding-bottom: calc(var(--ios-tab-bar-height, 49px) + env(safe-area-inset-bottom, 20px) + 80px);
 }
 
 /* Dark mode adjustments */
 .dark .exercise-detail-content-panel {
   background-color: var(--color-surface-secondary);
-}
-
-/* Ensure smooth scrolling performance */
-@media (prefers-reduced-motion: no-preference) {
-  .exercise-detail-video-container,
-  .exercise-detail-content-panel {
-    transition: transform 0ms linear;
-  }
 }
 
 /* Disable parallax for reduced motion */
@@ -69,6 +95,142 @@
   }
   
   .exercise-detail-content-panel {
-    margin-top: 0;
+    position: relative;
+    top: auto !important;
+    transform: none !important;
   }
+}
+
+/* ================================
+   iOS-specific: Sticky video with scale/fade effect
+   
+   Uses position:sticky which works correctly on iOS without
+   breaking stacking contexts. The video scales down and fades
+   as you scroll - similar to iOS App Store / Apple Music.
+   ================================ */
+
+.ios-app .exercise-detail-container {
+  /* Normal document flow */
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Background for the sticky video area */
+  background: linear-gradient(to bottom, #000 0%, #000 40vh, var(--color-surface-primary, #fff) 40vh);
+}
+
+.dark.ios-app .exercise-detail-container,
+.ios-app.dark .exercise-detail-container {
+  background: linear-gradient(to bottom, #000 0%, #000 40vh, var(--color-surface-secondary, #1c1c1e) 40vh);
+}
+
+/* Sticky video wrapper - stays pinned while scrolling */
+.ios-app .exercise-detail-video-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 45vh;
+  min-height: 280px;
+  max-height: 400px;
+  overflow: hidden;
+  /* GPU acceleration for smooth transforms */
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.ios-app .exercise-detail-video-container {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  /* Apply scroll-based transforms via JS */
+  transform-origin: center top;
+  transition: none; /* Transforms controlled by JS for smoothness */
+}
+
+/* Video inner content - scale and fade applied here */
+.ios-app .exercise-detail-video-container > div {
+  width: 100%;
+  height: 100%;
+}
+
+/* Gradient overlay that intensifies as you scroll */
+.ios-app .exercise-detail-video-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
+.ios-app .exercise-detail-content-panel {
+  /* Positioned in normal flow, overlaps the sticky video */
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100%;
+  z-index: 10;
+  /* Pull up to overlap the video area */
+  margin-top: -2rem;
+  background-color: var(--color-surface-primary);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  /* Elevated shadow for depth */
+  box-shadow: 
+    0 -8px 30px rgba(0, 0, 0, 0.15),
+    0 -2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
+  /* Reset JS transforms - CSS handles everything */
+  transform: none !important;
+  -webkit-transform: none !important;
+  /* Tab bar spacing */
+  padding-bottom: calc(var(--ios-tab-bar-height, 49px) + env(safe-area-inset-bottom, 34px) + 100px);
+}
+
+.dark .ios-app .exercise-detail-content-panel,
+.ios-app.dark .exercise-detail-content-panel {
+  background-color: var(--color-surface-secondary, #1c1c1e);
+  box-shadow: 
+    0 -8px 30px rgba(0, 0, 0, 0.4),
+    0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Handle/pill indicator at top of content panel */
+.ios-app .exercise-detail-content-panel::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  margin: 8px auto 16px;
+}
+
+.dark .ios-app .exercise-detail-content-panel::before,
+.ios-app.dark .exercise-detail-content-panel::before {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.ios-app .exercise-detail-back-button {
+  /* Keep fixed - back button is small and doesn't cause issues */
+  position: fixed;
+  z-index: 200;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
 }

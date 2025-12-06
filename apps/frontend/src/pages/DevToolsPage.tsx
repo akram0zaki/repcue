@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { storageService } from '../services/storageService';
 import { syncService } from '../services/syncService';
+import { authService } from '../services/authService';
 import { legalDocsService } from '../services/legalDocsService';
 import { consentService } from '../services/consentService';
+import { isNativePlatform, getPlatform, isIOS, isAndroid, isWeb } from '../utils/nativeCapabilities';
 import type { CatalogMembership, GlobalExercise } from '../types';
 import { getAllCatalogs } from '../data/catalogs';
 import logger from '../utils/logger';
@@ -31,6 +33,37 @@ export default function DevToolsPage() {
   const [manifestData, setManifestData] = useState<string>('');
   const [cacheInfo, setCacheInfo] = useState<string>('');
 
+  // Magic link / Deep link inspector state
+  const [authDiagnostics, setAuthDiagnostics] = useState<string>('');
+  const [deepLinkLog, setDeepLinkLog] = useState<string[]>([]);
+  const [testEmail, setTestEmail] = useState<string>('');
+  const [magicLinkStatus, setMagicLinkStatus] = useState<string>('');
+  const [copyStatus, setCopyStatus] = useState<string>('');
+
+  // Helper to copy text to clipboard
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus(`✅ Copied ${label}!`);
+      setTimeout(() => setCopyStatus(''), 2000);
+    } catch (error) {
+      // Fallback for iOS
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopyStatus(`✅ Copied ${label}!`);
+      } catch {
+        setCopyStatus(`❌ Copy failed`);
+      }
+      document.body.removeChild(textArea);
+      setTimeout(() => setCopyStatus(''), 2000);
+    }
+  };
   useEffect(() => {
     const unsubscribe = syncService.onSyncStatusChange((st) => {
       setSyncStatus(st);
@@ -161,6 +194,251 @@ export default function DevToolsPage() {
       <h1 className="text-2xl font-bold mb-6">Developer Tools</h1>
       
       <div className="space-y-4">
+        {/* Magic Link & Deep Link Debugging */}
+        <div className="card p-4 bg-base-200">
+          <h2 className="text-xl font-semibold mb-4">🔗 Magic Link & Deep Link Inspector</h2>
+          
+          {/* Platform Detection */}
+          <div className="alert alert-info text-xs mb-4 select-text">
+            <div className="space-y-1 w-full">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">Platform Detection:</span>
+                <button 
+                  onClick={() => copyToClipboard(
+                    `isNativePlatform: ${isNativePlatform()}\ngetPlatform: ${getPlatform()}\nisIOS: ${isIOS()}\nisAndroid: ${isAndroid()}\nisWeb: ${isWeb()}\nUser Agent: ${navigator.userAgent}`,
+                    'platform info'
+                  )}
+                  className="btn btn-xs btn-ghost"
+                >
+                  📋 Copy
+                </button>
+              </div>
+              <div className="select-all">• isNativePlatform: {isNativePlatform() ? '✅ YES' : '❌ NO'}</div>
+              <div className="select-all">• getPlatform: {getPlatform()}</div>
+              <div className="select-all">• isIOS: {isIOS() ? '✅ YES' : '❌ NO'}</div>
+              <div className="select-all">• isAndroid: {isAndroid() ? '✅ YES' : '❌ NO'}</div>
+              <div className="select-all">• isWeb: {isWeb() ? '✅ YES' : '❌ NO'}</div>
+              <div className="select-all break-all">• User Agent: {navigator.userAgent}</div>
+            </div>
+          </div>
+          
+          {/* Copy Status Toast */}
+          {copyStatus && (
+            <div className="alert alert-success text-xs mb-2">
+              <span>{copyStatus}</span>
+            </div>
+          )}
+          
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => {
+                  const diag = authService.getDiagnostics();
+                  setAuthDiagnostics(JSON.stringify(diag, null, 2));
+                  logger.log('[DevTools] Auth diagnostics:', diag);
+                }}
+                className="btn btn-primary btn-sm"
+              >
+                Get Auth Diagnostics
+              </button>
+              
+              <button 
+                onClick={() => {
+                  const currentUrl = window.location.href;
+                  const hash = window.location.hash;
+                  const search = window.location.search;
+                  
+                  let info = '🌐 Current URL Analysis:\n\n';
+                  info += `Full URL: ${currentUrl}\n`;
+                  info += `Origin: ${window.location.origin}\n`;
+                  info += `Pathname: ${window.location.pathname}\n`;
+                  info += `Search: ${search || '(none)'}\n`;
+                  info += `Hash: ${hash || '(none)'}\n\n`;
+                  
+                  if (hash) {
+                    info += '📋 Hash Parameters:\n';
+                    const hashParams = new URLSearchParams(hash.substring(1));
+                    hashParams.forEach((value, key) => {
+                      info += `  ${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
+                    });
+                  }
+                  
+                  if (search) {
+                    info += '📋 Query Parameters:\n';
+                    const searchParams = new URLSearchParams(search);
+                    searchParams.forEach((value, key) => {
+                      info += `  ${key}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}\n`;
+                    });
+                  }
+                  
+                  setAuthDiagnostics(info);
+                  logger.log('[DevTools] URL analysis:', { currentUrl, hash, search });
+                }}
+                className="btn btn-secondary btn-sm"
+              >
+                Analyze Current URL
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  setMagicLinkStatus('Opening repcue://auth/callback...');
+                  try {
+                    // Try to open the custom URL scheme
+                    window.location.href = 'repcue://auth/callback?test=true';
+                    setMagicLinkStatus('Redirect initiated - if nothing happened, the scheme may not be registered');
+                  } catch (error) {
+                    setMagicLinkStatus(`Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+                  }
+                }}
+                className="btn btn-accent btn-sm"
+              >
+                Test repcue:// Scheme
+              </button>
+              
+              <button 
+                onClick={async () => {
+                  // Simulate receiving a deep link
+                  const testUrl = 'repcue://auth/callback#access_token=test123&token_type=bearer&expires_in=3600&refresh_token=test456';
+                  setDeepLinkLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] Simulating: ${testUrl}`]);
+                  
+                  // Parse and log
+                  try {
+                    const url = new URL(testUrl);
+                    let info = '🧪 Simulated Deep Link:\n\n';
+                    info += `Protocol: ${url.protocol}\n`;
+                    info += `Host: ${url.host}\n`;
+                    info += `Pathname: ${url.pathname}\n`;
+                    info += `Hash: ${url.hash}\n`;
+                    info += `Search: ${url.search}\n\n`;
+                    
+                    if (url.hash) {
+                      info += 'Hash Params:\n';
+                      const params = new URLSearchParams(url.hash.substring(1));
+                      params.forEach((v, k) => {
+                        info += `  ${k}: ${v.substring(0, 30)}...\n`;
+                      });
+                    }
+                    
+                    setAuthDiagnostics(info);
+                    setDeepLinkLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] Parsed successfully`]);
+                  } catch (error) {
+                    setDeepLinkLog(prev => [...prev, `[${new Date().toLocaleTimeString()}] Parse error: ${error}`]);
+                  }
+                }}
+                className="btn btn-info btn-sm"
+              >
+                Simulate Deep Link
+              </button>
+            </div>
+            
+            {/* Test Magic Link */}
+            <div className="bg-base-300 p-3 rounded">
+              <h3 className="font-semibold text-sm mb-2">🧪 Test Magic Link (sends real email)</h3>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="test@example.com"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  className="input input-bordered input-sm flex-1"
+                />
+                <button
+                  onClick={async () => {
+                    if (!testEmail) {
+                      setMagicLinkStatus('Please enter an email');
+                      return;
+                    }
+                    setMagicLinkStatus('Sending magic link...');
+                    const result = await authService.signInWithMagicLink(testEmail);
+                    if (result.success) {
+                      setMagicLinkStatus('✅ Magic link sent! Check your email.');
+                      const diag = authService.getDiagnostics();
+                      setAuthDiagnostics(JSON.stringify(diag, null, 2));
+                    } else {
+                      setMagicLinkStatus(`❌ Error: ${result.error}`);
+                    }
+                  }}
+                  className="btn btn-warning btn-sm"
+                  disabled={!testEmail}
+                >
+                  Send Magic Link
+                </button>
+              </div>
+              {magicLinkStatus && (
+                <div className="mt-2 text-sm">{magicLinkStatus}</div>
+              )}
+            </div>
+            
+            {/* Deep Link Log */}
+            {deepLinkLog.length > 0 && (
+              <div className="bg-base-300 p-3 rounded">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-sm">📜 Deep Link Log</h3>
+                  <button 
+                    onClick={() => setDeepLinkLog([])}
+                    className="btn btn-xs btn-ghost"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="max-h-32 overflow-y-auto text-xs font-mono">
+                  {deepLinkLog.map((log, i) => (
+                    <div key={i} className="py-0.5">{log}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Auth Diagnostics Output */}
+            {authDiagnostics && (
+              <div className="bg-base-300 p-3 rounded max-h-64 overflow-y-auto">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-semibold text-sm">🔍 Diagnostics Output:</h3>
+                  <button 
+                    onClick={() => copyToClipboard(authDiagnostics, 'diagnostics')}
+                    className="btn btn-xs btn-ghost"
+                  >
+                    📋 Copy
+                  </button>
+                </div>
+                <pre className="text-xs whitespace-pre-wrap font-mono select-text select-all">{authDiagnostics}</pre>
+              </div>
+            )}
+            
+            <div className="alert text-xs">
+              <div>
+                <div className="font-semibold mb-1">💡 Magic Link Troubleshooting:</div>
+                <ul className="list-disc list-inside space-y-1">
+                  <li><strong>Simulator:</strong> Custom URL schemes (repcue://) work, but Universal Links don&apos;t</li>
+                  <li><strong>Real Device:</strong> Both custom schemes and Universal Links work</li>
+                  <li><strong>Supabase Config:</strong> Add <code className="select-all bg-base-300 px-1 rounded">repcue://auth/callback</code> to Redirect URLs</li>
+                  <li><strong>Check Email:</strong> Magic link should use repcue:// scheme for native apps</li>
+                  <li><strong>Debug:</strong> Check Xcode console for &quot;appUrlOpen&quot; events</li>
+                </ul>
+              </div>
+            </div>
+            
+            {/* Required Supabase Redirect URL */}
+            <div className="alert alert-warning text-xs">
+              <div className="w-full">
+                <div className="font-semibold mb-2">⚠️ Required Supabase Redirect URL:</div>
+                <div className="flex items-center gap-2">
+                  <code className="select-all bg-base-100 px-2 py-1 rounded flex-1 break-all">repcue://auth/callback</code>
+                  <button 
+                    onClick={() => copyToClipboard('repcue://auth/callback', 'redirect URL')}
+                    className="btn btn-xs btn-ghost"
+                  >
+                    📋
+                  </button>
+                </div>
+                <div className="mt-2 opacity-80">
+                  Add this URL to: Supabase Dashboard → Authentication → URL Configuration → Redirect URLs
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="card p-4 bg-base-200">
           <h2 className="text-xl font-semibold mb-4">Database Version</h2>
           

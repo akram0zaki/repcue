@@ -1041,7 +1041,7 @@ body.rtl .catalog-selector button svg {
 .ios-modal__action {
   font-size: 17px;
   font-weight: 400;
-  color: var(--ios-system-blue);
+  color: var(--color-primary, #0096C7);
   background: none;
   border: none;
   padding: 8px;
@@ -1191,7 +1191,7 @@ body.rtl .catalog-selector button svg {
 .ios-button {
   font-size: 17px;
   font-weight: 400;
-  color: var(--ios-system-blue);
+  color: var(--color-primary, #0096C7);
   background: none;
   border: none;
   padding: 12px 16px;
@@ -1205,13 +1205,13 @@ body.rtl .catalog-selector button svg {
 }
 
 .ios-button--filled {
-  background-color: var(--ios-system-blue);
+  background-color: var(--color-primary, #0096C7);
   color: #FFFFFF;
   font-weight: 600;
 }
 
 .ios-button--filled:active {
-  background-color: #006AE6;
+  background-color: var(--color-primary-hover, #0077A5);
 }
 
 .ios-button--destructive {
@@ -1273,7 +1273,7 @@ body.rtl .catalog-selector button svg {
 }
 
 .ios-input:focus {
-  box-shadow: 0 0 0 2px var(--ios-system-blue);
+  box-shadow: 0 0 0 2px var(--color-primary, #0096C7);
 }
 
 /* iOS Search Bar */
@@ -1368,7 +1368,7 @@ body.rtl .catalog-selector button svg {
   padding: 12px;
   font-size: 17px;
   font-weight: 400;
-  color: var(--ios-system-blue);
+  color: var(--color-primary, #0096C7);
   background: none;
   border: none;
   cursor: pointer;

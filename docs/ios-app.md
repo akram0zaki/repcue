@@ -259,7 +259,7 @@ pnpm cap:run  # Run app pointing to dev server
 # In Xcode: View → Debug Area → Activate Console
 
 # Check device logs
-xcrun simctl spawn booted log stream --predicate 'subsystem == "com.repcue.app"'
+xcrun simctl spawn booted log stream --predicate 'subsystem == "me.repcue.app"'
 ```
 
 ---

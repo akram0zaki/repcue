@@ -236,3 +236,210 @@ button:disabled .platform-spinner,
 [role="button"][aria-disabled="true"] .platform-spinner {
   opacity: 0.7;
 }
+
+/* ================================
+   Platform Tab Bar Styles
+   ================================ */
+
+/* Base tab bar container */
+.platform-tabbar {
+  /* Ensure tab bar stays above page content like exercise detail panels */
+  z-index: 100 !important;
+}
+
+/* iOS Tab Bar - Following Apple Human Interface Guidelines */
+.platform-tabbar--ios {
+  height: calc(var(--ios-tab-bar-height, 49px) + env(safe-area-inset-bottom, 0px));
+  background-color: rgba(249, 249, 249, 0.94);
+  border-top: 0.5px solid rgba(60, 60, 67, 0.29);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+.dark .platform-tabbar--ios {
+  background-color: rgba(28, 28, 30, 0.88);
+  border-top-color: rgba(84, 84, 88, 0.65);
+}
+
+/* iOS Tab Bar Container */
+.platform-tabbar__container--ios {
+  padding: 6px 0;
+  height: var(--ios-tab-bar-height, 49px);
+}
+
+/* iOS Tab Item */
+.platform-tabbar__item--ios {
+  flex: 1;
+  height: 100%;
+  padding: 2px 0;
+  color: var(--ios-system-gray, #8E8E93);
+  /* Haptic feedback hint for native */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.platform-tabbar__item--ios.platform-tabbar__item--active {
+  color: var(--color-primary, #0096C7);
+}
+
+/* iOS Tab Icon */
+.platform-tabbar__item--ios .platform-tabbar__icon {
+  margin-bottom: 2px;
+  /* Slightly thinner stroke weight like SF Symbols */
+  stroke-width: 1.5;
+}
+
+/* iOS Tab Label */
+.platform-tabbar__item--ios .platform-tabbar__label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: -0.24px;
+  /* SF Pro Text characteristics */
+  font-feature-settings: "tnum" on;
+}
+
+/* iOS More Button */
+.platform-tabbar__more--ios {
+  width: 44px;
+  height: 100%;
+  color: var(--ios-system-gray, #8E8E93);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.platform-tabbar__more--ios.platform-tabbar__item--active {
+  color: var(--color-primary, #0096C7);
+}
+
+/* iOS Dropdown Menu */
+.platform-tabbar__dropdown--ios {
+  min-width: 200px;
+  background-color: rgba(249, 249, 249, 0.94);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-radius: var(--ios-corner-radius-large, 14px);
+  box-shadow: 
+    0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 10px 40px rgba(0, 0, 0, 0.12),
+    0 2px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.dark .platform-tabbar__dropdown--ios {
+  background-color: rgba(44, 44, 46, 0.94);
+}
+
+/* iOS Dropdown Item */
+.platform-tabbar__dropdown-item--ios {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-label-primary, #000000);
+  background: transparent;
+  border: none;
+  text-align: left;
+  transition: background-color 0.1s ease;
+}
+
+.dark .platform-tabbar__dropdown-item--ios {
+  color: var(--ios-label-primary, #FFFFFF);
+}
+
+.platform-tabbar__dropdown-item--ios:active {
+  background-color: var(--ios-fill-tertiary, rgba(118, 118, 128, 0.12));
+}
+
+.platform-tabbar__dropdown-item--ios:not(:last-child) {
+  border-bottom: 0.5px solid var(--ios-separator, rgba(60, 60, 67, 0.29));
+}
+
+.dark .platform-tabbar__dropdown-item--ios:not(:last-child) {
+  border-bottom-color: var(--ios-separator, rgba(84, 84, 88, 0.65));
+}
+
+.platform-tabbar__dropdown-item--ios.platform-tabbar__dropdown-item--active {
+  color: var(--color-primary, #0096C7);
+}
+
+/* Android Tab Bar - Following Material Design Guidelines */
+.platform-tabbar--android {
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  background-color: #ffffff;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .platform-tabbar--android {
+  background-color: #1e1e1e;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Android Tab Bar Container */
+.platform-tabbar__container--android {
+  padding: 8px 0;
+  height: 56px;
+}
+
+/* Android Tab Item */
+.platform-tabbar__item--android {
+  flex: 1;
+  height: 100%;
+  padding: 4px 0;
+  color: rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .platform-tabbar__item--android {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.platform-tabbar__item--android.platform-tabbar__item--active {
+  color: #6200ee; /* Material primary */
+}
+
+.dark .platform-tabbar__item--android.platform-tabbar__item--active {
+  color: #bb86fc; /* Material primary dark */
+}
+
+/* Android ripple effect */
+.platform-tabbar__item--android::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.platform-tabbar__item--android:active::after {
+  opacity: 0.08;
+}
+
+/* Android More Button */
+.platform-tabbar__more--android {
+  width: 48px;
+  height: 100%;
+  color: rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .platform-tabbar__more--android {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.platform-tabbar__more--android::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.platform-tabbar__more--android:active::after {
+  opacity: 0.08;
+}

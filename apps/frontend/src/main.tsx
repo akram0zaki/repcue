@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './i18n'
 import { SnackbarProvider } from './components/SnackbarProvider'
+import { PlatformProvider } from './contexts/PlatformContext'
 import { isNativePlatform, isIOS, logPlatformInfo } from './utils/nativeCapabilities'
 import { initializeStatusBar } from './utils/iosStatusBar'
 import { initializeKeyboard } from './utils/iosKeyboard'
@@ -82,13 +83,15 @@ initializeIOSApp().then(() => {
   AppComponent.then(Component => {
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
-        {isSharedRoute ? (
-          <Component />
-        ) : (
-          <SnackbarProvider>
+        <PlatformProvider>
+          {isSharedRoute ? (
             <Component />
-          </SnackbarProvider>
-        )}
+          ) : (
+            <SnackbarProvider>
+              <Component />
+            </SnackbarProvider>
+          )}
+        </PlatformProvider>
       </StrictMode>,
     )
   }).catch(error => {
@@ -100,13 +103,15 @@ initializeIOSApp().then(() => {
   AppComponent.then(Component => {
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
-        {isSharedRoute ? (
-          <Component />
-        ) : (
-          <SnackbarProvider>
+        <PlatformProvider>
+          {isSharedRoute ? (
             <Component />
-          </SnackbarProvider>
-        )}
+          ) : (
+            <SnackbarProvider>
+              <Component />
+            </SnackbarProvider>
+          )}
+        </PlatformProvider>
       </StrictMode>,
     )
   });

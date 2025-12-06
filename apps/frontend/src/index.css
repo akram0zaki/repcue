@@ -8,6 +8,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* HTML and Body background - uses theme tokens for proper iOS overscroll appearance */
+html, body {
+  background-color: var(--color-background-primary, #ffffff);
+}
+
+/* Dark mode: .dark class is on html element */
+html.dark, html.dark body {
+  background-color: var(--color-background-primary, #121212);
+}
+
 /* Optional RTL helper: toggled via body.rtl from i18n init */
 /* Prefer CSS logical properties in components; this is a light global helper */
 :root {
@@ -772,16 +782,42 @@ body.rtl .truncate {
     color: var(--color-primary-light);
   }
 
+  /* Touch-friendly exercise card - no sticky hover on iOS */
+  .exercise-card-touch {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .exercise-card-touch:active {
+    @apply shadow-xl;
+  }
+  
+  /* Only apply hover effects on devices with real hover capability */
+  @media (hover: hover) and (pointer: fine) {
+    .exercise-card-touch:hover {
+      @apply shadow-xl;
+    }
+  }
+
   .exercise-hover-link {
     color: inherit;
+    /* Use active state for immediate feedback, not hover (which sticks on touch) */
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .exercise-hover-link:hover {
-    color: var(--color-primary-dark);
+  /* Only apply hover on devices with pointer (mouse/trackpad) */
+  @media (hover: hover) and (pointer: fine) {
+    .exercise-hover-link:hover {
+      color: var(--color-primary-dark);
+    }
+
+    .dark .exercise-hover-link:hover {
+      color: var(--color-primary-light);
+    }
   }
 
-  .dark .exercise-hover-link:hover {
-    color: var(--color-primary-light);
+  /* Active state for touch feedback */
+  .exercise-hover-link:active {
+    opacity: 0.7;
   }
 
   /* Settings Page Elements */

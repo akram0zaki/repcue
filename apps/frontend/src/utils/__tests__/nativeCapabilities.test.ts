@@ -45,7 +45,7 @@ vi.mock('@capacitor/preferences', () => ({
 vi.mock('@capacitor/app', () => ({
   App: {
     addListener: vi.fn().mockResolvedValue({ remove: vi.fn() }),
-    getInfo: vi.fn().mockResolvedValue({ name: 'RepCue', id: 'com.repcue.app', version: '1.0.0', build: '1' }),
+    getInfo: vi.fn().mockResolvedValue({ name: 'RepCue', id: 'me.repcue.app', version: '1.0.0', build: '1' }),
     getLaunchUrl: vi.fn().mockResolvedValue({ url: null }),
     exitApp: vi.fn().mockResolvedValue(undefined),
     minimizeApp: vi.fn().mockResolvedValue(undefined),

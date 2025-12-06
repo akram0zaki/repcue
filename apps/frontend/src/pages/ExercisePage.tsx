@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import type { Exercise, ExerciseCategory, AppSettings, CatalogMembership } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
+import { syncService } from '../services/syncService';
+import { PullToRefresh } from '../components/platform';
 import { 
   WorkoutIcon, 
   TargetIcon, 
@@ -55,6 +57,21 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
   const { isSharedExercise } = useSharedExercises();
+
+  // Pull-to-refresh handler - triggers sync and refreshes exercises
+  const handleRefresh = useCallback(async () => {
+    try {
+      // Trigger sync if user is authenticated
+      if (user) {
+        await syncService.sync(true);
+      }
+      // Emit event to refresh data in App.tsx
+      window.dispatchEvent(new CustomEvent('sync:applied'));
+    } catch (error) {
+      // Log silently - sync errors shouldn't disrupt the user
+      logger.error('Failed to refresh:', error);
+    }
+  }, [user]);
 
   // Bulk load all exercise memberships to prevent N+1 query problem
   const [exerciseMemberships, setExerciseMemberships] = useState<Map<string, CatalogMembership[]>>(new Map());
@@ -359,6 +376,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   };
 
   return (
+    <PullToRefresh onRefresh={handleRefresh} testId="exercises-pull-to-refresh">
     <>
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-4xl">
@@ -843,6 +861,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
 
 
     </>
+    </PullToRefresh>
   );
 };
 
@@ -908,16 +927,31 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   // Check if exercise is shared using the tracking field
   const isSharedExerciseCard = isSharedExercise(exercise.id);
 
+  /**
+   * Handle card click - navigate to exercise details
+   */
+  const handleCardClick = () => {
+    onNavigateToExercise(exercise.id);
+  };
+
   return (
     <div 
       ref={cardRef}
-      className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+      className={`relative bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden transition-shadow select-none ${
       isUserCreated
         ? 'exercise-card-custom'
         : 'border border-surface-200 dark:border-surface-700'
     }`} data-testid="exercise-card">
+      {/* Invisible button overlay for card-level click - native button works on iOS first tap */}
+      <button
+        type="button"
+        onClick={handleCardClick}
+        className="absolute inset-0 w-full h-full z-0 cursor-pointer bg-transparent border-0 p-0 m-0"
+        aria-label={t('exercises:viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+      />
 
-      <div className="p-2 sm:p-3">
+      <div className="p-2 sm:p-3 relative z-10 pointer-events-none">
         {/* Top Row - Exercise Details (Left) and Action Buttons (Right) */}
         <div className="mb-1">
           <div className="flex items-start justify-between gap-3">
@@ -974,7 +1008,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             </div>
 
             {/* Right Side - Action Buttons */}
-            <div className="flex items-center gap-1 flex-shrink-0 flex-nowrap">
+            <div className="flex items-center gap-1 flex-shrink-0 flex-nowrap pointer-events-auto">
 
               {/* Edit Button - Only for user-created */}
               {isUserCreated && onEdit && (
@@ -1025,15 +1059,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         </div>
 
-        {/* Exercise Name - Clickable Link to Details */}
+        {/* Exercise Name - Card click handles navigation */}
         <div className="mb-2">
-          <button
-            onClick={() => onNavigateToExercise(exercise.id)}
-            className="text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 exercise-hover-link transition-colors"
+          <span
+            className="block text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 exercise-hover-link transition-colors"
             aria-label={t('exercises:viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
           >
             {loc.name}
-          </button>
+          </span>
         </div>
         {/* Base tags preview - Fixed 2 lines with overflow indicator */}
         {Array.isArray((exercise as Exercise & { base_tags?: string[] }).base_tags) && (exercise as Exercise & { base_tags?: string[] }).base_tags!.length > 0 ? (
@@ -1084,7 +1117,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {/* Start Timer Button - Full Width */}
         <button
           onClick={() => onStartTimer(exercise)}
-          className="w-full px-3 py-2 btn-primary text-sm font-medium rounded-lg transition-colors min-h-[36px] flex items-center justify-center gap-1.5"
+          className="w-full px-3 py-2 btn-primary text-sm font-medium rounded-lg transition-colors min-h-[36px] flex items-center justify-center gap-1.5 pointer-events-auto"
           data-testid="start-exercise-timer"
         >
           <PlayIcon size={16} />

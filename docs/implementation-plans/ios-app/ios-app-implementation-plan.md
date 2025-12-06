@@ -263,7 +263,7 @@ Supabase backend         →    Same (API calls work)
 |------|---------|
 | **Development Certificate** | Sign app for development/testing |
 | **Distribution Certificate** | Sign app for App Store submission |
-| **App ID** | Unique identifier (e.g., `com.repcue.app`) |
+| **App ID** | Unique identifier (e.g., `me.repcue.app`) |
 | **Provisioning Profiles** | Link certificates to devices/App Store |
 
 ---
@@ -282,7 +282,7 @@ pnpm add @capacitor/core @capacitor/cli @capacitor/ios
 #### 1.2 Initialize Capacitor ✅
 
 ```bash
-npx cap init "RepCue" "com.repcue.app" --web-dir dist
+npx cap init "RepCue" "me.repcue.app" --web-dir dist
 ```
 
 #### 1.3 Create Capacitor Configuration ✅
@@ -293,7 +293,7 @@ Create `apps/frontend/capacitor.config.ts`:
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.repcue.app',
+  appId: 'me.repcue.app',
   appName: 'RepCue',
   webDir: 'dist',
   server: {
@@ -1850,9 +1850,9 @@ Ensure modals follow iOS patterns:
 - [ ] Pull-to-refresh where appropriate
 
 ### Navigation
-- [ ] Tab bar follows iOS conventions
+- [x] Tab bar follows iOS conventions
 - [ ] Back navigation works correctly
-- [ ] Modal presentation matches iOS style
+- [x] Modal presentation matches iOS style
 - [ ] Gestures don't conflict with system gestures
 
 ### Content
@@ -2045,7 +2045,7 @@ apps/frontend/
 ```bash
 # Initial setup
 pnpm add @capacitor/core @capacitor/cli @capacitor/ios
-npx cap init "RepCue" "com.repcue.app" --web-dir dist
+npx cap init "RepCue" "me.repcue.app" --web-dir dist
 npx cap add ios
 
 # Development workflow

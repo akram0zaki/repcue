@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.repcue.app',
+  appId: 'me.repcue.app',
   appName: 'RepCue',
   webDir: 'dist',
   server: {
@@ -19,8 +19,8 @@ const config: CapacitorConfig = {
     preferredContentMode: 'mobile',
     // Scroll bounce for native feel
     scrollEnabled: true,
-    // Status bar appearance - matches RepCue primary color
-    backgroundColor: '#0096C7',
+    // WebView background - matches dark mode surface for consistent overscroll appearance
+    backgroundColor: '#0f172a',
     // Enable inline video playback (required for exercise demo videos)
     allowsLinkPreview: false,
     // WKWebView configuration

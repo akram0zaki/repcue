@@ -29,6 +29,7 @@ import { UpdateNotificationManager } from './components/UpdateNotificationManage
 import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
+import { DeepLinkHandler } from './components/DeepLinkHandler';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
 import type { UpdateInfo, UpdateError } from './types';
 import type { PersonalRecord } from './types/coaching';
@@ -2810,6 +2811,7 @@ useEffect(() => {
       ) : canUseBrowserRouter ? (
         <Router>
         <ScrollToTop />
+        <DeepLinkHandler />
         <ChunkErrorBoundary>
           <MigrationSuccessBanner />
           <AppShell>

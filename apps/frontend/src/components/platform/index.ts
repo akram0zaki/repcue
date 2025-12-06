@@ -38,3 +38,17 @@ export {
 export {
   PlatformConfirmationModal,
 } from './PlatformConfirmationModal';
+
+// Tab bar component
+export {
+  default as PlatformTabBar,
+  type TabItem,
+  type MoreMenuItem,
+  type PlatformTabBarProps,
+} from './PlatformTabBar';
+
+// Pull to refresh component
+export {
+  PullToRefresh,
+  type PullToRefreshProps,
+} from './PullToRefresh';

@@ -920,7 +920,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               <button
                 onClick={onStartTimer}
                 disabled={!selectedExercise}
-                className="btn-ghost disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="start-timer"
               >
                 {t('common.start')}

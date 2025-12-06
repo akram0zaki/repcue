@@ -1,6 +1,159 @@
 ## Unreleased
 
+### 2025-12-07
+
+#### 📱 Feature - iOS OAuth & Native Authentication Enhancements
+
+**Added**: In-app browser OAuth flow for native iOS using `@capacitor/browser` plugin
+
+**Purpose**: Google and Apple Sign-In now work correctly on iOS native app. OAuth providers block embedded WebViews for security reasons, so we use Safari View Controller (in-app browser) which shows the real Safari URL bar for user trust.
+
+**OAuth Flow for Native Apps**:
+- Opens OAuth URL in Safari View Controller with slide-up sheet presentation
+- Uses `repcue://auth/callback` custom URL scheme for redirect
+- Auto-closes browser when callback is received
+- Deep link handler processes tokens and establishes session
+
+**Auth Service Enhancements** (`authService.ts`):
+- `signInWithOAuth()` now detects native platform and uses in-app browser
+- `signInWithMagicLink()` uses `repcue://` scheme for native apps
+- Added `getDiagnostics()` method for debugging auth issues
+- Added `clearHandledAuthCallback()` to reset auth state on logout
+
+**New Capacitor Plugin**:
+- `@capacitor/browser` - In-app browser for OAuth flows
+
+**Deep Link Handler Improvements** (`nativeCapabilities.ts`):
+- Persistent auth callback marker using Capacitor Preferences
+- Prevents re-processing of auth callbacks after WebView reload
+- Added `wasAuthCallbackHandled()` and `clearHandledAuthCallback()` functions
+- Screen wake lock functions: `keepScreenAwake()`, `allowScreenSleep()`, `isScreenKeptAwake()`
+
+---
+
+#### 🏗️ Feature - iOS-Style Pull-to-Refresh
+
+**Added**: Native iOS pull-to-refresh gesture on WorkoutsPage and ExercisesPage
+
+**New Components & Hooks**:
+- `PullToRefresh.tsx` - Wrapper component with iOS-native styling
+- `usePullToRefresh.ts` - Touch gesture handling hook with rubber-band resistance effect
+- `IOSPullToRefresh` indicator component (8-segment spinner with progress)
+
+**WorkoutsPage Enhancements**:
+- Wrapped in `PullToRefresh` component
+- Triggers sync when authenticated, then reloads workouts
+- Improved theming: uses semantic `text-secondary`, `heading-text`, `section-icon` classes
+
+---
+
+#### 🎨 UI/UX - Timer Page & iOS Polish
+
+**Changed**: Timer Start button now uses `btn-primary` class for theme-aware highlighting
+- Previously used `btn-ghost` which didn't indicate it was the primary action
+- Now correctly uses the theme's primary color for visual prominence
+
+**CSS Improvements**:
+- `exerciseDetailParallax.css` - Complete rewrite for iOS compatibility
+  - Uses `position: sticky` instead of `position: fixed` for iOS WebView
+  - GPU-accelerated transforms with `translate3d(0, 0, 0)`
+  - Proper safe area handling with `env(safe-area-inset-*)`
+  - Added `.ios-app` variant with sticky video wrapper and scale/fade effect
+
+**iOS Tokens** (`tokens.css`):
+- Replaced hardcoded `--ios-system-blue` with `var(--color-primary)` in:
+  - `.ios-modal__action`
+  - `.ios-button`
+  - `.ios-button--filled`
+  - `.ios-input:focus`
+  - `.ios-action-sheet__action`
+
+---
+
+#### 📚 Documentation
+
+**New Documentation**:
+- `docs/ios-testflight.md` - Complete TestFlight distribution guide
+- `docs/platform-abstraction.md` - Cross-platform architecture documentation (v1.1.0)
+  - Added OAuth in-app browser flow section
+  - Documented Safari View Controller usage for Google/Apple Sign-In
+
+**Updated Documentation**:
+- `docs/ios-app.md` - Updated bundle ID references to `me.repcue.app`
+- `docs/implementation-plans/ios-app/ios-app-implementation-plan.md` - Updated progress
+  - Tab bar iOS conventions: ✅
+  - Modal presentation iOS style: ✅
+  - Updated bundle ID references
+
+---
+
+#### 🔧 Infrastructure
+
+**New Files**:
+- `apps/frontend/ios/App/App/App.entitlements` - Associated Domains for Universal Links
+- `apps/frontend/public/.well-known/apple-app-site-association` - Apple app association file
+- `apps/frontend/public/.well-known/assetlinks.json` - Android App Links (placeholder)
+- `apps/frontend/src/components/DeepLinkHandler.tsx` - Component wrapper for deep link hook
+- `apps/frontend/src/hooks/useDeepLinks.ts` - Universal Links / App Links handler
+
+**New Capacitor Plugin**:
+- `@capacitor-community/keep-awake` - Screen wake lock for workouts
+
+**Tests**:
+- `PlatformTabBar.test.tsx` - 32 tests for tab bar component
+- `usePullToRefresh.test.ts` - Pull-to-refresh hook tests
+- Updated `nativeCapabilities.test.ts` - Bundle ID updated to `me.repcue.app`
+
+---
+
+#### 📱 Settings Page
+
+**Added**: Developer Tools link at bottom of Settings page
+- Navigates to `/dev-tools` page
+- Styled as subtle footer link with code icon
+
+---
+
 ### 2025-12-05
+
+#### 🏗️ Feature - iOS-Native Tab Bar Navigation
+
+**Added**: Platform-aware tab bar component (`PlatformTabBar`) that renders native iOS styling
+
+**Purpose**: The bottom navigation bar now automatically adapts to iOS Human Interface Guidelines when running as a native iOS app, providing a truly native look and feel.
+
+**New Component**:
+- `PlatformTabBar.tsx` - Adaptive tab bar for iOS, Android, and Web platforms
+
+**iOS-Specific Features**:
+- 49px height per iOS HIG specifications
+- Blur backdrop with 20px gaussian blur and saturation boost
+- iOS system blue (#007AFF) for active tab state
+- iOS system gray (#8E8E93) for inactive tabs
+- 10px font labels with proper SF Pro characteristics
+- Translucent frosted glass effect in light and dark modes
+- iOS-style dropdown menu for "More" items with separator lines
+
+**Android-Specific Features** (future-ready):
+- 56px height per Material Design guidelines
+- Material elevation shadow system
+- Material ripple effect on tap
+
+**Web Platform**:
+- Maintains existing styling for web browsers
+- No change to web user experience
+
+**CSS Additions** (`platform.css`):
+- `.platform-tabbar--ios` - Full iOS tab bar styling
+- `.platform-tabbar--android` - Material Design styling
+- `.platform-tabbar__dropdown--ios` - Frosted glass dropdown
+
+**Updated Component**:
+- `Navigation.tsx` - Now uses `PlatformTabBar` internally
+
+**Tests**: 32 unit tests for PlatformTabBar (all passing, 61 total platform tests)
+
+---
 
 #### 🏗️ Feature - Platform Abstraction Layer for iOS/Android/Web
 

@@ -7,6 +7,8 @@ import { Routes, Weekday } from '../types';
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { syncService } from '../services/syncService';
+import { PullToRefresh } from '../components/platform';
 import { StarFilledIcon } from '../components/icons/NavigationIcons';
 import CalendarIcon from '../components/icons/CalendarIcon';
 import { localizeExercise } from '../utils/localizeExercise';
@@ -32,6 +34,20 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['common', 'exerciseDetails']);
   const { isAuthenticated } = useAuth();
+
+  // Pull-to-refresh handler - triggers sync and refreshes local data
+  const handleRefresh = useCallback(async () => {
+    try {
+      // Trigger sync if authenticated
+      if (isAuthenticated) {
+        await syncService.sync(true);
+      }
+      // Emit event to refresh data in App.tsx
+      window.dispatchEvent(new CustomEvent('sync:applied'));
+    } catch (error) {
+      logger.error('Failed to refresh:', error);
+    }
+  }, [isAuthenticated]);
   
   // Coaching insights for home page (conditional on settings)
   const shouldShowCoachOnHome = appSettings.coach_enabled && appSettings.coach_show_on_home;
@@ -182,6 +198,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
 
   const popularExercises = getPopularExercises();
   return (
+    <PullToRefresh onRefresh={handleRefresh} testId="home-pull-to-refresh">
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-4 py-2 max-w-md">
         {/* Hero Banner */}
@@ -309,7 +326,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
               <div className="upcoming-workout-card">
                 <div className="flex flex-col sm:flex-row items-start gap-4">
                   <div className="flex-shrink-0 self-center sm:self-start">
-                    <CalendarIcon size={48} className="drop-shadow-sm" />
+                    <CalendarIcon size={48} className="section-icon !w-12 !h-12" />
                   </div>
                   <div className="flex-1 text-center sm:text-start-rtl">
                     <h2 className="text-h3 font-bold mb-3 leading-tight heading-text">
@@ -472,6 +489,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         initialMode="signin"
       />
     </div>
+    </PullToRefresh>
   );
 };
 

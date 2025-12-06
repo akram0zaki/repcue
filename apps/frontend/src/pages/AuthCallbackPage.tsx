@@ -3,12 +3,39 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../config/supabase';
 import { Routes } from '../types';
+import { isNativePlatform } from '../utils/nativeCapabilities';
 import logger from '../utils/logger';
+
+/**
+ * Extract tokens from URL hash fragment
+ * Supabase returns tokens in hash format: #access_token=xxx&refresh_token=xxx&...
+ */
+function extractTokensFromHash(hash: string): { accessToken?: string; refreshToken?: string } | null {
+  if (!hash || !hash.includes('access_token')) {
+    return null;
+  }
+  
+  // Remove leading # if present
+  const hashContent = hash.startsWith('#') ? hash.substring(1) : hash;
+  const params = new URLSearchParams(hashContent);
+  
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+  
+  if (accessToken) {
+    return { accessToken, refreshToken: refreshToken || undefined };
+  }
+  
+  return null;
+}
 
 /**
  * OAuth callback page that handles authentication redirects
  * This page is typically visited after OAuth sign-in (Google, Apple, etc.)
  * Enhanced with better error handling and user feedback
+ * 
+ * For native apps using custom URL schemes (repcue://), tokens in the hash
+ * must be manually extracted and set since Supabase doesn't auto-detect them.
  */
 const AuthCallbackPage: React.FC = () => {
   const { t } = useTranslation('auth');
@@ -23,7 +50,21 @@ const AuthCallbackPage: React.FC = () => {
       try {
         // Detect authentication type from URL hash or params
         const hash = window.location.hash;
+        const href = window.location.href;
         const isMagicLink = hash.includes('type=magiclink') || searchParams.get('type') === 'magiclink';
+        
+        // Always log for debugging on native (visible in Xcode console)
+        console.log('🔐 AuthCallbackPage mounted');
+        console.log('🔐 Current URL:', href.substring(0, 120));
+        console.log('🔐 Hash present:', !!hash, 'length:', hash.length);
+        console.log('🔐 Has access_token:', hash.includes('access_token'));
+        
+        logger.log('🔐 Auth callback started:', {
+          hash: hash ? `${hash.substring(0, 50)}...` : '(empty)',
+          isNative: isNativePlatform(),
+          isMagicLink,
+          href: href.substring(0, 100)
+        });
         
         // Extract provider from URL params or detect from auth type
         let detectedProvider = searchParams.get('provider') || '';
@@ -35,6 +76,58 @@ const AuthCallbackPage: React.FC = () => {
           ? detectedProvider.charAt(0).toUpperCase() + detectedProvider.slice(1)
           : t('callback.defaultProvider', 'your account');
         setProvider(displayProvider);
+
+        // For native apps with custom URL schemes, tokens in the hash need to be
+        // manually extracted and set since Supabase doesn't auto-detect them
+        if (isNativePlatform() && hash.includes('access_token')) {
+          logger.log('🔐 Native app detected with tokens in hash, extracting...');
+          const tokens = extractTokensFromHash(hash);
+          
+          if (tokens?.accessToken) {
+            logger.log('🔐 Setting session from extracted tokens');
+            const { data, error: setSessionError } = await supabase.auth.setSession({
+              access_token: tokens.accessToken,
+              refresh_token: tokens.refreshToken || ''
+            });
+            
+            if (setSessionError) {
+              logger.error('🔐 Failed to set session from tokens:', setSessionError);
+              setError(t('errors.signInFailed', 'Sign-in failed. Please try again.'));
+              setTimeout(() => navigate(Routes.HOME, { replace: true }), 4000);
+              return;
+            }
+            
+            if (data.session?.user) {
+              logger.log('🔐 Session set successfully from tokens:', {
+                userId: data.session.user.id,
+                email: data.session.user.email
+              });
+              
+              // Clear the URL hash to prevent re-processing on navigation
+              if (window.location.hash) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+              }
+              
+              setSuccess(true);
+              
+              // Check for shared exercise token
+              const shareToken = searchParams.get('saveSharedExercise');
+              if (shareToken) {
+                sessionStorage.setItem('pendingShareToken', shareToken);
+              }
+              
+              // Quick redirect - session is already set
+              setTimeout(() => {
+                if (shareToken) {
+                  navigate(`${Routes.HOME}?saveSharedExercise=${shareToken}`, { replace: true });
+                } else {
+                  navigate(Routes.HOME, { replace: true });
+                }
+              }, 800); // Reduced from 2000ms - just show brief success flash
+              return;
+            }
+          }
+        }
 
         // Check for OAuth error in URL params (common OAuth error pattern)
         const errorParam = searchParams.get('error');

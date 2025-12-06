@@ -1,0 +1,31 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "3PL59MTF96.me.repcue.app"
+        ],
+        "components": [
+          {
+            "/": "/auth/callback",
+            "comment": "Magic link authentication callback"
+          },
+          {
+            "/": "/auth/reset-password",
+            "comment": "Password reset callback"
+          },
+          {
+            "/": "/share/*",
+            "comment": "Shared exercise deep links"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "3PL59MTF96.me.repcue.app"
+    ]
+  }
+}
