@@ -272,6 +272,7 @@
     "beepInterval60": "Cada 60 segundos",
     "wakeLock": "Mantener pantalla activa",
     "selectExercise": "Seleccionar ejercicio",
+    "selectExerciseHint": "Selecciona un ejercicio para comenzar:",
     "fit": "Ajustar",
     "fill": "Rellenar"
   },

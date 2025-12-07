@@ -2,6 +2,59 @@
 
 ### 2025-12-07
 
+#### 🐛 Fix - Search Input Icon Overlap
+
+**Fixed**: Magnifying glass icon overlapping with placeholder/input text in search fields.
+
+**Problem**: In the ExerciseSelector component (used on Timer page), the search icon was overlapping with the placeholder text and user input.
+
+**Solution**: 
+- Matched ExerciseSelector search styling to ExercisePage search styling
+- Increased input left padding from `ps-10` to `ps-14 sm:ps-16`
+- Used smaller responsive icon sizes `h-4 w-4 sm:h-5 sm:w-5`
+- Applied RTL-aware properties (`ps-`, `pe-`, `start-`, `end-`) for proper RTL language support
+
+**Files Changed**:
+- [ExerciseSelector.tsx](apps/frontend/src/components/ExerciseSelector/ExerciseSelector.tsx) - Fixed search input padding and icon positioning
+
+---
+
+#### ✨ Enhancement - Timer Page Exercise Selection Help Text
+
+**Added**: Help text "Select an exercise to start training:" appears on Timer page when no exercise is selected.
+
+**Problem**: Users landing on the Timer page without an exercise selected had no guidance on what to do next.
+
+**Solution**: 
+- Added conditional help text above the exercise selection control
+- Text only appears when no exercise is selected
+- Translated to all 8 supported locales
+
+**Files Changed**:
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Added conditional help text
+- All 8 locale files (common.json) - Added `timer.selectExerciseHint` translations
+
+---
+
+#### 🐛 Fix - Post-Workout Survey Modal Vertical Overflow
+
+**Fixed**: Post-workout feedback survey modal was truncated on smaller screens with no scrolling.
+
+**Problem**: The modal requesting user feedback after completing an exercise was cut off at top and bottom on phones with smaller screens, with no way to scroll.
+
+**Solution**: 
+- Added `max-h-[85vh] overflow-y-auto` for scrolling on small screens
+- Reduced padding, margins, and spacing throughout the modal
+- Reduced button padding from `p-4` to `px-3 py-2.5`
+- Reduced emoji size from `text-3xl` to `text-2xl`
+- Reduced description text from `text-sm` to `text-xs`
+- Applied RTL-aware margins (`me-2`, `text-start`)
+
+**Files Changed**:
+- [PostWorkoutSurvey.tsx](apps/frontend/src/components/PostWorkoutSurvey.tsx) - Optimized modal layout for mobile
+
+---
+
 #### ✨ Enhancement - Exercise Active/Inactive Status
 
 **Added**: New `is_active` property for `GlobalExercise` to control exercise visibility in listings.

@@ -272,6 +272,7 @@
     "beepInterval60": "Elke 60 sekonden",
     "wakeLock": "Wekkerslot",
     "selectExercise": "Oefening selektearje",
+    "selectExerciseHint": "Selektearje in oefening om te begjinnen:",
     "fit": "Passen",
     "fill": "Folje"
   },

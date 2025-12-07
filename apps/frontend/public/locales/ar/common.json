@@ -265,6 +265,7 @@
     "beepInterval60": "كل 60 ثانية",
     "wakeLock": "قفل الشاشة",
     "selectExercise": "اختر التمرين",
+    "selectExerciseHint": "اختر تمريناً للبدء:",
     "fit": "احتواء",
     "fill": "ملء"
   },

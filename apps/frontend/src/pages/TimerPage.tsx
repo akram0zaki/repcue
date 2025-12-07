@@ -384,6 +384,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Compact Exercise Selection - Hidden in workout mode */}
         {!isWorkoutMode && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 mb-2">
+            {/* Help text when no exercise selected */}
+            {!selectedExercise && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('timer.selectExerciseHint')}</p>
+            )}
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('timer.exerciseLabel')}</span>
               {selectedExercise ? (
