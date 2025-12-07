@@ -2,6 +2,30 @@
 
 ### 2025-12-07
 
+#### ✨ Enhancement - Parallax Collapsing Header Effect
+
+**Added**: Apple-style parallax collapsing header effect to Home Page and fixed visual glitch on Exercise Detail Page.
+
+**Home Page**:
+- Hero banner now uses sticky positioning with scale/fade effect on scroll
+- As user scrolls down, the hero image shrinks (1.0 → 0.85) and fades (1.0 → 0.5)
+- Content panel with rounded top corners slides up over the hero
+- Dark overlay fades in over the hero as you scroll
+- Small pill/handle indicator at top of content panel (Apple design pattern)
+- Effect works on all platforms (iOS, Android, web browsers)
+- Respects `prefers-reduced-motion` accessibility preference
+
+**Exercise Detail Page**:
+- Fixed visual glitch where a white sheet appeared between the video and content panel during scroll
+- Changed container background from gradient to solid black so only the rounded-corner content panel is visible over the video
+
+**Files Changed**:
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Added scroll state tracking and parallax hero rendering
+- [homeParallax.css](apps/frontend/src/styles/homeParallax.css) - New CSS file for home page parallax styles
+- [exerciseDetailParallax.css](apps/frontend/src/styles/exerciseDetailParallax.css) - Fixed iOS container background
+
+---
+
 #### 🐛 Bug Fix Attempt - iOS Video Re-render Issue (Attempt #4)
 
 **Issue**: Videos on iOS play for ~1 second, pause for ~4 seconds, then restart from the beginning

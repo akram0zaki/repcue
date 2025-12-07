@@ -115,13 +115,13 @@
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  /* Background for the sticky video area */
-  background: linear-gradient(to bottom, #000 0%, #000 40vh, var(--color-surface-primary, #fff) 40vh);
+  /* Solid black background - content panel covers it with rounded corners */
+  background-color: #000;
 }
 
 .dark.ios-app .exercise-detail-container,
 .ios-app.dark .exercise-detail-container {
-  background: linear-gradient(to bottom, #000 0%, #000 40vh, var(--color-surface-secondary, #1c1c1e) 40vh);
+  background-color: #000;
 }
 
 /* Sticky video wrapper - stays pinned while scrolling */

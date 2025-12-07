@@ -23,6 +23,7 @@ import Imprint from '../components/Imprint';
 import logger from '../utils/logger';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import type { ExerciseMediaIndex } from '../types/media';
+import '../styles/homeParallax.css';
 
 interface HomePageProps {
   exercises: Exercise[];
@@ -34,6 +35,16 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   const navigate = useNavigate();
   const { t, i18n } = useTranslation(['common', 'exerciseDetails']);
   const { isAuthenticated } = useAuth();
+  const [scrollY, setScrollY] = useState(0);
+
+  // Parallax effect - listen to scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Pull-to-refresh handler - triggers sync and refreshes local data
   const handleRefresh = useCallback(async () => {
@@ -197,34 +208,69 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   };
 
   const popularExercises = getPopularExercises();
-  return (
-    <PullToRefresh onRefresh={handleRefresh} testId="home-pull-to-refresh">
-    <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
-      <div className="container mx-auto px-4 py-2 max-w-md">
-        {/* Hero Banner */}
-        <div className="relative mb-4 rounded-lg overflow-hidden shadow-lg">
-          <div className="relative h-40 bg-gradient-to-br from-primary-600 to-primary-800">
-            <img
-              src="/images/hero-banner.png"
-              alt="Fitness motivation"
-              className="w-full h-full object-cover"
-            />
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-            {/* Motivational Text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center px-4">
-                <h2 className="text-h3 text-white mb-2 leading-tight timer-text-shadow-lg">
-                  {t('home.heroTitle', { defaultValue: 'Stay consistent, stay strong.' })}
-                </h2>
-                <p className="text-caption text-white/90 font-medium timer-text-shadow-sm">
-                  {t('home.heroSubtitle', { defaultValue: 'Your workouts, your way.' })}
-                </p>
-              </div>
-            </div>
+
+  // Scroll effect calculations for parallax hero
+  const maxScroll = 120; // Scroll distance for full effect
+  const scrollProgress = Math.min(scrollY / maxScroll, 1); // 0 to 1
+  const heroScale = 1 - (scrollProgress * 0.15); // Scale from 1 to 0.85
+  const heroOpacity = 1 - (scrollProgress * 0.5); // Opacity from 1 to 0.5
+  const overlayOpacity = scrollProgress * 0.4; // Overlay from 0 to 0.4
+
+  // Render hero section with parallax effect
+  const renderHeroSection = () => {
+    const heroContent = (
+      <>
+        <img
+          src="/images/hero-banner.png"
+          alt="Fitness motivation"
+          className="w-full h-full object-cover"
+        />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+        {/* Motivational Text */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center px-4">
+            <h2 className="text-h3 text-white mb-2 leading-tight timer-text-shadow-lg">
+              {t('home.heroTitle', { defaultValue: 'Stay consistent, stay strong.' })}
+            </h2>
+            <p className="text-caption text-white/90 font-medium timer-text-shadow-sm">
+              {t('home.heroSubtitle', { defaultValue: 'Your workouts, your way.' })}
+            </p>
           </div>
         </div>
+        {/* Scroll overlay - fades in as you scroll */}
+        <div 
+          className="home-hero-overlay"
+          style={{ opacity: overlayOpacity }}
+        />
+      </>
+    );
 
+    // Sticky wrapper with scale/fade effect for all platforms
+    return (
+      <div className="home-hero-wrapper">
+        <div 
+          className="home-hero-container"
+          style={{
+            transform: `scale(${heroScale})`,
+            opacity: heroOpacity,
+          }}
+        >
+          {heroContent}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <PullToRefresh onRefresh={handleRefresh} testId="home-pull-to-refresh">
+    <div id="main-content" className="min-h-screen pb-20 bg-background-50 dark:bg-background-950 home-parallax-container">
+      <div className="container mx-auto px-4 py-2 max-w-md">
+        {/* Hero Banner */}
+        {renderHeroSection()}
+
+        {/* Content Panel - slides over hero */}
+        <div className="home-content-panel">
         <header className="text-center mb-3">
           <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-1">
             {APP_NAME}
@@ -480,6 +526,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
             </div>
           </footer>
         </div>
+        </div>{/* End content panel wrapper */}
       </div>
 
       {/* Auth Modal */}
