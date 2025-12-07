@@ -2,6 +2,24 @@
 
 ### 2025-12-07
 
+#### ✨ Enhancement - Smart Catalog Assignment for Single-Catalog Users
+
+**Added**: When a user has access to only one catalog, the "Catalog Assignment" section is automatically hidden on the Create/Edit Exercise page, and the single catalog is auto-selected in the background.
+
+**Problem**: For users with access to only one catalog (e.g., General Fitness for non-premium users), displaying a catalog selection UI with a single pre-selected option was unnecessary and added visual clutter.
+
+**Solution**: 
+- `CatalogMultiSelector` now reports available catalog count via `onCatalogCountChange` callback
+- Auto-selects the single catalog when only one is available
+- `ExerciseForm` conditionally hides the entire catalog assignment section when `availableCatalogCount <= 1`
+- Catalog membership record is still created correctly behind the scenes
+
+**Files Changed**:
+- [CatalogMultiSelector.tsx](apps/frontend/src/components/CatalogMultiSelector.tsx) - Added `onCatalogCountChange` callback and auto-selection logic
+- [ExerciseForm.tsx](apps/frontend/src/components/ExerciseForm.tsx) - Added catalog count tracking and conditional rendering
+
+---
+
 #### ✨ Enhancement - Exercise Catalog Scroll Position Persistence
 
 **Added**: Both vertical and horizontal scroll positions are now preserved when navigating to exercise details and back.

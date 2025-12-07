@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseCatalog } from '../types';
 import { getAvailableCatalogs } from '../data/catalogs';
@@ -10,6 +10,8 @@ interface CatalogMultiSelectorProps {
   disabled?: boolean;
   className?: string;
   minSelected?: number; // enforce minimum selected count (default 1)
+  /** Callback to inform parent how many catalogs are available */
+  onCatalogCountChange?: (count: number) => void;
 }
 
 /**
@@ -17,6 +19,7 @@ interface CatalogMultiSelectorProps {
  * - Tailwind only (no inline styles)
  * - Keyboard friendly (checkbox group)
  * - Screen-reader labels
+ * - Auto-selects single catalog when only one is available
  */
 const CatalogMultiSelector: React.FC<CatalogMultiSelectorProps> = ({
   selectedCatalogIds,
@@ -24,12 +27,25 @@ const CatalogMultiSelector: React.FC<CatalogMultiSelectorProps> = ({
   availableCatalogs,
   disabled = false,
   className = '',
-  minSelected = 1
+  minSelected = 1,
+  onCatalogCountChange
 }) => {
   const { t } = useTranslation(['catalogs', 'common']);
   const catalogs = (availableCatalogs && availableCatalogs.length > 0)
     ? availableCatalogs
     : getAvailableCatalogs(); // This now filters by isVisible
+
+  // Report catalog count to parent
+  useEffect(() => {
+    onCatalogCountChange?.(catalogs.length);
+  }, [catalogs.length, onCatalogCountChange]);
+
+  // Auto-select the single catalog if only one is available
+  useEffect(() => {
+    if (catalogs.length === 1 && !selectedCatalogIds.includes(catalogs[0].id)) {
+      onChange([catalogs[0].id]);
+    }
+  }, [catalogs, selectedCatalogIds, onChange]);
 
   const toggle = (id: string) => {
     if (disabled) return;
