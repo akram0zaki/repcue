@@ -54,6 +54,8 @@ export interface GlobalExercise extends SyncMetadata {
   /** Indicates whether a guided video is available for this exercise */
   has_video?: boolean; // default false in catalog initialization
   is_favorite: boolean;
+  /** Whether this exercise is active and should be shown in listings. Defaults to true. */
+  is_active?: boolean;
   
   /**
    * Base tags: Universal, catalog-agnostic tags (e.g., 'stability', 'warmup', 'isometric')

@@ -2,6 +2,28 @@
 
 ### 2025-12-07
 
+#### ✨ Enhancement - Exercise Active/Inactive Status
+
+**Added**: New `is_active` property for `GlobalExercise` to control exercise visibility in listings.
+
+**Problem**: Some exercises may need to be temporarily hidden from users without deleting them from the codebase (e.g., exercises with broken videos, exercises under review, seasonal content).
+
+**Solution**: 
+- Added `is_active?: boolean` property to `GlobalExercise` type interface (defaults to `true`)
+- Modified `createGlobalExercise` helper to set `is_active: true` by default, with option to override
+- Added filtering in `useExerciseFilter` hook to exclude exercises where `is_active === false`
+- Updated exercise count display in filter results to exclude inactive exercises from total
+
+**Usage**: To hide an exercise, add `is_active: false` to its definition in `globalExercises.ts`
+
+**Files Changed**:
+- [types/index.ts](apps/frontend/src/types/index.ts) - Added `is_active` property to GlobalExercise interface
+- [globalExercises.ts](apps/frontend/src/data/globalExercises.ts) - Updated helper to support `is_active` override
+- [useExerciseFilter.ts](apps/frontend/src/hooks/useExerciseFilter.ts) - Added inactive exercise filtering
+- [ExercisePage.tsx](apps/frontend/src/pages/ExercisePage.tsx) - Updated count display to exclude inactive exercises
+
+---
+
 #### ✨ Enhancement - Smart Catalog Assignment for Single-Catalog Users
 
 **Added**: When a user has access to only one catalog, the "Catalog Assignment" section is automatically hidden on the Create/Edit Exercise page, and the single catalog is auto-selected in the background.

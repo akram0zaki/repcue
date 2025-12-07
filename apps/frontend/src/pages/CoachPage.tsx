@@ -18,11 +18,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import CoachingCard from '../components/CoachingCard';
 import WeeklyStreakCalendar from '../components/WeeklyStreakCalendar';
 import ProgressChart from '../components/ProgressChart';
 import { PullToRefresh } from '../components/platform';
 import { useCoachingInsights } from '../hooks/useCoachingInsights';
+import { InsightsModal } from '../components/InsightsModal';
 import { StorageService } from '../services/storageService';
 import type { ActivityLog, AppSettings, Exercise, Workout } from '../types';
 import logger from '../utils/logger';
@@ -45,6 +45,7 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [expandedWorkouts, setExpandedWorkouts] = useState<Set<string>>(new Set());
   const [workoutNameMap, setWorkoutNameMap] = useState<Record<string, string>>({});
+  const [showInsightsModal, setShowInsightsModal] = useState(false);
 
   // Load activity logs for charts
   React.useEffect(() => {
@@ -351,23 +352,47 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
             </p>
           </div>
 
-          {/* Empty state */}
+          {/* Empty state - differentiate between no history vs dismissed all insights */}
           <div className="bg-surface-0 dark:bg-surface-900 rounded-xl p-4 sm:p-6 shadow-sm border border-surface-200 dark:border-surface-700 text-center">
-            <svg className="w-16 h-16 text-surface-400 dark:text-surface-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            <h3 className="text-h3 mb-2">
-              {t('coaching:empty.title', { defaultValue: 'No Insights Yet' })}
-            </h3>
-            <p className="text-body mb-6">
-              {t('coaching:empty.message', { defaultValue: 'Start working out to get personalized coaching insights!' })}
-            </p>
-            <button
-              onClick={() => navigate('/timer')}
-              className="btn-primary"
-            >
-              {t('coaching:empty.startWorkout', { defaultValue: 'Start Your First Workout' })}
-            </button>
+            {logs.length === 0 ? (
+              <>
+                {/* No workout history at all */}
+                <svg className="w-16 h-16 text-surface-400 dark:text-surface-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <h3 className="text-h3 mb-2">
+                  {t('coaching:empty.title', { defaultValue: 'No Insights Yet' })}
+                </h3>
+                <p className="text-body mb-6">
+                  {t('coaching:empty.message', { defaultValue: 'Start working out to get personalized coaching insights!' })}
+                </p>
+                <button
+                  onClick={() => navigate('/timer')}
+                  className="btn-primary"
+                >
+                  {t('coaching:empty.startWorkout', { defaultValue: 'Start Your First Workout' })}
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Has workout history but no active insights (all dismissed or none generated) */}
+                <svg className="w-16 h-16 text-success-500 dark:text-success-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-h3 mb-2">
+                  {t('coaching:empty.allCaughtUpTitle', { defaultValue: "You're All Caught Up!" })}
+                </h3>
+                <p className="text-body mb-4">
+                  {t('coaching:empty.allCaughtUpMessage', { defaultValue: "Great job! You've reviewed all your coaching recommendations. Keep up the good work and check back later for new insights." })}
+                </p>
+                <button
+                  onClick={() => navigate('/workouts')}
+                  className="btn-secondary"
+                >
+                  {t('coaching:empty.continueWorkout', { defaultValue: 'Continue Training' })}
+                </button>
+              </>
+            )}
           </div>
 
           {/* Show progress section even when no insights */}
@@ -557,59 +582,68 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
           </div>
         </div>
 
-        {/* Insights list */}
-        <div className="space-y-3 mb-4">
-          {(() => {
-            // Group insights by source
-            const aiInsights = insights.filter(i => i.source === 'ai');
-            const ruleInsights = insights.filter(i => i.source === 'rule' || !i.source);
-            
-            return (
-              <>
-                {/* AI-powered insights section */}
-                {aiInsights.length > 0 && (
-                  <div key="ai-insights-section" className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 streak-count" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      <h2 className="text-h3 font-semibold">
-                        {t('coaching:aiInsights', { defaultValue: 'AI-Powered Insights' })}
-                      </h2>
-                    </div>
-                    {aiInsights.map(insight => (
-                      <CoachingCard
-                        key={insight.id}
-                        insight={insight}
-                        onAction={handleAction}
-                        onDismiss={dismissInsight}
-                      />
-                    ))}
-                  </div>
-                )}
+        {/* Coach Recommendations Link - Opens modal with insights */}
+        {insights.length > 0 && (
+          <button
+            onClick={() => setShowInsightsModal(true)}
+            className="w-full mb-4 p-4 rounded-xl
+              bg-gradient-to-r from-primary-50 to-primary-100 
+              dark:from-primary-900/30 dark:to-primary-800/30
+              border border-primary-200 dark:border-primary-700/50
+              hover:from-primary-100 hover:to-primary-150 
+              dark:hover:from-primary-900/40 dark:hover:to-primary-800/40
+              transition-all motion-reduce:transition-none
+              focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
+              dark:focus:ring-offset-background-900
+              group"
+            aria-label={t('coaching:insightsLink.ariaLabel', { 
+              count: insights.length,
+              defaultValue: 'View {{count}} coach recommendations' 
+            })}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {/* Icon */}
+                <div className="w-10 h-10 rounded-full flex items-center justify-center
+                  bg-primary-500/20 dark:bg-primary-400/20
+                  group-hover:bg-primary-500/30 dark:group-hover:bg-primary-400/30
+                  transition-colors motion-reduce:transition-none">
+                  <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
                 
-                {/* Rule-based insights section */}
-                {ruleInsights.length > 0 && (
-                  <div key="rule-insights-section" className="space-y-3">
-                    {aiInsights.length > 0 && (
-                      <h2 className="text-h3 font-semibold mt-6">
-                        {t('coaching:additionalInsights', { defaultValue: 'Additional Insights' })}
-                      </h2>
-                    )}
-                    {ruleInsights.map(insight => (
-                      <CoachingCard
-                        key={insight.id}
-                        insight={insight}
-                        onAction={handleAction}
-                        onDismiss={dismissInsight}
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
-            );
-          })()}
-        </div>
+                {/* Text content */}
+                <div className="text-left rtl:text-right">
+                  <h3 className="text-body font-semibold text-primary-700 dark:text-primary-300">
+                    {t('coaching:insightsLink.title', { defaultValue: 'How am I doing?' })}
+                  </h3>
+                  <p className="text-caption text-primary-600/80 dark:text-primary-400/80">
+                    {t('coaching:insightsLink.subtitle', { 
+                      count: insights.length,
+                      defaultValue: '{{count}} recommendations for you' 
+                    })}
+                  </p>
+                </div>
+              </div>
+              
+              {/* Arrow icon */}
+              <svg 
+                className="w-5 h-5 text-primary-500 dark:text-primary-400 
+                  ltr:group-hover:translate-x-1 rtl:group-hover:-translate-x-1
+                  transition-transform motion-reduce:transition-none
+                  rtl:rotate-180" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24" 
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+        )}
 
         {/* Progress section */}
         {logs.length > 0 && (
@@ -820,6 +854,15 @@ export const CoachPage: React.FC<CoachPageProps> = ({ appSettings, exercises }) 
         )}
         </div>
       </div>
+
+      {/* Insights Modal */}
+      <InsightsModal
+        isOpen={showInsightsModal}
+        onClose={() => setShowInsightsModal(false)}
+        insights={insights}
+        onAction={handleAction}
+        onDismiss={dismissInsight}
+      />
     </PullToRefresh>
   );
 };

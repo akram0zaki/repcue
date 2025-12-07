@@ -10,7 +10,10 @@
   "empty": {
     "title": "No Insights Yet",
     "message": "Start working out to get personalized coaching insights!",
-    "startWorkout": "Start Your First Workout"
+    "startWorkout": "Start Your First Workout",
+    "allCaughtUpTitle": "You're All Caught Up!",
+    "allCaughtUpMessage": "Great job! You've reviewed all your coaching recommendations. Keep up the good work and check back later for new insights, or scroll down to view your progress.",
+    "continueWorkout": "Continue Training"
   },
   "error": {
     "title": "Unable to Load Insights"
@@ -194,5 +197,19 @@
   "viewAll": "View All",
   "insightsCarousel": "Coaching insights carousel",
   "carouselNavigation": "Carousel navigation",
-  "goToInsight": "Go to insight {{number}}"
+  "goToInsight": "Go to insight {{number}}",
+  "insightsLink": {
+    "title": "How am I doing?",
+    "subtitle": "{{count}} recommendations for you",
+    "subtitle_one": "{{count}} recommendation for you",
+    "ariaLabel": "View {{count}} coach recommendations"
+  },
+  "insightsModal": {
+    "title": "Your Recommendations",
+    "ariaLabel": "Coach recommendations modal",
+    "summary": "Here's what your coach suggests based on your workout history",
+    "empty": "No recommendations at the moment. Keep working out to get personalized insights!",
+    "aiSection": "AI-Powered Recommendations",
+    "standardSection": "Standard Recommendations"
+  }
 }

@@ -657,7 +657,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 {(() => {
                   const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
                   const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { ns: 'catalogs', defaultValue: selectedCatalog.id }) : 'Unknown';
-                  const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
+                  const totalInCatalog = exercises.filter(ex => 
+                    ex.catalogId === selectedCatalogId && 
+                    !('is_active' in ex && ex.is_active === false)
+                  ).length;
                   return t('exercises:showingCountInCatalog', {
                     count: filteredExercises.length,
                     total: totalInCatalog,
