@@ -2,6 +2,23 @@
 
 ### 2025-12-07
 
+#### ✨ Enhancement - Exercise Catalog Scroll Position Persistence
+
+**Added**: Both vertical and horizontal scroll positions are now preserved when navigating to exercise details and back.
+
+**Problem**: When browsing the exercise catalog and clicking on an exercise to view details, pressing back would always return to the top of the catalog page, losing both vertical scroll position and any horizontal scrolling within category rows.
+
+**Solution**: 
+- Save vertical scroll position to `sessionStorage` before navigating to exercise details
+- Save horizontal scroll positions for each category row that has been scrolled
+- Restore both vertical and horizontal positions when returning via back navigation
+- Positions are cleared after restoration to prevent stale state
+
+**Files Changed**:
+- [ExercisePage.tsx](apps/frontend/src/pages/ExercisePage.tsx) - Added scroll position save/restore logic for both axes
+
+---
+
 #### ✨ Enhancement - Parallax Collapsing Header Effect
 
 **Added**: Apple-style parallax collapsing header effect to Home Page and fixed visual glitch on Exercise Detail Page.

@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: page already uses t() for user-visible text; remaining literals are units, icons, or fallback defaults */
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { Exercise, ExerciseCategory, AppSettings, CatalogMembership } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
@@ -52,11 +52,72 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation(['exercises', 'common', 'exerciseDetails', 'catalogs']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
   const { isSharedExercise } = useSharedExercises();
+
+  // Refs for horizontal scrolling navigation (declared early for scroll restoration)
+  const categoryScrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Scroll position persistence keys
+  const SCROLL_POSITION_KEY = 'exercise-page-scroll-position';
+  const HORIZONTAL_SCROLL_KEY = 'exercise-page-horizontal-scroll';
+
+  // Restore scroll positions when coming back to this page
+  useEffect(() => {
+    const savedVerticalPosition = sessionStorage.getItem(SCROLL_POSITION_KEY);
+    const savedHorizontalPositions = sessionStorage.getItem(HORIZONTAL_SCROLL_KEY);
+    
+    if (savedVerticalPosition || savedHorizontalPositions) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        // Restore vertical scroll
+        if (savedVerticalPosition) {
+          window.scrollTo(0, parseInt(savedVerticalPosition, 10));
+        }
+        
+        // Restore horizontal scroll positions for each category row
+        if (savedHorizontalPositions) {
+          try {
+            const horizontalPositions = JSON.parse(savedHorizontalPositions) as Record<string, number>;
+            Object.entries(horizontalPositions).forEach(([groupKey, scrollLeft]) => {
+              const scrollContainer = categoryScrollRefs.current[groupKey];
+              if (scrollContainer) {
+                scrollContainer.scrollLeft = scrollLeft;
+              }
+            });
+          } catch (e) {
+            logger.warn('Failed to restore horizontal scroll positions:', e);
+          }
+        }
+        
+        // Clear saved positions after restoring
+        sessionStorage.removeItem(SCROLL_POSITION_KEY);
+        sessionStorage.removeItem(HORIZONTAL_SCROLL_KEY);
+      });
+    }
+  }, [location.key]); // Re-run when location changes (including back navigation)
+
+  // Save scroll positions before navigating away
+  const saveScrollPosition = useCallback(() => {
+    // Save vertical scroll position
+    sessionStorage.setItem(SCROLL_POSITION_KEY, String(window.scrollY));
+    
+    // Save horizontal scroll positions for each category row
+    const horizontalPositions: Record<string, number> = {};
+    Object.entries(categoryScrollRefs.current).forEach(([groupKey, scrollContainer]) => {
+      if (scrollContainer && scrollContainer.scrollLeft > 0) {
+        horizontalPositions[groupKey] = scrollContainer.scrollLeft;
+      }
+    });
+    
+    if (Object.keys(horizontalPositions).length > 0) {
+      sessionStorage.setItem(HORIZONTAL_SCROLL_KEY, JSON.stringify(horizontalPositions));
+    }
+  }, []);
 
   // Pull-to-refresh handler - triggers sync and refreshes exercises
   const handleRefresh = useCallback(async () => {
@@ -115,10 +176,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-
-
-  // Refs for horizontal scrolling navigation
-  const categoryScrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Scroll functions for horizontal navigation
   const scrollCategory = useCallback((category: string, direction: 'left' | 'right') => {
@@ -358,6 +415,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   };
 
   const handleNavigateToExercise = (exerciseId: string) => {
+    saveScrollPosition();
     navigate(`/exercises/${exerciseId}`);
   };
 
