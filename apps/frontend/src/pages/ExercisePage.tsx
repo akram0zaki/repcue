@@ -638,7 +638,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       {groupExercises.length > 1 && (
                         <button
                           onClick={() => scrollCategory(groupKey, 'left')}
-                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
                           aria-label={t('a11y.scrollLeft', 'Scroll left')}
                         >
                           <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -651,7 +651,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       {groupExercises.length > 1 && (
                         <button
                           onClick={() => scrollCategory(groupKey, 'right')}
-                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
                           aria-label={t('a11y.scrollRight', 'Scroll right')}
                         >
                           <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1100,7 +1100,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         )}
 
         {/* Video/Image Area - Lazy loaded when visible */}
-        <div className="mb-2">
+        <div className="mb-2 pointer-events-auto">
           {isIntersecting ? (
             <VideoThumbnail
               exercise={exercise}

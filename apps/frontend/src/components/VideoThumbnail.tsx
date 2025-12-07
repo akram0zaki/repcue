@@ -74,6 +74,13 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   const [mediaMeta, setMediaMeta] = useState<ExerciseMedia | null>(null); // cached media entry for fallback
   const [attemptedFallback, setAttemptedFallback] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Ref to track isPlaying without causing effect re-runs
+  // This prevents the video from restarting when play state changes
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   // has_video can be stale; we derive availability from media index or custom URL
 
@@ -221,7 +228,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       clearTimeoutAndMarkLoaded();
       
       // Ensure first frame is shown for thumbnail
-      if (video && !isPlaying && video.currentTime === 0) {
+      // Use ref to check current playing state to avoid stale closure
+      if (video && !isPlayingRef.current && video.currentTime === 0) {
         video.currentTime = 0.1;
       }
     };
@@ -323,8 +331,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       clearTimeoutAndMarkLoaded();
       
       // Ensure we show the first frame for thumbnail display
-      // Only seek if video is not currently playing
-      if (!isPlaying && video.currentTime === 0) {
+      // Only seek if video is not currently playing (use ref to avoid stale closure)
+      if (!isPlayingRef.current && video.currentTime === 0) {
         video.currentTime = 0.1;
       }
     };
@@ -345,7 +353,9 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('error', handleError);
     };
-  }, [onVideoLoad, onVideoError, videoUrl, exercise.id, isPlaying]);
+  // CRITICAL: Do NOT include isPlaying in deps - it causes effect re-run which restarts video on iOS
+  // We use isPlayingRef.current inside handlers to access current playing state
+  }, [onVideoLoad, onVideoError, videoUrl, exercise.id, isSharedExercise, mediaMeta, attemptedFallback]);
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click events
@@ -397,12 +407,15 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     >
       {/* Video Element */}
       <video
-        key={videoUrl} // Force re-render when URL changes
+        // Removed key={videoUrl} - was causing video restart when caching completes
+        // The video element handles src changes natively without needing recreation
         ref={videoRef}
         src={videoUrl || undefined}
         poster={thumbnailUrl || undefined} // Show thumbnail image immediately
         className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-lg bg-gray-100 dark:bg-gray-800`}
-        preload="none" // Don't load video until user clicks play (saves bandwidth)
+        // For blob URLs (cached), preload metadata so video is ready to play instantly
+        // For network URLs, use 'none' to save bandwidth
+        preload={videoUrl?.startsWith('blob:') ? 'metadata' : 'none'}
         muted
         loop // Videos will loop automatically when playing
         playsInline

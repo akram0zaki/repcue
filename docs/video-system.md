@@ -128,10 +128,13 @@ RepCue includes a multi-tier caching system via `VideoCacheService` (`src/servic
 
 ### URL Resolution
 The `resolveVideoUrl` utility (`src/utils/resolveVideoUrl.ts`) handles multiple URL schemes:
-- Regular HTTP/HTTPS URLs: returned as-is (browser handles caching)
+- Regular HTTP/HTTPS URLs: cached via VideoCacheService (web only)
 - `blob:` URLs: returned directly
 - `blob-pending-sync://` / `blob-video://`: custom exercises stored locally
 - `shared-video://`: references another exercise's video file
+
+**Important: Native App Caching Behavior**
+On native iOS/Android apps, IndexedDB blob caching is **disabled**. This is because iOS WKWebView has compatibility issues with blob URLs created from IndexedDB stored video data, causing `MEDIA_ERR_SRC_NOT_SUPPORTED` errors. Native apps use direct CDN URLs instead and rely on iOS's built-in HTTP caching.
 
 ## Proxy & Headers (Cloudflare Pages Functions)
 The media proxy is implemented in `functions/media/[[path]].ts`:
@@ -207,6 +210,19 @@ In Capacitor native apps, relative `/media/*` paths resolve to `capacitor://loca
 - **Capacitor Config**: `allowNavigation` includes `https://repcue.me/*` and `https://*.repcue.me/*`
 - **WKWebView**: Configured for inline media playback via Capacitor defaults
 
+### iOS Blob URL Limitation
+**Critical**: iOS WKWebView cannot reliably play blob URLs created from IndexedDB stored video data. This causes `MEDIA_ERR_SRC_NOT_SUPPORTED` (error code 4) even though the same blob URLs work correctly on web browsers.
+
+**Workaround**: The `resolveVideoUrl` function detects native platforms and bypasses IndexedDB blob caching entirely, returning direct CDN URLs instead. iOS will use its native HTTP caching mechanism for video files.
+
+```typescript
+// In resolveVideoUrl.ts
+if (isNativePlatform()) {
+  // Skip blob cache, use direct URL
+  return fetchUrl; // https://repcue.me/media/...
+}
+```
+
 ### Video Probe Behavior
 The `VideoThumbnail` component normally probes video URLs with a Range request to verify they exist before displaying. For native apps, this probe is **skipped** because:
 - WKWebView's `fetch()` with Range headers is unreliable for cross-origin requests
@@ -275,6 +291,8 @@ See `scripts/video/README.md` for detailed steps:
 - **Blob URL "Load failed"**: Safari-specific issue; blob URLs may fail HEAD validation but work for playback
 - **Native app video white screen**: Check that CORS headers are deployed to Cloudflare; verify `crossOrigin="anonymous"` on video elements
 - **iOS video not loading**: Ensure Info.plist has ATS exceptions; check that URL normalization is working (look for absolute URLs in logs)
+- **iOS MEDIA_ERR_SRC_NOT_SUPPORTED**: This error with blob URLs indicates the iOS blob caching workaround may not be active. Verify `isNativePlatform()` returns `true` and `resolveVideoUrl` is bypassing cache
+- **iOS video plays then restarts**: May indicate blob URL issues; ensure native apps are using direct CDN URLs, not cached blob URLs
 - **Android video issues**: Verify `http://localhost` is in CORS allowed origins; check for mixed content warnings
 
 ## Implementation Files

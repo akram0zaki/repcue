@@ -813,6 +813,37 @@ export default function DevToolsPage() {
               
               <button 
                 onClick={async () => {
+                  if (!cacheInfo) {
+                    setStatus('⚠️ No cache info to copy. Click "Get Cache Stats" first.');
+                    return;
+                  }
+                  try {
+                    await navigator.clipboard.writeText(cacheInfo);
+                    setStatus('✅ Cache stats copied to clipboard!');
+                  } catch (error) {
+                    // Fallback for iOS/Safari which may block clipboard
+                    const textArea = document.createElement('textarea');
+                    textArea.value = cacheInfo;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                      document.execCommand('copy');
+                      setStatus('✅ Cache stats copied to clipboard!');
+                    } catch {
+                      setStatus('❌ Failed to copy. Please copy manually from the text below.');
+                    }
+                    document.body.removeChild(textArea);
+                  }
+                }}
+                className="btn btn-outline btn-sm"
+              >
+                📋 Copy Stats
+              </button>
+              
+              <button 
+                onClick={async () => {
                   setStatus('Testing video URL resolution...');
                   try {
                     const testUrls = [
