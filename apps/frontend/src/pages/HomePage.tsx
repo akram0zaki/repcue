@@ -210,11 +210,11 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
   const popularExercises = getPopularExercises();
 
   // Scroll effect calculations for parallax hero
-  const maxScroll = 120; // Scroll distance for full effect
+  const maxScroll = 250; // Scroll distance for full effect (increased for stickier feel)
   const scrollProgress = Math.min(scrollY / maxScroll, 1); // 0 to 1
-  const heroScale = 1 - (scrollProgress * 0.15); // Scale from 1 to 0.85
-  const heroOpacity = 1 - (scrollProgress * 0.5); // Opacity from 1 to 0.5
-  const overlayOpacity = scrollProgress * 0.4; // Overlay from 0 to 0.4
+  const heroScale = 1 - (scrollProgress * 0.25); // Scale from 1 to 0.75
+  const heroOpacity = 1 - (scrollProgress * 0.7); // Opacity from 1 to 0.3
+  const overlayOpacity = scrollProgress * 0.6; // Overlay from 0 to 0.6
 
   // Render hero section with parallax effect
   const renderHeroSection = () => {
