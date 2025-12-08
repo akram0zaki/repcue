@@ -4819,12 +4819,13 @@ export class StorageService {
       let preparedProfile: UserProfile;
 
       if (existingProfile) {
-        // Update existing profile
+        // Update existing profile - preserve join_date
         preparedProfile = prepareUpsert(
           {
             ...existingProfile,
             ...profileData,
             user_id: user.id,
+            join_date: existingProfile.join_date || new Date().toISOString(), // Preserve original join date
             last_updated_from_wizard: new Date().toISOString(),
           },
           user.id
@@ -4836,6 +4837,7 @@ export class StorageService {
             id: crypto.randomUUID(),
             user_id: user.id,
             ...profileData,
+            join_date: profileData.join_date || new Date().toISOString(), // Use provided or set to today
             last_updated_from_wizard: new Date().toISOString(),
           } as UserProfile,
           user.id
