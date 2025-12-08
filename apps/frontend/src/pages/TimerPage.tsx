@@ -696,13 +696,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
         {/* Enhanced Timer Display - Fullscreen Container */}
         <div 
           ref={timerContainerRef}
-          className={`relative ${isFullscreen ? 'fixed inset-0 z-50 bg-black flex flex-col' : ''}`}
+          className={`relative ${isFullscreen ? 'fixed inset-0 z-50 bg-black flex flex-col overflow-hidden' : ''}`}
         >
-          {/* Fullscreen: Top bar with progress stats - centered */}
+          {/* Fullscreen: Top bar with progress stats - overlay on video */}
           {/* Show for rep-based exercises with reps/sets, or time-based exercises with targetTime */}
           {isFullscreen && ((selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets) || 
             (selectedExercise?.exercise_type !== 'repetition_based' && targetTime && (isRunning || timerState.isPaused))) && (
-            <div className="flex-shrink-0 bg-black/80 backdrop-blur-sm px-4 py-4 flex items-center justify-center">
+            <div className="absolute top-0 left-0 right-0 z-10 bg-black/80 backdrop-blur-sm px-4 py-4 mt-20 flex items-center justify-center safe-area-top">
               <div className="flex items-center gap-5 text-white">
                 {isRepBased ? (
                   <>
@@ -791,7 +791,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
           {/* Fullscreen: Video with overlay controls */}
           {isFullscreen && showVideoInsideCircle && (
-            <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+            <div className="flex-1 flex items-center justify-center p-4 mt-20 relative overflow-hidden safe-area-top">
               <div className="relative w-full h-full flex items-center justify-center">
                 <video
                   key={`fullscreen-${selectedExercise?.id || 'no-exercise'}`}
@@ -822,8 +822,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   ))}
                 </video>
               </div>
-              {/* Video overlay controls - top right corner */}
-              <div className="absolute top-6 right-6 z-10 flex gap-2">
+              {/* Video overlay controls - below progress bar, top right */}
+              <div className="absolute top-28 right-6 z-10 flex gap-2">
                 {/* Fit/Fill toggle */}
                 {videoFeatureEnabled && (
                   <button

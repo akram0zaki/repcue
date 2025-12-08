@@ -293,17 +293,15 @@ type DatabaseUserFavorite = {}
 
 # 2025-12-07
 
-- Fix the video caching in the ios app.
+- ✅ Fix the video caching in the ios app.
 - Unify sign-in/up into one form and one action.
 - Identify all wildcards in legal documents and create a script to populate them correctly.
 - Create RepCue logo
 - Create all the content (app screenshots, app description)
-- Persist state of exercise catalog page:
+- ✅ Persist state of exercise catalog page:
 if I browse the exercise catalog anywhere and click on an exercise to view its details, when I click back I am always taken to the top of the exercises catalog page.
 I would like the state of the exercises page to per persisted so back would take me to exactly the viewport I was on.
-
-
-- Add full-screen mode to the Timer with Fit/Fill overlay instead of buttons. Consider renaming Fill/Fit to Zoom In/Out.
+- ✅ Add full-screen mode to the Timer with Fit/Fill overlay instead of buttons. Consider renaming Fill/Fit to Zoom In/Out.
 - Add speed control (slider) below the timer on the Timer page, and sync the user-selected speed per exercise to the user profile/preferences on supabase.
 - Add push notification to users during their preferred time of day to exercise.
 
