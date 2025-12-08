@@ -46,6 +46,44 @@ const ExitFullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ s
   </svg>
 );
 
+// Fit icon - arrows pointing inward (content fits within container)
+const FitIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="M7 9l3 3-3 3" />
+    <path d="M17 9l-3 3 3 3" />
+  </svg>
+);
+
+// Fill icon - arrows pointing outward (content fills container)
+const FillIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="M10 9l-3 3 3 3" />
+    <path d="M14 9l3 3-3 3" />
+  </svg>
+);
+
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -369,7 +407,7 @@ const ExerciseDetailPage: React.FC = () => {
           {/* Fit/Fill toggle */}
           <button
             type="button"
-            className="btn-ghost btn-sm border-2 border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
+            className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
             onClick={async () => {
               const next = videoFitMode === 'fit' ? 'fill' : 'fit';
               setVideoFitMode(next);
@@ -390,11 +428,11 @@ const ExerciseDetailPage: React.FC = () => {
                 logger.warn('Failed to persist video_fit_mode setting from ExerciseDetailPage', e);
               }
             }}
-            aria-label={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
-            title={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+            aria-label={videoFitMode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+            title={videoFitMode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
             data-testid="toggle-video-fit-detail"
           >
-            {videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
+            {videoFitMode === 'fit' ? <FillIcon size={18} /> : <FitIcon size={18} />}
           </button>
           {/* Fullscreen toggle */}
           <button

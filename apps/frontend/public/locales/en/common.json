@@ -2,6 +2,8 @@
   "common": {
     "start": "Start",
     "stop": "Stop",
+    "pause": "Pause",
+    "resume": "Resume",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "ok": "OK",
@@ -58,9 +60,11 @@
     "confirmClearForm": "Are you sure you want to clear the form? This will delete your draft.",
     "noVideo": "No Video",
     "pauseVideo": "Pause Video",
+    "playVideo": "Play Video",
+    "enterFullscreen": "Enter fullscreen",
+    "exitFullscreen": "Exit fullscreen",
     "low": "Low",
     "notSupported": "Not Supported",
-    "playVideo": "Play Video",
     "premium": "PRO",
     "moreFilters": "More filters ({{count}})",
     "moreFilters_other": "More filters ({{count}})",
@@ -242,6 +246,7 @@
     "repProgress": "Rep Progress",
     "rep": "Rep",
     "set": "Set",
+    "time": "Time",
     "active": "Active",
     "rest": "Rest",
     "getReadyStartsIn_one": "Get Ready! Timer starts in {{count}} second",
@@ -266,7 +271,9 @@
     "selectExercise": "Select Exercise",
     "selectExerciseHint": "Select an exercise to start training:",
     "fit": "Fit",
-    "fill": "Fill"
+    "fill": "Fill",
+    "switchToFit": "Switch to Fit",
+    "switchToFill": "Switch to Fill"
   },
   "weekday": {
     "monday": "Monday",

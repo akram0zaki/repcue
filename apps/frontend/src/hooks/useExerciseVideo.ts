@@ -207,16 +207,17 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     return () => document.removeEventListener('visibilitychange', handler);
   }, [shouldPlay, repSpeedFactor]);
 
-  // When timer stops or resets, ensure video seeks to start for consistent next start
+  // When timer stops (not paused), ensure video seeks to start for consistent next start
+  // Only reset when actually stopped (isRunning=false), not when just paused (isPaused=true)
   useEffect(() => {
-    if (!isRunning) {
+    if (!isRunning && !isPaused) {
       const v = videoRef.current;
       if (v) {
         try { v.currentTime = 0; } catch { /* noop */ }
       }
       lastTimeRef.current = 0; // Reset loop detection baseline
     }
-  }, [isRunning]);
+  }, [isRunning, isPaused]);
 
   // Ready / error state tracking (+ retry play on load for race conditions)
   useEffect(() => {

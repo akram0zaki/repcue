@@ -361,6 +361,7 @@ export interface ActivityLog extends SyncMetadata {
 // Timer state
 export interface TimerState {
   isRunning: boolean;
+  isPaused: boolean; // true when timer is paused (preserves all state, freezes everything)
   currentTime: number; // in seconds
   targetTime?: number; // for countdown timers
   startTime?: Date;

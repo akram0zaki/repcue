@@ -1,6 +1,82 @@
 ## Unreleased
 
+### 2025-12-08
+
+#### ✨ Enhancement - Unified Timer Progress Bar Display
+
+**Added**: Progress bar for time-based exercises, matching the visual style of rep-based exercises.
+
+**Features**:
+- Time-based exercises now show a progress bar above the video (same as rep-based exercises)
+- Format: `Time 00:11/00:30 | Active` or `Time 00:11/00:30 | Rest 00:05`
+- In workout mode, also shows: `Exercise 2/5` for progress tracking
+- Fullscreen mode also displays the unified progress bar for both exercise types
+
+**UX Consistency**:
+- Both rep-based and time-based exercises now have the same visual layout
+- Progress information is always visible above the video/timer ring
+- Reduces cognitive load by using consistent UI patterns
+
+**Files Changed**:
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Extended progress bar rendering for time-based exercises
+- All 8 locale files (common.json) - Added `time` translation key (en: "Time", fr: "Temps", de: "Zeit", es: "Tiempo", nl: "Tijd", ar: "الوقت", ar-EG: "الوقت", fy: "Tiid")
+
+---
+
+#### ✨ Enhancement - Timer Pause/Resume Functionality
+
+**Added**: Pause and Resume buttons on the Timer page for better workout control.
+
+**Features**:
+- **Pause button**: Freezes the timer, video, and all progress indicators exactly where they are
+- **Resume button**: Continues the workout from the exact moment it was paused
+- Works during both exercise periods and rest periods (between sets)
+- Video playback pauses and resumes without resetting to the beginning
+- Progress rings and countdown timers maintain their state while paused
+
+**Button Layout**:
+- Start button: Shown when timer is not running and not paused
+- Stop button: Shown when timer is running (stops and logs activity)
+- Pause button: Shown when timer is running and not paused
+- Resume button: Shown when timer is paused
+- Reset button: Always available
+
+**Technical Details**:
+- Added `isPaused` boolean to TimerState interface
+- Separate handling for exercise timer resume vs rest period resume
+- Proper interval management to prevent memory leaks
+- Handles both `timerState.isResting` (between-sets rest) and `workoutMode.isResting` (between-exercises rest)
+
+**Files Changed**:
+- [types/index.ts](apps/frontend/src/types/index.ts) - Added `isPaused` to TimerState interface
+- [App.tsx](apps/frontend/src/App.tsx) - Added `pauseTimer` and `resumeTimer` functions, updated completion handling
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Added Pause/Resume button UI and props
+- [useExerciseVideo.ts](apps/frontend/src/hooks/useExerciseVideo.ts) - Video respects paused state for reset behavior
+- All 8 locale files (common.json) - Added `pause` and `resume` translations
+
+---
+
 ### 2025-12-07
+
+#### ✨ Enhancement - Timer Page Video Fullscreen Mode
+
+**Added**: Fullscreen button on Timer page exercise video for immersive workout viewing.
+
+**Features**: 
+- Fullscreen toggle button appears when a video is available on the timer display
+- Clean fullscreen layout with:
+  - **Top bar**: Progress stats (Rep X/Y | Active/Rest | Set X/Y) - centered
+  - **Center**: Full video without progress rings for immersive viewing
+  - **Video overlay**: Fit/Fill toggle and Exit fullscreen button in top-right corner (matching ExerciseDetailPage style)
+- No action buttons in fullscreen mode - exit fullscreen to access controls
+- Escape key or exit button closes fullscreen mode
+- Accessible with proper ARIA labels and keyboard support
+
+**Files Changed**:
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Added fullscreen state, handler, icons, and dedicated fullscreen UI layout
+- All 8 locale files (common.json) - Added `enterFullscreen` and `exitFullscreen` translations
+
+---
 
 #### 🐛 Fix - Search Input Icon Overlap
 

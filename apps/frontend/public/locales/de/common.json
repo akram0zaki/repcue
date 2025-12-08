@@ -2,6 +2,8 @@
   "common": {
     "start": "Start",
     "stop": "Stopp",
+    "pause": "Pause",
+    "resume": "Fortsetzen",
     "cancel": "Abbrechen",
     "confirm": "Bestätigen",
     "ok": "OK",
@@ -60,6 +62,8 @@
     "noVideo": "Kein Video",
     "pauseVideo": "Video pausieren",
     "playVideo": "Video abspielen",
+    "enterFullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild beenden",
     "premium": "PRO",
     "done": "Fertig",
     "refresh": "Aktualisieren",
@@ -250,6 +254,7 @@
     "repProgress": "Wiederholungs-Fortschritt",
     "rep": "Wdh",
     "set": "Satz",
+    "time": "Zeit",
     "active": "Aktiv",
     "rest": "Pause",
     "getReadyStartsIn_one": "Bereit machen! Timer startet in {{count}} Sekunde",
@@ -274,7 +279,9 @@
     "selectExercise": "Übung auswählen",
     "selectExerciseHint": "Wähle eine Übung aus, um zu beginnen:",
     "fit": "Einpassen",
-    "fill": "Füllen"
+    "fill": "Füllen",
+    "switchToFit": "Zu Einpassen wechseln",
+    "switchToFill": "Zu Füllen wechseln"
   },
   "weekday": {
     "monday": "Montag",

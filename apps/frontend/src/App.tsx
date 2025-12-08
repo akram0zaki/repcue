@@ -87,6 +87,8 @@ const TimerPageWrapper: React.FC<{
   onStartTimer: () => Promise<void>;
   onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
+  onPauseTimer: () => void;
+  onResumeTimer: () => void;
   onStartWorkoutMode: (workoutData: { workoutId: string; workoutName: string; exercises: WorkoutExercise[] }) => Promise<void>;
   onUpdateSettings?: (patch: Partial<AppSettings>) => void;
 }> = (props) => {
@@ -308,6 +310,7 @@ function App() {
   // Persistent Timer State
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
+    isPaused: false,
     currentTime: 0,
     intervalDuration: 30,
     currentExercise: undefined,
@@ -443,8 +446,8 @@ function App() {
       
   if (!mountedRef.current) return; // do not update after unmount
   setTimerState(prev => {
-        // Don't update if timer is not running or target time is not set
-        if (!prev.isRunning || !prev.targetTime) {
+        // Don't update if timer is not running, is paused, or target time is not set
+        if (!prev.isRunning || prev.isPaused || !prev.targetTime) {
           return prev;
         }
 
@@ -668,7 +671,7 @@ function App() {
       await releaseWakeLock();
     }
 
-    setTimerState(prev => ({ ...prev, isRunning: false, isCountdown: false, countdownTime: 0 }));
+    setTimerState(prev => ({ ...prev, isRunning: false, isPaused: false, isCountdown: false, countdownTime: 0 }));
   }, [appSettings.sound_enabled, appSettings.vibration_enabled, wakeLockActive, releaseWakeLock, timerState]);
 
   const resetTimer = useCallback(async () => {
@@ -688,6 +691,7 @@ function App() {
     setTimerState(prev => ({
       ...prev,
       isRunning: false,
+      isPaused: false,
       currentTime: 0,
       targetTime: undefined,
       startTime: undefined,
@@ -715,6 +719,83 @@ function App() {
       }
     }
   }, [wakeLockActive, releaseWakeLock, selectedExercise, appSettings.rep_speed_factor]);
+
+  // Pause timer - freezes everything in place
+  const pauseTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setTimerState(prev => ({ ...prev, isPaused: true }));
+  }, []);
+
+  // Resume timer - continues from exactly where it was paused
+  // NOTE: We need to read current state synchronously to create intervals correctly.
+  const resumeTimer = useCallback(() => {
+    // First, set isPaused to false immediately
+    setTimerState(prev => ({ ...prev, isPaused: false }));
+    
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    
+    // Check BOTH isResting flags - timerState.isResting (between sets) and workoutMode.isResting (between exercises)
+    const isRestPeriod = timerState.isResting === true || timerState.workoutMode?.isResting === true;
+    const currentTimeAtResume = timerState.currentTime;
+    
+    if (isRestPeriod) {
+      // Resume rest period with a rest-specific interval
+      const restStartTime = Date.now() - (currentTimeAtResume * 1000);
+      
+      intervalRef.current = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - restStartTime) / 1000);
+        
+        setTimerState(innerPrev => {
+          if (!innerPrev.isRunning || innerPrev.isPaused || !innerPrev.targetTime) {
+            return innerPrev;
+          }
+
+          const remaining = innerPrev.targetTime - elapsed;
+
+          if (remaining <= 0) {
+            return { ...innerPrev, currentTime: innerPrev.targetTime };
+          }
+
+          // Update rest time remaining for either type of rest
+          if (innerPrev.isResting || innerPrev.workoutMode?.isResting) {
+            if (innerPrev.workoutMode?.isResting) {
+              return { 
+                ...innerPrev, 
+                currentTime: elapsed,
+                workoutMode: {
+                  ...innerPrev.workoutMode,
+                  restTimeRemaining: Math.max(0, remaining)
+                }
+              };
+            } else {
+              // timerState.isResting - between sets rest
+              return { 
+                ...innerPrev, 
+                currentTime: elapsed,
+                restTimeRemaining: Math.max(0, remaining)
+              };
+            }
+          }
+
+          return innerPrev;
+        });
+      }, 1000);
+    } else {
+      // Resume normal exercise timer
+      const isRepBasedExercise = timerState.currentExercise?.exercise_type === 'repetition_based';
+      const newStartTime = Date.now() - (currentTimeAtResume * 1000);
+      lastBeepIntervalRef.current = Math.floor(currentTimeAtResume);
+      
+      intervalRef.current = createTimerInterval(newStartTime, isRepBasedExercise);
+    }
+  }, [timerState.isResting, timerState.workoutMode?.isResting, timerState.currentTime, timerState.currentExercise?.exercise_type, createTimerInterval]);
 
   // Workout Force Update Event Handlers
   useEffect(() => {
@@ -1233,7 +1314,39 @@ function App() {
         //   actualExerciseName: actualCurrentExercise?.name
         // });
         
-        if (workoutMode.isResting) {
+        // Check for between-sets rest (timerState.isResting) first
+        if (timerState.isResting && !workoutMode.isResting) {
+          // Between-sets rest completed - transition to next set
+          const currentSet = workoutMode.currentSet ?? 0;
+          const totalSets = workoutMode.totalSets ?? 1;
+          
+          // Play rest end feedback
+          if (appSettings.sound_enabled) {
+            audioService.announceText(`Rest complete! Starting set ${currentSet + 2} of ${totalSets}`);
+          }
+          if (appSettings.sound_enabled || appSettings.vibration_enabled) {
+            audioService.playRestEndFeedback(appSettings.sound_enabled, appSettings.vibration_enabled);
+          }
+          
+          // Start new timer for next set
+          const nextSetStartTime = Date.now();
+          const isRepBasedExercise = currentExercise?.exercise_type === 'repetition_based';
+          intervalRef.current = createTimerInterval(nextSetStartTime, isRepBasedExercise);
+          
+          setTimerState(prev => ({
+            ...prev,
+            workoutMode: prev.workoutMode ? {
+              ...prev.workoutMode,
+              currentSet: currentSet + 1,
+              currentRep: 0
+            } : prev.workoutMode,
+            currentTime: 0,
+            isResting: false,
+            restTimeRemaining: undefined,
+            targetTime: selectedDuration
+          }));
+          return;
+        } else if (workoutMode.isResting) {
           // Rest period completed, start next exercise automatically
           // Calculate next exercise index since currentExerciseIndex still points to completed exercise
           const nextExerciseIndex = workoutMode.currentExerciseIndex + 1;
@@ -1831,28 +1944,39 @@ function App() {
     };
   }, []);
 
+  // Settings that are local-only and don't need to trigger sync
+  const LOCAL_ONLY_SETTINGS = ['video_fit_mode'] as const;
+
   // Update app settings
   const updateAppSettings = React.useCallback(async (newSettings: Partial<AppSettings>) => {
     if (!hasConsent) return;
+
+    // Check if only local-only settings are being updated (skip sync if so)
+    const settingKeys = Object.keys(newSettings) as (keyof AppSettings)[];
+    const isLocalOnly = settingKeys.every(key => LOCAL_ONLY_SETTINGS.includes(key as typeof LOCAL_ONLY_SETTINGS[number]));
 
     // Use functional update to avoid stale closure issues
     setAppSettings(currentSettings => {
       const nextSettings: AppSettings = {
         ...currentSettings,
         ...newSettings,
-        // Always bump version and mark dirty so sync pushes reliably
-        version: (currentSettings.version || 1) + 1,
+        // Only bump version if not local-only (sync-worthy changes)
+        version: isLocalOnly ? currentSettings.version : (currentSettings.version || 1) + 1,
         updated_at: new Date().toISOString(),
-        dirty: 1,
-        op: 'upsert'
+        dirty: isLocalOnly ? currentSettings.dirty : 1,
+        op: isLocalOnly ? currentSettings.op : 'upsert'
       };
       
-      // Persist immediately, trigger sync in background (don't await)
+      // Persist immediately
       storageService.saveAppSettings(nextSettings)
         .then(() => {
-          // Trigger sync immediately but don't wait (offline-first)
-          logger.log('[updateAppSettings] Settings saved, triggering background sync (version:', nextSettings.version, ')');
-          void syncService.sync(true);
+          // Only trigger sync for non-local-only settings
+          if (!isLocalOnly) {
+            logger.log('[updateAppSettings] Settings saved, triggering background sync (version:', nextSettings.version, ')');
+            void syncService.sync(true);
+          } else {
+            logger.log('[updateAppSettings] Local-only setting saved (no sync):', settingKeys.join(', '));
+          }
         })
         .catch(error => {
           logger.error('Failed to save app settings:', error);
@@ -2909,6 +3033,8 @@ useEffect(() => {
                       onStartTimer={startTimer}
                       onStopTimer={stopTimer}
                       onResetTimer={resetTimer}
+                      onPauseTimer={pauseTimer}
+                      onResumeTimer={resumeTimer}
                       onStartWorkoutMode={startWorkoutMode}
                       onUpdateSettings={updateAppSettings}
                     />

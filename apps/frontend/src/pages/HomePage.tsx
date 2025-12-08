@@ -500,7 +500,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                 data-testid="exercises-count-link"
               >
                 <div className="text-xl font-bold link">
-                  {exercises.length}
+                  {exercises.filter(ex => !('is_active' in ex && ex.is_active === false)).length}
                 </div>
                 <div className="text-sm secondary-label-text">
                   {t('home.availableExercises')}

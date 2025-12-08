@@ -2,6 +2,8 @@
   "common": {
     "start": "Démarrer",
     "stop": "Arrêter",
+    "pause": "Pause",
+    "resume": "Reprendre",
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "ok": "OK",
@@ -60,6 +62,8 @@
     "noVideo": "Pas de vidéo",
     "pauseVideo": "Mettre en pause la vidéo",
     "playVideo": "Lire la vidéo",
+    "enterFullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran",
     "premium": "PRO",
     "done": "Fait",
     "refresh": "Actualiser",
@@ -249,6 +253,7 @@
     "exercisesRemaining_other": "{{count}} exercices restants",
     "repProgress": "Progression des répétitions",    "rep": "Rép",
     "set": "Série",
+    "time": "Temps",
     "active": "Actif",
     "rest": "Repos",    "getReadyStartsIn_one": "Préparez-vous ! Le minuteur démarre dans {{count}} seconde",
     "getReadyStartsIn_other": "Préparez-vous ! Le minuteur démarre dans {{count}} secondes",
@@ -272,7 +277,9 @@
     "selectExercise": "Sélectionner un exercice",
     "selectExerciseHint": "Sélectionnez un exercice pour commencer :",
     "fit": "Ajuster",
-    "fill": "Remplir"
+    "fill": "Remplir",
+    "switchToFit": "Passer à Ajuster",
+    "switchToFill": "Passer à Remplir"
   },
   "weekday": {
     "monday": "Lundi",

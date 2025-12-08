@@ -2,6 +2,8 @@
   "common": {
     "start": "يلا",
     "stop": "بطّل",
+    "pause": "وقّف مؤقت",
+    "resume": "كمّل",
     "cancel": "سيب",
     "confirm": "تأكيد",
     "ok": "تمام",
@@ -62,6 +64,8 @@
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
+    "enterFullscreen": "ملء الشاشة",
+    "exitFullscreen": "الخروج من ملء الشاشة",
     "premium": "مميز",
     "done": "تم",
     "refresh": "حدّث",
@@ -245,6 +249,7 @@
     "exercisesRemaining_other": "باقي {{count}} تمرين",
     "repProgress": "تقدم العدات",    "rep": "تكرار",
     "set": "مجموعة",
+    "time": "الوقت",
     "active": "نشط",
     "rest": "راحة",    "getReadyStartsIn_one": "استعد! المؤقت هيبدأ في {{count}} ثانية",
     "getReadyStartsIn_other": "استعد! المؤقت هيبدأ في {{count}} ثانية",
@@ -268,7 +273,9 @@
     "selectExercise": "اختار التمرين",
     "selectExerciseHint": "اختار تمرين عشان تبدأ:",
     "fit": "احتواء",
-    "fill": "ملء"
+    "fill": "ملء",
+    "switchToFit": "التبديل لاحتواء",
+    "switchToFill": "التبديل لملء"
   },
   "weekday": {
     "monday": "الإتنين",

@@ -2,6 +2,8 @@
   "common": {
     "start": "Start",
     "stop": "Stop",
+    "pause": "Pauzeer",
+    "resume": "Hervatten",
     "cancel": "Annuleren",
     "confirm": "Bevestigen",
     "ok": "OK",
@@ -60,6 +62,8 @@
     "noVideo": "Geen Video",
     "pauseVideo": "Pauze Video",
     "playVideo": "Afspelen Video",
+    "enterFullscreen": "Volledig scherm",
+    "exitFullscreen": "Volledig scherm afsluiten",
     "premium": "PRO",
     "moreFilters": "Meer filters ({{count}})",
     "moreFilters_other": "Meer filters ({{count}})",
@@ -241,6 +245,7 @@
     "exercisesRemaining_other": "{{count}} oefeningen resterend",
     "repProgress": "Herhaling Voortgang",    "rep": "Herhaling",
     "set": "Set",
+    "time": "Tijd",
     "active": "Actief",
     "rest": "Rust",    "getReadyStartsIn_one": "Maak je klaar! Timer start over {{count}} seconde",
     "getReadyStartsIn_other": "Maak je klaar! Timer start over {{count}} seconden",
@@ -264,7 +269,9 @@
     "selectExercise": "Selecteer Oefening",
     "selectExerciseHint": "Selecteer een oefening om te beginnen:",
     "fit": "Passend",
-    "fill": "Vullen"
+    "fill": "Vullen",
+    "switchToFit": "Wisselen naar Passend",
+    "switchToFill": "Wisselen naar Vullen"
   },
   "weekday": {
     "monday": "Maandag",

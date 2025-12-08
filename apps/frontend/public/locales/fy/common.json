@@ -2,6 +2,8 @@
   "common": {
     "start": "Begjinne",
     "stop": "Stopje",
+    "pause": "Pauze",
+    "resume": "Trochgean",
     "cancel": "Annulearje",
     "confirm": "Befestigje",
     "ok": "Goed",
@@ -60,6 +62,8 @@
     "noVideo": "Gjin Fideo",
     "pauseVideo": "Pause Fideo",
     "playVideo": "Spylje Fideo",
+    "enterFullscreen": "Folslën skêrm",
+    "exitFullscreen": "Slute folslën skêrm",
     "premium": "PRO",
     "done": "Klear",
     "refresh": "Ferfarskje",
@@ -250,6 +254,7 @@
     "repProgress": "Rep-foarútgong",
     "rep": "Rep",
     "set": "Set",
+    "time": "Tiid",
     "active": "Aktyf",
     "rest": "Rêst",
     "getReadyStartsIn_one": "Meitsje jo klear! Timer begjint yn {{count}} sekonde",
@@ -274,7 +279,9 @@
     "selectExercise": "Oefening selektearje",
     "selectExerciseHint": "Selektearje in oefening om te begjinnen:",
     "fit": "Passen",
-    "fill": "Folje"
+    "fill": "Folje",
+    "switchToFit": "Wikselje nei Passen",
+    "switchToFill": "Wikselje nei Folje"
   },
   "weekday": {
     "monday": "Moandei",

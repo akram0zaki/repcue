@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: page uses t() per design; remaining literals are units, icons, or technical tokens */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { localizeExercise } from '../utils/localizeExercise';
 import type { Exercise, AppSettings, TimerState } from '../types';
@@ -14,6 +14,82 @@ import { useExerciseVideo } from '../hooks/useExerciseVideo';
 import getVideoSources from '../utils/videoSources';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import logger from '../utils/logger';
+
+// Fullscreen icons
+const FullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+  </svg>
+);
+
+const ExitFullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+  </svg>
+);
+
+// Video fit mode icons - Fit: arrows pointing inward, Fill: arrows pointing outward
+const FitIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Frame */}
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    {/* Inward arrows - top left */}
+    <path d="M7 9l3 3-3 3" />
+    {/* Inward arrows - top right */}
+    <path d="M17 9l-3 3 3 3" />
+  </svg>
+);
+
+const FillIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    {/* Frame */}
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    {/* Outward arrows - left */}
+    <path d="M10 9l-3 3 3 3" />
+    {/* Outward arrows - right */}
+    <path d="M14 9l3 3-3 3" />
+  </svg>
+);
 
 interface TimerPageProps {
   exercises: Exercise[];
@@ -30,6 +106,8 @@ interface TimerPageProps {
   onStartTimer: () => Promise<void>;
   onStopTimer: (isCompletion?: boolean) => Promise<void>;
   onResetTimer: () => Promise<void>;
+  onPauseTimer: () => void;
+  onResumeTimer: () => void;
   onUpdateSettings?: (patch: Partial<AppSettings>) => void;
 }
 
@@ -48,12 +126,83 @@ const TimerPage: React.FC<TimerPageProps> = ({
   onStartTimer,
   onStopTimer,
   onResetTimer,
+  onPauseTimer,
+  onResumeTimer,
   onUpdateSettings
 }) => {
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   
   // State for collapsible duration selector
   const [isDurationExpanded, setIsDurationExpanded] = useState(false);
+  
+  // Fullscreen state and ref
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const timerContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Video state preservation for fullscreen toggle
+  const videoStateRef = useRef<{ currentTime: number; playbackRate: number } | null>(null);
+
+  // Toggle fullscreen - preserve video state across mode switch
+  const handleToggleFullscreen = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const container = timerContainerRef.current;
+    if (!container) return;
+
+    try {
+      // Save current video state before toggle (the current video element will be unmounted)
+      const currentVideo = document.querySelector('video[data-testid="exercise-video"], video[data-testid="exercise-video-fullscreen"]') as HTMLVideoElement | null;
+      if (currentVideo) {
+        videoStateRef.current = {
+          currentTime: currentVideo.currentTime,
+          playbackRate: currentVideo.playbackRate
+        };
+      }
+      
+      if (!document.fullscreenElement) {
+        await container.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      logger.error('[TimerPage] Fullscreen toggle failed:', error);
+    }
+  }, []);
+
+  // Listen for fullscreen changes (e.g., user presses Escape)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      // Save video state before React re-renders on fullscreen change
+      const currentVideo = document.querySelector('video[data-testid="exercise-video"], video[data-testid="exercise-video-fullscreen"]') as HTMLVideoElement | null;
+      if (currentVideo && !videoStateRef.current) {
+        videoStateRef.current = {
+          currentTime: currentVideo.currentTime,
+          playbackRate: currentVideo.playbackRate
+        };
+      }
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+  
+  // Restore video state after fullscreen toggle causes video element remount
+  const handleVideoCanPlay = useCallback((e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    if (videoStateRef.current) {
+      video.currentTime = videoStateRef.current.currentTime;
+      video.playbackRate = videoStateRef.current.playbackRate;
+      videoStateRef.current = null; // Clear after restoring
+    } else {
+      // Ensure playback rate is set even without saved state
+      const playbackRate = 1 / appSettings.rep_speed_factor;
+      video.playbackRate = playbackRate;
+    }
+  }, [appSettings.rep_speed_factor]);
   
   // ---------------- Video Demo Integration (Phase 2) ----------------
   // Calculate display values
@@ -178,8 +327,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
     mediaIndex,
     enabled: !!videoFeatureEnabled,
     isRunning: timerState.isRunning,
-    isActiveMovement: timerState.isRunning && !timerState.isCountdown && !restingNow,
-    isPaused: !timerState.isRunning,
+    isActiveMovement: timerState.isRunning && !timerState.isPaused && !timerState.isCountdown && !restingNow,
+    isPaused: timerState.isPaused,
     repSpeedFactor: appSettings.rep_speed_factor
   });
   
@@ -476,26 +625,59 @@ const TimerPage: React.FC<TimerPageProps> = ({
         )}
 
         {/* Progress Details Section - Single line compact display */}
-        {selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-3 py-2 mb-2">
-            <div className="flex items-center justify-center gap-3 text-xs font-medium">
-              <span className="text-gray-700 dark:text-gray-300">
-                {t('common:timer.rep')} {Math.min((currentRep || 0) + 1, totalReps)}/{totalReps}
-              </span>
-              <span className="text-gray-400 dark:text-gray-600">|</span>
-              {isResting && restTimeRemaining !== undefined ? (
-                <span className="text-purple-600 dark:text-purple-400">
-                  {t('common:timer.rest')} {formatTime(restTimeRemaining)}
-                </span>
+        {/* Show for rep-based exercises with reps/sets, or time-based exercises with targetTime */}
+        {((selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets) || 
+          (selectedExercise?.exercise_type !== 'repetition_based' && targetTime && (isRunning || timerState.isPaused))) && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm px-4 py-3 mb-2">
+            <div className="flex items-center justify-center gap-4">
+              {isRepBased ? (
+                <>
+                  <span className="timer-progress-text text-gray-700 dark:text-gray-300">
+                    {t('common:timer.rep')} {Math.min((currentRep || 0) + 1, totalReps!)}/{totalReps}
+                  </span>
+                  <span className="timer-progress-separator text-gray-400 dark:text-gray-600">|</span>
+                  {isResting && restTimeRemaining !== undefined ? (
+                    <span className="timer-progress-text text-purple-600 dark:text-purple-400">
+                      {t('common:timer.rest')} {formatTime(restTimeRemaining)}
+                    </span>
+                  ) : (
+                    <span className="timer-progress-text text-gray-500 dark:text-gray-500">
+                      {t('common:timer.active')}
+                    </span>
+                  )}
+                  <span className="timer-progress-separator text-gray-400 dark:text-gray-600">|</span>
+                  <span className="timer-progress-text text-gray-700 dark:text-gray-300">
+                    {t('common:timer.set')} {(currentSet || 0) + 1}/{totalSets}
+                  </span>
+                </>
               ) : (
-                <span className="text-gray-500 dark:text-gray-500">
-                  {t('common:timer.active')}
-                </span>
+                <>
+                  <span className="timer-progress-text text-gray-700 dark:text-gray-300">
+                    {t('common:timer.time')} {formatTime(currentTime || 0)}/{formatTime(targetTime!)}
+                  </span>
+                  <span className="timer-progress-separator text-gray-400 dark:text-gray-600">|</span>
+                  {actuallyResting && restTimeRemaining !== undefined ? (
+                    <span className="timer-progress-text text-purple-600 dark:text-purple-400">
+                      {t('common:timer.rest')} {formatTime(restTimeRemaining)}
+                    </span>
+                  ) : (
+                    <span className="timer-progress-text text-gray-500 dark:text-gray-500">
+                      {t('common:timer.active')}
+                    </span>
+                  )}
+                  {isWorkoutMode && (
+                    <>
+                      <span className="timer-progress-separator text-gray-400 dark:text-gray-600">|</span>
+                      <span className="timer-progress-text text-gray-700 dark:text-gray-300">
+                        {t('timer.exerciseIndexOf', { 
+                          index: workoutMode.currentExerciseIndex + 1, 
+                          total: workoutMode.exercises.length 
+                        })}
+                      </span>
+                    </>
+                  )}
+                </>
               )}
-              <span className="text-gray-400 dark:text-gray-600">|</span>
-              <span className="text-gray-700 dark:text-gray-300">
-                {t('common:timer.set')} {(currentSet || 0) + 1}/{totalSets}
-              </span>
             </div>
           </div>
         )}
@@ -511,7 +693,170 @@ const TimerPage: React.FC<TimerPageProps> = ({
           </div>
         )}
 
-        {/* Enhanced Timer Display */}
+        {/* Enhanced Timer Display - Fullscreen Container */}
+        <div 
+          ref={timerContainerRef}
+          className={`relative ${isFullscreen ? 'fixed inset-0 z-50 bg-black flex flex-col' : ''}`}
+        >
+          {/* Fullscreen: Top bar with progress stats - centered */}
+          {/* Show for rep-based exercises with reps/sets, or time-based exercises with targetTime */}
+          {isFullscreen && ((selectedExercise?.exercise_type === 'repetition_based' && totalReps && totalSets) || 
+            (selectedExercise?.exercise_type !== 'repetition_based' && targetTime && (isRunning || timerState.isPaused))) && (
+            <div className="flex-shrink-0 bg-black/80 backdrop-blur-sm px-4 py-4 flex items-center justify-center">
+              <div className="flex items-center gap-5 text-white">
+                {isRepBased ? (
+                  <>
+                    <span className="timer-progress-text-fullscreen">
+                      {t('common:timer.rep')} {Math.min((currentRep || 0) + 1, totalReps!)}/{totalReps}
+                    </span>
+                    <span className="timer-progress-separator-fullscreen text-gray-400">|</span>
+                    {isResting && restTimeRemaining !== undefined ? (
+                      <span className="timer-progress-text-fullscreen text-purple-400">
+                        {t('common:timer.rest')} {formatTime(restTimeRemaining)}
+                      </span>
+                    ) : (
+                      <span className="timer-progress-text-fullscreen text-green-400">
+                        {t('common:timer.active')}
+                      </span>
+                    )}
+                    <span className="timer-progress-separator-fullscreen text-gray-400">|</span>
+                    <span className="timer-progress-text-fullscreen">
+                      {t('common:timer.set')} {(currentSet || 0) + 1}/{totalSets}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="timer-progress-text-fullscreen">
+                      {t('common:timer.time')} {formatTime(currentTime || 0)}/{formatTime(targetTime!)}
+                    </span>
+                    <span className="timer-progress-separator-fullscreen text-gray-400">|</span>
+                    {actuallyResting && restTimeRemaining !== undefined ? (
+                      <span className="timer-progress-text-fullscreen text-purple-400">
+                        {t('common:timer.rest')} {formatTime(restTimeRemaining)}
+                      </span>
+                    ) : (
+                      <span className="timer-progress-text-fullscreen text-green-400">
+                        {t('common:timer.active')}
+                      </span>
+                    )}
+                    {isWorkoutMode && (
+                      <>
+                        <span className="timer-progress-separator-fullscreen text-gray-400">|</span>
+                        <span className="timer-progress-text-fullscreen">
+                          {t('timer.exerciseIndexOf', { 
+                            index: workoutMode.currentExerciseIndex + 1, 
+                            total: workoutMode.exercises.length 
+                          })}
+                        </span>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Video overlay controls for Ring mode - top right corner outside the ring */}
+          {!isFullscreen && appSettings.ring_timer !== false && showVideoInsideCircle && (
+            <div className="absolute z-20 top-2 right-2 flex gap-2">
+              {/* Fit/Fill toggle */}
+              {videoFeatureEnabled && (
+                <button
+                  type="button"
+                  className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                  onClick={() => {
+                    const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
+                    onUpdateSettings?.({ video_fit_mode: next });
+                  }}
+                  data-testid="toggle-video-fit-ring"
+                  aria-label={appSettings.video_fit_mode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+                  title={appSettings.video_fit_mode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+                >
+                  {appSettings.video_fit_mode === 'fit' ? <FillIcon size={18} /> : <FitIcon size={18} />}
+                </button>
+              )}
+              {/* Fullscreen toggle */}
+              <button
+                type="button"
+                onClick={handleToggleFullscreen}
+                className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                aria-label={t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+                title={t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+                data-testid="toggle-fullscreen-timer-ring"
+              >
+                <FullscreenIcon size={18} />
+              </button>
+            </div>
+          )}
+
+          {/* Fullscreen: Video with overlay controls */}
+          {isFullscreen && showVideoInsideCircle && (
+            <div className="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
+              <div className="relative w-full h-full flex items-center justify-center">
+                <video
+                  key={`fullscreen-${selectedExercise?.id || 'no-exercise'}`}
+                  ref={exerciseVideo.videoRef}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  crossOrigin="anonymous"
+                  className={`rounded-lg gpu-accelerated ${appSettings.video_fit_mode === 'fit' ? 'max-h-full max-w-full object-contain' : 'w-full h-full object-cover'}`}
+                  aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
+                  data-testid="exercise-video-fullscreen"
+                  onCanPlay={handleVideoCanPlay}
+                  onLoadedMetadata={(e) => {
+                    const video = e.currentTarget;
+                    const playbackRate = 1 / appSettings.rep_speed_factor;
+                    video.playbackRate = playbackRate;
+                  }}
+                  onPlay={(e) => {
+                    const video = e.currentTarget;
+                    const playbackRate = 1 / appSettings.rep_speed_factor;
+                    video.playbackRate = playbackRate;
+                  }}
+                >
+                  {getVideoSources(videoUrl).map(s => (
+                    <source key={s.src} src={s.src} type={s.type} />
+                  ))}
+                </video>
+              </div>
+              {/* Video overlay controls - top right corner */}
+              <div className="absolute top-6 right-6 z-10 flex gap-2">
+                {/* Fit/Fill toggle */}
+                {videoFeatureEnabled && (
+                  <button
+                    type="button"
+                    className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                    onClick={() => {
+                      const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
+                      onUpdateSettings?.({ video_fit_mode: next });
+                    }}
+                    data-testid="toggle-video-fit-fullscreen"
+                    aria-label={appSettings.video_fit_mode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+                    title={appSettings.video_fit_mode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+                  >
+                    {appSettings.video_fit_mode === 'fit' ? <FillIcon size={18} /> : <FitIcon size={18} />}
+                  </button>
+                )}
+                {/* Exit fullscreen button */}
+                <button
+                  type="button"
+                  onClick={handleToggleFullscreen}
+                  className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                  aria-label={t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' })}
+                  title={t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' })}
+                  data-testid="toggle-fullscreen-timer-exit"
+                >
+                  <ExitFullscreenIcon size={18} />
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {/* Normal mode: Original timer display */}
+          {!isFullscreen && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-3">
           {/* Conditional Timer Display: Circular (ring_timer: true) or Rectangular (ring_timer: false) */}
           {appSettings.ring_timer !== false ? (
@@ -539,6 +884,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   className={`h-full w-full ${appSettings.video_fit_mode === 'fit' ? 'object-contain' : 'object-cover'} object-center mx-auto block gpu-accelerated`}
                   aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                   data-testid="exercise-video"
+                  onCanPlay={handleVideoCanPlay}
                   onLoadedMetadata={(e) => {
                     // Set playback rate as soon as metadata is loaded (before autoPlay starts)
                     const video = e.currentTarget;
@@ -581,7 +927,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               </div>
             )}
             <svg 
-              className="transform -rotate-90 pointer-events-none relative z-0 timer-square-280" 
+              className="transform -rotate-90 pointer-events-none relative z-0 timer-square-280"
               viewBox="0 0 280 280"
             >
               {/* For repetition-based exercises (both workout mode and standalone): show nested circles */}
@@ -676,8 +1022,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
               )}
             </svg>
             
-            {/* Time Display - Only show for countdown, rest, or time-based exercises */}
-            {(!isRepBased || isCountdown || actuallyResting) && (
+            {/* Time Display - Only show for countdown or rest periods (time-based exercises now use progress bar above) */}
+            {(isCountdown || actuallyResting) && (
             <div className="absolute top-0 left-0 right-0 flex justify-center pt-4 z-10" data-testid="timer-display">
               <div className="text-center">
                 {isCountdown ? (
@@ -732,6 +1078,38 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   className="absolute rounded-lg overflow-hidden z-[1] video-inset-10"
                   data-testid="exercise-video-wrapper"
                 >
+                  {/* Video overlay controls - inside video frame (top-right corner) */}
+                  {!isFullscreen && (
+                    <div className="absolute top-3 right-3 z-10 flex gap-2">
+                      {/* Fit/Fill toggle */}
+                      {videoFeatureEnabled && (
+                        <button
+                          type="button"
+                          className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                          onClick={() => {
+                            const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
+                            onUpdateSettings?.({ video_fit_mode: next });
+                          }}
+                          data-testid="toggle-video-fit-rect"
+                          aria-label={appSettings.video_fit_mode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+                          title={appSettings.video_fit_mode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+                        >
+                          {appSettings.video_fit_mode === 'fit' ? <FillIcon size={18} /> : <FitIcon size={18} />}
+                        </button>
+                      )}
+                      {/* Fullscreen toggle */}
+                      <button
+                        type="button"
+                        onClick={handleToggleFullscreen}
+                        className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                        aria-label={t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+                        title={t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+                        data-testid="toggle-fullscreen-timer-rect"
+                      >
+                        <FullscreenIcon size={18} />
+                      </button>
+                    </div>
+                  )}
                   {/* Video taking maximum space with minimal border for progress */}
                   <video
                     key={selectedExercise?.id || 'no-exercise'}
@@ -745,6 +1123,17 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     className={`h-full w-full ${appSettings.video_fit_mode === 'fit' ? 'object-contain' : 'object-cover'} gpu-accelerated`}
                     aria-label={`${selectedExercise?.name || 'Exercise'} demo video`}
                     data-testid="exercise-video"
+                    onCanPlay={handleVideoCanPlay}
+                    onLoadedMetadata={(e) => {
+                      const video = e.currentTarget;
+                      const playbackRate = 1 / appSettings.rep_speed_factor;
+                      video.playbackRate = playbackRate;
+                    }}
+                    onPlay={(e) => {
+                      const video = e.currentTarget;
+                      const playbackRate = 1 / appSettings.rep_speed_factor;
+                      video.playbackRate = playbackRate;
+                    }}
                     onLoadedData={() => {
                       // Safety: ensure play attempt if hook's effect missed due to timing
                       if (exerciseVideo.videoRef.current && exerciseVideo.videoRef.current.paused && timerState.isRunning && !timerState.isCountdown && !restingNow) {
@@ -877,8 +1266,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 )}
               </svg>
 
-              {/* Time Display for Rectangular Timer - Only show for countdown, rest, or time-based exercises */}
-              {(!isRepBased || isCountdown || actuallyResting) && (
+              {/* Time Display for Rectangular Timer - Only show for countdown or rest periods (time-based exercises now use progress bar above) */}
+              {(isCountdown || actuallyResting) && (
               <div className="absolute top-0 left-0 right-0 flex justify-center pt-4 z-10" data-testid="timer-display">
                 <div className="text-center">
                   {isCountdown ? (
@@ -920,7 +1309,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
           {/* Timer Controls - Compact */}
           <div className="flex justify-center space-x-2 mt-2">
-            {!isRunning ? (
+            {/* Start button - shown when timer is not running and not paused */}
+            {!isRunning && !timerState.isPaused && (
               <button
                 onClick={onStartTimer}
                 disabled={!selectedExercise}
@@ -929,13 +1319,49 @@ const TimerPage: React.FC<TimerPageProps> = ({
               >
                 {t('common.start')}
               </button>
-            ) : (
+            )}
+
+            {/* Stop button - shown when timer is running (stops and logs the activity) */}
+            {isRunning && !isCountdown && (
               <button
                 onClick={() => onStopTimer()}
                 className="btn-secondary px-4 py-2 text-sm"
                 data-testid="stop-timer"
               >
-                {isCountdown ? t('common.cancel') : t('common.stop')}
+                {t('common.stop')}
+              </button>
+            )}
+
+            {/* Cancel button - shown during countdown */}
+            {isRunning && isCountdown && (
+              <button
+                onClick={() => onStopTimer()}
+                className="btn-secondary px-4 py-2 text-sm"
+                data-testid="cancel-countdown"
+              >
+                {t('common.cancel')}
+              </button>
+            )}
+
+            {/* Pause button - shown when timer is running and not in countdown */}
+            {isRunning && !isCountdown && !timerState.isPaused && (
+              <button
+                onClick={onPauseTimer}
+                className="btn-ghost"
+                data-testid="pause-timer"
+              >
+                {t('common.pause')}
+              </button>
+            )}
+
+            {/* Resume button - shown when timer is paused */}
+            {timerState.isPaused && (
+              <button
+                onClick={onResumeTimer}
+                className="btn-primary"
+                data-testid="resume-timer"
+              >
+                {t('common.resume')}
               </button>
             )}
 
@@ -946,24 +1372,9 @@ const TimerPage: React.FC<TimerPageProps> = ({
             >
               {t('common.reset')}
             </button>
-
-            {/* Fit/Fill toggle */}
-            {videoFeatureEnabled && (
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => {
-                  const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
-                  onUpdateSettings?.({ video_fit_mode: next });
-                }}
-                data-testid="toggle-video-fit"
-                aria-label={appSettings.video_fit_mode === 'fit' ? t('timer.fit', 'Fit') : t('timer.fill', 'Fill')}
-                title={appSettings.video_fit_mode === 'fit' ? t('timer.fit', 'Fit') : t('timer.fill', 'Fill')}
-              >
-                {appSettings.video_fit_mode === 'fit' ? t('timer.fit', 'Fit') : t('timer.fill', 'Fill')}
-              </button>
-            )}
           </div>
+        </div>
+          )}
         </div>
 
 
