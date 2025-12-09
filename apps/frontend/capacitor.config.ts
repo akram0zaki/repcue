@@ -9,9 +9,6 @@ const config: CapacitorConfig = {
     // url: 'http://localhost:5173',
     // cleartext: true
     
-    // Custom hostname to show "repcue.app" instead of "localhost" in iOS system messages
-    hostname: 'repcue.app',
-    
     // Allow loading videos from production CDN
     // This enables cross-origin requests to repcue.me for video content
     allowNavigation: ['https://repcue.me/*', 'https://*.repcue.me/*']

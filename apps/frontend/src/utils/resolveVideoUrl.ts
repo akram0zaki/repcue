@@ -1,14 +1,8 @@
 import { storageService } from '../services/storageService';
 import { supabase } from '../config/supabase';
-import { isNativePlatform, VIDEO_CACHING_ENABLED } from '../config/features';
+import { isNativePlatform, VIDEO_CACHING_ENABLED, VIDEO_CDN_BASE_URL } from '../config/features';
 import { VideoCacheService } from '../services/videoCacheService';
 import logger from './logger';
-
-/**
- * Production CDN base URL for video assets
- * Used by native apps to load videos since they can't use relative /media/* paths
- */
-const VIDEO_CDN_BASE_URL = 'https://repcue.me';
 
 /**
  * Resolves video URLs, handling:

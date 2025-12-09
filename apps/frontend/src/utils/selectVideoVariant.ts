@@ -1,17 +1,8 @@
 import type { ExerciseMedia, VideoAspect, VideoFormat, VideoResolution } from '../types/media';
 import type { Exercise } from '../types';
-import { VIDEO_R2_ENABLED } from '../config/features';
+import { VIDEO_R2_ENABLED, VIDEO_CDN_BASE_URL } from '../config/features';
 import { isNativePlatform } from './nativeCapabilities';
 import logger from './logger';
-
-/**
- * Production CDN base URL for video assets
- * Used by native apps to load videos since they can't use relative /media/* paths
- * (The /media/* proxy only works in Cloudflare Pages environment)
- * 
- * NOTE: Use dev.repcue.me for testing, repcue.me for production
- */
-const VIDEO_CDN_BASE_URL = 'https://dev.repcue.me';
 
 /**
  * Convert relative video URLs to absolute URLs for native apps

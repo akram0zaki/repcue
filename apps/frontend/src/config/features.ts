@@ -44,6 +44,12 @@ export const THEME_CUSTOMIZATION_ENABLED = true;
 // When enabled, uses new variants structure; when disabled, falls back to legacy video paths
 export const VIDEO_R2_ENABLED = true; // Enabled for testing R2 video hosting
 
+// Video CDN Base URL
+// Production CDN for video assets - used by native apps to load videos
+// since they can't use relative /media/* paths (which only work in Cloudflare Pages)
+// Configure per environment via VITE_VIDEO_CDN_URL, defaults to production
+export const VIDEO_CDN_BASE_URL = import.meta.env.VITE_VIDEO_CDN_URL || 'https://repcue.me';
+
 // Smart Video Caching System
 // Enable persistent IndexedDB caching for instant video playback and offline access
 // When enabled, videos are cached locally and never re-downloaded (40x faster load times)

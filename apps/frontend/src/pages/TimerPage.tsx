@@ -11,7 +11,6 @@ import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import type { ExerciseMediaIndex } from '../types/media';
 import selectVideoVariant from '../utils/selectVideoVariant';
 import { useExerciseVideo } from '../hooks/useExerciseVideo';
-import getVideoSources from '../utils/videoSources';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import logger from '../utils/logger';
 
@@ -224,7 +223,8 @@ const TimerPage: React.FC<TimerPageProps> = ({
 
   // ---------------- Video Demo Integration (Phase 2) ----------------
   const [mediaIndex, setMediaIndex] = useState<ExerciseMediaIndex | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  // NOTE: videoUrl is now obtained from exerciseVideo.videoUrl (properly cached via resolveVideoUrl)
+  // Previously had local state that bypassed caching by calling selectVideoVariant() directly
   const [repPulse, setRepPulse] = useState<number>(0); // increments each video loop for visual pulse
   const prefersReducedMotion = (() => {
     if (typeof window === 'undefined') return false;
@@ -358,7 +358,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
         }
       } else if (isCountdown && exerciseForVideo && exerciseVideo.media) {
         // Standalone or workout about to start: prefetch current exercise video prior to playback
-        prefetchUrl = videoUrl || null;
+        prefetchUrl = exerciseVideo.videoUrl || null;
       }
 
       if (prefetchUrl) {
@@ -382,15 +382,10 @@ const TimerPage: React.FC<TimerPageProps> = ({
     prefetchVideos().catch(error => {
       logger.warn('Failed to prefetch video:', error);
     });
-  }, [videoFeatureEnabled, mediaIndex, workoutMode?.isResting, workoutMode?.currentExerciseIndex, workoutMode?.exercises, isCountdown, videoUrl, exercises, exerciseForVideo, exerciseVideo.media]);
+  }, [videoFeatureEnabled, mediaIndex, workoutMode?.isResting, workoutMode?.currentExerciseIndex, workoutMode?.exercises, isCountdown, exerciseVideo.videoUrl, exercises, exerciseForVideo, exerciseVideo.media]);
 
-  useEffect(() => {
-    if (!exerciseVideo.media) { setVideoUrl(null); return; }
-    const update = () => setVideoUrl(selectVideoVariant(exerciseVideo.media));
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, [exerciseVideo.media]);
+  // NOTE: Removed effect that was calling selectVideoVariant() directly and bypassing cache.
+  // Now using exerciseVideo.videoUrl from the hook which properly resolves through resolveVideoUrl() → cache
 
   // Force reload when URL changes so new <source> children are considered by the media element
   useEffect(() => {
@@ -398,7 +393,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     if (v) {
       try { v.load(); } catch {}
     }
-  }, [videoUrl, exerciseVideo.videoRef]);
+  }, [exerciseVideo.videoUrl, exerciseVideo.videoRef]);
 
   useEffect(() => {
     if (!exerciseVideo || !isRepBased) return;
@@ -407,7 +402,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
     });
   }, [exerciseVideo, isRepBased]);
 
-  const showVideoInsideCircle = !!videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow && !exerciseVideo.error;
+  const showVideoInsideCircle = !!exerciseVideo.videoUrl && !!exerciseForVideo && videoFeatureEnabled && exerciseVideo.media && !isCountdown && !restingNow && !exerciseVideo.error;
 
   // Phase 3 debug aid: log reasons when an exercise marked has_video does not actually render
   useEffect(() => {
@@ -417,7 +412,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
   if (appSettings.show_exercise_videos === false) reasons.push('user setting off');
   if (!VIDEO_DEMOS_ENABLED) reasons.push('feature flag disabled');
     if (!exerciseVideo.media) reasons.push('missing media metadata');
-    if (!videoUrl) reasons.push('no variant chosen');
+    if (!exerciseVideo.videoUrl) reasons.push('no variant chosen');
     if (isCountdown) reasons.push('during countdown');
     if (restingNow) reasons.push('rest state');
     if (exerciseVideo.error) reasons.push('error state');
@@ -425,7 +420,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
       // One concise debug line (no PII) to assist diagnosing missing video rendering
       logger.debug('[VideoDemo] hidden', exerciseForVideo.id, '->', reasons.join(', '));
     }
-  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, videoUrl, isCountdown, restingNow, exerciseVideo.error, appSettings.show_exercise_videos]);
+  }, [exerciseForVideo, videoFeatureEnabled, showVideoInsideCircle, exerciseVideo.media, exerciseVideo.videoUrl, isCountdown, restingNow, exerciseVideo.error, appSettings.show_exercise_videos]);
   
   // Rep/Set progress for repetition-based exercises (both workout mode and standalone)
   
@@ -796,6 +791,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <video
                   key={`fullscreen-${selectedExercise?.id || 'no-exercise'}`}
                   ref={exerciseVideo.videoRef}
+                  src={exerciseVideo.videoUrl || undefined}
                   autoPlay
                   muted
                   loop
@@ -816,11 +812,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                     const playbackRate = 1 / appSettings.rep_speed_factor;
                     video.playbackRate = playbackRate;
                   }}
-                >
-                  {getVideoSources(videoUrl).map(s => (
-                    <source key={s.src} src={s.src} type={s.type} />
-                  ))}
-                </video>
+                />
               </div>
               {/* Video overlay controls - below progress bar, top right */}
               <div className="absolute top-28 right-6 z-10 flex gap-2">
@@ -866,7 +858,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
               aria-live="off"
             >
             {showVideoInsideCircle && ((() => {
-              logger.debug('[TimerPage] Rendering video element', { url: videoUrl, factor: appSettings.rep_speed_factor });
+              logger.debug('[TimerPage] Rendering video element', { url: exerciseVideo.videoUrl, factor: appSettings.rep_speed_factor });
               return (
               <div
                 className="absolute inset-4 sm:inset-6 rounded-full overflow-hidden z-[1] flex items-center justify-center"
@@ -876,6 +868,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <video
                   key={selectedExercise?.id || 'no-exercise'}
                   ref={exerciseVideo.videoRef}
+                  src={exerciseVideo.videoUrl || undefined}
                   muted
                   loop
                   playsInline
@@ -903,11 +896,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       exerciseVideo.videoRef.current.play().catch(() => {});
                     }
                   }}
-                >
-                  {getVideoSources(videoUrl).map(s => (
-                    <source key={s.src} src={s.src} type={s.type} />
-                  ))}
-                </video>
+                />
                 {/* Subtle overlay to maintain ring contrast */}
                 <div className="absolute inset-0 bg-black/10 dark:bg-black/20 pointer-events-none" />
               </div>
@@ -1114,6 +1103,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                   <video
                     key={selectedExercise?.id || 'no-exercise'}
                     ref={exerciseVideo.videoRef}
+                    src={exerciseVideo.videoUrl || undefined}
                     autoPlay
                     muted
                     loop
@@ -1140,11 +1130,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                         exerciseVideo.videoRef.current.play().catch(() => {});
                       }
                     }}
-                  >
-                    {getVideoSources(videoUrl).map(s => (
-                      <source key={s.src} src={s.src} type={s.type} />
-                    ))}
-                  </video>
+                  />
                   {/* Subtle overlay to maintain border contrast */}
                   <div className="absolute inset-0 bg-black/5 dark:bg-black/10 pointer-events-none" />
                 </div>

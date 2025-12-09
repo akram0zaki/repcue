@@ -894,8 +894,16 @@ export default function DevToolsPage() {
                 onClick={async () => {
                   setStatus('Inspecting IndexedDB video cache...');
                   try {
-                    // Open IndexedDB directly
+                    // Open IndexedDB directly - use version 1 to match VideoCacheService
                     const dbRequest = indexedDB.open('repcue-video-cache', 1);
+                    
+                    dbRequest.onupgradeneeded = () => {
+                      // This happens if DB didn't exist - just create the store
+                      const db = dbRequest.result;
+                      if (!db.objectStoreNames.contains('videos')) {
+                        db.createObjectStore('videos', { keyPath: 'id' });
+                      }
+                    };
                     
                     dbRequest.onsuccess = async () => {
                       const db = dbRequest.result;
@@ -903,34 +911,71 @@ export default function DevToolsPage() {
                       const store = transaction.objectStore('videos');
                       const getAllRequest = store.getAll();
                       
-                      getAllRequest.onsuccess = () => {
+                      getAllRequest.onsuccess = async () => {
                         const videos = getAllRequest.result;
                         let info = `📦 IndexedDB Video Cache (${videos.length} entries):\n\n`;
                         
-                        videos.slice(0, 10).forEach((video: {
-                          id: string;
-                          url: string;
-                          size: number;
-                          mimeType: string;
-                          cachedAt: number;
-                          lastAccessedAt: number;
-                          expiresAt: number;
-                          accessCount: number;
-                        }) => {
+                        for (const video of videos.slice(0, 5)) {
                           info += `URL: ${video.url.substring(video.url.lastIndexOf('/') + 1)}\n`;
                           info += `  ID: ${video.id}\n`;
                           info += `  Size: ${(video.size / 1024 / 1024).toFixed(2)} MB\n`;
                           info += `  MIME: ${video.mimeType}\n`;
+                          info += `  Has Blob: ${!!video.blob}\n`;
+                          
+                          // Validate blob content
+                          if (video.blob) {
+                            const blobType = video.blob.type;
+                            const blobSize = video.blob.size;
+                            info += `  Blob Type: ${blobType || '(empty)'}\n`;
+                            info += `  Blob Size: ${(blobSize / 1024 / 1024).toFixed(2)} MB\n`;
+                            
+                            // Check MP4 signature (first 12 bytes should contain 'ftyp')
+                            try {
+                              const buffer = await video.blob.slice(0, 12).arrayBuffer();
+                              const bytes = new Uint8Array(buffer);
+                              const signature = String.fromCharCode(...bytes.slice(4, 8));
+                              const hexDump = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+                              info += `  First 12 bytes: ${hexDump}\n`;
+                              info += `  Signature: "${signature}" (${signature === 'ftyp' ? '✅ Valid MP4' : '❌ Invalid'})\n`;
+                              
+                              // Test creating blob URL and loading in video element
+                              try {
+                                const testBlob = new Blob([video.blob], { type: video.mimeType || 'video/mp4' });
+                                const testUrl = URL.createObjectURL(testBlob);
+                                info += `  Test Blob URL: ${testUrl.substring(0, 40)}...\n`;
+                                
+                                // Quick video element test
+                                const testVideo = document.createElement('video');
+                                testVideo.muted = true;
+                                testVideo.src = testUrl;
+                                
+                                const testResult = await new Promise<string>((resolve) => {
+                                  testVideo.onloadedmetadata = () => resolve(`✅ Loadable (${testVideo.duration.toFixed(1)}s)`);
+                                  testVideo.onerror = () => {
+                                    const err = testVideo.error;
+                                    resolve(`❌ Error code ${err?.code}: ${err?.message || 'Unknown'}`);
+                                  };
+                                  setTimeout(() => resolve('⚠️ Timeout'), 3000);
+                                });
+                                
+                                info += `  Playability: ${testResult}\n`;
+                                URL.revokeObjectURL(testUrl);
+                              } catch (testErr) {
+                                info += `  Test Error: ${testErr}\n`;
+                              }
+                            } catch (sigErr) {
+                              info += `  ❌ Could not read blob: ${sigErr}\n`;
+                            }
+                          } else {
+                            info += `  ❌ No blob data stored!\n`;
+                          }
+                          
                           info += `  Cached: ${new Date(video.cachedAt).toLocaleString()}\n`;
-                          info += `  Last Access: ${new Date(video.lastAccessedAt).toLocaleString()}\n`;
-                          info += `  Expires: ${new Date(video.expiresAt).toLocaleString()}\n`;
-                          info += `  Access Count: ${video.accessCount}\n`;
-                          info += `  Expired: ${Date.now() > video.expiresAt ? '❌ YES' : '✅ NO'}\n`;
                           info += '\n';
-                        });
+                        }
                         
-                        if (videos.length > 10) {
-                          info += `... and ${videos.length - 10} more videos\n`;
+                        if (videos.length > 5) {
+                          info += `... and ${videos.length - 5} more videos\n`;
                         }
                         
                         setCacheInfo(info);
@@ -944,7 +989,14 @@ export default function DevToolsPage() {
                     };
                     
                     dbRequest.onerror = () => {
-                      setStatus(`❌ Error opening IndexedDB: ${dbRequest.error?.message}`);
+                      const error = dbRequest.error;
+                      setStatus(`❌ Error opening IndexedDB: ${error?.message || 'Unknown error'}`);
+                      setCacheInfo(`IndexedDB error details:\nName: ${error?.name}\nMessage: ${error?.message}`);
+                    };
+                    
+                    // Also handle blocked event (happens if another tab has the DB open with a higher version)
+                    dbRequest.onblocked = () => {
+                      setStatus('⚠️ IndexedDB blocked - close other tabs and try again');
                     };
                   } catch (error) {
                     setStatus(`❌ Error: ${error instanceof Error ? error.message : 'Unknown'}`);

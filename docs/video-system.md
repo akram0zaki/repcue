@@ -19,6 +19,35 @@ This document explains how the exercise video feature works end-to-end, includin
 - **Client**: selects the right format and aspect, respects reduced motion, and integrates with the timer
 - **Native Apps**: Capacitor iOS/Android apps use absolute URLs to production CDN (`https://repcue.me/media/*`)
 
+## ⚠️ Critical Attention Points
+
+These are the most important implementation details that can cause hard-to-debug issues:
+
+### 1. Blob URL Lifecycle Management
+**DO NOT revoke blob URLs in components or hooks.** VideoCacheService maintains a memory cache of blob URLs that must persist across component lifecycles. Revoking them causes `MEDIA_ERR_SRC_NOT_SUPPORTED` errors.
+
+### 2. iOS/WKWebView Blob Creation
+When creating blob URLs from IndexedDB data, **always extract ArrayBuffer first**:
+```typescript
+// ✅ Correct - works on iOS
+const arrayBuffer = await blob.arrayBuffer();
+const freshBlob = new Blob([arrayBuffer], { type: mimeType });
+URL.createObjectURL(freshBlob);
+```
+Directly wrapping IndexedDB blobs with `new Blob([blob], ...)` fails silently on iOS.
+
+### 3. Native App URL Resolution
+Relative `/media/*` URLs don't work in Capacitor apps (they resolve to `capacitor://localhost/media/*` which doesn't exist). The `resolveVideoUrl` function converts them to absolute CDN URLs.
+
+### 4. IndexedDB Version Matching
+When accessing IndexedDB directly (e.g., in DevTools diagnostics), use the same version as `VideoCacheService` (currently `1`). Version mismatches trigger `onupgradeneeded` instead of `onsuccess`.
+
+### 5. Video Element Attributes for iOS
+Always include on `<video>` elements:
+- `playsInline` - Required for inline playback (prevents fullscreen takeover)
+- `crossOrigin="anonymous"` - Required for CORS requests to CDN
+- `muted` - Required for autoplay to work
+
 ## Feature Flags & Settings
 Feature flags are defined in `apps/frontend/src/config/features.ts`:
 
@@ -115,26 +144,72 @@ Video selection is handled by `src/utils/selectVideoVariant.ts`:
 RepCue includes a multi-tier caching system via `VideoCacheService` (`src/services/videoCacheService.ts`):
 
 ### Cache Tiers
-1. **Memory cache**: In-memory Map of URL → blob URL (instant access)
-2. **IndexedDB**: Persistent blob storage with 90-day expiration
+1. **Memory cache**: In-memory Map of URL → blob URL (instant access, persists during session)
+2. **IndexedDB**: Persistent blob storage with 90-day expiration (database: `repcue-video-cache`, version 1)
 3. **Service Worker**: Runtime cache for `/media/*` paths
 
 ### Features
 - **LRU eviction**: Automatically removes least-recently-used videos when storage is full
 - **Storage quota monitoring**: Respects 80% max quota, keeps 10% free
 - **De-duplication**: Concurrent fetches for same URL share a single network request
-- **Blob URL lifecycle**: Automatic cleanup of blob URLs on component unmount
+- **Blob URL lifecycle**: Managed by VideoCacheService, NOT by individual components
 - **Consent-aware**: Respects user consent via ConsentService
+- **iOS/WKWebView compatible**: Uses ArrayBuffer extraction for reliable blob URL creation
+
+### Critical Implementation Details
+
+#### Blob URL Management
+**IMPORTANT**: Blob URLs created by `VideoCacheService` must NOT be revoked by consuming components. The service maintains a memory cache of blob URLs that persist across component mount/unmount cycles. Revoking these URLs would cause `MEDIA_ERR_SRC_NOT_SUPPORTED` errors when trying to play previously cached videos.
+
+```typescript
+// ❌ WRONG - Don't do this in hooks/components
+useEffect(() => {
+  return () => {
+    if (videoUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(videoUrl); // This breaks the cache!
+    }
+  };
+}, [videoUrl]);
+
+// ✅ CORRECT - Let VideoCacheService manage blob URLs
+// Cleanup happens via clearAll() or LRU eviction
+```
+
+#### iOS/WKWebView Blob Compatibility
+IndexedDB stores blobs using the structured clone algorithm, but WKWebView doesn't always materialize them correctly when creating blob URLs directly. The solution is to **always extract the ArrayBuffer** and create a fresh Blob:
+
+```typescript
+// In VideoCacheService.getVideo():
+const arrayBuffer = await video.blob.arrayBuffer();
+const freshBlob = new Blob([arrayBuffer], { type: expectedType });
+blobUrl = URL.createObjectURL(freshBlob);
+```
+
+This ensures the blob data is fully materialized in memory before creating the URL, which is required for reliable playback on iOS.
 
 ### URL Resolution
 The `resolveVideoUrl` utility (`src/utils/resolveVideoUrl.ts`) handles multiple URL schemes:
-- Regular HTTP/HTTPS URLs: cached via VideoCacheService (web only)
-- `blob:` URLs: returned directly
+- Regular HTTP/HTTPS URLs: cached via VideoCacheService
+- Relative URLs (`/media/*`): converted to absolute CDN URLs for native apps, then cached
+- `blob:` URLs: returned directly (already resolved)
 - `blob-pending-sync://` / `blob-video://`: custom exercises stored locally
 - `shared-video://`: references another exercise's video file
 
-**Important: Native App Caching Behavior**
-On native iOS/Android apps, IndexedDB blob caching is **disabled**. This is because iOS WKWebView has compatibility issues with blob URLs created from IndexedDB stored video data, causing `MEDIA_ERR_SRC_NOT_SUPPORTED` errors. Native apps use direct CDN URLs instead and rely on iOS's built-in HTTP caching.
+### Native App URL Handling
+For Capacitor iOS/Android apps, relative `/media/*` paths need special handling:
+
+1. **Detection**: `isNativePlatform()` checks for Capacitor runtime
+2. **URL Conversion**: Relative paths are prefixed with `VIDEO_CDN_BASE_URL` (default: `https://repcue.me`)
+3. **Caching**: Videos ARE cached in IndexedDB on native apps (unlike the previous bypass approach)
+4. **Blob Creation**: Uses ArrayBuffer extraction method for iOS compatibility
+
+```typescript
+// In resolveVideoUrl.ts
+if (isNativePlatform() && isRelativeUrl && videoUrl.startsWith('/media/')) {
+  fetchUrl = `${VIDEO_CDN_BASE_URL}${videoUrl}`;
+  // e.g., /media/burpees_v1_1920x1080.mp4 → https://repcue.me/media/burpees_v1_1920x1080.mp4
+}
+```
 
 ## Proxy & Headers (Cloudflare Pages Functions)
 The media proxy is implemented in `functions/media/[[path]].ts`:
@@ -283,17 +358,95 @@ See `scripts/video/README.md` for detailed steps:
 | `purge-media-cache.mjs` | Purge Cloudflare cache for videos |
 
 ## Troubleshooting
-- **Video not playing in Safari**: ensure MP4 fallback exists and `+faststart` is set; check blob URL validity
-- **Choppy playback**: check CRF/bitrate; reduce resolution or simplify background
-- **404 from `/media/...`**: confirm object key in R2; check manifest path and upload logs
-- **Seeking broken**: verify Range header handling; test with DevTools network panel for 206 responses
-- **IndexedDB cache issues**: check browser storage quota; clear via `VideoCacheService.clearAll()`
-- **Blob URL "Load failed"**: Safari-specific issue; blob URLs may fail HEAD validation but work for playback
-- **Native app video white screen**: Check that CORS headers are deployed to Cloudflare; verify `crossOrigin="anonymous"` on video elements
-- **iOS video not loading**: Ensure Info.plist has ATS exceptions; check that URL normalization is working (look for absolute URLs in logs)
-- **iOS MEDIA_ERR_SRC_NOT_SUPPORTED**: This error with blob URLs indicates the iOS blob caching workaround may not be active. Verify `isNativePlatform()` returns `true` and `resolveVideoUrl` is bypassing cache
-- **iOS video plays then restarts**: May indicate blob URL issues; ensure native apps are using direct CDN URLs, not cached blob URLs
-- **Android video issues**: Verify `http://localhost` is in CORS allowed origins; check for mixed content warnings
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Video not playing in Safari | Missing MP4 fallback or `+faststart` not set | Ensure MP4 exists with `-movflags +faststart` |
+| Choppy playback | High bitrate or complex background | Reduce CRF/resolution, simplify clip |
+| 404 from `/media/...` | Object not in R2 or wrong path | Check R2 bucket and manifest paths |
+| Seeking broken | Range header not handled | Verify proxy returns 206 for Range requests |
+| IndexedDB cache issues | Browser storage quota exceeded | Clear via Settings → DevTools → Clear Video Cache |
+
+### iOS/Capacitor-Specific Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `MEDIA_ERR_SRC_NOT_SUPPORTED` (code 4) | Blob URL created incorrectly from IndexedDB | Ensure VideoCacheService uses ArrayBuffer extraction (see below) |
+| Videos work in DevTools test but fail in app | Blob URLs being revoked prematurely | Remove cleanup effects that revoke blob URLs in hooks/components |
+| White screen instead of video | CORS headers missing or wrong origin | Verify Cloudflare proxy includes `capacitor://localhost` in allowed origins |
+| Video loads then restarts continuously | Component re-rendering recreating video element | Remove `key={videoUrl}` from video element |
+| Timer shows description instead of video | `showVideoInsideCircle` conditions not met | Check debug logs for which condition is failing |
+
+### iOS Blob URL Fix (Critical)
+
+iOS WKWebView has a specific issue with blob URLs created from IndexedDB: the structured clone algorithm doesn't always materialize the blob data correctly. The symptom is `MEDIA_ERR_SRC_NOT_SUPPORTED` (error code 4) even when the blob data is valid.
+
+**The Fix** (implemented in `VideoCacheService.getVideo()`):
+```typescript
+// ❌ OLD - Doesn't work reliably on iOS
+const typedBlob = new Blob([video.blob], { type: blobMimeType });
+blobUrl = URL.createObjectURL(typedBlob);
+
+// ✅ NEW - Works on all platforms including iOS
+const arrayBuffer = await video.blob.arrayBuffer();
+const freshBlob = new Blob([arrayBuffer], { type: expectedType });
+blobUrl = URL.createObjectURL(freshBlob);
+```
+
+The key difference is extracting the `ArrayBuffer` first, which forces the blob data to be fully materialized in memory before creating the URL.
+
+### Blob URL Lifecycle (Critical)
+
+**Never revoke blob URLs managed by VideoCacheService.** The service maintains a memory cache that persists blob URLs across component lifecycles. If you revoke them:
+1. The memory cache entry becomes invalid
+2. Next access returns the revoked URL
+3. Video fails with `MEDIA_ERR_SRC_NOT_SUPPORTED`
+
+**Symptoms of premature revocation:**
+- Videos work on first load but fail after navigation
+- DevTools shows valid blobs but playback fails
+- Different blob URLs shown in errors vs DevTools inspection
+
+**Solution:** Remove any cleanup effects in hooks that call `URL.revokeObjectURL()` for cached video URLs.
+
+### DevTools Diagnostics
+
+The app includes video cache diagnostics in Settings → DevTools → Video Cache Diagnostics:
+
+1. **Inspect Video Cache**: Shows storage stats (count, size, quota)
+2. **Test Video URLs**: Tests URL resolution for sample exercises
+3. **Inspect IndexedDB**: Shows detailed blob inspection including:
+   - First 12 bytes (hex dump)
+   - MP4 signature validation (`ftyp` check)
+   - Blob MIME type
+   - Playability test (attempts to load in video element)
+4. **Clear Video Cache**: Removes all cached videos
+
+**Using IndexedDB Inspection:**
+- If blobs show `✅ Valid MP4` and `✅ Loadable` but videos still fail, the issue is likely blob URL revocation
+- If blobs show `❌ Invalid` signature, the cache is corrupted - clear it
+- If playability test shows error code 4, the blob URL creation method needs the ArrayBuffer fix
+
+### Debug Logging
+
+Enable debug logs by setting `DEBUG = true` in `src/config/features.ts`. Key log messages:
+
+```
+[VideoCacheService] IndexedDB cache HIT: <url>
+[VideoCacheService] Created blob URL from ArrayBuffer: { url, originalType, newType, blobUrl }
+[VideoDemo] Render check: { exerciseId, showVideoInsideCircle, videoUrl, hasMedia, ... }
+[VideoDemo] hidden <exerciseId> -> <reasons>
+```
+
+### Native App Debugging Checklist
+
+1. **Check Xcode console** for `[VideoCacheService]` logs
+2. **Verify URL conversion**: Look for logs showing `/media/...` → `https://repcue.me/media/...`
+3. **Check CORS**: Network requests should have `Access-Control-Allow-Origin: capacitor://localhost`
+4. **Verify blob creation**: Look for "Created blob URL from ArrayBuffer" logs
+5. **Check video element**: Ensure `crossOrigin="anonymous"` and `playsInline` attributes are present
 
 ## Implementation Files
 

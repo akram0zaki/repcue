@@ -1,5 +1,33 @@
 ## Unreleased
 
+### 2025-12-09
+
+#### 🐛 Fix - iOS Capacitor Video Playback
+
+**Fixed**: Videos now play correctly on iOS Capacitor app (were showing description fallback instead of videos).
+
+**Root Causes Identified and Fixed**:
+
+1. **Blob URL Revocation Issue**: The `useExerciseVideo` hook was revoking blob URLs on cleanup, but these URLs were managed by `VideoCacheService`'s memory cache. When components unmounted and remounted, the cached blob URLs were already revoked, causing `MEDIA_ERR_SRC_NOT_SUPPORTED` errors.
+
+2. **iOS WKWebView Blob Creation**: IndexedDB blobs weren't being materialized correctly when creating blob URLs. Direct `new Blob([storedBlob], ...)` wrapping doesn't work reliably on iOS. Fixed by extracting ArrayBuffer first: `await blob.arrayBuffer()` → `new Blob([arrayBuffer], ...)`.
+
+3. **DevTools IndexedDB Version Mismatch**: DevTools diagnostics were opening IndexedDB with version 2 while `VideoCacheService` uses version 1, causing `onupgradeneeded` to fire instead of `onsuccess`.
+
+**Technical Changes**:
+- Removed blob URL cleanup effect from `useExerciseVideo` hook - VideoCacheService now solely manages blob URL lifecycle
+- Updated `VideoCacheService.getVideo()` to always use ArrayBuffer extraction method for iOS compatibility
+- Fixed DevTools IndexedDB inspection to use correct database version (1)
+- Added comprehensive blob validation diagnostics to DevTools (MP4 signature check, playability test)
+
+**Files Changed**:
+- [useExerciseVideo.ts](apps/frontend/src/hooks/useExerciseVideo.ts) - Removed blob URL cleanup effect
+- [videoCacheService.ts](apps/frontend/src/services/videoCacheService.ts) - ArrayBuffer extraction for blob URL creation
+- [DevToolsPage.tsx](apps/frontend/src/pages/DevToolsPage.tsx) - Fixed IndexedDB version, added blob inspection diagnostics
+- [video-system.md](docs/video-system.md) - Updated documentation with attention points and troubleshooting
+
+---
+
 ### 2025-12-08
 
 #### ✨ Enhancement - Unified Timer Progress Bar Display

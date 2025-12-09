@@ -104,7 +104,10 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
 
     const m = mediaIndex[exercise.id];
     setMedia(m ?? null);
-    if (!m) { setVideoUrl(null); return; }
+    if (!m) { 
+      setVideoUrl(null); 
+      return; 
+    }
     
     // Prefer R2 variants selection with viewport-aware choice
     const chosen = selectVideoVariant(m);
@@ -248,14 +251,10 @@ export function useExerciseVideo({ exercise, mediaIndex, enabled, isRunning, isA
     return () => { v.removeEventListener('loadeddata', loaded); v.removeEventListener('error', failed); };
   }, [videoUrl, shouldPlay, exercise, repSpeedFactor]);
 
-  // Cleanup blob URLs when component unmounts or video URL changes
-  useEffect(() => {
-    return () => {
-      if (videoUrl && videoUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(videoUrl);
-      }
-    };
-  }, [videoUrl]);
+  // NOTE: We do NOT revoke blob URLs here because they are managed by VideoCacheService
+  // which maintains a memory cache of blob URLs. Revoking them here would break
+  // the cache and cause MEDIA_ERR_SRC_NOT_SUPPORTED errors when trying to play
+  // previously cached videos. VideoCacheService handles cleanup via clearAll() and LRU eviction.
 
   return { videoRef, media, videoUrl, ready, error, onLoop };
 }
