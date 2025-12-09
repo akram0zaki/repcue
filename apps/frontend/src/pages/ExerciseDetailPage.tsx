@@ -10,7 +10,6 @@ import { VideoThumbnail } from '../components/VideoThumbnail';
 import { useAuth } from '../hooks/useAuth';
 import { usePlatform } from '../contexts/PlatformContext';
 import logger from '../utils/logger';
-import { hideStatusBar, showStatusBar } from '../utils/iosStatusBar';
 import '../styles/exerciseDetailParallax.css';
 import type { AppSettings } from '../types';
 
@@ -145,13 +144,9 @@ const ExerciseDetailPage: React.FC = () => {
 
     try {
       if (!document.fullscreenElement) {
-        // Hide status bar on iOS when entering fullscreen
-        await hideStatusBar();
         await container.requestFullscreen();
         setIsFullscreen(true);
       } else {
-        // Show status bar on iOS when exiting fullscreen
-        await showStatusBar();
         await document.exitFullscreen();
         setIsFullscreen(false);
       }
