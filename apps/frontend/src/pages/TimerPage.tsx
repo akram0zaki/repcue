@@ -820,7 +820,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 {videoFeatureEnabled && (
                   <button
                     type="button"
-                    className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                    className="p-1.5 bg-white/5 dark:bg-gray-800/5 text-gray-800 dark:text-white rounded-lg shadow-sm hover:bg-white/15 dark:hover:bg-gray-700/15 transition-colors backdrop-blur-sm border border-white/10 dark:border-gray-600/10"
                     onClick={() => {
                       const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
                       onUpdateSettings?.({ video_fit_mode: next });
@@ -836,7 +836,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                 <button
                   type="button"
                   onClick={handleToggleFullscreen}
-                  className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                  className="p-1.5 bg-white/5 dark:bg-gray-800/5 text-gray-800 dark:text-white rounded-lg shadow-sm hover:bg-white/15 dark:hover:bg-gray-700/15 transition-colors backdrop-blur-sm border border-white/10 dark:border-gray-600/10"
                   aria-label={t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' })}
                   title={t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' })}
                   data-testid="toggle-fullscreen-timer-exit"
@@ -1074,7 +1074,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       {videoFeatureEnabled && (
                         <button
                           type="button"
-                          className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                          className="p-1.5 bg-white/5 dark:bg-gray-800/5 text-gray-800 dark:text-white rounded-lg shadow-sm hover:bg-white/15 dark:hover:bg-gray-700/15 transition-colors backdrop-blur-sm border border-white/10 dark:border-gray-600/10"
                           onClick={() => {
                             const next = (appSettings.video_fit_mode === 'fit') ? 'fill' : 'fit';
                             onUpdateSettings?.({ video_fit_mode: next });
@@ -1090,7 +1090,7 @@ const TimerPage: React.FC<TimerPageProps> = ({
                       <button
                         type="button"
                         onClick={handleToggleFullscreen}
-                        className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+                        className="p-1.5 bg-white/5 dark:bg-gray-800/5 text-gray-800 dark:text-white rounded-lg shadow-sm hover:bg-white/15 dark:hover:bg-gray-700/15 transition-colors backdrop-blur-sm border border-white/10 dark:border-gray-600/10"
                         aria-label={t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
                         title={t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
                         data-testid="toggle-fullscreen-timer-rect"
