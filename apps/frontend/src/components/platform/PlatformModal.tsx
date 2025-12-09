@@ -8,7 +8,7 @@
  * 
  * @module PlatformModal
  */
-import React, { useEffect, useRef, useCallback, type ReactNode } from 'react';
+import React, { useEffect, useRef, useCallback, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { isIOS, isNativePlatform } from '../../utils/nativeCapabilities';
@@ -66,6 +66,8 @@ export const PlatformModal: React.FC<PlatformModalProps> = ({
   const { t } = useTranslation();
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const startYRef = useRef<number>(0);
+  const [dragDelta, setDragDelta] = useState(0);
   
   const isNative = isNativePlatform();
   const ios = isIOS();
@@ -84,6 +86,31 @@ export const PlatformModal: React.FC<PlatformModalProps> = ({
       onClose();
     }
   }, [closeOnBackdrop, onClose]);
+
+  // Handle touch start for drag to close
+  const handleTouchStart = useCallback((event: React.TouchEvent) => {
+    startYRef.current = event.touches[0].clientY;
+  }, []);
+
+  // Handle touch move for drag to close
+  const handleTouchMove = useCallback((event: React.TouchEvent) => {
+    const currentY = event.touches[0].clientY;
+    const delta = currentY - startYRef.current;
+    
+    // Only track positive movement (dragging down)
+    if (delta > 0) {
+      setDragDelta(delta);
+    }
+  }, []);
+
+  // Handle touch end for drag to close
+  const handleTouchEnd = useCallback(() => {
+    const threshold = 100; // 100px to trigger close
+    if (dragDelta > threshold) {
+      onClose();
+    }
+    setDragDelta(0);
+  }, [dragDelta, onClose]);
 
   // Focus trap and keyboard handling
   useEffect(() => {
@@ -170,10 +197,22 @@ export const PlatformModal: React.FC<PlatformModalProps> = ({
           aria-modal="true"
           aria-label={ariaLabel || title}
           tabIndex={-1}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            transform: dragDelta > 0 ? `translateY(${dragDelta}px)` : undefined,
+            transition: dragDelta > 0 ? 'none' : undefined,
+          }}
         >
           {/* Drag handle */}
           {showHandle && (
-            <div className="flex justify-center pt-3 pb-2">
+            <div 
+              className="flex justify-center pt-3 pb-2 active:opacity-50 transition-opacity"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               <div 
                 className={`
                   w-9 h-1 rounded-full
