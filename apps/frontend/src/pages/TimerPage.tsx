@@ -14,6 +14,7 @@ import { useExerciseVideo } from '../hooks/useExerciseVideo';
 import getVideoSources from '../utils/videoSources';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import logger from '../utils/logger';
+import { hideStatusBar, showStatusBar } from '../utils/iosStatusBar';
 
 // Fullscreen icons
 const FullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
@@ -159,9 +160,13 @@ const TimerPage: React.FC<TimerPageProps> = ({
       }
       
       if (!document.fullscreenElement) {
+        // Hide status bar on iOS when entering fullscreen
+        await hideStatusBar();
         await container.requestFullscreen();
         setIsFullscreen(true);
       } else {
+        // Show status bar on iOS when exiting fullscreen
+        await showStatusBar();
         await document.exitFullscreen();
         setIsFullscreen(false);
       }
