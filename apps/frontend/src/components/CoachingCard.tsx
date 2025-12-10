@@ -18,6 +18,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CoachingInsight } from '../types/coaching';
+import { decodeHtmlEntities } from '../utils/sanitizeText';
 
 interface CoachingCardProps {
   insight: CoachingInsight;
@@ -241,7 +242,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
           id={titleId}
           className="text-h3 break-words"
         >
-          {t(titleKey, titleParams)}
+          {decodeHtmlEntities(t(titleKey, titleParams))}
         </h4>
       </div>
 
@@ -251,7 +252,7 @@ export const CoachingCard: React.FC<CoachingCardProps> = ({ insight, onAction, o
           id={messageId}
           className="text-body"
         >
-          {t(messageKey, messageParams)}
+          {decodeHtmlEntities(t(messageKey, messageParams))}
         </p>
       </div>
 

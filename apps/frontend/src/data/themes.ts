@@ -6,22 +6,22 @@
 import type { Theme } from '../types/theme';
 
 /**
- * Default Theme (Classic Teal)
- * Matches the current RepCue color palette exactly
- * REQ-001, REQ-002: Default theme preserving existing design
+ * Default Theme (Electric Blue + Mint)
+ * Modern, athletic aesthetic with electric blue and mint green accents
+ * REQ-001, REQ-002: Default theme with new modern color palette
  */
 const defaultTheme: Theme = {
   id: 'default',
   name: 'themes.default.name',
   description: 'themes.default.description',
-  previewColors: ['#0096C7', '#0077A5', '#52B788'],
+  previewColors: ['#2962FF', '#00E5A8', '#4C7BFF'],
   
   light: {
     // Primary Brand Colors
-    primary: '#0096C7',
-    primaryHover: '#0077A5',
-    primaryFocus: '#005F84',
-    primaryDisabled: '#B3E0EF',
+    primary: '#2962FF',
+    primaryHover: '#2557E6',
+    primaryFocus: '#1E47C4',
+    primaryDisabled: '#C5D2FF',
 
     // Background Colors
     background: '#ffffff',
@@ -86,10 +86,10 @@ const defaultTheme: Theme = {
 
   dark: {
     // Primary Brand Colors - Dark Mode
-    primary: '#0096C7',
-    primaryHover: '#33ADD3',
-    primaryFocus: '#5CC2DE',
-    primaryDisabled: '#1F3B47',
+    primary: '#4C7BFF',
+    primaryHover: '#7595FF',
+    primaryFocus: '#A1B4FF',
+    primaryDisabled: '#1E2745',
 
     // Background Colors - Dark Mode
     background: '#121212',
@@ -124,7 +124,7 @@ const defaultTheme: Theme = {
     // Border Colors - Dark Mode
     borderPrimary: '#334155',
     borderSecondary: '#475569',
-    borderFocus: '#33ADD3',
+    borderFocus: '#7595FF',
 
     // Status Colors - Dark Mode
     success: '#52B788',

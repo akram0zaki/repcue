@@ -218,8 +218,8 @@ export const InsightsCarousel: React.FC<InsightsCarouselProps> = ({
   return (
     <div className="mb-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold text-text-900 dark:text-text-50">
+      <div className="flex items-center justify-between mb-3 px-4">
+        <h2 className="section-title">
           {t('coaching:insights', { defaultValue: 'Coach Insights' })}
         </h2>
         {onViewAll && (

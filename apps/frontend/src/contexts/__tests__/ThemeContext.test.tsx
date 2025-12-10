@@ -182,7 +182,7 @@ describe('ThemeContext', () => {
         </ThemeProvider>
       );
 
-      expect(screen.getByTestId('current-theme-name')).toHaveTextContent('Ocean Teal');
+      expect(screen.getByTestId('current-theme-name')).toHaveTextContent('Electric Blue + Mint');
     });
 
     it('should provide all available themes', () => {

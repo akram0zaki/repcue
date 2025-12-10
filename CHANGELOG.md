@@ -2,6 +2,74 @@
 
 ### 2025-12-10
 
+#### ✨ Enhancement - UI Modernization Phase 2: Typography, Colors & Polish
+
+**Typography System Overhaul**:
+- Implemented new font families: **Outfit** (headings) + **DM Sans** (body)
+- Updated Google Fonts preload in index.html for new font pairing
+- Revised heading sizes: H1 now 26px (mobile), H2 26px, H3 20px
+- Lighter heading colors in light mode (#6b7280) for sophisticated aesthetic
+- Dark mode headers use very light grey (#f3f4f6) for contrast
+- Updated Tailwind config with new font family definitions
+
+**Theme System Update - Electric Blue + Mint**:
+- Updated default theme from "Classic Teal" to "Electric Blue + Mint"
+- New preview colors: `['#2962FF', '#00E5A8', '#4C7BFF']`
+- Light mode primary: #2962FF (Electric Blue)
+- Dark mode primary: #4C7BFF (softer blue for dark backgrounds)
+- Updated theme selector names in all 8 locales (en, de, es, fr, nl, fy, ar, ar-EG)
+
+**Button Hover Fixes (CSS Specificity)**:
+- Fixed exercise card "Start" button hover text becoming unreadable
+- Fixed upcoming workout card button hover states
+- Used high-specificity selectors (`.btn-primary.btn-primary`) to override base styles
+- Explicitly reset `box-shadow: none` and `transform: none` on hover
+
+**Dark Mode Text Contrast**:
+- Fixed unreadable text on upcoming workout card in dark mode
+- Date subtitle, exercise count, and duration now use explicit light tokens
+- Changed from `var(--color-text-primary)` to `var(--color-text-50/200)` for proper contrast
+
+**RTL Layout Fix**:
+- Theme selector checkmark icon now uses CSS logical property `end-2` for RTL support
+- Text alignment uses `text-start` instead of `text-left`
+
+**AI Coach Text Sanitization**:
+- Created `sanitizeText.ts` utility for HTML entity decoding
+- Updated CoachingCard and InsightsModal to decode entities (e.g., `&rsquo;` → `'`)
+- Uses OWASP-recommended textarea method for safe XSS-free decoding
+
+**AI Workout Button Redesign**:
+- Pill-shaped button with two-column layout (icon section + text section)
+- Vertical separator between icon and text
+- RTL-aware text alignment
+- Unified shadow system with Coach Insights carousel
+
+**HomePage Refinements**:
+- Hero section: Enhanced gradient overlay for better text readability
+- Section titles: Consistent light grey color (#6b7280) with dark mode variant
+- Favorite exercises: Two-row card layout with star icon in title row
+- Popular exercises: Section title now has consistent padding
+
+**Files Changed**:
+- [index.html](apps/frontend/index.html) - Updated Google Fonts (Inter → Outfit + DM Sans)
+- [index.css](apps/frontend/src/index.css) - Typography classes, button specificity, dark mode tokens
+- [tailwind.config.js](apps/frontend/tailwind.config.js) - Font family definitions
+- [themes.ts](apps/frontend/src/data/themes.ts) - Electric Blue + Mint color palette
+- [homeParallax.css](apps/frontend/src/styles/homeParallax.css) - Enhanced gradient overlays
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Layout refinements, card structure
+- [CoachingCard.tsx](apps/frontend/src/components/CoachingCard.tsx) - HTML entity sanitization
+- [InsightsModal.tsx](apps/frontend/src/components/InsightsModal.tsx) - HTML entity sanitization
+- [sanitizeText.ts](apps/frontend/src/utils/sanitizeText.ts) - New utility (created)
+- [sanitizeText.test.ts](apps/frontend/src/utils/__tests__/sanitizeText.test.ts) - Unit tests (created)
+- [modernise-ui-implementation-plan.md](docs/implementation-plans/ui-modernization/modernise-ui-implementation-plan.md) - Progress tracking
+
+**Build Status**: ✅ TypeScript: 0 errors | CSS: All assets compiled | Tests: Passing
+
+---
+
+### 2025-12-10 (Previous Entry)
+
 #### ✨ Enhancement - HomePage UI Refinements & Design System Unification
 
 **Implemented**: 

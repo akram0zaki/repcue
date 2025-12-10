@@ -225,17 +225,14 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
           alt="Fitness motivation"
           className="w-full h-full object-cover"
         />
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+        {/* Gradient Overlay - enhanced for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20"></div>
         {/* Motivational Text */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-4">
-            <h2 className="text-h1 text-white mb-2 leading-tight timer-text-shadow-lg">
-              {t('home.heroTitle', { defaultValue: 'Stay consistent, stay strong.' })}
-            </h2>
-            <p className="text-caption text-white/90 font-medium timer-text-shadow-sm">
+            <h2 className="text-h1 text-white leading-tight timer-text-shadow-lg">
               {t('home.heroSubtitle', { defaultValue: 'Your workouts, your way.' })}
-            </p>
+            </h2>
           </div>
         </div>
         {/* Scroll overlay - fades in as you scroll */}
@@ -275,7 +272,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
           <h1 className="text-h2 text-text-900 dark:text-text-50 mb-1">
             {APP_NAME}
           </h1>
-          <p className="text-small text-text-600 dark:text-text-100">
+          <p className="text-small font-light leading-relaxed text-text-600 dark:text-text-100">
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
@@ -346,7 +343,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                         {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
                       </p>
                       <p>
-                        ~{Math.round((upcomingWorkout.workout.exercises.reduce((sum, ex) => sum + (ex.duration_seconds || 30), 0)) / 60)} {t('common.minutes', { defaultValue: 'min' })}
+                        ~{Math.round((upcomingWorkout.workout.estimated_duration || 0) / 60)} {t('common.minutes', { defaultValue: 'min' })}
                       </p>
                     </div>
 
@@ -400,7 +397,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         <div className="space-y-3 shadow-sm">
           {/* Popular Exercises Section */}
           <section>
-            <h2 className="section-title mb-3">
+            <h2 className="section-title mb-3 px-4">
               {t('home.popularExercises', { defaultValue: 'Popular Exercises' })}
             </h2>
             {popularExercises.length > 0 ? (
@@ -484,7 +481,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
 
           {/* Favorites Section */}
           <section>
-            <h2 className="section-title mb-2">
+            <h2 className="section-title mb-2 px-4">
               {t('home.favoriteExercises')}
             </h2>
             {exercises.filter(ex => ex.is_favorite).length > 0 ? (
@@ -496,36 +493,40 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                     <button
                       key={exercise.id}
                       onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}
-                      className="w-full exercise-card p-3 bg-surface-0 dark:bg-surface-800 rounded-lg shadow-sm text-left transition-all duration-200 hover:shadow-md"
+                      className="w-full exercise-card p-3 sm:p-4 bg-surface-0 dark:bg-surface-800 rounded-lg shadow-sm text-left transition-all duration-200 hover:shadow-md"
                     >
-                      <div className="flex items-center justify-between gap-3">
+                      {/* Row 1: Exercise name with star icon on the left */}
+                      <div className="flex items-start gap-2 mb-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleFavorite(exercise.id);
+                          }}
+                          className="flex-shrink-0 pt-0.5 text-yellow-500 hover:text-yellow-600 transition-colors"
+                          aria-label={t('home.removeFromFavoritesAria', { name: localizeExercise(exercise, t).name })}
+                        >
+                          <StarFilledIcon size={18} />
+                        </button>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-text-900 dark:text-text-50 truncate">
+                          <h3 className="font-medium text-text-900 dark:text-text-50 line-clamp-1 leading-snug">
                             {localizeExercise(exercise, t).name}
                           </h3>
-                          <p className="text-sm secondary-label-text line-clamp-2">
+                          <p className="text-sm secondary-label-text line-clamp-1 leading-snug">
                             {localizeExercise(exercise, t).description}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                          <button
-                            onClick={() => onToggleFavorite(exercise.id)}
-                            className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
-                            aria-label={t('home.removeFromFavoritesAria', { name: localizeExercise(exercise, t).name })}
-                          >
-                            <StarFilledIcon size={16} />
-                          </button>
-                          <button
-                            className="btn-primary text-sm"
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleStartTimer(exercise);
-                            }}
-                          >
-                            {t('common.start')}
-                          </button>
-                        </div>
                       </div>
+
+                      {/* Row 2: Action button full-width */}
+                      <button
+                        className="w-full btn-primary text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-lg"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStartTimer(exercise);
+                        }}
+                      >
+                        {t('common.start')}
+                      </button>
                     </button>
                   ))}
               </div>

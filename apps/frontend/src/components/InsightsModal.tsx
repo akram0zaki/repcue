@@ -18,6 +18,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PlatformModal } from './platform/PlatformModal';
 import type { CoachingInsight } from '../types/coaching';
+import { decodeHtmlEntities } from '../utils/sanitizeText';
 
 interface InsightsModalProps {
   /** Whether the modal is visible */
@@ -203,7 +204,7 @@ const InsightItem: React.FC<InsightItemProps> = ({ insight, onAction, onDismiss 
           {/* Title row with badges */}
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <h4 className="text-body font-semibold text-text-900 dark:text-text-50">
-              {t(titleKey, titleParams)}
+              {decodeHtmlEntities(t(titleKey, titleParams))}
             </h4>
             {insight.source === 'ai' && (
               <span className="ai-badge inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium">
@@ -217,7 +218,7 @@ const InsightItem: React.FC<InsightItemProps> = ({ insight, onAction, onDismiss 
 
           {/* Message */}
           <p className="text-caption text-text-600 dark:text-text-300 mb-3">
-            {t(messageKey, messageParams)}
+            {decodeHtmlEntities(t(messageKey, messageParams))}
           </p>
 
           {/* Actions */}

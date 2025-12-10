@@ -4,8 +4,8 @@
     "description": "Wählen Sie Ihr bevorzugtes Farbschema",
     "applying": "Farbschema wird angewendet...",
     "default": {
-      "name": "Ozean Türkis",
-      "description": "Klassisches Türkis-Schema mit ausgewogenem Kontrast"
+      "name": "Elektroblau + Mint",
+      "description": "Moderne sportliche Ästhetik mit lebendigem Blau und frischem Mint"
     },
     "energetic": {
       "name": "Energetisches Orange",

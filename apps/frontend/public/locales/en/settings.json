@@ -4,8 +4,8 @@
     "description": "Choose your preferred color theme",
     "applying": "Applying theme...",
     "default": {
-      "name": "Ocean Teal",
-      "description": "Classic teal theme with balanced contrast"
+      "name": "Electric Blue + Mint",
+      "description": "Modern athletic aesthetic with vibrant blue and fresh mint"
     },
     "energetic": {
       "name": "Energetic Orange",

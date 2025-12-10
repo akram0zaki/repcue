@@ -73,7 +73,7 @@ export function ThemeSelector(): React.JSX.Element {
             >
               {/* Active indicator */}
               {isActive && (
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-2 end-2">
                   <svg
                     className="w-5 h-5 text-primary"
                     fill="currentColor"
@@ -90,7 +90,7 @@ export function ThemeSelector(): React.JSX.Element {
               )}
 
               {/* Theme name and description */}
-              <div className="text-left mb-3">
+              <div className="text-start mb-3">
                 <h3 className="font-semibold text-text-900 dark:text-text-50 mb-1">
                   {t(`settings:theme.${theme.id}.name`, theme.name)}
                 </h3>

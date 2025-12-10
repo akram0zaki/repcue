@@ -222,7 +222,8 @@ body.rtl .truncate {
   }
 
   body {
-    @apply h-full m-0 font-sans antialiased;
+    @apply h-full m-0 antialiased;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     /* Use new design token system instead of generic gray colors */
     background-color: var(--color-background-secondary);
     color: var(--color-text-primary);
@@ -362,25 +363,39 @@ body.rtl .truncate {
   }
 
   /* Exercise card start buttons - outline/ghost style for reduced visual weight */
+  /* High specificity to override .btn-primary base styles that appear later in cascade */
   .exercise-card .btn-start,
-  .exercise-card .btn-primary {
+  .exercise-card .btn-primary,
+  .exercise-card .btn-primary.btn-primary {
     @apply min-h-10 h-10 px-5 text-sm;
     border-radius: 9999px;
     border: 1px solid var(--color-primary);
     background-color: transparent;
     color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
     @apply transition-all duration-200;
   }
 
   .exercise-card .btn-start:hover,
-  .exercise-card .btn-primary:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  .exercise-card .btn-primary:hover,
+  .exercise-card .btn-primary.btn-primary:hover,
+  .exercise-card .btn-primary:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-primary) 5%, transparent);
     border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
   }
 
   .exercise-card .btn-start:active,
-  .exercise-card .btn-primary:active {
-    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  .exercise-card .btn-primary:active,
+  .exercise-card .btn-primary.btn-primary:active,
+  .exercise-card .btn-primary:active:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
   }
 
   .dark .exercise-card .btn-start,
@@ -455,7 +470,7 @@ body.rtl .truncate {
     font-weight: 600;
     margin-bottom: 0.25rem;
     text-align: left;
-    color: var(--color-text-primary);
+    color: #6b7280; /* Light grey to match section-title */
   }
 
   .upcoming-body {
@@ -582,7 +597,7 @@ body.rtl .truncate {
   }
 
   .dark .upcoming-header {
-    color: var(--color-text-heading);
+    color: #f3f4f6; /* Very light grey to match section-title */
   }
 
   .dark .upcoming-date .day {
@@ -590,15 +605,15 @@ body.rtl .truncate {
   }
 
   .dark .upcoming-date .day-sub {
-    color: var(--color-text-primary);
+    color: var(--color-text-200);
   }
 
   .dark .upcoming-info h3 {
-    color: var(--color-text-heading);
+    color: var(--color-text-50);
   }
 
   .dark .upcoming-stats p {
-    color: var(--color-text-primary);
+    color: var(--color-text-200);
   }
 
   .dark .upcoming-workout-card {
@@ -618,20 +633,34 @@ body.rtl .truncate {
   }
 
   /* Upcoming workout Start Now button - pill shape matching exercise cards */
-  .upcoming-workout-card .btn-primary {
+  /* High specificity to override .btn-primary base styles that appear later in cascade */
+  .upcoming-workout-card .btn-primary,
+  .upcoming-workout-card .btn-primary.btn-primary {
     border-radius: 9999px;
     border: 1px solid var(--color-primary);
     background-color: transparent;
     color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
   }
 
-  .upcoming-workout-card .btn-primary:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  .upcoming-workout-card .btn-primary:hover,
+  .upcoming-workout-card .btn-primary.btn-primary:hover,
+  .upcoming-workout-card .btn-primary:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-primary) 5%, transparent);
     border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
   }
 
-  .upcoming-workout-card .btn-primary:active {
-    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  .upcoming-workout-card .btn-primary:active,
+  .upcoming-workout-card .btn-primary.btn-primary:active,
+  .upcoming-workout-card .btn-primary:active:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    color: var(--color-primary);
+    box-shadow: none;
+    transform: none;
   }
 
   /* Dark mode: use filled button for better visibility */
@@ -676,11 +705,11 @@ body.rtl .truncate {
   /* Section title styling for HomePage sections */
   .section-title {
     @apply text-lg font-semibold;
-    color: var(--color-text-primary);
+    color: #6b7280; /* Light grey instead of primary text color */
   }
 
   .dark .section-title {
-    color: var(--color-text-heading);
+    color: #f3f4f6; /* Very light grey for dark mode */
   }
 
   /* Generic section heading class using token system */
@@ -865,39 +894,59 @@ body.rtl .truncate {
 
   /* Typography utilities following UI specs */
   .text-h1 {
-    font-size: 32px;
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 26px;
     line-height: 1.25;
-    font-weight: 700;
+    font-weight: 600;
+    color: #6b7280; /* Lighter grey */
+  }
+
+  @media (min-width: 480px) {
+    .text-h1 {
+      font-size: 32px;
+    }
   }
 
   .text-h2 {
-    font-size: 24px;
+    font-family: 'Outfit', system-ui, sans-serif;
+    font-size: 26px;
     line-height: 1.3;
     font-weight: 600;
+    color: #6b7280; /* Lighter grey */
   }
 
   .text-h3 {
+    font-family: 'Outfit', system-ui, sans-serif;
     font-size: 20px;
     line-height: 1.4;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   .text-body {
+    font-family: 'DM Sans', system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.5;
     font-weight: 400;
   }
 
   .text-caption {
-    font-size: 14px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 12px;
     line-height: 1.4;
     font-weight: 500;
   }
 
   .text-small {
-    font-size: 12px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 14px;
     line-height: 1.3;
-    font-weight: 500;
+    font-weight: 400;
+  }
+
+  /* Dark mode overrides for headers */
+  .dark .text-h1,
+  .dark .text-h2 {
+    color: #f3f4f6; /* Very light grey for dark mode */
   }
 
   /* Settings page utilities */
@@ -1388,11 +1437,84 @@ body.rtl .truncate {
 
   /* AI Workout Button - unified shadow with Coach Insights carousel */
   .ai-workout-btn {
+    border-radius: 9999px;
     box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    padding: 0;
+    overflow: hidden;
+    height: auto;
+    transition: box-shadow 0.2s;
   }
 
   .ai-workout-btn:hover:not(:disabled) {
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .ai-workout-btn.btn-primary {
+    border-radius: 9999px;
+  }
+
+  /* Icon section - matches button background */
+  .ai-workout-icon-section {
+    background-color: var(--color-primary);
+    color: white;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* Vertical separator */
+  .ai-workout-icon-section::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Text section - same colors as icon section */
+  .ai-workout-text-section {
+    background-color: var(--color-primary);
+    color: white;
+    font-weight: 500;
+    flex: 1;
+    padding: 0.75rem 1.5rem 0.75rem 1rem;
+    text-align: left;
+  }
+  
+  /* RTL text alignment */
+  body.rtl .ai-workout-text-section {
+    padding: 0.75rem 1rem 0.75rem 1.5rem;
+    text-align: right;
+  }
+
+  /* Dark mode styling */
+  .dark .ai-workout-icon-section {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .dark .ai-workout-icon-section::after {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .dark .ai-workout-text-section {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  /* Hover states */
+  .ai-workout-btn:hover:not(:disabled) .ai-workout-icon-section {
+    background-color: var(--color-primary-hover);
+  }
+
+  .ai-workout-btn:hover:not(:disabled) .ai-workout-text-section {
+    background-color: var(--color-primary-hover);
+  }
+
+  .dark .ai-workout-btn:hover:not(:disabled) .ai-workout-text-section {
+    background-color: var(--color-primary-hover);
   }
 
   .dark .ai-workout-btn {

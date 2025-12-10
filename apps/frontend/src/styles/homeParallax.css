@@ -33,7 +33,7 @@
   transform: translateZ(0);
 }
 
-/* Modern gradient overlay for hero section */
+/* Modern gradient overlay for hero section - enhanced for luxury contrast */
 .home-hero-wrapper::after {
   content: '';
   position: absolute;
@@ -41,20 +41,20 @@
   background: linear-gradient(
     180deg,
     rgba(41, 98, 255, 0) 0%,
-    rgba(41, 98, 255, 0.15) 50%,
-    rgba(0, 0, 0, 0.4) 100%
+    rgba(41, 98, 255, 0.1) 45%,
+    rgba(0, 0, 0, 0.55) 100%
   );
   pointer-events: none;
   z-index: 2;
 }
 
-/* Dark mode variant for gradient overlay */
+/* Dark mode variant for gradient overlay - enhanced opacity */
 .dark .home-hero-wrapper::after {
   background: linear-gradient(
     180deg,
     rgba(76, 123, 255, 0) 0%,
-    rgba(76, 123, 255, 0.1) 50%,
-    rgba(0, 0, 0, 0.6) 100%
+    rgba(76, 123, 255, 0.08) 45%,
+    rgba(0, 0, 0, 0.75) 100%
   );
 }
 
@@ -90,8 +90,8 @@
   background-color: var(--color-background-50, #fafafa);
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
-  /* Pull up to overlap the hero */
-  margin-top: 0.5rem;
+  /* Pull up to overlap the hero with subtle spacing for depth */
+  margin-top: 1rem;
   padding-top: 1rem;
   /* Subtle shadow for depth */
   box-shadow: 

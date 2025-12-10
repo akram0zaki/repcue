@@ -18,11 +18,20 @@ This plan translates all the design feedback in this chat into **concrete styles
 - [x] 2.2 Dark Mode Border Focus - Fixed from cyan to #4C7BFF for consistency
 - [x] 2.3 Semantic & Utility Colors - All token-based, no hardcoded colors remain
 - [x] All legacy teal fallback colors (#0096C7, #0077A5) updated to #2962FF
+- [x] Default theme updated with Electric Blue + Mint in theme selector
 
 **Section 3: Typography System**
 - [x] 3.1 Semantic Text Classes - .text-h1 through .text-caption all defined
 - [x] 3.2 Color Hierarchy - Text colors follow token system (primary, secondary, tertiary)
 - [x] HomePage, ExercisePage, TimerPage using semantic classes
+
+**Section 4: AI Coach Insights Text Sanitization**
+- [x] 4.1 Created `sanitizeText.ts` utility with `decodeHtmlEntities()` function
+- [x] 4.2 Handles HTML-encoded characters from API responses (&amp;, &rsquo;, &mdash;, etc.)
+- [x] 4.3 Updated CoachingCard component to sanitize title and message text
+- [x] 4.4 Updated InsightsModal component to sanitize insight display text
+- [x] 4.5 Uses OWASP-recommended textarea method for safe HTML entity decoding
+- [x] 4.6 Protects against XSS by only decoding entities, no script execution
 
 **Section 5: Components**
 - [x] 5.1 Buttons - All button variants with proper focus, hover, active states:
