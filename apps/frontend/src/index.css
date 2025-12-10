@@ -105,7 +105,7 @@ body.rtl .truncate {
 
 /* Enhanced focus styles for keyboard navigation */
 .keyboard-focus {
-  outline: 2px solid var(--color-primary, #0096C7) !important;
+  outline: 2px solid var(--color-primary, #2962FF) !important;
   outline-offset: 2px !important;
   border-radius: 4px;
 }
@@ -142,7 +142,7 @@ body.rtl .truncate {
   position: absolute;
   top: -40px;
   left: 6px;
-  background: var(--color-primary, #0096C7);
+  background: var(--color-primary, #2962FF);
   color: white;
   padding: 8px;
   text-decoration: none;
@@ -182,7 +182,7 @@ body.rtl .truncate {
 
 /* Enhanced focus management */
 .focus-visible:focus {
-  outline: 2px solid var(--color-primary, #0096C7);
+  outline: 2px solid var(--color-primary, #2962FF);
   outline-offset: 2px;
 }
 
@@ -190,9 +190,9 @@ body.rtl .truncate {
 :root {
   --motion-duration: 300ms;
   --motion-ease: ease;
-  --color-primary: #0096C7;
-  --color-primary-hover: #0077A5;
-  --color-primary-focus: #005F84;
+  --color-primary: #2962FF;
+  --color-primary-hover: #2557E6;
+  --color-primary-focus: #1E47C4;
 }
 
 /* Respect reduced motion preference */
@@ -331,20 +331,20 @@ body.rtl .truncate {
     color: var(--color-primary);
   }
 
-  /* Exercise card using design tokens */
+  /* Exercise card using design tokens - refined for modern app feel */
   .exercise-card {
-    @apply p-4 rounded-lg border-2 border-transparent;
+    @apply p-4 rounded-lg transition-all duration-200;
     background-color: var(--color-surface-primary);
-    box-shadow: var(--shadow-sm);
-    @apply hover:shadow-lg;
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 70%, transparent);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06);
+    @apply hover:shadow-md;
     @apply focus-within:ring-4;
-    @apply transition-all duration-200;
-    border-color: var(--color-border-primary);
   }
 
   .exercise-card:hover {
     background-color: var(--color-surface-hover);
     border-color: var(--color-primary);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06), inset 0 0 0 2px var(--color-primary);
   }
 
   .exercise-card:focus-within {
@@ -361,6 +361,295 @@ body.rtl .truncate {
     background-color: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary));
   }
 
+  /* Exercise card start buttons - outline/ghost style for reduced visual weight */
+  .exercise-card .btn-start,
+  .exercise-card .btn-primary {
+    @apply min-h-10 h-10 px-5 text-sm;
+    border-radius: 9999px;
+    border: 1px solid var(--color-primary);
+    background-color: transparent;
+    color: var(--color-primary);
+    @apply transition-all duration-200;
+  }
+
+  .exercise-card .btn-start:hover,
+  .exercise-card .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    border-color: var(--color-primary);
+  }
+
+  .exercise-card .btn-start:active,
+  .exercise-card .btn-primary:active {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  .dark .exercise-card .btn-start,
+  .dark .exercise-card .btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .dark .exercise-card .btn-start:hover,
+  .dark .exercise-card .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+  }
+
+  .dark .exercise-card .btn-start:active,
+  .dark .exercise-card .btn-primary:active {
+    background-color: var(--color-primary-focus);
+  }
+
+  /* Dark mode exercise card - enhanced surface and border contrast */
+  .dark .exercise-card {
+    background-color: var(--color-surface-secondary);
+    border-color: color-mix(in srgb, var(--color-border-primary) 50%, transparent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .dark .exercise-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 0 2px var(--color-primary);
+  }
+
+  /* Upcoming workout card - refined radial gradient with light borders */
+  .upcoming-workout-card {
+    @apply p-5 rounded-lg transition-all duration-200;
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 60%, transparent);
+    background: radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary)),
+      var(--color-surface-primary)
+    );
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .upcoming-workout-card:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-primary));
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  /* New upcoming card layout */
+  .upcoming-card {
+    @apply rounded-lg transition-all duration-200 p-5;
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 60%, transparent);
+    background: radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary)),
+      var(--color-surface-primary)
+    );
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .upcoming-card:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-primary));
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .upcoming-header {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    text-align: left;
+    color: var(--color-text-primary);
+  }
+
+  .upcoming-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .upcoming-body {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .upcoming-date {
+      min-width: 140px;
+      flex-shrink: 0;
+    }
+  }
+
+  .upcoming-date {
+    text-align: left;
+  }
+
+  .upcoming-date .day {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1.2;
+  }
+
+  .upcoming-date .day-sub {
+    margin-top: 0.125rem;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+  }
+
+  .upcoming-info {
+    text-align: left;
+  }
+
+  .upcoming-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--color-text-primary);
+  }
+
+  .upcoming-stats {
+    margin-bottom: 0.5rem;
+  }
+
+  .upcoming-stats p {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+  }
+
+  .upcoming-stats p:last-child {
+    margin-bottom: 0;
+  }
+
+  .upcoming-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  @media (min-width: 640px) {
+    .upcoming-actions {
+      justify-content: flex-end;
+    }
+  }
+
+  .btn-start-now {
+    @apply rounded-full font-semibold transition-all duration-200;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    background-color: transparent;
+  }
+
+  .btn-start-now:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    border-color: var(--color-primary);
+  }
+
+  .btn-start-now:active {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  .dark .btn-start-now {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .dark .btn-start-now:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+  }
+
+  .dark .btn-start-now:active {
+    background-color: var(--color-primary-focus);
+  }
+
+  .dark .upcoming-card {
+    background-color: var(--color-surface-secondary);
+    background: radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-secondary)),
+      var(--color-surface-secondary)
+    );
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+
+  .dark .upcoming-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .dark .upcoming-header {
+    color: var(--color-text-heading);
+  }
+
+  .dark .upcoming-date .day {
+    color: var(--color-primary);
+  }
+
+  .dark .upcoming-date .day-sub {
+    color: var(--color-text-primary);
+  }
+
+  .dark .upcoming-info h3 {
+    color: var(--color-text-heading);
+  }
+
+  .dark .upcoming-stats p {
+    color: var(--color-text-primary);
+  }
+
+  .dark .upcoming-workout-card {
+    background-color: var(--color-surface-secondary);
+    background: radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-secondary)),
+      var(--color-surface-secondary)
+    );
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+
+  .dark .upcoming-workout-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Upcoming workout Start Now button - pill shape matching exercise cards */
+  .upcoming-workout-card .btn-primary {
+    border-radius: 9999px;
+    border: 1px solid var(--color-primary);
+    background-color: transparent;
+    color: var(--color-primary);
+  }
+
+  .upcoming-workout-card .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    border-color: var(--color-primary);
+  }
+
+  .upcoming-workout-card .btn-primary:active {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  /* Dark mode: use filled button for better visibility */
+  .dark .upcoming-workout-card .btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .dark .upcoming-workout-card .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+  }
+
+  .dark .upcoming-workout-card .btn-primary:active {
+    background-color: var(--color-primary-focus);
+  }
+
   /* Skip links for accessibility using design tokens */
   .skip-link {
     @apply absolute left-[-9999px] top-4 z-50;
@@ -372,6 +661,94 @@ body.rtl .truncate {
 
   .skip-link:focus {
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+
+  /* Language selector styling - modern minimal approach */
+  .language-selector-container {
+    @apply flex flex-col gap-3 items-center justify-center py-4;
+  }
+
+  .language-selector-label {
+    @apply text-xs font-semibold uppercase tracking-wider;
+    color: var(--color-text-muted);
+  }
+
+  /* Section title styling for HomePage sections */
+  .section-title {
+    @apply text-lg font-semibold;
+    color: var(--color-text-primary);
+  }
+
+  .dark .section-title {
+    color: var(--color-text-heading);
+  }
+
+  /* Generic section heading class using token system */
+  .section-heading {
+    color: var(--color-text-heading);
+  }
+
+  .language-select {
+    @apply px-3 py-2 rounded-lg border;
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 70%, transparent);
+    background-color: var(--color-surface-primary);
+    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    @apply transition-all duration-200 cursor-pointer;
+  }
+
+  .language-select:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 50%, var(--color-border-primary));
+    background-color: var(--color-surface-hover);
+  }
+
+  .language-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  }
+
+  .dark .language-select {
+    background-color: var(--color-surface-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+
+  .dark .language-select:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: var(--color-surface-secondary);
+  }
+
+  .dark .language-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+  }
+
+  /* Footer / Legal section styling - lighter appearance */
+  .footer-legal-section {
+    @apply flex flex-col gap-2 items-center justify-center py-3;
+  }
+
+  .footer-legal-link,
+  .footer-legal-text {
+    @apply text-xs;
+    color: var(--color-text-secondary);
+    @apply transition-colors duration-200;
+  }
+
+  .footer-legal-link:hover {
+    color: var(--color-primary);
+    @apply underline;
+  }
+
+  .footer-legal-link:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+    @apply rounded px-1;
+  }
+
+  .footer-divider {
+    @apply text-text-400 dark:text-text-600;
   }
 }
 
@@ -580,22 +957,38 @@ body.rtl .truncate {
      COACHING CARD THEMING
      ======================================== */
   
-  /* AI insight card - uses theme primary color with transparency */
+  /* AI insight card - matches upcoming workout card style */
   .ai-insight-card {
-    background-color: var(--color-background-primary);
-    border-left-width: 4px;
-    border-left-color: var(--color-primary);
-    border-top: 1px solid var(--color-border-primary);
-    border-right: 1px solid var(--color-border-primary);
-    border-bottom: 1px solid var(--color-border-primary);
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 60%, transparent);
+    background: radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary)),
+      var(--color-surface-primary)
+    );
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
 
-  /* AI insight card slight tint using primary color */
+  .ai-insight-card:hover {
+    border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-primary));
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  /* AI insight card dark mode - matches upcoming workout card */
   .dark .ai-insight-card {
-    background: linear-gradient(135deg, 
-      var(--color-background-primary) 0%, 
-      var(--color-background-secondary) 100%
+    background: radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-secondary)),
+      var(--color-surface-secondary)
     );
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+
+  .dark .ai-insight-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
   }
   
   /* AI badge styling - solid primary color for maximum visibility */
@@ -748,6 +1141,40 @@ body.rtl .truncate {
     opacity: 0.6;
   }
 
+  /* Main CTA button - hero action with gradient + pill shape */
+  .cta-main {
+    @apply w-full rounded-2xl py-4 px-6 font-semibold text-white flex items-center justify-center gap-2;
+    background-image: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 70%, var(--color-secondary))
+    );
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+    @apply transition-all duration-200 hover:shadow-2xl active:scale-95;
+  }
+
+  .cta-main:hover {
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28);
+  }
+
+  .cta-main:focus {
+    outline: none;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28), 0 0 0 4px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  .dark .cta-main {
+    background-image: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 60%, var(--color-secondary))
+    );
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .dark .cta-main:hover {
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  }
+
   .exercise-badge-count {
     background-color: var(--color-primary);
     color: white;
@@ -884,4 +1311,195 @@ body.rtl .truncate {
       animation: none !important;
     }
   }
+
+  /* ==================================================
+   MODERN UI OVERRIDES – ELECTRIC BLUE + MINT THEME
+   ================================================== */
+
+@layer components {
+  /* Modern primary exercise button */
+  .btn-exercise {
+    @apply w-full min-h-[3.5rem] px-4 py-3 rounded-2xl text-base font-semibold;
+    @apply flex items-center justify-between gap-3;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply transition-all duration-200;
+    background-image: linear-gradient(
+      135deg,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 70%, var(--color-secondary))
+    );
+    color: var(--color-text-inverse);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+  }
+
+  .btn-exercise:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.24);
+  }
+
+  .btn-exercise:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+  }
+
+  .btn-exercise:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-image: none;
+    background-color: var(--color-primary-disabled);
+    color: var(--color-text-tertiary);
+    box-shadow: none;
+  }
+
+  /* Modern primary button – shared across app */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-semibold;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply transition-all duration-200;
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    background-color: var(--color-primary-focus);
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  }
+
+  .btn-primary:disabled {
+    background-color: var(--color-primary-disabled);
+    color: var(--color-text-tertiary);
+    opacity: 0.7;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .btn-outline,
+  .btn-start-now {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
+  }
+
+  /* AI Workout Button - unified shadow with Coach Insights carousel */
+  .ai-workout-btn {
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .ai-workout-btn:hover:not(:disabled) {
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .dark .ai-workout-btn {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+
+  .dark .ai-workout-btn:hover:not(:disabled) {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Modern exercise cards – softer, less boxy */
+  .exercise-card {
+    border-radius: 1rem;
+    background: radial-gradient(
+        circle at top left,
+        color-mix(in srgb, var(--color-primary) 6%, var(--color-surface-primary)),
+        var(--color-surface-primary)
+      );
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 80%, transparent);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.09);
+    transition: transform 160ms ease,
+                box-shadow 160ms ease,
+                border-color 160ms ease;
+  }
+
+  .exercise-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border-primary));
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  }
+
+  .exercise-card:focus-within {
+    border-color: var(--color-primary-focus);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-primary) 50%, transparent),
+      0 16px 32px rgba(15, 23, 42, 0.18);
+  }
+
+  .exercise-card.favorite {
+    background: radial-gradient(
+        circle at top left,
+        color-mix(in srgb, var(--color-secondary) 18%, var(--color-surface-primary)),
+        var(--color-surface-primary)
+      );
+  }
+
+  /* Modern nav active state – soft pill highlight */
+  .nav-item-active {
+    border-radius: 9999px;
+    background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  /* Timer start button – align with new brand */
+  .btn-timer-start {
+    border-radius: 9999px;
+    background-image: radial-gradient(
+      circle at top left,
+      var(--color-primary),
+      color-mix(in srgb, var(--color-primary) 65%, var(--color-secondary))
+    );
+    color: var(--color-text-inverse);
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.38);
+  }
+
+  .btn-timer-start:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 26px 60px rgba(15, 23, 42, 0.42);
+  }
+
+  .btn-timer-start:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.32);
+  }
+}
+
+@layer utilities {
+  /* Modern soft glass effect for hero / upcoming workout sections */
+  .glass-soft {
+    background-color: color-mix(in srgb, var(--color-background-primary) 72%, transparent);
+    backdrop-filter: blur(16px);
+    border-radius: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--color-border-primary) 70%, transparent);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+  }
+
+  .section-label-modern {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+  }
+
+  /* Dark mode text contrast improvements */
+  .dark .text-secondary {
+    color: color-mix(in srgb, white 70%, var(--color-text-secondary));
+  }
+
+  .dark .text-tertiary {
+    color: color-mix(in srgb, white 45%, var(--color-text-tertiary));
+  }
+
+  .dark .help-text {
+    color: color-mix(in srgb, white 55%, var(--color-text-secondary));
+  }
+}
+
 }

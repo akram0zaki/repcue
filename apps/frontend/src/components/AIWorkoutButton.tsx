@@ -104,7 +104,7 @@ export default function AIWorkoutButton({
       <button
         type="button"
         onClick={handleClick}
-        className={`${buttonClass} w-full ${className}`}
+        className={`${buttonClass} ai-workout-btn ${className}`}
         aria-label={buttonLabel}
         data-testid="ai-workout-button"
       >

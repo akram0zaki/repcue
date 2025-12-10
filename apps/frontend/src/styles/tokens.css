@@ -4,15 +4,15 @@
 
 :root {
   /* Primary Brand Colors - Light Mode Defaults (Teal theme) */
-  --color-primary: #0096C7;
-  --color-primary-hover: #0077A5;
-  --color-primary-focus: #005F84;
-  --color-primary-disabled: #B3E0EF;
+  --color-primary: #2962FF;
+  --color-primary-hover: #2557E6;
+  --color-primary-focus: #1E47C4;
+  --color-primary-disabled: #C5D2FF;
 
   /* Secondary Brand Colors */
-  --color-secondary: #90E0EF;
-  --color-secondary-hover: #74D0E4;
-  --color-secondary-focus: #5BBACD;
+  --color-secondary: #00E5A8;
+  --color-secondary-hover: #00C892;
+  --color-secondary-focus: #00AB7B;
 
   /* Background System */
   --color-background-primary: #ffffff;
@@ -33,7 +33,7 @@
   /* Border System */
   --color-border-primary: #e2e8f0;
   --color-border-secondary: #cbd5e1;
-  --color-border-focus: #0096C7;
+  --color-border-focus: #2962FF;
 
   /* Status Colors */
   --color-success: #52B788;
@@ -105,15 +105,15 @@
 /* Dark Mode Overrides */
 .dark {
   /* Primary Brand Colors - Dark Mode Specific */
-  --color-primary: #0096C7;
-  --color-primary-hover: #33ADD3;
-  --color-primary-focus: #5CC2DE;
-  --color-primary-disabled: #1F3B47;
+  --color-primary: #4C7BFF;
+  --color-primary-hover: #7595FF;
+  --color-primary-focus: #A1B4FF;
+  --color-primary-disabled: #1E2745;
 
   /* Secondary Brand Colors - Dark Mode */
-  --color-secondary: #90E0EF;
-  --color-secondary-hover: #74D0E4;
-  --color-secondary-focus: #5BBACD;
+  --color-secondary: #00E5A8;
+  --color-secondary-hover: #00C892;
+  --color-secondary-focus: #00AB7B;
 
   /* Background System - Dark Mode (following UI specs) */
   --color-background-primary: #121212;   /* From UI specs, not #1f2937 */
@@ -126,15 +126,15 @@
   --color-surface-hover: #334155;
 
   /* Text System - Dark Mode */
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #f1f5f9;
-  --color-text-tertiary: #e2e8f0;
+  --color-text-primary: rgba(255, 255, 255, 0.92);
+  --color-text-secondary: rgba(255, 255, 255, 0.75);
+  --color-text-tertiary: rgba(255, 255, 255, 0.55);
   --color-text-inverse: #0f172a;
 
   /* Border System - Dark Mode */
   --color-border-primary: #334155;
   --color-border-secondary: #475569;
-  --color-border-focus: #33ADD3;
+  --color-border-focus: #4C7BFF;
 
   /* Status Colors - Dark Mode */
   --color-success: #52B788;
@@ -451,35 +451,50 @@
   opacity: 0.8;
 }
 
-/* Insights carousel card background */
+/* Insights carousel card background - matches upcoming workout card style */
 .insights-card {
-  background: linear-gradient(to bottom right, var(--color-primary-surface), var(--color-primary-surface-hover));
-  border-color: var(--color-primary-border);
-  border-width: 1px;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 1px solid color-mix(in srgb, var(--color-border-primary) 60%, transparent);
+  background: radial-gradient(
+    circle at top left,
+    color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary)),
+    var(--color-surface-primary)
+  );
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .insights-card:hover {
-  transform: scale(1.02);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border-primary));
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
 }
 
 .insights-card:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-surface-primary), 0 0 0 4px var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
 }
 
 .dark .insights-card {
-  background: linear-gradient(to bottom right, var(--color-primary-dark), var(--color-primary-darker));
-  border-color: var(--color-primary-border);
-  opacity: 0.7;
+  background: radial-gradient(
+    circle at top left,
+    color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-secondary)),
+    var(--color-surface-secondary)
+  );
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.dark .insights-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 .dark .insights-card:focus {
-  box-shadow: 0 0 0 2px #1f2937, 0 0 0 4px var(--color-primary);
+  border-color: var(--color-primary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* Generic empty state card that adapts to theme */
@@ -1058,7 +1073,7 @@ body.rtl .catalog-selector button svg {
 .ios-modal__action {
   font-size: 17px;
   font-weight: 400;
-  color: var(--color-primary, #0096C7);
+  color: var(--color-primary, #2962FF);
   background: none;
   border: none;
   padding: 8px;
@@ -1208,7 +1223,7 @@ body.rtl .catalog-selector button svg {
 .ios-button {
   font-size: 17px;
   font-weight: 400;
-  color: var(--color-primary, #0096C7);
+  color: var(--color-primary, #2962FF);
   background: none;
   border: none;
   padding: 12px 16px;
@@ -1222,13 +1237,13 @@ body.rtl .catalog-selector button svg {
 }
 
 .ios-button--filled {
-  background-color: var(--color-primary, #0096C7);
+  background-color: var(--color-primary, #2962FF);
   color: #FFFFFF;
   font-weight: 600;
 }
 
 .ios-button--filled:active {
-  background-color: var(--color-primary-hover, #0077A5);
+  background-color: var(--color-primary-hover, #2557E6);
 }
 
 .ios-button--destructive {
@@ -1290,7 +1305,7 @@ body.rtl .catalog-selector button svg {
 }
 
 .ios-input:focus {
-  box-shadow: 0 0 0 2px var(--color-primary, #0096C7);
+  box-shadow: 0 0 0 2px var(--color-primary, #2962FF);
 }
 
 /* iOS Search Bar */
@@ -1385,7 +1400,7 @@ body.rtl .catalog-selector button svg {
   padding: 12px;
   font-size: 17px;
   font-weight: 400;
-  color: var(--color-primary, #0096C7);
+  color: var(--color-primary, #2962FF);
   background: none;
   border: none;
   cursor: pointer;
@@ -1410,4 +1425,11 @@ body.rtl .catalog-selector button svg {
 /* iOS-specific tap highlight removal */
 .ios-app * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Dark mode heading color system */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-heading: rgba(255, 255, 255, 0.92);
+  }
 }

@@ -1,5 +1,111 @@
 ## Unreleased
 
+### 2025-12-10
+
+#### ✨ Enhancement - HomePage UI Refinements & Design System Unification
+
+**Implemented**: 
+- Unified dark mode text color hierarchy across HomePage
+- Coach Insights carousel styling aligned with Upcoming Workout card
+- AI Workout button narrower width with centered layout
+- Unified button shadow system (Coach Insights and AI Workout button)
+
+**Visual Improvements**:
+- **Upcoming Workout Card Dark Mode**: Fixed dim text colors
+  - Date text (day-sub): Now uses `var(--color-text-primary)` for proper visibility
+  - Exercise count & duration stats: Upgraded to `var(--color-text-primary)` 
+  - Card content readable in both light and dark modes
+  
+- **Coach Insights Carousel Redesign**: Matches Upcoming Workout card style
+  - Replaced gradient background with radial gradient: `color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary))`
+  - Updated box-shadow: Light mode `0 10px 20px rgba(15, 23, 42, 0.08)` with hover `0 12px 24px rgba(15, 23, 42, 0.12)`
+  - Dark mode shadows: `0 12px 32px rgba(0, 0, 0, 0.55)` with hover `0 16px 40px rgba(0, 0, 0, 0.6)`
+  - Updated border from 4px left accent to full 1px border with semi-transparent color-mix
+  - Border-radius: `0.75rem` → `1rem` for consistency
+  
+- **AI Workout Button**: 
+  - Width constrained with `max-w-sm` (max 384px)
+  - Centered on page with `flex justify-center px-4`
+  - Added white space on both sides (responsive padding)
+  - Shadow unified with Coach Insights carousel (not primary button)
+  - Dark mode: `0 12px 32px rgba(0, 0, 0, 0.55)`
+
+- **AI Insight Card CSS**: Updated to match Coach Insights styling
+  - Radial gradient with primary color tint (10% light, 12% dark)
+  - Unified shadow system with Insights carousel
+  - Removed left-border accent, added full border
+
+- **Button Shadow Tokens**: 
+  - Primary buttons: `0 6px 16px rgba(0, 0, 0, 0.14)`
+  - Outline/Secondary buttons (.btn-outline, .btn-start-now): `0 3px 8px rgba(0, 0, 0, 0.10)`
+  - Coach Insights & AI Workout: `0 10px 20px rgba(15, 23, 42, 0.08)` (lighter, softer)
+
+**Design System Updates**:
+- Unified shadow system across all card and button types
+- Dark mode text hierarchy properly implemented with rgba-based tokens
+- All surfaces now use consistent radial gradient approach (primary color tint)
+- Consistent border styling: Semi-transparent color-mix for subtle accents
+
+**Files Changed**:
+- [index.css](apps/frontend/src/index.css) - Updated upcoming card dark mode text colors, AI insight card styling, button shadows, AI workout button shadow class
+- [tokens.css](apps/frontend/src/styles/tokens.css) - Updated insights-card styling to match upcoming workout card, added dark mode variants
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Updated AI Workout Button section layout (flex justify-center with px-4)
+- [AIWorkoutButton.tsx](apps/frontend/src/components/AIWorkoutButton.tsx) - Removed w-full, added ai-workout-btn and max-w-sm classes
+
+**Build Status**: ✅ TypeScript: 0 errors | CSS: All assets compiled | Tests: Passing
+
+---
+
+### 2025-12-10 (Previous)
+
+#### ✨ Enhancement - HomePage Modern UI Redesign
+
+**Implemented**: Complete HomePage modernization following electric blue + mint design system.
+
+**Visual Improvements**:
+- **Hero Section**: Added gradient overlay via CSS pseudo-element (electric blue to black)
+  - Enhanced typography using `.text-h1` for hero title (larger, more impactful)
+  - Smooth gradient overlay with dark mode variant
+- **Header Section**: Applied semantic typography classes
+  - App name: `.text-h2` (from `text-2xl font-bold`)
+  - Tagline: `.text-small` (from `text-sm`)
+  - Consistent with design system
+- **Upcoming Workout Card**: Modern soft blue surface styling
+  - Gradient background using primary and secondary colors
+  - Subtle borders and shadows with hover elevation
+  - Dark mode variant with proper color adjustments
+- **Exercise Cards**: Reduced visual weight on action buttons
+  - "Start" buttons now use outline/ghost style instead of filled
+  - Pill-shaped with reduced height (40px) and padding
+  - Smaller text size for secondary emphasis
+  - Hover states with subtle background tint
+- **Section Headers**: Modernized with semantic styling
+  - New `.section-title` class applied to "Popular Exercises" and "Favorites"
+  - Consistent typography and color using token system
+- **Footer Styling**: Modern minimal approach
+  - New `.footer-legal-link` and `.footer-legal-text` classes
+  - Muted colors with proper hover and focus states
+  - Smaller text size for secondary information
+- **Language Selector**: Lightweight and modern
+  - New `.language-select` and `.language-selector-container` classes
+  - Softer borders and better visual hierarchy
+  - Proper focus ring styling for accessibility
+
+**Technical Details**:
+- All changes follow the token system (var(--color-*) colors only)
+- Maintains dark mode support throughout
+- Accessibility preserved with proper focus rings and semantic HTML
+- Minimal JSX changes - primarily CSS-focused implementation
+
+**Files Changed**:
+- [homeParallax.css](apps/frontend/src/styles/homeParallax.css) - Added hero gradient overlay via `::after` pseudo-element
+- [index.css](apps/frontend/src/index.css) - Added modern styling for exercise cards, upcoming workout card, section titles, language selector, and footer
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Updated typography semantic classes and section title styling
+
+**Build Status**: ✅ TypeScript: 0 errors | CSS: All assets compiled | Tests: Passing
+
+---
+
 ### 2025-12-09
 
 #### 🐛 Fix - iOS Capacitor Video Playback

@@ -230,7 +230,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         {/* Motivational Text */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center px-4">
-            <h2 className="text-h3 text-white mb-2 leading-tight timer-text-shadow-lg">
+            <h2 className="text-h1 text-white mb-2 leading-tight timer-text-shadow-lg">
               {t('home.heroTitle', { defaultValue: 'Stay consistent, stay strong.' })}
             </h2>
             <p className="text-caption text-white/90 font-medium timer-text-shadow-sm">
@@ -272,10 +272,10 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         {/* Content Panel - slides over hero */}
         <div className="home-content-panel">
         <header className="text-center mb-3">
-          <h1 className="text-2xl font-bold text-text-900 dark:text-text-50 mb-1">
+          <h1 className="text-h2 text-text-900 dark:text-text-50 mb-1">
             {APP_NAME}
           </h1>
-          <p className="text-sm text-text-600 dark:text-text-100">
+          <p className="text-small text-text-600 dark:text-text-100">
             {t('home.tagline', { defaultValue: APP_DESCRIPTION })}
           </p>
         </header>
@@ -308,11 +308,11 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         )}
 
         {/* AI Workout Assistant Section */}
-        <section className="mb-4">
+        <section className="mb-4 flex justify-center px-4">
           <AIWorkoutButton
             variant="primary"
             isFirstTime={true}
-            className="w-full"
+            className="max-w-sm"
           />
         </section>
 
@@ -320,52 +320,55 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
         {hasConsent && (
           <section className="mb-4">
             {upcomingWorkout ? (
-              <div className="upcoming-workout-card">
-                <h2 className="text-h3 font-semibold text-text-900 dark:text-text-50 mb-3 sm:mb-4">
+              <div className="upcoming-card">
+                <div className="upcoming-header">
                   {t('home.upcomingWorkout')}
-                </h2>
-                <div className="flex flex-col gap-3 sm:gap-4">
-                  {/* Date and Workout Info Row */}
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                    {/* Date Section */}
-                    <div className="text-center sm:text-left rtl:sm:text-right flex-shrink-0">
-                      <div className="text-h2 font-bold upcoming-workout-weekday leading-tight">
-                        {upcomingWorkout.weekday}
-                      </div>
-                      <div className="text-caption secondary-label-text mt-1">
-                        {upcomingWorkout.date}
-                      </div>
-                    </div>
+                </div>
 
-                    {/* Workout Info */}
-                    <div className="flex-1 min-w-0 text-center sm:text-left rtl:sm:text-right">
-                      <div className="text-body font-medium label-text truncate">
-                        {upcomingWorkout.workout.name}
-                      </div>
-                      <div className="text-small help-text mt-1">
-                        {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
-                      </div>
+                <div className="upcoming-body">
+                  {/* Date Column */}
+                  <div className="upcoming-date">
+                    <div className="day">
+                      {upcomingWorkout.weekday}
+                    </div>
+                    <div className="day-sub">
+                      {upcomingWorkout.date}
                     </div>
                   </div>
 
-                  {/* Start Button - Full width on mobile, auto on larger screens */}
-                  <button
-                    onClick={() => {
-                      // Navigate to timer in workout-guided mode
-                      navigate(Routes.TIMER, {
-                        state: {
-                          workoutMode: {
-                            workout_id: upcomingWorkout.workout.id,
-                            workout_name: upcomingWorkout.workout.name,
-                            exercises: upcomingWorkout.workout.exercises
-                          }
-                        }
-                      });
-                    }}
-                    className="btn-primary touch-target w-full sm:w-auto sm:self-start rtl:sm:self-end"
-                  >
-                    {t('home.startNow')}
-                  </button>
+                  {/* Info + Button Column */}
+                  <div className="upcoming-info">
+                    <h3>
+                      {upcomingWorkout.workout.name}
+                    </h3>
+                    <div className="upcoming-stats">
+                      <p>
+                        {t('workouts.exerciseCount', { count: upcomingWorkout.workout.exercises.length })}
+                      </p>
+                      <p>
+                        ~{Math.round((upcomingWorkout.workout.exercises.reduce((sum, ex) => sum + (ex.duration_seconds || 30), 0)) / 60)} {t('common.minutes', { defaultValue: 'min' })}
+                      </p>
+                    </div>
+
+                    <div className="upcoming-actions">
+                      <button
+                        onClick={() => {
+                          navigate(Routes.TIMER, {
+                            state: {
+                              workoutMode: {
+                                workout_id: upcomingWorkout.workout.id,
+                                workout_name: upcomingWorkout.workout.name,
+                                exercises: upcomingWorkout.workout.exercises
+                              }
+                            }
+                          });
+                        }}
+                        className="btn-start-now"
+                      >
+                        {t('home.startNow')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -394,48 +397,83 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
           </section>
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-3 shadow-sm">
           {/* Popular Exercises Section */}
           <section>
-            <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
+            <h2 className="section-title mb-3">
               {t('home.popularExercises', { defaultValue: 'Popular Exercises' })}
             </h2>
             {popularExercises.length > 0 ? (
-              <div className="space-y-2">
-                {popularExercises.map(exercise => (
-                  <div key={exercise.id} className="exercise-card w-full p-3 bg-surface-0 dark:bg-surface-800 rounded-lg shadow-sm">
-                    <div className="flex items-start justify-between mb-2 gap-3">
-                      <button
-                        onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}
-                        className="text-left flex-1 min-w-0 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              <div className="relative group overflow-x-hidden">
+                {/* Left navigation button */}
+                {popularExercises.length > 1 && (
+                  <button
+                    onClick={() => {
+                      const container = document.querySelector('[data-popular-exercises]');
+                      if (container) container.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                    aria-label="Scroll left"
+                  >
+                    <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                )}
+
+                {/* Right navigation button */}
+                {popularExercises.length > 1 && (
+                  <button
+                    onClick={() => {
+                      const container = document.querySelector('[data-popular-exercises]');
+                      if (container) container.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                    aria-label="Scroll right"
+                  >
+                    <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
+
+                <div className="overflow-x-auto scrollbar-hide" data-popular-exercises>
+                  <div className="flex gap-3 pb-2 w-max">
+                    {popularExercises.map(exercise => (
+                      <div
+                        key={exercise.id}
+                        className="flex-none w-56 exercise-card p-3 flex flex-col"
                       >
-                        <h3 className="font-medium text-text-900 dark:text-text-50 truncate">
-                          {localizeExercise(exercise, t).name}
-                        </h3>
-                      </button>
-                      <button
-                        className="btn-primary text-sm flex-shrink-0"
-                        onClick={() => handleStartTimer(exercise)}
-                      >
-                        {t('common.start')}
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <VideoThumbnail
-                        exercise={exercise}
-                        className="w-24 h-20 rounded-md overflow-hidden flex-shrink-0"
-                      />
-                      <button
-                        onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}
-                        className="text-left line-clamp-2 flex-1 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                      >
-                        <p className="text-sm secondary-label-text line-clamp-2">
-                          {localizeExercise(exercise, t).description}
-                        </p>
-                      </button>
-                    </div>
+                        <button
+                          onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}
+                          className="text-left mb-2 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                        >
+                          <h3 className="font-medium text-text-900 dark:text-text-50 truncate text-sm">
+                            {localizeExercise(exercise, t).name}
+                          </h3>
+                        </button>
+                        <VideoThumbnail
+                          exercise={exercise}
+                          className="w-full h-24 rounded-md overflow-hidden mb-2"
+                        />
+                        <button
+                          onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}
+                          className="text-left flex-1 min-w-0 mb-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                        >
+                          <p className="text-xs secondary-label-text line-clamp-2">
+                            {localizeExercise(exercise, t).description}
+                          </p>
+                        </button>
+                        <button
+                          className="btn-primary text-xs w-full"
+                          onClick={() => handleStartTimer(exercise)}
+                        >
+                          {t('common.start')}
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
             ) : (
               <p className="help-text text-center py-3">
@@ -446,7 +484,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
 
           {/* Favorites Section */}
           <section>
-            <h2 className="text-lg font-semibold text-text-900 dark:text-text-50 mb-2">
+            <h2 className="section-title mb-2">
               {t('home.favoriteExercises')}
             </h2>
             {exercises.filter(ex => ex.is_favorite).length > 0 ? (
@@ -455,7 +493,11 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                   .filter(exercise => exercise.is_favorite)
                   .slice(0, 3)
                   .map(exercise => (
-                    <div key={exercise.id} className="exercise-card w-full p-3 bg-surface-0 dark:bg-surface-800 rounded-lg shadow-sm">
+                    <button
+                      key={exercise.id}
+                      onClick={() => navigate(`${Routes.EXERCISES}/${exercise.id}`)}
+                      className="w-full exercise-card p-3 bg-surface-0 dark:bg-surface-800 rounded-lg shadow-sm text-left transition-all duration-200 hover:shadow-md"
+                    >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-text-900 dark:text-text-50 truncate">
@@ -465,7 +507,7 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                             {localizeExercise(exercise, t).description}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                           <button
                             onClick={() => onToggleFavorite(exercise.id)}
                             className="p-1 text-yellow-500 hover:text-yellow-600 transition-colors"
@@ -475,13 +517,16 @@ const HomePage: React.FC<HomePageProps> = ({ exercises, appSettings, onToggleFav
                           </button>
                           <button
                             className="btn-primary text-sm"
-                            onClick={() => handleStartTimer(exercise)}
+                            onClick={e => {
+                              e.stopPropagation();
+                              handleStartTimer(exercise);
+                            }}
                           >
                             {t('common.start')}
                           </button>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))}
               </div>
             ) : (
