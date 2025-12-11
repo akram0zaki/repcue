@@ -15,6 +15,7 @@ import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
 import { useSharedExercises } from './hooks/useSharedExercises';
+import { useIOSBackGesture } from './hooks/useIOSBackGesture';
 import { useSnackbar } from './components/SnackbarProvider';
 import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
@@ -319,6 +320,9 @@ function App() {
     isResting: false,
     restTimeRemaining: undefined
   });
+
+  // iOS back gesture navigation
+  useIOSBackGesture();
 
   // Helper function to check if we're on a shared exercise route that doesn't require consent
   // Check if current route should be accessible without consent (public routes + legal center)
