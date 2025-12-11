@@ -345,7 +345,7 @@ body.rtl .truncate {
   .exercise-card:hover {
     background-color: var(--color-surface-hover);
     border-color: var(--color-primary);
-    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06), inset 0 0 0 2px var(--color-primary);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.06), inset 0 0 0 1px var(--color-primary);
   }
 
   .exercise-card:focus-within {
@@ -425,7 +425,7 @@ body.rtl .truncate {
 
   .dark .exercise-card:hover {
     border-color: var(--color-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 0 2px var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px var(--color-primary);
   }
 
   /* Upcoming workout card - refined radial gradient with light borders */
@@ -469,7 +469,7 @@ body.rtl .truncate {
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
-    text-align: left;
+    text-align: start;
     color: #6b7280; /* Light grey to match section-title */
   }
 
@@ -493,7 +493,7 @@ body.rtl .truncate {
   }
 
   .upcoming-date {
-    text-align: left;
+    text-align: start;
   }
 
   .upcoming-date .day {
@@ -510,7 +510,7 @@ body.rtl .truncate {
   }
 
   .upcoming-info {
-    text-align: left;
+    text-align: start;
   }
 
   .upcoming-info h3 {
