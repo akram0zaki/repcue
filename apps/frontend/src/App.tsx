@@ -15,7 +15,6 @@ import { INITIAL_EXERCISES } from './data/exercises';
 import { useWakeLock } from './hooks/useWakeLock';
 import { useAuth } from './hooks/useAuth';
 import { useSharedExercises } from './hooks/useSharedExercises';
-import { useIOSBackGesture } from './hooks/useIOSBackGesture';
 import { useSnackbar } from './components/SnackbarProvider';
 import { useTranslation } from 'react-i18next';
 import ConsentBanner from './components/ConsentBanner';
@@ -31,6 +30,7 @@ import { WorkoutForceUpdateModal } from './components/WorkoutForceUpdateModal';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { registerPWALinkHandlers } from './utils/pwaDetection';
 import { DeepLinkHandler } from './components/DeepLinkHandler';
+import { IOSGestureProvider } from './components/IOSGestureProvider';
 import type { Exercise, AppSettings, TimerState, ActivityLog, WorkoutExercise, WorkoutSession } from './types';
 import type { UpdateInfo, UpdateError } from './types';
 import type { PersonalRecord } from './types/coaching';
@@ -320,9 +320,6 @@ function App() {
     isResting: false,
     restTimeRemaining: undefined
   });
-
-  // iOS back gesture navigation
-  useIOSBackGesture();
 
   // Helper function to check if we're on a shared exercise route that doesn't require consent
   // Check if current route should be accessible without consent (public routes + legal center)
@@ -2938,12 +2935,13 @@ useEffect(() => {
         </div>
       ) : canUseBrowserRouter ? (
         <Router>
-        <ScrollToTop />
-        <DeepLinkHandler />
-        <ChunkErrorBoundary>
-          <MigrationSuccessBanner />
-          <AppShell>
-          <Suspense fallback={createRouteLoader('page')}>
+        <IOSGestureProvider>
+          <ScrollToTop />
+          <DeepLinkHandler />
+          <ChunkErrorBoundary>
+            <MigrationSuccessBanner />
+            <AppShell>
+            <Suspense fallback={createRouteLoader('page')}>
             <Routes>
               <Route 
                 path={AppRoutes.HOME} 
@@ -3130,6 +3128,7 @@ useEffect(() => {
           </Suspense>
           </AppShell>
         </ChunkErrorBoundary>
+        </IOSGestureProvider>
       </Router>
       ) : (
         // Fallback minimal shell for tests missing location; avoids Router URL creation
