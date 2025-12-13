@@ -1,9 +1,11 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: page already uses t() for user-visible text; remaining literals are units, icons, or fallback defaults */
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { Exercise, ExerciseCategory, AppSettings, CatalogMembership } from '../types';
 import { ExerciseCategory as Categories } from '../types';
 import { Routes as AppRoutes } from '../types';
+import { syncService } from '../services/syncService';
+import { PullToRefresh } from '../components/platform';
 import { 
   WorkoutIcon, 
   TargetIcon, 
@@ -50,11 +52,87 @@ interface ExercisePageProps {
 
 const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onToggleFavorite, onDeleteExercise }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation(['exercises', 'common', 'exerciseDetails', 'catalogs']);
   const { showSnackbar } = useSnackbar();
   const { flags } = useFeatureFlags();
   const { user } = useAuth();
   const { isSharedExercise } = useSharedExercises();
+
+  // Refs for horizontal scrolling navigation (declared early for scroll restoration)
+  const categoryScrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  // Scroll position persistence keys
+  const SCROLL_POSITION_KEY = 'exercise-page-scroll-position';
+  const HORIZONTAL_SCROLL_KEY = 'exercise-page-horizontal-scroll';
+
+  // Restore scroll positions when coming back to this page
+  useEffect(() => {
+    const savedVerticalPosition = sessionStorage.getItem(SCROLL_POSITION_KEY);
+    const savedHorizontalPositions = sessionStorage.getItem(HORIZONTAL_SCROLL_KEY);
+    
+    if (savedVerticalPosition || savedHorizontalPositions) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        // Restore vertical scroll
+        if (savedVerticalPosition) {
+          window.scrollTo(0, parseInt(savedVerticalPosition, 10));
+        }
+        
+        // Restore horizontal scroll positions for each category row
+        if (savedHorizontalPositions) {
+          try {
+            const horizontalPositions = JSON.parse(savedHorizontalPositions) as Record<string, number>;
+            Object.entries(horizontalPositions).forEach(([groupKey, scrollLeft]) => {
+              const scrollContainer = categoryScrollRefs.current[groupKey];
+              if (scrollContainer) {
+                scrollContainer.scrollLeft = scrollLeft;
+              }
+            });
+          } catch (e) {
+            logger.warn('Failed to restore horizontal scroll positions:', e);
+          }
+        }
+        
+        // Clear saved positions after restoring
+        sessionStorage.removeItem(SCROLL_POSITION_KEY);
+        sessionStorage.removeItem(HORIZONTAL_SCROLL_KEY);
+      });
+    }
+  }, [location.key]); // Re-run when location changes (including back navigation)
+
+  // Save scroll positions before navigating away
+  const saveScrollPosition = useCallback(() => {
+    // Save vertical scroll position
+    sessionStorage.setItem(SCROLL_POSITION_KEY, String(window.scrollY));
+    
+    // Save horizontal scroll positions for each category row
+    const horizontalPositions: Record<string, number> = {};
+    Object.entries(categoryScrollRefs.current).forEach(([groupKey, scrollContainer]) => {
+      if (scrollContainer && scrollContainer.scrollLeft > 0) {
+        horizontalPositions[groupKey] = scrollContainer.scrollLeft;
+      }
+    });
+    
+    if (Object.keys(horizontalPositions).length > 0) {
+      sessionStorage.setItem(HORIZONTAL_SCROLL_KEY, JSON.stringify(horizontalPositions));
+    }
+  }, []);
+
+  // Pull-to-refresh handler - triggers sync and refreshes exercises
+  const handleRefresh = useCallback(async () => {
+    try {
+      // Trigger sync if user is authenticated
+      if (user) {
+        await syncService.sync(true);
+      }
+      // Emit event to refresh data in App.tsx
+      window.dispatchEvent(new CustomEvent('sync:applied'));
+    } catch (error) {
+      // Log silently - sync errors shouldn't disrupt the user
+      logger.error('Failed to refresh:', error);
+    }
+  }, [user]);
 
   // Bulk load all exercise memberships to prevent N+1 query problem
   const [exerciseMemberships, setExerciseMemberships] = useState<Map<string, CatalogMembership[]>>(new Map());
@@ -98,10 +176,6 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   const [previewExercise, setPreviewExercise] = useState<Exercise | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-
-
-  // Refs for horizontal scrolling navigation
-  const categoryScrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Scroll functions for horizontal navigation
   const scrollCategory = useCallback((category: string, direction: 'left' | 'right') => {
@@ -341,6 +415,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   };
 
   const handleNavigateToExercise = (exerciseId: string) => {
+    saveScrollPosition();
     navigate(`/exercises/${exerciseId}`);
   };
 
@@ -359,6 +434,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
   };
 
   return (
+    <PullToRefresh onRefresh={handleRefresh} testId="exercises-pull-to-refresh">
     <>
     <div id="main-content" className="min-h-screen pt-safe pb-20 bg-background-50 dark:bg-background-950">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4 max-w-4xl">
@@ -581,7 +657,10 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                 {(() => {
                   const selectedCatalog = EXERCISE_CATALOGS.find(c => c.id === selectedCatalogId);
                   const catalogName = selectedCatalog ? t(selectedCatalog.nameKey, { ns: 'catalogs', defaultValue: selectedCatalog.id }) : 'Unknown';
-                  const totalInCatalog = exercises.filter(ex => ex.catalogId === selectedCatalogId).length;
+                  const totalInCatalog = exercises.filter(ex => 
+                    ex.catalogId === selectedCatalogId && 
+                    !('is_active' in ex && ex.is_active === false)
+                  ).length;
                   return t('exercises:showingCountInCatalog', {
                     count: filteredExercises.length,
                     total: totalInCatalog,
@@ -620,7 +699,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       {groupExercises.length > 1 && (
                         <button
                           onClick={() => scrollCategory(groupKey, 'left')}
-                          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
                           aria-label={t('a11y.scrollLeft', 'Scroll left')}
                         >
                           <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -633,7 +712,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                       {groupExercises.length > 1 && (
                         <button
                           onClick={() => scrollCategory(groupKey, 'right')}
-                          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 catalog-selector"
                           aria-label={t('a11y.scrollRight', 'Scroll right')}
                         >
                           <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -797,6 +876,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
                   muted
                   loop
                   playsInline
+                  crossOrigin="anonymous"
                   onError={handleVideoError}
                   ref={videoRef}
                 >
@@ -842,6 +922,7 @@ const ExercisePage: React.FC<ExercisePageProps> = ({ exercises, appSettings, onT
 
 
     </>
+    </PullToRefresh>
   );
 };
 
@@ -907,16 +988,31 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   // Check if exercise is shared using the tracking field
   const isSharedExerciseCard = isSharedExercise(exercise.id);
 
+  /**
+   * Handle card click - navigate to exercise details
+   */
+  const handleCardClick = () => {
+    onNavigateToExercise(exercise.id);
+  };
+
   return (
     <div 
       ref={cardRef}
-      className={`bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow touch-manipulation ${
+      className={`relative bg-surface-0 dark:bg-surface-800 rounded-lg shadow-lg overflow-hidden transition-shadow select-none ${
       isUserCreated
         ? 'exercise-card-custom'
         : 'border border-surface-200 dark:border-surface-700'
     }`} data-testid="exercise-card">
+      {/* Invisible button overlay for card-level click - native button works on iOS first tap */}
+      <button
+        type="button"
+        onClick={handleCardClick}
+        className="absolute inset-0 w-full h-full z-0 cursor-pointer bg-transparent border-0 p-0 m-0"
+        aria-label={t('exercises:viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+      />
 
-      <div className="p-2 sm:p-3">
+      <div className="p-2 sm:p-3 relative z-10 pointer-events-none">
         {/* Top Row - Exercise Details (Left) and Action Buttons (Right) */}
         <div className="mb-1">
           <div className="flex items-start justify-between gap-3">
@@ -973,7 +1069,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             </div>
 
             {/* Right Side - Action Buttons */}
-            <div className="flex items-center gap-1 flex-shrink-0 flex-nowrap">
+            <div className="flex items-center gap-1 flex-shrink-0 flex-nowrap pointer-events-auto">
 
               {/* Edit Button - Only for user-created */}
               {isUserCreated && onEdit && (
@@ -1006,6 +1102,8 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
                   exerciseName={loc.name}
                   ownerId={exercise.owner_id}
                   className="flex-shrink-0 text-text-700 dark:text-text-200 hover:text-green-600 dark:hover:text-green-400 transition-colors p-1 -m-1 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] flex items-center justify-center"
+                  iconSize={18}
+                  iconClassName="sm:!w-5 sm:!h-5"
                 />
               )}
 
@@ -1022,15 +1120,14 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           </div>
         </div>
 
-        {/* Exercise Name - Clickable Link to Details */}
+        {/* Exercise Name - Card click handles navigation */}
         <div className="mb-2">
-          <button
-            onClick={() => onNavigateToExercise(exercise.id)}
-            className="text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 exercise-hover-link transition-colors"
+          <span
+            className="block text-left w-full text-sm sm:text-base font-semibold text-text-900 dark:text-text-50 leading-tight line-clamp-2 h-8 exercise-hover-link transition-colors"
             aria-label={t('exercises:viewDetailsAria', { name: loc.name, defaultValue: `View details for ${loc.name}` })}
           >
             {loc.name}
-          </button>
+          </span>
         </div>
         {/* Base tags preview - Fixed 2 lines with overflow indicator */}
         {Array.isArray((exercise as Exercise & { base_tags?: string[] }).base_tags) && (exercise as Exercise & { base_tags?: string[] }).base_tags!.length > 0 ? (
@@ -1064,7 +1161,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         )}
 
         {/* Video/Image Area - Lazy loaded when visible */}
-        <div className="mb-2">
+        <div className="mb-2 pointer-events-auto">
           {isIntersecting ? (
             <VideoThumbnail
               exercise={exercise}
@@ -1081,7 +1178,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
         {/* Start Timer Button - Full Width */}
         <button
           onClick={() => onStartTimer(exercise)}
-          className="w-full px-3 py-2 btn-primary text-sm font-medium rounded-lg transition-colors min-h-[36px] flex items-center justify-center gap-1.5"
+          className="w-full px-3 py-2 btn-primary text-sm font-medium rounded-lg transition-colors min-h-[36px] flex items-center justify-center gap-1.5 pointer-events-auto"
           data-testid="start-exercise-timer"
         >
           <PlayIcon size={16} />

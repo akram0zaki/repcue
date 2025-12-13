@@ -1,20 +1,31 @@
 import { storageService } from '../services/storageService';
 import { supabase } from '../config/supabase';
+import { isNativePlatform, VIDEO_CACHING_ENABLED, VIDEO_CDN_BASE_URL } from '../config/features';
+import { VideoCacheService } from '../services/videoCacheService';
 import logger from './logger';
 
 /**
  * Resolves video URLs, handling:
- *  - Regular (http/https) URLs: returned as-is, browser handles caching via HTTP
+ *  - Regular (http/https) URLs: cached via VideoCacheService for instant playback
+ *  - Relative URLs (/media/*): cached via VideoCacheService with platform-appropriate URL
  *  - blob: URLs: returned directly (already resolved)
  *  - blob-pending-sync://{exerciseId}/{filename}: local file stored, upload still pending
  *  - blob-video://{exerciseId}/{filename}: local file stored & cloud-confirmed (stable scheme)
  *  - shared-video://{originalExerciseId}/{originalOwnerId}: reuse another exercise's video
  *
- * Note: Video caching now relies on standard HTTP Cache-Control headers and browser/CDN caching.
- * This is more reliable than IndexedDB blob URLs, especially on iOS/Safari.
+ * Video Caching Strategy:
+ * - VideoCacheService provides multi-tier caching: Memory → IndexedDB → Network
+ * - Cached videos load instantly from IndexedDB blob URLs
+ * - LRU eviction keeps storage usage under control
+ * - Falls back to direct URL if caching fails or is disabled
+ * 
  * For blob-* schemes we look up IndexedDB (via storageService) and materialize a runtime blob: URL.
  * If the binary is missing but a storage_path exists we attempt a download (covers recovery cases).
  * For shared videos we reference the original exercise's stored video file.
+ * 
+ * Native App Handling:
+ * For Capacitor iOS/Android apps, relative /media/* paths are converted to absolute URLs
+ * pointing to the production CDN where the Cloudflare R2 proxy function works.
  */
 export async function resolveVideoUrl(videoUrl: string | null | undefined): Promise<string | null> {
   if (!videoUrl) return null;
@@ -28,15 +39,52 @@ export async function resolveVideoUrl(videoUrl: string | null | undefined): Prom
   if (videoUrl.startsWith('blob-pending-sync://') || videoUrl.startsWith('blob-video://') || videoUrl.startsWith('shared-video://')) {
     // Handle these schemes below (don't return early)
   } else {
-    // For regular HTTP/HTTPS/relative URLs, return as-is
-    // Browser will handle caching via standard HTTP Cache-Control headers
-    // This works reliably across all platforms including iOS
+    // For regular HTTP/HTTPS/relative URLs, use VideoCacheService for persistent caching
     const isHttpUrl = videoUrl.startsWith('http://') || videoUrl.startsWith('https://');
     const isRelativeUrl = videoUrl.startsWith('/');
     
     if (isHttpUrl || isRelativeUrl) {
-      logger.log('🎥 [ResolveVideo] Using direct URL - browser/CDN will handle caching', { videoUrl });
-      return videoUrl;
+      // Determine the final URL to fetch (convert relative to absolute for native apps)
+      let fetchUrl = videoUrl;
+      const isNative = isNativePlatform();
+      if (isNative && isRelativeUrl && videoUrl.startsWith('/media/')) {
+        fetchUrl = `${VIDEO_CDN_BASE_URL}${videoUrl}`;
+        logger.log('🎥 [ResolveVideo] Native app: converting to absolute URL', { 
+          original: videoUrl, 
+          absolute: fetchUrl 
+        });
+      }
+      
+      // Use VideoCacheService for persistent IndexedDB caching (all platforms including native)
+      if (VIDEO_CACHING_ENABLED) {
+        try {
+          const cacheService = VideoCacheService.getInstance();
+          
+          // fetchAndCache returns cached blob URL if available, otherwise fetches and caches
+          const cachedUrl = await cacheService.fetchAndCache(fetchUrl);
+          if (cachedUrl) {
+            logger.log('🎥 [ResolveVideo] Using cached/fetched blob URL', { 
+              originalUrl: videoUrl, 
+              cachedUrl: cachedUrl.substring(0, 50) + '...'
+            });
+            return cachedUrl;
+          }
+          
+          // Cache service returned null, fall back to direct URL
+          logger.log('🎥 [ResolveVideo] Cache service returned null, using direct URL', { videoUrl: fetchUrl });
+          return fetchUrl;
+        } catch (cacheError) {
+          logger.error('🎥 [ResolveVideo] VideoCacheService error, falling back to direct URL', { 
+            videoUrl: fetchUrl, 
+            error: cacheError 
+          });
+          return fetchUrl;
+        }
+      }
+      
+      // Caching disabled, return direct URL
+      logger.log('🎥 [ResolveVideo] Caching disabled, using direct URL', { videoUrl: fetchUrl });
+      return fetchUrl;
     }
     
     // Unknown URL format, return as-is

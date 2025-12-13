@@ -1,0 +1,82 @@
+PODS:
+  - Capacitor (7.4.4):
+    - CapacitorCordova
+  - CapacitorApp (7.1.1):
+    - Capacitor
+  - CapacitorBrowser (7.0.3):
+    - Capacitor
+  - CapacitorCommunityKeepAwake (7.1.0):
+    - Capacitor
+  - CapacitorCordova (7.4.4)
+  - CapacitorDialog (7.0.3):
+    - Capacitor
+  - CapacitorHaptics (7.0.3):
+    - Capacitor
+  - CapacitorKeyboard (7.0.4):
+    - Capacitor
+  - CapacitorLocalNotifications (7.0.4):
+    - Capacitor
+  - CapacitorPreferences (7.0.3):
+    - Capacitor
+  - CapacitorSplashScreen (7.0.4):
+    - Capacitor
+  - CapacitorStatusBar (7.0.4):
+    - Capacitor
+
+DEPENDENCIES:
+  - "Capacitor (from `../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios`)"
+  - "CapacitorApp (from `../../../../node_modules/.pnpm/@capacitor+app@7.1.1_@capacitor+core@7.4.4/node_modules/@capacitor/app`)"
+  - "CapacitorBrowser (from `../../../../node_modules/.pnpm/@capacitor+browser@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/browser`)"
+  - "CapacitorCommunityKeepAwake (from `../../../../node_modules/.pnpm/@capacitor-community+keep-awake@7.1.0_@capacitor+core@7.4.4/node_modules/@capacitor-community/keep-awake`)"
+  - "CapacitorCordova (from `../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios`)"
+  - "CapacitorDialog (from `../../../../node_modules/.pnpm/@capacitor+dialog@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/dialog`)"
+  - "CapacitorHaptics (from `../../../../node_modules/.pnpm/@capacitor+haptics@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/haptics`)"
+  - "CapacitorKeyboard (from `../../../../node_modules/.pnpm/@capacitor+keyboard@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/keyboard`)"
+  - "CapacitorLocalNotifications (from `../../../../node_modules/.pnpm/@capacitor+local-notifications@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/local-notifications`)"
+  - "CapacitorPreferences (from `../../../../node_modules/.pnpm/@capacitor+preferences@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/preferences`)"
+  - "CapacitorSplashScreen (from `../../../../node_modules/.pnpm/@capacitor+splash-screen@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/splash-screen`)"
+  - "CapacitorStatusBar (from `../../../../node_modules/.pnpm/@capacitor+status-bar@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/status-bar`)"
+
+EXTERNAL SOURCES:
+  Capacitor:
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios"
+  CapacitorApp:
+    :path: "../../../../node_modules/.pnpm/@capacitor+app@7.1.1_@capacitor+core@7.4.4/node_modules/@capacitor/app"
+  CapacitorBrowser:
+    :path: "../../../../node_modules/.pnpm/@capacitor+browser@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/browser"
+  CapacitorCommunityKeepAwake:
+    :path: "../../../../node_modules/.pnpm/@capacitor-community+keep-awake@7.1.0_@capacitor+core@7.4.4/node_modules/@capacitor-community/keep-awake"
+  CapacitorCordova:
+    :path: "../../../../node_modules/.pnpm/@capacitor+ios@7.4.4_@capacitor+core@7.4.4/node_modules/@capacitor/ios"
+  CapacitorDialog:
+    :path: "../../../../node_modules/.pnpm/@capacitor+dialog@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/dialog"
+  CapacitorHaptics:
+    :path: "../../../../node_modules/.pnpm/@capacitor+haptics@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/haptics"
+  CapacitorKeyboard:
+    :path: "../../../../node_modules/.pnpm/@capacitor+keyboard@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/keyboard"
+  CapacitorLocalNotifications:
+    :path: "../../../../node_modules/.pnpm/@capacitor+local-notifications@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/local-notifications"
+  CapacitorPreferences:
+    :path: "../../../../node_modules/.pnpm/@capacitor+preferences@7.0.3_@capacitor+core@7.4.4/node_modules/@capacitor/preferences"
+  CapacitorSplashScreen:
+    :path: "../../../../node_modules/.pnpm/@capacitor+splash-screen@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/splash-screen"
+  CapacitorStatusBar:
+    :path: "../../../../node_modules/.pnpm/@capacitor+status-bar@7.0.4_@capacitor+core@7.4.4/node_modules/@capacitor/status-bar"
+
+SPEC CHECKSUMS:
+  Capacitor: 358dd1c3fdd71d969547b17e159fd8a7736cb45f
+  CapacitorApp: 63b237168fc869e758481dba283315a85743ee78
+  CapacitorBrowser: b98aa3db018a2ce4c68242d27e596c344f3b81b3
+  CapacitorCommunityKeepAwake: 05c75aab989f60e621870cf03b24a144a5544c30
+  CapacitorCordova: bf648a636f3c153f652d312ae145fb508b6ffced
+  CapacitorDialog: d2d329b3f4fd0f299a3dc3c36cad941889112508
+  CapacitorHaptics: ce15be8f287fa2c61c7d2d9e958885b90cf0bebc
+  CapacitorKeyboard: 5660c760113bfa48962817a785879373cf5339c3
+  CapacitorLocalNotifications: ba2a08bd92887b08f352e6b2db430575cef0cea3
+  CapacitorPreferences: 913eef88272c13eb6445b21e51fe8ef6635412cc
+  CapacitorSplashScreen: 000f7591d546907dda5cbb514bd6b6d9e6048cf8
+  CapacitorStatusBar: d0e0151c89c001a9c7125bac59ddedf76b664768
+
+PODFILE CHECKSUM: 59af52607f38a05351b453caa102e6ef01f3af01
+
+COCOAPODS: 1.16.2

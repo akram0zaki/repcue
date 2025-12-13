@@ -17,6 +17,7 @@ import { supabase } from '../config/supabase';
 import type { CoachingInsight, AnalyticsSummary } from '../types/coaching';
 import { authService } from './authService';
 import { AnalyticsService } from './analyticsService';
+import { decodeHtmlEntities } from '../utils/sanitizeText';
 import logger from '../utils/logger';
 
 /**
@@ -131,6 +132,8 @@ class InsightsService {
             correlationId: cachedInsights.metadata.correlationId,
             age: this.getCacheAge()
           });
+          // Ensure cached insights are sanitized
+          cachedInsights.insights = this.sanitizeInsights(cachedInsights.insights);
           return cachedInsights;
         }
       }
@@ -266,6 +269,9 @@ class InsightsService {
           }
           return insight;
         });
+
+        // Sanitize HTML entities in insight text
+        data.insights = this.sanitizeInsights(data.insights);
 
         // Cache the response (24h TTL aligned with server cache)
         this.setCachedInsights(data, analytics);
@@ -505,6 +511,18 @@ class InsightsService {
       expiresAt: expiresAt.toISOString(),
       correlationId: response.metadata.correlationId
     });
+  }
+
+  /**
+   * Sanitizes HTML entities in insight text to prevent display issues
+   * Decodes encoded characters like &amp;, &rsquo;, &mdash;, etc.
+   */
+  private sanitizeInsights(insights: CoachingInsight[]): CoachingInsight[] {
+    return insights.map(insight => ({
+      ...insight,
+      title: decodeHtmlEntities(insight.title),
+      message: decodeHtmlEntities(insight.message)
+    }));
   }
 }
 

@@ -27,9 +27,10 @@ function createGlobalExercise(
  exerciseData: Omit<
   GlobalExercise,
   'updated_at' | 'created_at' | 'deleted' | 'version' | 'dirty' | 'op' | 'synced_at' | 'owner_id'
- > & { id: string }
+ > & { id: string; is_active?: boolean }
 ): GlobalExercise {
  return {...exerciseData,
+  is_active: exerciseData.is_active ?? true,
   updated_at: new Date().toISOString(),
   created_at: new Date().toISOString(),
   deleted: false,
@@ -430,6 +431,7 @@ createGlobalExercise({
   default_duration: 30, // Standard mobility/warmup duration
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['hands', 'mobility'],
   base_tags: ['hands', 'fingers', 'warmup', 'mobility', 'dexterity'],
   benefits: 'Increases flexibility and blood circulation in the fingers and hands. Finger rolls help maintain range of motion in the finger joints and can improve dexterity and coordination of the fingers. Useful for warming up the hands before fine motor tasks or relieving stiffness after long periods of computer use. Over time, such exercises can help keep your hands nimble and may reduce risk of issues like tendonitis by gently working the tendons through their motion.',
@@ -936,6 +938,7 @@ createGlobalExercise({
   default_duration: 90, // 1–2 min freestyle
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['cardio', 'full-body', 'flexibility'],
   base_tags: ['dance', 'mood', 'cardio'],
   benefits: 'Improves mood, cardio, and flexibility.',
@@ -974,6 +977,7 @@ createGlobalExercise({
   default_duration: 18, // 15–20s
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['balance', 'legs', 'core', 'shoulders'],
   base_tags: ['posture', 'strength'],
   benefits: 'Improves balance, posture, and strength.',
@@ -992,6 +996,7 @@ createGlobalExercise({
   default_duration: 25, // 20–30s
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['balance', 'legs', 'core'],
   base_tags: ['focus', 'stability'],
   benefits: 'Improves balance and focus.',
@@ -1010,6 +1015,7 @@ createGlobalExercise({
   default_duration: 45, // 30–60s
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['core', 'back'],
   base_tags: ['posture', 'core', 'awareness'],
   benefits: 'Improves posture awareness and core endurance.',
@@ -1050,6 +1056,7 @@ createGlobalExercise({
   rep_duration_seconds: 1.5,
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['core'],
   base_tags: ['pelvic-floor', 'bladder-control'],
   benefits: 'Strengthens pelvic floor.',
@@ -1068,6 +1075,7 @@ createGlobalExercise({
   default_duration: 8 * 60, // 5–10 min
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['flexibility', 'core', 'back'],
   base_tags: ['relaxation', 'cramp-relief', 'yoga'],
   benefits: 'Relieves cramps and promotes relaxation.',
@@ -1086,6 +1094,7 @@ createGlobalExercise({
   default_duration: 150, // 2–3 min
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['core'],
   base_tags: ['relaxation', 'stress'],
   benefits: 'Reduces stress; improves oxygenation.',
@@ -1104,6 +1113,7 @@ createGlobalExercise({
   default_duration: 8 * 60, // 5–10 min
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['flexibility', 'hips', 'legs', 'back'],
   base_tags: ['prenatal', 'hips', 'legs'],
   benefits: 'Relieves common pregnancy discomforts.',
@@ -1124,6 +1134,7 @@ createGlobalExercise({
   rep_duration_seconds: 2,
   is_favorite: false,
   has_video: false,
+  is_active: false,
   muscle_groups: ['core', 'back'],
   base_tags: ['postnatal', 'recovery'],
   benefits: 'Helps restore core strength postpartum.',

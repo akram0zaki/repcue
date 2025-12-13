@@ -12,6 +12,8 @@ interface ShareButtonProps {
   exerciseName: string;
   ownerId?: string | null;
   className?: string;
+  iconClassName?: string;
+  iconSize?: number;
 }
 
 interface ShareDialogProps {
@@ -267,6 +269,8 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
   exerciseName,
   ownerId,
   className = '',
+  iconClassName,
+  iconSize,
 }) => {
   const { flags } = useFeatureFlags();
   const { showSnackbar } = useSnackbar();
@@ -300,7 +304,7 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
         className={className}
         title="Share Exercise"
       >
-        <ShareIcon className="h-6 w-6" />
+        <ShareIcon size={iconSize} className={iconClassName || 'h-6 w-6'} />
       </button>
       
       <ShareDialog

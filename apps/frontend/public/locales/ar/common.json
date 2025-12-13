@@ -2,6 +2,8 @@
   "common": {
     "start": "ابدأ",
     "stop": "توقف",
+    "pause": "إيقاف مؤقت",
+    "resume": "استئناف",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "ok": "موافق",
@@ -56,10 +58,12 @@
     "cancelTitle": "إلغاء",
     "clear": "مسح",
     "clearFormTitle": "مسح النموذج",
-    "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
+    "confirmClearForm": "هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
+    "enterFullscreen": "ملء الشاشة",
+    "exitFullscreen": "الخروج من ملء الشاشة",
     "premium": "مميز",
     "done": "تم",
     "refresh": "تحديث",
@@ -78,7 +82,12 @@
     "other": "أخرى",
     "selectOne": "اختر واحدًا",
     "skip": "تخطي",
-    "submit": "إرسال"
+    "submit": "إرسال",
+    "buttons": {
+      "cancel": "إلغاء"
+    },
+    "never": "أبداً",
+    "videoUnavailable": "الفيديو غير متاح"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -122,9 +131,9 @@
     "disabled": "معطل",
     "dataStoredLocally": "يتم تخزين بيانات التمرين محلياً على هذا الجهاز.",
     "pleaseAcceptConsent": "يرجى قبول موافقة تخزين البيانات لتفعيل ميزات التصدير/المسح.",
-  "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
-  "consentStatusLabel": "حالة الموافقة",
-  "consentVersion": "إصدار الموافقة",
+    "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
+    "consentStatusLabel": "حالة الموافقة",
+    "consentVersion": "إصدار الموافقة",
     "exportData": "تصدير البيانات",
     "exportDataHelp": "تحميل بيانات التمرين كملف JSON",
     "exportInProgress": "جارٍ التصدير...",
@@ -243,6 +252,7 @@
     "repProgress": "تقدم التكرار",
     "rep": "تكرار",
     "set": "مجموعة",
+    "time": "الوقت",
     "active": "نشط",
     "rest": "راحة",
     "getReadyStartsIn_one": "استعد! المؤقت يبدأ خلال {{count}} ثانية",
@@ -265,8 +275,11 @@
     "beepInterval60": "كل 60 ثانية",
     "wakeLock": "قفل الشاشة",
     "selectExercise": "اختر التمرين",
+    "selectExerciseHint": "اختر تمريناً للبدء:",
     "fit": "احتواء",
-    "fill": "ملء"
+    "fill": "ملء",
+    "switchToFit": "التبديل إلى احتواء",
+    "switchToFill": "التبديل إلى ملء"
   },
   "weekday": {
     "monday": "الاثنين",

@@ -2,6 +2,8 @@
   "common": {
     "start": "يلا",
     "stop": "بطّل",
+    "pause": "وقّف مؤقت",
+    "resume": "كمّل",
     "cancel": "سيب",
     "confirm": "تأكيد",
     "ok": "تمام",
@@ -58,10 +60,12 @@
     "cancelTitle": "إلغاء",
     "clear": "مسح",
     "clearFormTitle": "مسح النموذج",
-    "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
+    "confirmClearForm": "هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
+    "enterFullscreen": "ملء الشاشة",
+    "exitFullscreen": "الخروج من ملء الشاشة",
     "premium": "مميز",
     "done": "تم",
     "refresh": "حدّث",
@@ -81,7 +85,12 @@
     "selectOne": "اختر واحدًا",
     "skip": "تخطي",
     "submit": "إرسال",
-    "submitting": "جاري الإرسال..."
+    "submitting": "جاري الإرسال...",
+    "buttons": {
+      "cancel": "إلغاء"
+    },
+    "never": "أبداً",
+    "videoUnavailable": "الفيديو غير متاح"
   },
   "navigation": {
     "home": "البيت",
@@ -125,9 +134,9 @@
     "disabled": "مقفول",
     "dataStoredLocally": "بيانات التمرين بتاعتك محفوظة على الجهاز ده.",
     "pleaseAcceptConsent": "لو سمحت وافق على تخزين البيانات عشان تقدر تصدّر وتمسح البيانات.",
-  "consentMigrationWarning": "⚠️ بيانات الموافقة هتتنقل للإصدار الجديد في تحميل البرنامج الجاي.",
-  "consentStatusLabel": "حالة الموافقة",
-  "consentVersion": "إصدار الموافقة",
+    "consentMigrationWarning": "⚠️ بيانات الموافقة هتتنقل للإصدار الجديد في تحميل البرنامج الجاي.",
+    "consentStatusLabel": "حالة الموافقة",
+    "consentVersion": "إصدار الموافقة",
     "exportData": "صدّر البيانات",
     "exportDataHelp": "نزّل بيانات التمرين بتاعتك كملف JSON",
     "exportInProgress": "جارٍ التصدير...",
@@ -243,10 +252,13 @@
     "categoriesSelected_other": "{{count}} فئات مختارة",
     "exercisesRemaining_one": "باقي {{count}} تمرين",
     "exercisesRemaining_other": "باقي {{count}} تمرين",
-    "repProgress": "تقدم العدات",    "rep": "تكرار",
+    "repProgress": "تقدم العدات",
+    "rep": "تكرار",
     "set": "مجموعة",
+    "time": "الوقت",
     "active": "نشط",
-    "rest": "راحة",    "getReadyStartsIn_one": "استعد! المؤقت هيبدأ في {{count}} ثانية",
+    "rest": "راحة",
+    "getReadyStartsIn_one": "استعد! المؤقت هيبدأ في {{count}} ثانية",
     "getReadyStartsIn_other": "استعد! المؤقت هيبدأ في {{count}} ثانية",
     "getReadyEllipsis": "استعد...",
     "exerciseComplete": "تمرين {{total}}/{{total}} - خلص!",
@@ -266,8 +278,11 @@
     "beepInterval60": "كل 60 ثانية",
     "wakeLock": "قفل الشاشة",
     "selectExercise": "اختار التمرين",
+    "selectExerciseHint": "اختار تمرين عشان تبدأ:",
     "fit": "احتواء",
-    "fill": "ملء"
+    "fill": "ملء",
+    "switchToFit": "التبديل لاحتواء",
+    "switchToFill": "التبديل لملء"
   },
   "weekday": {
     "monday": "الإتنين",

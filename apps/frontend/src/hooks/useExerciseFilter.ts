@@ -199,6 +199,12 @@ export function useExerciseFilter(
     const catalogBadges = getCatalogBadges(filterState.selectedCatalogId);
 
     const filtered = exercises.filter(exercise => {
+      // Filter out inactive exercises (is_active defaults to true if not set)
+      // Use 'in' operator for type safety since Exercise type doesn't have is_active
+      if ('is_active' in exercise && exercise.is_active === false) {
+        return false;
+      }
+
       // Exclude exercises that are in the exclude list
       if (excludedIds.has(exercise.id)) {
         return false;

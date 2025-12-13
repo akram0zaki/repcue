@@ -4,8 +4,8 @@
     "description": "Choisissez votre thème de couleur préféré",
     "applying": "Application du thème...",
     "default": {
-      "name": "Bleu Océan",
-      "description": "Thème bleu classique avec contraste équilibré"
+      "name": "Bleu Électrique + Menthe",
+      "description": "Esthétique athlétique moderne avec bleu vibrant et menthe fraîche"
     },
     "energetic": {
       "name": "Orange Énergique",
@@ -27,5 +27,17 @@
       "name": "Élégant Minimal",
       "description": "Palette monochrome sophistiquée"
     }
-  }
+  },
+  "videoStorage": "Stockage Vidéo",
+  "cachedVideos": "Vidéos en Cache",
+  "videoStorageInfo": "Les vidéos sont mises en cache localement pour une lecture plus rapide et un accès hors ligne. Les vidéos mises en cache seront automatiquement supprimées après 90 jours ou si le stockage est plein.",
+  "clearAllVideos": "Effacer Toutes les Vidéos",
+  "clearExpiredVideos": "Effacer les Vidéos Expirées",
+  "newestVideo": "Vidéo la Plus Récente",
+  "oldestVideo": "Vidéo la Plus Ancienne",
+  "storageUsed": "Stockage Utilisé",
+  "quotaUsage": "Utilisation du Quota",
+  "refreshStats": "Actualiser les Statistiques",
+  "videoCacheCleared": "Cache vidéo effacé avec succès",
+  "videoCacheConfirmClearAll": "Êtes-vous sûr de vouloir effacer toutes les vidéos en cache?"
 }

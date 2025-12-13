@@ -6,12 +6,21 @@ import { ExercisePlaceholder } from './ExercisePlaceholder';
 import { resolveVideoUrl } from '../utils/resolveVideoUrl';
 import { loadExerciseMedia } from '../utils/loadExerciseMedia';
 import selectVideoVariant from '../utils/selectVideoVariant';
+import { isNativePlatform } from '../utils/nativeCapabilities';
 import type { Exercise } from '../types';
 import type { ExerciseMedia } from '../types/media';
 import logger from '../utils/logger';
 
 // Helper: quick existence probe (first byte) to detect 404/missing objects
+// Skipped for native apps where WKWebView fetch with Range headers can be unreliable
 const probe = async (probeUrl: string): Promise<boolean> => {
+  // Skip probe for native apps - trust the resolved URLs
+  // WKWebView cross-origin fetch with Range headers is unreliable
+  if (isNativePlatform()) {
+    logger.log('🎥 [VideoThumbnail] Skipping probe for native app, trusting URL', { probeUrl });
+    return true;
+  }
+  
   try {
     const res = await fetch(probeUrl, {
       method: 'GET',
@@ -65,6 +74,13 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
   const [mediaMeta, setMediaMeta] = useState<ExerciseMedia | null>(null); // cached media entry for fallback
   const [attemptedFallback, setAttemptedFallback] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Ref to track isPlaying without causing effect re-runs
+  // This prevents the video from restarting when play state changes
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   // has_video can be stale; we derive availability from media index or custom URL
 
@@ -212,7 +228,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       clearTimeoutAndMarkLoaded();
       
       // Ensure first frame is shown for thumbnail
-      if (video && !isPlaying && video.currentTime === 0) {
+      // Use ref to check current playing state to avoid stale closure
+      if (video && !isPlayingRef.current && video.currentTime === 0) {
         video.currentTime = 0.1;
       }
     };
@@ -314,8 +331,8 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       clearTimeoutAndMarkLoaded();
       
       // Ensure we show the first frame for thumbnail display
-      // Only seek if video is not currently playing
-      if (!isPlaying && video.currentTime === 0) {
+      // Only seek if video is not currently playing (use ref to avoid stale closure)
+      if (!isPlayingRef.current && video.currentTime === 0) {
         video.currentTime = 0.1;
       }
     };
@@ -336,7 +353,9 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('error', handleError);
     };
-  }, [onVideoLoad, onVideoError, videoUrl, exercise.id, isPlaying]);
+  // CRITICAL: Do NOT include isPlaying in deps - it causes effect re-run which restarts video on iOS
+  // We use isPlayingRef.current inside handlers to access current playing state
+  }, [onVideoLoad, onVideoError, videoUrl, exercise.id, isSharedExercise, mediaMeta, attemptedFallback]);
 
   const handlePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click events
@@ -350,9 +369,20 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
       video.pause();
       setIsPlaying(false);
     } else {
+      // Store ref to current video element to check if it's still the same after async play
+      const currentVideo = video;
       video.play().then(() => {
-        setIsPlaying(true);
+        // Only update state if the video element is still the same (not re-rendered)
+        if (videoRef.current === currentVideo) {
+          setIsPlaying(true);
+        }
       }).catch((error) => {
+        // AbortError is expected when video is interrupted (e.g., component re-render, user navigates away)
+        // Don't treat it as a real error
+        if (error.name === 'AbortError') {
+          logger.log('🎥 [VideoThumbnail] Play interrupted (AbortError) - this is expected during navigation/re-render');
+          return;
+        }
         logger.error('🎥 [VideoThumbnail] Video play failed:', { exerciseId: exercise.id, error });
         setHasError(true);
       });
@@ -377,15 +407,19 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = ({
     >
       {/* Video Element */}
       <video
-        key={videoUrl} // Force re-render when URL changes
+        // Removed key={videoUrl} - was causing video restart when caching completes
+        // The video element handles src changes natively without needing recreation
         ref={videoRef}
         src={videoUrl || undefined}
         poster={thumbnailUrl || undefined} // Show thumbnail image immediately
         className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-lg bg-gray-100 dark:bg-gray-800`}
-        preload="none" // Don't load video until user clicks play (saves bandwidth)
+        // For blob URLs (cached), preload metadata so video is ready to play instantly
+        // For network URLs, use 'none' to save bandwidth
+        preload={videoUrl?.startsWith('blob:') ? 'metadata' : 'none'}
         muted
         loop // Videos will loop automatically when playing
         playsInline
+        crossOrigin="anonymous" // Required for loading videos from external CDN (repcue.me) in native apps
         // @ts-expect-error - loading attribute is valid but not in React types yet
         loading="eager" // Force immediate loading of poster images (no lazy loading)
       />

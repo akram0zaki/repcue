@@ -1,9 +1,19 @@
-import type { Session } from '@supabase/supabase-js';
+import type { AuthSession as Session } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import type { AuthState, AuthUserProfile } from '../types';
 import { storageService } from './storageService';
 import { webauthnService, type PasskeyRegistrationResult, type PasskeyAuthenticationResult } from './webauthnService';
+import { isNativePlatform, clearHandledAuthCallback } from '../utils/nativeCapabilities';
 import logger from '../utils/logger';
+
+/**
+ * Get the app base URL for Universal Links / App Links
+ * For native apps, this enables deep linking from email clients
+ * Configured via VITE_APP_BASE_URL environment variable
+ */
+const getAppBaseUrl = (): string => {
+  return import.meta.env.VITE_APP_BASE_URL || 'https://dev.repcue.me';
+};
 
 /**
  * Authentication service using Supabase
@@ -58,7 +68,7 @@ export class AuthService {
       }
 
       // Listen for auth changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
         logger.log('Auth state changed:', event, session?.user?.id || 'no user');
         
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -140,6 +150,9 @@ export class AuthService {
       refreshToken: undefined
     };
     this.notifyListeners();
+    
+    // Clear the handled auth callback marker so future logins work properly
+    await clearHandledAuthCallback();
   }
 
   /**
@@ -353,24 +366,41 @@ export class AuthService {
 
   /**
    * Sign in with magic link (passwordless)
+   * 
+   * Redirect URL strategy:
+   * - Native apps (iOS/Android): Use custom URL scheme (repcue://) for simulator/development
+   *   OR Universal Links (HTTPS) for production when properly configured
+   * - PWA: Use custom protocol (web+repcue://) for deep linking
+   * - Web browser: Use current origin for seamless redirect
    */
   public async signInWithMagicLink(email: string): Promise<{ success: boolean; error?: string }> {
     try {
       // Check for pending shared exercise token that needs to be preserved
       const pendingShareToken = sessionStorage.getItem('pendingShareToken');
 
-      // Build the redirect URL based on environment
+      // Build the redirect URL based on platform
       let redirectUrl: string;
 
-      // Check if we're in PWA mode (standalone display)
+      // Detect platform
+      const isNative = isNativePlatform();
       const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
                     ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
 
-      if (isPWA) {
+      if (isNative) {
+        // For native Capacitor apps (iOS/Android):
+        // Use custom URL scheme (repcue://) which works in simulator and on devices
+        // without needing Universal Links / Associated Domains configuration
+        redirectUrl = `repcue://auth/callback`;
+        
+        // Note: For production with Universal Links, you could use:
+        // redirectUrl = `${getAppBaseUrl()}/auth/callback`;
+        // But this requires the app to be signed and Associated Domains configured
+      } else if (isPWA) {
         // For PWA: use custom protocol for deep linking back to PWA
         redirectUrl = `web+repcue://auth/callback`;
       } else {
-        // For browser: use current origin to preserve domain context (works for localhost and production)
+        // For web browser: use current origin to preserve domain context
+        // Works for localhost, dev.repcue.me, repcue.me, etc.
         redirectUrl = `${this.getRedirectBase()}/auth/callback`;
       }
 
@@ -380,6 +410,8 @@ export class AuthService {
         url.searchParams.set('saveSharedExercise', pendingShareToken);
         redirectUrl = url.toString();
       }
+
+      logger.log('Magic link redirect URL:', redirectUrl, { isNative, isPWA });
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
@@ -405,21 +437,77 @@ export class AuthService {
 
   /**
    * Sign in with OAuth provider (Google, Apple, etc.)
+   * For native apps, uses in-app browser with custom URL scheme redirect
    */
   public async signInWithOAuth(provider: 'google' | 'apple' | 'github'): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${this.getRedirectBase()}/auth/callback`
+      const isNative = isNativePlatform();
+      
+      if (isNative) {
+        // For native apps: use skipBrowserRedirect and open in-app browser
+        // The redirect will use our custom URL scheme (repcue://)
+        const redirectTo = 'repcue://auth/callback';
+        
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo,
+            skipBrowserRedirect: true, // Don't auto-redirect, we'll handle it
+          }
+        });
+
+        if (error) {
+          return { success: false, error: error.message };
         }
-      });
 
-      if (error) {
-        return { success: false, error: error.message };
+        if (data?.url) {
+          // Dynamically import Browser to avoid bundling for web
+          const { Browser } = await import('@capacitor/browser');
+          
+          // Open the OAuth URL in an in-app browser
+          // When auth completes, it will redirect to repcue://auth/callback
+          // which our deep link handler will catch
+          await Browser.open({ 
+            url: data.url,
+            presentationStyle: 'popover' // iOS: slide up sheet
+          });
+          
+          // Set up listener to close browser when we get the callback
+          // The deep link handler in useDeepLinks will process the tokens
+          const handleCallback = async () => {
+            try {
+              await Browser.close();
+            } catch {
+              // Browser may already be closed
+            }
+          };
+          
+          // Listen for app URL events to know when to close browser
+          const { App } = await import('@capacitor/app');
+          const listener = await App.addListener('appUrlOpen', async (event) => {
+            if (event.url.startsWith('repcue://auth/callback')) {
+              await handleCallback();
+              await listener.remove();
+            }
+          });
+        }
+
+        return { success: true };
+      } else {
+        // For web: use standard OAuth redirect flow
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider,
+          options: {
+            redirectTo: `${this.getRedirectBase()}/auth/callback`
+          }
+        });
+
+        if (error) {
+          return { success: false, error: error.message };
+        }
+
+        return { success: true };
       }
-
-      return { success: true };
     } catch (error) {
       logger.error('OAuth error:', error);
       return { success: false, error: 'An unexpected error occurred' };
@@ -668,6 +756,74 @@ export class AuthService {
       logger.error('Refresh session error:', error);
       return { success: false, error: 'An unexpected error occurred' };
     }
+  }
+
+  /**
+   * Get diagnostic information for debugging magic links
+   * Returns platform detection, redirect URLs, and session state
+   */
+  public getDiagnostics(): {
+    platform: {
+      isNative: boolean;
+      isPWA: boolean;
+      isWeb: boolean;
+      userAgent: string;
+    };
+    redirectUrls: {
+      magicLinkRedirect: string;
+      currentOrigin: string;
+      appBaseUrl: string;
+    };
+    session: {
+      isAuthenticated: boolean;
+      userId: string | undefined;
+      email: string | undefined;
+      hasSession: boolean;
+      sessionExpiresAt: string | undefined;
+    };
+    supabase: {
+      projectUrl: string;
+    };
+  } {
+    const isNative = isNativePlatform();
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                  ((window.navigator as unknown) as { standalone?: boolean }).standalone === true;
+
+    // Compute redirect URL same as signInWithMagicLink
+    let magicLinkRedirect: string;
+    if (isNative) {
+      magicLinkRedirect = `repcue://auth/callback`;
+    } else if (isPWA) {
+      magicLinkRedirect = `web+repcue://auth/callback`;
+    } else {
+      magicLinkRedirect = `${this.getRedirectBase()}/auth/callback`;
+    }
+
+    return {
+      platform: {
+        isNative,
+        isPWA,
+        isWeb: !isNative && !isPWA,
+        userAgent: navigator.userAgent,
+      },
+      redirectUrls: {
+        magicLinkRedirect,
+        currentOrigin: this.getRedirectBase(),
+        appBaseUrl: getAppBaseUrl(),
+      },
+      session: {
+        isAuthenticated: this.authState.isAuthenticated,
+        userId: this.authState.user?.id,
+        email: this.authState.user?.email,
+        hasSession: !!this.currentSession,
+        sessionExpiresAt: this.currentSession?.expires_at
+          ? new Date(this.currentSession.expires_at * 1000).toISOString()
+          : undefined,
+      },
+      supabase: {
+        projectUrl: import.meta.env.VITE_SUPABASE_URL || 'not configured',
+      },
+    };
   }
 }
 

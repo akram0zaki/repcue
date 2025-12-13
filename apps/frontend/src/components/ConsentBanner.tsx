@@ -188,7 +188,7 @@ export const ConsentBanner: React.FC<ConsentBannerProps> = ({ onConsentGranted }
                   {t('learnMore')}
                 </button>
                 <button
-                  onClick={() => window.open('/legal', '_blank')}
+                  onClick={() => { window.location.href = '/legal'; }}
                   className="text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 underline font-medium focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 rounded block"
                 >
                   {t('viewLegalCenter')}

@@ -104,28 +104,34 @@ export default function AIWorkoutButton({
       <button
         type="button"
         onClick={handleClick}
-        className={`${buttonClass} w-full ${className}`}
+        className={`${buttonClass} ai-workout-btn ${className}`}
         aria-label={buttonLabel}
         data-testid="ai-workout-button"
       >
-        <span className="flex items-center justify-center gap-2">
-          {/* AI icon (sparkles/stars) */}
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-            />
-          </svg>
-          <span>{buttonLabel}</span>
+        <span className="flex items-center h-full">
+          {/* Icon section - left side (LTR) / right side (RTL) */}
+          <span className="ai-workout-icon-section flex items-center justify-center w-12 h-12 rtl:order-2">
+            {/* AI icon (sparkles/stars) */}
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+              />
+            </svg>
+          </span>
+          {/* Text section - right side (LTR) / left side (RTL) */}
+          <span className="ai-workout-text-section flex-1 rtl:order-1 flex items-center justify-start">
+            {buttonLabel}
+          </span>
         </span>
       </button>
 

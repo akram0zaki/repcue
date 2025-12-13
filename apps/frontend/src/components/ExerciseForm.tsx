@@ -179,6 +179,8 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
     if (exercise?.catalogId) return [exercise.catalogId];
     return [catalogId];
   });
+  // Track available catalog count to conditionally hide selector when only one
+  const [availableCatalogCount, setAvailableCatalogCount] = useState<number>(0);
 
   // Modal states
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -621,24 +623,38 @@ export const ExerciseForm: React.FC<ExerciseFormProps> = ({
           </div>
           {/* End of basic information */}
 
-          {/* Catalog Assignment (Multi-select) */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('catalogs:assignmentHeading', { defaultValue: 'Catalog Assignment' })}</h3>
+          {/* Catalog Assignment (Multi-select) - Hidden when only one catalog available */}
+          {availableCatalogCount > 1 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('catalogs:assignmentHeading', { defaultValue: 'Catalog Assignment' })}</h3>
+              <CatalogMultiSelector
+                selectedCatalogIds={selectedCatalogIds}
+                onChange={setSelectedCatalogIds}
+                disabled={loading}
+                minSelected={1}
+                onCatalogCountChange={setAvailableCatalogCount}
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('catalogs:assignmentHint', { defaultValue: 'Select catalogs to associate. Tags below apply as base tags (catalog-agnostic). Per-catalog overrides coming soon.' })}
+              </p>
+              {selectedCatalogIds.length === 0 && (
+                <p className="text-xs text-red-600 dark:text-red-400" role="alert">
+                  {t('catalogs:minOneRequired', { defaultValue: 'At least one catalog must remain selected.' })}
+                </p>
+              )}
+            </div>
+          )}
+          {/* Hidden CatalogMultiSelector to auto-select single catalog when only one available */}
+          {availableCatalogCount <= 1 && (
             <CatalogMultiSelector
               selectedCatalogIds={selectedCatalogIds}
               onChange={setSelectedCatalogIds}
               disabled={loading}
               minSelected={1}
+              onCatalogCountChange={setAvailableCatalogCount}
+              className="hidden"
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {t('catalogs:assignmentHint', { defaultValue: 'Select catalogs to associate. Tags below apply as base tags (catalog-agnostic). Per-catalog overrides coming soon.' })}
-            </p>
-            {selectedCatalogIds.length === 0 && (
-              <p className="text-xs text-red-600 dark:text-red-400" role="alert">
-                {t('catalogs:minOneRequired', { defaultValue: 'At least one catalog must remain selected.' })}
-              </p>
-            )}
-          </div>
+          )}
           {/* End catalog assignment */}
 
           {/* Type-specific fields */}

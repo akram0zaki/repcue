@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Exercise } from '../types';
@@ -8,21 +8,95 @@ import { storageService } from '../services/storageService';
 import { getExerciseById } from '../data/exercises';
 import { VideoThumbnail } from '../components/VideoThumbnail';
 import { useAuth } from '../hooks/useAuth';
+import { usePlatform } from '../contexts/PlatformContext';
 import logger from '../utils/logger';
 import '../styles/exerciseDetailParallax.css';
 import type { AppSettings } from '../types';
+
+// Fullscreen icons
+const FullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+  </svg>
+);
+
+const ExitFullscreenIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+  </svg>
+);
+
+// Fit icon - arrows pointing inward (content fits within container)
+const FitIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="M7 9l3 3-3 3" />
+    <path d="M17 9l-3 3 3 3" />
+  </svg>
+);
+
+// Fill icon - arrows pointing outward (content fills container)
+const FillIcon: React.FC<{ size?: number; className?: string }> = ({ size = 20, className = '' }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="M10 9l-3 3 3 3" />
+    <path d="M14 9l3 3-3 3" />
+  </svg>
+);
 
 const ExerciseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'exercises', 'exerciseDetails']);
   const { user } = useAuth();
+  const { isIOS, isNative } = usePlatform();
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [videoFitMode, setVideoFitMode] = useState<'fit' | 'fill'>('fit');
 
@@ -60,6 +134,37 @@ const ExerciseDetailPage: React.FC = () => {
         // default remains 'fit'
       }
     })();
+  }, []);
+
+  // Toggle fullscreen
+  const handleToggleFullscreen = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const container = videoContainerRef.current;
+    if (!container) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await container.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (error) {
+      logger.error('[ExerciseDetailPage] Fullscreen toggle failed:', error);
+    }
+  }, []);
+
+  // Listen for fullscreen changes (e.g., user presses Escape)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, []);
 
   // Refresh favorite status when page regains focus or becomes visible
@@ -278,6 +383,112 @@ const ExerciseDetailPage: React.FC = () => {
   const minVisibleVideo = videoHeight * 0.25; // Keep 25% of video visible when fully collapsed
   const maxScroll = videoHeight - minVisibleVideo - initialOverlap; // Maximum amount content can slide up
 
+  // iOS scroll effect calculations
+  const isIOSNative = isIOS && isNative;
+  const iosMaxScroll = 200; // Scroll distance for full effect
+  const iosScrollProgress = Math.min(scrollY / iosMaxScroll, 1); // 0 to 1
+  const iosScale = 1 - (iosScrollProgress * 0.15); // Scale from 1 to 0.85
+  const iosOpacity = 1 - (iosScrollProgress * 0.4); // Opacity from 1 to 0.6
+  const iosOverlayOpacity = iosScrollProgress * 0.6; // Overlay from 0 to 0.6
+
+  // Video section with platform-specific rendering
+  const renderVideoSection = () => {
+    const videoContent = (
+      <>
+        <VideoThumbnail
+          exercise={exercise}
+          className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:w-full [&>div]:h-full [&>div]:aspect-auto"
+          objectFit={videoFitMode === 'fit' ? 'contain' : 'cover'}
+          onVideoLoad={() => logger.log('Hero video loaded for exercise:', exercise.id)}
+          onVideoError={() => logger.warn('Hero video failed to load for exercise:', exercise.id)}
+        />
+        {/* Video controls overlay */}
+        <div className="absolute top-3 right-3 z-10 flex gap-2">
+          {/* Fit/Fill toggle */}
+          <button
+            type="button"
+            className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+            onClick={async () => {
+              const next = videoFitMode === 'fit' ? 'fill' : 'fit';
+              setVideoFitMode(next);
+              try {
+                const current = await storageService.getAppSettings();
+                if (current) {
+                  const nextSettings: AppSettings = {
+                    ...current,
+                    video_fit_mode: next,
+                    version: (current.version || 1) + 1,
+                    updated_at: new Date().toISOString(),
+                    dirty: 1,
+                    op: 'upsert'
+                  } as AppSettings;
+                  await storageService.saveAppSettings(nextSettings);
+                }
+              } catch (e) {
+                logger.warn('Failed to persist video_fit_mode setting from ExerciseDetailPage', e);
+              }
+            }}
+            aria-label={videoFitMode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+            title={videoFitMode === 'fit' ? t('timer.switchToFill', 'Switch to Fill') : t('timer.switchToFit', 'Switch to Fit')}
+            data-testid="toggle-video-fit-detail"
+          >
+            {videoFitMode === 'fit' ? <FillIcon size={18} /> : <FitIcon size={18} />}
+          </button>
+          {/* Fullscreen toggle */}
+          <button
+            type="button"
+            onClick={handleToggleFullscreen}
+            className="p-1.5 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-white rounded-lg shadow-md hover:bg-white dark:hover:bg-gray-700 transition-colors backdrop-blur-sm border border-gray-200 dark:border-gray-600"
+            aria-label={isFullscreen ? t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' }) : t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+            title={isFullscreen ? t('common:exitFullscreen', { defaultValue: 'Exit fullscreen' }) : t('common:enterFullscreen', { defaultValue: 'Enter fullscreen' })}
+            data-testid="toggle-fullscreen-detail"
+          >
+            {isFullscreen ? <ExitFullscreenIcon size={18} /> : <FullscreenIcon size={18} />}
+          </button>
+        </div>
+        {/* iOS scroll overlay - fades in as you scroll */}
+        {isIOSNative && (
+          <div 
+            className="exercise-detail-video-overlay"
+            style={{ opacity: iosOverlayOpacity }}
+          />
+        )}
+      </>
+    );
+
+    if (isIOSNative) {
+      // iOS: Sticky wrapper with scale/fade effect
+      return (
+        <div className="exercise-detail-video-wrapper">
+          <div 
+            ref={videoContainerRef}
+            className="exercise-detail-video-container"
+            style={{
+              transform: `scale(${iosScale})`,
+              opacity: iosOpacity,
+            }}
+          >
+            <div className="w-full h-full">
+              {videoContent}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Web/Desktop: Original fixed positioning
+    return (
+      <div 
+        ref={videoContainerRef}
+        className="exercise-detail-video-container"
+      >
+        <div className="w-full h-full">
+          {videoContent}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="exercise-detail-container bg-surface-0 dark:bg-surface-900">
       {/* Fixed Back Button */}
@@ -292,59 +503,13 @@ const ExerciseDetailPage: React.FC = () => {
         </svg>
       </button>
 
-      {/* Hero Video Section - Fixed position, stays in place */}
-      <div 
-        ref={videoContainerRef}
-        className="exercise-detail-video-container"
-      >
-        <div className="w-full h-full">
-          <VideoThumbnail
-            exercise={exercise}
-            className="w-full h-full [&>video]:aspect-auto [&>video]:h-full [&>video]:w-full [&>div]:h-full [&>div]:aspect-auto"
-            objectFit={videoFitMode === 'fit' ? 'contain' : 'cover'}
-            onVideoLoad={() => logger.log('Hero video loaded for exercise:', exercise.id)}
-            onVideoError={() => logger.warn('Hero video failed to load for exercise:', exercise.id)}
-          />
-          {/* Fit/Fill toggle overlay */}
-          <div className="absolute top-3 right-3 z-10">
-            <button
-              type="button"
-              className="btn-ghost btn-sm border-2 border-gray-300 dark:border-gray-600 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
-              onClick={async () => {
-                const next = videoFitMode === 'fit' ? 'fill' : 'fit';
-                setVideoFitMode(next);
-                try {
-                  const current = await storageService.getAppSettings();
-                  if (current) {
-                    const nextSettings: AppSettings = {
-                      ...current,
-                      video_fit_mode: next,
-                      version: (current.version || 1) + 1,
-                      updated_at: new Date().toISOString(),
-                      dirty: 1,
-                      op: 'upsert'
-                    } as AppSettings;
-                    await storageService.saveAppSettings(nextSettings);
-                  }
-                } catch (e) {
-                  logger.warn('Failed to persist video_fit_mode setting from ExerciseDetailPage', e);
-                }
-              }}
-              aria-label={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
-              title={videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
-              data-testid="toggle-video-fit-detail"
-            >
-              {videoFitMode === 'fit' ? t('common:timer.fit', 'Fit') : t('common:timer.fill', 'Fill')}
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Hero Video Section */}
+      {renderVideoSection()}
 
-      {/* Content Section - Positioned to slide up over video */}
+      {/* Content Section */}
       <div 
         className="exercise-detail-content-panel"
-        // Initial position: covering bottom 10% of video, slides up as page scrolls
-        style={{ 
+        style={isIOSNative ? undefined : { 
           top: `${videoHeight - initialOverlap}px`,
           transform: `translateY(-${Math.min(scrollY, maxScroll)}px)`
         }}

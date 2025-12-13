@@ -11,10 +11,12 @@
  * - Privacy-compliant analytics tracking
  * - iOS Safari detection (no beforeinstallprompt support)
  * - Platform-specific install guidance
+ * - Native app detection (Capacitor) - install prompts disabled
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { isIOS, canInstall, getBrowserName, getOSName } from '../utils/platformDetection';
+import { isNativePlatform } from '../utils/nativeCapabilities';
 import { INSTALL_PROMPT_ENABLED, INSTALL_PROMPT_IOS_ENABLED } from '../config/features';
 import logger from '../utils/logger';
 
@@ -366,6 +368,16 @@ export const useInstallPrompt = (): UseInstallPromptReturn => {
    * Setup event listeners and initial state
    */
   useEffect(() => {
+    // NATIVE APP: Install prompt disabled when running as native Capacitor app
+    if (isNativePlatform()) {
+      logger.log('Install prompt: Disabled for native Capacitor app');
+      setIsAvailable(false);
+      setCanShowPrompt(false);
+      setIsInstalled(true); // Consider native app as "installed"
+      setHasInitialized(true);
+      return;
+    }
+
     // GLOBAL DISABLE: Install prompt completely disabled due to persistent flashing bug
     if (!INSTALL_PROMPT_ENABLED) {
       logger.warn('Install prompt: Globally disabled due to persistent flashing issues');

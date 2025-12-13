@@ -1,0 +1,445 @@
+/**
+ * Platform Component Styles
+ * 
+ * Styles for platform-abstracted components that adapt to iOS, Android, and Web.
+ * These styles complement the existing tokens.css iOS styles.
+ */
+
+/* ================================
+   Platform Spinner Styles
+   ================================ */
+
+.platform-spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* iOS-style spinner animation (8 segments fading) */
+.platform-spinner--ios .ios-spinner-svg {
+  animation: ios-spinner-rotate 0.8s steps(8) infinite;
+}
+
+@keyframes ios-spinner-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Android Material Design spinner */
+.platform-spinner--android .android-spinner-circle {
+  animation: android-spinner-dash 1.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes android-spinner-dash {
+  0% {
+    stroke-dasharray: 1, 62.8;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 31.4, 31.4;
+    stroke-dashoffset: -15.7;
+  }
+  100% {
+    stroke-dasharray: 1, 62.8;
+    stroke-dashoffset: -62.8;
+  }
+}
+
+/* Web spinner - uses standard Tailwind animate-spin */
+.platform-spinner--web {
+  /* Standard border spinner styled inline */
+}
+
+/* ================================
+   Platform Modal/Sheet Styles
+   ================================ */
+
+/* Sheet container */
+.platform-sheet {
+  /* Base styles handled in component */
+}
+
+/* Sheet drag handle */
+.platform-sheet__handle {
+  width: 36px;
+  height: 5px;
+  background-color: var(--ios-fill-secondary, rgba(120, 120, 128, 0.16));
+  border-radius: 2.5px;
+  margin: 8px auto;
+}
+
+/* Safe area utilities */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.safe-area-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+.safe-area-y {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ================================
+   Platform Dialog Styles
+   ================================ */
+
+/* Dialog animation */
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* Tailwind-compatible animation classes */
+.animate-in {
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+.fade-in {
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+.zoom-in-95 {
+  animation: dialog-fade-in 0.2s ease-out;
+}
+
+/* ================================
+   Platform-Specific Overrides
+   ================================ */
+
+/* iOS-specific button sizing (44pt minimum touch target per HIG) */
+.ios-app button,
+.ios-app [role="button"],
+.ios-app a {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Exception: inline buttons that are part of text */
+.ios-app .inline-button {
+  min-height: auto;
+  min-width: auto;
+}
+
+/* iOS blur backdrop for modals */
+@supports (backdrop-filter: blur(20px)) {
+  .ios-app .platform-sheet,
+  .ios-app .platform-modal {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark.ios-app .platform-sheet,
+  .dark.ios-app .platform-modal {
+    background-color: rgba(28, 28, 30, 0.8);
+  }
+}
+
+/* Android-specific styles (for future use) */
+.android-app button,
+.android-app [role="button"],
+.android-app a {
+  min-height: 48px; /* Material Design touch target */
+}
+
+/* Android elevation system */
+.android-elevation-1 {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.android-elevation-2 {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.android-elevation-3 {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+}
+
+.android-elevation-4 {
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ================================
+   Reduced Motion Support
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .platform-spinner--ios .ios-spinner-svg,
+  .platform-spinner--android .android-spinner-circle,
+  .platform-spinner--web > div {
+    animation: none !important;
+  }
+  
+  /* Show a static indicator instead */
+  .platform-spinner--ios .ios-spinner-svg,
+  .platform-spinner--android .android-spinner-circle {
+    opacity: 0.7;
+  }
+  
+  .platform-sheet {
+    transition: none !important;
+  }
+  
+  .animate-in,
+  .fade-in,
+  .zoom-in-95 {
+    animation: none !important;
+  }
+}
+
+/* ================================
+   Loading Button States
+   ================================ */
+
+/* Ensure spinner in button is sized correctly */
+button .platform-spinner,
+[role="button"] .platform-spinner {
+  margin: 0;
+}
+
+/* Disabled loading button */
+button:disabled .platform-spinner,
+[role="button"][aria-disabled="true"] .platform-spinner {
+  opacity: 0.7;
+}
+
+/* ================================
+   Platform Tab Bar Styles
+   ================================ */
+
+/* Base tab bar container */
+.platform-tabbar {
+  /* Ensure tab bar stays above page content like exercise detail panels */
+  z-index: 100 !important;
+}
+
+/* iOS Tab Bar - Following Apple Human Interface Guidelines */
+.platform-tabbar--ios {
+  height: calc(var(--ios-tab-bar-height, 49px) + env(safe-area-inset-bottom, 0px));
+  background-color: rgba(249, 249, 249, 0.94);
+  border-top: 0.5px solid rgba(60, 60, 67, 0.29);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+.dark .platform-tabbar--ios {
+  background-color: rgba(28, 28, 30, 0.88);
+  border-top-color: rgba(84, 84, 88, 0.65);
+}
+
+/* iOS Tab Bar Container */
+.platform-tabbar__container--ios {
+  padding: 6px 0;
+  height: var(--ios-tab-bar-height, 49px);
+}
+
+/* iOS Tab Item */
+.platform-tabbar__item--ios {
+  flex: 1;
+  height: 100%;
+  padding: 2px 0;
+  color: var(--ios-system-gray, #8E8E93);
+  /* Haptic feedback hint for native */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.platform-tabbar__item--ios.platform-tabbar__item--active {
+  color: var(--color-primary, #0096C7);
+}
+
+/* iOS Tab Icon */
+.platform-tabbar__item--ios .platform-tabbar__icon {
+  margin-bottom: 2px;
+  /* Slightly thinner stroke weight like SF Symbols */
+  stroke-width: 1.5;
+}
+
+/* iOS Tab Label */
+.platform-tabbar__item--ios .platform-tabbar__label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: -0.24px;
+  /* SF Pro Text characteristics */
+  font-feature-settings: "tnum" on;
+}
+
+/* iOS More Button */
+.platform-tabbar__more--ios {
+  width: 44px;
+  height: 100%;
+  color: var(--ios-system-gray, #8E8E93);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.platform-tabbar__more--ios.platform-tabbar__item--active {
+  color: var(--color-primary, #0096C7);
+}
+
+/* iOS Dropdown Menu */
+.platform-tabbar__dropdown--ios {
+  min-width: 200px;
+  background-color: rgba(249, 249, 249, 0.94);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-radius: var(--ios-corner-radius-large, 14px);
+  box-shadow: 
+    0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 10px 40px rgba(0, 0, 0, 0.12),
+    0 2px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.dark .platform-tabbar__dropdown--ios {
+  background-color: rgba(44, 44, 46, 0.94);
+}
+
+/* iOS Dropdown Item */
+.platform-tabbar__dropdown-item--ios {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-label-primary, #000000);
+  background: transparent;
+  border: none;
+  text-align: left;
+  transition: background-color 0.1s ease;
+}
+
+.dark .platform-tabbar__dropdown-item--ios {
+  color: var(--ios-label-primary, #FFFFFF);
+}
+
+.platform-tabbar__dropdown-item--ios:active {
+  background-color: var(--ios-fill-tertiary, rgba(118, 118, 128, 0.12));
+}
+
+.platform-tabbar__dropdown-item--ios:not(:last-child) {
+  border-bottom: 0.5px solid var(--ios-separator, rgba(60, 60, 67, 0.29));
+}
+
+.dark .platform-tabbar__dropdown-item--ios:not(:last-child) {
+  border-bottom-color: var(--ios-separator, rgba(84, 84, 88, 0.65));
+}
+
+.platform-tabbar__dropdown-item--ios.platform-tabbar__dropdown-item--active {
+  color: var(--color-primary, #0096C7);
+}
+
+/* Android Tab Bar - Following Material Design Guidelines */
+.platform-tabbar--android {
+  height: calc(56px + env(safe-area-inset-bottom, 0px));
+  background-color: #ffffff;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .platform-tabbar--android {
+  background-color: #1e1e1e;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Android Tab Bar Container */
+.platform-tabbar__container--android {
+  padding: 8px 0;
+  height: 56px;
+}
+
+/* Android Tab Item */
+.platform-tabbar__item--android {
+  flex: 1;
+  height: 100%;
+  padding: 4px 0;
+  color: rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .platform-tabbar__item--android {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.platform-tabbar__item--android.platform-tabbar__item--active {
+  color: #6200ee; /* Material primary */
+}
+
+.dark .platform-tabbar__item--android.platform-tabbar__item--active {
+  color: #bb86fc; /* Material primary dark */
+}
+
+/* Android ripple effect */
+.platform-tabbar__item--android::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.platform-tabbar__item--android:active::after {
+  opacity: 0.08;
+}
+
+/* Android More Button */
+.platform-tabbar__more--android {
+  width: 48px;
+  height: 100%;
+  color: rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .platform-tabbar__more--android {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.platform-tabbar__more--android::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.platform-tabbar__more--android:active::after {
+  opacity: 0.08;
+}

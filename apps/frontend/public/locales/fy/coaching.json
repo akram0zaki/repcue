@@ -10,7 +10,10 @@
   "empty": {
     "title": "Noch Gjin Ynsichten",
     "message": "Begjin mei trainen om personalisearre coachingsynzichten te krijen!",
-    "startWorkout": "Start Jo Earste Training"
+    "startWorkout": "Start Jo Earste Training",
+    "allCaughtUpTitle": "Jo binne hielendal by!",
+    "allCaughtUpMessage": "Goed dien! Jo hawwe al jo coach-oanbefellings besjoen. Gean sa troch en kom letter werom foar nije ynsichten, of rôlje nei ûnderen om jo foarútgong te besjen.",
+    "continueWorkout": "Trochgean mei traine"
   },
   "error": {
     "title": "Ynsichten Koene Net Laden Wurde"
@@ -194,5 +197,19 @@
   "viewAll": "Alles besjen",
   "insightsCarousel": "Karousel mei coachynsichten",
   "carouselNavigation": "Karouselnavigaasje",
-  "goToInsight": "Gean nei ynsicht {{number}}"
+  "goToInsight": "Gean nei ynsicht {{number}}",
+  "insightsLink": {
+    "title": "Hoe doch ik it?",
+    "subtitle": "{{count}} oanbefellings foar dy",
+    "subtitle_one": "{{count}} oanbefelling foar dy",
+    "ariaLabel": "Besjoch {{count}} coach-oanbefellings"
+  },
+  "insightsModal": {
+    "title": "Dyn Oanbefellings",
+    "ariaLabel": "Modal mei coach-oanbefellings",
+    "summary": "Dit stelt dyn coach foar op basis fan dyn trainingsskiednis",
+    "empty": "Op dit stuit gjin oanbefellings. Bliuw traine om persoanlike ynsichten te krijen!",
+    "aiSection": "KI-oandreaune Oanbefellings",
+    "standardSection": "Standert Oanbefellings"
+  }
 }

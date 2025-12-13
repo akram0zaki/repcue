@@ -1524,6 +1524,10 @@ export class StorageService {
 
       logger.log('💾 [VideoFile] Video file saved to IndexedDB successfully');
       
+      // Trigger the video upload service to process this pending upload
+      // This is non-blocking - upload happens in background
+      this.triggerVideoUpload();
+      
       // Return the blob URL format that the VideoUploadWidget expects
       return `blob-pending-sync://${exerciseId}/${file.name}`;
     } catch (error) {
@@ -1535,6 +1539,25 @@ export class StorageService {
       });
       throw error;
     }
+  }
+
+  /**
+   * Trigger video upload service to process pending uploads
+   * Non-blocking - uploads happen in background
+   */
+  private triggerVideoUpload(): void {
+    // Delay slightly to ensure IndexedDB transaction is committed
+    setTimeout(async () => {
+      try {
+        const { default: VideoUploadService } = await import('./videoUploadService');
+        const uploadService = VideoUploadService.getInstance();
+        await uploadService.initialize();
+        logger.log('💾 [VideoFile] Triggering video upload service...');
+        await uploadService.processPendingUploads();
+      } catch (error) {
+        logger.warn('💾 [VideoFile] Failed to trigger video upload:', error);
+      }
+    }, 1000);
   }
 
   /**
@@ -4796,12 +4819,13 @@ export class StorageService {
       let preparedProfile: UserProfile;
 
       if (existingProfile) {
-        // Update existing profile
+        // Update existing profile - preserve join_date
         preparedProfile = prepareUpsert(
           {
             ...existingProfile,
             ...profileData,
             user_id: user.id,
+            join_date: existingProfile.join_date || new Date().toISOString(), // Preserve original join date
             last_updated_from_wizard: new Date().toISOString(),
           },
           user.id
@@ -4813,6 +4837,7 @@ export class StorageService {
             id: crypto.randomUUID(),
             user_id: user.id,
             ...profileData,
+            join_date: profileData.join_date || new Date().toISOString(), // Use provided or set to today
             last_updated_from_wizard: new Date().toISOString(),
           } as UserProfile,
           user.id

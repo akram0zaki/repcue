@@ -206,11 +206,11 @@ const SYNC_ORDER = [
   'user_favorites',      // Shared exercise references
   'workouts',            // User-created workouts
   'activity_logs',       // Exercise history
-  'workout_sessions',    // Workout tracking
-  'video_files'          // Custom video uploads
+  'workout_sessions'     // Workout tracking
 ];
 
 // Note: exercise_catalogs is NOT synced - built-in reference data only
+// Note: video_files is NOT synced via sync_v2 - handled by VideoUploadService
 ```
 
 ---
@@ -390,9 +390,9 @@ User Upload → IndexedDB (immediate) → VideoUploadService → Supabase Storag
 
 | Component | Location | Responsibility |
 |-----------|----------|----------------|
-| **VideoUploadService** | `src/services/videoUploadService.ts` | Background upload of pending videos to Supabase Storage |
+| **VideoUploadService** | `src/services/videoUploadService.ts` | Background upload of pending videos to Supabase Storage + direct metadata insert |
 | **StorageService** | `src/services/storageService.ts` | Local IndexedDB storage for video files |
-| **sync_v2** | Edge function | Syncs metadata only (storage_path reference), NOT video binaries |
+| **sync_v2** | Edge function | Does NOT handle video_files - all video operations via VideoUploadService |
 
 ### Upload Process
 
@@ -413,14 +413,17 @@ User Upload → IndexedDB (immediate) → VideoUploadService → Supabase Storag
    - Sets `storage_path` to cloud path
    - Clears `file_data` (blob) to save space
    - Updates `custom_video_url` to `blob-video://` scheme
-6. **Metadata Sync**: The `storage_path` string syncs normally via `sync_v2`
+6. **Direct Metadata Insert**: VideoUploadService inserts/upserts `video_files` record directly to Supabase (NOT via sync_v2)
+   - This is required because `video_files` was removed from sync scope
+   - Only metadata (id, storage_path, exercise_id, etc.) is inserted - NOT the blob
 
 #### Phase 3: Cross-Device Access
-1. **Metadata Sync**: Other devices receive video file records with `storage_path`
-2. **Download Trigger**: `downloadVideoFileForOfflineAccess()` called
-3. **Storage Access**: Direct download from Supabase Storage for owned videos
-4. **Local Caching**: Store in IndexedDB for offline access
-5. **URL Resolution**: Create blob URLs for video players
+1. **Metadata Available**: Video file records exist in Supabase `video_files` table (inserted by VideoUploadService)
+2. **Share/View Access**: `get-shared-exercise` edge function queries `video_files` table for `storage_path`
+3. **Signed URL Generation**: Edge function creates signed URL for Supabase Storage access
+4. **Download Trigger**: `downloadVideoFileForOfflineAccess()` called for caching
+5. **Local Caching**: Store in IndexedDB for offline access
+6. **URL Resolution**: Create blob URLs for video players
 
 ### Why Videos Don't Sync via sync_v2
 
@@ -433,7 +436,8 @@ The main sync function (`sync_v2`) has a **2MB payload limit** imposed by Supaba
 - Has no size limit (up to 50MB per video)
 - Supports progress tracking
 - Handles offline queuing with retry
-- Only syncs the `storage_path` reference string via `sync_v2`
+- Inserts metadata directly to Supabase `video_files` table (NOT via sync_v2)
+- The `video_files` table is completely excluded from sync_v2 scope
 
 ### VideoUploadService API
 
@@ -841,10 +845,10 @@ const SYNC_TABLES = [
   'workouts',
   'activity_logs',
   'workout_sessions',
-  'video_files',
   'personal_records'
 ];
 // Note: exercise_catalogs is NOT synced - built-in reference data only
+// Note: video_files is NOT synced - handled by VideoUploadService direct insert
 ```
 
 #### Field Allowlists

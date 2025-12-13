@@ -1,8 +1,11 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: UI strings use t(); remaining literals are icons/units */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storageService } from '../services/storageService';
 import { consentService } from '../services/consentService';
+import { syncService } from '../services/syncService';
+import { PullToRefresh } from '../components/platform';
+import { useAuth } from '../hooks/useAuth';
 import type { Workout, Weekday } from '../types';
 import { Routes } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -12,10 +15,27 @@ import logger from '../utils/logger';
 const WorkoutsPage: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasConsent, setHasConsent] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  // Refresh handler for pull-to-refresh - triggers sync and reloads data
+  const handleRefresh = useCallback(async () => {
+    if (!consentService.hasConsent()) return;
+    try {
+      // Trigger sync if authenticated
+      if (isAuthenticated) {
+        await syncService.sync(true);
+      }
+      // Reload workouts from local storage
+      const allWorkouts = await storageService.getWorkouts();
+      setWorkouts(allWorkouts);
+    } catch (error) {
+      logger.error('Failed to refresh workouts:', error);
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const checkConsentAndLoadWorkouts = async () => {
@@ -189,10 +209,11 @@ const WorkoutsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background-50 dark:bg-background-950 pt-safe pb-20">
-      <div className="container mx-auto px-4 py-4 max-w-md">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-text-900 dark:text-text-50">
+    <PullToRefresh onRefresh={handleRefresh} testId="workouts-pull-to-refresh">
+      <div className="min-h-screen bg-background-50 dark:bg-background-950 pt-safe pb-20">
+        <div className="container mx-auto px-4 py-4 max-w-md">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-text-900 dark:text-text-50">
             {t('workouts.title')}
           </h1>
           <button
@@ -214,15 +235,10 @@ const WorkoutsPage: React.FC = () => {
 
         {workouts.length === 0 ? (
           <div className="text-center py-12">
-            <div className="mx-auto w-16 h-16 bg-surface-200 dark:bg-surface-700 rounded-full flex items-center justify-center mb-6">
-              <svg className="w-8 h-8 text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-text-900 dark:text-text-50 mb-2">
+            <h3 className="text-h3 font-medium heading-text mb-2">
               {t('workouts.emptyTitle')}
             </h3>
-            <p className="text-text-500 dark:text-text-400 mb-6">
+            <p className="text-body text-secondary mb-6">
               {t('workouts.emptyBody')}
             </p>
             <button
@@ -345,8 +361,9 @@ const WorkoutsPage: React.FC = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 };
 

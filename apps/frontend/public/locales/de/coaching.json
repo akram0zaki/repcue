@@ -10,7 +10,10 @@
   "empty": {
     "title": "Noch keine Einblicke",
     "message": "Beginnen Sie mit dem Training, um personalisierte Coaching-Einblicke zu erhalten!",
-    "startWorkout": "Starten Sie Ihr Erstes Training"
+    "startWorkout": "Starten Sie Ihr Erstes Training",
+    "allCaughtUpTitle": "Sie sind auf dem neuesten Stand!",
+    "allCaughtUpMessage": "Gut gemacht! Sie haben alle Ihre Coach-Empfehlungen durchgesehen. Machen Sie weiter so und schauen Sie später nach neuen Einblicken, oder scrollen Sie nach unten, um Ihren Fortschritt anzuzeigen.",
+    "continueWorkout": "Weiter trainieren"
   },
   "error": {
     "title": "Einblicke konnten nicht geladen werden"
@@ -194,5 +197,19 @@
   "viewAll": "Alle ansehen",
   "insightsCarousel": "Karussell mit Coaching-Einblicken",
   "carouselNavigation": "Karussell-Navigation",
-  "goToInsight": "Gehe zu Einblick {{number}}"
+  "goToInsight": "Gehe zu Einblick {{number}}",
+  "insightsLink": {
+    "title": "Wie mache ich mich?",
+    "subtitle": "{{count}} Empfehlungen für dich",
+    "subtitle_one": "{{count}} Empfehlung für dich",
+    "ariaLabel": "{{count}} Coach-Empfehlungen anzeigen"
+  },
+  "insightsModal": {
+    "title": "Deine Empfehlungen",
+    "ariaLabel": "Modal für Coach-Empfehlungen",
+    "summary": "Das schlägt dein Coach basierend auf deiner Trainingsgeschichte vor",
+    "empty": "Momentan keine Empfehlungen. Trainiere weiter, um personalisierte Einblicke zu erhalten!",
+    "aiSection": "KI-gestützte Empfehlungen",
+    "standardSection": "Standard-Empfehlungen"
+  }
 }

@@ -10,7 +10,10 @@
   "empty": {
     "title": "Nog Geen Inzichten",
     "message": "Start met trainen om gepersonaliseerde coachingsinzichten te ontvangen!",
-    "startWorkout": "Start Je Eerste Training"
+    "startWorkout": "Start Je Eerste Training",
+    "allCaughtUpTitle": "Je bent helemaal bij!",
+    "allCaughtUpMessage": "Goed gedaan! Je hebt al je coach-aanbevelingen bekeken. Ga zo door en kom later terug voor nieuwe inzichten, of scroll naar beneden om je voortgang te bekijken.",
+    "continueWorkout": "Doorgaan met trainen"
   },
   "error": {
     "title": "Kan Inzichten Niet Laden"
@@ -194,5 +197,19 @@
   "viewAll": "Bekijk Alles",
   "insightsCarousel": "Carrousel met coachinzichten",
   "carouselNavigation": "Carrouselnavigatie",
-  "goToInsight": "Ga naar inzicht {{number}}"
+  "goToInsight": "Ga naar inzicht {{number}}",
+  "insightsLink": {
+    "title": "Hoe doe ik het?",
+    "subtitle": "{{count}} aanbevelingen voor jou",
+    "subtitle_one": "{{count}} aanbeveling voor jou",
+    "ariaLabel": "Bekijk {{count}} coach-aanbevelingen"
+  },
+  "insightsModal": {
+    "title": "Jouw Aanbevelingen",
+    "ariaLabel": "Modal met coach-aanbevelingen",
+    "summary": "Dit is wat je coach voorstelt op basis van je trainingsgeschiedenis",
+    "empty": "Momenteel geen aanbevelingen. Blijf trainen om persoonlijke inzichten te krijgen!",
+    "aiSection": "AI-aangedreven Aanbevelingen",
+    "standardSection": "Standaard Aanbevelingen"
+  }
 }

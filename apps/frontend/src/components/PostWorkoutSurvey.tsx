@@ -123,10 +123,10 @@ export const PostWorkoutSurvey: React.FC<PostWorkoutSurveyProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl p-6 w-full max-w-md shadow-xl">
+      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-xl max-h-[85vh] overflow-y-auto">
         {/* Header */}
-        <div className="mb-6">
-          <h3 className="text-xl font-bold text-text-900 dark:text-text-50 mb-2">
+        <div className="mb-4">
+          <h3 className="text-lg font-bold text-text-900 dark:text-text-50 mb-1">
             {t('coaching:survey.title', { defaultValue: 'How was your workout?' })}
           </h3>
           <p className="text-body text-sm">
@@ -138,21 +138,21 @@ export const PostWorkoutSurvey: React.FC<PostWorkoutSurveyProps> = ({
 
         {!showDetailed ? (
           /* Quick Response Options */
-          <div className="space-y-3 mb-4">
+          <div className="space-y-2 mb-3">
             {/* Great */}
             <button
               onClick={() => handleQuickResponse('great')}
               disabled={isSubmitting}
-              className="w-full p-4 rounded-xl border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={t('coaching:survey.great', { defaultValue: 'Felt great!' })}
             >
               <div className="flex items-center">
-                <span className="text-3xl mr-3">😊</span>
-                <div className="text-left flex-1">
+                <span className="text-2xl me-2">😊</span>
+                <div className="text-start flex-1">
                   <div className="font-semibold text-green-900 dark:text-green-100">
                     {t('coaching:survey.great', { defaultValue: 'Felt great!' })}
                   </div>
-                  <div className="text-sm text-green-700 dark:text-green-300">
+                  <div className="text-xs text-green-700 dark:text-green-300">
                     {t('coaching:survey.greatDesc', { defaultValue: 'Strong energy, good form' })}
                   </div>
                 </div>
@@ -163,16 +163,16 @@ export const PostWorkoutSurvey: React.FC<PostWorkoutSurveyProps> = ({
             <button
               onClick={() => handleQuickResponse('good')}
               disabled={isSubmitting}
-              className="w-full p-4 rounded-xl border-2 border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={t('coaching:survey.good', { defaultValue: 'Felt good' })}
             >
               <div className="flex items-center">
-                <span className="text-3xl mr-3">🙂</span>
-                <div className="text-left flex-1">
+                <span className="text-2xl me-2">🙂</span>
+                <div className="text-start flex-1">
                   <div className="font-semibold text-primary-900 dark:text-primary-100">
                     {t('coaching:survey.good', { defaultValue: 'Felt good' })}
                   </div>
-                  <div className="text-sm text-primary-700 dark:text-primary-300">
+                  <div className="text-xs text-primary-700 dark:text-primary-300">
                     {t('coaching:survey.goodDesc', { defaultValue: 'Solid workout, no issues' })}
                   </div>
                 </div>
@@ -183,16 +183,16 @@ export const PostWorkoutSurvey: React.FC<PostWorkoutSurveyProps> = ({
             <button
               onClick={() => handleQuickResponse('okay')}
               disabled={isSubmitting}
-              className="w-full p-4 rounded-xl border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={t('coaching:survey.okay', { defaultValue: 'It was okay' })}
             >
               <div className="flex items-center">
-                <span className="text-3xl mr-3">😐</span>
-                <div className="text-left flex-1">
+                <span className="text-2xl me-2">😐</span>
+                <div className="text-start flex-1">
                   <div className="font-semibold text-yellow-900 dark:text-yellow-100">
                     {t('coaching:survey.okay', { defaultValue: 'It was okay' })}
                   </div>
-                  <div className="text-sm text-yellow-700 dark:text-yellow-300">
+                  <div className="text-xs text-yellow-700 dark:text-yellow-300">
                     {t('coaching:survey.okayDesc', { defaultValue: 'Got through it' })}
                   </div>
                 </div>
@@ -203,16 +203,16 @@ export const PostWorkoutSurvey: React.FC<PostWorkoutSurveyProps> = ({
             <button
               onClick={() => handleQuickResponse('tired')}
               disabled={isSubmitting}
-              className="w-full p-4 rounded-xl border-2 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2.5 rounded-xl border-2 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={t('coaching:survey.tired', { defaultValue: 'Felt tired' })}
             >
               <div className="flex items-center">
-                <span className="text-3xl mr-3">😓</span>
-                <div className="text-left flex-1">
+                <span className="text-2xl me-2">😓</span>
+                <div className="text-start flex-1">
                   <div className="font-semibold text-orange-900 dark:text-orange-100">
                     {t('coaching:survey.tired', { defaultValue: 'Felt tired' })}
                   </div>
-                  <div className="text-sm text-orange-700 dark:text-orange-300">
+                  <div className="text-xs text-orange-700 dark:text-orange-300">
                     {t('coaching:survey.tiredDesc', { defaultValue: 'Low energy, challenging' })}
                   </div>
                 </div>

@@ -4,8 +4,8 @@
     "description": "Kies jo favorite kleurskema",
     "applying": "Skema tapasse...",
     "default": {
-      "name": "Oseaan Turkoois",
-      "description": "Klassyk turkoois skema mei balansearre kontrast"
+      "name": "Elektrysk Blau + Mint",
+      "description": "Moderne atletyske estetyk mei libbenich blau en fris mint"
     },
     "energetic": {
       "name": "Enerzjyk Oranje",
@@ -27,5 +27,17 @@
       "name": "Elegant Minimaal",
       "description": "Ferfine monochroom palet"
     }
-  }
+  },
+  "videoStorage": "Fideoopslach",
+  "cachedVideos": "Cached Video's",
+  "videoStorageInfo": "Fideo's wurde lokaal cached foar sneller ôfspylen en offline tagong. Cached fideo's wurde automatysk fuortsmiten nei 90 dagen of as de opslach fol is.",
+  "clearAllVideos": "Alle Video's Wiskje",
+  "clearExpiredVideos": "Ferrûne Video's Wiskje",
+  "newestVideo": "Nijste Video",
+  "oldestVideo": "Aldste Video",
+  "storageUsed": "Brûkte Opslach",
+  "quotaUsage": "Kwotabrûk",
+  "refreshStats": "Statistiken Fernije",
+  "videoCacheCleared": "Fideo cache suksesfolle wiske",
+  "videoCacheConfirmClearAll": "Bin do wis dat do alle cached fideo's wiskje wilst?"
 }

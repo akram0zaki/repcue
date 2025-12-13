@@ -1,0 +1,147 @@
+/* Home Page - Parallax Collapsing Header Effect */
+/* 
+ * Implements the Apple-style sticky header with scale/fade effect.
+ * The hero image shrinks and fades as the user scrolls, while the 
+ * content panel slides up over it with rounded corners.
+ */
+
+/* ================================
+   Parallax container and hero styles (all platforms)
+   ================================ */
+
+.home-parallax-container {
+  /* Normal document flow */
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Safe area padding at top */
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Sticky hero wrapper - stays pinned while scrolling */
+.home-hero-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 280px;
+  overflow: hidden;
+  margin-bottom: -2rem; /* Pull content up slightly */
+  /* GPU acceleration for smooth transforms */
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Modern gradient overlay for hero section - enhanced for luxury contrast */
+.home-hero-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(41, 98, 255, 0) 0%,
+    rgba(41, 98, 255, 0.1) 45%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Dark mode variant for gradient overlay - enhanced opacity */
+.dark .home-hero-wrapper::after {
+  background: linear-gradient(
+    180deg,
+    rgba(76, 123, 255, 0) 0%,
+    rgba(76, 123, 255, 0.08) 45%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
+}
+
+.home-hero-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  /* Scale from center */
+  transform-origin: center center;
+  transition: none; /* Transforms controlled by JS for smoothness */
+  /* Background for gradient */
+  background: linear-gradient(to bottom right, var(--color-primary-600), var(--color-primary-800));
+}
+
+/* Gradient overlay that intensifies as you scroll */
+.home-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.1s ease-out;
+}
+
+/* Content panel that slides over the hero */
+.home-content-panel {
+  position: relative;
+  z-index: 10;
+  background-color: var(--color-background-50, #fafafa);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  /* Pull up to overlap the hero with subtle spacing for depth */
+  margin-top: 1rem;
+  padding-top: 1rem;
+  /* Subtle shadow for depth */
+  box-shadow: 
+    0 -4px 20px rgba(0, 0, 0, 0.08),
+    0 -1px 4px rgba(0, 0, 0, 0.04);
+  min-height: calc(100vh - 280px);
+}
+
+/* Dark mode adjustments */
+.dark .home-content-panel {
+  background-color: var(--color-background-950, #0a0a0a);
+  box-shadow: 
+    0 -4px 20px rgba(0, 0, 0, 0.3),
+    0 -1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Handle/pill indicator at top of content panel (Apple style) */
+.home-content-panel::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+.dark .home-content-panel::before {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Disable parallax for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  
+  .home-hero-container {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  
+  .home-content-panel {
+    margin-top: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .home-content-panel::before {
+    display: none;
+  }
+}

@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax -- i18n-exempt: language names shown in their native forms */
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { changeLanguageWithPreload } from '../i18n';
 import { storageService } from '../services/storageService';
 import { syncService } from '../services/syncService';
 import logger from '../utils/logger';
@@ -28,10 +29,15 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   className = '' 
 }) => {
   const { i18n, t } = useTranslation();
+  const [isChanging, setIsChanging] = useState(false);
 
   const handleLanguageChange = async (languageCode: string) => {
+    if (isChanging) return; // Prevent double-clicks
+    
     try {
-      await i18n.changeLanguage(languageCode);
+      setIsChanging(true);
+      // Use preloading for instant language switch (especially important on iOS)
+      await changeLanguageWithPreload(languageCode);
       // Persist preference for cross-device sync (best-effort)
       try {
         await storageService.updateUserPreferences({ locale: languageCode });
@@ -43,6 +49,8 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       }
     } catch (error) {
       logger.error('Failed to change language:', error);
+    } finally {
+      setIsChanging(false);
     }
   };
 
@@ -54,8 +62,10 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         <select
           value={currentLanguage}
           onChange={(e) => handleLanguageChange(e.target.value)}
-          className="text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isChanging}
+          className={`text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isChanging ? 'opacity-50 cursor-wait' : ''}`}
           aria-label={t('settings.selectLanguage')}
+          aria-busy={isChanging}
         >
           {supportedLanguages.map((lang) => (
             <option key={lang.code} value={lang.code}>
@@ -63,6 +73,9 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
             </option>
           ))}
         </select>
+        {isChanging && (
+          <span className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" aria-hidden="true" />
+        )}
       </div>
     );
   }
@@ -77,19 +90,26 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           {t('settings.language')}
         </label>
       )}
-      <select
-        id="language-selector"
-        value={currentLanguage}
-        onChange={(e) => handleLanguageChange(e.target.value)}
-        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-        aria-describedby="language-help"
-      >
-        {supportedLanguages.map((lang) => (
-          <option key={lang.code} value={lang.code}>
-            {lang.nativeLabel} ({lang.label})
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          id="language-selector"
+          value={currentLanguage}
+          onChange={(e) => handleLanguageChange(e.target.value)}
+          disabled={isChanging}
+          className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${isChanging ? 'opacity-50 cursor-wait' : ''}`}
+          aria-describedby="language-help"
+          aria-busy={isChanging}
+        >
+          {supportedLanguages.map((lang) => (
+            <option key={lang.code} value={lang.code}>
+              {lang.nativeLabel} ({lang.label})
+            </option>
+          ))}
+        </select>
+        {isChanging && (
+          <span className="absolute right-10 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-gray-300 border-t-primary-500 rounded-full animate-spin" aria-hidden="true" />
+        )}
+      </div>
       <p 
         id="language-help"
         className="text-xs text-gray-500 dark:text-gray-400"

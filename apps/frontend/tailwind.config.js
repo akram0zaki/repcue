@@ -133,7 +133,8 @@ export default {
 
       // Add font families for multi-language support
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'sans': ['DM Sans', 'system-ui', 'sans-serif'],
+        'heading': ['Outfit', 'system-ui', 'sans-serif'],
         'sans-ar': ['Cairo', 'Tajawal', 'Noto Sans Arabic', 'sans-serif'],
       },
 

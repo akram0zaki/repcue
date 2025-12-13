@@ -10,7 +10,10 @@
   "empty": {
     "title": "Aún no hay Información",
     "message": "¡Comienza a entrenar para recibir información de coaching personalizada!",
-    "startWorkout": "Empezar Mi Primer Entrenamiento"
+    "startWorkout": "Empezar Mi Primer Entrenamiento",
+    "allCaughtUpTitle": "¡Estás al día!",
+    "allCaughtUpMessage": "¡Buen trabajo! Has revisado todas tus recomendaciones del entrenador. Sigue así y vuelve más tarde para nuevos consejos, o desplázate hacia abajo para ver tu progreso.",
+    "continueWorkout": "Continuar entrenando"
   },
   "error": {
     "title": "No se pudo cargar la información"
@@ -194,5 +197,19 @@
   "viewAll": "Ver Todo",
   "insightsCarousel": "Carrusel de consejos de entrenamiento",
   "carouselNavigation": "Navegación del carrusel",
-  "goToInsight": "Ir al consejo {{number}}"
+  "goToInsight": "Ir al consejo {{number}}",
+  "insightsLink": {
+    "title": "¿Cómo lo estoy haciendo?",
+    "subtitle": "{{count}} recomendaciones para ti",
+    "subtitle_one": "{{count}} recomendación para ti",
+    "ariaLabel": "Ver {{count}} recomendaciones del entrenador"
+  },
+  "insightsModal": {
+    "title": "Tus Recomendaciones",
+    "ariaLabel": "Modal de recomendaciones del entrenador",
+    "summary": "Esto es lo que tu entrenador sugiere basándose en tu historial de entrenamientos",
+    "empty": "Sin recomendaciones por el momento. ¡Sigue entrenando para obtener consejos personalizados!",
+    "aiSection": "Recomendaciones con IA",
+    "standardSection": "Recomendaciones Estándar"
+  }
 }

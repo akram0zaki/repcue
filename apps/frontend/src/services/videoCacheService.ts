@@ -194,11 +194,41 @@ export class VideoCacheService {
           return null;
         }
 
+        // Validate MIME type is a video format
+        const validVideoMimeTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+        const blobMimeType = video.mimeType || video.blob.type;
+        if (!validVideoMimeTypes.some(type => blobMimeType.startsWith(type.split('/')[0]))) {
+          logger.error('[VideoCacheService] Invalid MIME type in cached blob, deleting:', { url, mimeType: blobMimeType, blobType: video.blob.type });
+          await this.deleteFromStore(id);
+          return null;
+        }
+
+        // Additional validation: check blob has reasonable size for video (at least 10KB)
+        if (video.blob.size < 10000) {
+          logger.error('[VideoCacheService] Cached blob too small to be valid video, deleting:', { url, size: video.blob.size });
+          await this.deleteFromStore(id);
+          return null;
+        }
+
         // Create blob URL and cache in memory
         let blobUrl;
         try {
-          blobUrl = URL.createObjectURL(video.blob);
-          logger.log('[VideoCacheService] Created fresh blob URL from IndexedDB:', { url, blobUrl, blobSize: video.blob.size, mimeType: video.mimeType });
+          // CRITICAL: On iOS/WKWebView, blobs from IndexedDB don't work reliably when used directly
+          // with URL.createObjectURL(). The structured clone algorithm may not preserve them correctly.
+          // Solution: ALWAYS extract ArrayBuffer and create a fresh Blob, regardless of stored type.
+          // This ensures the blob is fully materialized in memory before creating the URL.
+          const expectedType = blobMimeType || 'video/mp4';
+          const arrayBuffer = await video.blob.arrayBuffer();
+          const freshBlob = new Blob([arrayBuffer], { type: expectedType });
+          blobUrl = URL.createObjectURL(freshBlob);
+          logger.log('[VideoCacheService] Created blob URL from ArrayBuffer:', { 
+            url: url.substring(url.lastIndexOf('/') + 1), 
+            originalType: video.blob.type, 
+            newType: expectedType, 
+            originalSize: video.blob.size,
+            newSize: freshBlob.size,
+            blobUrl: blobUrl.substring(0, 50)
+          });
         } catch (blobError) {
           logger.error('[VideoCacheService] Failed to create blob URL:', { url, error: blobError });
           return null;

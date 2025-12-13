@@ -1,6 +1,7 @@
 {
   "myProfile": "My Profile",
   "profile": "Profile",
+  "bio": "Bio",
   "editProfile": "Edit Profile",
   "signInRequired": "Sign In Required",
   "signInToViewProfile": "Please sign in to view your profile.",

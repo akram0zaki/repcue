@@ -140,7 +140,7 @@ App.tsx:1469 ⚙️ Final settings to set: {id: 'default-app-settings', interval
         + ✅ Sort options: "Name", "Type", "Recently Added"
         + ✅ Search functionality that works across both types
 
-- 🔄 Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile:
+- ✅ Introduce a Profile page accessible via the Profile button on the Settings page. The Profile page should display details such as the user's name (how they like to be called), email address, number of connections/friends (if clicked it would list the connections), from the connections listing clicking/tapping one of the connections would display the connection's profile:
   1. ProfileService StorageService Integration ✅
     - Replaced non-existent getTable() and saveToTable() methods with mock
   implementation
@@ -290,6 +290,20 @@ Ask me questions if the requirement is not clear, and once you have all the answ
 
 // Type for database records during migration - supports both user_id and owner_id
 type DatabaseUserFavorite = {}
+
+# 2025-12-07
+
+- ✅ Fix the video caching in the ios app.
+- Unify sign-in/up into one form and one action.
+- Identify all wildcards in legal documents and create a script to populate them correctly.
+- Create RepCue logo
+- Create all the content (app screenshots, app description)
+- ✅ Persist state of exercise catalog page:
+if I browse the exercise catalog anywhere and click on an exercise to view its details, when I click back I am always taken to the top of the exercises catalog page.
+I would like the state of the exercises page to per persisted so back would take me to exactly the viewport I was on.
+- ✅ Add full-screen mode to the Timer with Fit/Fill overlay instead of buttons. Consider renaming Fill/Fit to Zoom In/Out.
+- Add speed control (slider) below the timer on the Timer page, and sync the user-selected speed per exercise to the user profile/preferences on supabase.
+- Add push notification to users during their preferred time of day to exercise.
 
 
 ---

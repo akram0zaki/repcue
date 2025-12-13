@@ -4,8 +4,8 @@
     "description": "Kies je favoriete kleurthema",
     "applying": "Thema toepassen...",
     "default": {
-      "name": "Oceaan Turquoise",
-      "description": "Klassiek turquoise thema met gebalanceerd contrast"
+      "name": "Elektrisch Blauw + Mint",
+      "description": "Moderne atletische esthetiek met levendig blauw en fris mint"
     },
     "energetic": {
       "name": "Energiek Oranje",
@@ -27,5 +27,17 @@
       "name": "Elegant Minimaal",
       "description": "Verfijnde monochrome palet"
     }
-  }
+  },
+  "videoStorage": "Videopslagmedia",
+  "cachedVideos": "Gecachte Video's",
+  "videoStorageInfo": "Video's worden lokaal in het cachegeheugen opgeslagen voor sneller afspelen en offline toegang. Gecachte video's worden na 90 dagen automatisch verwijderd of wanneer de opslag vol is.",
+  "clearAllVideos": "Alle Video's Wissen",
+  "clearExpiredVideos": "Verlopen Video's Wissen",
+  "newestVideo": "Nieuwste Video",
+  "oldestVideo": "Oudste Video",
+  "storageUsed": "Gebruikte Opslag",
+  "quotaUsage": "Quotumgebruik",
+  "refreshStats": "Statistieken Vernieuwen",
+  "videoCacheCleared": "Videocache succesvol gewist",
+  "videoCacheConfirmClearAll": "Weet je zeker dat je alle gecachte video's wilt verwijderen?"
 }

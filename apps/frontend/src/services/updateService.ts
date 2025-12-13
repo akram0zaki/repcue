@@ -18,6 +18,7 @@ import i18n from '../i18n';
 // APP_VERSION removed - using server-based versioning
 import { swEventEmitter, updateServiceWorkerCoordinated } from '../utils/serviceWorker';
 import { updateErrorHandler } from '../utils/updateErrorHandler';
+import { isNativePlatform } from '../utils/nativeCapabilities';
 import logger from '../utils/logger';
 
 const UPDATE_PREFERENCES_KEY = 'repcue_update_preferences';
@@ -239,8 +240,17 @@ export class UpdateService {
 
   /**
    * Initialize service worker for PWA updates with enhanced coordination
+   * Note: Service worker updates are disabled for native Capacitor apps
+   * as they use App Store updates instead
    */
   private async initializeServiceWorker(): Promise<void> {
+    // Skip service worker initialization for native Capacitor apps
+    // Native apps handle updates through App Store, not service workers
+    if (isNativePlatform()) {
+      logger.log('Service Worker: Skipped for native Capacitor app (uses App Store updates)');
+      return;
+    }
+
     if (!('serviceWorker' in navigator)) {
       logger.warn('Service Worker not supported');
       return;
@@ -436,8 +446,15 @@ export class UpdateService {
 
   /**
    * Check for updates from the edge function with comprehensive error handling and retry logic
+   * Note: Update checks are disabled for native Capacitor apps as they use App Store updates
    */
   public async checkForUpdates(opts?: { force?: boolean }): Promise<UpdateInfo | null> {
+    // Skip update checks for native Capacitor apps - they use App Store for updates
+    if (isNativePlatform()) {
+      logger.log('Update check: Skipped for native Capacitor app (uses App Store updates)');
+      return null;
+    }
+
     // Single-flight guard: if a check is executing, return the existing promise.
     if (this.isChecking && this.inFlightCheck) {
       // logger.debug('Returning in-flight update check promise');

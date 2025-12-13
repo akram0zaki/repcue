@@ -4,8 +4,8 @@
     "description": "Elige tu tema de color preferido",
     "applying": "Aplicando tema...",
     "default": {
-      "name": "Turquesa Océano",
-      "description": "Tema turquesa clásico con contraste equilibrado"
+      "name": "Azul Eléctrico + Menta",
+      "description": "Estética atlética moderna con azul vibrante y menta fresca"
     },
     "energetic": {
       "name": "Naranja Energético",
@@ -27,5 +27,17 @@
       "name": "Elegante Minimalista",
       "description": "Paleta monocromática sofisticada"
     }
-  }
+  },
+  "videoStorage": "Almacenamiento de Video",
+  "cachedVideos": "Videos en Caché",
+  "videoStorageInfo": "Los videos se almacenan en caché localmente para reproducción más rápida y acceso sin conexión. Los videos en caché se eliminarán automáticamente después de 90 días o cuando el almacenamiento esté lleno.",
+  "clearAllVideos": "Borrar Todos los Videos",
+  "clearExpiredVideos": "Borrar Videos Caducados",
+  "newestVideo": "Video Más Reciente",
+  "oldestVideo": "Video Más Antiguo",
+  "storageUsed": "Almacenamiento Utilizado",
+  "quotaUsage": "Uso de Cuota",
+  "refreshStats": "Actualizar Estadísticas",
+  "videoCacheCleared": "Caché de video borrado exitosamente",
+  "videoCacheConfirmClearAll": "¿Estás seguro de que quieres borrar todos los videos en caché?"
 }

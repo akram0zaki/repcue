@@ -1,6 +1,912 @@
 ## Unreleased
 
+### 2025-12-10
+
+#### ✨ Enhancement - UI Modernization Phase 2: Typography, Colors & Polish
+
+**Typography System Overhaul**:
+- Implemented new font families: **Outfit** (headings) + **DM Sans** (body)
+- Updated Google Fonts preload in index.html for new font pairing
+- Revised heading sizes: H1 now 26px (mobile), H2 26px, H3 20px
+- Lighter heading colors in light mode (#6b7280) for sophisticated aesthetic
+- Dark mode headers use very light grey (#f3f4f6) for contrast
+- Updated Tailwind config with new font family definitions
+
+**Theme System Update - Electric Blue + Mint**:
+- Updated default theme from "Classic Teal" to "Electric Blue + Mint"
+- New preview colors: `['#2962FF', '#00E5A8', '#4C7BFF']`
+- Light mode primary: #2962FF (Electric Blue)
+- Dark mode primary: #4C7BFF (softer blue for dark backgrounds)
+- Updated theme selector names in all 8 locales (en, de, es, fr, nl, fy, ar, ar-EG)
+
+**Button Hover Fixes (CSS Specificity)**:
+- Fixed exercise card "Start" button hover text becoming unreadable
+- Fixed upcoming workout card button hover states
+- Used high-specificity selectors (`.btn-primary.btn-primary`) to override base styles
+- Explicitly reset `box-shadow: none` and `transform: none` on hover
+
+**Dark Mode Text Contrast**:
+- Fixed unreadable text on upcoming workout card in dark mode
+- Date subtitle, exercise count, and duration now use explicit light tokens
+- Changed from `var(--color-text-primary)` to `var(--color-text-50/200)` for proper contrast
+
+**RTL Layout Fix**:
+- Theme selector checkmark icon now uses CSS logical property `end-2` for RTL support
+- Text alignment uses `text-start` instead of `text-left`
+
+**AI Coach Text Sanitization**:
+- Created `sanitizeText.ts` utility for HTML entity decoding
+- Updated CoachingCard and InsightsModal to decode entities (e.g., `&rsquo;` → `'`)
+- Uses OWASP-recommended textarea method for safe XSS-free decoding
+
+**AI Workout Button Redesign**:
+- Pill-shaped button with two-column layout (icon section + text section)
+- Vertical separator between icon and text
+- RTL-aware text alignment
+- Unified shadow system with Coach Insights carousel
+
+**HomePage Refinements**:
+- Hero section: Enhanced gradient overlay for better text readability
+- Section titles: Consistent light grey color (#6b7280) with dark mode variant
+- Favorite exercises: Two-row card layout with star icon in title row
+- Popular exercises: Section title now has consistent padding
+
+**Files Changed**:
+- [index.html](apps/frontend/index.html) - Updated Google Fonts (Inter → Outfit + DM Sans)
+- [index.css](apps/frontend/src/index.css) - Typography classes, button specificity, dark mode tokens
+- [tailwind.config.js](apps/frontend/tailwind.config.js) - Font family definitions
+- [themes.ts](apps/frontend/src/data/themes.ts) - Electric Blue + Mint color palette
+- [homeParallax.css](apps/frontend/src/styles/homeParallax.css) - Enhanced gradient overlays
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Layout refinements, card structure
+- [CoachingCard.tsx](apps/frontend/src/components/CoachingCard.tsx) - HTML entity sanitization
+- [InsightsModal.tsx](apps/frontend/src/components/InsightsModal.tsx) - HTML entity sanitization
+- [sanitizeText.ts](apps/frontend/src/utils/sanitizeText.ts) - New utility (created)
+- [sanitizeText.test.ts](apps/frontend/src/utils/__tests__/sanitizeText.test.ts) - Unit tests (created)
+- [modernise-ui-implementation-plan.md](docs/implementation-plans/ui-modernization/modernise-ui-implementation-plan.md) - Progress tracking
+
+**Build Status**: ✅ TypeScript: 0 errors | CSS: All assets compiled | Tests: Passing
+
+---
+
+### 2025-12-10 (Previous Entry)
+
+#### ✨ Enhancement - HomePage UI Refinements & Design System Unification
+
+**Implemented**: 
+- Unified dark mode text color hierarchy across HomePage
+- Coach Insights carousel styling aligned with Upcoming Workout card
+- AI Workout button narrower width with centered layout
+- Unified button shadow system (Coach Insights and AI Workout button)
+
+**Visual Improvements**:
+- **Upcoming Workout Card Dark Mode**: Fixed dim text colors
+  - Date text (day-sub): Now uses `var(--color-text-primary)` for proper visibility
+  - Exercise count & duration stats: Upgraded to `var(--color-text-primary)` 
+  - Card content readable in both light and dark modes
+  
+- **Coach Insights Carousel Redesign**: Matches Upcoming Workout card style
+  - Replaced gradient background with radial gradient: `color-mix(in srgb, var(--color-primary) 10%, var(--color-surface-primary))`
+  - Updated box-shadow: Light mode `0 10px 20px rgba(15, 23, 42, 0.08)` with hover `0 12px 24px rgba(15, 23, 42, 0.12)`
+  - Dark mode shadows: `0 12px 32px rgba(0, 0, 0, 0.55)` with hover `0 16px 40px rgba(0, 0, 0, 0.6)`
+  - Updated border from 4px left accent to full 1px border with semi-transparent color-mix
+  - Border-radius: `0.75rem` → `1rem` for consistency
+  
+- **AI Workout Button**: 
+  - Width constrained with `max-w-sm` (max 384px)
+  - Centered on page with `flex justify-center px-4`
+  - Added white space on both sides (responsive padding)
+  - Shadow unified with Coach Insights carousel (not primary button)
+  - Dark mode: `0 12px 32px rgba(0, 0, 0, 0.55)`
+
+- **AI Insight Card CSS**: Updated to match Coach Insights styling
+  - Radial gradient with primary color tint (10% light, 12% dark)
+  - Unified shadow system with Insights carousel
+  - Removed left-border accent, added full border
+
+- **Button Shadow Tokens**: 
+  - Primary buttons: `0 6px 16px rgba(0, 0, 0, 0.14)`
+  - Outline/Secondary buttons (.btn-outline, .btn-start-now): `0 3px 8px rgba(0, 0, 0, 0.10)`
+  - Coach Insights & AI Workout: `0 10px 20px rgba(15, 23, 42, 0.08)` (lighter, softer)
+
+**Design System Updates**:
+- Unified shadow system across all card and button types
+- Dark mode text hierarchy properly implemented with rgba-based tokens
+- All surfaces now use consistent radial gradient approach (primary color tint)
+- Consistent border styling: Semi-transparent color-mix for subtle accents
+
+**Files Changed**:
+- [index.css](apps/frontend/src/index.css) - Updated upcoming card dark mode text colors, AI insight card styling, button shadows, AI workout button shadow class
+- [tokens.css](apps/frontend/src/styles/tokens.css) - Updated insights-card styling to match upcoming workout card, added dark mode variants
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Updated AI Workout Button section layout (flex justify-center with px-4)
+- [AIWorkoutButton.tsx](apps/frontend/src/components/AIWorkoutButton.tsx) - Removed w-full, added ai-workout-btn and max-w-sm classes
+
+**Build Status**: ✅ TypeScript: 0 errors | CSS: All assets compiled | Tests: Passing
+
+---
+
+### 2025-12-10 (Previous)
+
+#### ✨ Enhancement - HomePage Modern UI Redesign
+
+**Implemented**: Complete HomePage modernization following electric blue + mint design system.
+
+**Visual Improvements**:
+- **Hero Section**: Added gradient overlay via CSS pseudo-element (electric blue to black)
+  - Enhanced typography using `.text-h1` for hero title (larger, more impactful)
+  - Smooth gradient overlay with dark mode variant
+- **Header Section**: Applied semantic typography classes
+  - App name: `.text-h2` (from `text-2xl font-bold`)
+  - Tagline: `.text-small` (from `text-sm`)
+  - Consistent with design system
+- **Upcoming Workout Card**: Modern soft blue surface styling
+  - Gradient background using primary and secondary colors
+  - Subtle borders and shadows with hover elevation
+  - Dark mode variant with proper color adjustments
+- **Exercise Cards**: Reduced visual weight on action buttons
+  - "Start" buttons now use outline/ghost style instead of filled
+  - Pill-shaped with reduced height (40px) and padding
+  - Smaller text size for secondary emphasis
+  - Hover states with subtle background tint
+- **Section Headers**: Modernized with semantic styling
+  - New `.section-title` class applied to "Popular Exercises" and "Favorites"
+  - Consistent typography and color using token system
+- **Footer Styling**: Modern minimal approach
+  - New `.footer-legal-link` and `.footer-legal-text` classes
+  - Muted colors with proper hover and focus states
+  - Smaller text size for secondary information
+- **Language Selector**: Lightweight and modern
+  - New `.language-select` and `.language-selector-container` classes
+  - Softer borders and better visual hierarchy
+  - Proper focus ring styling for accessibility
+
+**Technical Details**:
+- All changes follow the token system (var(--color-*) colors only)
+- Maintains dark mode support throughout
+- Accessibility preserved with proper focus rings and semantic HTML
+- Minimal JSX changes - primarily CSS-focused implementation
+
+**Files Changed**:
+- [homeParallax.css](apps/frontend/src/styles/homeParallax.css) - Added hero gradient overlay via `::after` pseudo-element
+- [index.css](apps/frontend/src/index.css) - Added modern styling for exercise cards, upcoming workout card, section titles, language selector, and footer
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Updated typography semantic classes and section title styling
+
+**Build Status**: ✅ TypeScript: 0 errors | CSS: All assets compiled | Tests: Passing
+
+---
+
+### 2025-12-09
+
+#### 🐛 Fix - iOS Capacitor Video Playback
+
+**Fixed**: Videos now play correctly on iOS Capacitor app (were showing description fallback instead of videos).
+
+**Root Causes Identified and Fixed**:
+
+1. **Blob URL Revocation Issue**: The `useExerciseVideo` hook was revoking blob URLs on cleanup, but these URLs were managed by `VideoCacheService`'s memory cache. When components unmounted and remounted, the cached blob URLs were already revoked, causing `MEDIA_ERR_SRC_NOT_SUPPORTED` errors.
+
+2. **iOS WKWebView Blob Creation**: IndexedDB blobs weren't being materialized correctly when creating blob URLs. Direct `new Blob([storedBlob], ...)` wrapping doesn't work reliably on iOS. Fixed by extracting ArrayBuffer first: `await blob.arrayBuffer()` → `new Blob([arrayBuffer], ...)`.
+
+3. **DevTools IndexedDB Version Mismatch**: DevTools diagnostics were opening IndexedDB with version 2 while `VideoCacheService` uses version 1, causing `onupgradeneeded` to fire instead of `onsuccess`.
+
+**Technical Changes**:
+- Removed blob URL cleanup effect from `useExerciseVideo` hook - VideoCacheService now solely manages blob URL lifecycle
+- Updated `VideoCacheService.getVideo()` to always use ArrayBuffer extraction method for iOS compatibility
+- Fixed DevTools IndexedDB inspection to use correct database version (1)
+- Added comprehensive blob validation diagnostics to DevTools (MP4 signature check, playability test)
+
+**Files Changed**:
+- [useExerciseVideo.ts](apps/frontend/src/hooks/useExerciseVideo.ts) - Removed blob URL cleanup effect
+- [videoCacheService.ts](apps/frontend/src/services/videoCacheService.ts) - ArrayBuffer extraction for blob URL creation
+- [DevToolsPage.tsx](apps/frontend/src/pages/DevToolsPage.tsx) - Fixed IndexedDB version, added blob inspection diagnostics
+- [video-system.md](docs/video-system.md) - Updated documentation with attention points and troubleshooting
+
+---
+
+### 2025-12-08
+
+#### ✨ Enhancement - Unified Timer Progress Bar Display
+
+**Added**: Progress bar for time-based exercises, matching the visual style of rep-based exercises.
+
+**Features**:
+- Time-based exercises now show a progress bar above the video (same as rep-based exercises)
+- Format: `Time 00:11/00:30 | Active` or `Time 00:11/00:30 | Rest 00:05`
+- In workout mode, also shows: `Exercise 2/5` for progress tracking
+- Fullscreen mode also displays the unified progress bar for both exercise types
+
+**UX Consistency**:
+- Both rep-based and time-based exercises now have the same visual layout
+- Progress information is always visible above the video/timer ring
+- Reduces cognitive load by using consistent UI patterns
+
+**Files Changed**:
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Extended progress bar rendering for time-based exercises
+- All 8 locale files (common.json) - Added `time` translation key (en: "Time", fr: "Temps", de: "Zeit", es: "Tiempo", nl: "Tijd", ar: "الوقت", ar-EG: "الوقت", fy: "Tiid")
+
+---
+
+#### ✨ Enhancement - Timer Pause/Resume Functionality
+
+**Added**: Pause and Resume buttons on the Timer page for better workout control.
+
+**Features**:
+- **Pause button**: Freezes the timer, video, and all progress indicators exactly where they are
+- **Resume button**: Continues the workout from the exact moment it was paused
+- Works during both exercise periods and rest periods (between sets)
+- Video playback pauses and resumes without resetting to the beginning
+- Progress rings and countdown timers maintain their state while paused
+
+**Button Layout**:
+- Start button: Shown when timer is not running and not paused
+- Stop button: Shown when timer is running (stops and logs activity)
+- Pause button: Shown when timer is running and not paused
+- Resume button: Shown when timer is paused
+- Reset button: Always available
+
+**Technical Details**:
+- Added `isPaused` boolean to TimerState interface
+- Separate handling for exercise timer resume vs rest period resume
+- Proper interval management to prevent memory leaks
+- Handles both `timerState.isResting` (between-sets rest) and `workoutMode.isResting` (between-exercises rest)
+
+**Files Changed**:
+- [types/index.ts](apps/frontend/src/types/index.ts) - Added `isPaused` to TimerState interface
+- [App.tsx](apps/frontend/src/App.tsx) - Added `pauseTimer` and `resumeTimer` functions, updated completion handling
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Added Pause/Resume button UI and props
+- [useExerciseVideo.ts](apps/frontend/src/hooks/useExerciseVideo.ts) - Video respects paused state for reset behavior
+- All 8 locale files (common.json) - Added `pause` and `resume` translations
+
+---
+
+### 2025-12-07
+
+#### ✨ Enhancement - Timer Page Video Fullscreen Mode
+
+**Added**: Fullscreen button on Timer page exercise video for immersive workout viewing.
+
+**Features**: 
+- Fullscreen toggle button appears when a video is available on the timer display
+- Clean fullscreen layout with:
+  - **Top bar**: Progress stats (Rep X/Y | Active/Rest | Set X/Y) - centered
+  - **Center**: Full video without progress rings for immersive viewing
+  - **Video overlay**: Fit/Fill toggle and Exit fullscreen button in top-right corner (matching ExerciseDetailPage style)
+- No action buttons in fullscreen mode - exit fullscreen to access controls
+- Escape key or exit button closes fullscreen mode
+- Accessible with proper ARIA labels and keyboard support
+
+**Files Changed**:
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Added fullscreen state, handler, icons, and dedicated fullscreen UI layout
+- All 8 locale files (common.json) - Added `enterFullscreen` and `exitFullscreen` translations
+
+---
+
+#### 🐛 Fix - Search Input Icon Overlap
+
+**Fixed**: Magnifying glass icon overlapping with placeholder/input text in search fields.
+
+**Problem**: In the ExerciseSelector component (used on Timer page), the search icon was overlapping with the placeholder text and user input.
+
+**Solution**: 
+- Matched ExerciseSelector search styling to ExercisePage search styling
+- Increased input left padding from `ps-10` to `ps-14 sm:ps-16`
+- Used smaller responsive icon sizes `h-4 w-4 sm:h-5 sm:w-5`
+- Applied RTL-aware properties (`ps-`, `pe-`, `start-`, `end-`) for proper RTL language support
+
+**Files Changed**:
+- [ExerciseSelector.tsx](apps/frontend/src/components/ExerciseSelector/ExerciseSelector.tsx) - Fixed search input padding and icon positioning
+
+---
+
+#### ✨ Enhancement - Timer Page Exercise Selection Help Text
+
+**Added**: Help text "Select an exercise to start training:" appears on Timer page when no exercise is selected.
+
+**Problem**: Users landing on the Timer page without an exercise selected had no guidance on what to do next.
+
+**Solution**: 
+- Added conditional help text above the exercise selection control
+- Text only appears when no exercise is selected
+- Translated to all 8 supported locales
+
+**Files Changed**:
+- [TimerPage.tsx](apps/frontend/src/pages/TimerPage.tsx) - Added conditional help text
+- All 8 locale files (common.json) - Added `timer.selectExerciseHint` translations
+
+---
+
+#### 🐛 Fix - Post-Workout Survey Modal Vertical Overflow
+
+**Fixed**: Post-workout feedback survey modal was truncated on smaller screens with no scrolling.
+
+**Problem**: The modal requesting user feedback after completing an exercise was cut off at top and bottom on phones with smaller screens, with no way to scroll.
+
+**Solution**: 
+- Added `max-h-[85vh] overflow-y-auto` for scrolling on small screens
+- Reduced padding, margins, and spacing throughout the modal
+- Reduced button padding from `p-4` to `px-3 py-2.5`
+- Reduced emoji size from `text-3xl` to `text-2xl`
+- Reduced description text from `text-sm` to `text-xs`
+- Applied RTL-aware margins (`me-2`, `text-start`)
+
+**Files Changed**:
+- [PostWorkoutSurvey.tsx](apps/frontend/src/components/PostWorkoutSurvey.tsx) - Optimized modal layout for mobile
+
+---
+
+#### ✨ Enhancement - Exercise Active/Inactive Status
+
+**Added**: New `is_active` property for `GlobalExercise` to control exercise visibility in listings.
+
+**Problem**: Some exercises may need to be temporarily hidden from users without deleting them from the codebase (e.g., exercises with broken videos, exercises under review, seasonal content).
+
+**Solution**: 
+- Added `is_active?: boolean` property to `GlobalExercise` type interface (defaults to `true`)
+- Modified `createGlobalExercise` helper to set `is_active: true` by default, with option to override
+- Added filtering in `useExerciseFilter` hook to exclude exercises where `is_active === false`
+- Updated exercise count display in filter results to exclude inactive exercises from total
+
+**Usage**: To hide an exercise, add `is_active: false` to its definition in `globalExercises.ts`
+
+**Files Changed**:
+- [types/index.ts](apps/frontend/src/types/index.ts) - Added `is_active` property to GlobalExercise interface
+- [globalExercises.ts](apps/frontend/src/data/globalExercises.ts) - Updated helper to support `is_active` override
+- [useExerciseFilter.ts](apps/frontend/src/hooks/useExerciseFilter.ts) - Added inactive exercise filtering
+- [ExercisePage.tsx](apps/frontend/src/pages/ExercisePage.tsx) - Updated count display to exclude inactive exercises
+
+---
+
+#### ✨ Enhancement - Smart Catalog Assignment for Single-Catalog Users
+
+**Added**: When a user has access to only one catalog, the "Catalog Assignment" section is automatically hidden on the Create/Edit Exercise page, and the single catalog is auto-selected in the background.
+
+**Problem**: For users with access to only one catalog (e.g., General Fitness for non-premium users), displaying a catalog selection UI with a single pre-selected option was unnecessary and added visual clutter.
+
+**Solution**: 
+- `CatalogMultiSelector` now reports available catalog count via `onCatalogCountChange` callback
+- Auto-selects the single catalog when only one is available
+- `ExerciseForm` conditionally hides the entire catalog assignment section when `availableCatalogCount <= 1`
+- Catalog membership record is still created correctly behind the scenes
+
+**Files Changed**:
+- [CatalogMultiSelector.tsx](apps/frontend/src/components/CatalogMultiSelector.tsx) - Added `onCatalogCountChange` callback and auto-selection logic
+- [ExerciseForm.tsx](apps/frontend/src/components/ExerciseForm.tsx) - Added catalog count tracking and conditional rendering
+
+---
+
+#### ✨ Enhancement - Exercise Catalog Scroll Position Persistence
+
+**Added**: Both vertical and horizontal scroll positions are now preserved when navigating to exercise details and back.
+
+**Problem**: When browsing the exercise catalog and clicking on an exercise to view details, pressing back would always return to the top of the catalog page, losing both vertical scroll position and any horizontal scrolling within category rows.
+
+**Solution**: 
+- Save vertical scroll position to `sessionStorage` before navigating to exercise details
+- Save horizontal scroll positions for each category row that has been scrolled
+- Restore both vertical and horizontal positions when returning via back navigation
+- Positions are cleared after restoration to prevent stale state
+
+**Files Changed**:
+- [ExercisePage.tsx](apps/frontend/src/pages/ExercisePage.tsx) - Added scroll position save/restore logic for both axes
+
+---
+
+#### ✨ Enhancement - Parallax Collapsing Header Effect
+
+**Added**: Apple-style parallax collapsing header effect to Home Page and fixed visual glitch on Exercise Detail Page.
+
+**Home Page**:
+- Hero banner now uses sticky positioning with scale/fade effect on scroll
+- As user scrolls down, the hero image shrinks (1.0 → 0.85) and fades (1.0 → 0.5)
+- Content panel with rounded top corners slides up over the hero
+- Dark overlay fades in over the hero as you scroll
+- Small pill/handle indicator at top of content panel (Apple design pattern)
+- Effect works on all platforms (iOS, Android, web browsers)
+- Respects `prefers-reduced-motion` accessibility preference
+
+**Exercise Detail Page**:
+- Fixed visual glitch where a white sheet appeared between the video and content panel during scroll
+- Changed container background from gradient to solid black so only the rounded-corner content panel is visible over the video
+
+**Files Changed**:
+- [HomePage.tsx](apps/frontend/src/pages/HomePage.tsx) - Added scroll state tracking and parallax hero rendering
+- [homeParallax.css](apps/frontend/src/styles/homeParallax.css) - New CSS file for home page parallax styles
+- [exerciseDetailParallax.css](apps/frontend/src/styles/exerciseDetailParallax.css) - Fixed iOS container background
+
+---
+
+#### 🐛 Bug Fix Attempt - iOS Video Re-render Issue (Attempt #4)
+
+**Issue**: Videos on iOS play for ~1 second, pause for ~4 seconds, then restart from the beginning
+
+**Investigation**: Traced the issue to React state changes triggering `useEffect` re-runs that remove and re-add video event listeners during playback.
+
+**Changes Applied**:
+1. Added `isPlayingRef` ref to track play state without causing effect re-runs
+2. Removed `isPlaying` from the video loading effect dependency array
+3. Updated event handlers (`handleLoadedData`, `handleCanPlay`) to use `isPlayingRef.current` instead of stale closure
+
+**Hypothesis**: When `setIsPlaying(true)` was called after `video.play()` resolved, the effect would re-run and tear down/recreate event listeners, interrupting iOS WKWebView video playback.
+
+**Result**: ❌ **Issue persists** - The iOS video restart behavior continues despite these changes. Root cause may be deeper in iOS WKWebView's handling of blob URLs or video element lifecycle.
+
+**Known Issue**: iOS native app video playback has a known issue where videos restart after ~1 second. This appears to be related to iOS WKWebView's handling of blob URLs from IndexedDB. Web/PWA version works correctly.
+
+**Workaround Attempts Made**:
+1. Disabled IndexedDB caching on native iOS (direct CDN URLs)
+2. Removed `key={videoUrl}` to prevent React element recreation
+3. Changed `preload` attribute to `"metadata"` for blob URLs
+4. Removed `isPlaying` from effect dependencies to prevent listener teardown
+
+**Next Steps**: Further investigation needed into iOS WKWebView video element behavior, possibly requiring native iOS video player implementation or alternative caching strategy.
+
+---
+
+#### 🐛 Bug Fix - iOS Video Playback (Attempt #3) - Disable Blob Caching on Native
+
+**Issue**: Videos on iOS show `MEDIA_ERR_SRC_NOT_SUPPORTED` (error code 4) when using blob URLs from IndexedDB cache
+
+**Root Cause**: iOS WKWebView has compatibility issues with blob URLs created from IndexedDB stored video data. The blob URLs are valid and work on web browsers but fail on native iOS.
+
+**Solution**: Skip IndexedDB blob caching entirely on native iOS/Android apps. Native apps will use direct CDN URLs (`https://repcue.me/media/*`) which iOS can cache using its built-in HTTP caching mechanism.
+
+**Changes**:
+- `resolveVideoUrl.ts`: Added early return for native platforms to bypass `VideoCacheService` and use direct URLs
+- Web browsers continue to use IndexedDB caching for instant playback
+
+**Note**: Previous changes (removed `key={videoUrl}`, dynamic `preload` attribute) are still in place and may help with other video playback issues.
+
+---
+
+#### 🐛 Bug Fix - iOS Video Playback Restart Issue (Attempt #2)
+
+**Issue**: Videos on iOS play for ~1 second, pause for ~4 seconds, then restart from the beginning
+
+**Changes Applied**:
+1. Removed `key={videoUrl}` from VideoThumbnail - was causing React to destroy and recreate video element when URL changed
+2. Changed `preload` attribute to `"metadata"` for cached blob URLs - allows iOS to preload video data before play is clicked
+
+**Hypothesis**: iOS WKWebView has issues with blob URLs when `preload="none"` - the video starts playing before it's fully ready, causing a restart when the full data loads
+
+---
+
+
+**Added**: Copy button on DevTools page to copy video cache statistics to clipboard
+
+**Purpose**: Makes it easier to share cache diagnostic information when troubleshooting video playback issues
+
+**Changes**:
+- `DevToolsPage.tsx`: Added "📋 Copy Stats" button next to "Get Cache Stats"
+- Includes fallback for iOS/Safari clipboard API restrictions
+
+---
+
+#### ⏪ Reverted - Non-blocking Video Caching Approach
+
+**Reverted**: Background caching approach that was causing `MEDIA_ERR_SRC_NOT_SUPPORTED` errors on iOS
+
+**Issue**: The non-blocking approach (returning direct URL while caching in background) caused corrupted blob URLs that iOS Safari couldn't play. Error logs showed `MEDIA_ERR_SRC_NOT_SUPPORTED` for multiple videos.
+
+**Root Cause Investigation Ongoing**: The iOS video playback issue (plays 1 sec, pauses 4 sec, restarts) remains unresolved. The cached blob URLs appear to have corrupted or incomplete data despite showing 20 videos cached (16.91 MB).
+
+**Restored Behavior**: `resolveVideoUrl` now awaits `fetchAndCache()` to ensure complete video data before returning blob URLs
+
+---
+
+#### 🐛 Bug Fix - Category Navigation Arrow Visibility
+
+**Fixed**: Right navigation arrow for scrolling exercise categories was not visible
+
+**Root Cause**: Navigation buttons had `z-10` while ExerciseCard had content at `z-10`, causing overlap issues when inline video playback was enabled
+
+**Changes**:
+- `ExercisePage.tsx`: Increased navigation button z-index from `z-10` to `z-20`
+
+---
+
+#### 🎬 Enhancement - Inline Video Playback on Exercise Cards
+
+**Added**: Click on video thumbnail to play video inline without navigating to exercise details
+
+**Behavior**:
+- Clicking anywhere on the exercise card still opens exercise details (unchanged)
+- Clicking specifically on the video thumbnail now plays/pauses the video inline
+- All other interactive elements (buttons, icons) continue to work as expected
+
+**Changes**:
+- `ExercisePage.tsx`: Added `pointer-events-auto` to VideoThumbnail wrapper
+- Video click events properly stop propagation to prevent card navigation
+
+**UX Improvement**: Users can quickly preview exercise videos without leaving the exercises list
+
+---
+
+#### 🐛 Bug Fix - Video Caching Integration Restored
+
+**Fixed**: Video caching was completely disabled due to `resolveVideoUrl` bypassing the `VideoCacheService`
+
+**Issue**: The DevTools page showed 0 cached videos despite `VIDEO_CACHING_ENABLED=true`. Videos were loading directly from CDN every time instead of being cached in IndexedDB.
+
+**Root Cause**: The `resolveVideoUrl` function was modified to return HTTP/relative URLs directly without going through `VideoCacheService.fetchAndCache()`. A comment even said "Video caching now relies on standard HTTP Cache-Control headers" which disabled the multi-tier caching system.
+
+**Changes**:
+- `resolveVideoUrl.ts`: Re-integrated `VideoCacheService` for HTTP and relative URLs
+  - Calls `fetchAndCache()` which provides: Memory → IndexedDB → Network caching
+  - Falls back to direct URL if caching fails or is disabled
+  - Respects `VIDEO_CACHING_ENABLED` feature flag
+- Updated `useExerciseVideo.test.tsx` to mock `resolveVideoUrl` for synchronous tests
+
+**Impact**: Exercise demo videos are now properly cached in IndexedDB, enabling:
+- Instant playback from cache (40x faster load times)
+- Offline video access after first view
+- Reduced bandwidth usage
+- Better performance on iOS/PWA
+
+---
+
+#### �📱 Feature - iOS OAuth & Native Authentication Enhancements
+
+**Added**: In-app browser OAuth flow for native iOS using `@capacitor/browser` plugin
+
+**Purpose**: Google and Apple Sign-In now work correctly on iOS native app. OAuth providers block embedded WebViews for security reasons, so we use Safari View Controller (in-app browser) which shows the real Safari URL bar for user trust.
+
+**OAuth Flow for Native Apps**:
+- Opens OAuth URL in Safari View Controller with slide-up sheet presentation
+- Uses `repcue://auth/callback` custom URL scheme for redirect
+- Auto-closes browser when callback is received
+- Deep link handler processes tokens and establishes session
+
+**Auth Service Enhancements** (`authService.ts`):
+- `signInWithOAuth()` now detects native platform and uses in-app browser
+- `signInWithMagicLink()` uses `repcue://` scheme for native apps
+- Added `getDiagnostics()` method for debugging auth issues
+- Added `clearHandledAuthCallback()` to reset auth state on logout
+
+**New Capacitor Plugin**:
+- `@capacitor/browser` - In-app browser for OAuth flows
+
+**Deep Link Handler Improvements** (`nativeCapabilities.ts`):
+- Persistent auth callback marker using Capacitor Preferences
+- Prevents re-processing of auth callbacks after WebView reload
+- Added `wasAuthCallbackHandled()` and `clearHandledAuthCallback()` functions
+- Screen wake lock functions: `keepScreenAwake()`, `allowScreenSleep()`, `isScreenKeptAwake()`
+
+---
+
+#### 🏗️ Feature - iOS-Style Pull-to-Refresh
+
+**Added**: Native iOS pull-to-refresh gesture on WorkoutsPage and ExercisesPage
+
+**New Components & Hooks**:
+- `PullToRefresh.tsx` - Wrapper component with iOS-native styling
+- `usePullToRefresh.ts` - Touch gesture handling hook with rubber-band resistance effect
+- `IOSPullToRefresh` indicator component (8-segment spinner with progress)
+
+**WorkoutsPage Enhancements**:
+- Wrapped in `PullToRefresh` component
+- Triggers sync when authenticated, then reloads workouts
+- Improved theming: uses semantic `text-secondary`, `heading-text`, `section-icon` classes
+
+---
+
+#### 🎨 UI/UX - Timer Page & iOS Polish
+
+**Changed**: Timer Start button now uses `btn-primary` class for theme-aware highlighting
+- Previously used `btn-ghost` which didn't indicate it was the primary action
+- Now correctly uses the theme's primary color for visual prominence
+
+**CSS Improvements**:
+- `exerciseDetailParallax.css` - Complete rewrite for iOS compatibility
+  - Uses `position: sticky` instead of `position: fixed` for iOS WebView
+  - GPU-accelerated transforms with `translate3d(0, 0, 0)`
+  - Proper safe area handling with `env(safe-area-inset-*)`
+  - Added `.ios-app` variant with sticky video wrapper and scale/fade effect
+
+**iOS Tokens** (`tokens.css`):
+- Replaced hardcoded `--ios-system-blue` with `var(--color-primary)` in:
+  - `.ios-modal__action`
+  - `.ios-button`
+  - `.ios-button--filled`
+  - `.ios-input:focus`
+  - `.ios-action-sheet__action`
+
+---
+
+#### 📚 Documentation
+
+**New Documentation**:
+- `docs/ios-testflight.md` - Complete TestFlight distribution guide
+- `docs/platform-abstraction.md` - Cross-platform architecture documentation (v1.1.0)
+  - Added OAuth in-app browser flow section
+  - Documented Safari View Controller usage for Google/Apple Sign-In
+
+**Updated Documentation**:
+- `docs/ios-app.md` - Updated bundle ID references to `me.repcue.app`
+- `docs/implementation-plans/ios-app/ios-app-implementation-plan.md` - Updated progress
+  - Tab bar iOS conventions: ✅
+  - Modal presentation iOS style: ✅
+  - Updated bundle ID references
+
+---
+
+#### 🔧 Infrastructure
+
+**New Files**:
+- `apps/frontend/ios/App/App/App.entitlements` - Associated Domains for Universal Links
+- `apps/frontend/public/.well-known/apple-app-site-association` - Apple app association file
+- `apps/frontend/public/.well-known/assetlinks.json` - Android App Links (placeholder)
+- `apps/frontend/src/components/DeepLinkHandler.tsx` - Component wrapper for deep link hook
+- `apps/frontend/src/hooks/useDeepLinks.ts` - Universal Links / App Links handler
+
+**New Capacitor Plugin**:
+- `@capacitor-community/keep-awake` - Screen wake lock for workouts
+
+**Tests**:
+- `PlatformTabBar.test.tsx` - 32 tests for tab bar component
+- `usePullToRefresh.test.ts` - Pull-to-refresh hook tests
+- Updated `nativeCapabilities.test.ts` - Bundle ID updated to `me.repcue.app`
+
+---
+
+#### 📱 Settings Page
+
+**Added**: Developer Tools link at bottom of Settings page
+- Navigates to `/dev-tools` page
+- Styled as subtle footer link with code icon
+
+---
+
+### 2025-12-05
+
+#### 🏗️ Feature - iOS-Native Tab Bar Navigation
+
+**Added**: Platform-aware tab bar component (`PlatformTabBar`) that renders native iOS styling
+
+**Purpose**: The bottom navigation bar now automatically adapts to iOS Human Interface Guidelines when running as a native iOS app, providing a truly native look and feel.
+
+**New Component**:
+- `PlatformTabBar.tsx` - Adaptive tab bar for iOS, Android, and Web platforms
+
+**iOS-Specific Features**:
+- 49px height per iOS HIG specifications
+- Blur backdrop with 20px gaussian blur and saturation boost
+- iOS system blue (#007AFF) for active tab state
+- iOS system gray (#8E8E93) for inactive tabs
+- 10px font labels with proper SF Pro characteristics
+- Translucent frosted glass effect in light and dark modes
+- iOS-style dropdown menu for "More" items with separator lines
+
+**Android-Specific Features** (future-ready):
+- 56px height per Material Design guidelines
+- Material elevation shadow system
+- Material ripple effect on tap
+
+**Web Platform**:
+- Maintains existing styling for web browsers
+- No change to web user experience
+
+**CSS Additions** (`platform.css`):
+- `.platform-tabbar--ios` - Full iOS tab bar styling
+- `.platform-tabbar--android` - Material Design styling
+- `.platform-tabbar__dropdown--ios` - Frosted glass dropdown
+
+**Updated Component**:
+- `Navigation.tsx` - Now uses `PlatformTabBar` internally
+
+**Tests**: 32 unit tests for PlatformTabBar (all passing, 61 total platform tests)
+
+---
+
+#### 🏗️ Feature - Platform Abstraction Layer for iOS/Android/Web
+
+**Added**: Cross-platform UI components that automatically adapt to iOS, Android, or Web
+
+**Purpose**: Single codebase that renders platform-native experiences - iOS gets iOS-style UI, Android gets Material design, Web gets browser-appropriate styling. This replaces the previous iOS-only component approach.
+
+**New Components**:
+- `PlatformContext.tsx` - React context providing platform detection throughout the app
+- `PlatformSpinner.tsx` - Adaptive spinner (8-segment iOS style, Material circle for Android, CSS spinner for web)
+- `PlatformModal.tsx` - Sheet-style modal on mobile (slides from bottom), centered overlay on web
+- `PlatformConfirmDialog.tsx` - Styled confirmation dialog for web platforms
+- `PlatformConfirmationModal.tsx` - Drop-in replacement using native dialogs on iOS/Android
+
+**New Hooks**:
+- `usePlatform()` - Access platform detection (isNative, isIOS, isAndroid, isWeb, platform)
+- `usePlatformClasses()` - Utility for conditional platform-specific CSS classes
+- `usePlatformConfirm()` - Imperative confirmation dialogs with native support
+
+**Platform-Specific Features**:
+- **iOS**: Native dialogs via Capacitor, 8-segment activity indicator, sheet modals with safe areas
+- **Android**: Native dialogs via Capacitor, Material Design circular progress, elevated sheets
+- **Web**: Styled modal dialogs, CSS-based spinners, backdrop blur effects
+
+**CSS Additions** (`platform.css`):
+- Platform-specific keyframe animations
+- Safe area padding utilities
+- Touch action optimizations for mobile
+
+**Backward Compatibility**:
+- Existing `ConfirmationModal` component now wraps `PlatformConfirmationModal`
+- No changes required to existing code using ConfirmationModal
+
+**Tests**: 29 unit tests for platform components (all passing)
+
+**Documentation**: Updated [iOS App Implementation Plan](docs/implementation-plans/ios-app/ios-app-implementation-plan.md)
+
+---
+
+### 2025-12-04
+
+#### 📱 Feature - iOS App (Capacitor Integration)
+
+**Added**: Native iOS app wrapper using Capacitor for App Store distribution
+
+**Approach**: Hybrid architecture wrapping the existing React PWA in a native iOS container via Capacitor 7.4.4, sharing 99% of code between web and iOS.
+
+**Phases Completed**:
+- ✅ **Phase 1**: Capacitor Integration - Core setup, iOS platform, 8 native plugins
+- ✅ **Phase 2**: Native Plugin Integration - Platform detection, haptics, iOS utilities
+- ✅ **Phase 3**: iOS-Specific UI Adjustments - Safe areas, keyboard handling, status bar
+- ✅ **Phase 4**: Privacy Manifest & App Store Prep - PrivacyInfo.xcprivacy created
+- ✅ **Phase 5**: Testing & Optimization - Video playback, CORS, scrolling fixes
+
+**Capacitor Plugins Installed (8)**:
+- @capacitor/app (lifecycle, back button)
+- @capacitor/dialog (native alerts/confirms)
+- @capacitor/haptics (haptic feedback)
+- @capacitor/keyboard (keyboard events)
+- @capacitor/local-notifications (timer alerts)
+- @capacitor/preferences (native storage)
+- @capacitor/splash-screen (launch screen)
+- @capacitor/status-bar (status bar styling)
+
+**New Utility Modules**:
+- `nativeCapabilities.ts` - Platform detection (`isNativePlatform()`, `isIOS()`) + haptic feedback
+- `nativeDialog.ts` - Native iOS-style alerts and confirms
+- `iosStatusBar.ts` - Status bar theming
+- `iosKeyboard.ts` - Keyboard handling
+
+**Video Playback Fixes for iOS**:
+- URL normalization for native apps (convert relative `/media/*` to absolute URLs)
+- CORS headers in Cloudflare Pages Function with `capacitor://localhost` origin
+- `crossOrigin="anonymous"` on all video elements
+- Probe skip for WKWebView (Range header fetch unreliable)
+- AbortError graceful handling during navigation
+
+**Circular Dependency Fix**:
+- Modified `logger.ts` to use `import.meta.env.DEV` instead of importing from `features.ts`
+- Updated `selectVideoVariant.ts` and `VideoThumbnail.tsx` for direct imports
+
+**Privacy Manifest** (`PrivacyInfo.xcprivacy`):
+- No tracking declared
+- Collected data: Email, fitness data, user ID (app functionality only)
+- API usage: UserDefaults, file timestamps, boot time, disk space
+
+**Documentation**:
+- [iOS App Developer Guide](docs/ios-app.md) - Build, run, debug, troubleshoot, App Store submission
+- [iOS Implementation Plan](docs/implementation-plans/ios-app/ios-app-implementation-plan.md) - Detailed phases
+
+**Remaining**: Phase 6 (App Store Submission) - TestFlight beta testing, then production release
+
+---
+
 ### 2025-12-01
+
+
+#### 🎬 Enhancement - Fullscreen Video Button on Exercise Detail Page
+
+**Added**: Fullscreen toggle button to ExerciseDetailPage video section
+
+**Changes**:
+- Added FullscreenIcon and ExitFullscreenIcon SVG components (matching SharedExerciseVideo)
+- Added `isFullscreen` state and `handleToggleFullscreen` handler
+- Added fullscreen change event listener (handles Escape key exit)
+- Positioned button next to existing Fit/Fill toggle with flex layout
+
+**Files Changed**:
+- [ExerciseDetailPage.tsx](apps/frontend/src/pages/ExerciseDetailPage.tsx)
+
+---
+
+#### � Documentation - Exercise Sharing System
+
+**Added**: Comprehensive documentation for the exercise sharing module
+
+**Document**: [docs/exercise-sharing.md](docs/exercise-sharing.md)
+
+**Contents**:
+- Complete architecture diagram showing share and save flows
+- Database schema details (`exercise_shares`, `user_favorites`, `generate_share_token()`)
+- Step-by-step Share Flow (ShareButton → share-exercise → URL generation)
+- Step-by-step Save Flow (StandaloneSharedExercise → save-shared-exercise → user_favorites)
+- Video handling details (signed URLs, download on save, recovery mechanism)
+- Authentication integration (magic link flow with share token preservation)
+- All 4 Edge Functions documented with request/response formats
+- Frontend components (ShareButton, StandaloneSharedExercise, SharedExerciseVideo)
+- Key services and hooks (StorageService, useSharedExercises)
+- Security considerations (rate limiting, token security, access control)
+- Troubleshooting guide with SQL queries for debugging
+
+---
+
+#### 🗃️ Database - Add Unique Constraint for Video Files
+
+**Added**: Unique constraint on `video_files` table for upsert support
+
+**Migration**: [20251201_add_video_files_unique_constraint.sql](supabase/migrations/20251201_add_video_files_unique_constraint.sql)
+
+**Purpose**: Convert unique index to unique constraint so PostgreSQL upsert with `ON CONFLICT (exercise_id, owner_id)` works correctly.
+
+**Note**: Production had 61 duplicate records for one exercise which were cleaned up before applying the constraint.
+
+**Deployed**: ✅ Dev (repcue-dev) and ✅ Prod (RepCue)
+
+---
+
+#### 🎥 Enhancement - Auto-Hide Video Controls
+
+**Improved**: SharedExerciseVideo component now auto-hides controls during playback
+
+**Changes**:
+- Controls auto-hide after 2 seconds when video is playing
+- Controls stay visible when paused
+- Mouse enter/touch shows controls, mouse leave hides when playing
+- Cleanup timeout on unmount to prevent memory leaks
+
+**Files Changed**:
+- [SharedExerciseVideo.tsx](apps/frontend/src/components/SharedExerciseVideo.tsx)
+
+---
+
+#### �🐛 Bug Fix - Storage RLS Policies for Video Upload
+
+**Fixed**: Video uploads failing with "new row violates row-level security policy" error
+
+**Root Cause**: The `exercise-videos` storage bucket had INSERT, UPDATE, and DELETE policies but was missing SELECT policies. Supabase Storage operations require SELECT permissions for:
+- Checking if a file exists before upsert operations
+- Reading file metadata during upload operations
+
+**Solution**: Added two SELECT policies for the `exercise-videos` bucket:
+1. `Users can read own exercise-videos` - Authenticated users can read their own videos
+2. `Public can read exercise-videos` - Anyone can read (bucket is public for shared exercises)
+
+**Migration**: [20251201_add_exercise_videos_select_policy.sql](supabase/migrations/20251201_add_exercise_videos_select_policy.sql)
+
+**Deployed**: ✅ Dev (repcue-dev) and ✅ Prod (RepCue)
+
+---
+
+#### 🔧 Enhancement - Video Upload Service Improvements
+
+**Improved**: Enhanced debugging and reliability of `VideoUploadService`
+
+**Changes**:
+- Added detailed logging for all video files in IndexedDB during processing
+- Improved filtering logic to handle both boolean `true` and numeric `1` for `upload_pending`
+- Added `triggerVideoUpload()` helper in `StorageService` for immediate upload after video save
+- Service now triggers immediately when video is added (in addition to periodic checks)
+
+**Files Changed**:
+- [videoUploadService.ts](apps/frontend/src/services/videoUploadService.ts)
+- [storageService.ts](apps/frontend/src/services/storageService.ts)
+
+---
+
+#### 🐛 Bug Fix - TypeScript Build Errors with Supabase Types
+
+**Fixed**: Build errors due to renamed types in @supabase/supabase-js v2.81.1
+
+**Problem**: The `Session` and `User` types were renamed to `AuthSession` and `AuthUser` in supabase-js v2.81.1.
+
+**Solution**: Updated imports to use aliased exports:
+```typescript
+export type { AuthSession as Session, AuthUser as User } from '@supabase/supabase-js';
+```
+
+**Files Changed**:
+- [supabase.ts](apps/frontend/src/config/supabase.ts)
+- [authService.ts](apps/frontend/src/services/authService.ts)
+
+---
 
 #### 🆕 New Feature - Background Video Upload Service
 

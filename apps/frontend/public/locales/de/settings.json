@@ -4,8 +4,8 @@
     "description": "Wählen Sie Ihr bevorzugtes Farbschema",
     "applying": "Farbschema wird angewendet...",
     "default": {
-      "name": "Ozean Türkis",
-      "description": "Klassisches Türkis-Schema mit ausgewogenem Kontrast"
+      "name": "Elektroblau + Mint",
+      "description": "Moderne sportliche Ästhetik mit lebendigem Blau und frischem Mint"
     },
     "energetic": {
       "name": "Energetisches Orange",
@@ -27,5 +27,17 @@
       "name": "Elegant Minimal",
       "description": "Anspruchsvolle monochrome Palette"
     }
-  }
+  },
+  "videoStorage": "Videospeicher",
+  "cachedVideos": "Zwischengespeicherte Videos",
+  "videoStorageInfo": "Videos werden lokal zwischengespeichert für schnellere Wiedergabe und Offlinezugriff. Zwischengespeicherte Videos werden nach 90 Tagen automatisch gelöscht oder wenn der Speicher voll ist.",
+  "clearAllVideos": "Alle Videos Löschen",
+  "clearExpiredVideos": "Abgelaufene Videos Löschen",
+  "newestVideo": "Neuestes Video",
+  "oldestVideo": "Ältestes Video",
+  "storageUsed": "Speicher Verwendet",
+  "quotaUsage": "Quota-Auslastung",
+  "refreshStats": "Statistiken Aktualisieren",
+  "videoCacheCleared": "Video-Cache erfolgreich geleert",
+  "videoCacheConfirmClearAll": "Möchten Sie wirklich alle zwischengespeicherten Videos löschen?"
 }

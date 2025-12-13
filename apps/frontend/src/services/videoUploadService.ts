@@ -213,34 +213,53 @@ class VideoUploadService {
         return [];
       }
 
-      // Query for pending uploads owned by this user
-      const pendingFiles = await db.video_files
-        .where('upload_pending')
-        .equals(1) // IndexedDB stores boolean as 1/0
-        .filter((vf) => 
-          vf.owner_id === userId && 
-          !vf.deleted && 
-          vf.file_data !== null &&
-          vf.file_data !== undefined
-        )
-        .toArray();
-
-      // Also check for upload_pending: true (boolean)
-      const pendingFilesBoolean = await db.video_files
-        .filter((vf) => 
-          vf.upload_pending === true &&
-          vf.owner_id === userId && 
-          !vf.deleted && 
-          vf.file_data !== null &&
-          vf.file_data !== undefined
-        )
-        .toArray();
-
-      // Combine and deduplicate
-      const allPending = [...pendingFiles, ...pendingFilesBoolean];
-      const uniqueById = new Map(allPending.map(f => [f.id, f]));
+      // Get ALL video files first for debugging
+      const allFiles = await db.video_files.toArray();
+      logger.log('[VideoUpload] All video files in IndexedDB:', allFiles.length);
       
-      return Array.from(uniqueById.values()) as PendingVideoFile[];
+      // Log details of each file for debugging
+      allFiles.forEach((vf, i) => {
+        logger.log(`[VideoUpload] File ${i + 1}:`, {
+          id: vf.id,
+          exercise_id: vf.exercise_id,
+          file_name: vf.file_name,
+          owner_id: vf.owner_id,
+          upload_pending: vf.upload_pending,
+          upload_pending_type: typeof vf.upload_pending,
+          deleted: vf.deleted,
+          has_file_data: vf.file_data !== null && vf.file_data !== undefined,
+          file_data_type: vf.file_data ? typeof vf.file_data : 'null'
+        });
+      });
+
+      // Filter for pending uploads owned by this user
+      // Note: IndexedDB may store booleans as 1/0, so check both
+      const pendingFiles = allFiles.filter((vf) => 
+        (vf.upload_pending === true || (vf.upload_pending as unknown) === 1) &&
+        vf.owner_id === userId && 
+        !vf.deleted && 
+        vf.file_data !== null &&
+        vf.file_data !== undefined
+      );
+      
+      logger.log(`[VideoUpload] Filtered pending files for user ${userId}:`, pendingFiles.length);
+      
+      // Deduplicate: keep only one pending upload per exercise (most recent by updated_at)
+      // This prevents multiple uploads to the same exercise when user re-attaches videos
+      const exerciseMap = new Map<string, PendingVideoFile>();
+      for (const vf of pendingFiles) {
+        const existing = exerciseMap.get(vf.exercise_id);
+        if (!existing || (vf.updated_at && existing.updated_at && vf.updated_at > existing.updated_at)) {
+          exerciseMap.set(vf.exercise_id, vf as PendingVideoFile);
+        }
+      }
+      
+      const dedupedFiles = Array.from(exerciseMap.values());
+      if (dedupedFiles.length !== pendingFiles.length) {
+        logger.log(`[VideoUpload] Deduplicated from ${pendingFiles.length} to ${dedupedFiles.length} files`);
+      }
+      
+      return dedupedFiles;
     } catch (error) {
       logger.error('[VideoUpload] Error getting pending video files:', error);
       return [];
@@ -356,15 +375,66 @@ class VideoUploadService {
 
       const now = new Date().toISOString();
 
-      // Update video_files record
+      // Get the current video_files record from IndexedDB
+      const videoFile = await db.video_files.get(videoFileId);
+      if (!videoFile) {
+        throw new Error(`Video file record not found: ${videoFileId}`);
+      }
+
+      // Update video_files record in IndexedDB
       await db.video_files.update(videoFileId, {
         upload_pending: false,
         storage_path: storagePath,
         file_data: undefined, // Clear the blob data to save space (it's in cloud now)
         updated_at: now,
-        dirty: 1, // Mark dirty so metadata syncs
+        dirty: 0, // Not dirty since we're syncing directly
         op: 'upsert'
       });
+
+      // Also mark any OTHER pending video_files for this exercise as deleted (cleanup duplicates)
+      // This handles cases where user attached video multiple times before upload completed
+      const allVideoFiles = await db.video_files.where('exercise_id').equals(exerciseId).toArray();
+      for (const vf of allVideoFiles) {
+        if (vf.id !== videoFileId && (vf.upload_pending === true || (vf.upload_pending as unknown) === 1)) {
+          logger.log(`[VideoUpload] Cleaning up duplicate pending entry: ${vf.id}`);
+          await db.video_files.update(vf.id, {
+            upload_pending: false,
+            deleted: true,
+            file_data: undefined,
+            updated_at: now
+          });
+        }
+      }
+
+      // Also insert/update the video_files record in Supabase directly
+      // This is needed because video_files is not in regular sync scope (to avoid blob serialization)
+      // Use exercise_id,owner_id for conflict resolution since that's the unique constraint
+      const { error: upsertError } = await supabase
+        .from('video_files')
+        .upsert({
+          id: videoFileId,
+          owner_id: videoFile.owner_id,
+          exercise_id: exerciseId,
+          file_name: fileName,
+          file_size: videoFile.file_size,
+          mime_type: videoFile.mime_type,
+          upload_pending: false,
+          storage_path: storagePath,
+          created_at: videoFile.created_at,
+          updated_at: now,
+          deleted: false,
+          version: (videoFile.version || 0) + 1
+        }, { 
+          onConflict: 'exercise_id,owner_id',
+          ignoreDuplicates: false // Update existing record
+        });
+
+      if (upsertError) {
+        logger.warn(`[VideoUpload] Failed to sync video_files to Supabase: ${upsertError.message}`);
+        // Don't throw - local record is updated, sync can happen later
+      } else {
+        logger.log(`[VideoUpload] Synced video_files record to Supabase: ${videoFileId}`);
+      }
 
       // Update the exercise's custom_video_url to indicate sync complete
       const exercise = await db.exercises.get(exerciseId);

@@ -112,7 +112,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'black',
     pictureUrl: '/images/catalogs/aikido-square.png',
     groupByBadge: 'kyuLevel', // Group exercises by Kyu level badge on listing page
-    isVisible: true,
+    isVisible: false,
     isIncludedInAI: false,
     badges: [
       {
@@ -152,7 +152,7 @@ export const EXERCISE_CATALOGS: ExerciseCatalog[] = [
     colorTheme: 'green',
     pictureUrl: '/images/catalogs/tai-chi-square.png',
     groupByBadge: 'category', // Group exercises by form badge on listing page
-    isVisible: true,
+    isVisible: false,
     isIncludedInAI: false,
     badges: [
       {

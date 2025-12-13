@@ -2,6 +2,8 @@
   "common": {
     "start": "Iniciar",
     "stop": "Detener",
+    "pause": "Pausar",
+    "resume": "Reanudar",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "ok": "OK",
@@ -56,10 +58,12 @@
     "cancelTitle": "Cancelar",
     "clear": "Borrar",
     "clearFormTitle": "Borrar formulario",
-    "confirmClearForm":"¿Estás seguro de que deseas borrar el formulario? Esto eliminará tu borrador.",
+    "confirmClearForm": "¿Estás seguro de que deseas borrar el formulario? Esto eliminará tu borrador.",
     "noVideo": "Sin video",
     "pauseVideo": "Pausar video",
     "playVideo": "Reproducir video",
+    "enterFullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
     "premium": "PRO",
     "done": "Hecho",
     "refresh": "Actualizar",
@@ -87,7 +91,12 @@
     "selectOne": "Seleccionar uno",
     "skip": "Omitir",
     "submit": "Enviar",
-    "submitting": "Enviando..."
+    "submitting": "Enviando...",
+    "buttons": {
+      "cancel": "Cancelar"
+    },
+    "never": "Nunca",
+    "videoUnavailable": "Video no disponible"
   },
   "navigation": {
     "home": "Inicio",
@@ -131,9 +140,9 @@
     "disabled": "Desactivado",
     "dataStoredLocally": "Tus datos de entrenamiento se almacenan localmente en este dispositivo.",
     "pleaseAcceptConsent": "Por favor acepta el consentimiento de almacenamiento de datos para habilitar las funciones de exportación/borrado.",
-  "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
-  "consentStatusLabel": "Estado del consentimiento",
-  "consentVersion": "Versión de consentimiento",
+    "consentMigrationWarning": "⚠️ Los datos de consentimiento se migrarán a la última versión en la próxima carga de la aplicación.",
+    "consentStatusLabel": "Estado del consentimiento",
+    "consentVersion": "Versión de consentimiento",
     "exportData": "Exportar datos",
     "exportDataHelp": "Descarga tus datos de entrenamiento como archivo JSON",
     "exportInProgress": "Exportando...",
@@ -250,6 +259,7 @@
     "repProgress": "Progreso de repeticiones",
     "rep": "Rep",
     "set": "Serie",
+    "time": "Tiempo",
     "active": "Activo",
     "rest": "Descanso",
     "getReadyStartsIn_one": "¡Prepárate! El cronómetro comienza en {{count}} segundo",
@@ -272,8 +282,11 @@
     "beepInterval60": "Cada 60 segundos",
     "wakeLock": "Mantener pantalla activa",
     "selectExercise": "Seleccionar ejercicio",
+    "selectExerciseHint": "Selecciona un ejercicio para comenzar:",
     "fit": "Ajustar",
-    "fill": "Rellenar"
+    "fill": "Rellenar",
+    "switchToFit": "Cambiar a Ajustar",
+    "switchToFill": "Cambiar a Rellenar"
   },
   "weekday": {
     "monday": "Lunes",

@@ -54,5 +54,5 @@ export const supabaseFunctionBaseUrl = supabaseUrl;
 
 // Export utility types from supabase.ts
 export type { Json } from '../types/supabase';
-export type { Session, User } from '@supabase/supabase-js';
+export type { AuthSession as Session, AuthUser as User } from '@supabase/supabase-js';
 

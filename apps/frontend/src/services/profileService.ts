@@ -70,40 +70,10 @@ class ProfileService {
   /**
    * Get user's connections
    */
-  async getUserConnections(userId: string): Promise<Connection[]> {
+  async getUserConnections(_userId: string): Promise<Connection[]> {
     try {
-      // Mock connections data
-      const mockConnections: Connection[] = [
-        {
-          id: generateUUID(),
-          owner_id: userId,
-          updated_at: new Date().toISOString(),
-          deleted: false,
-          version: 1,
-          created_at: new Date().toISOString(),
-          user_id: userId,
-          connected_user_id: 'mock-user-1',
-          status: 'accepted',
-          requested_at: new Date().toISOString(),
-          accepted_at: new Date().toISOString(),
-          nickname: 'Friend 1'
-        },
-        {
-          id: generateUUID(),
-          owner_id: userId,
-          updated_at: new Date().toISOString(),
-          deleted: false,
-          version: 1,
-          created_at: new Date().toISOString(),
-          user_id: userId,
-          connected_user_id: 'mock-user-2',
-          status: 'accepted',
-          requested_at: new Date().toISOString(),
-          accepted_at: new Date().toISOString(),
-          nickname: 'Friend 2'
-        }
-      ];
-      return mockConnections;
+      // TODO: Implement actual connection retrieval from Supabase
+      return [];
     } catch (error) {
       logger.error('Failed to get user connections:', error);
       return [];
