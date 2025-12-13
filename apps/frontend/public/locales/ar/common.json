@@ -58,7 +58,7 @@
     "cancelTitle": "إلغاء",
     "clear": "مسح",
     "clearFormTitle": "مسح النموذج",
-    "confirmClearForm":"هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
+    "confirmClearForm": "هل أنت متأكد أنك تريد مسح النموذج؟ سيؤدي ذلك إلى حذف المسودة الخاصة بك.",
     "noVideo": "لا يوجد فيديو",
     "pauseVideo": "إيقاف الفيديو",
     "playVideo": "تشغيل الفيديو",
@@ -82,7 +82,12 @@
     "other": "أخرى",
     "selectOne": "اختر واحدًا",
     "skip": "تخطي",
-    "submit": "إرسال"
+    "submit": "إرسال",
+    "buttons": {
+      "cancel": "إلغاء"
+    },
+    "never": "أبداً",
+    "videoUnavailable": "الفيديو غير متاح"
   },
   "navigation": {
     "home": "الرئيسية",
@@ -126,9 +131,9 @@
     "disabled": "معطل",
     "dataStoredLocally": "يتم تخزين بيانات التمرين محلياً على هذا الجهاز.",
     "pleaseAcceptConsent": "يرجى قبول موافقة تخزين البيانات لتفعيل ميزات التصدير/المسح.",
-  "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
-  "consentStatusLabel": "حالة الموافقة",
-  "consentVersion": "إصدار الموافقة",
+    "consentMigrationWarning": "⚠️ سيتم ترحيل بيانات الموافقة إلى أحدث إصدار عند تحميل التطبيق التالي.",
+    "consentStatusLabel": "حالة الموافقة",
+    "consentVersion": "إصدار الموافقة",
     "exportData": "تصدير البيانات",
     "exportDataHelp": "تحميل بيانات التمرين كملف JSON",
     "exportInProgress": "جارٍ التصدير...",

@@ -27,5 +27,19 @@
       "name": "Elegant Minimal",
       "description": "Sophisticated monochrome palette"
     }
-  }
+  },
+  "videoStorage": "Video Storage",
+  "cachedVideos": "Cached Videos",
+  "videoStorageInfo": "Videos are cached locally for faster playback and offline access. Cached videos will be automatically removed after 90 days or when storage is full.",
+  "clearVideoCache": "Clear Video Cache",
+  "clearVideoCacheHelp": "Remove all cached exercise videos to free up space. Videos will re-download when needed.",
+  "clearAllVideos": "Clear All Videos",
+  "clearExpiredVideos": "Clear Expired Videos",
+  "newestVideo": "Newest Video",
+  "oldestVideo": "Oldest Video",
+  "storageUsed": "Storage Used",
+  "quotaUsage": "Quota Usage",
+  "refreshStats": "Refresh Stats",
+  "videoCacheCleared": "Video cache cleared successfully",
+  "videoCacheConfirmClearAll": "Are you sure you want to clear all cached videos?"
 }

@@ -58,7 +58,7 @@
     "cancelTitle": "Abbrechen",
     "clear": "Löschen",
     "clearFormTitle": "Formular löschen",
-    "confirmClearForm":"Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht.",
+    "confirmClearForm": "Sind Sie sicher, dass Sie das Formular löschen möchten? Dadurch wird Ihr Entwurf gelöscht.",
     "noVideo": "Kein Video",
     "pauseVideo": "Video pausieren",
     "playVideo": "Video abspielen",
@@ -91,7 +91,12 @@
     "selectOne": "Wählen Sie eine aus",
     "skip": "Überspringen",
     "submit": "Einreichen",
-    "submitting": "Wird eingereicht..."
+    "submitting": "Wird eingereicht...",
+    "buttons": {
+      "cancel": "Abbrechen"
+    },
+    "never": "Nie",
+    "videoUnavailable": "Video nicht verfügbar"
   },
   "navigation": {
     "home": "Startseite",
@@ -135,9 +140,9 @@
     "disabled": "Deaktiviert",
     "dataStoredLocally": "Ihre Trainingsdaten werden lokal auf diesem Gerät gespeichert.",
     "pleaseAcceptConsent": "Bitte akzeptieren Sie die Datenspeicher-Einwilligung, um Export-/Lösch-Funktionen zu aktivieren.",
-  "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
-  "consentStatusLabel": "Einwilligungsstatus",
-  "consentVersion": "Einwilligungsversion",
+    "consentMigrationWarning": "⚠️ Einwilligungsdaten werden beim nächsten App-Start auf die neueste Version migriert.",
+    "consentStatusLabel": "Einwilligungsstatus",
+    "consentVersion": "Einwilligungsversion",
     "exportData": "Daten exportieren",
     "exportDataHelp": "Laden Sie Ihre Trainingsdaten als JSON-Datei herunter",
     "exportInProgress": "Export wird durchgeführt...",

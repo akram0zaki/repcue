@@ -58,7 +58,7 @@
     "cancelTitle": "Annulearje",
     "clear": "Effacer",
     "clearFormTitle": "Formulier wiske",
-    "confirmClearForm":"Bist der wis fan dat jo it formulier wiske wolle? Dit sil jo brouillon ferwiderje.",
+    "confirmClearForm": "Bist der wis fan dat jo it formulier wiske wolle? Dit sil jo brouillon ferwiderje.",
     "noVideo": "Gjin Fideo",
     "pauseVideo": "Pause Fideo",
     "playVideo": "Spylje Fideo",
@@ -91,7 +91,12 @@
     "selectOne": "Kies ien",
     "skip": "Oerslaan",
     "submit": "Ferstjoere",
-    "submitting": "Bezig mei ferstjoeren..."
+    "submitting": "Bezig mei ferstjoeren...",
+    "buttons": {
+      "cancel": "Annulearje"
+    },
+    "never": "Nea",
+    "videoUnavailable": "Fideo net beskikber"
   },
   "navigation": {
     "home": "Thús",
@@ -135,9 +140,9 @@
     "disabled": "Utskeakele",
     "dataStoredLocally": "Jo traininggegevens wurde lokaal op dit apparaat bewarre.",
     "pleaseAcceptConsent": "Akseptearje asjebleaft gegevensopslachtoestemming om eksport/wiskfunksjes yn te skeakeljen.",
-  "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
-  "consentStatusLabel": "Tastimmingsstatus",
-  "consentVersion": "Tastimmingsferzje",
+    "consentMigrationWarning": "⚠️ Toestemmingsgegevens wurde by folgjende app-laden nei de nijste ferzje migrearre.",
+    "consentStatusLabel": "Tastimmingsstatus",
+    "consentVersion": "Tastimmingsferzje",
     "exportData": "Gegevens eksportearje",
     "exportDataHelp": "Laad jo traininggegevens yn as JSON-bestân",
     "exportInProgress": "Exportearje...",
